@@ -1,5 +1,9 @@
 # Repository documentation
 
+- [Feature plan 04 — guided mechanics and end-of-run progression](features/feature-plan-04.md):
+  proposed teaching moments, run-end rewards and unlock reveals, menu gates,
+  boss-rush offers, pause audio and secret-unlock fixes.
+
 - [Equipment identity and copy consistency](features/equipment-identity-and-copy-plan.md):
   proposed audit and implementation plan for blades, outfits, Awakenings, Temple
   upgrades and their shared player-facing language.
