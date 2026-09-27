@@ -22,7 +22,7 @@ test('Template browsing never spends and Knife Pouch requires the throwing abili
   await page.getByRole('button', { name: 'Donate 125 Embers', exact: true }).click();
   expect(await balance()).toBe(875);
   await expect(page.locator('#templateContent > [role="status"]')).toHaveCount(0);
-  await expect(page.locator('#templateContent > :first-child')).toHaveText('Temple');
+  await expect(page.locator('.temple-header h2')).toHaveText('Temple');
   await page.locator('[data-upgrade="pouch"]').click();
   await page.getByRole('button', { name: 'Donate 150 Embers', exact: true }).click();
   expect(await balance()).toBe(725);

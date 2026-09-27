@@ -43,12 +43,29 @@ test('portrait title and setup fit while Temple uses compact top-centred details
     await expect(page.locator('#template')).toHaveCSS('opacity', '1');
     await expect(page.locator('#template h2')).toHaveText('Temple');
     await expect(page.locator('#template')).not.toContainText(
-      /earned through play|suppresses|challenge modes|Need .* more/,
+      /earned through play|suppresses|challenge modes|Need .* more|Choose a blessing/,
     );
     await expect(page.locator('[data-upgrade="vitality"] span').last()).toHaveText('100');
     const icon = await page.locator('.template-detail svg').boundingBox();
     const heading = await page.locator('.template-detail h3').boundingBox();
     expect(icon!.y + icon!.height).toBeLessThanOrEqual(heading!.y);
+    const done = page.locator('#template [data-back]');
+    await expect(done).toHaveText('Done');
+    const doneBox = await done.boundingBox();
+    const titleBox = await page.locator('#template h2').boundingBox();
+    expect(doneBox!.x).toBeGreaterThan(titleBox!.x + titleBox!.width);
+    expect(doneBox!.y).toBeLessThan(60);
+    const tiles = await page
+      .locator('.upgrade-tile')
+      .evaluateAll((nodes) =>
+        nodes.map((node) => ({
+          x: node.getBoundingClientRect().x,
+          y: node.getBoundingClientRect().y,
+          bottom: node.getBoundingClientRect().bottom,
+        })),
+      );
+    expect(tiles[0]!.y).toBe(tiles[2]!.y);
+    expect(tiles[5]!.bottom).toBeLessThan(size.height);
     await page.screenshot({ path: info.outputPath(`temple-${size.width}.png`) });
   }
 });

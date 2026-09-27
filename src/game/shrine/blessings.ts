@@ -40,12 +40,21 @@ export function shrineOffers(state: ShrineState, random: Random = Math.random): 
   if (curse.length && state.bossCount >= 2 && random() < 0.4) take(curse);
   while (offers.length < state.m.shrineN) {
     const items =
-      rare.length && random() < 0.3 + state.m.rare ? rare : common.length ? common : rare;
+      rare.length && random() < Math.max(0, Math.min(1, 0.3 + state.m.rare))
+        ? rare
+        : common.length
+          ? common
+          : rare;
     if (!items.length) break;
     take(items);
   }
-  if (state.m.rareShrine && !offers.some((b) => b.t === 1) && rare.length) {
-    if (offers.length >= state.m.shrineN) offers.pop();
+  const guaranteed = Math.min(state.m.shrineN, Math.max(0, Math.floor(state.m.rareShrine)));
+  while (offers.filter((b) => b.t === 1).length < guaranteed && rare.length) {
+    if (offers.length >= state.m.shrineN) {
+      const replace = offers.findIndex((b) => b.t !== 1);
+      if (replace < 0) break;
+      offers.splice(replace, 1);
+    }
     take(rare);
   }
   return shuffle(offers, random);

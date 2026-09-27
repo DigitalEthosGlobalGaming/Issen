@@ -33,7 +33,7 @@ balance. Donations are final and benefits are captured at the next eligible run.
 | --- | --- | --- | --- |
 | Vitality | +1 Normal starting life/rank | 100, 200, 350 | 3 |
 | Focus | +5% parry window/rank | 75, 150, 225 | 3 |
-| Offerings | +1 Shrine choice | 150 | 1 |
+| Offerings | +1 choice; rank 2 adds +20 percentage points rare chance; rank 3 adds 1 guaranteed rare | 150, 250, 400 | 3 |
 | Awakening Access | Rank 1: weapon challenges; rank 2: outfit challenges | 200, 300 | 2 |
 | Throwing Knife | One starting knife | 125 | 1 |
 | Knife Pouch | +1 knife/rank; requires Throwing Knife | 150, 250 | 2 |
@@ -46,6 +46,12 @@ Awakening Access is an ownership gate and remains visible in the Armoury; earned
 equipment forms can be selected independently of the Template combat eligibility.
 Composure is spent after existing equipment/blessing protection. Recovery heals
 only after cleared-wave milestones and never exceeds the current life cap.
+
+Offerings ranks are cumulative. The extra choice adds to equipment choice bonuses
+(for example, a five-choice robe plus Offerings produces six choices). Rare-roll
+bonuses add to the base 30% chance and clamp to 0–100%. Each rare-guarantee source
+adds one guaranteed rare choice, limited by the offer count and remaining eligible
+rare blessings. Guarantees replace non-rare offers without duplicating blessings.
 
 Acceptance: selection, affordability, prerequisite and max-rank states must be
 clear in narrow/wide layouts. Rejected purchases cannot charge; reload preserves
@@ -123,6 +129,10 @@ Existing Vitality ranks and explicit access resets remain unchanged.
 The admin **Clear test profile** action requires confirmation, removes only
 `issen.testing.*` saves and reloads into a fresh test profile. Queued saves from
 the departing runtime are suppressed; player saves are never removed.
+
+Admin **Unlock all** grants all Armoury items, including secret items and awakened
+forms, and removes their test revocations. It does not alter Temple ranks, currency,
+equipped gear or player-profile saves. Awakening-access ranks still gate the forms.
 
 Acceptance: verify all four access/challenge/activation states, independent forms,
 new-profile no-access play, migration, upgrades Off, and secret-item protection.

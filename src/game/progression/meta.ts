@@ -54,9 +54,10 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
   {
     id: 'offerings',
     name: 'Offerings',
-    description: '+1 Shrine blessing choice',
-    costs: [150],
-    maxRank: 1,
+    description:
+      'More choices and rarer blessings at shrines. Each rank keeps the benefits before it.',
+    costs: [150, 250, 400],
+    maxRank: 3,
   },
   {
     id: 'awakening',
@@ -162,7 +163,7 @@ export function parseMeta(
           ? integer(ranks.vitality, 3)
           : integer(ranks.vitality, 1) * 2,
       focus: integer(ranks.focus, 3),
-      offerings: integer(ranks.offerings, 1),
+      offerings: integer(ranks.offerings, 3),
       awakening: Math.max(
         saved.schemaVersion === 3 ? integer(ranks.awakening, 2) : integer(ranks.awakening, 1) * 2,
         saved.schemaVersion !== 2 &&
@@ -223,14 +224,16 @@ export function templatePowers(
 export function templateModifiers(
   meta: MetaProgress,
   setup: Setup,
-): { lives: number; parry: number; shrineN: number } {
+): { lives: number; parry: number; shrineN: number; rare?: number; rareShrine?: number } {
   const ranks = templateEligible(setup)
     ? parseMeta(meta).upgrades
     : { vitality: 0, focus: 0, offerings: 0 };
   return {
     lives: ranks.vitality,
     parry: 1 + ranks.focus * 0.05,
-    shrineN: ranks.offerings ? 3 + ranks.offerings : 0,
+    shrineN: ranks.offerings ? 4 : 0,
+    ...(ranks.offerings >= 2 ? { rare: 0.2 } : {}),
+    ...(ranks.offerings >= 3 ? { rareShrine: 1 } : {}),
   };
 }
 export type RewardEvent = 'kill' | 'wave' | 'boss';

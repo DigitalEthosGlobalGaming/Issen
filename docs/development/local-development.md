@@ -60,6 +60,9 @@ Open the tools again to jump to a stage/wave/boss, change equipment and awakenin
 set lives or Embers, reset test Temple ranks, or replay tutorial and mode reveals.
 **Clear test profile** asks for confirmation, removes only `issen.testing.*`, and
 reloads a fresh test profile. It blocks stale queued saves during reload.
+**Unlock all** grants the complete Armoury (including awakened unlocks) only in
+the test profile, without changing Temple ranks or equipment. Set Awakening Access
+separately to reveal and use those forms.
 **Return to player profile** reloads the original saves. The shortcut ships in the
 client for convenience, not as an access-control mechanism. Never reset player
 saves to test these flows.

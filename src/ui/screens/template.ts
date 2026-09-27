@@ -7,13 +7,11 @@ import {
 
 export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () => void): void {
   root.replaceChildren();
-  const heading = document.createElement('h2');
-  heading.textContent = 'Temple';
   const balance = document.createElement('p');
   balance.textContent = `${meta.embers} Embers`;
   const note = document.createElement('p');
-  note.textContent = 'Offer Embers for lasting strength. Choose a blessing to learn more.';
-  root.append(heading, balance, note);
+  note.textContent = 'Offer Embers for lasting strength.';
+  root.append(balance, note);
   const selected =
     TEMPLATE_UPGRADES.find((u) => u.id === root.dataset.selectedUpgrade)?.id ?? 'vitality';
   root.dataset.selectedUpgrade = selected;
@@ -93,7 +91,13 @@ function effectText(id: UpgradeId, rank: number): string {
     case 'focus':
       return `+${rank * 5}% boss parry window`;
     case 'offerings':
-      return `${3 + rank} Shrine choices, when available`;
+      return rank >= 3
+        ? '+1 shrine choice, +20% rare chance and 1 guaranteed rare. Stacks with equipment.'
+        : rank === 2
+          ? '+1 shrine choice and +20% rare chance. Stacks with equipment.'
+          : rank === 1
+            ? '+1 shrine choice. Stacks with equipment.'
+            : 'Standard shrine choices';
     case 'awakening':
       return rank >= 2
         ? 'Weapon and outfit awakening challenges'

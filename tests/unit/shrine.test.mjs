@@ -3,6 +3,55 @@ import assert from 'node:assert/strict';
 import { BLESS } from '../../src/game/content/blessings.ts';
 import { shrineOffers, applyBlessing } from '../../src/game/shrine/blessings.ts';
 import { rng } from '../../src/shared/random.ts';
+import { computeModifiers } from '../../src/game/equipment/modifiers.ts';
+import { parseMeta, purchaseUpgrade, templateModifiers } from '../../src/game/progression/meta.ts';
+
+test('Offerings ranks persist, retain the extra choice and add rarity to equipment', () => {
+  const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3' };
+  const meta = parseMeta({ embers: 800 });
+  for (let rank = 1; rank <= 3; rank++) {
+    assert.equal(purchaseUpgrade(meta, 'offerings'), true);
+    assert.equal(parseMeta(meta).upgrades.offerings, rank);
+    const base = computeModifiers([templateModifiers(meta, setup)], new Set());
+    assert.equal(base.shrineN, 4);
+    assert.equal(base.rare, rank >= 2 ? 0.2 : 0);
+    assert.equal(base.rareShrine, rank === 3 ? 1 : 0);
+    const equipped = computeModifiers(
+      [{ shrineN: 5, rare: 0.1, rareShrine: 1 }, templateModifiers(meta, setup)],
+      new Set(),
+    );
+    assert.equal(equipped.shrineN, 6);
+    assert.ok(Math.abs(equipped.rare - (rank >= 2 ? 0.3 : 0.1)) < 1e-10);
+    assert.equal(equipped.rareShrine, rank === 3 ? 2 : 1);
+    const off = computeModifiers(
+      [templateModifiers(meta, { ...setup, upgrades: false })],
+      new Set(),
+    );
+    assert.deepEqual([off.shrineN, off.rare, off.rareShrine], [3, 0, 0]);
+  }
+  assert.equal(meta.embers, 0);
+  assert.equal(purchaseUpgrade(meta, 'offerings'), false);
+});
+
+test('rare chance improves rolls and guarantees stack without duplicates or exhausted-pool loops', () => {
+  const run = state();
+  assert.ok(shrineOffers(run, () => 0.4).every((b) => b.t === 0));
+  run.m.rare = 0.2;
+  assert.ok(shrineOffers(run, () => 0.4).some((b) => b.t === 1));
+  run.m.rare = 0;
+  run.m.rareShrine = 2;
+  for (let seed = 0; seed < 100; seed++) {
+    const offers = shrineOffers(run, rng(seed));
+    assert.ok(offers.filter((b) => b.t === 1).length >= 2);
+    assert.equal(offers.length, 3);
+    assert.equal(new Set(offers.map((b) => b.id)).size, offers.length);
+  }
+  const rares = BLESS.filter((b) => b.t === 1);
+  run.bless = new Set(rares.slice(1).map((b) => b.id));
+  assert.equal(shrineOffers(run, () => 0.9).filter((b) => b.t === 1).length, 1);
+  run.bless.add(rares[0].id);
+  assert.equal(shrineOffers(run, () => 0.9).filter((b) => b.t === 1).length, 0);
+});
 
 const state = () => ({
   bless: new Set(),

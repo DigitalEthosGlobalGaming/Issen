@@ -2,6 +2,7 @@ export interface AdminActions {
   testing: boolean;
   switchProfile(enabled: boolean): void;
   clearProfile?(): boolean;
+  unlockAll?(): void;
   jump(stage: number, wave: number, boss: boolean): void;
   restart(): void;
   item(id: string, action: 'grant' | 'remove' | 'equip'): void;
@@ -81,6 +82,11 @@ export function renderAdmin(
     reset.hidden = false;
   });
   root.append(reset);
+  button('Unlock all', () => actions.unlockAll?.());
+  text(
+    'p',
+    'Unlock every Armoury item and awakened form. Temple upgrades and equipped items stay unchanged. Awakening access is still required.',
+  );
   const select = (label: string, entries: readonly { value: string; label: string }[]) => {
     const wrap = document.createElement('label');
     wrap.textContent = label;

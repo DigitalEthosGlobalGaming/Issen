@@ -97,6 +97,15 @@
 #template {
   font-size: 14px;
 }
+.temple-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#template .temple-header h2 {
+  margin: 0;
+}
 #template h2 {
   font-size: 24px;
   margin: 4px 0 8px;
@@ -126,6 +135,55 @@
 /* Compact portrait menus retain full-sized touch targets and natural overflow
    for unusually short screens or enlarged accessibility text. */
 @media (max-width: 600px) {
+  #templateContent > p {
+    font-size: 12px;
+    margin: 3px 0;
+    text-align: left;
+  }
+  #template .template-layout {
+    margin-top: 8px;
+    gap: 8px;
+  }
+  #template .template-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  #template .upgrade-tile {
+    min-height: 90px;
+    padding: 6px 4px;
+    gap: 2px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  #template .upgrade-tile svg {
+    width: 30px;
+    height: 30px;
+  }
+  #template .upgrade-tile span {
+    font-size: 10px;
+  }
+  #template .template-detail svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 4px;
+  }
+  #template .upgrade-card {
+    padding: 8px;
+    margin: 0;
+  }
+  #template h3 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  #template .upgrade-card p {
+    font-size: 12px;
+    margin: 5px 0;
+  }
+  #template .btn {
+    font-size: 13px;
+    min-height: 44px;
+    padding: 6px 12px;
+  }
   #title,
   #setup,
   #template {

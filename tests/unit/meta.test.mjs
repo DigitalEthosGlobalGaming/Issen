@@ -61,7 +61,7 @@ test('rank costs are charged once and challenge settings exclude permanent power
   for (const id of ['vitality', 'focus', 'focus', 'focus', 'offerings'])
     assert.equal(purchaseUpgrade(meta, id), true);
   assert.equal(meta.embers, 300);
-  for (const id of ['focus', 'offerings']) assert.equal(purchaseUpgrade(meta, id), false);
+  assert.equal(purchaseUpgrade(meta, 'focus'), false);
   assert.equal(meta.embers, 300);
   assert.deepEqual(templateModifiers(meta, normal), { lives: 1, parry: 1.15, shrineN: 4 });
   for (const variant of [

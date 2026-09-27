@@ -2082,6 +2082,19 @@ export function startGame(): () => void {
       {
         testing: isTestProfile(),
         clearProfile: () => clearTestProfile(),
+        unlockAll: () => {
+          if (!isTestProfile()) return;
+          const ids = [
+            ...ITEMS.map((item) => item.id),
+            ...Object.keys({ ...SPECIAL, ...ROBE_AWAKENINGS }).map((id) => id + '+'),
+          ];
+          for (const id of ids) {
+            UNL.add(id);
+            revoked.delete(id);
+          }
+          store.set('issen.revoked', [...revoked]);
+          store.set('issen.unlocks', [...UNL]);
+        },
         switchProfile: (enabled) => {
           if (!switchTestProfile(enabled))
             toast({ k: '!', msg: 'Profile switching is unavailable in this browser session.' });

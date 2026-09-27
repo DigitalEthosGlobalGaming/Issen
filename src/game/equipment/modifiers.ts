@@ -17,6 +17,7 @@ const DEFAULT_MODIFIERS = {
   comboStep: 5,
   comboCap: 4,
   hazard: 1,
+  /** Source values are total choices above a baseline of 3; their bonuses add. */
   shrineN: 3,
   runWard: 0,
   kage: 0,
@@ -33,7 +34,9 @@ const DEFAULT_MODIFIERS = {
   lives: 0,
   standoff: 1,
   foxsight: 0,
+  /** Number of guaranteed rare choices per shrine, additive across sources. */
   rareShrine: 0,
+  /** Additive rare-roll probability bonus, clamped when choosing offers. */
   rare: 0,
   regen: 0,
   soWin: 1,
@@ -64,7 +67,8 @@ const DEFAULT_MODIFIERS = {
  * consumers receive the defaults plus every active source.
  *
  * Values do not all stack alike: duration/score factors multiply, comboStep takes
- * the minimum, comboCap/bossDmg/standoff/shrineN take the maximum, and remaining
+ * the minimum, comboCap/bossDmg/standoff take the maximum, shrineN adds each
+ * source's extra choices above three, and remaining
  * source fields add. Numeric flags use zero for off. Blessings apply afterwards.
  * Add a field with a neutral default, an explicit stacking rule and a gameplay
  * consumer; changing a catalog description alone never implements a mechanic.
@@ -101,7 +105,7 @@ export function computeModifiers(
         m[k] *= v;
       else if (k === 'comboStep') m.comboStep = Math.min(m.comboStep, v);
       else if (k === 'comboCap' || k === 'bossDmg' || k === 'standoff') m[k] = Math.max(m[k], v);
-      else if (k === 'shrineN') m.shrineN = Math.max(m.shrineN, v);
+      else if (k === 'shrineN') m.shrineN += Math.max(0, v - 3);
       else m[k] += v;
     }
   }
