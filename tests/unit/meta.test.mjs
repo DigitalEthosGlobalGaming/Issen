@@ -4,7 +4,6 @@ import {
   parseMeta,
   purchaseUpgrade,
   templateModifiers,
-  rewardCurrency,
   unlockBossMilestone,
   pendingModeReveals,
   markModeRevealsSeen,
@@ -13,6 +12,11 @@ import {
   TEMPLATE_UPGRADES,
   templatePowers,
 } from '../../src/game/progression/meta.ts';
+import {
+  createRunRewardLedger,
+  accrueRunReward,
+  settleRunReward,
+} from '../../src/game/progression/run-rewards.ts';
 
 const normal = { mode: 'waves', diff: 'normal', arrows: true, lives: '3' };
 
@@ -45,7 +49,9 @@ test('metadata rejects fractional, negative and nonfinite fields and caps valid 
 
 test('earning, purchasing and reloading preserves balance and permanent ranks', () => {
   const meta = parseMeta(null);
-  for (let i = 0; i < 3; i++) rewardCurrency(meta, 'boss');
+  const ledger = createRunRewardLedger();
+  for (let i = 0; i < 6; i++) accrueRunReward(ledger, 'boss');
+  settleRunReward(meta, ledger);
   assert.equal(purchaseUpgrade(meta, 'focus'), true);
   assert.equal(meta.embers, 0);
   assert.equal(purchaseUpgrade(meta, 'focus'), false);
@@ -138,20 +144,6 @@ test('orphaned pouch ranks grant no knife and recovery rank one needs six waves'
   assert.deepEqual(templatePowers(meta, normal), { knives: 0, composure: 0, recoveryEvery: 6 });
 });
 
-test('eligible rewards exclude tutorial, Zen and testing and saturate safely', () => {
-  const meta = parseMeta(null);
-  assert.equal(rewardCurrency(meta, 'kill'), 1);
-  assert.equal(rewardCurrency(meta, 'wave'), 5);
-  assert.equal(rewardCurrency(meta, 'boss'), 25);
-  for (const context of [{ zen: true }, { tutorial: true }, { testing: true }])
-    assert.equal(rewardCurrency(meta, 'boss', context), 0);
-  assert.equal(meta.embers, 31);
-  assert.equal(meta.earned, 31);
-  meta.embers = 999_999_999;
-  assert.equal(rewardCurrency(meta, 'boss'), 1);
-  assert.equal(meta.embers, 1_000_000_000);
-});
-
 test('boss positions unlock modes once and reveal state survives reload', () => {
   let meta = parseMeta(null);
   const locked = { mode: 'rush', diff: 'ronin', arrows: false, lives: '3' };
@@ -187,4 +179,13 @@ test('journey milestones count harder settings but exclude Zen and Boss Rush', (
     assert.equal(unlockBossMilestone(meta, 3, { ...normal, ...variant }), false);
     assert.equal(meta.bossMilestone, 0);
   }
+});
+
+test('No lives and Endless require the first Vitality rank even with a stale setup', () => {
+  const meta = parseMeta({ schemaVersion: 4, bossMilestone: 3 });
+  for (const lives of ['0', 'zen'])
+    assert.equal(sanitizeSetup({ ...normal, lives }, meta).lives, '3');
+  meta.upgrades.vitality = 1;
+  for (const lives of ['0', 'zen'])
+    assert.equal(sanitizeSetup({ ...normal, lives }, meta).lives, lives);
 });

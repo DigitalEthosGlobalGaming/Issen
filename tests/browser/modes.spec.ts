@@ -7,12 +7,15 @@ test.beforeEach(async ({ page }) => {
       localStorage.setItem(
         'issen.meta',
         JSON.stringify({
+          schemaVersion: 4,
           tutorial: 'skipped',
           bossMilestone: 3,
           revealSeen: 3,
+          upgrades: { vitality: 1 },
         }),
       );
     }
+    localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
   });
 });
 
@@ -32,13 +35,17 @@ for (const mode of ['waves', 'rush'] as const) {
         await page.getByRole('button', { name: 'Draw your blade' }).click();
         await page.getByRole('button', { name: 'Begin', exact: true }).click();
         await expect(page.locator('#hud')).toHaveClass(/on/);
-        await expect(page.locator('#lives i')).toHaveCount(lives === '3' ? 2 : 0);
+        await expect(page.locator('#lives i')).toHaveCount(
+          lives === '3' ? (mode === 'waves' && diff === 'normal' ? 3 : 2) : 0,
+        );
         if (mode === 'rush') await expect(page.locator('#bossbar')).toHaveClass(/on/);
         else await expect(page.locator('#bossbar')).not.toHaveClass(/on/);
         if (diff === 'ronin') await expect(page.locator('#badges')).toContainText('浪人');
         if (lives === 'zen') await expect(page.locator('#score')).toHaveText('0 連');
         await page.keyboard.press('p');
         await page.getByRole('button', { name: 'End run', exact: true }).click();
+        for (let i = 0; i < 3 && (await page.locator('#runResultSequence').isVisible()); i++)
+          await page.locator('#runResultSequence').click();
         await expect(page.locator('#oReason')).toHaveText('You sheathed your blade.');
         const key =
           diff +
@@ -73,6 +80,8 @@ test('a missed attack in no-lives mode reaches death and restart', async ({ page
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await expect(page.locator('#over')).toHaveClass(/on/, { timeout: 12000 });
   await expect(page.locator('#oReason')).toHaveText('Too slow. His blade found you first.');
+  for (let i = 0; i < 3 && (await page.locator('#runResultSequence').isVisible()); i++)
+    await page.locator('#runResultSequence').click();
   const stats = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!));
   expect(stats.deaths.late).toBe(1);
   await page.locator('#bAgain').click();

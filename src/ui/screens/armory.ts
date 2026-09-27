@@ -3,6 +3,7 @@ import type { Equipment } from '../../platform/saves.ts';
 import type { Statistics, BladeStats } from '../../game/progression/statistics.ts';
 import { SPECIAL } from '../../game/content/awakenings.ts';
 import { ROBE_AWAKENINGS } from '../../game/content/robe-awakenings.ts';
+import { isNewArmoryItem, markArmoryItemViewed } from '../../game/progression/armory-seen.ts';
 
 const ARM: readonly (readonly [ItemCategory, string])[] = [
   ['blade', 'Blades'],
@@ -20,6 +21,8 @@ export interface ArmoryOptions {
   equipment: Equipment;
   unlocks: ReadonlySet<string>;
   statistics: Statistics;
+  seen?: Set<string>;
+  onViewed?(): void;
   seals: Readonly<Record<string, string>>;
   charms: Readonly<Record<string, string>>;
   awakeningAccess?(type: ItemCategory): boolean;
@@ -46,6 +49,8 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     return element;
   };
   const ITEM_BY: Record<string, Item> = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
+  const seen = options.seen ?? new Set<string>();
+  const newItem = (item: Item) => isNewArmoryItem(item, UNL, seen);
   let armTab: ItemCategory = 'blade',
     armSel: string | null = null;
   const access = (type: ItemCategory) => options.awakeningAccess?.(type) ?? false;
@@ -82,6 +87,12 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(t === armTab));
       b.innerHTML = `${label}<small>${own}/${all.length}</small>`;
+      if (all.some(newItem)) {
+        const badge = doc.createElement('span');
+        badge.className = 'arm-new';
+        badge.textContent = 'NEW';
+        b.append(badge);
+      }
       b.addEventListener('click', () => {
         armTab = t;
         armSel = null;
@@ -102,7 +113,11 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     const tiles = $('armTiles');
     tiles.innerHTML = '';
     if (!armSel || ITEM_BY[armSel]?.type !== armTab) armSel = EQ[armTab];
-    for (const it of ITEMS.filter((i) => i.type === armTab)) {
+    const category = ITEMS.filter((i) => i.type === armTab);
+    for (const it of [
+      ...category.filter((i) => UNL.has(i.id)),
+      ...category.filter((i) => !UNL.has(i.id)),
+    ]) {
       const own = UNL.has(it.id),
         on = EQ[armTab] === it.id;
       const b = doc.createElement('button');
@@ -123,9 +138,16 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       );
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
       b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${spU ? '<span class="spb">真</span>' : ''}`;
+      if (newItem(it)) {
+        const badge = doc.createElement('span');
+        badge.className = 'arm-new tile-new';
+        badge.textContent = 'NEW';
+        b.append(badge);
+      }
       b.addEventListener('click', () => {
         const again = activationReady === it.id && armSel === it.id && EQ[armTab] === it.id;
         armSel = it.id;
+        if (markArmoryItemViewed(it.id, UNL, seen)) options.onViewed?.();
         activationReady = own ? it.id : null;
         if (own) {
           if (armTab === 'blade') {
@@ -193,6 +215,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   }
   return {
     render,
+    hasNew: () => ITEMS.some(newItem),
     get tab() {
       return armTab;
     },

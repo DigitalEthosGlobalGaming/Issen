@@ -2,6 +2,7 @@ import type { Setup } from '../../platform/saves.ts';
 
 export interface SetupProgression {
   getMilestone(): number;
+  hasVitality?(): boolean;
   getReveals(): readonly { milestone: number; id: string; name: string; description: string }[];
   onRevealed(): void;
   onRevealSound?(): void;
@@ -42,9 +43,16 @@ export function createSetupScreen(
   function milestone() {
     return progression ? Math.max(0, progression.getMilestone() || 0) : 3;
   }
+  function hasVitality() {
+    return progression?.hasVitality?.() ?? true;
+  }
   function renderControls(): void {
     const earned = milestone();
     let changed = false;
+    if (!hasVitality() && setup.lives !== '3') {
+      setup.lives = '3';
+      changed = true;
+    }
     if (earned < 1 && setup.mode === 'rush') {
       setup.mode = 'waves';
       changed = true;
@@ -58,6 +66,8 @@ export function createSetupScreen(
       changed = true;
     }
     if (changed) onChange(setup);
+    const arrowsOption = root.querySelector<HTMLElement>('#arrowsOption');
+    if (arrowsOption) arrowsOption.hidden = earned < 3;
     for (const group of groups) {
       const key = group.dataset.k;
       if (
@@ -79,7 +89,9 @@ export function createSetupScreen(
               : '0'
             : setup[key];
       for (const button of group.querySelectorAll('button')) {
-        const locked = requiredMilestone(key, button.dataset.v) > earned;
+        const locked =
+          requiredMilestone(key, button.dataset.v) > earned ||
+          (key === 'lives' && button.dataset.v !== '3' && !hasVitality());
         button.hidden = locked;
         button.disabled = locked;
         button.setAttribute('aria-pressed', String(button.dataset.v === current));
@@ -139,6 +151,7 @@ export function createSetupScreen(
           const key = group.dataset.k;
           const value = button.dataset.v;
           if (requiredMilestone(key, value) > milestone()) return;
+          if (key === 'lives' && value !== '3' && !hasVitality()) return;
           if (key === 'mode' && (value === 'waves' || value === 'rush')) setup.mode = value;
           else if (key === 'diff' && (value === 'normal' || value === 'ronin')) setup.diff = value;
           else if (key === 'lives' && (value === '3' || value === '0' || value === 'zen'))

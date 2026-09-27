@@ -1,7 +1,7 @@
 # Repository documentation
 
 - [Feature plan 04 — guided mechanics and end-of-run progression](features/feature-plan-04.md):
-  proposed teaching moments, run-end rewards and unlock reveals, menu gates,
+  implemented teaching moments, run-end rewards and unlock reveals, menu gates,
   boss-rush offers, pause audio and secret-unlock fixes.
 
 - [Equipment identity and copy consistency](features/equipment-identity-and-copy-plan.md):
@@ -15,7 +15,7 @@
   tradeoffs, visual identities and activation rules.
 
 - [Next features and changes](features/next-feature-plan.md): implemented polish,
-  isolated testing tools, developer type documentation, Template progression and
+  isolated testing tools, developer type documentation, Temple progression and
   onboarding rules, with acceptance checks and migration decisions.
 
 - [Implemented architecture](architecture/overview.md): ownership, boundaries and where to add features.

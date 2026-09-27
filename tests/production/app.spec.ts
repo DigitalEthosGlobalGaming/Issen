@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+async function finishResults(page: import('@playwright/test').Page) {
+  for (let i = 0; i < 4 && (await page.locator('#runResultSequence').isVisible()); i++)
+    await page.locator('#runResultSequence').click();
+}
+
 test('built assets include fresh onboarding, Template and isolated testing tools', async ({
   page,
 }) => {
@@ -14,6 +19,7 @@ test('built assets include fresh onboarding, Template and isolated testing tools
   await page.getByRole('button', { name: 'Skip tutorial' }).click();
   await page.keyboard.press('p');
   await page.locator('#bEnd').click();
+  await finishResults(page);
   await page.locator('#bMenu').click();
   await page.locator('#bTemplate').click();
   await expect(page.locator('#templateContent')).toContainText('0 Embers');
@@ -64,6 +70,7 @@ test('built assets support startup, armory, a run, sharing, and landscape layout
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await page.keyboard.press('p');
   await page.getByRole('button', { name: 'End run', exact: true }).click();
+  await finishResults(page);
   await page.locator('#bShare').click();
   await expect
     .poll(() =>

@@ -63,6 +63,10 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem('issen.meta', JSON.stringify({ tutorial: 'skipped', embers: 42 }));
+    localStorage.setItem(
+      'issen.testing.guidedLessons',
+      JSON.stringify({ order: true, bossParry: true }),
+    );
   });
   await page.goto('/');
   const original = await page.evaluate(() => localStorage.getItem('issen.meta'));
@@ -99,13 +103,17 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   expect(await page.evaluate(() => localStorage.getItem('issen.stats'))).toBeNull();
 });
 
-test('boss victory awards Embers and unlocks Boss Rush with a persistent one-time reveal', async ({
+test('boss victory waits until run end to award Embers and reveal Boss Rush once', async ({
   page,
 }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('issen.testing', '1');
     if (!localStorage.getItem('issen.testing.meta'))
       localStorage.setItem('issen.testing.meta', JSON.stringify({ tutorial: 'skipped' }));
+    localStorage.setItem(
+      'issen.testing.guidedLessons',
+      JSON.stringify({ order: true, bossParry: true }),
+    );
     Math.random = () => 0.5;
     let next = 0,
       time = 0;
@@ -144,17 +152,36 @@ test('boss victory awards Embers and unlocks Boss Rush with a persistent one-tim
   await cut();
   await advance(54);
   await cut();
+  const pending = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('issen.testing.meta')!),
+  );
+  expect(pending.bossMilestone).toBe(0);
+  expect(pending.embers).toBe(0);
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.unlocks') || '[]')),
+  ).not.toContain('kuro');
+  await page.keyboard.press('p');
+  await page.locator('#bEnd').evaluate((button: HTMLButtonElement) => button.click());
   const meta = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!));
   expect(meta.bossMilestone).toBe(1);
-  expect(meta.embers).toBe(25);
-  await page.reload();
-  await page.locator('#bPlay').evaluate((b: HTMLButtonElement) => b.click());
-  await expect(page.locator('#setupReveals')).toContainText('Unlocked · Boss Rush');
+  expect(meta.embers).toBe(12);
   expect(
-    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!).revealSeen),
-  ).toBe(1);
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.unlocks')!)),
+  ).toContain('kuro');
+  await expect(page.locator('#runResultSequence')).toContainText('Embers gathered');
+  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  await expect(page.locator('#runResultSequence')).toContainText('Boss Rush');
+  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!).embers),
+  ).toBe(12);
   await page.reload();
   await page.locator('#bPlay').evaluate((b: HTMLButtonElement) => b.click());
   await expect(page.locator('#setupReveals')).toBeHidden();
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!).revealSeen),
+  ).toBe(1);
   await expect(page.locator('[data-v="rush"]')).not.toHaveAttribute('hidden', '');
 });

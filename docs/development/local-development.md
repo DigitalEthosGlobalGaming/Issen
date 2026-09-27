@@ -43,6 +43,8 @@ end-run/restart, all twelve mode/difficulty/life-setting combinations, boss vict
 to shrine to next duel, Daruma revival, malformed saves, mute persistence, screen
 controllers, renderer isolation, portrait/landscape drawing, sharing fallback
 branches with mocked browser/host APIs, share-card generation and disposal/remount.
+Feature-04 browser checks additionally exercise first live guided encounters,
+portrait setup gates, Armoury NEW badges, deferred boss rewards and run-end reveals.
 These tests are not proof of pixel-perfect parity or complete playthrough coverage.
 Production tests separately exercise bundled asset startup, armory, a run, sharing
 and landscape layout. Native mobile share sheets and physical touch devices are not
@@ -77,12 +79,18 @@ saves to test these flows.
 
 The first Begin for a fresh profile launches practice; complete it or use Skip.
 Ordinary runtime tests should seed completed/skipped tutorial metadata in their
-isolated context when onboarding is outside their scope. Legacy contexts with
+isolated context when onboarding is outside their scope. Tests that drive ordered
+waves or boss combat without teaching prompts should also seed
+`issen.guidedLessons` with `{ "order": true, "bossParry": true }`; test-profile
+fixtures use the `issen.testing.guidedLessons` namespace. No lives and Endless
+fixtures need Vitality rank 1 in schema-4 metadata. Legacy contexts with
 positive historical runs/duels/best-wave and absent metadata migrate to all modes
 unlocked. Use explicit fresh metadata when testing locked modes rather than relying
-on migration. See the [feature record](../features/next-feature-plan.md) for exact
-currency, milestone and compatibility rules. The [second feature record](../features/feature-plan-02.md)
-updates the upgrade catalog, Normal-life baseline, upgrades toggle and awakening rules.
+on migration. See the [first feature record](../features/next-feature-plan.md) for
+historical currency and milestone rules. The [second feature record](../features/feature-plan-02.md)
+updates the upgrade catalog, Normal-life baseline, upgrades toggle and awakening
+rules; [feature plan 04](../features/feature-plan-04.md) records current end-run
+settlement and teaching behavior.
 
 For awakening tests seed `issen.awakening` with separate `blades`/`robes` records
 and use owned access in metadata; editing lifetime `issen.stats.bl` after migration
@@ -90,8 +98,9 @@ must not grant new challenge progress. Use schema version 4 for new fixtures:
 awakening rank 1 enables weapons only and rank 2 enables outfits too. Older
 purchased combined access migrates once to rank 2. Metadata versioning prevents the old
 Knife/Pouch split from losing capacity: old owned Knife + Pouch ranks become the
-single knife rank (1–3). Fractional bonus Embers persist as integer hundredths in
-`emberRemainder`, so small Yoroi rewards accumulate across reloads. Versioning also prevents the old
+single knife rank (1–3). Fractional Embers persist as integer hundredths in
+`emberRemainder`, so half-rate kills and small Yoroi rewards accumulate across
+completed runs and reloads. An abandoned run does not pay out. Versioning also prevents the old
 Vitality-to-rank-2 compensation from applying repeatedly. Test Off separately from
 challenge-mode eligibility: Off suppresses both Template powers and awakened forms,
 while challenge tracking still works after access. Knife tests must cover bosses,
@@ -104,6 +113,11 @@ hidden-secret presentation. These targeted checks do not replace integrated
 run-start, migration, input and visual checks.
 
 `tests/unit/meta.test.mjs` covers progression rules and parsing;
+`tests/unit/run-rewards.test.mjs`, `armory-seen.test.mjs`, and
+`guided-state.test.mjs` cover the new run-local payout, viewed state, and
+teaching state. `tests/browser/feature-plan-04.spec.ts` checks live guided
+encounters and mobile menu progression. The boss-rush pool, Twin filtering,
+and secret event sequences/predicates have focused unit coverage.
 `tests/browser/tutorial.spec.ts` exercises the independent playable lesson flow,
 skip/replay, cleanup and save isolation. The audio cue test verifies synthesis
 parameters; listening in combat is still needed to assess the sound's character.

@@ -13,6 +13,7 @@ test.beforeEach(async ({ page }) => {
         }),
       );
     }
+    localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
   });
 });
 
@@ -60,6 +61,8 @@ test('ending a paused run renders records and allows a fresh run', async ({ page
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await page.keyboard.press('p');
   await page.getByRole('button', { name: 'End run', exact: true }).click();
+  for (let i = 0; i < 3 && (await page.locator('#runResultSequence').isVisible()); i++)
+    await page.locator('#runResultSequence').click();
   await expect(page.locator('#over')).toHaveClass(/on/);
   await expect(page.locator('#oSub')).toHaveText('You left the field');
   await expect(page.locator('#oReason')).toHaveText('You sheathed your blade.');

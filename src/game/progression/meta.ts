@@ -12,15 +12,15 @@ export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze
   recovery: 0,
 });
 export type TutorialStatus = 'new' | 'completed' | 'skipped';
-/** Persistent account progression. Embers are awarded immediately for combat
- * events, so abandoned runs keep their earnings. Ranks apply to the next run.
+/** Persistent account progression. Pending combat rewards are settled only
+ * when a run ends. Ranks apply to the next run.
  * bossMilestone records journey position, not repeated boss victories;
  * revealSeen independently records which menu introductions have played. */
 export interface MetaProgress {
   schemaVersion: 4;
   embers: number;
   earned: number;
-  /** Hundredths of a bonus Ember, carried between rewards and reloads. */
+  /** Hundredths of an Ember, carried between completed runs and reloads. */
   emberRemainder: number;
   upgrades: Record<UpgradeId, number>;
   bossMilestone: number;
@@ -236,31 +236,6 @@ export function templateModifiers(
     ...(ranks.offerings >= 3 ? { rareShrine: 1 } : {}),
   };
 }
-export type RewardEvent = 'kill' | 'wave' | 'boss';
-export interface RewardContext {
-  zen?: boolean;
-  tutorial?: boolean;
-  testing?: boolean;
-  emberBonus?: number;
-}
-/** Runtime calls exactly once per authoritative event, never from rendering.
- * Testing is excluded unless the caller deliberately uses an isolated profile. */
-export function rewardCurrency(
-  meta: MetaProgress,
-  event: RewardEvent,
-  context: RewardContext = {},
-): number {
-  if (context.zen || context.tutorial || context.testing) return 0;
-  const base = { kill: 1, wave: 5, boss: 25 }[event];
-  const bonus = Number.isFinite(context.emberBonus) ? Math.max(0, context.emberBonus!) : 0;
-  const fraction = integer(meta.emberRemainder, 99) + Math.round(base * bonus * 100);
-  const amount = base + Math.floor(fraction / 100);
-  meta.emberRemainder = fraction % 100;
-  const before = integer(meta.embers, MAX_CURRENCY);
-  meta.embers = Math.min(MAX_CURRENCY, before + amount);
-  meta.earned = Math.min(MAX_CURRENCY, integer(meta.earned, MAX_CURRENCY) + amount);
-  return meta.embers - before;
-}
 /** One-based boss position in a qualifying journey; earlier repeat victories
  * cannot advance the milestone. Tutorial outcomes must not call this function. */
 export function unlockBossMilestone(meta: MetaProgress, ordinal: number, setup: Setup): boolean {
@@ -291,5 +266,6 @@ export function sanitizeSetup(setup: Setup, meta: MetaProgress): Setup {
     mode: meta.bossMilestone >= 1 ? setup.mode : 'waves',
     diff: meta.bossMilestone >= 2 ? setup.diff : 'normal',
     arrows: meta.bossMilestone >= 3 ? setup.arrows : true,
+    lives: meta.upgrades.vitality >= 1 ? setup.lives : '3',
   };
 }

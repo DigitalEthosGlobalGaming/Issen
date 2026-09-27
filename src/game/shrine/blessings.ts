@@ -6,11 +6,51 @@ import type { Random } from '../../shared/random.ts';
 export type Blessing = (typeof BLESS)[number];
 export interface BlessingState {
   bless: Set<string>;
+  /** Boss rush has duels only: no wave enemies, attacker gaps, or wave clears. */
+  rush?: boolean;
   zen: boolean;
   hard: boolean;
   lives: number;
   maxLives: number;
   runWards: number;
+}
+
+/** Effects with a real duel, score, or life consumer in boss rush. Keep this
+ * explicit so a new blessing cannot silently enter the rush pool by default.
+ */
+export const BOSS_RUSH_BLESSINGS: ReadonlySet<string> = new Set([
+  'focus',
+  'fortune',
+  'edge',
+  'momentum',
+  'breath',
+  'counter',
+  'iron',
+  'duelist',
+  'steady',
+  'quickstep',
+  'paperward',
+  'phoenix',
+  'timestop',
+  'gold',
+  'twin',
+  'banner',
+  'glass',
+  'blood',
+  'blind',
+]);
+
+export function blessingEligible(state: BlessingState, blessing: Blessing): boolean {
+  return (
+    !state.bless.has(blessing.id) &&
+    (!state.rush || BOSS_RUSH_BLESSINGS.has(blessing.id)) &&
+    (!blessing.lives || (!state.zen && !state.hard)) &&
+    (blessing.id !== 'blood' || state.lives > 1)
+  );
+}
+
+function twinTargets(state: BlessingState): number {
+  return BLESS.filter((b) => b.t === 0 && blessingEligible(state, b)).length;
 }
 export interface ShrineState extends BlessingState {
   bossCount: number;
@@ -21,9 +61,7 @@ export interface ShrineState extends BlessingState {
 export function shrineOffers(state: ShrineState, random: Random = Math.random): Blessing[] {
   if (state.m.noShrine) return [];
   const available = (b: Blessing) =>
-    !state.bless.has(b.id) &&
-    (!b.lives || (!state.zen && !state.hard)) &&
-    (b.id !== 'blood' || state.lives > 1);
+    blessingEligible(state, b) && (b.id !== 'twin' || twinTargets(state) >= 2);
   const pool = (tier: number) =>
     shuffle(
       BLESS.filter((b) => b.t === tier && available(b)),
@@ -81,7 +119,7 @@ export function applyBlessing(
   }
   if (id !== 'twin') return [];
   const extras = shuffle(
-    BLESS.filter((b) => b.t === 0 && !state.bless.has(b.id) && (!b.lives || livesMode)),
+    BLESS.filter((b) => b.t === 0 && blessingEligible(state, b)),
     random,
   ).slice(0, 2);
   for (const blessing of extras) {

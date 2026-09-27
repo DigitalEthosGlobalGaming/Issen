@@ -1,14 +1,34 @@
 <div id="over" class="screen">
-  <div class="o-k" id="oK">討死</div>
-  <div class="o-sub" id="oSub">You have fallen</div>
-  <div class="o-reason" id="oReason"></div>
-  <div class="o-score" id="oScore" style="cursor: pointer">0</div>
-  <div><span class="o-new" id="oNew">New best</span></div>
-  <div class="o-stats" id="oStats"></div>
-  <div class="o-unl" id="oUnl"></div>
-  <button class="btn primary" id="bAgain" type="button">Rise again</button>
-  <div class="row">
-    <button class="btn" id="bShare" type="button">Share card</button>
-    <button class="btn" id="bMenu" type="button">Title</button>
+  <div
+    id="runResultSequence"
+    class="result-sequence"
+    role="button"
+    tabindex="0"
+    aria-label="Continue through run rewards"
+    hidden
+  >
+    <div class="result-flame" aria-hidden="true">火</div>
+    <div id="resultKind" class="result-kind"></div>
+    <div id="resultLabel" class="result-label"></div>
+    <div class="result-count">
+      <span id="resultGain" class="result-gain"></span><span id="resultEmbers"></span>
+    </div>
+    <p id="resultDescription"></p>
+    <span class="result-next">Tap to continue</span>
+    <span id="resultAccessible" class="sr-only" aria-live="polite"></span>
+  </div>
+  <div id="overSummary">
+    <div class="o-k" id="oK">討死</div>
+    <div class="o-sub" id="oSub">You have fallen</div>
+    <div class="o-reason" id="oReason"></div>
+    <div class="o-score" id="oScore" style="cursor: pointer">0</div>
+    <div><span class="o-new" id="oNew">New best</span></div>
+    <div class="o-stats" id="oStats"></div>
+    <div class="o-unl" id="oUnl"></div>
+    <button class="btn primary" id="bAgain" type="button">Rise again</button>
+    <div class="row">
+      <button class="btn" id="bShare" type="button">Share card</button>
+      <button class="btn" id="bMenu" type="button">Title</button>
+    </div>
   </div>
 </div>

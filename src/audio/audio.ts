@@ -17,10 +17,12 @@ interface NoiseOptions extends Envelope {
 interface AudioState {
   ctx: AudioContext | null;
   master: GainNode | null;
+  ambience: GainNode | null;
   noise: AudioBuffer | null;
   wg: GainNode | null;
   wbp: BiquadFilterNode | null;
   muted: boolean;
+  paused: boolean;
   wt: number;
   at: number;
 }
@@ -29,10 +31,12 @@ export function createAudio(initialMuted: boolean) {
   const A: AudioState = {
     ctx: null,
     master: null,
+    ambience: null,
     noise: null,
     wg: null,
     wbp: null,
     muted: initialMuted,
+    paused: false,
     wt: 0,
     at: 0,
   };
@@ -53,6 +57,9 @@ export function createAudio(initialMuted: boolean) {
       const comp = c.createDynamicsCompressor();
       A.master.connect(comp);
       comp.connect(c.destination);
+      A.ambience = c.createGain();
+      A.ambience.gain.value = A.paused ? 0 : 1;
+      A.ambience.connect(A.master);
       const len = c.sampleRate * 2,
         buf = c.createBuffer(1, len, c.sampleRate),
         d = buf.getChannelData(0);
@@ -69,7 +76,7 @@ export function createAudio(initialMuted: boolean) {
       wg.gain.value = 0;
       src.connect(bp);
       bp.connect(wg);
-      wg.connect(A.master);
+      wg.connect(A.ambience);
       src.start();
       A.wg = wg;
       A.wbp = bp;
@@ -77,7 +84,7 @@ export function createAudio(initialMuted: boolean) {
       A.ctx = null;
     }
   }
-  function nz(o: NoiseOptions) {
+  function nz(o: NoiseOptions, ambience = false) {
     const c = A.ctx;
     if (!c || !A.noise || !A.master) return;
     const t = c.currentTime + (o.delay || 0);
@@ -94,11 +101,11 @@ export function createAudio(initialMuted: boolean) {
     gn.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     s.connect(f);
     f.connect(gn);
-    gn.connect(A.master);
+    gn.connect(ambience ? A.ambience! : A.master);
     s.start(t, Math.random() * 1.5);
     s.stop(t + o.dur + 0.05);
   }
-  function tn(o: ToneOptions) {
+  function tn(o: ToneOptions, ambience = false) {
     const c = A.ctx;
     if (!c || !A.master) return;
     const t = c.currentTime + (o.delay || 0);
@@ -111,7 +118,7 @@ export function createAudio(initialMuted: boolean) {
     gn.gain.exponentialRampToValueAtTime(o.g, t + (o.a || 0.004));
     gn.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     os.connect(gn);
-    gn.connect(A.master);
+    gn.connect(ambience ? A.ambience! : A.master);
     os.start(t);
     os.stop(t + o.dur + 0.05);
   }
@@ -275,33 +282,37 @@ export function createAudio(initialMuted: boolean) {
     },
   };
   function ambient(raw: number, w: string | null) {
-    if (!A.ctx || A.muted) return;
+    if (!A.ctx || A.muted || A.paused) return;
     A.at = (A.at || 0) - raw;
     if (w === 'smoke' && R() < raw * 10)
-      nz({ type: 'highpass', f0: 1800 + R() * 2000, dur: 0.02 + R() * 0.03, g: 0.03 + R() * 0.06 });
+      nz(
+        { type: 'highpass', f0: 1800 + R() * 2000, dur: 0.02 + R() * 0.03, g: 0.03 + R() * 0.06 },
+        true,
+      );
     if (A.at > 0) return;
     if (w === 'storm') {
       A.at = 4.5 + R() * 3;
-      nz({ type: 'lowpass', f0: 250, f1: 900, dur: 3.2, g: 0.22, a: 1.3, q: 0.3 });
+      nz({ type: 'lowpass', f0: 250, f1: 900, dur: 3.2, g: 0.22, a: 1.3, q: 0.3 }, true);
     } else if (w === 'night') {
       A.at = 0.7 + R() * 1.2;
       for (let i = 0; i < 3; i++)
-        tn({ f0: 4200 + R() * 300, dur: 0.04, g: 0.025, delay: i * 0.075 });
+        tn({ f0: 4200 + R() * 300, dur: 0.04, g: 0.025, delay: i * 0.075 }, true);
     } else if (w === 'sakura') {
       A.at = 3 + R() * 4;
-      tn({ f0: 2600, f1: 3500, dur: 0.12, g: 0.035 });
-      tn({ f0: 3300, f1: 2500, dur: 0.1, g: 0.03, delay: 0.16 });
+      tn({ f0: 2600, f1: 3500, dur: 0.12, g: 0.035 }, true);
+      tn({ f0: 3300, f1: 2500, dur: 0.1, g: 0.03, delay: 0.16 }, true);
     } else if (w === 'bamboo') {
       A.at = 8 + R() * 5;
-      tn({ f0: 430, f1: 300, dur: 0.3, g: 0.18, type: 'triangle' });
-      nz({ f0: 1100, dur: 0.06, g: 0.18 });
+      tn({ f0: 430, f1: 300, dur: 0.3, g: 0.18, type: 'triangle' }, true);
+      nz({ f0: 1100, dur: 0.06, g: 0.18 }, true);
     } else if (w === 'gust') {
       A.at = 6 + R() * 5;
-      tn({ f0: 700, f1: 480, dur: 0.3, g: 0.04, type: 'sawtooth' });
+      tn({ f0: 700, f1: 480, dur: 0.3, g: 0.04, type: 'sawtooth' }, true);
     } else A.at = 2;
   }
 
   function update(raw: number, w: string | null, wind: number, whiteout: number) {
+    if (A.paused) return;
     if (A.ctx && A.wg && A.wbp) {
       A.wt += raw;
       if (A.wt > 0.25) {
@@ -328,6 +339,15 @@ export function createAudio(initialMuted: boolean) {
     tone: tn,
     cues: sfx,
     update,
+    setPaused(paused: boolean) {
+      if (A.paused === paused) return;
+      A.paused = paused;
+      if (A.ctx && A.ambience) {
+        const now = A.ctx.currentTime;
+        A.ambience.gain.cancelScheduledValues(now);
+        A.ambience.gain.setTargetAtTime(paused ? 0 : 1, now, paused ? 0.06 : 0.15);
+      }
+    },
     get muted() {
       return A.muted;
     },
@@ -339,6 +359,7 @@ export function createAudio(initialMuted: boolean) {
       const context = A.ctx;
       A.ctx = null;
       A.master = null;
+      A.ambience = null;
       A.noise = null;
       A.wg = null;
       A.wbp = null;

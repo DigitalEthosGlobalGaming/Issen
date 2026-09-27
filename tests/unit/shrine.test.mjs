@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BLESS } from '../../src/game/content/blessings.ts';
-import { shrineOffers, applyBlessing } from '../../src/game/shrine/blessings.ts';
+import {
+  BOSS_RUSH_BLESSINGS,
+  shrineOffers,
+  applyBlessing,
+} from '../../src/game/shrine/blessings.ts';
 import { rng } from '../../src/shared/random.ts';
 import { computeModifiers } from '../../src/game/equipment/modifiers.ts';
 import { parseMeta, purchaseUpgrade, templateModifiers } from '../../src/game/progression/meta.ts';
@@ -125,4 +129,55 @@ test('immediate blessings preserve life and ward rules and Twin applies its extr
   applyBlessing(run, 'iron');
   applyBlessing(run, 'glass');
   assert.deepEqual([run.lives, run.maxLives], [2, 2]);
+});
+
+test('boss rush only offers duel-relevant effects in every tier', () => {
+  const run = state();
+  run.rush = true;
+  run.bossCount = 3;
+  run.m.rare = 0.4;
+  run.m.rareShrine = 2;
+  for (let seed = 0; seed < 200; seed++) {
+    const offers = shrineOffers(run, rng(seed));
+    assert.equal(offers.length, 3);
+    assert.ok(offers.every((b) => BOSS_RUSH_BLESSINGS.has(b.id)));
+    assert.ok(
+      offers.every(
+        (b) =>
+          !['harvest', 'swallow', 'patience', 'stormborn', 'silence', 'haste', 'frenzy'].includes(
+            b.id,
+          ),
+      ),
+    );
+    assert.ok(offers.filter((b) => b.t === 1).length >= 2);
+  }
+  const normal = state();
+  normal.bless = new Set(BLESS.filter((b) => b.id !== 'harvest').map((b) => b.id));
+  assert.deepEqual(
+    shrineOffers(normal, rng(1)).map((b) => b.id),
+    ['harvest'],
+  );
+});
+
+test('Twin secondary grants obey boss-rush filter and exhausted rare pools fall back', () => {
+  const run = state();
+  run.rush = true;
+  run.bless.add('twin');
+  const extras = applyBlessing(run, 'twin', rng(7));
+  assert.equal(extras.length, 2);
+  assert.ok(extras.every((b) => BOSS_RUSH_BLESSINGS.has(b.id) && b.t === 0));
+
+  run.m.rareShrine = 3;
+  run.bless = new Set(
+    BLESS.filter((b) => b.t === 1 && BOSS_RUSH_BLESSINGS.has(b.id)).map((b) => b.id),
+  );
+  const offers = shrineOffers(run, rng(9));
+  assert.ok(offers.length > 0);
+  assert.ok(offers.every((b) => b.t !== 1 && BOSS_RUSH_BLESSINGS.has(b.id)));
+
+  run.bless = new Set(
+    BLESS.filter((b) => b.t === 0 && BOSS_RUSH_BLESSINGS.has(b.id)).map((b) => b.id),
+  );
+  assert.ok(shrineOffers(run, rng(9)).every((b) => b.id !== 'twin'));
+  assert.deepEqual(applyBlessing(run, 'twin', rng(9)), []);
 });

@@ -10,9 +10,11 @@ test.beforeEach(async ({ page }) => {
           tutorial: 'skipped',
           bossMilestone: 3,
           revealSeen: 3,
+          upgrades: { vitality: 1 },
         }),
       );
     }
+    localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
   });
 });
 

@@ -1,13 +1,14 @@
 # Feature plan 04 — guided mechanics and end-of-run progression
 
-Status: **proposed for review; not implemented**.
+Status: **implemented**. The brief below records the requested design; the
+implementation record at the end describes the resulting rules.
 
 ## Goal
 
 Make new mechanics easier to learn, make a completed run feel rewarding, and keep
 progression and mode choices understandable on a phone. This plan also addresses
 several audio, reward-balance, and unlock defects. It changes no existing player
-save until implementation is approved.
+save retroactively.
 
 ## 1. Teach mechanics in the moment
 
@@ -26,8 +27,7 @@ lessons have been completed so they do not interrupt every run, while keeping
 the existing skippable opening tutorial. A skipped tutorial does not silently
 mark later, encounter-specific lessons complete.
 
-**Review interpretation:** “front” means the first front/order encounter. If it
-refers to a different mechanic, replace that trigger before implementation.
+**Implemented interpretation:** “front” means the first front/order encounter.
 
 ## 2. Settle progression when the run ends
 
@@ -39,9 +39,8 @@ milestones, equipment/Awakenings, and secret unlocks all use this boundary.
 
 An *ended run* means death, victory, or an explicit in-game **End run** action,
 including endless mode. Closing the app or refreshing before that point does not
-pay out. This is the proposed rule for review; it avoids making an ordinary quit
-silently lose a completed result, but we can make voluntary quits ineligible if
-that is the intended reward policy. The practice tutorial and test profile keep
+pay out. This rule avoids making an ordinary quit silently lose a completed
+result. The practice tutorial and test profile keep
 their current reward restrictions. Previously earned currency and unlocks stay
 earned; this change is not a retroactive reset.
 
@@ -88,8 +87,7 @@ bonus-equipped runs against the current economy before locking the exact rate.
 - Interpret “Arrows shown option” as the whole **Arrows** choice in setup: the
   normal shown-arrows behavior stays implicit until Blade Only is unlocked;
   only then show the **Shown / Blade only** control. This avoids displaying a
-  one-choice control. If a separate arrows-visibility unlock was intended,
-  define that unlock explicitly before building the gate.
+  one-choice control. No separate arrows-visibility unlock was introduced.
 
 New gear marks are distinct from the run-end reveal: a player can skip reveal
 animations and still find the unviewed item in the Armoury later.
@@ -164,3 +162,35 @@ manually verify a fresh profile and an existing `issen.*` profile on a portrait
 mobile viewport. No part of this plan is considered complete merely because an
 animation plays: the underlying reward, unlock, audio, and input behavior must
 meet the rules above.
+
+## Implementation record
+
+- `src/game/progression/run-rewards.ts` accumulates kill, wave, and boss rewards
+  as hundredths of an Ember at half the old rate (0.5, 2.5, and 12.5 before
+  bonuses). A completed run settles once, floors the combined total, and carries
+  the fractional remainder in `issen.meta.emberRemainder`. Death and explicit
+  End run settle; app closure does not. Zen/tutorial exclusions remain. Old
+  balances are not reduced. `src/game.ts` defers boss milestones and equipment
+  eligibility until that same boundary.
+- `src/ui/screens/run-results.ts` renders the settled Ember tally and mode/item
+  reveals before the summary. One tap finishes the current animation; the next
+  advances. Keyboard activation and reduced-motion settings are supported.
+  `src/game/progression/armory-seen.ts` persists explicit detail views under
+  `issen.armorySeen`, with old collections seeded as already viewed.
+- `src/game/onboarding/guided-state.ts` and `guided-lessons.ts` persist completed
+  first ordered-cut and boss-parry lessons under `issen.guidedLessons`. Reading
+  and the prompted action freeze simulation; the boss's approach runs at a
+  quarter speed before its glint is held. Skipping practice does not mark either
+  lesson done.
+- Setup sanitizes No lives and Endless without Vitality rank 1 and hides the
+  Arrows control until Blade Only. Armoury sorts owned gear first and clears
+  `NEW` only when its detail is selected. Boss-rush Shrine offers use an explicit
+  duel-relevant pool, including Twin's secondary picks. Secret eligibility is
+  resolved to a fixed point at run end; `secret-events.ts` records each trigger
+  sequence, and the result-screen applause secret gets its own post-run reveal.
+- `src/audio/audio.ts` fades a single ambience bus on pause and guided freezes,
+  suppressing weather accents without restarting the background loop.
+
+Automated verification includes strict TypeScript, unit tests for reward
+settlement, eligibility and state machines, and browser tests for portrait
+menus, live teaching encounters, end-run reveals, and existing mode flows.

@@ -29,7 +29,11 @@ implemented files.
 | Items, stages, cosmetics, bosses, blessings, awakenings | `src/game/content/` |
 | Modifier composition and shrine rules | `src/game/equipment/`, `src/game/shrine/` |
 | Scoring, records, statistics, unlocks | `src/game/progression/` |
-| Embers, Temple upgrades, tutorial status, mode milestones/reveals | `src/game/progression/meta.ts` |
+| Secret trigger counters and fixed-point eligibility | `src/game/progression/secret-events.ts`, `unlocks.ts` |
+| Temple upgrades, tutorial status, mode milestones | `src/game/progression/meta.ts` |
+| Pending Embers and one-time end-run settlement | `src/game/progression/run-rewards.ts` |
+| First-encounter teaching state and overlay | `src/game/onboarding/` |
+| Run-end tally/reveal and viewed Armoury gear | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts` |
 | Independent gated blade/outfit challenges | `src/game/progression/awakening-progress.ts`, `unlocks.ts` |
 | Outfit awakening catalog | `src/game/content/robe-awakenings.ts` |
 | Knife target selection and charge spending | `src/game/combat/knife.ts` |
@@ -52,7 +56,9 @@ implemented files.
   callbacks are synchronous; callers can observe phase changes immediately.
 - Frame scheduling separates capped raw elapsed time from slowed simulation time.
   Pausing skips simulation but retains rendering. Hit-stop/slow timers retain
-  their existing raw-time behavior. Resume resets the scheduler's clock.
+  their existing raw-time behavior. Resume resets the scheduler's clock. Guided
+  lessons use that paused-simulation boundary while reading/practicing; the
+  first boss approach uses quarter-speed simulation until a held parry glint.
 - Main rendering, armory previews and share cards use explicit target canvases.
   Preview instances own their particle and animation state; no global canvas swap
   is used. Palette caches are instance-owned.
@@ -71,6 +77,17 @@ implemented files.
   arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,
   with equipment/upgrades added without a total life cap. Tutorial practice owns separate state and never
   records gameplay rewards. The runtime persists its completion/skip callback.
+- Combat accrues half-rate Embers in a run-local ledger and writes them to
+  `issen.meta` only when death or explicit End run settles the run. The runtime
+  then grants mode/equipment unlocks, presents an Ember tally and unlock cards,
+  and finally shows the summary. `issen.armorySeen` stores gear detail views;
+  old owned gear migrates as seen. `issen.guidedLessons` records only successful
+  first ordered cuts and boss parries. Both keys follow the active profile
+  namespace and use validated defaults.
+- No lives and Endless require Vitality rank 1; the Arrows choice appears after
+  Blade Only unlocks. Boss Rush Shrine offers and Twin grants use a curated
+  duel-relevant pool. Ambient audio fades one persistent loop on pause instead
+  of restarting it.
 - `progression/awakening-progress.ts` validates `issen.awakening`: blade and robe
   counters are independent and earn only after category access (rank 1 weapons,
   rank 2 outfits). Metadata schema 3 preserves old combined access as rank 2. Existing lifetime blade

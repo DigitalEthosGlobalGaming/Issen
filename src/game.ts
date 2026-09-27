@@ -14,7 +14,15 @@ import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
 import { createShareCard } from './ui/share-card.ts';
 import { renderGameOver, ITEM_TYPE_LABEL as TYPE_WORD } from './ui/screens/game-over.ts';
+import { createRunResults } from './ui/screens/run-results.ts';
+import type { ResultReveal } from './ui/screens/run-results.ts';
 import { recordRun } from './game/progression/run-records.ts';
+import { recordSecretEvent } from './game/progression/secret-events.ts';
+import {
+  createRunRewardLedger,
+  accrueRunReward,
+  settleRunReward,
+} from './game/progression/run-rewards.ts';
 import { protectCombo, recoverAfterWave } from './game/progression/run-powers.ts';
 import { resolveDamage } from './game/combat/damage.ts';
 import {
@@ -59,6 +67,7 @@ import { modeKey as getModeKey } from './game/progression/modes.ts';
 import { renderStatistics, bindProfileReset } from './ui/screens/stats.ts';
 import { createFigureRenderer } from './rendering/figures/figure.ts';
 import { unlockEligibleItems } from './game/progression/unlocks.ts';
+import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
 import { applyFilm } from './rendering/effects/film.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
@@ -71,13 +80,13 @@ import { createSetupScreen } from './ui/screens/setup.ts';
 import { renderTemplate } from './ui/screens/template.ts';
 import { renderAdmin } from './ui/screens/admin.ts';
 import { createTutorial } from './ui/screens/tutorial.ts';
+import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
 import {
   parseMeta,
   templateModifiers,
   templatePowers,
   EMPTY_UPGRADES,
   TEMPLATE_UPGRADES,
-  rewardCurrency,
   unlockBossMilestone,
   pendingModeReveals,
   markModeRevealsSeen,
@@ -209,13 +218,17 @@ export function startGame(): () => void {
   saveAwakening();
   const saveMeta = () => store.set('issen.meta', META);
   saveMeta();
+  const ARMORY_SEEN = parseArmorySeen(store.get('issen.armorySeen', null), UNL);
+  store.set('issen.armorySeen', [...ARMORY_SEEN]);
   Object.assign(SETUP, sanitizeSetup(SETUP, META));
   let runTemplate = templateModifiers(META, SETUP);
   let runEmbers = 0;
+  let rewardLedger = createRunRewardLedger();
+  let runBossMilestone = 0;
+  let runItemReveals: ResultReveal[] = [];
   let tutorialStartsRun = false;
   function earn(event: 'kill' | 'wave' | 'boss') {
-    runEmbers += rewardCurrency(META, event, { zen: G.zen, emberBonus: G.m.emberBonus });
-    saveMeta();
+    accrueRunReward(rewardLedger, event, { zen: G.zen, emberBonus: G.m.emberBonus });
   }
   const saveStats = () => store.set('issen.stats', ST);
   const revokedSave = store.get('issen.revoked', []);
@@ -563,6 +576,12 @@ export function startGame(): () => void {
   const audioInit = audio.init,
     tn = audio.tone,
     sfx = audio.cues;
+  const guided = createGuidedLessons(
+    $('app'),
+    store.get('issen.guidedLessons', null),
+    (value) => store.set('issen.guidedLessons', value),
+    (frozen) => audio.setPaused(frozen || G.state === 'paused'),
+  );
   const ICON_ON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
   const ICON_OFF =
@@ -698,6 +717,7 @@ export function startGame(): () => void {
   }
   const banner = hudView.showBanner;
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
+  const runResults = createRunResults($('over'));
   function hint(key: string, text: string, dur = 3500) {
     if (G.hints[key]) return;
     G.hints[key] = 1;
@@ -712,7 +732,9 @@ export function startGame(): () => void {
       msg: it.msg || 'Unlocked: ' + it.n + ' ' + (it.type ? TYPE_WORD[it.type] : ''),
     });
   }
-  function checkUnlocks(silent = false) {
+  function checkUnlocks() {
+    if (G.state !== 'over') return;
+    const before = UNL.size;
     unlockEligibleItems(
       ST,
       UNL,
@@ -723,13 +745,24 @@ export function startGame(): () => void {
           return;
         }
         store.set('issen.unlocks', [...UNL]);
-        if (!silent) {
-          G.newUnlocks.push(it);
-          toast(it);
-        }
+        G.newUnlocks.push(it);
+        const base = id.replace(/\+$/, '');
+        const source = ITEM_BY[base];
+        const awakened = id.endsWith('+') ? (SPECIAL[base] ?? ROBE_AWAKENINGS[base]) : null;
+        const perk = awakened?.pk ?? source?.pk;
+        const tradeoff = awakened?.tr ?? source?.tr;
+        runItemReveals.push({
+          key: it.k,
+          name: it.n,
+          kind: TYPE_WORD[it.type],
+          description: perk
+            ? `${perk}${tradeoff ? ` · ${tradeoff}` : ''}`
+            : source?.f || 'View it in the Armoury.',
+        });
       },
       { access: META.upgrades.awakening, progress: AWAKENING },
     );
+    if (UNL.size !== before) refreshArmoryNew();
   }
   function pop(x: number, y: number, text: string, size?: number) {
     const ax = portrait ? W * 0.25 : W * 0.18,
@@ -845,6 +878,11 @@ export function startGame(): () => void {
     Object.assign(SETUP, sanitizeSetup(SETUP, META));
     runTemplate = templateModifiers(META, SETUP);
     runEmbers = 0;
+    rewardLedger = createRunRewardLedger();
+    runBossMilestone = 0;
+    runItemReveals = [];
+    guided.reset();
+    audio.setPaused(false);
     resetRun(G, SETUP, EQ, R);
     Object.assign(G, templatePowers(META, SETUP));
     G.maxKnives = G.knives;
@@ -872,8 +910,7 @@ export function startGame(): () => void {
     G.pauseN = 0;
     {
       const hr = new Date().getHours();
-      if ((hr === 23 || hr === 0) && !ST.midnight) {
-        ST.midnight = 1;
+      if (recordSecretEvent(ST, { kind: 'midnight', hour: hr })) {
         saveStats();
         checkUnlocks();
       }
@@ -1325,6 +1362,15 @@ export function startGame(): () => void {
     startSwing(P, dir);
   }
   function onSwipe(dir: Direction) {
+    if (
+      guided.swipe(
+        dir,
+        G.state === 'playing' && waveConfiguration().ordered
+          ? (liveOrdered()[0]?.dir ?? null)
+          : null,
+      )
+    )
+      return;
     if (G.state === 'standoff') {
       standoffSwipe(dir);
       return;
@@ -1338,6 +1384,7 @@ export function startGame(): () => void {
       if (outcome.kind === 'cut') {
         if (outcome.mirror) G.kagamiUsed = true;
         killEnemy(outcome.target, dir, outcome.mirror);
+        if (waveConfiguration().ordered) guided.orderSucceeded();
         if (outcome.mirror) {
           pop(0, 0, '鏡');
           sfx.glint();
@@ -1367,6 +1414,7 @@ export function startGame(): () => void {
     renderHp();
     $('bossbar').classList.add('on');
     sfx.drum();
+    guided.startBoss();
     hint('boss', 'A duel. Wait for the glint, then tap to parry. Tapping early is death.', 6000);
     if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
@@ -1395,6 +1443,7 @@ export function startGame(): () => void {
         pop(b.pos.x, b.pos.y - b.pos.h * 1.05, 'Recovered');
       },
     });
+    if (G.boss?.state === 'flash') guided.bossFlash();
   }
   function bossTipWorld(b: Boss): [number, number] {
     const tp = tipOf(b.pose, b.lean, b.def.spear ? 0.98 : 0.52);
@@ -1431,11 +1480,13 @@ export function startGame(): () => void {
     G.combo++;
     G.parries++;
     ST.parries++;
+    guided.bossParried();
     bumpCombo();
     addScore(Math.round(60 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05);
     if (!second) hint('parry', 'An opening. Swipe the way his blade points.', 3000);
   }
   function onTapDown() {
+    if (guided.tap()) return true;
     if (G.state === 'boss' && G.boss && G.boss.state === 'flash') {
       parry();
       return true;
@@ -1443,6 +1494,7 @@ export function startGame(): () => void {
     return false;
   }
   function onTap() {
+    if (guided.tap()) return;
     if (G.state === 'playing') {
       const target = throwKnife(G, R);
       if (!target) return;
@@ -1597,10 +1649,7 @@ export function startGame(): () => void {
         if (EQ.pet === 'crow') sfx.caw();
         G.bossesSlain++;
         earn('boss');
-        if (unlockBossMilestone(META, G.bossCount, SETUP)) {
-          saveMeta();
-          toast({ k: '開', msg: 'A new path awaits in Before you draw.' });
-        }
+        runBossMilestone = Math.max(runBossMilestone, G.bossCount);
         ST.duels++;
         if (G.rush) {
           ST.rushBest = Math.max(ST.rushBest || 0, G.bossesSlain);
@@ -1612,8 +1661,7 @@ export function startGame(): () => void {
           challenge('d');
         }
         if (G.mode === 'ronin') ST.roninDuels++;
-        if (b.def.mirror) ST.mirrorWins++;
-        if (b.def.mirror && !b.failed) ST.mirrorClean = 1;
+        if (b.def.mirror) recordSecretEvent(ST, { kind: 'mirrorVictory', clean: !b.failed });
         if (G.bless.has('breath') && !G.zen && !G.hard && G.lives < G.maxLives) {
           G.lives++;
           renderLives();
@@ -1776,8 +1824,7 @@ export function startGame(): () => void {
     audioInit();
     sfx.knock();
     knocks++;
-    if (knocks >= 3 && !ST.omikuji) {
-      ST.omikuji = 1;
+    if (recordSecretEvent(ST, { kind: 'shrineKnocks', count: knocks })) {
       saveStats();
       sfx.bell();
       checkUnlocks();
@@ -1801,11 +1848,23 @@ export function startGame(): () => void {
     audioInit();
     G.claps = (G.claps || 0) + 1;
     tn({ f0: 700 + G.claps * 90, dur: 0.06, g: 0.05 });
-    if (G.claps >= 5 && !ST.applause) {
-      ST.applause = 1;
+    if (recordSecretEvent(ST, { kind: 'scoreClaps', count: G.claps })) {
       saveStats();
       sfx.popper();
+      const previous = runItemReveals.length;
       checkUnlocks();
+      const newReveals = runItemReveals.slice(previous);
+      if (newReveals.length) {
+        $('oUnl').append(
+          document.createTextNode(` ${newReveals.map((item) => item.name).join(', ')} unlocked`),
+        );
+        G.overReady = false;
+        $('bAgain').disabled = true;
+        runResults.startUnlocks(newReveals, () => {
+          G.overReady = true;
+          $('bAgain').disabled = false;
+        });
+      }
     }
   });
   function openShrine() {
@@ -1903,7 +1962,8 @@ export function startGame(): () => void {
   function playerDie(killer: Enemy | Boss | null, reason: string) {
     if (G.state === 'dead' || G.state === 'over') return;
     if (reason === 'feint') {
-      ST.feinted = (ST.feinted || 0) + 1;
+      recordSecretEvent(ST, { kind: 'feintMistake' });
+      saveStats();
       checkUnlocks();
     }
     const oldLives = G.lives,
@@ -1947,7 +2007,10 @@ export function startGame(): () => void {
     $('bossbar').classList.remove('on');
   }
   function showOver() {
+    if (G.state === 'over') return;
     G.state = 'over';
+    guided.reset();
+    audio.setPaused(false);
     timeScale = 1;
     lbT = 0;
     clearHints();
@@ -1956,7 +2019,18 @@ export function startGame(): () => void {
     challenge('sc', G.score);
     if (!G.zen) store.set('issen.best', ST.bestScore);
     saveStats();
+    unlockBossMilestone(META, runBossMilestone, SETUP);
     checkUnlocks();
+    const reward = settleRunReward(META, rewardLedger);
+    runEmbers = reward.gained;
+    const modeReveals: ResultReveal[] = pendingModeReveals(META).map((mode) => ({
+      key: '開',
+      name: mode.name,
+      kind: 'mode',
+      description: mode.description,
+    }));
+    markModeRevealsSeen(META);
+    saveMeta();
     G.cardScore = G.score;
     G.card = null;
     G.claps = 0;
@@ -1970,10 +2044,10 @@ export function startGame(): () => void {
     hud(false);
     G.overReady = false;
     $('bAgain').disabled = true;
-    lifecycle.timeout(() => {
+    runResults.start(reward, [...modeReveals, ...runItemReveals], () => {
       G.overReady = true;
       $('bAgain').disabled = false;
-    }, 750);
+    });
     setBestLine();
   }
   function setBestLine() {
@@ -1988,6 +2062,7 @@ export function startGame(): () => void {
     G.blade = false;
     G.zen = false;
     clearHints();
+    refreshArmoryNew();
     showScreen('title');
     hud(false);
     $('bossbar').classList.remove('on');
@@ -2015,6 +2090,7 @@ export function startGame(): () => void {
     (setup) => store.set('issen.setup', setup),
     {
       getMilestone: () => META.bossMilestone,
+      hasVitality: () => META.upgrades.vitality >= 1,
       getReveals: () => pendingModeReveals(META),
       getLoadoutSummary: () => {
         const enabled = SETUP.upgrades !== false && META.upgrades.awakening > 0;
@@ -2100,6 +2176,7 @@ export function startGame(): () => void {
           }
           store.set('issen.revoked', [...revoked]);
           store.set('issen.unlocks', [...UNL]);
+          refreshArmoryNew();
         },
         switchProfile: (enabled) => {
           if (!switchTestProfile(enabled))
@@ -2222,6 +2299,11 @@ export function startGame(): () => void {
     equipment: EQ,
     unlocks: UNL,
     statistics: ST,
+    seen: ARMORY_SEEN,
+    onViewed: () => {
+      store.set('issen.armorySeen', [...ARMORY_SEEN]);
+      refreshArmoryNew();
+    },
     seals: SEALS,
     charms: CHARMCOL,
     awakeningAccess: (type) => META.upgrades.awakening >= (type === 'robe' ? 2 : 1),
@@ -2241,6 +2323,9 @@ export function startGame(): () => void {
     },
   });
   const renderArmory = armory.render;
+  function refreshArmoryNew() {
+    $('armoryNew').hidden = !armory.hasNew();
+  }
   const KONAMI = 'up,up,down,down,left,right,left,right';
   let kseq: Direction[] = [];
   let tapN = 0,
@@ -2255,11 +2340,11 @@ export function startGame(): () => void {
       if (tapN >= 5) tn({ f0: 520 + (tapN - 5) * 55, dur: 0.07, g: 0.05 });
       return;
     }
+    const completedTaps = tapN;
     tapN = 0;
     sfx.caw();
     flash(0.3, '230,220,190');
-    if (!ST.scarecrow) {
-      ST.scarecrow = 1;
+    if (recordSecretEvent(ST, { kind: 'titleTaps', count: completedTaps })) {
       saveStats();
       checkUnlocks();
     } else toast({ k: '案山子', msg: 'The Scarecrow is already yours' });
@@ -2288,8 +2373,7 @@ export function startGame(): () => void {
       audioInit();
       sfx.perfect();
       flash(0.4, '150,200,255');
-      if (!ST.konami) {
-        ST.konami = 1;
+      if (recordSecretEvent(ST, { kind: 'konami' })) {
         saveStats();
         checkUnlocks();
       } else toast({ k: '光剣', msg: 'Kōken is already yours' });
@@ -2463,19 +2547,20 @@ export function startGame(): () => void {
   function pause() {
     if (['playing', 'boss', 'between', 'standoff'].includes(G.state)) {
       G.pauseN = (G.pauseN || 0) + 1;
-      if (G.pauseN >= 10 && !ST.fidget) {
-        ST.fidget = 1;
+      if (recordSecretEvent(ST, { kind: 'pauses', count: G.pauseN })) {
         saveStats();
         checkUnlocks();
       }
       G.pausedFrom = G.state;
       G.state = 'paused';
+      audio.setPaused(true);
       showScreen('paused');
     }
   }
   function resume() {
     if (G.state !== 'paused' || !G.pausedFrom) return;
     G.state = G.pausedFrom;
+    audio.setPaused(guided.frozen);
     showScreen(null);
     frameLoop.resetClock();
   }
@@ -2541,6 +2626,8 @@ export function startGame(): () => void {
     updateWeather(dt);
     updatePlayer(dt);
     updateEnemies(dt);
+    if (G.state === 'playing' && waveConfiguration().ordered && liveOrdered()[0]?.state === 'idle')
+      guided.startOrder();
     if (G.boss) updateBoss(dt);
     updateWave(dt);
     if (G.state === 'standoff') updateStandoff(dt);
@@ -3023,11 +3110,11 @@ export function startGame(): () => void {
         G.slowT = value;
       },
       get timeScale() {
-        return timeScale;
+        return timeScale * guided.scale;
       },
     },
     {
-      paused: () => G.state === 'paused',
+      paused: () => G.state === 'paused' || guided.frozen,
       update,
       render,
       afterRender: () => {
@@ -3066,7 +3153,7 @@ export function startGame(): () => void {
   resize();
   setupAttract();
   setMuteIcon();
-  checkUnlocks(true);
+  refreshArmoryNew();
   setBestLine();
   if (document.fonts && document.fonts.load)
     document.fonts.load(`800 20px "Shippori Mincho B1"`, '一二三四五閃').catch(() => {});
@@ -3078,6 +3165,8 @@ export function startGame(): () => void {
     tutorial.dispose();
     armory.dispose();
     notifications.dispose();
+    guided.dispose();
+    runResults.dispose();
     void audio.dispose()?.catch(() => {});
   });
   frameLoop.start();

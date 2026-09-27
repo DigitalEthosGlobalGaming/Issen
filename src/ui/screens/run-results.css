@@ -1,0 +1,123 @@
+#over .result-sequence {
+  min-height: min(520px, 76dvh);
+  width: min(100%, 430px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.result-sequence:focus-visible {
+  outline: 2px solid #e8ca83;
+  outline-offset: -4px;
+}
+.result-flame {
+  color: #ed9e3a;
+  font-size: 76px;
+  line-height: 1;
+  text-shadow: 0 0 28px #e75d34;
+}
+.result-kind {
+  color: #e7bc71;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+.result-label {
+  color: #f4e9d6;
+  font-size: clamp(22px, 7vw, 32px);
+  font-weight: 700;
+}
+.result-count {
+  color: #f4d89d;
+  font-size: clamp(42px, 13vw, 70px);
+  font-weight: 800;
+  position: relative;
+  line-height: 1.2;
+}
+.result-gain {
+  position: absolute;
+  top: -28px;
+  right: -45px;
+  color: #efa64d;
+  font-size: 22px;
+}
+.result-sequence p {
+  max-width: 320px;
+  color: #cbbfaa;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.result-next {
+  color: #d6c7ae;
+  font-size: 13px;
+  margin-top: 16px;
+}
+.result-sequence.show-unlock .result-count {
+  display: none;
+}
+.result-sequence.animating:not(.show-unlock) .result-gain {
+  animation: ember-fly 1s ease-in-out both;
+}
+.result-sequence.animating .result-flame {
+  animation: result-flame 1s ease-out both;
+}
+.result-sequence.animating.show-unlock .result-label {
+  animation: unlock-enter 0.65s ease-out both;
+}
+@keyframes ember-fly {
+  from {
+    opacity: 0;
+    transform: translate(68px, -95px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+@keyframes result-flame {
+  from {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes unlock-enter {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-sequence,
+  .result-sequence * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

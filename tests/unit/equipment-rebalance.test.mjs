@@ -5,12 +5,12 @@ import { ROBE_AWAKENINGS } from '../../src/game/content/robe-awakenings.ts';
 import { computeModifiers } from '../../src/game/equipment/modifiers.ts';
 import { normalLives } from '../../src/game/equipment/lives.ts';
 import { applyBlessing } from '../../src/game/shrine/blessings.ts';
+import { parseMeta, templateModifiers, templatePowers } from '../../src/game/progression/meta.ts';
 import {
-  parseMeta,
-  templateModifiers,
-  templatePowers,
-  rewardCurrency,
-} from '../../src/game/progression/meta.ts';
+  createRunRewardLedger,
+  accrueRunReward,
+  settleRunReward,
+} from '../../src/game/progression/run-rewards.ts';
 
 const items = Object.fromEntries(createItems(() => new Set()).map((item) => [item.id, item]));
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3' };
@@ -53,18 +53,28 @@ test('old knife and pouch purchases migrate once to combined rank without chargi
 
 test('Yoroi fractional Ember rewards survive reloads and excluded events cannot earn bonuses', () => {
   let meta = parseMeta(null);
-  for (let i = 0; i < 9; i++) rewardCurrency(meta, 'kill', { emberBonus: 0.1 });
-  assert.equal(meta.embers, 9);
-  assert.equal(meta.emberRemainder, 90);
+  let ledger = createRunRewardLedger();
+  for (let i = 0; i < 9; i++) accrueRunReward(ledger, 'kill', { emberBonus: 0.1 });
+  assert.equal(meta.embers, 0);
+  assert.equal(settleRunReward(meta, ledger).gained, 4);
+  assert.equal(meta.emberRemainder, 95);
   meta = parseMeta(JSON.parse(JSON.stringify(meta)));
-  assert.equal(rewardCurrency(meta, 'kill', { emberBonus: 0.1 }), 2);
-  assert.equal(meta.earned, 11);
-  assert.equal(meta.emberRemainder, 0);
-  assert.equal(rewardCurrency(meta, 'boss', { emberBonus: 0.2 }), 30);
-  assert.equal(rewardCurrency(meta, 'wave', { emberBonus: 0.1 }), 5);
+  ledger = createRunRewardLedger();
+  accrueRunReward(ledger, 'kill', { emberBonus: 0.1 });
+  assert.equal(settleRunReward(meta, ledger).gained, 1);
+  assert.equal(meta.earned, 5);
   assert.equal(meta.emberRemainder, 50);
+  ledger = createRunRewardLedger();
+  accrueRunReward(ledger, 'boss', { emberBonus: 0.2 });
+  assert.equal(settleRunReward(meta, ledger).gained, 15);
+  ledger = createRunRewardLedger();
+  accrueRunReward(ledger, 'wave', { emberBonus: 0.1 });
+  assert.equal(settleRunReward(meta, ledger).gained, 3);
+  assert.equal(meta.emberRemainder, 25);
   const before = structuredClone(meta);
+  ledger = createRunRewardLedger();
   for (const context of [{ zen: true }, { tutorial: true }, { testing: true }])
-    assert.equal(rewardCurrency(meta, 'boss', { ...context, emberBonus: 0.2 }), 0);
+    accrueRunReward(ledger, 'boss', { ...context, emberBonus: 0.2 });
+  assert.equal(settleRunReward(meta, ledger).gained, 0);
   assert.deepEqual(meta, before);
 });

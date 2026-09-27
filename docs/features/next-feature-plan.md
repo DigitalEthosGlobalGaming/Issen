@@ -52,6 +52,11 @@ documentation; no player glossary was introduced.
 
 ### Currency and Template decisions
 
+Historical behavior in this section was superseded by
+[feature plan 04](feature-plan-04.md): Embers now settle at run end at half these
+rates, and mode unlocks are revealed there rather than granted mid-run. The
+permanent-upgrade menu is named **Temple** in the current UI.
+
 The permanent-upgrade menu is named **Template**. **Shrine** remains the in-run
 blessing system. Active non-Zen gameplay grants **1 Ember per enemy kill**,
 **5 per cleared wave**, and **25 per boss victory**. Rewards save immediately,
