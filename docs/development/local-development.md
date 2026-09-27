@@ -13,6 +13,7 @@ Use Node 24 (the migration was verified with 24.16.0), then run `npm install` an
 | `npm run format:check` | Check formatting without changing files |
 | `npm run typecheck:watch` | Continuous compiler diagnostics |
 | `npm run build` | Type-check, then bundle into generated `dist/` |
+| `npm run build:pages` | Type-check, then build for the `/Issen/` GitHub Pages path |
 | `npm run preview` | Serve the production build; run build first |
 | `npm test` | Node test runner with native TypeScript stripping for rule tests |
 | `npm run test:browser` | Playwright tests using installed Microsoft Edge |
@@ -53,3 +54,14 @@ Sharing tries an optional host downloads API, then Web Share when file sharing i
 supported, then a PNG download link. Host downloads require the host integration;
 Web Share depends on browser/device support. The displayed image remains a manual
 save option. Native dialogs and actual mobile devices require separate verification.
+
+## GitHub Pages deployment
+
+Pushing `main` runs `.github/workflows/deploy-pages.yml`. The workflow installs the
+locked dependencies, runs `npm run build:pages`, uploads `dist/` as a Pages artifact
+and deploys it to the `github-pages` environment. The published site is
+`https://digitalethosglobalgaming.github.io/Issen/`.
+
+The Pages build uses `/Issen/` as Vite's base path because this is a project site.
+Keep `npm run build` at the root base so existing local preview and production tests
+continue to exercise `http://127.0.0.1:4173/`.

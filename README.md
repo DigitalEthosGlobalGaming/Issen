@@ -2,6 +2,8 @@
 
 A one-handed samurai swipe game for mobile browsers. Everything is drawn in code on a canvas. Development uses TypeScript 7 and Vite. The only external visual resource is the Shippori Mincho B1 font from Google Fonts, with system serif fallbacks.
 
+Play the published game at [digitalethosglobalgaming.github.io/Issen](https://digitalethosglobalgaming.github.io/Issen/).
+
 ## Files
 
 - `index.html` and `src/main.ts`: Vite entry and application startup.
@@ -26,7 +28,7 @@ npm run dev
 
 Open the local address printed by Vite. For phone testing on your local network, use `npm run dev -- --host 0.0.0.0` and your computer's IP address.
 
-`npm run typecheck` checks all application TypeScript. `npm run build` type-checks and builds `dist/`; `npm run preview` serves that output. `npm test` runs rule tests. `npm run test:browser` runs isolated browser regression tests using an installed Microsoft Edge browser and starts Vite if needed. See [development guidance](docs/development/local-development.md) for verification scope.
+`npm run typecheck` checks all application TypeScript. `npm run build` type-checks and builds `dist/`; `npm run preview` serves that output. `npm run build:pages` creates the GitHub Pages build with the repository base path. `npm test` runs rule tests. `npm run test:browser` runs isolated browser regression tests using an installed Microsoft Edge browser and starts Vite if needed. See [development guidance](docs/development/local-development.md) for verification scope.
 
 ## Adding features
 
