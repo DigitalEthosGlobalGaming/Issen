@@ -27,7 +27,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await expect(page.locator('.template-detail')).toContainText('Throwing Knife · 2/3');
   await page.getByRole('button', { name: 'Donate 250 Embers', exact: true }).click();
   expect(await balance()).toBe(475);
-  await expect(page.locator('.template-detail')).toContainText('3 starting knives');
+  await expect(page.locator('.template-detail')).toContainText('3 starting throwing knives');
   await expect(page.getByRole('button', { name: 'Fully donated' })).toBeDisabled();
   await expect(page.locator('[data-upgrade="knife"]')).toHaveAttribute('aria-pressed', 'true');
 });

@@ -163,9 +163,10 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     $('armInfo').innerHTML =
       `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? it.f : 'To unlock: ' + it.d}</div>` +
       (sp
-        ? `<div class="awakening-active"><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
+        ? `<div class="awakening-active"><div class="awakening-label">Awakened active</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
         : (it.pk ? `<div class="pk">+ ${it.pk}</div>` : '') +
-          (it.tr ? `<div class="tr">− ${it.tr}</div>` : '')) +
+          (it.tr ? `<div class="tr">− ${it.tr}</div>` : '') +
+          (own && it.role ? `<div class="item-role">${it.role}</div>` : '')) +
       spInfo(it, own);
   }
   function spInfo(it: Item, own: boolean) {
@@ -188,7 +189,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
           ? 'Ready. Select this tile, then tap it again to activate.'
           : 'Equip it, then tap again to awaken it.'
       : `Challenge: ${sp.need[2]} ${it.type === 'blade' ? 'with this blade' : 'while wearing this outfit'} (${cur.toLocaleString()}/${sp.need[1].toLocaleString()}).`;
-    return `<div class="spx">真 Awakening: ${st}</div>`;
+    return `<div class="spx">真 ${it.type === 'blade' ? 'Blade' : 'Outfit'} Awakening: ${st}</div>`;
   }
   return {
     render,

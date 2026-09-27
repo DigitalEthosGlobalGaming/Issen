@@ -16,6 +16,7 @@ test('portrait title and setup fit while Temple uses compact top-centred details
     await page.setViewportSize(size);
     await page.goto('/');
     await expect(page.locator('#bTemplate')).toHaveText('Temple');
+    await expect(page.locator('#title .title-version')).toHaveText('v1.0.0');
     const fits = async (id: string) =>
       page.locator(id).evaluate((el) => ({
         height: el.scrollHeight <= el.clientHeight + 1,

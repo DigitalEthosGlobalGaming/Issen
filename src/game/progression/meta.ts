@@ -41,14 +41,14 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
   {
     id: 'vitality',
     name: 'Vitality',
-    description: 'Raise Normal starting lives from two to five, one life per rank.',
+    description: 'Add 1 starting life per rank in Normal Waves. Equipment bonuses stack.',
     costs: [100, 200, 350],
     maxRank: 3,
   },
   {
     id: 'focus',
     name: 'Focus',
-    description: '+5% parry window per rank',
+    description: 'Lengthen the duel parry window by 5% per rank.',
     costs: [75, 150, 225],
     maxRank: 3,
   },
@@ -56,7 +56,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'offerings',
     name: 'Offerings',
     description:
-      'More choices and rarer blessings at shrines. Each rank keeps the benefits before it.',
+      'Gain +1 Shrine choice, then a 20 percentage point rare chance bonus, then 1 guaranteed rare blessing when available. Ranks stack.',
     costs: [150, 250, 400],
     maxRank: 3,
   },
@@ -64,7 +64,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'awakening',
     name: 'Awakening Access',
     description:
-      'Unlock weapon awakenings first, then outfit awakenings. Complete their challenges in the Armoury to awaken your equipment.',
+      'Unlock Blade Awakening challenges, then Outfit Awakening challenges. Complete them in the Armoury to activate new forms.',
     costs: [200, 300],
     maxRank: 2,
   },
@@ -72,7 +72,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'knife',
     name: 'Throwing Knife',
     description:
-      'Unlock throwing knives, then carry one more per rank. Tap to defeat an ordinary enemy. Not usable on bosses or in standoffs.',
+      'Carry 1 throwing knife per rank. Tap during a wave to defeat an ordinary enemy; knives cannot target bosses or standoffs.',
     costs: [125, 150, 250],
     maxRank: 3,
   },
@@ -80,7 +80,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'composure',
     name: 'Composure',
     description:
-      'Preserve your combo through one otherwise unprotected combo break per rank each run. Equipment protection is used first.',
+      'Forgive 1 otherwise unprotected combo break per rank each run. Equipment protection is used first.',
     costs: [175, 300],
     maxRank: 2,
   },
@@ -88,7 +88,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'recovery',
     name: 'Recovery',
     description:
-      'Restore one life after every six cleared waves, or every three at rank two. Never exceeds your life cap.',
+      'Restore 1 life after every 6 cleared waves, or every 3 at rank 2, up to your current life maximum.',
     costs: [200, 350],
     maxRank: 2,
   },

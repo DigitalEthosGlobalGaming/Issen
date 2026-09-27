@@ -36,6 +36,7 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
         .find((button) => button.textContent!.startsWith(name))!
         .click();
     controller.render();
+    const balancedBlade = info().includes('Balanced · no modifiers');
     click('Tamahagane');
     click('Tamahagane');
     const gated = !equipment.bladeSp && !root.querySelector('.spx,.spb,.awakening-active');
@@ -43,8 +44,12 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
     controller.render();
     const inactiveHidden = !info().includes('Score ×1.15');
     click('Tamahagane');
-    const bladeActive = equipment.bladeSp && !!root.querySelector('.awakening-active');
+    const bladeActive =
+      equipment.bladeSp &&
+      !!root.querySelector('.awakening-active') &&
+      info().includes('Awakened active');
     tab('Outfits');
+    const balancedOutfit = info().includes('Balanced · no modifiers');
     const beforeSelection = !info().includes('15% more time between attackers');
     click('Sumi');
     const firstSelection = !equipment.robeSp && !info().includes('15% more time between attackers');
@@ -52,7 +57,7 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
     const outfitActive =
       equipment.robeSp &&
       equipment.bladeSp &&
-      !info().includes('Awakened active') &&
+      info().includes('Awakened active') &&
       !!root.querySelector('.awakening-active .pk') &&
       info().includes('15% more time between attackers');
     enabled = false;
@@ -78,8 +83,10 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
     controller.dispose();
     return {
       gated,
+      balancedBlade,
       inactiveHidden,
       bladeActive,
+      balancedOutfit,
       beforeSelection,
       firstSelection,
       outfitActive,
@@ -91,8 +98,10 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
   });
   expect(result).toEqual({
     gated: true,
+    balancedBlade: true,
     inactiveHidden: true,
     bladeActive: true,
+    balancedOutfit: true,
     beforeSelection: true,
     firstSelection: true,
     outfitActive: true,

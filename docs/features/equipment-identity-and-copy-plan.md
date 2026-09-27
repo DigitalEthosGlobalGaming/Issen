@@ -1,6 +1,6 @@
 # Feature plan 03 — equipment identity and copy consistency
 
-Status: proposed. This is a content and balance pass, not an implemented feature.
+Status: phase 1 implemented for v1.0.0; phases 2 and 3 remain proposed.
 
 ## Goal
 
@@ -82,11 +82,10 @@ adding hidden side effects. Make each Awakening Access purchase immediately show
 new Armoury challenges it opened; do not add another combat bonus solely to make the
 tile look busier.
 
-### 5. Copy has one rules error and several avoidable inconsistencies
+### 5. Copy had several avoidable inconsistencies
 
-- Rags says “Start with 2 lives,” but its modifier is `lives: -1`. With the current
-  two-life baseline this means one starting life before other bonuses. It should say
-  **One fewer starting life**, matching Shinobi and the awakened Rags wording.
+- Rags previously said “Start with 2 lives” despite its `lives: -1` modifier. That
+  wording was corrected to **One fewer starting life** before this phase began.
 - The UI mixes **weapon awakening**, **blade awakening** and **equipment form**.
   Armoury calls the category **Blades**, so use **Blade Awakening** and **Outfit
   Awakening** in player-facing copy. Keep saved IDs unchanged.
@@ -101,16 +100,16 @@ tile look busier.
 - Use **+N Shrine choices** rather than a total number because equipment and Temple
   sources stack. Use **1 guaranteed rare blessing when available** for guarantees.
 - `Focus` is the only Temple catalog description without terminal punctuation.
-- Existing feature documentation promises an explicit “Awakened active” label, while
-  the current UI and browser test intentionally rely on the yellow block and `真`
-  marker without that phrase. Decide the presentation, then make the document and
-  test agree.
+- Existing feature documentation promised an explicit “Awakened active” label, while
+  the UI relied on colour and `真`. Phase 1 added the visible label and updated its
+  browser check.
 
 ## Proposed implementation
 
 ### Phase 1 — truthful, consistent copy
 
-This phase must not change balance, unlock conditions, saved IDs or modifier values.
+Implemented for v1.0.0. This phase did not change balance, unlock conditions, saved
+IDs or modifier values.
 
 1. Add a short shared writing glossary to this document and revise the three catalogs
    against it.

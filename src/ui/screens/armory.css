@@ -68,6 +68,17 @@
   font-size: 14px;
   color: rgba(236, 230, 218, 0.55);
 }
+.armInfo .item-role {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--paper-dim);
+}
+.armInfo .awakening-label {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
 .armBottom {
   flex: 1 1 auto;
   min-height: 0;

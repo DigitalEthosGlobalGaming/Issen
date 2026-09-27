@@ -61,14 +61,16 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     title.textContent = `${upgrade.name} · ${rank}/${upgrade.maxRank}`;
     const description = document.createElement('p');
     description.textContent = upgrade.description;
-    const effect = document.createElement('p');
+    const current = document.createElement('p');
+    const next = document.createElement('p');
+    const eligibility = document.createElement('p');
     const value = (n: number) => effectText(upgrade.id, n);
-    effect.textContent =
-      upgrade.id === 'vitality'
-        ? value(Math.min(rank + 1, upgrade.maxRank))
-        : rank < upgrade.maxRank
-          ? `Next: ${value(rank + 1)}`
-          : value(rank);
+    current.textContent = `Current: ${value(rank)}`;
+    if (rank < upgrade.maxRank) next.textContent = `Next: ${value(rank + 1)}`;
+    eligibility.textContent =
+      upgrade.id === 'awakening'
+        ? 'Challenges become available in the Armoury after purchase.'
+        : 'Applies to guided Normal Waves on Normal difficulty with Normal lives and permanent upgrades On.';
     const buy = document.createElement('button');
     buy.className = 'btn';
     buy.textContent = blocked
@@ -84,9 +86,9 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
         root.querySelector<HTMLElement>('.template-detail')?.focus();
       }
     };
-    card.append(illustration(upgrade.id), title);
-    if (upgrade.id !== 'vitality') card.append(description);
-    card.append(effect, buy);
+    card.append(illustration(upgrade.id), title, description, current);
+    if (rank < upgrade.maxRank) card.append(next);
+    card.append(eligibility, buy);
     details.append(card);
   }
 }
@@ -94,33 +96,35 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
     case 'vitality':
-      return `+${rank} ${rank === 1 ? 'Life' : 'Lives'}`;
+      return `${2 + rank} Normal starting lives before equipment bonuses`;
     case 'focus':
-      return `+${rank * 5}% boss parry window`;
+      return rank ? `Duel parry window ${rank * 5}% longer` : 'Standard duel parry window';
     case 'offerings':
       return rank >= 3
-        ? '+1 shrine choice, +20% rare chance and 1 guaranteed rare. Stacks with equipment.'
+        ? '+1 Shrine choice, +20 percentage points rare chance and 1 guaranteed rare when available'
         : rank === 2
-          ? '+1 shrine choice and +20% rare chance. Stacks with equipment.'
+          ? '+1 Shrine choice and +20 percentage points rare chance'
           : rank === 1
-            ? '+1 shrine choice. Stacks with equipment.'
-            : 'Standard shrine choices';
+            ? '+1 Shrine choice'
+            : 'Standard Shrine choices';
     case 'awakening':
       return rank >= 2
-        ? 'Weapon and outfit awakening challenges'
+        ? 'Blade and Outfit Awakening challenges'
         : rank === 1
-          ? 'Weapon awakening challenges'
+          ? 'Blade Awakening challenges'
           : 'Awakening challenges locked';
     case 'knife':
       return rank
-        ? `${rank} starting ${rank === 1 ? 'knife' : 'knives'}`
-        : 'Throwing knives unavailable';
+        ? `${rank} starting throwing ${rank === 1 ? 'knife' : 'knives'}`
+        : 'No throwing knives';
     case 'composure':
-      return `${rank} protected combo breaks per run`;
+      return rank
+        ? `${rank} combo ${rank === 1 ? 'break' : 'breaks'} forgiven per run`
+        : 'No combo protection';
     case 'recovery':
       return rank
         ? `Restore 1 life every ${rank === 1 ? 6 : 3} cleared waves`
-        : 'No milestone healing';
+        : 'No wave-clear recovery';
   }
 }
 const illustrations: Record<UpgradeId, string> = {

@@ -39,7 +39,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '214,193,133' },
   },
   shiro: {
-    pk: 'Regain a life every 15 clean cuts',
+    pk: 'Restore 1 life every 15 clean cuts',
     tr: 'Enemies strike 15% faster',
     m: { restore: 15, atk: 0.85 },
     need: ['p', 60, 'Land 60 perfect cuts'],
@@ -63,7 +63,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '193,216,222' },
   },
   monk: {
-    pk: '+2 extra shrine choices and 1 guaranteed rare blessing when available',
+    pk: '+2 Shrine choices; 1 guaranteed rare blessing when available',
     tr: 'Score ×0.75',
     m: { shrineN: 5, rareShrine: 1, score: 0.75 },
     need: ['w', 15, 'Reach wave 15'],
@@ -71,7 +71,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '219,180,92' },
   },
   mino: {
-    pk: 'Weather hazards reduced by 75%; 10% more time between attackers',
+    pk: 'Weather hazards 75% weaker; 10% more time between attackers',
     tr: 'Enemies strike 10% faster',
     m: { hazard: 0.25, gap: 1.1, atk: 0.9 },
     need: ['w', 22, 'Reach wave 22'],
@@ -79,7 +79,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '159,194,158' },
   },
   helm: {
-    pk: 'Two run wards forgive mistakes',
+    pk: 'First two life-losing hits per run are warded',
     tr: 'Score ×0.7',
     m: { runWard: 2, score: 0.7 },
     need: ['k', 300, 'Cut down 300 foes'],
@@ -95,7 +95,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '224,171,100' },
   },
   shinobi: {
-    pk: 'Standoffs twice as common and pay double; swipes register at half distance',
+    pk: 'Standoffs twice as common; standoff score ×2; swipes register at 50% distance',
     tr: 'One fewer starting life',
     m: { standoff: 2, swipe: 0.5, lives: -1 },
     need: ['c', 70, 'Reach a 70 combo'],
@@ -111,7 +111,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '239,182,116' },
   },
   noh: {
-    pk: 'Every shrine includes a rare when available; duel openings 20% longer',
+    pk: '1 guaranteed rare blessing per Shrine when available; duel openings 20% longer',
     tr: 'Score ×0.8',
     m: { rareShrine: 1, stag: 1.2, score: 0.8 },
     need: ['d', 7, 'Win 7 duels'],
@@ -119,7 +119,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '221,214,188' },
   },
   yoroi: {
-    pk: '+20% Embers earned; one run ward forgives a mistake',
+    pk: '+20% Embers earned; first life-losing hit per run is warded',
     tr: 'Enemies strike 15% faster; score ×0.75',
     m: { emberBonus: 0.2, runWard: 1, atk: 0.85, score: 0.75 },
     need: ['w', 24, 'Reach wave 24'],
@@ -135,7 +135,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '194,182,137' },
   },
   rags: {
-    pk: 'Regain a life every 4 waves; each lost life adds ×0.25 to score',
+    pk: 'Restore 1 life every 4 waves; each lost life adds 0.25 to your score multiplier',
     tr: 'One fewer starting life',
     m: { regen: 4, scarScore: 0.25, lives: -1 },
     need: ['k', 240, 'Cut down 240 foes'],
