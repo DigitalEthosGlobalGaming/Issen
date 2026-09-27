@@ -13,7 +13,11 @@ import { createRunState, resetRun } from './game/run-state.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
 import { createShareCard } from './ui/share-card.ts';
-import { renderGameOver, ITEM_TYPE_LABEL as TYPE_WORD } from './ui/screens/game-over.ts';
+import {
+  appendGameOverUnlocks,
+  renderGameOver,
+  ITEM_TYPE_LABEL as TYPE_WORD,
+} from './ui/screens/game-over.ts';
 import { createRunResults } from './ui/screens/run-results.ts';
 import type { ResultReveal } from './ui/screens/run-results.ts';
 import { recordRun } from './game/progression/run-records.ts';
@@ -222,7 +226,6 @@ export function startGame(): () => void {
   store.set('issen.armorySeen', [...ARMORY_SEEN]);
   Object.assign(SETUP, sanitizeSetup(SETUP, META));
   let runTemplate = templateModifiers(META, SETUP);
-  let runEmbers = 0;
   let rewardLedger = createRunRewardLedger();
   let runBossMilestone = 0;
   let runItemReveals: ResultReveal[] = [];
@@ -872,7 +875,6 @@ export function startGame(): () => void {
   function startRun() {
     Object.assign(SETUP, sanitizeSetup(SETUP, META));
     runTemplate = templateModifiers(META, SETUP);
-    runEmbers = 0;
     rewardLedger = createRunRewardLedger();
     runBossMilestone = 0;
     runItemReveals = [];
@@ -1850,9 +1852,7 @@ export function startGame(): () => void {
       checkUnlocks();
       const newReveals = runItemReveals.slice(previous);
       if (newReveals.length) {
-        $('oUnl').append(
-          document.createTextNode(` ${newReveals.map((item) => item.name).join(', ')} unlocked`),
-        );
+        appendGameOverUnlocks($('over'), newReveals);
         G.overReady = false;
         $('bAgain').disabled = true;
         runResults.startUnlocks(newReveals, () => {
@@ -2017,7 +2017,6 @@ export function startGame(): () => void {
     unlockBossMilestone(META, runBossMilestone, SETUP);
     checkUnlocks();
     const reward = settleRunReward(META, rewardLedger);
-    runEmbers = reward.gained;
     const modeReveals: ResultReveal[] = pendingModeReveals(META).map((mode) => ({
       key: '開',
       name: mode.name,
@@ -2029,11 +2028,7 @@ export function startGame(): () => void {
     G.cardScore = G.score;
     G.card = null;
     G.claps = 0;
-    renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n);
-    $('oStats').append(
-      document.createTextNode(` · ${runEmbers} Embers earned · ${META.embers} available`),
-    );
-    if (!G.upgradesEnabled) $('oStats').append(document.createTextNode(' · Temple upgrades off'));
+    renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled);
     showScreen('over');
     hud(false);
     G.overReady = false;

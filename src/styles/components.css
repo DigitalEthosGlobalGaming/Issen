@@ -116,10 +116,18 @@
     margin-top: 8px;
   }
   .o-stats {
-    margin: 6px 0 4px;
+    margin-top: 8px;
+    padding: 6px 0;
   }
   .o-unl {
     margin-bottom: 6px;
+  }
+  .o-context {
+    margin-top: 8px;
+  }
+  .o-embers {
+    margin-top: 7px;
+    padding: 5px 10px;
   }
   #banner {
     top: auto;

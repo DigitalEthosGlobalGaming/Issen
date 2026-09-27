@@ -66,7 +66,13 @@ test('ending a paused run renders records and allows a fresh run', async ({ page
   await expect(page.locator('#over')).toHaveClass(/on/);
   await expect(page.locator('#oSub')).toHaveText('You left the field');
   await expect(page.locator('#oReason')).toHaveText('You sheathed your blade.');
-  await expect(page.locator('#oStats')).toContainText('Normal. Wave 1');
+  await expect(page.locator('#oContext')).toContainText('Normal · Wave 1');
+  await expect(page.locator('#oStats .o-stat')).toHaveCount(3);
+  await expect(page.locator('#oStats')).toContainText('Cuts');
+  await expect(page.locator('#oEmberGain')).toHaveText('+0 Embers');
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
+    .toBe(true);
   await expect(page.locator('#bAgain')).toBeEnabled();
   const stats = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!));
   expect(stats.runs).toBe(1);

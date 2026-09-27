@@ -83,7 +83,8 @@ implemented files.
   then grants mode/equipment unlocks, presents an Ember tally and unlock cards,
   and finally shows the summary. The result screen animates each run's gain into
   the available balance, then hides the gain while retaining the settled balance
-  and accessible total. `issen.armorySeen` stores gear detail views; old owned
+  and accessible total. The summary places run context above the score and shows
+  compact stat, Ember, and unlock rows below it. `issen.armorySeen` stores gear detail views; old owned
   gear migrates as seen. Unviewed gear, its tab, and the Armoury entry
   use underlined labels. `issen.guidedLessons` records only successful
   first ordered cuts and boss parries. Both keys follow the active profile

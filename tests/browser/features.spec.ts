@@ -180,6 +180,8 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
   await expect(page.locator('#runResultSequence')).toContainText('Boss Rush');
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  await expect(page.locator('#oEmberGain')).toHaveText('+12 Embers');
+  await expect(page.locator('#oEmberTotal')).toHaveText('12 total');
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!).embers),
   ).toBe(12);
