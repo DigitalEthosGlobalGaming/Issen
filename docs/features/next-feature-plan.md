@@ -62,33 +62,36 @@ boundary. Any profile reset should explicitly identify the data being reset.
 Done when a tester can reach a chosen encounter, change a loadout and reproduce
 progression states without manually editing saves or losing their real profile.
 
-## 4. Explain the game's important concepts
+## 4. Document important gameplay types in the TypeScript source
 
-Create a focused guide to the concepts players need to understand. Here, “types”
-means gameplay concepts, rather than an exhaustive list of TypeScript types.
-Explain what each concept is, how it is obtained or encountered, how to use it,
-and whether its effects last for a run or persist across runs.
+Add developer-facing documentation beside selected gameplay types and their
+owning code. A developer reading a type should understand what the concept
+represents in the game, how it fits into the surrounding systems and how to
+work with it. This is targeted source documentation, not an exhaustive pass over
+every type or a player-facing guide.
 
-Initial scope:
+Use `Awakening` in `src/game/content/awakenings.ts` as the initial example.
+Planned JSDoc on the interface or its module should explain that an awakening
+is an unlockable variant of a blade, earned through blade-specific progress,
+with a gameplay benefit, a tradeoff and optional visual changes. Explain how
+the catalog relates to progress tracking, unlock eligibility and modifier
+application, with references to the relevant owning modules.
 
-- Blades, equipment and cosmetic categories: what affects play and what affects appearance.
-- Awakenings: their relationship to blades, requirements, benefits and tradeoffs.
-- Blessings: how choices at the existing in-run Shrine affect a run.
-- Stages, waves and boss duels: how they structure progression.
-- Boss Rush, Ronin and Blade Only: how each changes play and how it is unlocked.
-- The new currency and permanent Template boosters once their rules are settled.
+Document fields where their meaning is not obvious, particularly abbreviated
+names and the `need` tuple: what each value represents, how the requirement is
+evaluated and how the gameplay modifiers and visual settings are consumed.
+Include concise guidance for adding or changing an awakening, grounded in the
+actual implementation and its conventions.
 
-For example, the current awakening system is tied to individual blades. Meeting
-a blade-specific progress requirement unlocks its awakened variant, which has
-a defined benefit and tradeoff and may change its visual effects. The Steel
-awakening requires 200 foes defeated with that blade; its modifiers give
-×1.15 score while enemies strike 5% faster. Awakening progress and eligibility
-are defined in `src/game/content/awakenings.ts` and
-`src/game/progression/unlocks.ts`.
+Apply the same approach selectively to other important domain types, such as
+blessings, equipment and progression state, where the type shape alone does not
+explain the gameplay meaning. Avoid comments that merely repeat TypeScript
+syntax or duplicate large catalogs.
 
-The finished guide should include concise usage instructions and examples checked
-against the implementation. Decide whether it remains repository documentation
-or also appears as contextual help in the Armoury and other menus.
+Done when a developer can read the documented type in their editor and understand
+its purpose, relationships and extension points without reconstructing the
+concept from its call sites. Source changes are deferred until implementation;
+this section only records the planned documentation work.
 
 ## 5. Persistent currency and a permanent-upgrade Template
 
@@ -179,7 +182,7 @@ profiles and a return to the menu with multiple unlocks pending.
 
 1. Address the sound and lingering-shadow issues as small independent changes.
 2. Build the core testing menu to support the remaining work.
-3. Write the concept guide and settle the progression and currency decisions above.
+3. Document key gameplay types in the source and settle the progression and currency decisions above.
 4. Implement tutorial, mode milestones, save migration and unlock reveals.
 5. Implement the currency and permanent Template upgrades, then balance their
    interactions with the existing game.

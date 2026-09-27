@@ -123,6 +123,8 @@ export function updateEnemies(G: EnemyUpdateState, dt: number, env: EnemyUpdateE
     e.pos = enemyPos(e);
   }
   G.enemies = G.enemies.filter(
-    (e) => !(e.state === 'dying' && e.t > 1.12) && !(e.state === 'fade' && e.t > 0.5),
+    (e) =>
+      !(e.state === 'dying' && e.t >= (!e.deathType || e.deathType === 'split' ? 0.9 : 1.1)) &&
+      !(e.state === 'fade' && e.t >= 0.5),
   );
 }

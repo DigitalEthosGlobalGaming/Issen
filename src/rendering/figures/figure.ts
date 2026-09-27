@@ -1167,6 +1167,20 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       ny = dx,
       Lg = Math.max(W, H) * 2;
     const fade = 1 - clamp((t - dur * 0.4) / (dur * 0.6));
+    if (fade <= 0) return;
+    // Ground contact belongs to the whole figure, not either moving fragment.
+    // Drawing it inside each clipped half made shadows drift with falling bodies.
+    if (!f.noShadow) {
+      g.save();
+      g.globalAlpha *= fade * (f.alpha ?? 1);
+      g.translate(p.x, p.y);
+      g.scale(p.h, p.h);
+      g.fillStyle = 'rgba(0,0,0,.25)';
+      g.beginPath();
+      g.ellipse(0.05, 0.004, 0.36, 0.035, 0, 0, TAU);
+      g.fill();
+      g.restore();
+    }
     for (const side of [1, -1]) {
       g.save();
       g.globalAlpha *= fade;
@@ -1180,7 +1194,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineTo(cx - dx * Lg + nx * Lg * side, cy - dy * Lg + ny * Lg * side);
       g.closePath();
       g.clip();
-      drawFigure(f);
+      drawFigure({ ...f, noShadow: true });
       g.restore();
     }
   }

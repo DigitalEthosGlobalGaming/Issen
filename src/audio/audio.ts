@@ -201,8 +201,12 @@ export function createAudio(initialMuted: boolean) {
       nz({ f0: 1400, f1: 900, dur: 0.25, g: 0.18, q: 3 });
     },
     clink() {
-      tn({ f0: 2300, f1: 1900, dur: 0.25, g: 0.1, type: 'triangle' });
-      nz({ type: 'lowpass', f0: 500, dur: 0.08, g: 0.2 });
+      // A fallen blade bites into earth: a dry impact with a brief steel tick.
+      // Avoid the old descending triangle tone, which sounded like a squeak.
+      nz({ type: 'lowpass', f0: 850, f1: 280, dur: 0.105, g: 0.22, q: 0.5, a: 0.002 });
+      tn({ f0: 125, f1: 75, dur: 0.085, g: 0.12, a: 0.002 });
+      tn({ f0: 2150, dur: 0.065, g: 0.035, a: 0.002 });
+      nz({ f0: 3200, dur: 0.035, g: 0.045, q: 0.7, a: 0.002 });
     },
     heart() {
       tn({ f0: 72, f1: 44, dur: 0.18, g: 0.55 });
