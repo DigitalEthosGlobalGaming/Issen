@@ -62,10 +62,14 @@ implemented files.
 - Storage failure is non-fatal. `platform/saves.ts` validates profile data before
   it reaches gameplay. Existing `issen.*` keys and mode-record keys remain stable.
   Browser origin determines which saves are visible.
+  Stats' confirmed profile reset routes through `clearActiveProfile`, deleting
+  only the active namespace and suppressing stale writes until reload. The test
+  admin wrapper cannot delete the player namespace. `bindProfileReset` owns the
+  accessible confirmation modal and isolates its keyboard events from gameplay.
 - `progression/meta.ts` validates the new `issen.meta` progression record. Temple
   modifiers and consumables are captured at run start and apply only to opted-in,
   arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,
-  with equipment/upgrades composed and capped at five. Tutorial practice owns separate state and never
+  with equipment/upgrades added without a total life cap. Tutorial practice owns separate state and never
   records gameplay rewards. The runtime persists its completion/skip callback.
 - `progression/awakening-progress.ts` validates `issen.awakening`: blade and robe
   counters are independent and earn only after category access (rank 1 weapons,

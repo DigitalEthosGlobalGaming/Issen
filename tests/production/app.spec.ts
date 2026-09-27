@@ -59,7 +59,7 @@ test('built assets support startup, armory, a run, sharing, and landscape layout
       .data.some((value) => value !== 0),
   );
   expect(rendered).toBe(true);
-  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.locator('#armory').getByRole('button', { name: 'Done', exact: true }).click();
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await page.keyboard.press('p');

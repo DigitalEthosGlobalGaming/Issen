@@ -63,7 +63,12 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     description.textContent = upgrade.description;
     const effect = document.createElement('p');
     const value = (n: number) => effectText(upgrade.id, n);
-    effect.textContent = rank < upgrade.maxRank ? `Next: ${value(rank + 1)}` : value(rank);
+    effect.textContent =
+      upgrade.id === 'vitality'
+        ? value(Math.min(rank + 1, upgrade.maxRank))
+        : rank < upgrade.maxRank
+          ? `Next: ${value(rank + 1)}`
+          : value(rank);
     const buy = document.createElement('button');
     buy.className = 'btn';
     buy.textContent = blocked
@@ -79,7 +84,9 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
         root.querySelector<HTMLElement>('.template-detail')?.focus();
       }
     };
-    card.append(illustration(upgrade.id), title, description, effect, buy);
+    card.append(illustration(upgrade.id), title);
+    if (upgrade.id !== 'vitality') card.append(description);
+    card.append(effect, buy);
     details.append(card);
   }
 }
@@ -87,7 +94,7 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
     case 'vitality':
-      return `${2 + rank} starting lives, before equipment bonuses`;
+      return `+${rank} ${rank === 1 ? 'Life' : 'Lives'}`;
     case 'focus':
       return `+${rank * 5}% boss parry window`;
     case 'offerings':
@@ -105,9 +112,9 @@ function effectText(id: UpgradeId, rank: number): string {
           ? 'Weapon awakening challenges'
           : 'Awakening challenges locked';
     case 'knife':
-      return rank ? '1 starting knife before pouch bonuses' : 'Throwing knives unavailable';
-    case 'pouch':
-      return `+${rank} starting knives`;
+      return rank
+        ? `${rank} starting ${rank === 1 ? 'knife' : 'knives'}`
+        : 'Throwing knives unavailable';
     case 'composure':
       return `${rank} protected combo breaks per run`;
     case 'recovery':
@@ -123,8 +130,6 @@ const illustrations: Record<UpgradeId, string> = {
   offerings: '<path d="M15 38H81M22 26H74M29 38V79M67 38V79M21 79H75M35 61H61M40 61V50H56V61"/>',
   awakening: '<path d="M48 11L57 36L84 48L57 59L48 85L37 59L12 48L37 36Z"/>',
   knife: '<path d="M19 78L35 59L41 65L25 84ZM35 59L70 16L77 11L78 21L41 65M29 52L49 71"/>',
-  pouch:
-    '<path d="M31 29H65L74 72Q48 88 22 72ZM29 29H67M34 17L39 29M48 13V29M62 17L57 29M37 49H59M43 59H53"/>',
   composure: '<path d="M48 13L77 25V49Q73 72 48 84Q23 72 19 49V25ZM31 49L43 61L66 36"/>',
   recovery: '<path d="M74 39A29 29 0 1 0 73 65M74 20V39H55M48 34V64M33 49H63"/>',
 };

@@ -15,14 +15,14 @@ The base robe must be owned before its challenge is displayed, including secrets
 | Shiro | 60 perfects | Restore a life every 15 clean cuts | Attacks 15% faster | Ivory frost |
 | Oni mask | 8 duels | Parry window +35% | Openings −20% | Vermilion dark aura |
 | Tengu mask | 100 perfects | Perfect arc +40%; swipe distance ×0.8 | Score ×0.8 | Pale blue afterimage |
-| Monk hood | Wave 15 | 5 Shrine choices; guaranteed available rare | Score ×0.75 | Saffron glow |
+| Monk hood | Wave 15 | +2 Shrine choices; guaranteed available rare | Score ×0.75 | Saffron glow |
 | Straw cape | Wave 22 | Hazards −75%; attacker spacing +10% | Attacks 10% faster | Rain-green frost |
 | Kabuto | 300 kills | 2 run wards forgive mistakes | Score ×0.7 | Aged-brass glow |
 | Jinbaori | 10 duels | +2 starting lives; parry window +10% | Score ×0.65 | Commander-gold glow |
 | Shinobi | Combo 70 | Double standoffs/reward; half swipe distance | −1 starting life | Indigo afterimage |
 | Kitsune mask | 80 perfects | Reveal feints; feints cannot cost a life | Attacks 15% faster | Fox-amber petals |
 | Noh mask | 7 duels | Guaranteed available rare; openings +20% | Score ×0.8 | Porcelain glow |
-| Yoroi | Wave 24 | +2 starting lives; 1 run ward | Attacks 15% faster; score ×0.75 | Steel-blue sparks |
+| Yoroi | Wave 24 | +20% Embers earned; 1 run ward | Attacks 15% faster; score ×0.75 | Steel-blue sparks |
 | Komusō | 70 perfects | Perfect arc +30%; hidden-arrow score ×1.4 | Parry window −15% | Reed afterimage |
 | Rags | 240 kills | Restore a life every 4 waves; lost lives add ×0.25 score | −1 starting life | Copper-patch glow |
 | Kabuki lion | Combo 90 | 2 combo mistakes forgiven/wave; growing 10-combo bonus | Attacks 12% faster | Rose petals |
@@ -31,7 +31,7 @@ The base robe must be owned before its challenge is displayed, including secrets
 
 Awakened outfit modifiers replace base outfit modifiers; blade and robe activation
 are independent, and their sources then compose through `computeModifiers`.
-Normal-life increases and recovery respect the five-life cap. Feint probability
+Normal-life bonuses have no overall cap; recovery heals to the current maximum. Feint probability
 offsets are percentage points, not multipliers. Duration modifiers below one make
 attacks faster. Shrine rare guarantees require a remaining eligible rare blessing.
 

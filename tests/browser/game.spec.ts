@@ -140,8 +140,10 @@ test('armory preview draws without errors in portrait and landscape', async ({ p
   });
   expect(pixels).toBe(true);
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(page.getByRole('button', { name: 'Done', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(
+    page.locator('#armory').getByRole('button', { name: 'Done', exact: true }),
+  ).toBeVisible();
+  await page.locator('#armory').getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.locator('#title')).toHaveClass(/on/);
   expect(errors).toEqual([]);
 });

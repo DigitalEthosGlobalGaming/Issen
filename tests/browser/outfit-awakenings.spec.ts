@@ -52,7 +52,8 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
     const outfitActive =
       equipment.robeSp &&
       equipment.bladeSp &&
-      info().includes('Awakened active') &&
+      !info().includes('Awakened active') &&
+      !!root.querySelector('.awakening-active .pk') &&
       info().includes('15% more time between attackers');
     enabled = false;
     controller.render();

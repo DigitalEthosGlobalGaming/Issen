@@ -163,7 +163,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     $('armInfo').innerHTML =
       `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? it.f : 'To unlock: ' + it.d}</div>` +
       (sp
-        ? `<div class="awakening-active"><strong>Awakened active</strong><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
+        ? `<div class="awakening-active"><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
         : (it.pk ? `<div class="pk">+ ${it.pk}</div>` : '') +
           (it.tr ? `<div class="tr">− ${it.tr}</div>` : '')) +
       spInfo(it, own);

@@ -63,6 +63,14 @@ reloads a fresh test profile. It blocks stale queued saves during reload.
 **Unlock all** grants the complete Armoury (including awakened unlocks) only in
 the test profile, without changing Temple ranks or equipment. Set Awakening Access
 separately to reveal and use those forms.
+
+Stats also offers **Reset profile** for the active profile. Its modal warning
+requires **Delete all progress**; Cancel/Escape leave saves unchanged. A player
+reset removes player `issen.*` keys but preserves `issen.testing.*`; a test reset
+removes only `issen.testing.*`. Records, unlocks, awakening progress, Temple ranks,
+currency, onboarding and settings are reset, then the game reloads. Queued writes
+are blocked during reload, and failures attempt to restore the captured data.
+Verify this only in disposable browser contexts, never with real player saves.
 **Return to player profile** reloads the original saves. The shortcut ships in the
 client for convenience, not as an access-control mechanism. Never reset player
 saves to test these flows.
@@ -78,9 +86,12 @@ updates the upgrade catalog, Normal-life baseline, upgrades toggle and awakening
 
 For awakening tests seed `issen.awakening` with separate `blades`/`robes` records
 and use owned access in metadata; editing lifetime `issen.stats.bl` after migration
-must not grant new challenge progress. Use schema version 3 for new fixtures:
+must not grant new challenge progress. Use schema version 4 for new fixtures:
 awakening rank 1 enables weapons only and rank 2 enables outfits too. Older
 purchased combined access migrates once to rank 2. Metadata versioning prevents the old
+Knife/Pouch split from losing capacity: old owned Knife + Pouch ranks become the
+single knife rank (1–3). Fractional bonus Embers persist as integer hundredths in
+`emberRemainder`, so small Yoroi rewards accumulate across reloads. Versioning also prevents the old
 Vitality-to-rank-2 compensation from applying repeatedly. Test Off separately from
 challenge-mode eligibility: Off suppresses both Template powers and awakened forms,
 while challenge tracking still works after access. Knife tests must cover bosses,

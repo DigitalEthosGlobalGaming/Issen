@@ -8,6 +8,8 @@ const DEFAULT_MODIFIERS = {
   /** Offset to the normalized perfect-zone threshold; negative enlarges the arc. */
   pz: 0,
   score: 1,
+  /** Additive currency bonus; 0.1 means 10% more earned Embers. */
+  emberBonus: 0,
   perfect: 1,
   normal: 1,
   feint: 0,

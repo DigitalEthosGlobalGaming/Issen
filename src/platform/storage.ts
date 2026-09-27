@@ -8,20 +8,29 @@ function readTestProfile(): boolean {
 // Snapshot for this module instance: queued saves while reload is pending still
 // belong to the departing profile, regardless of the next session's selector.
 const activeTestProfile = readTestProfile();
-let resettingTestProfile = false;
-/** Clear only the isolated namespace and reload before any stale runtime can save. */
+let resettingProfile = false;
+/** Admin convenience: never allow the test-only action to clear player saves. */
 export function clearTestProfile(): boolean {
-  if (!activeTestProfile || resettingTestProfile) return false;
+  return activeTestProfile ? clearActiveProfile() : false;
+}
+/** Clear the active profile only, then reload before stale runtime state can save. */
+export function clearActiveProfile(): boolean {
+  if (resettingProfile) return false;
   const backup = new Map<string, string>();
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('issen.testing.')) {
+      const matches =
+        key &&
+        (activeTestProfile
+          ? key.startsWith('issen.testing.')
+          : key.startsWith('issen.') && !key.startsWith('issen.testing.'));
+      if (key && matches) {
         const value = localStorage.getItem(key);
         if (value !== null) backup.set(key, value);
       }
     }
-    resettingTestProfile = true;
+    resettingProfile = true;
     for (const key of backup.keys()) localStorage.removeItem(key);
     location.reload();
     return true;
@@ -33,7 +42,7 @@ export function clearTestProfile(): boolean {
         /* Best-effort recovery if storage is unavailable. */
       }
     }
-    resettingTestProfile = false;
+    resettingProfile = false;
     return false;
   }
 }
@@ -70,7 +79,7 @@ export const store = {
     }
   },
   set(key: string, value: unknown): void {
-    if (resettingTestProfile) return;
+    if (resettingProfile) return;
     try {
       localStorage.setItem(profileKey(key), JSON.stringify(value));
     } catch {

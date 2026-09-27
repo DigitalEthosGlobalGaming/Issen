@@ -1,14 +1,13 @@
 import type { Setup } from '../../platform/saves.ts';
 
 export type UpgradeId =
-  'vitality' | 'focus' | 'offerings' | 'awakening' | 'knife' | 'pouch' | 'composure' | 'recovery';
+  'vitality' | 'focus' | 'offerings' | 'awakening' | 'knife' | 'composure' | 'recovery';
 export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze({
   vitality: 0,
   focus: 0,
   offerings: 0,
   awakening: 0,
   knife: 0,
-  pouch: 0,
   composure: 0,
   recovery: 0,
 });
@@ -18,9 +17,11 @@ export type TutorialStatus = 'new' | 'completed' | 'skipped';
  * bossMilestone records journey position, not repeated boss victories;
  * revealSeen independently records which menu introductions have played. */
 export interface MetaProgress {
-  schemaVersion: 3;
+  schemaVersion: 4;
   embers: number;
   earned: number;
+  /** Hundredths of a bonus Ember, carried between rewards and reloads. */
+  emberRemainder: number;
   upgrades: Record<UpgradeId, number>;
   bossMilestone: number;
   revealSeen: number;
@@ -71,18 +72,9 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'knife',
     name: 'Throwing Knife',
     description:
-      'Start with one throwing knife. Tap during a wave to defeat a random ordinary enemy. Never used on bosses or in standoffs.',
-    costs: [125],
-    maxRank: 1,
-  },
-  {
-    id: 'pouch',
-    name: 'Knife Pouch',
-    description:
-      'Carry one additional starting knife per rank, up to three total. Requires Throwing Knife.',
-    costs: [150, 250],
-    maxRank: 2,
-    requires: 'knife',
+      'Unlock throwing knives, then carry one more per rank. Tap to defeat an ordinary enemy. Not usable on bosses or in standoffs.',
+    costs: [125, 150, 250],
+    maxRank: 3,
   },
   {
     id: 'composure',
@@ -154,26 +146,34 @@ export function parseMeta(
   const bossMilestone = established ? 3 : integer(saved.bossMilestone, 3);
   const embers = integer(saved.embers, MAX_CURRENCY);
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     embers,
     earned: Math.max(embers, integer(saved.earned, MAX_CURRENCY)),
+    emberRemainder: integer(saved.emberRemainder, 99),
     upgrades: {
       vitality:
-        saved.schemaVersion === 2 || saved.schemaVersion === 3
+        saved.schemaVersion === 2 || saved.schemaVersion === 3 || saved.schemaVersion === 4
           ? integer(ranks.vitality, 3)
           : integer(ranks.vitality, 1) * 2,
       focus: integer(ranks.focus, 3),
       offerings: integer(ranks.offerings, 3),
       awakening: Math.max(
-        saved.schemaVersion === 3 ? integer(ranks.awakening, 2) : integer(ranks.awakening, 1) * 2,
+        saved.schemaVersion === 3 || saved.schemaVersion === 4
+          ? integer(ranks.awakening, 2)
+          : integer(ranks.awakening, 1) * 2,
         saved.schemaVersion !== 2 &&
           saved.schemaVersion !== 3 &&
+          saved.schemaVersion !== 4 &&
           [...unlocks].some((id) => id.endsWith('+'))
           ? 2
           : 0,
       ),
-      knife: integer(ranks.knife, 1),
-      pouch: integer(ranks.pouch, 2),
+      knife:
+        saved.schemaVersion === 4
+          ? integer(ranks.knife, 3)
+          : integer(ranks.knife, 1)
+            ? 1 + integer(ranks.pouch, 2)
+            : 0,
       composure: integer(ranks.composure, 2),
       recovery: integer(ranks.recovery, 2),
     },
@@ -216,7 +216,7 @@ export function templatePowers(
 ): { knives: number; composure: number; recoveryEvery: number } {
   const ranks = templateEligible(setup) ? parseMeta(meta).upgrades : EMPTY_UPGRADES;
   return {
-    knives: ranks.knife ? 1 + ranks.pouch : 0,
+    knives: ranks.knife,
     composure: ranks.composure,
     recoveryEvery: ranks.recovery === 2 ? 3 : ranks.recovery === 1 ? 6 : 0,
   };
@@ -241,6 +241,7 @@ export interface RewardContext {
   zen?: boolean;
   tutorial?: boolean;
   testing?: boolean;
+  emberBonus?: number;
 }
 /** Runtime calls exactly once per authoritative event, never from rendering.
  * Testing is excluded unless the caller deliberately uses an isolated profile. */
@@ -250,7 +251,11 @@ export function rewardCurrency(
   context: RewardContext = {},
 ): number {
   if (context.zen || context.tutorial || context.testing) return 0;
-  const amount = { kill: 1, wave: 5, boss: 25 }[event];
+  const base = { kill: 1, wave: 5, boss: 25 }[event];
+  const bonus = Number.isFinite(context.emberBonus) ? Math.max(0, context.emberBonus!) : 0;
+  const fraction = integer(meta.emberRemainder, 99) + Math.round(base * bonus * 100);
+  const amount = base + Math.floor(fraction / 100);
+  meta.emberRemainder = fraction % 100;
   const before = integer(meta.embers, MAX_CURRENCY);
   meta.embers = Math.min(MAX_CURRENCY, before + amount);
   meta.earned = Math.min(MAX_CURRENCY, integer(meta.earned, MAX_CURRENCY) + amount);

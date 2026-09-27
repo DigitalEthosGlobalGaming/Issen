@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Template browsing never spends and Knife Pouch requires the throwing ability', async ({
+test('Temple browsing never spends and Throwing Knife upgrades its own capacity', async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -12,22 +12,24 @@ test('Template browsing never spends and Knife Pouch requires the throwing abili
   await page.goto('/');
   await page.locator('#bTemplate').click();
   const balance = () => page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers);
-  await expect(page.locator('.upgrade-tile')).toHaveCount(8);
-  for (const id of ['focus', 'recovery', 'pouch'])
+  await expect(page.locator('.upgrade-tile')).toHaveCount(7);
+  await expect(page.locator('[data-upgrade="pouch"]')).toHaveCount(0);
+  for (const id of ['focus', 'recovery', 'knife'])
     await page.locator(`[data-upgrade="${id}"]`).click();
   expect(await balance()).toBe(1000);
-  await expect(page.locator('.template-detail button')).toHaveText('Requires Throwing Knife');
-  await expect(page.locator('.template-detail button')).toBeDisabled();
   await page.locator('[data-upgrade="knife"]').click();
   await page.getByRole('button', { name: 'Donate 125 Embers', exact: true }).click();
   expect(await balance()).toBe(875);
   await expect(page.locator('#templateContent > [role="status"]')).toHaveCount(0);
   await expect(page.locator('.temple-header h2')).toHaveText('Temple');
-  await page.locator('[data-upgrade="pouch"]').click();
   await page.getByRole('button', { name: 'Donate 150 Embers', exact: true }).click();
   expect(await balance()).toBe(725);
-  await expect(page.locator('.template-detail')).toContainText('Knife Pouch · 1/2');
-  await expect(page.locator('[data-upgrade="pouch"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.template-detail')).toContainText('Throwing Knife · 2/3');
+  await page.getByRole('button', { name: 'Donate 250 Embers', exact: true }).click();
+  expect(await balance()).toBe(475);
+  await expect(page.locator('.template-detail')).toContainText('3 starting knives');
+  await expect(page.getByRole('button', { name: 'Fully donated' })).toBeDisabled();
+  await expect(page.locator('[data-upgrade="knife"]')).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('Normal starts with two lives and upgrades Off retains purchases while separating records', async ({
@@ -63,7 +65,8 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
     ranks: JSON.parse(localStorage.getItem('issen.meta')!).upgrades,
     records: Object.keys(JSON.parse(localStorage.getItem('issen.stats')!).rec),
   }));
-  expect(saved.ranks).toMatchObject({ vitality: 3, knife: 1, pouch: 2, composure: 2 });
+  expect(saved.ranks).toMatchObject({ vitality: 3, knife: 3, composure: 2 });
+  expect(saved.ranks.pouch).toBeUndefined();
   expect(saved.records).toEqual(['normal-base']);
   await page.reload();
   await page.locator('#bPlay').click();

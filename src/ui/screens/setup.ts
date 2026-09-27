@@ -19,7 +19,7 @@ const descriptions = {
     0: 'No arrows. Read the sword itself. Score ×1.5.',
   },
   lives: {
-    '3': 'Two starting lives. Upgrade Vitality for up to five.',
+    '3': 'Two starting lives, plus Vitality and equipment bonuses.',
     '0': 'One mistake ends the run. Score ×1.5.',
     zen: 'No death. Mistakes break your combo. End your run from pause.',
   },

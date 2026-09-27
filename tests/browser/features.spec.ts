@@ -92,7 +92,7 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('spinbutton', { name: 'Lives', exact: true }).fill('9');
   await page.getByRole('button', { name: 'Set lives', exact: true }).click();
-  await expect(page.locator('#lives i')).toHaveCount(5);
+  await expect(page.locator('#lives i')).toHaveCount(9);
   await page.getByRole('button', { name: 'Return to player profile', exact: true }).click();
   await expect(page.locator('#testBadge')).toBeHidden();
   expect(await page.evaluate(() => localStorage.getItem('issen.meta'))).toBe(original);

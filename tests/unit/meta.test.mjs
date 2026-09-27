@@ -82,7 +82,7 @@ test('rank costs are charged once and challenge settings exclude permanent power
 
 test('expanded ranks migrate once and existing awakenings retain access', () => {
   const migrated = parseMeta({ upgrades: { vitality: 1 } }, {}, new Set(['steel+']));
-  assert.equal(migrated.schemaVersion, 3);
+  assert.equal(migrated.schemaVersion, 4);
   assert.equal(migrated.upgrades.vitality, 2);
   assert.equal(migrated.upgrades.awakening, 2);
   assert.deepEqual(parseMeta(JSON.parse(JSON.stringify(migrated))), migrated);
@@ -110,9 +110,9 @@ test('awakening purchases split weapons and outfits and preserve old combined ac
   );
 });
 
-test('eight upgrade catalog enforces pouch prerequisite and maximum ranks', () => {
+test('seven upgrade catalog includes unified knives and enforces maximum ranks', () => {
   const meta = parseMeta({ embers: 10000 });
-  assert.equal(TEMPLATE_UPGRADES.length, 8);
+  assert.equal(TEMPLATE_UPGRADES.length, 7);
   assert.equal(purchaseUpgrade(meta, 'pouch'), false);
   assert.equal(meta.embers, 10000);
   for (const upgrade of TEMPLATE_UPGRADES) {

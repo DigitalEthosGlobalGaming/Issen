@@ -91,6 +91,53 @@ test('malformed JSON and storage failures are nonfatal', async (t) => {
   assert.doesNotThrow(() => store.set('issen.meta', { embers: 1 }));
 });
 
+test('active player reset clears every player key but preserves test and unrelated data', async (t) => {
+  const { local, store, clearActiveProfile, reloads } = await fixture(t);
+  for (const key of [
+    'stats',
+    'best',
+    'meta',
+    'equip',
+    'unlocks',
+    'awakening',
+    'hints',
+    'setup',
+    'muted',
+    'revoked',
+    'future',
+  ])
+    local.set('issen.' + key, 'old');
+  local.set('issen.testing.meta', 'test');
+  local.set('another.app', 'other');
+  assert.equal(clearActiveProfile(), true);
+  store.set('issen.stats', { runs: 9 });
+  assert.deepEqual(
+    [...local],
+    [
+      ['issen.testing.meta', 'test'],
+      ['another.app', 'other'],
+    ],
+  );
+  assert.equal(reloads(), 1);
+  assert.equal(clearActiveProfile(), false);
+});
+
+test('failed deletion restores captured profile data and permits future saves', async (t) => {
+  const { local, store, clearActiveProfile } = await fixture(t);
+  local.set('issen.stats', 'records');
+  local.set('issen.meta', 'progress');
+  const remove = globalThis.localStorage.removeItem;
+  globalThis.localStorage.removeItem = (key) => {
+    if (key === 'issen.meta') throw new Error('denied');
+    remove(key);
+  };
+  assert.equal(clearActiveProfile(), false);
+  assert.equal(local.get('issen.stats'), 'records');
+  assert.equal(local.get('issen.meta'), 'progress');
+  store.set('issen.stats', { runs: 1 });
+  assert.equal(JSON.parse(local.get('issen.stats')).runs, 1);
+});
+
 test('profile switch requests reload and keeps old in-memory writes in their original namespace', async (t) => {
   const { store, local, session, switchTestProfile, reloads } = await fixture(t, true);
   local.set('issen.stats', JSON.stringify({ runs: 42 }));

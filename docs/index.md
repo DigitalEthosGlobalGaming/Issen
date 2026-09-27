@@ -1,5 +1,9 @@
 # Repository documentation
 
+- [Equipment identity and copy consistency](features/equipment-identity-and-copy-plan.md):
+  proposed audit and implementation plan for blades, outfits, Awakenings, Temple
+  upgrades and their shared player-facing language.
+
 - [Feature set 02 — environments, upgrades and awakenings](features/feature-plan-02.md):
   implemented decisions for tree polish, expanded Temple, Normal lives,
   throwing knives, upgrades toggle and awakening access/outfits; acceptance checks.

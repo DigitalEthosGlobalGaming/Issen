@@ -55,15 +55,13 @@ test('portrait title and setup fit while Temple uses compact top-centred details
     const titleBox = await page.locator('#template h2').boundingBox();
     expect(doneBox!.x).toBeGreaterThan(titleBox!.x + titleBox!.width);
     expect(doneBox!.y).toBeLessThan(60);
-    const tiles = await page
-      .locator('.upgrade-tile')
-      .evaluateAll((nodes) =>
-        nodes.map((node) => ({
-          x: node.getBoundingClientRect().x,
-          y: node.getBoundingClientRect().y,
-          bottom: node.getBoundingClientRect().bottom,
-        })),
-      );
+    const tiles = await page.locator('.upgrade-tile').evaluateAll((nodes) =>
+      nodes.map((node) => ({
+        x: node.getBoundingClientRect().x,
+        y: node.getBoundingClientRect().y,
+        bottom: node.getBoundingClientRect().bottom,
+      })),
+    );
     expect(tiles[0]!.y).toBe(tiles[2]!.y);
     expect(tiles[5]!.bottom).toBeLessThan(size.height);
     await page.screenshot({ path: info.outputPath(`temple-${size.width}.png`) });

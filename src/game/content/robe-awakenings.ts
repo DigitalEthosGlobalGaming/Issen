@@ -63,7 +63,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '193,216,222' },
   },
   monk: {
-    pk: 'Shrines offer 5 choices and always include a rare blessing when available',
+    pk: '+2 extra shrine choices and 1 guaranteed rare blessing when available',
     tr: 'Score ×0.75',
     m: { shrineN: 5, rareShrine: 1, score: 0.75 },
     need: ['w', 15, 'Reach wave 15'],
@@ -87,7 +87,7 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '192,183,136' },
   },
   jinbaori: {
-    pk: '+2 starting lives (up to 5); parry window 10% longer',
+    pk: '+2 starting lives; parry window 10% longer',
     tr: 'Score ×0.65',
     m: { lives: 2, parry: 1.1, score: 0.65 },
     need: ['d', 10, 'Win 10 duels'],
@@ -119,9 +119,9 @@ export const ROBE_AWAKENINGS: Record<string, Awakening> = {
     st: { c: '221,214,188' },
   },
   yoroi: {
-    pk: '+2 starting lives (up to 5); one run ward forgives a mistake',
+    pk: '+20% Embers earned; one run ward forgives a mistake',
     tr: 'Enemies strike 15% faster; score ×0.75',
-    m: { lives: 2, runWard: 1, atk: 0.85, score: 0.75 },
+    m: { emberBonus: 0.2, runWard: 1, atk: 0.85, score: 0.75 },
     need: ['w', 24, 'Reach wave 24'],
     aura: { c: '155,188,198', mode: 'bolt' },
     st: { c: '155,188,198' },

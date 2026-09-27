@@ -21,7 +21,7 @@ Normal starting-life counts and after healing, pausing and dying.
 
 ## 2. Browsable Temple collection
 
-Temple (formerly labelled Template) has eight selectable illustrated tiles and a details panel.
+Temple (formerly labelled Template) has seven selectable illustrated tiles and a details panel.
 Portrait layouts use smaller readable copy and a centred icon above the details.
 Tiles show numeric prices, without affordability shortfalls. The Temple shows the
 current balance; lifetime Ember earnings are shown in Stats.
@@ -35,8 +35,7 @@ balance. Donations are final and benefits are captured at the next eligible run.
 | Focus | +5% parry window/rank | 75, 150, 225 | 3 |
 | Offerings | +1 choice; rank 2 adds +20 percentage points rare chance; rank 3 adds 1 guaranteed rare | 150, 250, 400 | 3 |
 | Awakening Access | Rank 1: weapon challenges; rank 2: outfit challenges | 200, 300 | 2 |
-| Throwing Knife | One starting knife | 125 | 1 |
-| Knife Pouch | +1 knife/rank; requires Throwing Knife | 150, 250 | 2 |
+| Throwing Knife | Unlock knives, then +1 capacity per rank, to 3 | 125, 150, 250 | 3 |
 | Composure | Protect one otherwise unprotected combo break/rank/run | 175, 300 | 2 |
 | Recovery | Heal every six cleared waves; every three at rank 2 | 200, 350 | 2 |
 
@@ -62,7 +61,8 @@ balance, ranks and the chosen eligible next-run effects.
 During ordinary waves a tap (Space on keyboard) consumes one charge to defeat a
 random living targetable enemy. No target/no charges means no charge or punishment.
 The HUD shows charges and a brief projectile/hit effect explains the result.
-Charges reset on each run, with one base charge and up to two from Knife Pouch.
+Charges reset on each run to the Throwing Knife rank (1–3). Schema version 4
+merges old Knife plus Pouch purchases into the same capacity without charging.
 
 Boss taps only parry and never spend knives; standoffs retain their existing
 timing rules. UI, tutorial and pause interactions do not spend charges. A pointer
@@ -85,8 +85,13 @@ forms remain owned. Armoury shows base stats and an explicit suppression message
 Eligible challenge progress still accrues after access with upgrades Off.
 
 **Normal lives** starts at two. Vitality raises the baseline to three, four and
-five. Equipment adds its life modifier, and total Normal lives are clamped to a
-minimum of one and maximum of five. Blessings and healing respect the same cap.
+five. Equipment adds its life modifier with a minimum of one and no total cap.
+Jinbaori adds two lives, so max Vitality plus Jinbaori starts at seven. Shrine
+life increases can raise the maximum further; healing stops at that run maximum.
+Monk Hood adds one shrine choice (two when awakened), stacking with Offerings.
+Yoroi replaces its life bonus with +10% earned Embers; awakened Yoroi grants +20%
+and retains its ward. These bonuses apply to kill, wave and boss rewards. Fractional
+bonuses carry between rewards and reloads using `issen.meta.emberRemainder`.
 One-hit-death and Endless remain separate. The saved Normal-life identifier remains
 `'3'` for compatibility; player text no longer promises a fixed three.
 
@@ -95,7 +100,7 @@ preserving the old four-life starting benefit. Unpurchased profiles adopt the
 two-life baseline. Existing score keys are retained; upgrades-off runs use new
 `-base` suffixed record keys and an explicit upgrades-off label.
 
-Acceptance: validate fresh lives, all ranks, negative equipment modifiers, cap,
+Acceptance: validate fresh lives, all ranks, negative equipment modifiers, stacking,
 healing and migration. Changing setup or buying during a run must not refill
 consumables or apply permanent power mid-run.
 
@@ -109,8 +114,8 @@ instructions; their power text remains hidden until explicit activation.
 Selecting/equipping a tile then tapping it again activates the form. Returning
 to normal hides its powers again.
 
-Active benefit and tradeoff replace the base stats in yellow with **Awakened
-active** text. Blade and outfit choices are independent. Activated modifiers
+Active benefit and tradeoff replace the base stats in yellow, without a separate
+active-state label. Blade and outfit choices are independent. Activated modifiers
 replace their category's base source before the ordinary modifier composition.
 Off suppresses both forms' gameplay effects and visuals.
 
@@ -164,7 +169,7 @@ respecting life limits and upgrades Off.
 - `src/ui/screens/template.ts`, `setup.ts`, `armory.ts`: selection and presentation.
 - `src/rendering/scene/background.ts`: modest procedural tree variation.
 - `src/rendering/figures/types.ts`, `figure.ts`: independent robe aura.
-- `src/game.ts`: event wiring, capped life changes, equipment appearance,
+- `src/game.ts`: event wiring, life changes, equipment appearance,
   consumable effects, HUD and persistence.
 
 Use strict TypeScript, relevant rule/save tests and browser flows. Focused tests

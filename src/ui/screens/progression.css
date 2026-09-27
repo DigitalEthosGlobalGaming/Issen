@@ -1,6 +1,47 @@
 [hidden] {
   display: none !important;
 }
+.profile-reset {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid #6b6254;
+}
+.btn.danger {
+  color: #f0aaa0;
+  border-color: #af655c;
+}
+#resetProfileDialog {
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 20px;
+  background: #181613;
+  color: var(--paper);
+  border: 1px solid #af655c;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+  touch-action: pan-y;
+}
+#resetProfileDialog::backdrop {
+  background: #000b;
+}
+#resetProfileDialog h2 {
+  font-size: 20px;
+  margin-top: 0;
+}
+.reset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.reset-actions .btn {
+  flex: 1;
+  min-height: 44px;
+  font-size: 14px;
+}
 .template-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;

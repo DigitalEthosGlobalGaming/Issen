@@ -12,6 +12,52 @@ const DEATH_NAMES: Record<string, string> = {
 };
 type StatRow = readonly [value: string | number, label: string];
 
+/** Keep destructive confirmation separate from statistics rendering. */
+export function bindProfileReset(
+  root: HTMLElement,
+  reset: () => boolean,
+  testing: boolean,
+): () => void {
+  const dialog = root.querySelector<HTMLDialogElement>('#resetProfileDialog')!;
+  const open = root.querySelector<HTMLButtonElement>('#bResetProfile')!;
+  const cancel = root.querySelector<HTMLButtonElement>('#bCancelResetProfile')!;
+  const confirm = root.querySelector<HTMLButtonElement>('#bConfirmResetProfile')!;
+  const error = root.querySelector<HTMLElement>('#resetProfileError')!;
+  root.querySelector<HTMLElement>('#resetProfileScope')!.textContent = testing
+    ? 'You are resetting the test profile. Your player profile is untouched.'
+    : 'You are resetting your player profile. Your separate test profile is untouched.';
+  const events = new AbortController();
+  // Let the modal handle Escape/Tab, without triggering the game's shortcuts.
+  dialog.addEventListener('keydown', (event) => event.stopPropagation(), { signal: events.signal });
+  open.addEventListener(
+    'click',
+    () => {
+      error.hidden = true;
+      confirm.disabled = false;
+      dialog.showModal();
+      cancel.focus();
+    },
+    { signal: events.signal },
+  );
+  cancel.addEventListener('click', () => dialog.close(), { signal: events.signal });
+  confirm.addEventListener(
+    'click',
+    () => {
+      confirm.disabled = true;
+      if (!reset()) {
+        error.textContent = 'Unable to reset this profile. Please try again.';
+        error.hidden = false;
+        confirm.disabled = false;
+      }
+    },
+    { signal: events.signal },
+  );
+  return () => {
+    events.abort();
+    dialog.close();
+  };
+}
+
 export function formatPlayTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   return minutes >= 60

@@ -135,7 +135,7 @@ export function renderAdmin(
       actions.item(item.value, action),
     );
   button('Complete selected awakening challenge', () => actions.completeChallenge?.(item.value));
-  const lives = number('Lives', 2, 5);
+  const lives = number('Lives', 2, 99);
   button('Set lives', () => actions.lives(Number(lives.value)));
   const currency = number('Ember balance', 1000, 1000000);
   button('Set Embers', () => actions.currency(Number(currency.value)));

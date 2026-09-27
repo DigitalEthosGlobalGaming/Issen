@@ -56,7 +56,7 @@ import { shrineOffers, applyBlessing } from './game/shrine/blessings.ts';
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
-import { renderStatistics } from './ui/screens/stats.ts';
+import { renderStatistics, bindProfileReset } from './ui/screens/stats.ts';
 import { createFigureRenderer } from './rendering/figures/figure.ts';
 import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
@@ -106,7 +106,13 @@ import { createItems } from './game/content/items.ts';
 import { deathsTotal } from './game/progression/statistics.ts';
 import { createAudio } from './audio/audio.ts';
 import { computeModifiers } from './game/equipment/modifiers.ts';
-import { store, isTestProfile, switchTestProfile, clearTestProfile } from './platform/storage.ts';
+import {
+  store,
+  isTestProfile,
+  switchTestProfile,
+  clearTestProfile,
+  clearActiveProfile,
+} from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
 import { TAU, clamp, lerp, easeOut, easeInOut, angDiff } from './shared/math.ts';
 import { rng, shuffle } from './shared/random.ts';
@@ -208,7 +214,7 @@ export function startGame(): () => void {
   let runEmbers = 0;
   let tutorialStartsRun = false;
   function earn(event: 'kill' | 'wave' | 'boss') {
-    runEmbers += rewardCurrency(META, event, { zen: G.zen });
+    runEmbers += rewardCurrency(META, event, { zen: G.zen, emberBonus: G.m.emberBonus });
     saveMeta();
   }
   const saveStats = () => store.set('issen.stats', ST);
@@ -2138,8 +2144,8 @@ export function startGame(): () => void {
         },
         lives: (value) => {
           if (!Number.isFinite(value)) return;
-          G.maxLives = Math.max(1, Math.min(5, Math.floor(value)));
-          G.lives = Math.max(0, Math.min(5, Math.floor(value)));
+          G.maxLives = Math.max(1, Math.min(99, Math.floor(value)));
+          G.lives = Math.max(0, Math.min(99, Math.floor(value)));
           renderLives();
         },
         currency: (value) => {
@@ -2325,6 +2331,7 @@ export function startGame(): () => void {
   function renderStats() {
     renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length, META.earned);
   }
+  lifecycle.add(bindProfileReset($('stats'), clearActiveProfile, isTestProfile()));
   const preview = createArmoryPreview($('prevC'), {
     random: R,
     now: () => performance.now(),

@@ -125,13 +125,13 @@ test('knife never spends on bosses, standoffs, UI, pause, death, no targets or n
   assert.equal(empty.knives, 0);
 });
 
-test('Normal lives uses two baseline, capped five total and safe minimum', () => {
+test('Normal lives uses two baseline, uncapped bonuses and safe minimum', () => {
   for (const [bonus, lives] of [
     [0, 2],
     [1, 3],
     [2, 4],
     [3, 5],
-    [9, 5],
+    [9, 11],
     [-1, 1],
     [-100, 1],
     [Infinity, 2],
