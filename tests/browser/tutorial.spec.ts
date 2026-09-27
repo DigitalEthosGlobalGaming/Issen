@@ -1,10 +1,18 @@
 import { expect, test } from '@playwright/test';
 
-test('first-run tutorial persists completion and starts exactly one run', async ({ page }) => {
+test('first play starts a run directly and the menu tutorial remains optional', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   const tutorial = page.locator('.tutorial-overlay');
+  await expect(tutorial).toBeHidden();
+  await page.keyboard.press('p');
+  await expect(page.locator('#bResume')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).runs)).toBe(1);
+  await page.reload();
+  await page.locator('#bTutorial').click();
   await expect(tutorial).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: 'test-results/tutorial-portrait.png' });
@@ -40,7 +48,7 @@ test('first-run tutorial persists completion and starts exactly one run', async 
     .toBe('4');
   await page.getByRole('button', { name: 'Continue to the journey' }).click();
   await expect(tutorial).toBeHidden();
-  await page.keyboard.press('p');
+  await expect(page.locator('#bPlay')).toBeVisible();
   const before = await page.evaluate(() => ({
     meta: JSON.parse(localStorage.getItem('issen.meta')!),
     stats: JSON.parse(localStorage.getItem('issen.stats')!),

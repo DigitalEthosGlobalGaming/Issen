@@ -44,7 +44,7 @@ to shrine to next duel, Daruma revival, malformed saves, mute persistence, scree
 controllers, renderer isolation, portrait/landscape drawing, sharing fallback
 branches with mocked browser/host APIs, share-card generation and disposal/remount.
 Feature-04 browser checks additionally exercise first live guided encounters,
-portrait setup gates, Armoury NEW badges, deferred boss rewards and run-end reveals.
+portrait setup gates, Armoury unread underlines, deferred boss rewards and run-end reveals.
 These tests are not proof of pixel-perfect parity or complete playthrough coverage.
 Production tests separately exercise bundled asset startup, armory, a run, sharing
 and landscape layout. Native mobile share sheets and physical touch devices are not
@@ -77,9 +77,9 @@ Verify this only in disposable browser contexts, never with real player saves.
 client for convenience, not as an access-control mechanism. Never reset player
 saves to test these flows.
 
-The first Begin for a fresh profile launches practice; complete it or use Skip.
-Ordinary runtime tests should seed completed/skipped tutorial metadata in their
-isolated context when onboarding is outside their scope. Tests that drive ordered
+The first Begin for a fresh profile starts gameplay directly. Tutorial practice
+is available from the title menu and returns there on completion or Skip.
+Tests that drive ordered
 waves or boss combat without teaching prompts should also seed
 `issen.guidedLessons` with `{ "order": true, "bossParry": true }`; test-profile
 fixtures use the `issen.testing.guidedLessons` namespace. No lives and Endless

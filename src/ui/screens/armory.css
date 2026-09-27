@@ -260,19 +260,9 @@
 .awakening-active .tr {
   color: #d4b56c;
 }
-.arm-new {
-  display: inline-block;
-  margin-left: 5px;
-  padding: 2px 4px;
-  border-radius: 2px;
-  background: #b5672c;
-  color: #fff5df;
-  font: 700 9px/1 sans-serif;
-  vertical-align: middle;
-}
-.tile-new {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  margin: 0;
+.arm-unread .arm-label,
+.arm-unread .tn {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }

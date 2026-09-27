@@ -226,7 +226,6 @@ export function startGame(): () => void {
   let rewardLedger = createRunRewardLedger();
   let runBossMilestone = 0;
   let runItemReveals: ResultReveal[] = [];
-  let tutorialStartsRun = false;
   function earn(event: 'kill' | 'wave' | 'boss') {
     accrueRunReward(rewardLedger, event, { zen: G.zen, emberBonus: G.m.emberBonus });
   }
@@ -870,11 +869,7 @@ export function startGame(): () => void {
       position: enemyPos,
     });
   }
-  function startRun(skipTutorial = false) {
-    if (!skipTutorial && META.tutorial === 'new') {
-      launchTutorial(true);
-      return;
-    }
+  function startRun() {
     Object.assign(SETUP, sanitizeSetup(SETUP, META));
     runTemplate = templateModifiers(META, SETUP);
     runEmbers = 0;
@@ -1048,8 +1043,6 @@ export function startGame(): () => void {
         'Wait until his ring reaches the red arc, then cut, for a perfect cut.',
         5000,
       );
-    if (waveConfiguration().ordered)
-      hint('order', 'They strike in order now. Cut the red 一 first.', 5000);
     if (waveConfiguration().refill) hint('refill', 'The pack no longer thins. Keep cutting.', 4000);
     if (waveConfiguration().feint)
       hint('feint', 'A trembling seal may feint. Watch the blade turn.', 5000);
@@ -1415,7 +1408,6 @@ export function startGame(): () => void {
     $('bossbar').classList.add('on');
     sfx.drum();
     guided.startBoss();
-    hint('boss', 'A duel. Wait for the glint, then tap to parry. Tapping early is death.', 6000);
     if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
@@ -2120,18 +2112,16 @@ export function startGame(): () => void {
   const tutorial = createTutorial($('app'), (status) => {
     META.tutorial = status;
     saveMeta();
-    if (tutorialStartsRun) startRun(true);
-    else toTitle();
-  });
-  function launchTutorial(startAfter: boolean) {
     toTitle();
-    tutorialStartsRun = startAfter;
+  });
+  function launchTutorial() {
+    toTitle();
     tutorial.start();
   }
   function testJump(stage: number, wave: number, boss: boolean) {
     if (!isTestProfile()) return;
     SETUP.mode = 'waves';
-    startRun(true);
+    startRun();
     G.enemies = [];
     G.pendingSpawns = [];
     G.attacker = null;
@@ -2276,7 +2266,7 @@ export function startGame(): () => void {
           META.tutorial = value;
           saveMeta();
         },
-        replayTutorial: () => launchTutorial(false),
+        replayTutorial: launchTutorial,
         replayReveals: () => {
           META.revealSeen = 0;
           saveMeta();
@@ -2324,7 +2314,10 @@ export function startGame(): () => void {
   });
   const renderArmory = armory.render;
   function refreshArmoryNew() {
-    $('armoryNew').hidden = !armory.hasNew();
+    const unread = armory.hasNew();
+    $('bArmory').classList.toggle('arm-unread', unread);
+    if (unread) $('bArmory').setAttribute('aria-description', 'Unviewed equipment');
+    else $('bArmory').removeAttribute('aria-description');
   }
   const KONAMI = 'up,up,down,down,left,right,left,right';
   let kseq: Direction[] = [];
@@ -2500,7 +2493,7 @@ export function startGame(): () => void {
   lifecycle.listen($('bArmory'), 'click', () => openPanel('armory'));
   lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
   lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
-  lifecycle.listen($('bTutorial'), 'click', () => launchTutorial(false));
+  lifecycle.listen($('bTutorial'), 'click', launchTutorial);
   $('testBadge').hidden = !isTestProfile();
   lifecycle.listen(window, 'keydown', (event) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyA') {
@@ -3110,7 +3103,7 @@ export function startGame(): () => void {
         G.slowT = value;
       },
       get timeScale() {
-        return timeScale * guided.scale;
+        return timeScale;
       },
     },
     {

@@ -4,8 +4,7 @@ export interface GuidedLessonProgress {
   order: boolean;
   bossParry: boolean;
 }
-export type GuidedPhase =
-  'idle' | 'order-read' | 'order-practice' | 'boss-read' | 'boss-wait' | 'boss-ready';
+export type GuidedPhase = 'idle' | 'order-practice' | 'boss-wait' | 'boss-ready';
 
 export function parseGuidedLessons(value: unknown): GuidedLessonProgress {
   const saved =
@@ -23,11 +22,7 @@ export function createGuidedLessonState(
 ) {
   const progress = parseGuidedLessons(saved);
   let phase: GuidedPhase = 'idle';
-  const frozen = () =>
-    phase === 'order-read' ||
-    phase === 'order-practice' ||
-    phase === 'boss-read' ||
-    phase === 'boss-ready';
+  const frozen = () => phase === 'order-practice' || phase === 'boss-ready';
   function change(next: GuidedPhase) {
     if (next === phase) return;
     phase = next;
@@ -45,37 +40,24 @@ export function createGuidedLessonState(
     get frozen() {
       return frozen();
     },
-    get scale() {
-      return phase === 'boss-wait' ? 0.25 : 1;
-    },
     get progress() {
       return { ...progress };
     },
     startOrder() {
       if (phase !== 'idle' || progress.order) return false;
-      change('order-read');
+      change('order-practice');
       return true;
     },
     startBoss() {
       if (phase !== 'idle' || progress.bossParry) return false;
-      change('boss-read');
+      change('boss-wait');
       return true;
-    },
-    advanceReading() {
-      if (phase === 'order-read') change('order-practice');
-      else if (phase === 'boss-read') change('boss-wait');
     },
     bossFlash() {
       if (phase === 'boss-wait') change('boss-ready');
     },
     swipe(direction: Direction, expected: Direction | null) {
-      if (
-        phase === 'order-read' ||
-        phase === 'boss-read' ||
-        phase === 'boss-wait' ||
-        phase === 'boss-ready'
-      )
-        return { consumed: true, retry: false };
+      if (phase === 'boss-wait' || phase === 'boss-ready') return { consumed: true, retry: false };
       if (phase !== 'order-practice') return { consumed: false, retry: false };
       return { consumed: expected !== direction, retry: expected !== direction };
     },

@@ -13,7 +13,7 @@ test('guided lesson parsing accepts only completed booleans', () => {
   });
 });
 
-test('front-order lesson freezes reading and practice until a correct cut', () => {
+test('front-order lesson starts safe practice immediately and freezes until a correct cut', () => {
   const saves = [];
   const states = [];
   const lesson = createGuidedLessonState(
@@ -24,7 +24,6 @@ test('front-order lesson freezes reading and practice until a correct cut', () =
   assert.equal(lesson.startOrder(), true);
   assert.equal(lesson.frozen, true);
   assert.equal(lesson.swipe('up', 'left').consumed, true);
-  lesson.advanceReading();
   assert.equal(lesson.phase, 'order-practice');
   assert.equal(lesson.swipe('up', 'left').retry, true);
   assert.equal(lesson.progress.order, false);
@@ -34,21 +33,17 @@ test('front-order lesson freezes reading and practice until a correct cut', () =
   assert.equal(lesson.frozen, false);
   assert.equal(lesson.startOrder(), false);
   assert.deepEqual(states, [
-    ['order-read', true],
     ['order-practice', true],
     ['idle', false],
   ]);
 });
 
-test('boss lesson slows the glint approach, holds the parry and persists only on success', () => {
+test('boss lesson runs until the glint, holds the parry and persists only on success', () => {
   const saves = [];
   const lesson = createGuidedLessonState({ order: true }, (value) => saves.push(value));
   assert.equal(lesson.startBoss(), true);
-  assert.equal(lesson.frozen, true);
-  assert.equal(lesson.tap(), true);
-  lesson.advanceReading();
+  assert.equal(lesson.phase, 'boss-wait');
   assert.equal(lesson.frozen, false);
-  assert.equal(lesson.scale, 0.25);
   assert.equal(lesson.tap(), true);
   lesson.bossFlash();
   assert.equal(lesson.frozen, true);

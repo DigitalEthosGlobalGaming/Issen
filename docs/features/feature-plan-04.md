@@ -3,6 +3,12 @@
 Status: **implemented**. The brief below records the requested design; the
 implementation record at the end describes the resulting rules.
 
+The 1.1.1 polish pass removes the separate dismissible teaching message and
+duplicate front/boss hints. Ordered cuts enter paused practice immediately;
+bosses approach at normal speed and pause only on the first parry glint.
+The standalone tutorial is now optional from the menu, including on first play.
+Unread Armoury labels use an underline instead of a coloured `NEW` badge.
+
 ## Goal
 
 Make new mechanics easier to learn, make a completed run feel rewarding, and keep
@@ -178,13 +184,14 @@ meet the rules above.
   `src/game/progression/armory-seen.ts` persists explicit detail views under
   `issen.armorySeen`, with old collections seeded as already viewed.
 - `src/game/onboarding/guided-state.ts` and `guided-lessons.ts` persist completed
-  first ordered-cut and boss-parry lessons under `issen.guidedLessons`. Reading
-  and the prompted action freeze simulation; the boss's approach runs at a
-  quarter speed before its glint is held. Skipping practice does not mark either
-  lesson done.
+  first ordered-cut and boss-parry lessons under `issen.guidedLessons`. Ordered
+  cuts enter frozen practice directly. The boss approaches at normal speed and
+  freezes at its glint until a successful parry. There is no separate dismissible
+  reading card or duplicate encounter hint. The optional menu tutorial does not
+  run automatically or mark either live lesson done.
 - Setup sanitizes No lives and Endless without Vitality rank 1 and hides the
   Arrows control until Blade Only. Armoury sorts owned gear first and clears
-  `NEW` only when its detail is selected. Boss-rush Shrine offers use an explicit
+  unread underlines only when the item's detail is selected. Boss-rush Shrine offers use an explicit
   duel-relevant pool, including Twin's secondary picks. Secret eligibility is
   resolved to a fixed point at run end; `secret-events.ts` records each trigger
   sequence, and the result-screen applause secret gets its own post-run reveal.

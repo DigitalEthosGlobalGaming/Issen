@@ -54,7 +54,7 @@ test('reduced-motion result tally advances by keyboard without paying twice', as
   expect(meta.earned).toBe(0);
 });
 
-test('Armoury sorts owned gear first and keeps NEW badges until its detail is viewed', async ({
+test('Armoury sorts owned gear first and underlines unread gear until its detail is viewed', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -67,24 +67,34 @@ test('Armoury sorts owned gear first and keeps NEW badges until its detail is vi
       );
   });
   await page.goto('/');
-  await expect(page.locator('#armoryNew')).toBeVisible();
+  await expect(page.locator('#bArmory .arm-label')).toHaveCSS('text-decoration-line', 'underline');
   await page.locator('#bArmory').click();
-  await expect(page.locator('#armTabs [aria-selected="true"] .arm-new')).toBeVisible();
+  await expect(page.locator('#armTabs [aria-selected="true"] .arm-label')).toHaveCSS(
+    'text-decoration-line',
+    'underline',
+  );
   await expect(page.locator('#armTiles .tile').nth(0)).toContainText('Tamahagane');
   await expect(page.locator('#armTiles .tile').nth(1)).toContainText('Kurogane');
-  await expect(page.locator('#armTiles .tile-new')).toHaveCount(1);
+  await expect(page.locator('#armTiles .arm-unread')).toHaveCount(1);
+  await expect(page.locator('#armTiles .arm-unread .tn')).toHaveCSS(
+    'text-decoration-line',
+    'underline',
+  );
   await page.locator('#armory [data-back]').click();
-  await expect(page.locator('#armoryNew')).toBeVisible();
+  await expect(page.locator('#bArmory')).toHaveClass(/arm-unread/);
   await page.locator('#bArmory').click();
   await page.locator('#armTiles').getByRole('button', { name: 'Kurogane' }).click();
-  await expect(page.locator('#armTiles .tile-new')).toHaveCount(0);
+  await expect(page.locator('#armTiles .arm-unread')).toHaveCount(0);
+  await expect(page.locator('#armTabs .arm-unread')).toHaveCount(0);
   await page.locator('#armory [data-back]').click();
-  await expect(page.locator('#armoryNew')).toBeHidden();
+  await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/);
   await page.reload();
-  await expect(page.locator('#armoryNew')).toBeHidden();
+  await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/);
 });
 
-test('first ordered encounter freezes for reading and a safe cut', async ({ page }) => {
+test('first ordered encounter starts a safe cut without a dismissible message', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('issen.testing', '1');
     localStorage.setItem(
@@ -119,14 +129,14 @@ test('first ordered encounter freezes for reading and a safe cut', async ({ page
     .evaluate((button: HTMLButtonElement) => button.click());
   for (
     let i = 0;
-    i < 20 && !(await page.getByRole('heading', { name: 'The front of the pack' }).isVisible());
+    i < 20 && !(await page.getByRole('heading', { name: 'Cut the front enemy' }).isVisible());
     i++
   )
     await page.evaluate(() => (window as any).advance(10));
-  await expect(page.getByRole('heading', { name: 'The front of the pack' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
+  await expect(page.locator('.guided-overlay button')).toHaveCount(0);
+  await expect(page.locator('#hint')).not.toContainText('They strike in order now');
   await page.evaluate(() => (window as any).advance(80));
-  await expect(page.getByRole('heading', { name: 'The front of the pack' })).toBeVisible();
-  await page.keyboard.press('Space');
   await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
   for (const direction of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
     if (!(await page.locator('.guided-overlay').isVisible())) break;
@@ -172,9 +182,9 @@ test('first boss holds the glint until the player parries', async ({ page }) => 
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })
     .evaluate((button: HTMLButtonElement) => button.click());
-  await expect(page.getByRole('heading', { name: 'The boss’s glint' })).toBeVisible();
-  await page.keyboard.press('Space');
   await expect(page.getByRole('heading', { name: 'Watch for the glint' })).toBeVisible();
+  await expect(page.locator('.guided-overlay button')).toHaveCount(0);
+  await expect(page.locator('#hint')).not.toContainText('A duel. Wait for the glint');
   for (
     let i = 0;
     i < 60 && !(await page.getByRole('heading', { name: 'Parry now' }).isVisible());

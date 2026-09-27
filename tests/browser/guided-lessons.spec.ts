@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('guided prompts keep reading separate from the action and fit portrait view', async ({
-  page,
-}) => {
+test('guided prompts start safe practice directly and fit portrait view', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.evaluate(async () => {
@@ -28,11 +26,10 @@ test('guided prompts keep reading separate from the action and fit portrait view
   });
   const overlay = page.locator('.guided-overlay');
   await expect(overlay).toBeVisible();
-  await expect(page.locator('.guided-continue')).toHaveCSS('min-height', '44px');
+  await expect(overlay.getByRole('button')).toHaveCount(0);
   await expect
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
     .toBe(true);
-  await page.keyboard.press('Space');
   await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
   expect(await page.evaluate(() => (window as any).guidedFrozen)).toBe(true);
   expect(await page.evaluate(() => (window as any).guided.swipe('up', 'left'))).toBe(true);

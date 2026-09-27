@@ -57,8 +57,8 @@ implemented files.
 - Frame scheduling separates capped raw elapsed time from slowed simulation time.
   Pausing skips simulation but retains rendering. Hit-stop/slow timers retain
   their existing raw-time behavior. Resume resets the scheduler's clock. Guided
-  lessons use that paused-simulation boundary while reading/practicing; the
-  first boss approach uses quarter-speed simulation until a held parry glint.
+  lessons go directly to safe practice using that paused-simulation boundary.
+  The first boss approaches at normal speed, then holds its parry glint.
 - Main rendering, armory previews and share cards use explicit target canvases.
   Preview instances own their particle and animation state; no global canvas swap
   is used. Palette caches are instance-owned.
@@ -76,12 +76,14 @@ implemented files.
   modifiers and consumables are captured at run start and apply only to opted-in,
   arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,
   with equipment/upgrades added without a total life cap. Tutorial practice owns separate state and never
-  records gameplay rewards. The runtime persists its completion/skip callback.
+  records gameplay rewards. It is optional from the title menu; first play starts
+  a normal run. The runtime persists its completion/skip callback.
 - Combat accrues half-rate Embers in a run-local ledger and writes them to
   `issen.meta` only when death or explicit End run settles the run. The runtime
   then grants mode/equipment unlocks, presents an Ember tally and unlock cards,
   and finally shows the summary. `issen.armorySeen` stores gear detail views;
-  old owned gear migrates as seen. `issen.guidedLessons` records only successful
+  old owned gear migrates as seen. Unviewed gear, its tab, and the Armoury entry
+  use underlined labels. `issen.guidedLessons` records only successful
   first ordered cuts and boss parries. Both keys follow the active profile
   namespace and use validated defaults.
 - No lives and Endless require Vitality rank 1; the Arrows choice appears after

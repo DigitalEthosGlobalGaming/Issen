@@ -86,12 +86,10 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       b.className = 'tab';
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(t === armTab));
-      b.innerHTML = `${label}<small>${own}/${all.length}</small>`;
+      b.innerHTML = `<span class="arm-label">${label}</span><small>${own}/${all.length}</small>`;
       if (all.some(newItem)) {
-        const badge = doc.createElement('span');
-        badge.className = 'arm-new';
-        badge.textContent = 'NEW';
-        b.append(badge);
+        b.classList.add('arm-unread');
+        b.setAttribute('aria-description', 'Unviewed equipment');
       }
       b.addEventListener('click', () => {
         armTab = t;
@@ -139,10 +137,8 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
       b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${spU ? '<span class="spb">真</span>' : ''}`;
       if (newItem(it)) {
-        const badge = doc.createElement('span');
-        badge.className = 'arm-new tile-new';
-        badge.textContent = 'NEW';
-        b.append(badge);
+        b.classList.add('arm-unread');
+        b.setAttribute('aria-description', 'Unviewed equipment');
       }
       b.addEventListener('click', () => {
         const again = activationReady === it.id && armSel === it.id && EQ[armTab] === it.id;
