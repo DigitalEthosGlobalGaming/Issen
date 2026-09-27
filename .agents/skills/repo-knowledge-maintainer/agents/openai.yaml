@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Knowledge Maintainer"
+  short_description: "Keep Issen repository knowledge accurate"
+  default_prompt: "Use $repo-knowledge-maintainer to audit and improve this repository's documentation."

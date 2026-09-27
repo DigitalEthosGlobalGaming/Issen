@@ -1,0 +1,21 @@
+:root {
+  --bg: #1a1917;
+  --paper: #ece6da;
+  --paper-dim: rgba(236, 230, 218, 0.66);
+  --ink: #131210;
+  --seal: #a3271d;
+  --font:
+    'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', Georgia, serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #151412;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #151412;
+}

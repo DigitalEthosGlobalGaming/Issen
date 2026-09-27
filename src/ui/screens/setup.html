@@ -1,0 +1,40 @@
+<div id="setup" class="screen panel">
+  <div class="box">
+    <div class="ph">構え<span>Before you draw</span></div>
+    <div class="opt">
+      <div class="lab">Mode</div>
+      <div class="seg" data-k="mode" role="group" aria-label="Mode">
+        <button type="button" data-v="waves">Waves</button
+        ><button type="button" data-v="rush">決闘 Boss rush</button>
+      </div>
+      <div class="ds" id="dsMode"></div>
+    </div>
+    <div class="opt">
+      <div class="lab">Difficulty</div>
+      <div class="seg" data-k="diff" role="group" aria-label="Difficulty">
+        <button type="button" data-v="normal">Normal</button
+        ><button type="button" data-v="ronin">浪人 Ronin</button>
+      </div>
+      <div class="ds" id="dsDiff"></div>
+    </div>
+    <div class="opt">
+      <div class="lab">Arrows</div>
+      <div class="seg" data-k="arrows" role="group" aria-label="Arrows">
+        <button type="button" data-v="1">Shown</button
+        ><button type="button" data-v="0">Blade only</button>
+      </div>
+      <div class="ds" id="dsArrows"></div>
+    </div>
+    <div class="opt">
+      <div class="lab">Lives</div>
+      <div class="seg" data-k="lives" role="group" aria-label="Lives">
+        <button type="button" data-v="3">3 lives</button
+        ><button type="button" data-v="0">No lives</button
+        ><button type="button" data-v="zen">Endless</button>
+      </div>
+      <div class="ds" id="dsDeath"></div>
+    </div>
+    <button class="btn primary" id="bBegin" type="button">Begin</button>
+    <button class="btn back" type="button" data-back>Back</button>
+  </div>
+</div>
