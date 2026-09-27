@@ -169,6 +169,12 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.unlocks')!)),
   ).toContain('kuro');
   await expect(page.locator('#runResultSequence')).toContainText('Embers gathered');
+  await expect(page.locator('#resultGain')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#resultGain')).toHaveCSS('animation-name', 'ember-feed');
+  await expect(page.locator('#resultEmbers')).toHaveCSS('animation-name', 'ember-ignite');
+  await advance(30);
+  await expect(page.locator('#resultEmbers')).toHaveText('12');
+  await expect(page.locator('#resultGain')).toBeHidden();
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
   await expect(page.locator('#runResultSequence')).toContainText('Boss Rush');

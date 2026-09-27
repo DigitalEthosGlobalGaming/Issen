@@ -39,13 +39,74 @@
   font-weight: 800;
   position: relative;
   line-height: 1.2;
+  isolation: isolate;
+  font-variant-numeric: tabular-nums;
+}
+.result-count::before {
+  content: '';
+  position: absolute;
+  inset: -12px -36px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #e86a1b88 0%, #ed9e3a36 36%, transparent 72%);
+  filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+}
+#resultEmbers {
+  display: inline-block;
 }
 .result-gain {
   position: absolute;
-  top: -28px;
-  right: -45px;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: 2;
   color: #efa64d;
   font-size: 22px;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+.result-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.result-sparks i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffe6a0;
+  box-shadow: 0 0 10px 3px #ec6c23;
+  opacity: 0;
+}
+.result-sparks i:nth-child(1) {
+  --dx: -66px;
+  --dy: -45px;
+}
+.result-sparks i:nth-child(2) {
+  --dx: -36px;
+  --dy: -69px;
+}
+.result-sparks i:nth-child(3) {
+  --dx: 8px;
+  --dy: -74px;
+}
+.result-sparks i:nth-child(4) {
+  --dx: 57px;
+  --dy: -55px;
+}
+.result-sparks i:nth-child(5) {
+  --dx: -73px;
+  --dy: -18px;
+}
+.result-sparks i:nth-child(6) {
+  --dx: 72px;
+  --dy: -21px;
 }
 .result-sequence p {
   max-width: 320px;
@@ -61,8 +122,17 @@
 .result-sequence.show-unlock .result-count {
   display: none;
 }
-.result-sequence.animating:not(.show-unlock) .result-gain {
-  animation: ember-fly 1s ease-in-out both;
+.result-sequence.animating.has-gain .result-gain {
+  animation: ember-feed 1.45s ease-in-out both;
+}
+.result-sequence.animating.has-gain .result-count::before {
+  animation: ember-glow 1.45s ease-out both;
+}
+.result-sequence.animating.has-gain #resultEmbers {
+  animation: ember-ignite 1.45s ease-out both;
+}
+.result-sequence.animating.has-gain .result-sparks i {
+  animation: ember-spark 1.45s ease-out both;
 }
 .result-sequence.animating .result-flame {
   animation: result-flame 1s ease-out both;
@@ -70,14 +140,78 @@
 .result-sequence.animating.show-unlock .result-label {
   animation: unlock-enter 0.65s ease-out both;
 }
-@keyframes ember-fly {
-  from {
+@keyframes ember-feed {
+  0% {
     opacity: 0;
-    transform: translate(68px, -95px) scale(0.6);
+    transform: translate(-50%, -50px) scale(0.75);
   }
-  to {
+  18% {
     opacity: 1;
-    transform: translate(0, 0) scale(1);
+    transform: translate(-50%, -55px) scale(1.1);
+  }
+  48% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  69% {
+    opacity: 0;
+    transform: translate(-50%, 58px) scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 58px) scale(0.2);
+  }
+}
+@keyframes ember-glow {
+  0%,
+  42%,
+  100% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  61% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  79% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+}
+@keyframes ember-ignite {
+  0%,
+  43%,
+  100% {
+    color: #f4d89d;
+    text-shadow: none;
+    transform: scale(1);
+  }
+  58% {
+    color: #fff2ba;
+    text-shadow:
+      0 0 16px #ff9e38,
+      0 0 38px #e65922;
+    transform: scale(1.13);
+  }
+  76% {
+    color: #ffe0a0;
+    text-shadow: 0 0 20px #e86a1b;
+    transform: scale(1.04);
+  }
+}
+@keyframes ember-spark {
+  0%,
+  48% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.25);
+  }
+  59% {
+    opacity: 1;
+  }
+  84%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), var(--dy)) scale(0.45);
   }
 }
 @keyframes result-flame {

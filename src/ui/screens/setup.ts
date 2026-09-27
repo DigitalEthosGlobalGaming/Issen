@@ -20,7 +20,7 @@ const descriptions = {
     0: 'No arrows. Read the sword itself. Score ×1.5.',
   },
   lives: {
-    '3': 'Two starting lives, plus Vitality and equipment bonuses.',
+    '3': '',
     '0': 'One mistake ends the run. Score ×1.5.',
     zen: 'No death. Mistakes break your combo. End your run from pause.',
   },
@@ -66,6 +66,10 @@ export function createSetupScreen(
       changed = true;
     }
     if (changed) onChange(setup);
+    const difficultyOption = root.querySelector<HTMLElement>('#difficultyOption');
+    if (difficultyOption) difficultyOption.hidden = earned < 2;
+    const livesOption = root.querySelector<HTMLElement>('#livesOption');
+    if (livesOption) livesOption.hidden = !hasVitality();
     const arrowsOption = root.querySelector<HTMLElement>('#arrowsOption');
     if (arrowsOption) arrowsOption.hidden = earned < 3;
     for (const group of groups) {
@@ -109,13 +113,14 @@ export function createSetupScreen(
               setup.diff !== 'normal' ||
               setup.lives !== '3' ||
               !setup.arrows
-            ? 'This mode disables permanent gameplay upgrades.'
-            : 'Purchased permanent upgrades apply to this run.',
+            ? 'This mode disables Temple upgrades.'
+            : 'Purchased Temple upgrades apply to this run.',
       setupLoadout: progression?.getLoadoutSummary?.() ?? '',
     })) {
       const element = root.querySelector(`#${id}`);
       if (!element) throw new Error(`Missing setup description: ${id}`);
       element.textContent = text;
+      if (id === 'dsDeath' || id === 'setupLoadout') (element as HTMLElement).hidden = !text;
     }
   }
   function render(): void {

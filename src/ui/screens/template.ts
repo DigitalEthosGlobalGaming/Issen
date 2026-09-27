@@ -19,7 +19,7 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
   layout.className = 'template-layout';
   const grid = document.createElement('div');
   grid.className = 'template-grid';
-  grid.setAttribute('aria-label', 'Permanent upgrades');
+  grid.setAttribute('aria-label', 'Temple upgrades');
   const details = document.createElement('div');
   details.className = 'template-details';
   layout.append(grid, details);

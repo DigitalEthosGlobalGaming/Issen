@@ -38,7 +38,7 @@ test('Yoroi shows its currency identity and no longer grants extra starting live
   await expect(page.locator('#armInfo')).toContainText('+10% Embers earned');
   await page.locator('#armory [data-back]').click();
   await page.locator('#bPlay').click();
-  await expect(page.locator('#setupLoadout')).toContainText('Normal lives: 2');
+  await expect(page.locator('#setupLoadout')).toBeEmpty();
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(2);
 });

@@ -14,6 +14,7 @@ test('portrait setup gates special lives until Vitality and hides Arrows until B
   });
   await page.goto('/');
   await page.locator('#bPlay').click();
+  await expect(page.locator('#livesOption')).toBeHidden();
   await expect(page.locator('#setup [data-k="lives"] [data-v="0"]')).toBeHidden();
   await expect(page.locator('#setup [data-k="lives"] [data-v="zen"]')).toBeHidden();
   await expect(page.locator('#arrowsOption')).toBeHidden();
@@ -23,6 +24,7 @@ test('portrait setup gates special lives until Vitality and hides Arrows until B
   await page.getByRole('button', { name: 'Donate 100 Embers' }).click();
   await page.locator('#template [data-back]').click();
   await page.locator('#bPlay').click();
+  await expect(page.locator('#livesOption')).toBeVisible();
   await expect(page.locator('#setup [data-k="lives"] [data-v="0"]')).toBeVisible();
   await expect(page.locator('#setup [data-k="lives"] [data-v="zen"]')).toBeVisible();
   await expect(page.locator('#arrowsOption')).toBeHidden();

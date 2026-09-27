@@ -21,33 +21,33 @@ implemented files.
 
 ## Where changes belong
 
-| Concern | Maintained location |
-| --- | --- |
-| Run fields and restart initialization | `src/game/run-state.ts` |
-| Enemy spawn, targeting, damage, simulation | `src/game/combat/` |
-| Wave difficulty, boss factories/openings/updates, standoffs | `src/game/encounters/` |
-| Items, stages, cosmetics, bosses, blessings, awakenings | `src/game/content/` |
-| Modifier composition and shrine rules | `src/game/equipment/`, `src/game/shrine/` |
-| Scoring, records, statistics, unlocks | `src/game/progression/` |
-| Secret trigger counters and fixed-point eligibility | `src/game/progression/secret-events.ts`, `unlocks.ts` |
-| Temple upgrades, tutorial status, mode milestones | `src/game/progression/meta.ts` |
-| Pending Embers and one-time end-run settlement | `src/game/progression/run-rewards.ts` |
-| First-encounter teaching state and overlay | `src/game/onboarding/` |
-| Run-end tally/reveal and viewed Armoury gear | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts` |
-| Independent gated blade/outfit challenges | `src/game/progression/awakening-progress.ts`, `unlocks.ts` |
-| Outfit awakening catalog | `src/game/content/robe-awakenings.ts` |
-| Knife target selection and charge spending | `src/game/combat/knife.ts` |
-| Tutorial practice scene and isolated canvas | `src/ui/screens/tutorial.ts`, `tutorial.css` |
-| Temple and testing menu controls | `src/ui/screens/template.ts`, `admin.ts` |
-| Backgrounds, ambient grass/leaves, weather | `src/rendering/scene/` |
-| Figure geometry, poses, player animation, projection | `src/rendering/figures/` |
-| Particle state, spawning, updates, drawing, films | `src/rendering/effects/` |
-| Isolated armory rendering | `src/rendering/armory-preview.ts` |
-| Screen fragments and controllers | `src/ui/screens/` |
-| HUD/navigation, hints/toasts, share-card composition | `src/ui/` |
-| Pointer and keyboard adapters | `src/input/` |
-| Synthesized cues, audio context and ambience | `src/audio/audio.ts` |
-| Save validation, storage, sharing, haptics, lifecycle, frame scheduling | `src/platform/` |
+| Concern                                                                 | Maintained location                                                    |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Run fields and restart initialization                                   | `src/game/run-state.ts`                                                |
+| Enemy spawn, targeting, damage, simulation                              | `src/game/combat/`                                                     |
+| Wave difficulty, boss factories/openings/updates, standoffs             | `src/game/encounters/`                                                 |
+| Items, stages, cosmetics, bosses, blessings, awakenings                 | `src/game/content/`                                                    |
+| Modifier composition and shrine rules                                   | `src/game/equipment/`, `src/game/shrine/`                              |
+| Scoring, records, statistics, unlocks                                   | `src/game/progression/`                                                |
+| Secret trigger counters and fixed-point eligibility                     | `src/game/progression/secret-events.ts`, `unlocks.ts`                  |
+| Temple upgrades, tutorial status, mode milestones                       | `src/game/progression/meta.ts`                                         |
+| Pending Embers and one-time end-run settlement                          | `src/game/progression/run-rewards.ts`                                  |
+| First-encounter teaching state and overlay                              | `src/game/onboarding/`                                                 |
+| Run-end tally/reveal and viewed Armoury gear                            | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts` |
+| Independent gated blade/outfit challenges                               | `src/game/progression/awakening-progress.ts`, `unlocks.ts`             |
+| Outfit awakening catalog                                                | `src/game/content/robe-awakenings.ts`                                  |
+| Knife target selection and charge spending                              | `src/game/combat/knife.ts`                                             |
+| Tutorial practice scene and isolated canvas                             | `src/ui/screens/tutorial.ts`, `tutorial.css`                           |
+| Temple and testing menu controls                                        | `src/ui/screens/template.ts`, `admin.ts`                               |
+| Backgrounds, ambient grass/leaves, weather                              | `src/rendering/scene/`                                                 |
+| Figure geometry, poses, player animation, projection                    | `src/rendering/figures/`                                               |
+| Particle state, spawning, updates, drawing, films                       | `src/rendering/effects/`                                               |
+| Isolated armory rendering                                               | `src/rendering/armory-preview.ts`                                      |
+| Screen fragments and controllers                                        | `src/ui/screens/`                                                      |
+| HUD/navigation, hints/toasts, share-card composition                    | `src/ui/`                                                              |
+| Pointer and keyboard adapters                                           | `src/input/`                                                           |
+| Synthesized cues, audio context and ambience                            | `src/audio/audio.ts`                                                   |
+| Save validation, storage, sharing, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
 
 ## Boundaries that matter
 
@@ -81,8 +81,10 @@ implemented files.
 - Combat accrues half-rate Embers in a run-local ledger and writes them to
   `issen.meta` only when death or explicit End run settles the run. The runtime
   then grants mode/equipment unlocks, presents an Ember tally and unlock cards,
-  and finally shows the summary. `issen.armorySeen` stores gear detail views;
-  old owned gear migrates as seen. Unviewed gear, its tab, and the Armoury entry
+  and finally shows the summary. The result screen animates each run's gain into
+  the available balance, then hides the gain while retaining the settled balance
+  and accessible total. `issen.armorySeen` stores gear detail views; old owned
+  gear migrates as seen. Unviewed gear, its tab, and the Armoury entry
   use underlined labels. `issen.guidedLessons` records only successful
   first ordered cuts and boss parries. Both keys follow the active profile
   namespace and use validated defaults.

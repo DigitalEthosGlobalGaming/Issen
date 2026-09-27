@@ -51,16 +51,14 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
   await expect(page.locator('#setupLoadout')).toContainText('Normal lives: 5');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');
   await page.locator('[data-k="upgrades"] [data-v="0"]').click();
-  await expect(page.locator('#setupLoadout')).toContainText('Normal lives: 2');
-  await expect(page.locator('#setupLoadout')).toContainText('0 knives');
-  await expect(page.locator('#setupLoadout')).toContainText('0 combo protections');
+  await expect(page.locator('#setupLoadout')).toBeEmpty();
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(2);
   await expect(page.locator('#badges')).toContainText('Upgrades off');
   await expect(page.locator('.badge.knives')).toHaveCount(0);
   await page.keyboard.press('p');
   await page.getByRole('button', { name: 'End run', exact: true }).click();
-  await expect(page.locator('#oStats')).toContainText('Permanent upgrades off');
+  await expect(page.locator('#oStats')).toContainText('Temple upgrades off');
   const saved = await page.evaluate(() => ({
     ranks: JSON.parse(localStorage.getItem('issen.meta')!).upgrades,
     records: Object.keys(JSON.parse(localStorage.getItem('issen.stats')!).rec),

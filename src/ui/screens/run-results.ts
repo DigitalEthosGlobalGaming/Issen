@@ -44,6 +44,7 @@ export function createRunResults(root: HTMLElement): RunResults {
     sequence.classList.remove('animating');
     if (step === 0) {
       number.textContent = reward.after.toLocaleString();
+      gain.hidden = true;
       accessible.textContent = `${reward.gained} Embers earned. ${reward.after} available.`;
     }
   };
@@ -59,23 +60,26 @@ export function createRunResults(root: HTMLElement): RunResults {
     sequence.classList.toggle('show-unlock', step > 0);
     sequence.classList.remove('animating');
     void sequence.offsetWidth;
-    sequence.classList.add('animating');
-    animating = !reduceMotion();
+    animating = !reduceMotion() && (step > 0 || reward.gained > 0);
+    sequence.classList.toggle('animating', animating);
     if (step === 0) {
+      sequence.classList.toggle('has-gain', reward.gained > 0);
       label.textContent = 'Embers gathered';
       kind.textContent = '';
       description.textContent = reward.gained
         ? 'Your journey feeds the Temple flame.'
         : 'No Embers gathered this run.';
       gain.textContent = reward.gained ? `+${reward.gained.toLocaleString()}` : '+0';
+      gain.hidden = reward.gained === 0;
       number.textContent = reward.before.toLocaleString();
       accessible.textContent = `${reward.before} Embers before this run.`;
       if (animating) {
         const start = performance.now();
         const tick = (now: number) => {
-          const progress = Math.min(1, (now - start) / 1050);
+          const progress = Math.min(1, (now - start) / 1450);
+          const fuel = Math.min(1, Math.max(0, (progress - 0.46) / 0.46));
           number.textContent = Math.floor(
-            reward.before + reward.gained * (1 - (1 - progress) ** 3),
+            reward.before + reward.gained * (1 - (1 - fuel) ** 3),
           ).toLocaleString();
           if (progress < 1) frame = requestAnimationFrame(tick);
           else finishAnimation();

@@ -77,11 +77,14 @@ ordered swipe chain or open a boss.
 
 ## 4. Upgrades toggle and life rules
 
-Setup offers **Permanent upgrades: On / Off** and previews resolved lives, knives
-and combo protections. The choice is saved and captured at run start. Off leaves
-equipment and mode choices intact, but suppresses Template bonuses, consumable
-abilities and awakened equipment powers. Purchases, access, unlocks and selected
-forms remain owned. Armoury shows base stats and an explicit suppression message.
+Setup offers **Temple upgrades: On / Off**. Its summary shows life totals above
+the two-life baseline and nonzero knives or combo protections; it omits empty
+baseline text. Difficulty appears after Ronin unlocks, and Lives appears after
+Vitality rank 1 unlocks its special options. The choice is saved and captured at
+run start. Off leaves equipment and mode choices intact, but suppresses Temple
+bonuses, consumable abilities and awakened equipment powers. Purchases, access,
+unlocks and selected forms remain owned. Armoury shows base stats and an explicit
+suppression message.
 Eligible challenge progress still accrues after access with upgrades Off.
 
 **Normal lives** starts at two. Vitality raises the baseline to three, four and

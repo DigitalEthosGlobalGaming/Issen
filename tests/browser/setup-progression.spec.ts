@@ -37,7 +37,7 @@ test('setup toggles permanent power, retains Normal save identifier and refreshe
     before: 'Starting lives: 5 · Knives: 3',
     after: 'Starting lives: 2 · Knives: 0',
     off: 'true',
-    excluded: 'This mode disables permanent gameplay upgrades.',
+    excluded: 'This mode disables Temple upgrades.',
     saves: 3,
     lives: '3',
   });
@@ -53,6 +53,7 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
     const root = document.querySelector('#setup')!.cloneNode(true) as HTMLElement;
     const setup = { mode: 'rush', diff: 'ronin', arrows: false, lives: '3' };
     let milestone = 0,
+      vitality = false,
       seen = 0,
       saves = 0,
       sounds = 0;
@@ -68,6 +69,7 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
     ];
     const controller = createSetupScreen(root, setup, () => saves++, {
       getMilestone: () => milestone,
+      hasVitality: () => vitality,
       getReveals: () =>
         catalog.filter((entry) => entry.milestone > seen && entry.milestone <= milestone),
       onRevealed: () => {
@@ -79,6 +81,10 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
       root.querySelector<HTMLButtonElement>(`[data-k="${key}"] [data-v="${value}"]`)!;
     controller.render();
     const initial = { ...setup };
+    if (!root.querySelector('#difficultyOption')!.hasAttribute('hidden'))
+      throw new Error('Difficulty shown before Ronin unlock');
+    if (!root.querySelector('#livesOption')!.hasAttribute('hidden'))
+      throw new Error('Lives shown before Vitality unlock');
     const locked = [option('mode', 'rush'), option('diff', 'ronin'), option('arrows', '0')];
     if (locked.some((button) => !button.hidden || !button.disabled))
       throw new Error('Locked option visible or enabled');
@@ -97,7 +103,12 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
     controller.render();
     if (root.querySelectorAll('.setup-reveal').length) throw new Error('Reveal repeated');
     milestone = 3;
+    vitality = true;
     controller.render();
+    if (root.querySelector('#difficultyOption')!.hasAttribute('hidden'))
+      throw new Error('Difficulty hidden after Ronin unlock');
+    if (root.querySelector('#livesOption')!.hasAttribute('hidden'))
+      throw new Error('Lives hidden after Vitality unlock');
     const pending = [...root.querySelectorAll('.setup-reveal strong')].map(
       (entry) => entry.textContent,
     );

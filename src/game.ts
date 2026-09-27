@@ -2033,8 +2033,7 @@ export function startGame(): () => void {
     $('oStats').append(
       document.createTextNode(` · ${runEmbers} Embers earned · ${META.embers} available`),
     );
-    if (!G.upgradesEnabled)
-      $('oStats').append(document.createTextNode(' · Permanent upgrades off'));
+    if (!G.upgradesEnabled) $('oStats').append(document.createTextNode(' · Temple upgrades off'));
     showScreen('over');
     hud(false);
     G.overReady = false;
@@ -2102,7 +2101,13 @@ export function startGame(): () => void {
           new Set(),
         );
         const power = templatePowers(META, SETUP);
-        return `${SETUP.lives === 'zen' ? 'Endless lives' : SETUP.lives === '0' ? 'One hit ends the run' : `Normal lives: ${normalLives(mods.lives)}`} · ${power.knives} knives · ${power.composure} combo protections${EQ.charm === 'omikuji' ? ' · Fortune rolled at run start' : ''}`;
+        const summary: string[] = [];
+        const lives = normalLives(mods.lives);
+        if (SETUP.lives === '3' && lives !== 2) summary.push(`Normal lives: ${lives}`);
+        if (power.knives > 0) summary.push(`${power.knives} knives`);
+        if (power.composure > 0) summary.push(`${power.composure} combo protections`);
+        if (EQ.charm === 'omikuji') summary.push('Fortune rolled at run start');
+        return summary.join(' · ');
       },
       onRevealed: () => {
         markModeRevealsSeen(META);
