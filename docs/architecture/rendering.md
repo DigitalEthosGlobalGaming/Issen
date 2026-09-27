@@ -107,6 +107,20 @@ and have their base palette blended toward the stage fog color. Enemies are sort
 by vertical position where necessary, and foreground weather or foliage is drawn
 after figures. This repeated combination creates depth without a 3D renderer.
 
+### Enemy status cues
+
+`src/rendering/glyphs.ts` separates attacker status from swipe direction. The
+runtime passes the actual attacker and ordered rank: an attacker has a larger,
+bright paper marker with square corner brackets; the next ordered enemy has a
+smaller paper marker; waiting enemies have dim, dark-centred outlined markers.
+Entry fades multiply that status brightness, so arriving enemies cannot briefly
+look like the attacker. Numbered seals still show ordered priority.
+
+The brackets remain when direction arrows or timing rings are hidden. They do
+not reveal a direction or a perfect-cut window. Fog and weather visibility still
+apply to the whole marker; existing arrow-fade and equipment rules remain in the
+runtime. Boss/standoff glyphs retain their existing presentation.
+
 ### A common material pass
 
 Gradients, soft radial blobs, low-saturation palettes and selective `lighter`,

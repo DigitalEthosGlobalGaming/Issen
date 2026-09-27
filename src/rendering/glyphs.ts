@@ -11,6 +11,8 @@ interface GlyphEnvironment {
   noArc: boolean;
 }
 interface GlyphOptions {
+  /** Combat status is independent of the direction arrow and timing-ring visibility. */
+  emphasis?: 'attacking' | 'next' | 'waiting';
   alpha?: number;
   quiver?: boolean;
   prog?: number | null;
@@ -19,6 +21,15 @@ interface GlyphOptions {
   arrowA?: number | null;
   ghost?: Direction | null;
   rank?: number;
+}
+
+/** Entry fades multiply status brightness so arriving enemies never look like the attacker. */
+export function enemyGlyphCue(attacking: boolean, rank: number, entryAlpha = 1) {
+  const emphasis = attacking ? 'attacking' : rank === 1 ? 'next' : 'waiting';
+  return {
+    emphasis,
+    alpha: clamp(entryAlpha) * (attacking ? 1 : rank === 1 ? 0.75 : 0.45),
+  } as const;
 }
 const hexA = (h: string, a: number) => {
   const n = parseInt(h.slice(1), 16);
@@ -59,6 +70,28 @@ export function drawEnso(
   g.globalAlpha = o.alpha == null ? 1 : o.alpha;
   if (o.quiver) g.translate(Math.sin(time * 57) * 1.3, Math.cos(time * 49) * 1.3);
   const a0 = -Math.PI / 2;
+  const waiting = o.emphasis === 'waiting';
+  // Square corners identify the live threat without suggesting a swipe direction.
+  // Keep them even when a challenge hides arrows or the timing ring.
+  if (o.emphasis === 'attacking') {
+    const edge = r * 1.32,
+      corner = r * 0.3;
+    g.strokeStyle = '#f4ede1';
+    g.lineWidth = Math.max(1.5, r * 0.065);
+    g.lineCap = 'square';
+    g.shadowColor = '#121110';
+    g.shadowBlur = 3;
+    for (const sx of [-1, 1]) {
+      for (const sy of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(sx * (edge - corner), sy * edge);
+        g.lineTo(sx * edge, sy * edge);
+        g.lineTo(sx * edge, sy * (edge - corner));
+        g.stroke();
+      }
+    }
+    g.shadowBlur = 0;
+  }
   const Z = env.perfectZone,
     arc = o.prog != null && !o.noArc && !env.noArc,
     inZ = arc && o.prog != null && o.prog >= Z;
@@ -77,20 +110,22 @@ export function drawEnso(
     g.arc(0, 0, r * 1.13, a0 + Z * TAU, a0 + TAU);
     g.stroke();
   }
-  g.fillStyle = o.frozen
-    ? 'rgba(208,226,242,.96)'
-    : inZ
-      ? 'rgba(246,236,226,.95)'
-      : 'rgba(234,229,217,.9)';
+  g.fillStyle = waiting
+    ? 'rgba(22,21,19,.8)'
+    : o.frozen
+      ? 'rgba(208,226,242,.96)'
+      : inZ
+        ? 'rgba(246,236,226,.95)'
+        : 'rgba(234,229,217,.9)';
   g.beginPath();
   g.arc(0, 0, r * 0.9, 0, TAU);
   g.fill();
-  brushRing(g, r, -2.2, 0.93, r * 0.1, 'rgba(18,17,15,.3)');
+  brushRing(g, r, -2.2, 0.93, r * 0.1, waiting ? 'rgba(234,229,217,.65)' : 'rgba(18,17,15,.3)');
   if (o.prog != null) brushRing(g, r, a0, clamp(o.prog), r * 0.22, '#121110');
   g.save();
   g.rotate(DANG[dir]);
   if (o.arrowA != null) g.globalAlpha *= o.arrowA;
-  g.strokeStyle = '#121110';
+  g.strokeStyle = waiting ? '#eae5d9' : '#121110';
   g.lineCap = 'round';
   g.lineJoin = 'round';
   g.lineWidth = r * 0.2;

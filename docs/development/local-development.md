@@ -116,7 +116,10 @@ run-start, migration, input and visual checks.
 `tests/unit/run-rewards.test.mjs`, `armory-seen.test.mjs`, and
 `guided-state.test.mjs` cover the new run-local payout, viewed state, and
 teaching state. `tests/browser/feature-plan-04.spec.ts` checks live guided
-encounters and mobile menu progression. The boss-rush pool, Twin filtering,
+encounters and mobile menu progression, including browser-generated touch swipes
+during frozen cut practice and a touch parry at the held boss glint. Cut practice
+must allow pointer-down to begin a swipe; only a completed tap is suppressed.
+The boss-rush pool, Twin filtering,
 and secret event sequences/predicates have focused unit coverage.
 `tests/browser/tutorial.spec.ts` exercises the independent playable lesson flow,
 skip/replay, cleanup and save isolation. The audio cue test verifies synthesis

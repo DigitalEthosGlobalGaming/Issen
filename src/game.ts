@@ -72,7 +72,7 @@ import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model
 import { applyFilm } from './rendering/effects/film.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
 import { BASE, createPalette } from './rendering/palette.ts';
-import { drawEnso as renderEnso } from './rendering/glyphs.ts';
+import { drawEnso as renderEnso, enemyGlyphCue } from './rendering/glyphs.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 import { bindPointer } from './input/pointer.ts';
 import { bindKeyboard } from './input/keyboard.ts';
@@ -1478,6 +1478,9 @@ export function startGame(): () => void {
     if (!second) hint('parry', 'An opening. Swipe the way his blade points.', 3000);
   }
   function onTapDown() {
+    // Finger-down begins a possible swipe. Consume taps on release during cut
+    // practice so the pointer adapter can still recognize the teaching gesture.
+    if (guided.phase === 'order-practice') return false;
     if (guided.tap()) return true;
     if (G.state === 'boss' && G.boss && G.boss.state === 'flash') {
       parry();
@@ -2788,12 +2791,12 @@ export function startGame(): () => void {
       for (const e of live) {
         const p = e.pos,
           isA = e === G.attacker,
-          r = clamp(p.h * 0.15, 13, isA ? 32 : 24),
+          r = isA ? clamp(p.h * 0.18, 22, 32) : clamp(p.h * 0.13, 12, 20),
           y = Math.max(p.y - p.h * 1.18 - r, r + 62);
         const shown = e.fake && !e.switched && !G.bless.has('mercy') ? e.fake : e.dir,
           rank = ordered ? rk!.indexOf(e) + 1 : 0;
-        let alpha =
-          e.state === 'enter' ? clamp((e.t - 0.3) / 0.3) : ordered && rank !== 1 ? 0.5 : 1;
+        const cue = enemyGlyphCue(isA, rank, e.state === 'enter' ? (e.t - 0.3) / 0.3 : 1);
+        let alpha = cue.alpha;
         if (G.state === 'dead') alpha *= 0.4;
         alpha *= veilK;
         const seer = G.bless.has('foresight') && (ordered ? rank === 1 : isA);
@@ -2810,6 +2813,7 @@ export function startGame(): () => void {
         if (G.m.blind) arrowA = 0;
         else if (seer) arrowA = null;
         drawEnso(p.x, y, r, shown, {
+          emphasis: cue.emphasis,
           prog: isA && !G.m.noRing ? clamp(e.p) : null,
           alpha,
           rank,

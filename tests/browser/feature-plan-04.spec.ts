@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+test.use({ hasTouch: true });
+
 test('portrait setup gates special lives until Vitality and hides Arrows until Blade Only', async ({
   page,
 }) => {
@@ -92,65 +94,89 @@ test('Armoury sorts owned gear first and underlines unread gear until its detail
   await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/);
 });
 
-test('first ordered encounter starts a safe cut without a dismissible message', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('issen.testing', '1');
-    localStorage.setItem(
-      'issen.testing.meta',
-      JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }),
-    );
-    let next = 0,
-      time = 0;
-    const pending = new Map<number, FrameRequestCallback>();
-    window.requestAnimationFrame = (callback) => {
-      pending.set(++next, callback);
-      return next;
-    };
-    window.cancelAnimationFrame = (handle) => {
-      pending.delete(handle);
-    };
-    (window as any).advance = (count: number) => {
-      if (!time) time = performance.now();
-      for (let i = 0; i < count; i++) {
-        time += 50;
-        const callbacks = [...pending.values()];
-        pending.clear();
-        for (const callback of callbacks) callback(time);
-      }
-    };
+for (const input of ['keyboard', 'touch'] as const) {
+  test(`first ordered encounter accepts a safe ${input} cut without a dismissible message`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('issen.testing', '1');
+      localStorage.setItem(
+        'issen.testing.meta',
+        JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }),
+      );
+      let next = 0,
+        time = 0;
+      const pending = new Map<number, FrameRequestCallback>();
+      window.requestAnimationFrame = (callback) => {
+        pending.set(++next, callback);
+        return next;
+      };
+      window.cancelAnimationFrame = (handle) => {
+        pending.delete(handle);
+      };
+      (window as any).advance = (count: number) => {
+        if (!time) time = performance.now();
+        for (let i = 0; i < count; i++) {
+          time += 50;
+          const callbacks = [...pending.values()];
+          pending.clear();
+          for (const callback of callbacks) callback(time);
+        }
+      };
+    });
+    await page.goto('/');
+    await page.keyboard.press('Control+Shift+A');
+    await page.getByLabel('Wave within stage').selectOption('3');
+    await page
+      .getByRole('button', { name: 'Jump to wave', exact: true })
+      .evaluate((button: HTMLButtonElement) => button.click());
+    for (
+      let i = 0;
+      i < 20 && !(await page.getByRole('heading', { name: 'Cut the front enemy' }).isVisible());
+      i++
+    )
+      await page.evaluate(() => (window as any).advance(10));
+    await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
+    await expect(page.locator('.guided-overlay button')).toHaveCount(0);
+    await expect(page.locator('#hint')).not.toContainText('They strike in order now');
+    await page.evaluate(() => (window as any).advance(80));
+    await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
+    // A touch tap must leave the lesson active while allowing the next gesture to swipe.
+    if (input === 'touch') {
+      await page.touchscreen.tap(195, 500);
+      await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
+    }
+    const touch = input === 'touch' ? await page.context().newCDPSession(page) : null;
+    for (const [direction, dx, dy] of [
+      ['ArrowUp', 0, -90],
+      ['ArrowDown', 0, 90],
+      ['ArrowLeft', -90, 0],
+      ['ArrowRight', 90, 0],
+    ] as const) {
+      if (!(await page.locator('.guided-overlay').isVisible())) break;
+      if (touch) {
+        await touch.send('Input.dispatchTouchEvent', {
+          type: 'touchStart',
+          touchPoints: [{ x: 195, y: 500 }],
+        });
+        await touch.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [{ x: 195 + dx, y: 500 + dy }],
+        });
+        await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      } else await page.keyboard.press(direction);
+    }
+    await touch?.detach();
+    await expect(page.locator('.guided-overlay')).toBeHidden();
+    expect(
+      await page.evaluate(
+        () => JSON.parse(localStorage.getItem('issen.testing.guidedLessons')!).order,
+      ),
+    ).toBe(true);
   });
-  await page.goto('/');
-  await page.keyboard.press('Control+Shift+A');
-  await page.getByLabel('Wave within stage').selectOption('3');
-  await page
-    .getByRole('button', { name: 'Jump to wave', exact: true })
-    .evaluate((button: HTMLButtonElement) => button.click());
-  for (
-    let i = 0;
-    i < 20 && !(await page.getByRole('heading', { name: 'Cut the front enemy' }).isVisible());
-    i++
-  )
-    await page.evaluate(() => (window as any).advance(10));
-  await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
-  await expect(page.locator('.guided-overlay button')).toHaveCount(0);
-  await expect(page.locator('#hint')).not.toContainText('They strike in order now');
-  await page.evaluate(() => (window as any).advance(80));
-  await expect(page.getByRole('heading', { name: 'Cut the front enemy' })).toBeVisible();
-  for (const direction of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
-    if (!(await page.locator('.guided-overlay').isVisible())) break;
-    await page.keyboard.press(direction);
-  }
-  await expect(page.locator('.guided-overlay')).toBeHidden();
-  expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('issen.testing.guidedLessons')!).order,
-    ),
-  ).toBe(true);
-});
+}
 
-test('first boss holds the glint until the player parries', async ({ page }) => {
+test('first boss holds the glint until the player parries with touch', async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('issen.testing', '1');
     localStorage.setItem(
@@ -194,7 +220,7 @@ test('first boss holds the glint until the player parries', async ({ page }) => 
   await expect(page.getByRole('heading', { name: 'Parry now' })).toBeVisible();
   await page.evaluate(() => (window as any).advance(100));
   await expect(page.getByRole('heading', { name: 'Parry now' })).toBeVisible();
-  await page.keyboard.press('Space');
+  await page.touchscreen.tap(195, 500);
   await expect(page.locator('.guided-overlay')).toBeHidden();
   expect(
     await page.evaluate(
