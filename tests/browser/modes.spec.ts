@@ -1,5 +1,21 @@
 import { expect, test } from '@playwright/test';
 
+// These regressions exercise established gameplay; onboarding has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta')) {
+      localStorage.setItem(
+        'issen.meta',
+        JSON.stringify({
+          tutorial: 'skipped',
+          bossMilestone: 3,
+          revealSeen: 3,
+        }),
+      );
+    }
+  });
+});
+
 for (const mode of ['waves', 'rush'] as const) {
   for (const diff of ['normal', 'ronin'] as const) {
     for (const lives of ['3', '0', 'zen'] as const) {
@@ -16,7 +32,7 @@ for (const mode of ['waves', 'rush'] as const) {
         await page.getByRole('button', { name: 'Draw your blade' }).click();
         await page.getByRole('button', { name: 'Begin', exact: true }).click();
         await expect(page.locator('#hud')).toHaveClass(/on/);
-        await expect(page.locator('#lives i')).toHaveCount(lives === '3' ? 3 : 0);
+        await expect(page.locator('#lives i')).toHaveCount(lives === '3' ? 2 : 0);
         if (mode === 'rush') await expect(page.locator('#bossbar')).toHaveClass(/on/);
         else await expect(page.locator('#bossbar')).not.toHaveClass(/on/);
         if (diff === 'ronin') await expect(page.locator('#badges')).toContainText('浪人');

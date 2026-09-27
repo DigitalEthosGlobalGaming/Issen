@@ -24,6 +24,13 @@ Vite if necessary and can reuse an existing server. Tests that import the entry
 module must use its actual script URL, including Vite's timestamp when present,
 to avoid accidentally starting a second application instance.
 
+For production verification without writing `dist/`, run `npm run typecheck`,
+then `npx vite build --outDir .verification-build-next-features`. Set
+`ISSEN_PREVIEW_DIR=.verification-build-next-features` when running
+`npx playwright test --config playwright.production.config.ts`. The isolated
+build folder is ignored by Git. Use `--workers=1` for timing-sensitive browser
+checks on a busy machine.
+
 TypeScript is pinned to 7.0.2; Vite is pinned to 8.3.1. `package-lock.json` records
 the dependency resolution. Test files are executed by their runners; the application
 compiler's `include` covers `src/**/*.ts`, not the test directory.
@@ -41,8 +48,51 @@ Production tests separately exercise bundled asset startup, armory, a run, shari
 and landscape layout. Native mobile share sheets and physical touch devices are not
 covered by desktop automation.
 
-Keyboard controls are arrows/WASD to cut, Space to tap/parry, and P/Escape to pause.
+Keyboard controls are arrows/WASD to cut, Space to tap/parry (or throw an owned,
+charged knife during an ordinary wave), and P/Escape to pause.
 On a paused screen, a keyboard press resumes when a button is not focused.
+
+## Testing tools and onboarding
+
+Press **Ctrl+Shift+A** to open Testing tools. Select **Enter test profile**; the
+reload activates an isolated `issen.testing.*` save namespace and a visible badge.
+Open the tools again to jump to a stage/wave/boss, change equipment and awakenings,
+set lives or Embers, reset test Temple ranks, or replay tutorial and mode reveals.
+**Clear test profile** asks for confirmation, removes only `issen.testing.*`, and
+reloads a fresh test profile. It blocks stale queued saves during reload.
+**Return to player profile** reloads the original saves. The shortcut ships in the
+client for convenience, not as an access-control mechanism. Never reset player
+saves to test these flows.
+
+The first Begin for a fresh profile launches practice; complete it or use Skip.
+Ordinary runtime tests should seed completed/skipped tutorial metadata in their
+isolated context when onboarding is outside their scope. Legacy contexts with
+positive historical runs/duels/best-wave and absent metadata migrate to all modes
+unlocked. Use explicit fresh metadata when testing locked modes rather than relying
+on migration. See the [feature record](../features/next-feature-plan.md) for exact
+currency, milestone and compatibility rules. The [second feature record](../features/feature-plan-02.md)
+updates the upgrade catalog, Normal-life baseline, upgrades toggle and awakening rules.
+
+For awakening tests seed `issen.awakening` with separate `blades`/`robes` records
+and use owned access in metadata; editing lifetime `issen.stats.bl` after migration
+must not grant new challenge progress. Use schema version 3 for new fixtures:
+awakening rank 1 enables weapons only and rank 2 enables outfits too. Older
+purchased combined access migrates once to rank 2. Metadata versioning prevents the old
+Vitality-to-rank-2 compensation from applying repeatedly. Test Off separately from
+challenge-mode eligibility: Off suppresses both Template powers and awakened forms,
+while challenge tracking still works after access. Knife tests must cover bosses,
+standoffs, UI, zero charges and no valid target without spending charges.
+
+Focused coverage includes `tests/unit/robe-awakenings.test.mjs` for all 20 outfits,
+`tests/unit/robe-aura.test.mjs` for visual state/opacity isolation and
+`tests/browser/outfit-awakenings.spec.ts` for access, activation, suppression and
+hidden-secret presentation. These targeted checks do not replace integrated
+run-start, migration, input and visual checks.
+
+`tests/unit/meta.test.mjs` covers progression rules and parsing;
+`tests/browser/tutorial.spec.ts` exercises the independent playable lesson flow,
+skip/replay, cleanup and save isolation. The audio cue test verifies synthesis
+parameters; listening in combat is still needed to assess the sound's character.
 
 ## Persistence and sharing
 

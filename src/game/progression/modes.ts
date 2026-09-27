@@ -4,6 +4,7 @@ export interface RunMode {
   zen: boolean;
   hard: boolean;
   rush: boolean;
+  upgradesEnabled?: boolean;
 }
 
 /** Keep the existing save keys stable across the module migration. */
@@ -13,7 +14,8 @@ export function modeKey(run: RunMode): string {
     (run.blade ? '-blade' : '') +
     (run.zen ? '-zen' : '') +
     (run.hard ? '-hard' : '') +
-    (run.rush ? '-rush' : '')
+    (run.rush ? '-rush' : '') +
+    (run.upgradesEnabled === false ? '-base' : '')
   );
 }
 
@@ -37,11 +39,13 @@ export function modeLabel(
 
 export function recordLabel(key: string): string {
   const flags = key.split('-');
-  return modeLabel(
-    flags[0] ?? 'normal',
-    flags.includes('blade'),
-    flags.includes('zen'),
-    flags.includes('hard'),
-    flags.includes('rush'),
+  return (
+    modeLabel(
+      flags[0] ?? 'normal',
+      flags.includes('blade'),
+      flags.includes('zen'),
+      flags.includes('hard'),
+      flags.includes('rush'),
+    ) + (flags.includes('base') ? ', upgrades off' : '')
   );
 }

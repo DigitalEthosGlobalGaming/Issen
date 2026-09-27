@@ -62,8 +62,10 @@ export function renderStatistics(
   stats: Statistics,
   unlocked: number,
   total: number,
+  embersEarned?: number,
 ): void {
   const { summary, records } = statisticsRows(stats, unlocked, total);
+  if (embersEarned !== undefined) summary.push([embersEarned.toLocaleString(), 'Embers earned']);
   const doc = grid.ownerDocument;
   const fragment = doc.createDocumentFragment();
   const append = ([value, label]: StatRow) => {

@@ -1,0 +1,97 @@
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  background: rgba(14, 13, 12, 0.98);
+  color: var(--paper, #ece6da);
+  overflow: auto;
+  touch-action: manipulation;
+}
+.tutorial-overlay[hidden],
+.tutorial-overlay [hidden] {
+  display: none !important;
+}
+.tutorial-card {
+  width: min(100%, 580px);
+  margin: auto;
+  text-align: center;
+}
+.tutorial-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.tutorial-overlay button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #8a7a61;
+  background: #28241f;
+  color: #f2dfbb;
+  cursor: pointer;
+}
+.tutorial-overlay button:focus-visible {
+  outline: 2px solid #f1ca83;
+  outline-offset: 3px;
+}
+.tutorial-title {
+  margin: 22px 0 10px;
+  font-size: clamp(20px, 5vw, 30px);
+}
+.tutorial-lesson {
+  min-height: 3em;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 48ch;
+}
+.tutorial-canvas {
+  display: block;
+  width: 100%;
+  height: clamp(130px, 31vh, 290px);
+  touch-action: none;
+}
+.tutorial-cue {
+  min-height: 1.5em;
+  color: #f0d098;
+  letter-spacing: 0.08em;
+  margin: 8px 0;
+}
+.tutorial-feedback {
+  min-height: 2.5em;
+  color: #d6cbb8;
+  font-size: 13px;
+  margin: 8px 0;
+}
+.tutorial-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.tutorial-controls button {
+  font-size: 20px;
+  min-width: 44px;
+}
+.tutorial-note {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #b4a996;
+  margin: 18px auto 0;
+  max-width: 55ch;
+}
+@media (max-height: 560px) {
+  .tutorial-title {
+    margin-top: 8px;
+  }
+  .tutorial-canvas {
+    height: 120px;
+  }
+  .tutorial-feedback {
+    min-height: 1.5em;
+  }
+}

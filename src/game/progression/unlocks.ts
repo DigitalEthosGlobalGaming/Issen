@@ -1,4 +1,6 @@
 import { SPECIAL } from '../content/awakenings.ts';
+import { ROBE_AWAKENINGS } from '../content/robe-awakenings.ts';
+import type { AwakeningProgress } from './awakening-progress.ts';
 import type { Item, ItemCategory } from '../content/items.ts';
 import type { Statistics } from './statistics.ts';
 
@@ -16,15 +18,20 @@ export function unlockEligibleItems(
   unlocked: Set<string>,
   items: readonly Item[],
   onUnlock: (id: string, notice: UnlockNotice) => void,
+  awakening?: { access: boolean | number; progress: AwakeningProgress },
 ): void {
   const byId = new Map(items.map((item) => [item.id, item]));
-  for (const [id, awakening] of Object.entries(SPECIAL)) {
-    const progress = stats.bl[id];
+  for (const [id, definition] of Object.entries({ ...SPECIAL, ...ROBE_AWAKENINGS })) {
     const item = byId.get(id);
-    if (!item || unlocked.has(id + '+') || !progress) continue;
-    if (progress[awakening.need[0]] < awakening.need[1]) continue;
+    if (item?.type === 'robe' && awakening?.access !== true && Number(awakening?.access ?? 0) < 2)
+      continue;
+    const progress =
+      item?.type === 'robe' ? awakening?.progress.robes[id] : awakening?.progress.blades[id];
+    if (!awakening?.access || !item || !unlocked.has(id) || unlocked.has(id + '+') || !progress)
+      continue;
+    if (progress[definition.need[0]] < definition.need[1]) continue;
     unlocked.add(id + '+');
-    onUnlock(id + '+', { k: '真', n: item.n + ' awakened', type: 'blade' });
+    onUnlock(id + '+', { k: '真', n: item.n + ' awakened', type: item.type });
   }
   for (const item of items) {
     if (unlocked.has(item.id) || !item.ok(stats)) continue;

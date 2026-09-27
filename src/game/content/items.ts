@@ -2,18 +2,37 @@ import type { Statistics } from '../progression/statistics.ts';
 import { deathsTotal } from '../progression/statistics.ts';
 import type { Modifiers } from '../equipment/modifiers.ts';
 export type ItemCategory = 'blade' | 'robe' | 'charm' | 'crest' | 'pet' | 'fx' | 'film' | 'seal';
+/**
+ * An Armoury catalog entry, including both gameplay equipment and cosmetics.
+ * Ownership is stored separately as a set of stable IDs; equipped IDs are stored
+ * per ItemCategory in platform/saves.ts. progression/unlocks.ts evaluates `ok`.
+ * Blade, robe and charm modifier sources are composed by the runtime; visual
+ * categories are consumed by rendering/UI. Adding catalog metadata alone does
+ * not implement a new effect: wire its modifier or visual consumer as well.
+ */
 export interface Item {
+  /** Stable saved identity, also used to join blade visuals and awakenings. */
   id: string;
   type: ItemCategory;
+  /** Japanese glyph/label shown on the item card. */
   k: string;
+  /** Display name. */
   n: string;
+  /** Flavour text. */
   f: string;
+  /** Perk and tradeoff descriptions; mechanics are supplied through `m`. */
   pk?: string;
   tr?: string;
+  /** Visible unlock requirement, or a cryptic hint for a hidden item. */
   d?: string;
   hint?: string;
+  /** Truthy for a secret item whose locked card conceals its identity. */
   hidden?: number;
+  /** Equipment effects; see computeModifiers for stacking rules. */
   m?: Partial<Modifiers>;
+  /** Eligibility predicate, not an ownership check. May depend on earlier
+   * catalog unlocks through createItems' getUnlocks callback.
+   */
   ok: (stats: Statistics) => boolean;
 }
 export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {

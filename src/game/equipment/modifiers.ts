@@ -1,7 +1,11 @@
 const DEFAULT_MODIFIERS = {
+  /** Enemy attack duration factor: below 1 makes attacks faster. */
   atk: 1,
+  /** Multiplier for the time available to parry a duel attack. */
   parry: 1,
+  /** Multiplier for the boss's staggered opening after a successful parry. */
   stag: 1,
+  /** Offset to the normalized perfect-zone threshold; negative enlarges the arc. */
   pz: 0,
   score: 1,
   perfect: 1,
@@ -17,6 +21,7 @@ const DEFAULT_MODIFIERS = {
   runWard: 0,
   kage: 0,
   noArc: 0,
+  /** Added swipes required during a duel opening; negative makes it shorter. */
   chain: 0,
   blind: 0,
   swipe: 1,
@@ -24,6 +29,7 @@ const DEFAULT_MODIFIERS = {
   noShrine: 0,
   kiku: 0,
   freeze: 0,
+  /** Added starting lives, subject to the selected mode's life rules. */
   lives: 0,
   standoff: 1,
   foxsight: 0,
@@ -52,6 +58,17 @@ const DEFAULT_MODIFIERS = {
   noFade: 0,
   noRing: 0,
 };
+/**
+ * Resolved gameplay tuning for a run, composed from equipment/fortune sources
+ * and blessing IDs by computeModifiers. Catalogs supply Partial<Modifiers>;
+ * consumers receive the defaults plus every active source.
+ *
+ * Values do not all stack alike: duration/score factors multiply, comboStep takes
+ * the minimum, comboCap/bossDmg/standoff/shrineN take the maximum, and remaining
+ * source fields add. Numeric flags use zero for off. Blessings apply afterwards.
+ * Add a field with a neutral default, an explicit stacking rule and a gameplay
+ * consumer; changing a catalog description alone never implements a mechanic.
+ */
 export type Modifiers = typeof DEFAULT_MODIFIERS;
 
 export function computeModifiers(

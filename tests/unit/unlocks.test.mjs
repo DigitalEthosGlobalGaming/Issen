@@ -10,15 +10,16 @@ test('awakening thresholds grant once and publish the updated set before notific
   const unlocked = new Set(['steel']);
   const items = createItems(() => unlocked).filter((item) => item.id === 'steel');
   const events = [];
+  const awakening = { access: true, progress: { version: 1, blades: stats.bl, robes: {} } };
   const receive = (id, notice) => {
     assert.equal(unlocked.has(id), true);
     events.push({ id, notice });
   };
-  unlockEligibleItems(stats, unlocked, items, receive);
+  unlockEligibleItems(stats, unlocked, items, receive, awakening);
   assert.equal(events.length, 0);
   stats.bl.steel.k = 200;
-  unlockEligibleItems(stats, unlocked, items, receive);
-  unlockEligibleItems(stats, unlocked, items, receive);
+  unlockEligibleItems(stats, unlocked, items, receive, awakening);
+  unlockEligibleItems(stats, unlocked, items, receive, awakening);
   assert.deepEqual(events, [
     { id: 'steel+', notice: { k: '真', n: 'Tamahagane awakened', type: 'blade' } },
   ]);

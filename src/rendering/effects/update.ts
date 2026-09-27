@@ -9,6 +9,8 @@ export interface EffectEnvironment {
 }
 export function updateEffects(fx: Effects, dt: number, raw: number, env: EffectEnvironment) {
   const { scale: S, wind, time, random: R, onSwordStuck } = env;
+  for (const knife of fx.knives) knife.t += dt;
+  fx.knives = fx.knives.filter((knife) => knife.t < knife.life);
   for (const s of fx.slashes) s.t += dt;
   fx.slashes = fx.slashes.filter((s) => s.t < s.life);
   for (const d of fx.drops) {

@@ -8,10 +8,13 @@ export interface Setup {
   diff: 'normal' | 'ronin';
   arrows: boolean;
   lives: '3' | '0' | 'zen';
+  /** False starts a run without permanent bonuses or awakened powers. */
+  upgrades?: boolean;
 }
-export type Equipment = Record<ItemCategory, string> & { bladeSp: boolean };
+export type Equipment = Record<ItemCategory, string> & { bladeSp: boolean; robeSp?: boolean };
 export const DEFAULT_EQUIPMENT: Equipment = {
   bladeSp: false,
+  robeSp: false,
   crest: 'nocrest',
   pet: 'nopet',
   charm: 'nocharm',
@@ -70,6 +73,7 @@ export function parseSetup(value: unknown): Setup {
     diff: saved.diff === 'ronin' ? 'ronin' : 'normal',
     arrows: typeof saved.arrows === 'boolean' ? saved.arrows : true,
     lives: saved.lives === '0' || saved.lives === 'zen' ? saved.lives : '3',
+    upgrades: saved.upgrades !== false,
   };
 }
 
@@ -95,6 +99,7 @@ export function parseEquipment(
     if (saved[item.type] === item.id && unlocks.has(item.id)) equipment[item.type] = item.id;
   }
   equipment.bladeSp = saved.bladeSp === true;
+  equipment.robeSp = saved.robeSp === true && unlocks.has(equipment.robe + '+');
   return equipment;
 }
 

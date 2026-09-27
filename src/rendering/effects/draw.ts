@@ -10,6 +10,28 @@ export interface EffectDrawing {
 export function createEffectRenderer(g: CanvasRenderingContext2D, fx: Effects, env: EffectDrawing) {
   const { scale: S, time, font: FONT, seal: SEAL, mistSprite } = env;
   function drawFx() {
+    for (const knife of fx.knives) {
+      const progress = clamp(knife.t / knife.life);
+      g.save();
+      g.translate(lerp(knife.x0, knife.x1, progress), lerp(knife.y0, knife.y1, progress));
+      g.rotate(Math.atan2(knife.y1 - knife.y0, knife.x1 - knife.x0));
+      g.globalAlpha = 1 - progress * 0.3;
+      const size = Math.max(10, 18 * S);
+      g.fillStyle = '#f0dba9';
+      g.beginPath();
+      g.moveTo(size, 0);
+      g.lineTo(-size * 0.35, -size * 0.2);
+      g.lineTo(-size * 0.35, size * 0.2);
+      g.closePath();
+      g.fill();
+      g.strokeStyle = '#b99863';
+      g.lineWidth = 3;
+      g.beginPath();
+      g.moveTo(-size * 0.35, 0);
+      g.lineTo(-size, 0);
+      g.stroke();
+      g.restore();
+    }
     if (mistSprite)
       for (const u of fx.dust) {
         g.globalAlpha = 0.35 * (1 - u.t / u.life);

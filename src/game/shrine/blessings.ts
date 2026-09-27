@@ -62,8 +62,8 @@ export function applyBlessing(
   const livesMode = !state.zen && !state.hard;
   if (id === 'blood') state.lives = Math.max(1, state.lives - 1);
   if (id === 'iron' && livesMode) {
-    state.maxLives++;
-    state.lives++;
+    state.maxLives = Math.min(5, state.maxLives + 1);
+    state.lives = Math.min(state.maxLives, state.lives + 1);
   }
   if (id === 'paperward') state.runWards += 2;
   if (id === 'glass' && livesMode) {

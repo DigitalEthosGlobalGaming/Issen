@@ -1,5 +1,21 @@
 import { expect, test } from '@playwright/test';
 
+// These regressions exercise established gameplay; onboarding has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta')) {
+      localStorage.setItem(
+        'issen.meta',
+        JSON.stringify({
+          tutorial: 'skipped',
+          bossMilestone: 3,
+          revealSeen: 3,
+        }),
+      );
+    }
+  });
+});
+
 test('HUD handles life modes, combo scoring, and exclusive screen navigation', async ({ page }) => {
   await page.goto('/');
   const result = await page.evaluate(async () => {
@@ -76,6 +92,7 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
       statistics: parseStatistics({}),
       seals: {},
       charms: {},
+      awakeningAccess: () => true,
       events: { equipped: () => saves++, awaken: () => awakenings++, preview: () => previews++ },
     });
     const click = (selector: string) => root.querySelector<HTMLButtonElement>(selector)!.click();

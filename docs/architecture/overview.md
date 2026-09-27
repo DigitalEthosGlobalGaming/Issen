@@ -7,7 +7,7 @@ type checking; Vite's transpilation alone is not the build gate.
 ## Startup and ownership
 
 Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
-shell and eight screen fragments, then calls `startGame()` in `src/game.ts`.
+shell and screen fragments, then calls `startGame()` in `src/game.ts`.
 The returned disposer stops the runtime. `main.ts` removes the mounted root and
 registers disposal with Vite HMR before a replacement instance starts.
 
@@ -29,6 +29,12 @@ implemented files.
 | Items, stages, cosmetics, bosses, blessings, awakenings | `src/game/content/` |
 | Modifier composition and shrine rules | `src/game/equipment/`, `src/game/shrine/` |
 | Scoring, records, statistics, unlocks | `src/game/progression/` |
+| Embers, Temple upgrades, tutorial status, mode milestones/reveals | `src/game/progression/meta.ts` |
+| Independent gated blade/outfit challenges | `src/game/progression/awakening-progress.ts`, `unlocks.ts` |
+| Outfit awakening catalog | `src/game/content/robe-awakenings.ts` |
+| Knife target selection and charge spending | `src/game/combat/knife.ts` |
+| Tutorial practice scene and isolated canvas | `src/ui/screens/tutorial.ts`, `tutorial.css` |
+| Temple and testing menu controls | `src/ui/screens/template.ts`, `admin.ts` |
 | Backgrounds, ambient grass/leaves, weather | `src/rendering/scene/` |
 | Figure geometry, poses, player animation, projection | `src/rendering/figures/` |
 | Particle state, spawning, updates, drawing, films | `src/rendering/effects/` |
@@ -56,6 +62,27 @@ implemented files.
 - Storage failure is non-fatal. `platform/saves.ts` validates profile data before
   it reaches gameplay. Existing `issen.*` keys and mode-record keys remain stable.
   Browser origin determines which saves are visible.
+- `progression/meta.ts` validates the new `issen.meta` progression record. Temple
+  modifiers and consumables are captured at run start and apply only to opted-in,
+  arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,
+  with equipment/upgrades composed and capped at five. Tutorial practice owns separate state and never
+  records gameplay rewards. The runtime persists its completion/skip callback.
+- `progression/awakening-progress.ts` validates `issen.awakening`: blade and robe
+  counters are independent and earn only after category access (rank 1 weapons,
+  rank 2 outfits). Metadata schema 3 preserves old combined access as rank 2. Existing lifetime blade
+  progress migrates once. Awakened sources replace their base category source;
+  upgrades Off suppresses both forms without deleting ownership or progress.
+- `progression/modes.ts` preserves existing record identities and adds a `-base`
+  suffix for upgrades-off runs, so new base-play scores do not overwrite upgraded
+  records. Normal-life setup retains its saved `'3'` identifier despite the new
+  two-life baseline.
+- `Figure.robeAura` is separate from blade aura. Its stateless body halo is drawn
+  on the explicit figure context with inherited opacity, including preview/death
+  rendering; it does not consume random or particle state.
+- Testing tools use `platform/storage.ts` to route every store read/write to
+  `issen.testing.*` while the session's test-profile flag is active. Switching
+  profiles reloads the runtime to avoid mixing in-memory state. The admin panel
+  exposes mutations only inside that isolated profile.
 - HTML fragments are static Vite `?raw` imports. Mount before binding controllers.
   `styles/index.css` fixes cascade order: tokens, base, HUD, screens, armory,
   components. Keep feature-specific styling beside its feature when substantial.

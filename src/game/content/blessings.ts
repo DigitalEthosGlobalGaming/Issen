@@ -153,6 +153,17 @@ export const BLESS = [
 ];
 export const TIER = ['', 'rare', 'cursed'],
   TIERNAME = ['', 'Rare', 'Cursed'];
+/**
+ * A Shrine reward held for the current run in RunState.bless (a set of IDs).
+ * `t` is offer tier: 0 common, 1 rare, 2 cursed; `k`, `n` and `d` are the glyph,
+ * name and effect description. Truthy `lives` marks life-related offers excluded
+ * from Zen and hard mode; it is NOT an amount of healing.
+ *
+ * To add one, extend BLESS and implement its effect: shrine/blessings.ts owns
+ * offer eligibility and immediate effects, equipment/modifiers.ts owns composed
+ * numeric effects, and runtime/combat consumers handle triggered effects by ID.
+ * A description alone does not apply an effect. Offers omit already-owned IDs.
+ */
 export type Blessing = (typeof BLESS)[number];
 export const BLESS_BY: Record<string, Blessing> = Object.fromEntries(
   BLESS.map((blessing) => [blessing.id, blessing]),

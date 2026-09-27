@@ -39,15 +39,40 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
       0.03 * Math.sin(u * 31 * Math.PI + p[3]);
   }
   function pine(b: CanvasRenderingContext2D, x: number, y: number, s: number, col: string) {
+    // Local variation preserves the seeded layout of the surrounding scenery.
+    const variation = rng(Math.round(x * 31 + y * 17 + s * 101));
+    const shore = STAGES[stage]!.bgx === 'shore';
+    const charred = STAGES[stage]!.bgx === 'temple';
+    const lean = (variation() - 0.5) * 0.12 + (shore ? 0.15 : 0);
+    const width = 0.88 + variation() * 0.22;
+    b.save();
+    b.translate(x, y);
+    b.rotate(lean);
     b.fillStyle = col;
-    b.fillRect(x - s * 0.06, y - s * 0.9, s * 0.12, s * 0.9);
+    b.beginPath();
+    b.moveTo(-s * 0.045, 0);
+    b.quadraticCurveTo(-s * 0.025, -s * 0.65, s * 0.012, -s * 1.48);
+    b.lineTo(s * 0.035, -s * 1.1);
+    b.lineTo(s * 0.055, 0);
+    b.closePath();
+    b.fill();
     for (let i = 0; i < 4; i++) {
-      const yy = y - s * (0.55 + i * 0.28),
-        w = s * (0.75 - i * 0.14);
+      const yy = -s * (0.55 + i * 0.28 + variation() * 0.035),
+        w = s * (0.75 - i * 0.14) * width * (charred ? 0.75 : 1),
+        offset = s * ((variation() - 0.5) * 0.17 + (shore ? 0.08 : 0));
       b.beginPath();
-      b.ellipse(x + (i % 2 ? s * 0.08 : -s * 0.06), yy, w, s * 0.16, 0, 0, TAU);
+      b.ellipse(
+        offset,
+        yy,
+        w,
+        s * (0.12 + variation() * 0.06) * (charred ? 0.65 : 1),
+        (variation() - 0.5) * 0.09,
+        0,
+        TAU,
+      );
       b.fill();
     }
+    b.restore();
   }
   function branch(
     b: CanvasRenderingContext2D,
@@ -605,9 +630,9 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
       W * (portrait ? 0.96 : 0.93),
       ft + H * 0.01,
       H * (portrait ? 0.065 : 0.1),
-      -Math.PI / 2 - 0.2,
+      -Math.PI / 2 - (st.bgx === 'shore' ? 0.32 : 0.2),
       (portrait ? 4 : 6) * S,
-      6,
+      st.bgx === 'temple' ? 5 : 6,
       tr,
     );
     if (st.bgx === 'sakura') {
@@ -616,7 +641,7 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
         r,
         W * (portrait ? 0.94 : 0.91),
         ft - H * (portrait ? 0.13 : 0.2),
-        H * (portrait ? 0.07 : 0.1),
+        H * (portrait ? 0.074 : 0.106),
       );
       const lx2 = W * 0.06,
         ly2 = ft + H * 0.01;
@@ -635,7 +660,7 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
         r,
         lx2 + H * 0.02,
         ly2 - H * (portrait ? 0.1 : 0.15),
-        H * (portrait ? 0.055 : 0.08),
+        H * (portrait ? 0.058 : 0.084),
       );
     }
     drawProps(b, ft, gy);

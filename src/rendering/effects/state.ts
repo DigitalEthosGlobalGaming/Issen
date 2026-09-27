@@ -46,6 +46,7 @@ export interface Particle extends Positioned {
   pts?: [number, number][];
 }
 export interface Effects {
+  knives: (Timed & { x0: number; y0: number; x1: number; y1: number })[];
   slashes: (Timed & { x1: number; y1: number; x2: number; y2: number; w: number; dark: boolean })[];
   drops: (Moving & { r: number })[];
   sparks: Moving[];
@@ -71,6 +72,7 @@ export interface Effects {
 
 export function createEffects(): Effects {
   return {
+    knives: [],
     slashes: [],
     drops: [],
     sparks: [],

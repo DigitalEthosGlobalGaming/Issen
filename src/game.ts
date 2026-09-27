@@ -15,6 +15,7 @@ import { createArmoryScreen } from './ui/screens/armory.ts';
 import { createShareCard } from './ui/share-card.ts';
 import { renderGameOver, ITEM_TYPE_LABEL as TYPE_WORD } from './ui/screens/game-over.ts';
 import { recordRun } from './game/progression/run-records.ts';
+import { protectCombo, recoverAfterWave } from './game/progression/run-powers.ts';
 import { resolveDamage } from './game/combat/damage.ts';
 import {
   createStandoff,
@@ -67,18 +68,45 @@ import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 import { bindPointer } from './input/pointer.ts';
 import { bindKeyboard } from './input/keyboard.ts';
 import { createSetupScreen } from './ui/screens/setup.ts';
+import { renderTemplate } from './ui/screens/template.ts';
+import { renderAdmin } from './ui/screens/admin.ts';
+import { createTutorial } from './ui/screens/tutorial.ts';
+import {
+  parseMeta,
+  templateModifiers,
+  templatePowers,
+  EMPTY_UPGRADES,
+  TEMPLATE_UPGRADES,
+  rewardCurrency,
+  unlockBossMilestone,
+  pendingModeReveals,
+  markModeRevealsSeen,
+  sanitizeSetup,
+} from './game/progression/meta.ts';
 import { createSharing } from './platform/sharing.ts';
 import { createLayout } from './rendering/layout.ts';
 import { BLADES, ROBES } from './game/content/cosmetics.ts';
 import { SPECIAL } from './game/content/awakenings.ts';
+import { ROBE_AWAKENINGS } from './game/content/robe-awakenings.ts';
+import { parseAwakeningProgress, recordChallenge } from './game/progression/awakening-progress.ts';
+import type { BladeStats } from './game/progression/statistics.ts';
+import { normalLives } from './game/equipment/lives.ts';
+import { throwKnife } from './game/combat/knife.ts';
 import { FORTUNES } from './game/content/fortunes.ts';
 import { BLESS, TIER, TIERNAME, BLESS_BY } from './game/content/blessings.ts';
-import { loadStatistics, loadSetup, loadUnlocks, loadEquipment } from './platform/saves.ts';
+import {
+  loadStatistics,
+  loadSetup,
+  loadUnlocks,
+  loadEquipment,
+  parseEquipment,
+  DEFAULT_EQUIPMENT,
+} from './platform/saves.ts';
 import { createItems } from './game/content/items.ts';
 import { deathsTotal } from './game/progression/statistics.ts';
 import { createAudio } from './audio/audio.ts';
 import { computeModifiers } from './game/equipment/modifiers.ts';
-import { store } from './platform/storage.ts';
+import { store, isTestProfile, switchTestProfile, clearTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
 import { TAU, clamp, lerp, easeOut, easeInOut, angDiff } from './shared/math.ts';
 import { rng, shuffle } from './shared/random.ts';
@@ -168,8 +196,28 @@ export function startGame(): () => void {
 
   const ST = loadStatistics();
   const SETUP = loadSetup();
-  const saveStats = () => store.set('issen.stats', ST);
   const UNL = loadUnlocks();
+  const META = parseMeta(store.get('issen.meta', null), ST, UNL);
+  const AWAKENING = parseAwakeningProgress(store.get('issen.awakening', null), ST.bl);
+  const saveAwakening = () => store.set('issen.awakening', AWAKENING);
+  saveAwakening();
+  const saveMeta = () => store.set('issen.meta', META);
+  saveMeta();
+  Object.assign(SETUP, sanitizeSetup(SETUP, META));
+  let runTemplate = templateModifiers(META, SETUP);
+  let runEmbers = 0;
+  let tutorialStartsRun = false;
+  function earn(event: 'kill' | 'wave' | 'boss') {
+    runEmbers += rewardCurrency(META, event, { zen: G.zen });
+    saveMeta();
+  }
+  const saveStats = () => store.set('issen.stats', ST);
+  const revokedSave = store.get('issen.revoked', []);
+  const revoked = new Set<string>(
+    isTestProfile() && Array.isArray(revokedSave)
+      ? revokedSave.filter((id): id is string => typeof id === 'string')
+      : [],
+  );
   const EQ = loadEquipment(UNL, ITEMS);
   const SEALS: Record<string, string> = {
     verm: '#a3271d',
@@ -543,8 +591,38 @@ export function startGame(): () => void {
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
   let fx = createEffects();
+  function powersEnabled() {
+    return G.state === 'title' || G.state === 'over' ? SETUP.upgrades !== false : G.upgradesEnabled;
+  }
   function isSp() {
-    return !!(EQ.bladeSp && SPECIAL[EQ.blade] && UNL.has(EQ.blade + '+'));
+    return !!(
+      META.upgrades.awakening &&
+      powersEnabled() &&
+      EQ.bladeSp &&
+      SPECIAL[EQ.blade] &&
+      UNL.has(EQ.blade + '+')
+    );
+  }
+  function isRobeSp() {
+    return !!(
+      META.upgrades.awakening >= 2 &&
+      powersEnabled() &&
+      EQ.robeSp &&
+      ROBE_AWAKENINGS[EQ.robe] &&
+      UNL.has(EQ.robe + '+')
+    );
+  }
+  function playerRobePalette() {
+    const base = robePal(EQ.robe);
+    const accent = isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.st?.c : null;
+    return accent
+      ? { ...base, robeL: `rgb(${accent})`, inner: `rgb(${accent})`, obi: `rgb(${accent})` }
+      : base;
+  }
+  function challenge(metric: keyof BladeStats, value = 1) {
+    if (G.zen) return;
+    recordChallenge(AWAKENING, META.upgrades.awakening, G.runBlade, G.runRobe, metric, value);
+    saveAwakening();
   }
   function bladeMods() {
     return isSp() ? SPECIAL[EQ.blade]!.m : (ITEM_BY[EQ.blade] || {}).m;
@@ -567,7 +645,13 @@ export function startGame(): () => void {
   }
   function computeMods() {
     G.m = computeModifiers(
-      [bladeMods(), (ITEM_BY[EQ.robe] || {}).m, (ITEM_BY[EQ.charm] || {}).m, G.fortune?.m],
+      [
+        bladeMods(),
+        isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]!.m : (ITEM_BY[EQ.robe] || {}).m,
+        (ITEM_BY[EQ.charm] || {}).m,
+        G.fortune?.m,
+        runTemplate,
+      ],
       G.bless,
     );
   }
@@ -591,6 +675,7 @@ export function startGame(): () => void {
       ST.bestCombo = Math.max(ST.bestCombo, G.combo);
       const q = bst();
       if (q) q.c = Math.max(q.c, G.combo);
+      challenge('c', G.combo);
     }
   }
 
@@ -622,13 +707,23 @@ export function startGame(): () => void {
     });
   }
   function checkUnlocks(silent = false) {
-    unlockEligibleItems(ST, UNL, ITEMS, (_id, it) => {
-      store.set('issen.unlocks', [...UNL]);
-      if (!silent) {
-        G.newUnlocks.push(it);
-        toast(it);
-      }
-    });
+    unlockEligibleItems(
+      ST,
+      UNL,
+      ITEMS,
+      (id, it) => {
+        if (revoked.has(id)) {
+          UNL.delete(id);
+          return;
+        }
+        store.set('issen.unlocks', [...UNL]);
+        if (!silent) {
+          G.newUnlocks.push(it);
+          toast(it);
+        }
+      },
+      { access: META.upgrades.awakening, progress: AWAKENING },
+    );
   }
   function pop(x: number, y: number, text: string, size?: number) {
     const ax = portrait ? W * 0.25 : W * 0.18,
@@ -736,11 +831,20 @@ export function startGame(): () => void {
       position: enemyPos,
     });
   }
-  function startRun() {
+  function startRun(skipTutorial = false) {
+    if (!skipTutorial && META.tutorial === 'new') {
+      launchTutorial(true);
+      return;
+    }
+    Object.assign(SETUP, sanitizeSetup(SETUP, META));
+    runTemplate = templateModifiers(META, SETUP);
+    runEmbers = 0;
     resetRun(G, SETUP, EQ, R);
+    Object.assign(G, templatePowers(META, SETUP));
+    G.maxKnives = G.knives;
     computeMods();
     G.runWards = G.m.runWard;
-    G.maxLives = Math.max(1, 3 + G.m.lives);
+    G.maxLives = normalLives(G.m.lives);
     if (!G.zen && !G.hard) G.lives = G.maxLives;
     G.freezeT = 0;
     G.wardUsed = false;
@@ -852,6 +956,8 @@ export function startGame(): () => void {
           q.w = Math.max(q.w, n);
           if (G.mode === 'ronin') q.rw = Math.max(q.rw, n);
         }
+        challenge('w', n);
+        if (G.mode === 'ronin') challenge('rw', n);
       }
       ST.bestWave = Math.max(ST.bestWave, n);
       if (G.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
@@ -920,7 +1026,14 @@ export function startGame(): () => void {
           sfx.step();
           dust(c.pos.x, c.pos.y, c.pos.h * 0.4);
         },
-        cleared: (bonus) => addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S)),
+        cleared: (bonus) => {
+          earn('wave');
+          if (recoverAfterWave(G)) {
+            renderLives();
+            pop(W / 2, H * 0.4, 'Recovery +1 life');
+          }
+          addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
+        },
       },
       R,
     );
@@ -970,6 +1083,7 @@ export function startGame(): () => void {
     G.combo++;
     G.kills++;
     ST.kills++;
+    earn('kill');
     if (e.fake) ST.feintKills = (ST.feintKills || 0) + 1;
     if (G.m.maneki) {
       G.manekiN = (G.manekiN || 0) + 1;
@@ -982,6 +1096,7 @@ export function startGame(): () => void {
     {
       const q = bst();
       if (q) q.k++;
+      challenge('k');
     }
     bumpCombo();
     const P0 = e.pos,
@@ -1033,6 +1148,7 @@ export function startGame(): () => void {
       {
         const q = bst();
         if (q) q.p++;
+        challenge('p');
       }
       G.pStreak++;
       ST.bestPStreak = Math.max(ST.bestPStreak, G.pStreak);
@@ -1321,6 +1437,46 @@ export function startGame(): () => void {
     return false;
   }
   function onTap() {
+    if (G.state === 'playing') {
+      const target = throwKnife(G, R);
+      if (!target) return;
+      const pos = enemyPos(target);
+      const wasAttacker = G.attacker === target;
+      target.pos = pos;
+      target.state = 'dying';
+      target.t = 0;
+      target.k = 0;
+      target.deathType = 'stagger';
+      target.fallDir = 1;
+      target.cutAng = -Math.PI / 4;
+      if (wasAttacker) {
+        G.attacker = null;
+        G.gapT = waveConfiguration().gap;
+      }
+      G.kills++;
+      ST.kills++;
+      earn('kill');
+      addScore(
+        Math.round((wasAttacker ? 140 : 120) * comboMult() * G.m.normal),
+        pos.x,
+        pos.y - pos.h,
+        'Knife',
+      );
+      fx.knives.push({
+        x0: L.player.x,
+        y0: L.player.y - L.player.h * 0.55,
+        x1: pos.x,
+        y1: pos.y - pos.h * 0.55,
+        t: 0,
+        life: 0.18,
+      });
+      sparks(pos.x, pos.y - pos.h * 0.55, 10);
+      sfx.whoosh();
+      buzz(8);
+      hud(true);
+      saveStats();
+      return;
+    }
     if (G.state === 'standoff') {
       const so = G.so;
       if (so && !so.done && !so.fired) {
@@ -1434,6 +1590,11 @@ export function startGame(): () => void {
         G.petT = 1;
         if (EQ.pet === 'crow') sfx.caw();
         G.bossesSlain++;
+        earn('boss');
+        if (unlockBossMilestone(META, G.bossCount, SETUP)) {
+          saveMeta();
+          toast({ k: '開', msg: 'A new path awaits in Before you draw.' });
+        }
         ST.duels++;
         if (G.rush) {
           ST.rushBest = Math.max(ST.rushBest || 0, G.bossesSlain);
@@ -1442,6 +1603,7 @@ export function startGame(): () => void {
         {
           const q = bst();
           if (q) q.d++;
+          challenge('d');
         }
         if (G.mode === 'ronin') ST.roninDuels++;
         if (b.def.mirror) ST.mirrorWins++;
@@ -1586,6 +1748,8 @@ export function startGame(): () => void {
       G.kills++;
       ST.kills++;
       ST.standoffs++;
+      challenge('k');
+      earn('kill');
       addScore(
         Math.round(1000 * comboMult() * G.m.standoff),
         cx,
@@ -1614,6 +1778,10 @@ export function startGame(): () => void {
     }
   });
   function breakCombo() {
+    if (protectCombo(G)) {
+      pop(W / 2, H * 0.4, 'Composure · combo kept');
+      return;
+    }
     G.combo = G.bless && G.bless.has('banner') && G.combo >= 10 ? 10 : 0;
   }
   function applyPick(id: string) {
@@ -1706,7 +1874,7 @@ export function startGame(): () => void {
     pop(
       W / 2,
       H * 0.45,
-      label || (lost >= 3 ? `${lost} 連 broken` : 'Struck'),
+      label || (lost >= 3 && G.combo < lost ? `${lost} 連 broken` : 'Struck'),
       Math.max(20, 24 * S),
     );
     if (killer && 'def' in killer) {
@@ -1779,6 +1947,7 @@ export function startGame(): () => void {
     clearHints();
     $('bossbar').classList.remove('on');
     const { record: rec, newBest: nb } = recordRun(ST, G);
+    challenge('sc', G.score);
     if (!G.zen) store.set('issen.best', ST.bestScore);
     saveStats();
     checkUnlocks();
@@ -1786,6 +1955,11 @@ export function startGame(): () => void {
     G.card = null;
     G.claps = 0;
     renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n);
+    $('oStats').append(
+      document.createTextNode(` · ${runEmbers} Embers earned · ${META.embers} available`),
+    );
+    if (!G.upgradesEnabled)
+      $('oStats').append(document.createTextNode(' · Permanent upgrades off'));
     showScreen('over');
     hud(false);
     G.overReady = false;
@@ -1802,6 +1976,7 @@ export function startGame(): () => void {
       (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
   }
   function toTitle() {
+    G.panel = null;
     G.state = 'title';
     G.mode = 'normal';
     G.blade = false;
@@ -1824,12 +1999,201 @@ export function startGame(): () => void {
     if (id === 'armory') renderArmory();
     if (id === 'stats') renderStats();
     if (id === 'setup') renderSetup();
+    if (id === 'template') renderTemplate($('templateContent'), META, saveMeta);
+    if (id === 'admin') showAdmin();
     showScreen(id);
   }
-  const setupScreen = createSetupScreen($('setup'), SETUP, (setup) =>
-    store.set('issen.setup', setup),
+  const setupScreen = createSetupScreen(
+    $('setup'),
+    SETUP,
+    (setup) => store.set('issen.setup', setup),
+    {
+      getMilestone: () => META.bossMilestone,
+      getReveals: () => pendingModeReveals(META),
+      getLoadoutSummary: () => {
+        const enabled = SETUP.upgrades !== false && META.upgrades.awakening > 0;
+        const blade =
+          enabled && EQ.bladeSp && UNL.has(EQ.blade + '+')
+            ? SPECIAL[EQ.blade]?.m
+            : ITEM_BY[EQ.blade]?.m;
+        const robe =
+          enabled && META.upgrades.awakening >= 2 && EQ.robeSp && UNL.has(EQ.robe + '+')
+            ? ROBE_AWAKENINGS[EQ.robe]?.m
+            : ITEM_BY[EQ.robe]?.m;
+        const mods = computeModifiers(
+          [blade, robe, ITEM_BY[EQ.charm]?.m, templateModifiers(META, SETUP)],
+          new Set(),
+        );
+        const power = templatePowers(META, SETUP);
+        return `${SETUP.lives === 'zen' ? 'Endless lives' : SETUP.lives === '0' ? 'One hit ends the run' : `Normal lives: ${normalLives(mods.lives)}`} · ${power.knives} knives · ${power.composure} combo protections${EQ.charm === 'omikuji' ? ' · Fortune rolled at run start' : ''}`;
+      },
+      onRevealed: () => {
+        markModeRevealsSeen(META);
+        saveMeta();
+      },
+      onRevealSound: () => sfx.glint(),
+    },
   );
   const renderSetup = setupScreen.render;
+  const tutorial = createTutorial($('app'), (status) => {
+    META.tutorial = status;
+    saveMeta();
+    if (tutorialStartsRun) startRun(true);
+    else toTitle();
+  });
+  function launchTutorial(startAfter: boolean) {
+    toTitle();
+    tutorialStartsRun = startAfter;
+    tutorial.start();
+  }
+  function testJump(stage: number, wave: number, boss: boolean) {
+    if (!isTestProfile()) return;
+    SETUP.mode = 'waves';
+    startRun(true);
+    G.enemies = [];
+    G.pendingSpawns = [];
+    G.attacker = null;
+    G.boss = null;
+    G.so = null;
+    G.toSpawn = 0;
+    G.pausedFrom = null;
+    const ordinal = Math.max(0, Math.min(STAGES.length - 1, Math.floor(stage)));
+    G.bossCount = ordinal;
+    if (boss) {
+      G.wave = ordinal * 3 + 3;
+      setStage(ordinal, true);
+      G.cfg = waveCfg(G.wave);
+      startBoss();
+    } else startWave(ordinal * 3 + Math.max(1, Math.min(3, Math.floor(wave))), true);
+    G.panel = null;
+    showScreen(null);
+  }
+  function showAdmin() {
+    renderAdmin(
+      $('adminContent'),
+      [
+        ...ITEMS,
+        ...Object.keys({ ...SPECIAL, ...ROBE_AWAKENINGS }).map((id) => ({
+          id: id + '+',
+          n: `${ITEM_BY[id]?.n ?? id} awakened`,
+        })),
+      ],
+      STAGES,
+      {
+        testing: isTestProfile(),
+        clearProfile: () => clearTestProfile(),
+        switchProfile: (enabled) => {
+          if (!switchTestProfile(enabled))
+            toast({ k: '!', msg: 'Profile switching is unavailable in this browser session.' });
+        },
+        jump: testJump,
+        restart: () => testJump(G.stage, ((Math.max(1, G.wave) - 1) % 3) + 1, !!G.boss),
+        item: (id, action) => {
+          if (!isTestProfile()) return;
+          const awakened = id.endsWith('+');
+          const base = awakened ? id.slice(0, -1) : id;
+          const item = ITEM_BY[base];
+          if (!item || (awakened && !SPECIAL[base] && !ROBE_AWAKENINGS[base])) return;
+          if (action === 'remove') {
+            if (!Object.values(DEFAULT_EQUIPMENT).includes(id)) revoked.add(id);
+            if (!awakened) revoked.add(id + '+');
+            UNL.delete(id);
+            if (!awakened) UNL.delete(id + '+');
+            for (const value of Object.values(DEFAULT_EQUIPMENT))
+              if (typeof value === 'string') UNL.add(value);
+            Object.assign(EQ, parseEquipment(EQ, UNL, ITEMS));
+            if (!UNL.has(EQ.blade + '+')) EQ.bladeSp = false;
+            if (!UNL.has(EQ.robe + '+')) EQ.robeSp = false;
+          } else {
+            revoked.delete(base);
+            revoked.delete(id);
+            UNL.add(base);
+            UNL.add(id);
+            if (action === 'equip') {
+              EQ[item.type] = base;
+              if (item.type === 'blade') EQ.bladeSp = awakened;
+              if (item.type === 'robe') EQ.robeSp = awakened;
+            }
+          }
+          store.set('issen.revoked', [...revoked]);
+          store.set('issen.unlocks', [...UNL]);
+          store.set('issen.equip', EQ);
+          computeMods();
+          applySeal();
+          G.runBlade = EQ.blade;
+          G.runRobe = EQ.robe;
+        },
+        lives: (value) => {
+          if (!Number.isFinite(value)) return;
+          G.maxLives = Math.max(1, Math.min(5, Math.floor(value)));
+          G.lives = Math.max(0, Math.min(5, Math.floor(value)));
+          renderLives();
+        },
+        currency: (value) => {
+          if (Number.isFinite(value)) {
+            META.embers = Math.max(0, Math.min(1000000, Math.floor(value)));
+            saveMeta();
+          }
+        },
+        resetUpgrades: () => {
+          META.upgrades = { ...EMPTY_UPGRADES };
+          saveMeta();
+        },
+        upgrades: TEMPLATE_UPGRADES,
+        setUpgrade: (id, rank) => {
+          const definition = TEMPLATE_UPGRADES.find((u) => u.id === id);
+          if (!definition || !Number.isFinite(rank)) return;
+          META.upgrades[definition.id] = Math.max(
+            0,
+            Math.min(definition.maxRank, Math.floor(rank)),
+          );
+          saveMeta();
+        },
+        setKnives: (value) => {
+          if (Number.isFinite(value)) {
+            G.knives = Math.max(0, Math.min(3, Math.floor(value)));
+            G.maxKnives = Math.max(G.maxKnives, G.knives);
+            hud(true);
+          }
+        },
+        setUpgradesEnabled: (enabled) => {
+          SETUP.upgrades = enabled;
+          store.set('issen.setup', SETUP);
+        },
+        completeChallenge: (id) => {
+          const base = id.replace(/\+$/, '');
+          const definition = SPECIAL[base] ?? ROBE_AWAKENINGS[base];
+          if (!definition) return;
+          const table = SPECIAL[base] ? AWAKENING.blades : AWAKENING.robes;
+          const row = (table[base] ??= { k: 0, p: 0, d: 0, w: 0, rw: 0, c: 0, sc: 0 });
+          row[definition.need[0]] = definition.need[1];
+          saveAwakening();
+          checkUnlocks();
+        },
+        milestone: (value) => {
+          META.bossMilestone = Math.max(0, Math.min(3, value));
+          META.revealSeen = 0;
+          Object.assign(SETUP, sanitizeSetup(SETUP, META));
+          saveMeta();
+        },
+        tutorial: (value) => {
+          META.tutorial = value;
+          saveMeta();
+        },
+        replayTutorial: () => launchTutorial(false),
+        replayReveals: () => {
+          META.revealSeen = 0;
+          saveMeta();
+          G.panelFrom = 'title';
+          G.panel = 'setup';
+          renderSetup();
+          showScreen('setup');
+        },
+        inspect: () =>
+          `Stage ${G.stage + 1}, wave ${G.wave}, lives ${G.lives}; knives ${G.knives}\n${META.embers} Embers; awakening access ${META.upgrades.awakening > 0}; next run upgrades ${SETUP.upgrades !== false}\nRanks: ${JSON.stringify(META.upgrades)}\nModifiers: ${JSON.stringify(G.m)}`,
+      },
+    );
+  }
   function closePanel() {
     G.panel = null;
     showScreen(G.panelFrom);
@@ -1841,11 +2205,17 @@ export function startGame(): () => void {
     statistics: ST,
     seals: SEALS,
     charms: CHARMCOL,
+    awakeningAccess: (type) => META.upgrades.awakening >= (type === 'robe' ? 2 : 1),
+    awakeningProgress: (id, type) =>
+      type === 'blade' ? AWAKENING.blades[id] : AWAKENING.robes[id],
+    powersEnabled: () => SETUP.upgrades !== false,
     events: {
       equipped: (equipment) => {
         store.set('issen.equip', equipment);
         computeMods();
         applySeal();
+        G.runBlade = EQ.blade;
+        G.runRobe = EQ.robe;
       },
       awaken: () => sfx.glint(),
       preview: demoKill,
@@ -1940,7 +2310,7 @@ export function startGame(): () => void {
     });
   })();
   function renderStats() {
-    renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length);
+    renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length, META.earned);
   }
   const preview = createArmoryPreview($('prevC'), {
     random: R,
@@ -1960,7 +2330,8 @@ export function startGame(): () => void {
       background: bg,
       appearance: {
         d: P.d,
-        pal: robePal(EQ.robe),
+        pal: playerRobePalette(),
+        robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
         blade: bladeStyle(),
         variant: rb.variant,
         cape: rb.cape,
@@ -2024,6 +2395,20 @@ export function startGame(): () => void {
   });
   lifecycle.listen($('bArmory'), 'click', () => openPanel('armory'));
   lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
+  lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
+  lifecycle.listen($('bTutorial'), 'click', () => launchTutorial(false));
+  $('testBadge').hidden = !isTestProfile();
+  lifecycle.listen(window, 'keydown', (event) => {
+    if (event.ctrlKey && event.shiftKey && event.code === 'KeyA') {
+      event.preventDefault();
+      if (G.panel === 'admin') {
+        closePanel();
+        return;
+      }
+      pause();
+      openPanel('admin');
+    }
+  });
   lifecycle.listen($('bAgain'), 'click', () => {
     if (G.overReady) {
       audioInit();
@@ -2278,7 +2663,8 @@ export function startGame(): () => void {
       lean: 0,
       rot: -P.fall * 0.28,
       noShadow: true,
-      pal: robePal(EQ.robe),
+      pal: playerRobePalette(),
+      robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
       blade: bladeStyle(),
       variant: (ROBES[EQ.robe] || {}).variant,
       cape: (ROBES[EQ.robe] || {}).cape,
@@ -2475,7 +2861,6 @@ export function startGame(): () => void {
               ? 0.6
               : 0.9;
           hbP = 1;
-          sfx.heart();
           buzz(8);
         }
       }
@@ -2670,6 +3055,7 @@ export function startGame(): () => void {
     disposePointer();
     disposeKeyboard();
     setupScreen.dispose();
+    tutorial.dispose();
     armory.dispose();
     notifications.dispose();
     void audio.dispose()?.catch(() => {});

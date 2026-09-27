@@ -196,3 +196,27 @@ test('entry, fade and death lifetimes preserve transitions and valid projection'
   updateEnemies(state, 1.13, env);
   assert.equal(state.enemies.length, 0);
 });
+
+test('rapid deaths expire with their visual effects under small slow-motion steps and pause', () => {
+  const { state, env } = fixture();
+  state.enemies = ['split', 'kneel', 'disarm', 'stagger'].map((deathType) => ({
+    ...enemy(),
+    state: 'dying',
+    deathType,
+  }));
+  for (let i = 0; i < 89; i++) updateEnemies(state, 0.01, env);
+  assert.equal(state.enemies.length, 4);
+  const times = state.enemies.map((e) => e.t);
+  updateEnemies(state, 0, env);
+  assert.deepEqual(
+    state.enemies.map((e) => e.t),
+    times,
+  );
+  updateEnemies(state, 0.011, env);
+  assert.deepEqual(
+    state.enemies.map((e) => e.deathType),
+    ['kneel', 'disarm', 'stagger'],
+  );
+  updateEnemies(state, 0.2, env);
+  assert.equal(state.enemies.length, 0);
+});

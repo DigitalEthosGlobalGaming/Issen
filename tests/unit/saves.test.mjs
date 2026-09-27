@@ -41,12 +41,14 @@ test('malformed save fields cannot corrupt counters or setup', () => {
     diff: 'normal',
     arrows: true,
     lives: '3',
+    upgrades: true,
   });
   assert.deepEqual(parseSetup({ mode: 'rush', diff: 'ronin', arrows: false, lives: 'zen' }), {
     mode: 'rush',
     diff: 'ronin',
     arrows: false,
     lives: 'zen',
+    upgrades: true,
   });
 });
 

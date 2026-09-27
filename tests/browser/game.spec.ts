@@ -1,5 +1,21 @@
 import { expect, test } from '@playwright/test';
 
+// These regressions exercise established gameplay; onboarding has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta')) {
+      localStorage.setItem(
+        'issen.meta',
+        JSON.stringify({
+          tutorial: 'skipped',
+          bossMilestone: 3,
+          revealSeen: 3,
+        }),
+      );
+    }
+  });
+});
+
 test('runtime disposal stops animation and detached controls before remounting', async ({
   page,
 }) => {

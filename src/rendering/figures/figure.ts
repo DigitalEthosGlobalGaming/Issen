@@ -842,6 +842,46 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.scale(f.h, f.h * (f.sy || 1));
     if (f.alpha != null && f.alpha < 1) g.globalAlpha *= f.alpha;
     const A0 = g.globalAlpha;
+    if (f.robeAura) {
+      // Small, stateless fabric halo behind the body. It follows figure opacity
+      // and never borrows sword aura state or either preview's effect particles.
+      const aura = f.robeAura;
+      g.save();
+      const halo = g.createRadialGradient(lx * 0.35, -0.44, 0.13, lx * 0.35, -0.44, 0.53);
+      halo.addColorStop(0, `rgba(${aura.c},0)`);
+      halo.addColorStop(0.58, `rgba(${aura.c},.12)`);
+      halo.addColorStop(1, `rgba(${aura.c},0)`);
+      g.fillStyle = halo;
+      g.fillRect(-0.6 + lx * 0.35, -1.02, 1.2, 1.18);
+      g.strokeStyle = `rgba(${aura.c},.35)`;
+      g.fillStyle = `rgba(${aura.c},.25)`;
+      g.lineWidth = 0.007;
+      if (aura.mode === 'after' || aura.mode === 'dark') {
+        g.beginPath();
+        g.ellipse(lx * 0.35, -0.45, 0.38, 0.45, -0.12, Math.PI * 0.68, Math.PI * 1.88);
+        g.stroke();
+      } else {
+        for (let i = 0; i < 4; i++) {
+          const x = (i % 2 ? 1 : -1) * (0.29 + Math.floor(i / 2) * 0.035);
+          const y = -0.58 + Math.floor(i / 2) * 0.32;
+          g.beginPath();
+          if (aura.mode === 'bolt') {
+            g.moveTo(x - 0.014, y - 0.025);
+            g.lineTo(x + 0.01, y);
+            g.lineTo(x - 0.008, y + 0.015);
+            g.lineTo(x + 0.013, y + 0.036);
+            g.stroke();
+          } else if (aura.mode === 'petal') {
+            g.ellipse(x, y, 0.018, 0.007, i * 0.8, 0, TAU);
+            g.fill();
+          } else {
+            g.arc(x, y, aura.mode === 'frost' ? 0.01 : 0.015, 0, TAU);
+            g.fill();
+          }
+        }
+      }
+      g.restore();
+    }
     if (!f.noShadow) {
       g.fillStyle = 'rgba(0,0,0,.25)';
       g.beginPath();

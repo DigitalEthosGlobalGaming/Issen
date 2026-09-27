@@ -47,7 +47,7 @@ test('reset clears run progress and preserves scene and hint ownership', () => {
   assert.notEqual(run.bless, oldBlessings);
   assert.equal(run.bless.size, 0);
   resetRun(run, { diff: 'normal', mode: 'waves', arrows: true, lives: '3' }, DEFAULT_EQUIPMENT);
-  assert.equal(run.lives, 3);
+  assert.equal(run.lives, 2);
   assert.equal(run.fortune, null);
   assert.equal(run.rush, false);
   assert.equal(run.zen, false);

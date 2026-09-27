@@ -1,5 +1,21 @@
 import { expect, test } from '@playwright/test';
 
+// These regressions exercise established gameplay; onboarding has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta')) {
+      localStorage.setItem(
+        'issen.meta',
+        JSON.stringify({
+          tutorial: 'skipped',
+          bossMilestone: 3,
+          revealSeen: 3,
+        }),
+      );
+    }
+  });
+});
+
 test('armory preview effects stay local to their renderer instance', async ({ page }) => {
   await page.goto('/');
   const result = await page.evaluate(async () => {
@@ -347,6 +363,46 @@ test('every stage renders in both orientations with deterministic scenery', asyn
     };
   });
   expect(result).toEqual({ unique: 18, deterministic: true });
+});
+
+test('tree polish review preserves stage composition in both orientations', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const path = '/src/rendering/scene/background.ts';
+    const stagesPath = '/src/game/content/stages.ts';
+    const { createBackground } = await import(path);
+    const { STAGES } = await import(stagesPath);
+    const sheet = document.createElement('div');
+    sheet.id = 'treeReview';
+    sheet.style.cssText =
+      'position:relative;z-index:99999;background:#171512;color:white;display:grid;grid-template-columns:repeat(4,390px);gap:8px;width:max-content';
+    for (const stage of [0, 2, 6, 7]) {
+      const column = document.createElement('div');
+      const label = document.createElement('p');
+      label.textContent = STAGES[stage].n;
+      column.append(label);
+      for (const [w, h] of [
+        [390, 844],
+        [844, 390],
+      ]) {
+        const { canvas } = createBackground(w, h, 1, stage);
+        canvas.style.width = '390px';
+        canvas.style.height = `${(h / w) * 390}px`;
+        column.append(canvas);
+      }
+      sheet.append(column);
+    }
+    document.body.replaceChildren(sheet);
+    document.body.style.cssText = 'overflow:visible;width:max-content;height:auto';
+  });
+  await page.setViewportSize({ width: 1600, height: 1120 });
+  await page.locator('#treeReview').screenshot({ path: testInfo.outputPath('tree-review.png') });
+  await testInfo.attach('Trees: field, blossoms, burning temple and shore', {
+    path: testInfo.outputPath('tree-review.png'),
+    contentType: 'image/png',
+  });
 });
 
 test('film effects restore context state and leave other canvases untouched', async ({ page }) => {

@@ -2,6 +2,49 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPalette } from '../../src/rendering/palette.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
+import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
+import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+
+test('split enemy and boss shadows stay grounded, fade with the body and vanish at expiry', () => {
+  const stack = [];
+  const shadows = [];
+  const state = { globalAlpha: 1, fillStyle: '', ellipse: null };
+  const context = new Proxy(state, {
+    get(target, key) {
+      if (key === 'save') return () => stack.push({ ...target });
+      if (key === 'restore') return () => Object.assign(target, stack.pop());
+      if (key === 'ellipse') return (...args) => (target.ellipse = args);
+      if (key === 'fill')
+        return () => {
+          if (target.fillStyle === 'rgba(0,0,0,.25)') shadows.push(target.globalAlpha);
+        };
+      if (key === 'createLinearGradient' || key === 'createRadialGradient')
+        return () => ({ addColorStop() {} });
+      return key in target ? target[key] : () => {};
+    },
+  });
+  const palette = createPalette();
+  const renderer = createFigureRenderer(context, {
+    time: 0,
+    wind: 0,
+    petActive: false,
+    width: 390,
+    height: 844,
+    palette: (fog) => palette.fog(fog, [100, 110, 120]),
+    random: () => 0.5,
+  });
+  const f = { x: 100, y: 300, h: 100, fog: 0, alpha: 0.8, d: makeFig(4), pose: EPOSE.guard };
+  for (const duration of [0.9, 1.6]) {
+    shadows.length = 0;
+    renderer.drawSplit(f, f, 0.7, duration * 0.7, duration);
+    assert.equal(shadows.length, 1, 'one grounded shadow, never a shadow per fragment');
+    assert.ok(Math.abs(shadows[0] - 0.4) < 1e-10);
+    assert.equal(context.globalAlpha, 1, 'caller opacity restored');
+    shadows.length = 0;
+    renderer.drawSplit(f, f, 0.7, duration, duration);
+    assert.deepEqual(shadows, []);
+  }
+});
 
 test('fog caches distinguish stages and robe colors preserve their overrides', () => {
   const palette = createPalette();

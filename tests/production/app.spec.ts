@@ -1,5 +1,46 @@
 import { expect, test } from '@playwright/test';
 
+test('built assets include fresh onboarding, Template and isolated testing tools', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.addInitScript(() => localStorage.removeItem('issen.meta'));
+  await page.goto('/');
+  await page.locator('#bPlay').click();
+  await expect(page.locator('[data-v="rush"]')).toBeHidden();
+  await page.locator('#bBegin').click();
+  await expect(page.locator('.tutorial-overlay')).toBeVisible();
+  await page.getByRole('button', { name: 'Skip tutorial' }).click();
+  await page.keyboard.press('p');
+  await page.locator('#bEnd').click();
+  await page.locator('#bMenu').click();
+  await page.locator('#bTemplate').click();
+  await expect(page.locator('#templateContent')).toContainText('0 Embers');
+  await expect(page.getByRole('button', { name: 'Donate 100 Embers' })).toBeDisabled();
+  await page.locator('#template [data-back]').click();
+  await page.keyboard.press('Control+Shift+A');
+  await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
+  await expect(page.locator('#testBadge')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+// These regressions exercise established gameplay; onboarding has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta')) {
+      localStorage.setItem(
+        'issen.meta',
+        JSON.stringify({
+          tutorial: 'skipped',
+          bossMilestone: 3,
+          revealSeen: 3,
+        }),
+      );
+    }
+  });
+});
+
 test('built assets support startup, armory, a run, sharing, and landscape layout', async ({
   page,
 }) => {

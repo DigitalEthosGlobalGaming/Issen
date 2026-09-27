@@ -1,12 +1,43 @@
 import type { BladeStats } from '../progression/statistics.ts';
 import type { Modifiers } from '../equipment/modifiers.ts';
 
+/**
+ * An unlockable alternative equipment form: a benefit, tradeoff and optional
+ * visuals earned by playing with that blade/outfit after buying Awakening Access.
+ * SPECIAL and ROBE_AWAKENINGS use base item IDs; progression/unlocks.ts grants
+ * `id + '+'` when the corresponding AwakeningProgress.blades/robes record meets
+ * `need`. The Armoury explicitly activates Equipment.bladeSp/robeSp independently.
+ * Lifetime Statistics.bl is only a one-time legacy migration source, not the gate.
+ *
+ * Runtime REPLACES the category's base modifiers with `m`, then combines sources
+ * through equipment/modifiers.ts. Upgrades Off suppresses awakened effects and
+ * visuals without deleting ownership or preventing eligible challenge progress.
+ * Blade style or robe accents/aura are rendered in both live and isolated preview
+ * figures. Inactive forms reveal their requirements, never their power text.
+ *
+ * To add a form, use an existing equipment ID in its catalog and a BladeStats metric
+ * actually recorded by the runtime, and supply the full benefit/tradeoff pair.
+ * Keep descriptions consistent with modifier composition and consumers. A new
+ * metric also needs runtime tracking, defaults and save validation; a new visual
+ * mode needs a renderer. Preserve existing IDs because unlocks are saved by ID.
+ */
 export interface Awakening {
+  /** Perk text displayed in the Armoury; the actual effect lives in `m`. */
   pk: string;
+  /** Tradeoff text displayed beside the perk. */
   tr: string;
+  /** Complete awakened equipment effect, not a delta from the base effect. */
   m: Partial<Modifiers>;
+  /** [equipment challenge statistic, inclusive minimum, player-facing requirement].
+   * Eligibility checks the item's independent challenge record >= minimum. Counters such as
+   * kills accumulate; best-wave/score/combo metrics are maxima (see BladeStats).
+   */
   need: [keyof BladeStats, number, string];
+  /** Figure aura: `c` is comma-separated RGB, `mode` selects the renderer effect
+   * (glow, dark, frost, after, bolt or petal); null disables the aura.
+   */
   aura: { c: string; mode: string } | null;
+  /** BladeStyle overrides (`c` RGB, `gold` finish), or outfit RGB fabric accent `c`. */
   st?: { c?: string; gold?: number };
 }
 

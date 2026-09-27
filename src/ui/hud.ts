@@ -11,6 +11,8 @@ export const SCREENS: readonly Screen[] = [
   'share',
   'setup',
   'shrine',
+  'template',
+  'admin',
 ];
 type HudState = Pick<
   RunState,
@@ -25,7 +27,8 @@ type HudState = Pick<
   | 'combo'
   | 'maxCombo'
   | 'm'
->;
+> &
+  Partial<Pick<RunState, 'knives' | 'maxKnives' | 'upgradesEnabled'>>;
 
 export function createHud(root: HTMLElement) {
   const doc = root.ownerDocument;
@@ -53,7 +56,7 @@ export function createHud(root: HTMLElement) {
   }
 
   function renderLives(run: HudState): void {
-    health(lives, run.zen || run.hard ? 0 : run.maxLives || 3, run.lives);
+    health(lives, run.zen || run.hard ? 0 : run.maxLives || 2, run.lives);
   }
 
   function render(run: HudState, visible: boolean): void {
@@ -69,6 +72,8 @@ export function createHud(root: HTMLElement) {
     if (run.mode === 'ronin') badge('浪人', 'badge');
     if (run.blade) badge('刃', 'badge');
     if (run.zen) badge('無限', 'badge');
+    if ((run.maxKnives ?? run.knives ?? 0) > 0) badge(`Knife ×${run.knives ?? 0}`, 'badge knives');
+    if (run.upgradesEnabled === false) badge('Upgrades off', 'badge');
     for (const id of run.bless) {
       const blessing = BLESS_BY[id];
       if (blessing) badge(blessing.k, `chip ${TIER[blessing.t]}`);

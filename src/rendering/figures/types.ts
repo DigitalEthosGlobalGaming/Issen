@@ -57,6 +57,8 @@ export interface Figure {
   charm?: string;
   pet?: string;
   blade?: BladeStyle | null;
+  /** Outfit aura, independent of the blade; callers omit it for suppressed powers. */
+  robeAura?: Aura | null;
   glint?: number;
   rf?: { tail?: number; armor?: number; patches?: number; strawy?: number };
 }

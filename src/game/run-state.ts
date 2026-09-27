@@ -13,7 +13,16 @@ import { FORTUNES } from './content/fortunes.ts';
 export type RunPhase =
   'title' | 'playing' | 'boss' | 'between' | 'standoff' | 'shrine' | 'dead' | 'over' | 'paused';
 export type Screen =
-  'title' | 'setup' | 'armory' | 'stats' | 'share' | 'shrine' | 'over' | 'paused';
+  | 'title'
+  | 'setup'
+  | 'armory'
+  | 'stats'
+  | 'share'
+  | 'shrine'
+  | 'over'
+  | 'paused'
+  | 'template'
+  | 'admin';
 
 export interface RunState {
   state: RunPhase;
@@ -22,6 +31,13 @@ export interface RunState {
   zen: boolean;
   hard: boolean;
   rush: boolean;
+  upgradesEnabled: boolean;
+  knives: number;
+  maxKnives: number;
+  composure: number;
+  recoveryEvery: number;
+  wavesCleared: number;
+  runRobe: string;
   petT: number;
   kikuUsed: number;
   freezeT: number;
@@ -100,12 +116,19 @@ export function createRunState(savedHints: unknown = {}): RunState {
     zen: false,
     hard: false,
     rush: false,
+    upgradesEnabled: true,
+    knives: 0,
+    maxKnives: 0,
+    composure: 0,
+    recoveryEvery: 0,
+    wavesCleared: 0,
+    runRobe: '',
     petT: 0,
     kikuUsed: 0,
     freezeT: 0,
     slowT: 0,
     zanKey: -1,
-    maxLives: 3,
+    maxLives: 2,
     lives: 0,
     hits: 0,
     bless: new Set(),
@@ -175,11 +198,18 @@ export function resetRun(
   Object.assign(run, {
     mode: setup.diff,
     rush: setup.mode === 'rush',
+    upgradesEnabled: setup.upgrades !== false,
+    knives: 0,
+    maxKnives: 0,
+    composure: 0,
+    recoveryEvery: 0,
+    wavesCleared: 0,
+    runRobe: equipment.robe,
     blade: !setup.arrows,
     zen: setup.lives === 'zen',
     hard: setup.lives === '0',
-    maxLives: 3,
-    lives: setup.lives === '3' ? 3 : 0,
+    maxLives: 2,
+    lives: setup.lives === '3' ? 2 : 0,
     hits: 0,
     score: 0,
     wave: 0,
