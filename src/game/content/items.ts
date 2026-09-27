@@ -1,6 +1,7 @@
 import type { Statistics } from '../progression/statistics.ts';
 import { deathsTotal } from '../progression/statistics.ts';
 import type { Modifiers } from '../equipment/modifiers.ts';
+import { trialRewardItems } from './trials.ts';
 export type ItemCategory = 'blade' | 'robe' | 'charm' | 'crest' | 'pet' | 'fx' | 'film' | 'seal';
 /**
  * An Armoury catalog entry, including both gameplay equipment and cosmetics.
@@ -39,6 +40,7 @@ export interface Item {
 }
 export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {
   return [
+    ...trialRewardItems(),
     {
       id: 'steel',
       type: 'blade',

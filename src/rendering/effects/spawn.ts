@@ -78,7 +78,28 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       });
   }
   function killFx(t: string, cx: number, cy: number, ang: number, sc: number) {
-    if (t === 'petals') {
+    if (t === 'trial-ripple') {
+      inkBurst(cx, cy, ang, 5, sc);
+      for (let i = 0; i < 3; i++)
+        ring(cx, cy, (4 + i * 12) * sc, (65 + i * 28) * sc, 0.5 + i * 0.14, Math.max(1, 2 * sc));
+    } else if (t === 'trial-comet') {
+      inkBurst(cx, cy, ang, 5, sc);
+      for (let i = 0; i < 22; i++) {
+        const a = ang + (R() - 0.5) * 0.65;
+        const speed = (160 + R() * 400) * sc;
+        fx.px.push({
+          k: 'star',
+          x: cx,
+          y: cy,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          s: (2 + R() * 4) * sc,
+          t: 0,
+          life: 0.5 + R() * 0.5,
+          drag: 2,
+        });
+      }
+    } else if (t === 'petals') {
       inkBurst(cx, cy, ang, 6, sc);
       for (let i = 0; i < 26; i++) {
         const a = R() * TAU,

@@ -230,9 +230,6 @@
   #template {
     padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
   }
-  #title {
-    touch-action: pan-y;
-  }
   #title .t-k {
     font-size: clamp(64px, 20vw, 90px);
   }

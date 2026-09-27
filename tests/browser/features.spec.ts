@@ -1,17 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-test('fresh journey starts skippable tutorial, persists skip and hides locked modes', async ({
+test('fresh journey offers an optional tutorial, persists skip and hides locked modes', async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await page.locator('#bTutorial').click();
+  await expect(page.locator('.tutorial-overlay')).toBeVisible();
+  await page.getByRole('button', { name: 'Skip tutorial' }).click();
+  await expect(page.locator('.tutorial-overlay')).toBeHidden();
+  await expect(page.locator('#title')).toHaveClass(/on/);
   await page.locator('#bPlay').click();
   for (const selector of ['[data-v="rush"]', '[data-v="ronin"]', '[data-k="arrows"] [data-v="0"]'])
     await expect(page.locator('#setup ' + selector)).toBeHidden();
   await page.locator('#bBegin').click();
-  await expect(page.locator('.tutorial-overlay')).toBeVisible();
-  await page.getByRole('button', { name: 'Skip tutorial' }).click();
   await expect(page.locator('.tutorial-overlay')).toBeHidden();
   await expect(page.locator('#hud')).toHaveClass(/on/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).tutorial)).toBe(

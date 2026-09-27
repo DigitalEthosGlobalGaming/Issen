@@ -116,6 +116,18 @@ import {
   DEFAULT_EQUIPMENT,
 } from './platform/saves.ts';
 import { createItems } from './game/content/items.ts';
+import { TRIALS } from './game/content/trials.ts';
+import type { TrialDefinition } from './game/content/trials.ts';
+import {
+  parseTrialProgress,
+  trialsUnlocked,
+  trialPassed,
+  completeTrial,
+  grantTrialRewards,
+} from './game/progression/trials.ts';
+import { renderTrials } from './ui/screens/trials.ts';
+import type { TrialResult } from './ui/screens/trials.ts';
+import { DEATH_REASONS } from './ui/screens/game-over.ts';
 import { deathsTotal } from './game/progression/statistics.ts';
 import { createAudio } from './audio/audio.ts';
 import { computeModifiers } from './game/equipment/modifiers.ts';
@@ -213,9 +225,17 @@ export function startGame(): () => void {
 
   /* ---------------- persistent stats & unlocks ---------------- */
 
-  const ST = loadStatistics();
+  let ST = loadStatistics();
   const SETUP = loadSetup();
   const UNL = loadUnlocks();
+  const TRIAL_PROGRESS = parseTrialProgress(store.get('issen.trials', null));
+  grantTrialRewards(TRIAL_PROGRESS, UNL);
+  const playerStats = ST;
+  let activeTrial: TrialDefinition | null = null;
+  let trialFailure = '';
+  let trialResult: TrialResult | null = null;
+  let combatRandom = R;
+  let runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
   const META = parseMeta(store.get('issen.meta', null), ST, UNL);
   const AWAKENING = parseAwakeningProgress(store.get('issen.awakening', null), ST.bl);
   const saveAwakening = () => store.set('issen.awakening', AWAKENING);
@@ -230,22 +250,28 @@ export function startGame(): () => void {
   let runBossMilestone = 0;
   let runItemReveals: ResultReveal[] = [];
   function earn(event: 'kill' | 'wave' | 'boss') {
+    if (activeTrial) return;
     accrueRunReward(rewardLedger, event, { zen: G.zen, emberBonus: G.m.emberBonus });
   }
-  const saveStats = () => store.set('issen.stats', ST);
+  const saveStats = () => {
+    if (!activeTrial) store.set('issen.stats', ST);
+  };
   const revokedSave = store.get('issen.revoked', []);
   const revoked = new Set<string>(
     isTestProfile() && Array.isArray(revokedSave)
       ? revokedSave.filter((id): id is string => typeof id === 'string')
       : [],
   );
-  const EQ = loadEquipment(UNL, ITEMS);
+  let EQ = loadEquipment(UNL, ITEMS);
+  const playerEquipment = EQ;
   const SEALS: Record<string, string> = {
     verm: '#a3271d',
     gold: '#a67c22',
     indigo: '#2d3e72',
     jade: '#2f6f55',
     sumiseal: '#1b1a18',
+    'trial-platinum': '#aebbc5',
+    'trial-copper': '#c1845e',
   };
   let SEAL = '#a3271d',
     SEALARC = '#a3271d';
@@ -647,7 +673,7 @@ export function startGame(): () => void {
       : base;
   }
   function challenge(metric: keyof BladeStats, value = 1) {
-    if (G.zen) return;
+    if (G.zen || activeTrial) return;
     recordChallenge(AWAKENING, META.upgrades.awakening, G.runBlade, G.runRobe, metric, value);
     saveAwakening();
   }
@@ -671,6 +697,11 @@ export function startGame(): () => void {
     return ST.bl[id] || (ST.bl[id] = { k: 0, p: 0, d: 0, w: 0, rw: 0, c: 0, sc: 0 });
   }
   function computeMods() {
+    if (activeTrial) {
+      G.m = computeModifiers([], new Set());
+      G.m.hazard = 0;
+      return;
+    }
     G.m = computeModifiers(
       [
         bladeMods(),
@@ -721,6 +752,7 @@ export function startGame(): () => void {
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
   const runResults = createRunResults($('over'));
   function hint(key: string, text: string, dur = 3500) {
+    if (activeTrial) return;
     if (G.hints[key]) return;
     G.hints[key] = 1;
     store.set('issen.hints', G.hints);
@@ -735,6 +767,7 @@ export function startGame(): () => void {
     });
   }
   function checkUnlocks() {
+    if (activeTrial) return;
     if (G.state !== 'over') return;
     const before = UNL.size;
     unlockEligibleItems(
@@ -845,7 +878,8 @@ export function startGame(): () => void {
     return enemyPosition(e, L, W, H);
   }
   function spawnEnemy(slot: number, attract = false) {
-    return createEnemy(G, slot, attract, enemyPos, R);
+    if (activeTrial && !attract && G.toSpawn <= 0) return;
+    return createEnemy(G, slot, attract, enemyPos, attract ? R : combatRandom);
   }
   function setupAttract() {
     G.enemies = [];
@@ -858,7 +892,7 @@ export function startGame(): () => void {
     return orderedEnemies(G.enemies);
   }
   function pickAttacker() {
-    return selectAttacker(G.enemies, waveConfiguration().ordered, R);
+    return selectAttacker(G.enemies, waveConfiguration().ordered, combatRandom);
   }
   function updateEnemies(dt: number) {
     simulateEnemies(G, dt, {
@@ -873,15 +907,25 @@ export function startGame(): () => void {
     });
   }
   function startRun() {
-    Object.assign(SETUP, sanitizeSetup(SETUP, META));
-    runTemplate = templateModifiers(META, SETUP);
+    runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
+    if (!activeTrial) Object.assign(SETUP, sanitizeSetup(SETUP, META));
+    const setup = activeTrial
+      ? {
+          mode: 'waves' as const,
+          diff: 'ronin' as const,
+          arrows: activeTrial.arrows,
+          lives: '0' as const,
+          upgrades: false,
+        }
+      : SETUP;
+    runTemplate = templateModifiers(META, setup);
     rewardLedger = createRunRewardLedger();
     runBossMilestone = 0;
     runItemReveals = [];
     guided.reset();
     audio.setPaused(false);
-    resetRun(G, SETUP, EQ, R);
-    Object.assign(G, templatePowers(META, SETUP));
+    resetRun(G, setup, EQ, combatRandom);
+    Object.assign(G, templatePowers(META, setup));
     G.maxKnives = G.knives;
     computeMods();
     G.runWards = G.m.runWard;
@@ -905,6 +949,11 @@ export function startGame(): () => void {
     hud(true);
     $('bossbar').classList.remove('on');
     G.pauseN = 0;
+    if (activeTrial) {
+      startTrialEncounter();
+      setScore();
+      return;
+    }
     {
       const hr = new Date().getHours();
       if (recordSecretEvent(ST, { kind: 'midnight', hour: hr })) {
@@ -935,6 +984,108 @@ export function startGame(): () => void {
         'Endless combo. You cannot die, but every mistake breaks your chain. End the run from pause.',
         6500,
       );
+  }
+  function startTrial(id: string) {
+    const trial = TRIALS.find((entry) => entry.id === id);
+    if (!trial || activeTrial || !trialsUnlocked(playerStats.roninWave) || G.state !== 'title')
+      return;
+    activeTrial = trial;
+    trialFailure = '';
+    trialResult = null;
+    combatRandom = rng(trial.seed);
+    // Legacy combat counters write into a disposable statistics object during trials.
+    // Armoury and normal runs retain the original profile objects.
+    ST = structuredClone(playerStats);
+    EQ = {
+      ...DEFAULT_EQUIPMENT,
+      fx: playerEquipment.fx,
+      film: playerEquipment.film,
+      seal: playerEquipment.seal,
+    };
+    G.panel = null;
+    audioInit();
+    startRun();
+  }
+  function startTrialEncounter() {
+    const trial = activeTrial;
+    if (!trial) return;
+    G.afterBoss = false;
+    G.enemies = [];
+    G.pendingSpawns = [];
+    G.attacker = null;
+    G.boss = null;
+    G.event = null;
+    G.toSpawn = 0;
+    G.wave = 1;
+    G.cfg = waveCfg(1);
+    if (trial.wave) {
+      Object.assign(G.cfg, {
+        pack: 5,
+        refill: true,
+        ordered: true,
+        total: trial.wave.total,
+        atk: trial.wave.attack,
+        gap: 0.25,
+        feint: trial.wave.feint,
+      });
+      G.toSpawn = trial.wave.total;
+      G.nextOrder = 1;
+      G.gapT = 1.5;
+      G.pendingSpawns = initialSpawns(5, false, combatRandom);
+      G.state = 'playing';
+    } else {
+      G.bossCount = trial.bosses![G.bossesSlain]! - 1;
+      startBoss();
+    }
+    banner('試練', trial.name);
+    $('waveLbl').textContent = 'Trials';
+    renderTrialObjective();
+  }
+  function renderTrialObjective() {
+    const trial = activeTrial;
+    const visible = !!trial && ['playing', 'boss', 'between'].includes(G.state);
+    $('trialObjective').hidden = !visible;
+    if (!trial || !visible) return;
+    $('trialObjective').textContent = trial.wave
+      ? `${trial.name} · ${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · No mistakes`
+      : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
+  }
+  function finishTrial(message?: string) {
+    const trial = activeTrial;
+    if (!trial) return;
+    const passed = trialPassed(trial, { ...G, failed: !!message || !!trialFailure });
+    const newlyCompleted = passed && completeTrial(TRIAL_PROGRESS, trial.id);
+    if (passed) {
+      store.set('issen.trials', TRIAL_PROGRESS);
+      grantTrialRewards(TRIAL_PROGRESS, UNL);
+      store.set('issen.unlocks', [...UNL]);
+      sfx.unlock();
+    }
+    trialResult = {
+      id: trial.id,
+      passed,
+      newlyCompleted,
+      message:
+        message ||
+        trialFailure ||
+        (passed
+          ? 'Every condition met.'
+          : `You landed ${G.perfects} perfect cuts; ${trial.wave?.perfects ?? 0} were required.`),
+    };
+    activeTrial = null;
+    combatRandom = R;
+    ST = playerStats;
+    EQ = playerEquipment;
+    guided.reset();
+    audio.setPaused(false);
+    hitStop = 0;
+    $('trialObjective').hidden = true;
+    toTitle();
+    computeMods();
+    openPanel('trials');
+    $('trials')
+      .querySelector<HTMLButtonElement>('#trialResult button')
+      ?.focus({ preventScroll: true });
   }
   function nextStep() {
     if (G.rush) startRushDuel();
@@ -1073,7 +1224,7 @@ export function startGame(): () => void {
           addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
         },
       },
-      R,
+      combatRandom,
     );
   }
   function killEnemy(e: Enemy, dir: Direction, chained = false) {
@@ -1409,7 +1560,7 @@ export function startGame(): () => void {
     renderHp();
     $('bossbar').classList.add('on');
     sfx.drum();
-    guided.startBoss();
+    if (!activeTrial) guided.startBoss();
     if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
@@ -1422,11 +1573,11 @@ export function startGame(): () => void {
     return bossPosition(b, L);
   }
   function toIdle(b: Boss, base: number) {
-    bossToIdle(b, base, R);
+    bossToIdle(b, base, combatRandom);
   }
   function updateBoss(dt: number) {
     simulateBoss(G, dt, {
-      random: R,
+      random: combatRandom,
       sounds: sfx,
       flash,
       playerDie,
@@ -1455,7 +1606,7 @@ export function startGame(): () => void {
         chainModifier: G.m.chain,
         counter: G.bless.has('counter'),
       },
-      R,
+      combatRandom,
     );
     if (!second && G.bless.has('timestop')) G.slowT = Math.max(G.slowT, 1.4);
     if (counterDamage) {
@@ -1559,7 +1710,7 @@ export function startGame(): () => void {
     b.chainLeft--;
     let nd;
     do {
-      nd = DIRS[(R() * 4) | 0]!;
+      nd = DIRS[(combatRandom() * 4) | 0]!;
     } while (nd === b.sdir);
     b.sdir = nd;
     b.t = 0;
@@ -1828,6 +1979,8 @@ export function startGame(): () => void {
     }
   });
   function breakCombo() {
+    if (activeTrial?.cleanOpenings)
+      trialFailure = 'An opening was missed or a counter went the wrong way.';
     if (protectCombo(G)) {
       pop(W / 2, H * 0.4, 'Composure · combo kept');
       return;
@@ -1955,6 +2108,10 @@ export function startGame(): () => void {
     }
   }
   function playerDie(killer: Enemy | Boss | null, reason: string) {
+    if (activeTrial) {
+      trialFailure = DEATH_REASONS[reason] || 'A mistake ended the trial.';
+      return;
+    }
     if (G.state === 'dead' || G.state === 'over') return;
     if (reason === 'feint') {
       recordSecretEvent(ST, { kind: 'feintMistake' });
@@ -2002,6 +2159,10 @@ export function startGame(): () => void {
     $('bossbar').classList.remove('on');
   }
   function showOver() {
+    if (activeTrial) {
+      finishTrial(G.reason === 'quit' ? 'You ended the attempt.' : 'A mistake ended the trial.');
+      return;
+    }
     if (G.state === 'over') return;
     G.state = 'over';
     guided.reset();
@@ -2023,6 +2184,14 @@ export function startGame(): () => void {
       kind: 'mode',
       description: mode.description,
     }));
+    if (!runTrialsWasUnlocked && trialsUnlocked(ST.roninWave))
+      modeReveals.push({
+        key: '試',
+        name: 'Trials',
+        kind: 'mode',
+        description:
+          'Fixed mastery challenges. Earn exclusive kill effects, seals and film looks from the title menu.',
+      });
     markModeRevealsSeen(META);
     saveMeta();
     G.cardScore = G.score;
@@ -2040,6 +2209,9 @@ export function startGame(): () => void {
     setBestLine();
   }
   function setBestLine() {
+    $('bTrials').textContent = trialsUnlocked(playerStats.roninWave)
+      ? 'Trials'
+      : 'Trials · Ronin wave 10';
     $('tBest').textContent =
       (ST.bestScore ? `Best ${ST.bestScore.toLocaleString()}` : '') +
       (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
@@ -2071,6 +2243,8 @@ export function startGame(): () => void {
     if (id === 'setup') renderSetup();
     if (id === 'template') renderTemplate($('templateContent'), META, saveMeta);
     if (id === 'admin') showAdmin();
+    if (id === 'trials')
+      renderTrials($('trials'), TRIAL_PROGRESS, playerStats.roninWave, trialResult, startTrial);
     showScreen(id);
   }
   const setupScreen = createSetupScreen(
@@ -2343,7 +2517,13 @@ export function startGame(): () => void {
     if (recordSecretEvent(ST, { kind: 'titleTaps', count: completedTaps })) {
       saveStats();
       checkUnlocks();
-    } else toast({ k: '案山子', msg: 'The Scarecrow is already yours' });
+    }
+    toast({
+      k: '案山子',
+      msg: UNL.has('scarecrow')
+        ? 'The Scarecrow is already yours'
+        : 'Secret found. End a run to claim Scarecrow.',
+    });
   }
   function konamiInput(d: Direction) {
     tapN = 0;
@@ -2372,7 +2552,13 @@ export function startGame(): () => void {
       if (recordSecretEvent(ST, { kind: 'konami' })) {
         saveStats();
         checkUnlocks();
-      } else toast({ k: '光剣', msg: 'Kōken is already yours' });
+      }
+      toast({
+        k: '光剣',
+        msg: UNL.has('koken')
+          ? 'Kōken is already yours'
+          : 'Secret found. End a run to claim Kōken.',
+      });
     }
   }
   (() => {
@@ -2383,10 +2569,16 @@ export function startGame(): () => void {
     const el = $('title');
     lifecycle.listen(el, 'pointerdown', (e) => {
       if (e.target instanceof Element && e.target.closest('button')) return;
+      if (id !== null) return;
       id = e.pointerId;
       done = false;
       sx = e.clientX;
       sy = e.clientY;
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* Synthetic events and unavailable capture retain in-element handling. */
+      }
     });
     const fire = (e: PointerEvent) => {
       if (e.pointerId !== id || done) return;
@@ -2400,12 +2592,16 @@ export function startGame(): () => void {
     };
     lifecycle.listen(el, 'pointermove', fire);
     lifecycle.listen(el, 'pointerup', (e) => {
+      if (e.pointerId !== id) return;
       fire(e);
       if (e.pointerId === id && !done) titleTap();
       id = null;
     });
-    lifecycle.listen(el, 'pointercancel', () => {
-      id = null;
+    lifecycle.listen(el, 'pointercancel', (e) => {
+      if (e.pointerId === id) id = null;
+    });
+    lifecycle.listen(el, 'lostpointercapture', (e) => {
+      if (e.pointerId === id) id = null;
     });
   })();
   function renderStats() {
@@ -2497,10 +2693,12 @@ export function startGame(): () => void {
   lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
   lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
   lifecycle.listen($('bTutorial'), 'click', launchTutorial);
+  lifecycle.listen($('bTrials'), 'click', () => openPanel('trials'));
   $('testBadge').hidden = !isTestProfile();
   lifecycle.listen(window, 'keydown', (event) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyA') {
       event.preventDefault();
+      if (activeTrial) return;
       if (G.panel === 'admin') {
         closePanel();
         return;
@@ -2551,6 +2749,7 @@ export function startGame(): () => void {
       G.state = 'paused';
       audio.setPaused(true);
       showScreen('paused');
+      renderTrialObjective();
     }
   }
   function resume() {
@@ -2558,6 +2757,7 @@ export function startGame(): () => void {
     G.state = G.pausedFrom;
     audio.setPaused(guided.frozen);
     showScreen(null);
+    renderTrialObjective();
     frameLoop.resetClock();
   }
   function endRun() {
@@ -2605,6 +2805,10 @@ export function startGame(): () => void {
     });
   }
   function update(dt: number, raw: number) {
+    if (activeTrial && trialFailure) {
+      finishTrial(trialFailure);
+      return;
+    }
     time += dt;
     wind =
       1 +
@@ -2622,7 +2826,12 @@ export function startGame(): () => void {
     updateWeather(dt);
     updatePlayer(dt);
     updateEnemies(dt);
-    if (G.state === 'playing' && waveConfiguration().ordered && liveOrdered()[0]?.state === 'idle')
+    if (
+      !activeTrial &&
+      G.state === 'playing' &&
+      waveConfiguration().ordered &&
+      liveOrdered()[0]?.state === 'idle'
+    )
       guided.startOrder();
     if (G.boss) updateBoss(dt);
     updateWave(dt);
@@ -2630,7 +2839,12 @@ export function startGame(): () => void {
     if (G.state === 'between') {
       G.nextT -= dt;
       if (G.nextT <= 0) {
-        if (!G.afterBoss && G.wave % 3 === 0) startBoss();
+        if (activeTrial) {
+          if (trialFailure) finishTrial(trialFailure);
+          else if (activeTrial.bosses && G.bossesSlain < activeTrial.bosses.length)
+            startTrialEncounter();
+          else finishTrial();
+        } else if (!G.afterBoss && G.wave % 3 === 0) startBoss();
         else if (G.afterBoss) {
           G.afterBoss = false;
           openShrine();
@@ -2648,6 +2862,7 @@ export function startGame(): () => void {
       }
     }
     updateFx(dt, raw);
+    renderTrialObjective();
     if (stageFade > 0) {
       stageFade = Math.max(0, stageFade - raw / 1.3);
       if (!stageFade) prevBg = null;

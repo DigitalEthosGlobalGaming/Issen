@@ -79,6 +79,7 @@ for (const testing of [false, true]) {
     }
     await page.locator('#bPlay').click();
     await page.locator('#bBegin').click();
-    await expect(page.locator('.tutorial-overlay')).toBeVisible();
+    await expect(page.locator('.tutorial-overlay')).toBeHidden();
+    await expect(page.locator('#hud')).toHaveClass(/on/);
   });
 }

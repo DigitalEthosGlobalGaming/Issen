@@ -1,0 +1,50 @@
+.trials-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.trials-box {
+  text-align: left;
+}
+#trials {
+  touch-action: pan-y;
+}
+.trials-rules,
+.trial-card p,
+#trialResult p {
+  color: var(--paper-dim);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.trial-card,
+#trialResult {
+  border: 1px solid rgba(220, 210, 190, 0.24);
+  border-radius: 4px;
+  padding: 16px;
+  margin: 14px 0;
+}
+.trial-card h3,
+#trialResult h3 {
+  margin: 0 0 8px;
+}
+.trial-card .trial-reward {
+  color: var(--paper);
+}
+.trial-card .btn {
+  margin: 6px 0 0;
+}
+#trialResult {
+  border-color: var(--seal);
+}
+#trialObjective {
+  position: absolute;
+  bottom: max(18px, env(safe-area-inset-bottom, 0px));
+  left: 18px;
+  right: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--paper);
+  pointer-events: none;
+  text-shadow: 0 2px 5px #000;
+}

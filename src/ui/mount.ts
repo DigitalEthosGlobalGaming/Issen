@@ -7,6 +7,7 @@ import share from './screens/share.html?raw';
 import setup from './screens/setup.html?raw';
 import shrine from './screens/shrine.html?raw';
 import pause from './screens/pause.html?raw';
+import trials from './screens/trials.html?raw';
 
 const screens: Record<string, string> = {
   title,
@@ -17,6 +18,7 @@ const screens: Record<string, string> = {
   setup,
   shrine,
   pause,
+  trials,
 };
 
 export function mount(): HTMLElement {

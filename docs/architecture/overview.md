@@ -31,6 +31,7 @@ implemented files.
 | Scoring, records, statistics, unlocks                                   | `src/game/progression/`                                                |
 | Secret trigger counters and fixed-point eligibility                     | `src/game/progression/secret-events.ts`, `unlocks.ts`                  |
 | Temple upgrades, tutorial status, mode milestones                       | `src/game/progression/meta.ts`                                         |
+| Trial presets, completion and cosmetic grants                           | `src/game/content/trials.ts`, `src/game/progression/trials.ts`           |
 | Pending Embers and one-time end-run settlement                          | `src/game/progression/run-rewards.ts`                                  |
 | First-encounter teaching state and overlay                              | `src/game/onboarding/`                                                 |
 | Run-end tally/reveal and viewed Armoury gear                            | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts` |
@@ -72,6 +73,11 @@ implemented files.
   only the active namespace and suppressing stale writes until reload. The test
   admin wrapper cannot delete the player namespace. `bindProfileReset` owns the
   accessible confirmation modal and isolates its keyboard events from gameplay.
+- Trials unlock at Ronin wave 10 and use fixed encounters with disposable
+  statistics/equipment objects. The runtime restores the player objects on exit;
+  trial combat bypasses ordinary rewards, records and Awakening challenges.
+  `issen.trials` stores validated completion IDs, reconciled into cosmetic
+  ownership on load. See [Trials](../features/trials.md) for presets and rules.
 - `progression/meta.ts` validates the new `issen.meta` progression record. Temple
   modifiers and consumables are captured at run start and apply only to opted-in,
   arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,

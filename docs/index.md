@@ -1,5 +1,8 @@
 # Repository documentation
 
+- [Trials](features/trials.md): Ronin-gated preset mastery encounters, exclusive
+  cosmetic rewards, isolated progression and verification.
+
 - [Feature plan 04 — guided mechanics and end-of-run progression](features/feature-plan-04.md):
   implemented teaching moments, run-end rewards and unlock reveals, menu gates,
   boss-rush offers, pause audio and secret-unlock fixes.

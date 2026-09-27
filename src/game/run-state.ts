@@ -22,7 +22,8 @@ export type Screen =
   | 'over'
   | 'paused'
   | 'template'
-  | 'admin';
+  | 'admin'
+  | 'trials';
 
 export interface RunState {
   state: RunPhase;

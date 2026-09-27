@@ -171,6 +171,13 @@ meet the rules above.
 
 ## Implementation record
 
+Title-screen gestures reserve touch input (including vertical mobile swipes) and
+capture the active pointer. Finding or repeating an unclaimed title secret shows
+an explicit instruction to end a run to claim the reward. A recorded trigger is
+not treated as item ownership; these rewards still settle at run end. Browser
+regressions use actual browser-generated touch input for the swipe sequence,
+check the pending message, and verify the eventual item grant.
+
 - `src/game/progression/run-rewards.ts` accumulates kill, wave, and boss rewards
   as hundredths of an Ember at half the old rate (0.5, 2.5, and 12.5 before
   bonuses). A completed run settles once, floors the combined total, and carries

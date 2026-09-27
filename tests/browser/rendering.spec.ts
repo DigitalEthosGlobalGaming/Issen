@@ -420,7 +420,10 @@ test('film effects restore context state and leave other canvases untouched', as
     previewContext.fillRect(0, 0, 30, 30);
     previewContext.globalAlpha = 0.7;
     const before = live.toDataURL();
-    for (const film of ['sepia', 'silver', 'noir', 'cyan', 'nitrate', 'ukiyo', 'koda']) {
+    const { createItems } = await import('/src/game/content/items.ts');
+    for (const { id: film } of createItems(() => new Set()).filter(
+      (item: { type: string }) => item.type === 'film',
+    )) {
       applyFilm(previewContext, 30, 30, preview, film);
       if (previewContext.globalCompositeOperation !== 'source-over')
         throw new Error('Composition leaked');

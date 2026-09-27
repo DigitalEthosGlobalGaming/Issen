@@ -7,7 +7,14 @@ export function applyFilm(
 ) {
   if (f === 'mono') return;
   g.save();
-  if (f === 'sepia') {
+  if (f === 'trial-dusk' || f === 'trial-dawn') {
+    const gradient = g.createLinearGradient(0, 0, 0, H);
+    gradient.addColorStop(0, f === 'trial-dusk' ? 'rgba(92,65,138,.42)' : 'rgba(123,176,158,.32)');
+    gradient.addColorStop(1, f === 'trial-dusk' ? 'rgba(167,116,64,.3)' : 'rgba(173,119,132,.28)');
+    g.globalCompositeOperation = 'color';
+    g.fillStyle = gradient;
+    g.fillRect(0, 0, W, H);
+  } else if (f === 'sepia') {
     g.globalCompositeOperation = 'color';
     g.fillStyle = 'rgba(122,80,38,.55)';
     g.fillRect(0, 0, W, H);

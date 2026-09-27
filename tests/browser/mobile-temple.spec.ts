@@ -1,4 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+const packageInfo = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+);
 
 test('portrait title and setup fit while Temple uses compact top-centred details', async ({
   page,
@@ -16,7 +20,7 @@ test('portrait title and setup fit while Temple uses compact top-centred details
     await page.setViewportSize(size);
     await page.goto('/');
     await expect(page.locator('#bTemplate')).toHaveText('Temple');
-    await expect(page.locator('#title .title-version')).toHaveText('v1.0.0');
+    await expect(page.locator('#title .title-version')).toHaveText(`v${packageInfo.version}`);
     const fits = async (id: string) =>
       page.locator(id).evaluate((el) => ({
         height: el.scrollHeight <= el.clientHeight + 1,
