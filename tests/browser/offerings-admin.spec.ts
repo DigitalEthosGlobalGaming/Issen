@@ -68,3 +68,53 @@ test('Unlock all grants only Armoury ownership and preserves Temple, equipment a
     ),
   ).toBe(0);
 });
+
+test('admin unlocks Ronin only in the test profile and keeps it after reload', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.meta'))
+      localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, bossMilestone: 0 }));
+  });
+  await page.goto('/');
+  const playerMeta = await page.evaluate(() => localStorage.getItem('issen.meta'));
+  await page.keyboard.press('Control+Shift+A');
+  await expect(page.getByRole('button', { name: 'Unlock Ronin mode' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
+  await expect(page.locator('#testBadge')).toBeVisible();
+  await page.keyboard.press('Control+Shift+A');
+  await page.getByRole('button', { name: 'Unlock Ronin mode', exact: true }).click();
+  await expect(page.locator('.admin-status')).toContainText('mode milestone 2');
+  const first = await page.evaluate(() => localStorage.getItem('issen.testing.meta'));
+  expect(JSON.parse(first!).bossMilestone).toBe(2);
+  await page.getByRole('button', { name: 'Unlock Ronin mode', exact: true }).click();
+  expect(await page.evaluate(() => localStorage.getItem('issen.testing.meta'))).toBe(first);
+  await page.locator('#admin [data-back]').click();
+  await page.locator('#bPlay').click();
+  await expect(page.locator('#setup [data-k="diff"] [data-v="ronin"]')).toBeVisible();
+  await page.locator('#setup [data-k="diff"] [data-v="ronin"]').click();
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.setup')!).diff),
+  ).toBe('ronin');
+  await page.reload();
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('issen.testing.meta')!).bossMilestone,
+    ),
+  ).toBe(2);
+  await page.evaluate(() => {
+    const meta = JSON.parse(localStorage.getItem('issen.testing.meta')!);
+    meta.bossMilestone = 3;
+    localStorage.setItem('issen.testing.meta', JSON.stringify(meta));
+  });
+  await page.reload();
+  await page.keyboard.press('Control+Shift+A');
+  await page.getByRole('button', { name: 'Unlock Ronin mode', exact: true }).click();
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('issen.testing.meta')!).bossMilestone,
+    ),
+  ).toBe(3);
+  await page.getByRole('button', { name: 'Return to player profile', exact: true }).click();
+  expect(await page.evaluate(() => localStorage.getItem('issen.meta'))).toBe(playerMeta);
+  await page.locator('#bPlay').click();
+  await expect(page.locator('#setup [data-k="diff"] [data-v="ronin"]')).toBeHidden();
+});

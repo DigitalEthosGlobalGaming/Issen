@@ -19,6 +19,28 @@ Use Node 24 (the migration was verified with 24.16.0), then run `npm install` an
 | `npm run test:browser` | Playwright tests using installed Microsoft Edge |
 | `npm run test:production` | Build, then test bundled assets through a dedicated Vite preview server |
 
+## Fast feedback
+
+Start with `npm run typecheck` and the tests that cover the changed behavior. The
+unit suite is fast enough to run as a whole, but a focused file is also supported:
+
+```powershell
+node --test tests/unit/encounters.test.mjs
+npm run test:browser -- tests/browser/feature-plan-05.spec.ts
+npm run test:browser -- tests/browser/feature-plan-05.spec.ts -g "Temple rank"
+```
+
+The browser suite runs with two workers by default. This parallelizes test
+files; cases within a file still run in order. Use
+`npm run test:browser -- --workers=1` when investigating timing-sensitive
+failures, and rerun only failures with `npm run test:browser -- --last-failed`.
+Run the full browser suite for shared runtime changes and before a release. Run
+production tests when changing bundling, startup or deployment behavior, and
+for release verification. `npm run test:production` already runs `npm run build`,
+which includes TypeScript checking; a separate build/typecheck immediately
+before it duplicates work. After a passing check, repeat it only if subsequent
+edits affect what it covered.
+
 Browser tests use an isolated context at `http://127.0.0.1:5173`. Playwright starts
 Vite if necessary and can reuse an existing server. Tests that import the entry
 module must use its actual script URL, including Vite's timestamp when present,
@@ -28,8 +50,7 @@ For production verification without writing `dist/`, run `npm run typecheck`,
 then `npx vite build --outDir .verification-build-next-features`. Set
 `ISSEN_PREVIEW_DIR=.verification-build-next-features` when running
 `npx playwright test --config playwright.production.config.ts`. The isolated
-build folder is ignored by Git. Use `--workers=1` for timing-sensitive browser
-checks on a busy machine.
+build folder is ignored by Git.
 
 TypeScript is pinned to 7.0.2; Vite is pinned to 8.3.1. `package-lock.json` records
 the dependency resolution. Test files are executed by their runners; the application
@@ -58,8 +79,16 @@ On a paused screen, a keyboard press resumes when a button is not focused.
 
 Press **Ctrl+Shift+A** to open Testing tools. Select **Enter test profile**; the
 reload activates an isolated `issen.testing.*` save namespace and a visible badge.
-Open the tools again to jump to a stage/wave/boss, change equipment and awakenings,
-set lives or Embers, reset test Temple ranks, or replay tutorial and mode reveals.
+The screen groups Profile, Modes & Trials, Encounter, Armoury & Awakenings,
+Temple, and Onboarding controls. Open it again to jump to an encounter, set
+equipment or ranks, and replay lessons or reveals. Mode access is an ordered
+selector; **Unlock Ronin mode** is a shortcut that preserves later access.
+**Trials unlocked** sets the isolated test profile's Ronin best wave to 10 and
+also enables Ronin. Clearing the checkbox resets that test best wave to 0; it
+does not remove completed Trials or their cosmetic rewards. The Trials button
+then follows the same saved-progress gate as it does for a player profile.
+The permanent-upgrades checkbox controls the next run's setup. All of these
+controls are unavailable in the player profile.
 **Clear test profile** asks for confirmation, removes only `issen.testing.*`, and
 reloads a fresh test profile. It blocks stale queued saves during reload.
 **Unlock all** grants the complete Armoury (including awakened unlocks) only in

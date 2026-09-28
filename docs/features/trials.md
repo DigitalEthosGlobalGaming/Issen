@@ -4,6 +4,8 @@ Trials is a separate title-menu mode, unlocked by reaching **wave 10 in Ronin
 Waves** (after the third duel). The existing `issen.stats.roninWave` record grants
 access to established players too. Boss Rush and Endless do not advance that
 record. The title button appears only after that milestone is saved.
+Testing tools can set or clear that milestone in the isolated test profile with
+the **Trials unlocked** checkbox; ordinary player saves are unaffected.
 
 ## Encounters and rewards
 

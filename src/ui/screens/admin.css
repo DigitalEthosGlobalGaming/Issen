@@ -1,0 +1,89 @@
+#admin {
+  touch-action: pan-y;
+}
+#admin .box {
+  max-width: 760px;
+}
+#adminContent > h2 {
+  margin: 0 0 12px;
+  text-align: left;
+}
+#admin .admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+#admin .admin-group {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(236, 230, 218, 0.2);
+  background: rgba(22, 19, 16, 0.76);
+  text-align: left;
+}
+#admin .admin-group h3 {
+  margin: 0 0 9px;
+  color: #dec38c;
+  font-size: 17px;
+}
+#admin .admin-group p {
+  margin: 6px 0 10px;
+  color: var(--paper-dim);
+  font-size: 13px;
+}
+#admin .admin-group > .btn {
+  margin: 3px 0 8px;
+}
+#admin .admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 8px 0;
+}
+#admin .admin-actions .btn {
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 11px;
+  font-size: 13px;
+}
+#admin .admin-field {
+  margin-top: 9px;
+  font-size: 13px;
+}
+#admin .admin-field input,
+#admin .admin-field select {
+  width: 100%;
+}
+#admin .admin-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  margin: 12px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+#admin .admin-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--seal);
+}
+#admin .admin-debug {
+  margin: 7px 0;
+  font-size: 12px;
+}
+#admin .admin-debug summary {
+  cursor: pointer;
+}
+#admin .admin-confirm {
+  padding: 8px;
+  border: 1px solid #af655c;
+}
+#admin .admin-confirm .btn {
+  margin: 3px 6px 3px 0;
+}
+@media (max-width: 620px) {
+  #admin .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}

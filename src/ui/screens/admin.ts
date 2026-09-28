@@ -1,15 +1,26 @@
 export interface AdminActions {
   testing: boolean;
+  modeMilestone: number;
+  trialsUnlocked: boolean;
+  upgradesEnabled: boolean;
+  tutorialStatus: 'new' | 'completed' | 'skipped';
+  embers: number;
+  currentLives: number;
+  currentKnives: number;
+  currentStage: number;
+  currentWave: number;
   switchProfile(enabled: boolean): void;
   clearProfile?(): boolean;
   unlockAll?(): void;
+  unlockRonin(): void;
+  setTrialsUnlocked(enabled: boolean): void;
   jump(stage: number, wave: number, boss: boolean): void;
   restart(): void;
   item(id: string, action: 'grant' | 'remove' | 'equip'): void;
   lives(value: number): void;
   currency(value: number): void;
   resetUpgrades(): void;
-  upgrades?: readonly { id: string; name: string; maxRank: number }[];
+  upgrades?: readonly { id: string; name: string; maxRank: number; rank: number }[];
   setUpgrade?(id: string, rank: number): void;
   setKnives?(value: number): void;
   setUpgradesEnabled?(enabled: boolean): void;
@@ -21,6 +32,7 @@ export interface AdminActions {
   inspect(): string;
 }
 
+/** Test-profile controls only. The runtime owns every game and save mutation. */
 export function renderAdmin(
   root: HTMLElement,
   items: readonly { id: string; n: string }[],
@@ -28,143 +40,250 @@ export function renderAdmin(
   actions: AdminActions,
 ): void {
   root.replaceChildren();
-  const text = (tag: string, value: string) => {
-    const el = document.createElement(tag);
-    el.textContent = value;
-    root.append(el);
-    return el;
+  const doc = root.ownerDocument;
+  const heading = doc.createElement('h2');
+  heading.textContent = 'Testing tools';
+  root.append(heading);
+
+  const sections = doc.createElement('div');
+  sections.className = 'admin-grid';
+  root.append(sections);
+  const section = (title: string) => {
+    const panel = doc.createElement('section');
+    panel.className = 'admin-group';
+    const heading = doc.createElement('h3');
+    heading.textContent = title;
+    panel.append(heading);
+    sections.append(panel);
+    return panel;
   };
-  const button = (label: string, action: () => void) => {
-    const el = document.createElement('button');
-    el.className = 'btn';
-    el.textContent = label;
-    el.onclick = () => {
+  const row = (parent: HTMLElement) => {
+    const controls = doc.createElement('div');
+    controls.className = 'admin-actions';
+    parent.append(controls);
+    return controls;
+  };
+  let status: HTMLElement;
+  const updateStatus = () => {
+    status.textContent = actions.inspect();
+  };
+  const button = (parent: HTMLElement, label: string, action: () => void) => {
+    const control = doc.createElement('button');
+    control.type = 'button';
+    control.className = 'btn';
+    control.textContent = label;
+    control.onclick = () => {
       action();
-      status.textContent = actions.inspect();
+      updateStatus();
     };
-    root.append(el);
-    return el;
+    parent.append(control);
+    return control;
   };
-  text('h2', 'Testing tools');
-  text(
-    'p',
-    actions.testing
-      ? 'TEST PROFILE — all saves and records are isolated from your player profile.'
-      : 'Enter an isolated test profile to use these controls. Your player saves stay in place. Switching profiles reloads the game.',
-  );
-  const status = text('pre', actions.inspect());
-  status.className = 'admin-status';
-  status.setAttribute('aria-live', 'polite');
-  button(actions.testing ? 'Return to player profile' : 'Enter test profile', () =>
+  const select = (
+    parent: HTMLElement,
+    label: string,
+    entries: readonly { value: string; label: string }[],
+    value: string,
+  ) => {
+    const wrap = doc.createElement('label');
+    wrap.className = 'admin-field';
+    wrap.textContent = label;
+    const control = doc.createElement('select');
+    control.setAttribute('aria-label', label);
+    for (const entry of entries) {
+      const option = doc.createElement('option');
+      option.value = entry.value;
+      option.textContent = entry.label;
+      control.append(option);
+    }
+    control.value = value;
+    wrap.append(control);
+    parent.append(wrap);
+    return control;
+  };
+  const number = (parent: HTMLElement, label: string, value: number, max: number) => {
+    const wrap = doc.createElement('label');
+    wrap.className = 'admin-field';
+    wrap.textContent = label;
+    const control = doc.createElement('input');
+    control.type = 'number';
+    control.min = '0';
+    control.max = String(max);
+    control.value = String(value);
+    control.setAttribute('aria-label', label);
+    wrap.append(control);
+    parent.append(wrap);
+    return control;
+  };
+  const checkbox = (
+    parent: HTMLElement,
+    label: string,
+    checked: boolean,
+    change: (value: boolean) => void,
+  ) => {
+    const wrap = doc.createElement('label');
+    wrap.className = 'admin-check';
+    const control = doc.createElement('input');
+    control.type = 'checkbox';
+    control.checked = checked;
+    control.setAttribute('aria-label', label);
+    const caption = doc.createElement('span');
+    caption.textContent = label;
+    wrap.append(control, caption);
+    control.onchange = () => {
+      change(control.checked);
+      updateStatus();
+    };
+    parent.append(wrap);
+    return control;
+  };
+
+  const profile = section('Profile');
+  const note = doc.createElement('p');
+  note.textContent = actions.testing
+    ? 'TEST PROFILE · Player saves are separate.'
+    : 'Enter the test profile to use these controls.';
+  profile.append(note);
+  button(profile, actions.testing ? 'Return to player profile' : 'Enter test profile', () =>
     actions.switchProfile(!actions.testing),
   );
+  const details = doc.createElement('details');
+  details.className = 'admin-debug';
+  const summary = doc.createElement('summary');
+  summary.textContent = 'Current state';
+  status = doc.createElement('pre');
+  status.className = 'admin-status';
+  status.setAttribute('aria-live', 'polite');
+  updateStatus();
+  details.append(summary, status);
+  profile.append(details);
   if (!actions.testing) return;
-  const reset = document.createElement('div');
-  const prompt = document.createElement('p');
-  prompt.textContent =
-    'Delete all test progress, equipment and settings? Your player profile will not change.';
-  const confirm = document.createElement('button');
-  confirm.className = 'btn';
-  confirm.textContent = 'Confirm clear test profile';
-  confirm.onclick = () => {
-    if (!actions.clearProfile?.())
-      status.textContent = 'Could not clear the test profile. Please try again.';
-  };
-  const cancel = document.createElement('button');
-  cancel.className = 'btn';
-  cancel.textContent = 'Cancel';
-  cancel.onclick = () => {
-    reset.hidden = true;
-  };
-  reset.append(prompt, confirm, cancel);
-  reset.hidden = true;
-  button('Clear test profile', () => {
-    reset.hidden = false;
+
+  const clear = button(profile, 'Clear test profile', () => {
+    confirmClear.hidden = false;
   });
-  root.append(reset);
-  button('Unlock all', () => actions.unlockAll?.());
-  text(
-    'p',
-    'Unlock every Armoury item and awakened form. Temple upgrades and equipped items stay unchanged. Awakening access is still required.',
+  clear.classList.add('danger');
+  const confirmClear = doc.createElement('div');
+  confirmClear.className = 'admin-confirm';
+  confirmClear.hidden = true;
+  const warning = doc.createElement('p');
+  warning.textContent = 'Delete all test progress? Player saves stay intact.';
+  confirmClear.append(warning);
+  button(confirmClear, 'Confirm clear test profile', () => {
+    if (!actions.clearProfile?.()) status.textContent = 'Could not clear the test profile.';
+  });
+  button(confirmClear, 'Cancel', () => {
+    confirmClear.hidden = true;
+  });
+  profile.append(confirmClear);
+
+  const access = section('Modes & Trials');
+  const milestone = select(
+    access,
+    'Mode access',
+    [
+      { value: '0', label: 'Waves only' },
+      { value: '1', label: 'Boss Rush' },
+      { value: '2', label: 'Ronin' },
+      { value: '3', label: 'Blade Only' },
+    ],
+    String(actions.modeMilestone),
   );
-  const select = (label: string, entries: readonly { value: string; label: string }[]) => {
-    const wrap = document.createElement('label');
-    wrap.textContent = label;
-    const el = document.createElement('select');
-    el.setAttribute('aria-label', label);
-    for (const entry of entries) {
-      const o = document.createElement('option');
-      o.value = entry.value;
-      o.textContent = entry.label;
-      el.append(o);
-    }
-    wrap.append(el);
-    root.append(wrap);
-    return el;
+  milestone.onchange = () => {
+    actions.milestone(Number(milestone.value));
+    updateStatus();
   };
-  const number = (label: string, value: number, max: number) => {
-    const wrap = document.createElement('label');
-    wrap.textContent = label;
-    const el = document.createElement('input');
-    el.type = 'number';
-    el.min = '0';
-    el.max = String(max);
-    el.value = String(value);
-    el.setAttribute('aria-label', label);
-    wrap.append(el);
-    root.append(wrap);
-    return el;
-  };
+  const accessActions = row(access);
+  button(accessActions, 'Unlock Ronin mode', () => {
+    actions.unlockRonin();
+    milestone.value = String(Math.max(2, Number(milestone.value)));
+  });
+  checkbox(access, 'Trials unlocked', actions.trialsUnlocked, (enabled) => {
+    actions.setTrialsUnlocked(enabled);
+    if (enabled) milestone.value = String(Math.max(2, Number(milestone.value)));
+  });
+  button(accessActions, 'Replay unlock reveals', actions.replayReveals);
+
+  const encounter = section('Encounter');
   const stage = select(
+    encounter,
     'Stage',
-    stages.map((s, i) => ({ value: String(i), label: s.n })),
+    stages.map((entry, index) => ({ value: String(index), label: entry.n })),
+    String(actions.currentStage),
   );
   const wave = select(
+    encounter,
     'Wave within stage',
-    [1, 2, 3].map((n) => ({ value: String(n), label: String(n) })),
+    [1, 2, 3].map((value) => ({ value: String(value), label: String(value) })),
+    String(((Math.max(1, actions.currentWave) - 1) % 3) + 1),
   );
-  button('Jump to wave', () => actions.jump(Number(stage.value), Number(wave.value), false));
-  button('Jump to boss', () => actions.jump(Number(stage.value), 3, true));
-  button('Restart encounter', actions.restart);
+  const encounterActions = row(encounter);
+  button(encounterActions, 'Jump to wave', () =>
+    actions.jump(Number(stage.value), Number(wave.value), false),
+  );
+  button(encounterActions, 'Jump to boss', () => actions.jump(Number(stage.value), 3, true));
+  button(encounterActions, 'Restart encounter', actions.restart);
+  const lives = number(encounter, 'Lives', actions.currentLives, 99);
+  button(encounter, 'Set lives', () => actions.lives(Number(lives.value)));
+  const knives = number(encounter, 'Knife charges', actions.currentKnives, 3);
+  button(encounter, 'Set knife charges', () => actions.setKnives?.(Number(knives.value)));
+
+  const equipment = section('Armoury & Awakenings');
   const item = select(
+    equipment,
     'Item or awakening',
-    items.map((i) => ({ value: i.id, label: i.n })),
+    items.map((entry) => ({ value: entry.id, label: entry.n })),
+    items[0]?.id ?? '',
   );
+  const equipmentActions = row(equipment);
   for (const action of ['grant', 'remove', 'equip'] as const)
-    button(`${action[0]!.toUpperCase()}${action.slice(1)} item`, () =>
+    button(equipmentActions, `${action[0]!.toUpperCase()}${action.slice(1)} item`, () =>
       actions.item(item.value, action),
     );
-  button('Complete selected awakening challenge', () => actions.completeChallenge?.(item.value));
-  const lives = number('Lives', 2, 99);
-  button('Set lives', () => actions.lives(Number(lives.value)));
-  const currency = number('Ember balance', 1000, 1000000);
-  button('Set Embers', () => actions.currency(Number(currency.value)));
-  button('Reset test Temple upgrades', actions.resetUpgrades);
+  button(equipmentActions, 'Complete selected awakening challenge', () =>
+    actions.completeChallenge?.(item.value),
+  );
+  button(equipmentActions, 'Unlock all', () => actions.unlockAll?.());
+
+  const temple = section('Temple');
+  const currency = number(temple, 'Ember balance', actions.embers, 1000000);
+  button(temple, 'Set Embers', () => actions.currency(Number(currency.value)));
+  const upgrades = (actions.upgrades ?? []).map((entry) => ({ ...entry }));
   const upgrade = select(
+    temple,
     'Permanent upgrade',
-    (actions.upgrades ?? []).map((u) => ({ value: u.id, label: u.name })),
+    upgrades.map((entry) => ({ value: entry.id, label: entry.name })),
+    upgrades[0]?.id ?? '',
   );
-  const rank = number('Upgrade rank', 1, 3);
-  button('Set upgrade rank', () => actions.setUpgrade?.(upgrade.value, Number(rank.value)));
-  const knives = number('Knife charges', 1, 3);
-  button('Set knife charges', () => actions.setKnives?.(Number(knives.value)));
-  const enabled = select('Next run permanent upgrades', [
-    { value: '1', label: 'On' },
-    { value: '0', label: 'Off' },
-  ]);
-  button('Set upgrades for next run', () => actions.setUpgradesEnabled?.(enabled.value === '1'));
-  const milestone = select(
-    'Boss milestone',
-    [0, 1, 2, 3].map((n) => ({ value: String(n), label: String(n) })),
+  const rank = number(temple, 'Upgrade rank', upgrades[0]?.rank ?? 0, 3);
+  upgrade.onchange = () => {
+    rank.value = String(upgrades.find((entry) => entry.id === upgrade.value)?.rank ?? 0);
+    rank.max = String(upgrades.find((entry) => entry.id === upgrade.value)?.maxRank ?? 3);
+  };
+  button(temple, 'Set upgrade rank', () => {
+    actions.setUpgrade?.(upgrade.value, Number(rank.value));
+    const selected = upgrades.find((entry) => entry.id === upgrade.value);
+    if (selected) selected.rank = Math.max(0, Math.min(selected.maxRank, Number(rank.value)));
+  });
+  button(temple, 'Reset test Temple upgrades', () => {
+    actions.resetUpgrades();
+    for (const entry of upgrades) entry.rank = 0;
+    rank.value = '0';
+  });
+  checkbox(temple, 'Permanent upgrades next run', actions.upgradesEnabled, (enabled) =>
+    actions.setUpgradesEnabled?.(enabled),
   );
-  button('Set mode unlocks', () => actions.milestone(Number(milestone.value)));
+
+  const onboarding = section('Onboarding');
   const tutorial = select(
+    onboarding,
     'Tutorial status',
     ['new', 'completed', 'skipped'].map((value) => ({ value, label: value })),
+    actions.tutorialStatus,
   );
-  button('Set tutorial status', () =>
-    actions.tutorial(tutorial.value as 'new' | 'completed' | 'skipped'),
-  );
-  button('Replay tutorial', actions.replayTutorial);
-  button('Replay unlock reveals', actions.replayReveals);
+  tutorial.onchange = () => {
+    actions.tutorial(tutorial.value as 'new' | 'completed' | 'skipped');
+    updateStatus();
+  };
+  button(row(onboarding), 'Replay tutorial', actions.replayTutorial);
 }

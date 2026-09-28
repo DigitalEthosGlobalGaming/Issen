@@ -2331,6 +2331,15 @@ export function startGame(): () => void {
       STAGES,
       {
         testing: isTestProfile(),
+        modeMilestone: META.bossMilestone,
+        trialsUnlocked: trialsUnlocked(playerStats.roninWave),
+        upgradesEnabled: SETUP.upgrades !== false,
+        tutorialStatus: META.tutorial,
+        embers: META.embers,
+        currentLives: G.lives,
+        currentKnives: G.knives,
+        currentStage: G.stage,
+        currentWave: G.wave,
         clearProfile: () => clearTestProfile(),
         unlockAll: () => {
           if (!isTestProfile()) return;
@@ -2345,6 +2354,24 @@ export function startGame(): () => void {
           store.set('issen.revoked', [...revoked]);
           store.set('issen.unlocks', [...UNL]);
           refreshArmoryNew();
+        },
+        unlockRonin: () => {
+          if (!isTestProfile() || META.bossMilestone >= 2) return;
+          META.bossMilestone = 2;
+          META.revealSeen = Math.max(META.revealSeen, 2);
+          saveMeta();
+        },
+        setTrialsUnlocked: (enabled) => {
+          if (!isTestProfile()) return;
+          if (enabled && META.bossMilestone < 2) {
+            META.bossMilestone = 2;
+            META.revealSeen = Math.max(META.revealSeen, 2);
+            saveMeta();
+          }
+          playerStats.roninWave = enabled ? Math.max(10, playerStats.roninWave) : 0;
+          store.set('issen.stats', playerStats);
+          runTrialsWasUnlocked = enabled;
+          setBestLine();
         },
         switchProfile: (enabled) => {
           if (!switchTestProfile(enabled))
@@ -2403,7 +2430,10 @@ export function startGame(): () => void {
           META.upgrades = { ...EMPTY_UPGRADES };
           saveMeta();
         },
-        upgrades: TEMPLATE_UPGRADES,
+        upgrades: TEMPLATE_UPGRADES.map((upgrade) => ({
+          ...upgrade,
+          rank: META.upgrades[upgrade.id],
+        })),
         setUpgrade: (id, rank) => {
           const definition = TEMPLATE_UPGRADES.find((u) => u.id === id);
           if (!definition || !Number.isFinite(rank)) return;
@@ -2436,7 +2466,7 @@ export function startGame(): () => void {
         },
         milestone: (value) => {
           META.bossMilestone = Math.max(0, Math.min(3, value));
-          META.revealSeen = 0;
+          META.revealSeen = META.bossMilestone;
           Object.assign(SETUP, sanitizeSetup(SETUP, META));
           saveMeta();
         },
@@ -2454,7 +2484,7 @@ export function startGame(): () => void {
           showScreen('setup');
         },
         inspect: () =>
-          `Stage ${G.stage + 1}, wave ${G.wave}, lives ${G.lives}; knives ${G.knives}\n${META.embers} Embers; awakening access ${META.upgrades.awakening > 0}; next run upgrades ${SETUP.upgrades !== false}\nRanks: ${JSON.stringify(META.upgrades)}\nModifiers: ${JSON.stringify(G.m)}`,
+          `Stage ${G.stage + 1}, wave ${G.wave}, lives ${G.lives}; knives ${G.knives}\n${META.embers} Embers; mode milestone ${META.bossMilestone}; Trials ${trialsUnlocked(playerStats.roninWave)}; awakening access ${META.upgrades.awakening > 0}; next run upgrades ${SETUP.upgrades !== false}\nRanks: ${JSON.stringify(META.upgrades)}\nModifiers: ${JSON.stringify(G.m)}`,
       },
     );
   }

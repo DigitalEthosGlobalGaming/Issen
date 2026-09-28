@@ -10,8 +10,14 @@ Keep gameplay rules and data in their owning modules; connect presentation and
 transitions through the runtime. Pass explicit canvases to renderers and keep
 preview effects independent of live gameplay. Preserve `issen.*` save compatibility.
 
-Use strict TypeScript checks and relevant tests for implementation changes. Update
-the affected documentation when ownership or behavior changes. Do not edit generated
+Use strict TypeScript checks and the unit/browser tests relevant to an implementation
+change. During iteration, target the affected test files or cases; do not run the
+full browser or production suite after every small edit. Run broader checks when
+shared runtime behavior changes, before release, or when focused checks reveal a
+regression. Playwright uses two workers by default; use `--workers=1` only when
+diagnosing timing-sensitive failures. `test:production` already builds and
+type-checks, so avoid repeating those checks immediately beforehand. Update the
+affected documentation when ownership or behavior changes. Do not edit generated
 `dist/` files or clear real player saves for testing.
 
 When implementing an approved feature plan, increase the app's SemVer version
