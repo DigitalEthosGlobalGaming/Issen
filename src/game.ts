@@ -122,6 +122,7 @@ import {
   parseTrialProgress,
   trialsUnlocked,
   trialPassed,
+  trialFailureAfterCut,
   completeTrial,
   grantTrialRewards,
 } from './game/progression/trials.ts';
@@ -1384,6 +1385,7 @@ export function startGame(): () => void {
       hitStop = 0.055;
       flash(0.08);
     }
+    if (activeTrial) trialFailure ||= trialFailureAfterCut(activeTrial, G) || '';
     if (G.combo % 10 === 0 && G.m.comboBonus)
       addScore((G.m.comboBonus * G.combo) / 10, 0, 0, '歌舞伎');
     if (G.combo % 10 === 0 && G.m.furin) {

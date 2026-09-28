@@ -196,7 +196,7 @@ test('All six encounters complete through combat and persist exclusive rewards w
   ).toEqual(['trial-comet', 'trial-copper', 'trial-dawn']);
 });
 
-test('A full wave without enough perfect cuts fails and seeded retries reproduce the encounter', async ({
+test('A perfect-cut trial ends when its target becomes impossible and seeded retries reproduce the encounter', async ({
   page,
 }) => {
   await seed(page);
@@ -221,9 +221,11 @@ test('A full wave without enough perfect cuts fails and seeded retries reproduce
         return directions;
       }),
     );
-    await expect(page.locator('#trialResult')).toContainText('0 perfect cuts; 10 were required');
+    await expect(page.locator('#trialResult')).toContainText(
+      '10 perfect cuts needed; too many missed.',
+    );
   }
-  expect(sequences[0]).toHaveLength(12);
+  expect(sequences[0]).toHaveLength(3);
   expect(sequences[0]).toEqual(sequences[1]);
   expect(await page.evaluate(() => localStorage.getItem('issen.trials'))).toBeNull();
 });

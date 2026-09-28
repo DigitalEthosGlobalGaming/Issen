@@ -29,6 +29,16 @@ export function trialPassed(
   if (trial.wave) return result.kills >= trial.wave.total && result.perfects >= trial.wave.perfects;
   return !!trial.bosses?.length && result.bossesSlain >= trial.bosses.length;
 }
+/** A wave can stop as soon as its remaining cuts cannot satisfy the objective. */
+export function trialFailureAfterCut(
+  trial: TrialDefinition,
+  result: { kills: number; perfects: number },
+): string | null {
+  if (!trial.wave?.perfects) return null;
+  const remaining = Math.max(0, trial.wave.total - result.kills);
+  if (result.perfects + remaining >= trial.wave.perfects) return null;
+  return `${trial.wave.perfects} perfect cuts needed; too many missed.`;
+}
 /** Idempotent completion; cosmetics are also reconciled at load after interrupted writes. */
 export function completeTrial(progress: TrialProgress, id: string): boolean {
   if (!TRIALS.some((trial) => trial.id === id) || progress.completed.includes(id)) return false;

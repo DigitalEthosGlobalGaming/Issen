@@ -6,6 +6,7 @@ import {
   parseTrialProgress,
   trialsUnlocked,
   trialPassed,
+  trialFailureAfterCut,
   completeTrial,
   grantTrialRewards,
 } from '../../src/game/progression/trials.ts';
@@ -18,6 +19,15 @@ test('Trials unlock at Ronin wave 10 and reject invalid progress', () => {
   assert.deepEqual(parseTrialProgress({ completed: ['unknown', 'unbroken', 'unbroken', 42] }), {
     completed: ['unbroken'],
   });
+});
+
+test('Perfect-cut trials fail when the remaining cuts cannot reach the target', () => {
+  const trial = TRIALS.find((entry) => entry.id === 'true-edge');
+  assert.ok(trial);
+  assert.equal(trialFailureAfterCut(trial, { kills: 1, perfects: 0 }), null);
+  assert.equal(trialFailureAfterCut(trial, { kills: 2, perfects: 0 }), null);
+  assert.match(trialFailureAfterCut(trial, { kills: 3, perfects: 0 }), /10 perfect cuts needed/);
+  assert.equal(trialFailureAfterCut(trial, { kills: 11, perfects: 10 }), null);
 });
 
 test('All trial objectives require the full encounter, and failure overrides completion', () => {

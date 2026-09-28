@@ -25,7 +25,9 @@ film looks remain visible. Wave timings and enemy counts are fixed by the trial
 catalog. Duel timings use the existing Ronin boss rules. Combat uses a fresh
 seeded random stream on each attempt, separate from rendering and effects;
 identical input timing reproduces encounter choices. Visual weather hazards are
-neutralized for trial combat.
+neutralized for trial combat. A trial ends on the first hit or missed opening
+required by its objective. True Edge also ends as soon as the remaining enemies
+cannot bring the perfect-cut count to 10; it allows at most two ordinary cuts.
 
 The HUD shows the objective and progress. Completion, failure or ending from
 pause returns to the Trials panel with the result and a Retry button. A failed
@@ -53,11 +55,11 @@ are cosmetic and can be equipped in the Armoury in other modes.
 ## Verification
 
 `tests/unit/trials.test.mjs` covers access, malformed completion data, full
-objectives and idempotent reward reconciliation. Existing effect tests exercise
+objectives, early impossible-target failure and idempotent reward reconciliation. Existing effect tests exercise
 the new kill effects' finite particles, expiry and preview isolation.
 `tests/browser/trials.spec.ts` covers the hidden title entry before access, portrait/landscape overflow,
 live failure/retry/quit, all six successful combat sequences, insufficient
-perfect cuts, seeded replay, reload persistence, equipping all six cosmetic
+early impossible perfect-cut failure, seeded replay, reload persistence, equipping all six cosmetic
 rewards and profile isolation. The renderer test iterates the film catalog,
 including both Trials films, to check canvas isolation and context restoration.
 Successful encounter tests instrument the served module only in the test browser
