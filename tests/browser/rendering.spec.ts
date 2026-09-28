@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 test('player sword is behind the back-facing body', async ({ page }) => {
-  // Known regression: keep the intended depth contract executable while investigating.
-  test.fail();
   await page.goto('/');
   const order = await page.evaluate(async () => {
     const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
@@ -17,21 +15,41 @@ test('player sword is behind the back-facing body', async ({ page }) => {
     const order: string[] = [];
     const g = new Proxy(context, {
       get(target, key) {
-        if (key === 'fillRect') return (x: number, y: number, w: number, h: number) => {
-          if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
-          return target.fillRect(x, y, w, h);
-        };
-        if (key === 'fill') return (...args: Parameters<CanvasRenderingContext2D['fill']>) => {
-          if (target.fillStyle === obi) order.push('body');
-          return target.fill(...args);
-        };
+        if (key === 'fillRect')
+          return (x: number, y: number, w: number, h: number) => {
+            if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
+            return target.fillRect(x, y, w, h);
+          };
+        if (key === 'fill')
+          return (...args: Parameters<CanvasRenderingContext2D['fill']>) => {
+            if (target.fillStyle === obi) order.push('body');
+            return target.fill(...args);
+          };
         const value = Reflect.get(target, key, target);
         return typeof value === 'function' ? value.bind(target) : value;
       },
-      set(target, key, value) { return Reflect.set(target, key, value, target); },
+      set(target, key, value) {
+        return Reflect.set(target, key, value, target);
+      },
     });
-    createFigureRenderer(g, { time: 0, wind: 0, petActive: false, width: 400, height: 400, palette: () => palette, random: () => 0.5 })
-      .drawFigure({ x: 200, y: 300, h: 120, fog: 0, d: makeFig(7), pose: REST_POSE, back: true, noShadow: true });
+    createFigureRenderer(g, {
+      time: 0,
+      wind: 0,
+      petActive: false,
+      width: 400,
+      height: 400,
+      palette: () => palette,
+      random: () => 0.5,
+    }).drawFigure({
+      x: 200,
+      y: 300,
+      h: 120,
+      fog: 0,
+      d: makeFig(7),
+      pose: REST_POSE,
+      back: true,
+      noShadow: true,
+    });
     return order;
   });
   expect(order).toContain('sword');
@@ -40,7 +58,6 @@ test('player sword is behind the back-facing body', async ({ page }) => {
 });
 
 test('enemy attack arms sit behind the sword blade', async ({ page }) => {
-  test.fail();
   await page.goto('/');
   const order = await page.evaluate(async () => {
     const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
@@ -52,21 +69,40 @@ test('enemy attack arms sit behind the sword blade', async ({ page }) => {
     const order: string[] = [];
     const g = new Proxy(context, {
       get(target, key) {
-        if (key === 'fillRect') return (x: number, y: number, w: number, h: number) => {
-          if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
-          return target.fillRect(x, y, w, h);
-        };
-        if (key === 'stroke') return (...args: Parameters<CanvasRenderingContext2D['stroke']>) => {
-          if (Math.abs(target.lineWidth - 0.075) < 0.001) order.push('arm');
-          return target.stroke(...args);
-        };
+        if (key === 'fillRect')
+          return (x: number, y: number, w: number, h: number) => {
+            if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
+            return target.fillRect(x, y, w, h);
+          };
+        if (key === 'stroke')
+          return (...args: Parameters<CanvasRenderingContext2D['stroke']>) => {
+            if (Math.abs(target.lineWidth - 0.075) < 0.001) order.push('arm');
+            return target.stroke(...args);
+          };
         const value = Reflect.get(target, key, target);
         return typeof value === 'function' ? value.bind(target) : value;
       },
-      set(target, key, value) { return Reflect.set(target, key, value, target); },
+      set(target, key, value) {
+        return Reflect.set(target, key, value, target);
+      },
     });
-    createFigureRenderer(g, { time: 0, wind: 0, petActive: false, width: 400, height: 400, palette: () => palette, random: () => 0.5 })
-      .drawFigure({ x: 200, y: 300, h: 120, fog: 0, d: makeFig(9), pose: EPOSE.down, noShadow: true });
+    createFigureRenderer(g, {
+      time: 0,
+      wind: 0,
+      petActive: false,
+      width: 400,
+      height: 400,
+      palette: () => palette,
+      random: () => 0.5,
+    }).drawFigure({
+      x: 200,
+      y: 300,
+      h: 120,
+      fog: 0,
+      d: makeFig(9),
+      pose: EPOSE.down,
+      noShadow: true,
+    });
     return order;
   });
   expect(order.filter((part) => part === 'arm')).toHaveLength(2);

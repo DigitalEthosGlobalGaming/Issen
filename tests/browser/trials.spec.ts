@@ -72,7 +72,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/6 complete');
+  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/8 complete');
   await expect(page.locator('.trials-rules')).toHaveText('One hit ends the trial.');
   await expect(page.locator('[data-trial="true-edge"]').locator('..')).toContainText(
     '10 perfect cuts in 12. No hits.',
@@ -104,14 +104,14 @@ test('Live failure, retry and quitting preserve the main profile', async ({ page
   await expect(page.locator('#trialResult')).toContainText('You ended the attempt');
   expect(await saves(page)).toEqual(before);
   expect(await page.evaluate(() => localStorage.getItem('issen.trials'))).toBeNull();
-  await page.locator('#trials [data-back]').click();
+  await page.getByRole('button', { name: 'Back to title', exact: true }).click();
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await expect(page.locator('#bossbar')).toHaveClass(/on/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).runs)).toBe(9);
 });
 
-test('All six encounters complete through combat and persist exclusive rewards without farming', async ({
+test('All eight encounters complete through combat and persist exclusive rewards without farming', async ({
   page,
 }) => {
   await seed(page);
@@ -127,6 +127,8 @@ test('All six encounters complete through combat and persist exclusive rewards w
     'sightless',
     'twin-fang',
     'three-masters',
+    'golden-sovereign',
+    'broken-reality',
   ]) {
     await page.locator(`[data-trial="${id}"]`).click();
     const completed = await page.evaluate(() => {
@@ -138,7 +140,7 @@ test('All six encounters complete through combat and persist exclusive rewards w
         h.getEquipment().charm !== 'nocharm'
       )
         throw new Error('Trial inherited player powers');
-      for (let step = 0; step < 25000 && h.G.state !== 'title'; step++) {
+      for (let step = 0; step < 150000 && h.G.state !== 'title'; step++) {
         h.step(0.02, 0.02);
         if (h.G.state === 'playing' && h.G.attacker?.p >= 0.82) h.swipe(h.G.attacker.dir);
         const b = h.G.boss;
@@ -153,10 +155,10 @@ test('All six encounters complete through combat and persist exclusive rewards w
     await expect(page.locator('#trialResult')).toContainText('Unlocked:');
   }
   expect(await saves(page)).toEqual(before);
-  await expect(page.locator('#trialsAccess')).toContainText('6/6');
+  await expect(page.locator('#trialsAccess')).toContainText('8/8');
   await page.reload();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('6/6');
+  await expect(page.locator('#trialsAccess')).toContainText('8/8');
   expect(
     await page.evaluate(
       () =>
@@ -164,7 +166,7 @@ test('All six encounters complete through combat and persist exclusive rewards w
           id.startsWith('trial-'),
         ).length,
     ),
-  ).toBe(6);
+  ).toBe(8);
   await expect(page.locator('#trials')).toHaveCSS('opacity', '1');
   await page.screenshot({ path: 'test-results/trials-complete.png' });
   await page.locator('#trials [data-back]').click();
@@ -175,6 +177,8 @@ test('All six encounters complete through combat and persist exclusive rewards w
     ['Seals', 'Platinum', 'seal', 'trial-platinum'],
     ['Seals', 'Burnished copper', 'seal', 'trial-copper'],
     ['Film looks', 'Violet dusk', 'film', 'trial-dusk'],
+    ['Film looks', 'Imperial gold', 'film', 'trial-gold'],
+    ['Film looks', 'Broken signal', 'film', 'trial-glitch'],
     ['Film looks', 'Pale dawn', 'film', 'trial-dawn'],
   ]) {
     await page.getByRole('tab', { name: new RegExp(`^${tab}`) }).click();
@@ -206,7 +210,8 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   await page.locator('#bTrials').click();
   const sequences: string[][] = [];
   for (let attempt = 0; attempt < 2; attempt++) {
-    await page.locator('[data-trial="true-edge"]').click();
+    if (attempt === 0) await page.locator('[data-trial="true-edge"]').click();
+    else await page.getByRole('button', { name: 'Retry', exact: true }).click();
     sequences.push(
       await page.evaluate(() => {
         const h = (window as any).__trialHarness;
@@ -228,4 +233,36 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   expect(sequences[0]).toHaveLength(3);
   expect(sequences[0]).toEqual(sequences[1]);
   expect(await page.evaluate(() => localStorage.getItem('issen.trials'))).toBeNull();
+});
+
+test('Broken Reality ends on the first ordinary cut', async ({ page }) => {
+  await seed(page);
+  await instrument(page);
+  await page.goto('/');
+  await page.evaluate(() => (window as any).__trialHarness.stop());
+  await page.locator('#bTrials').click();
+  await page.locator('[data-trial="broken-reality"]').click();
+  const cuts = await page.evaluate(() => {
+    const h = (window as any).__trialHarness;
+    let cuts = 0;
+    for (let step = 0; step < 1000 && h.G.state !== 'title'; step++) {
+      h.step(0.02, 0.02);
+      if (h.G.state === 'playing' && h.G.attacker?.p >= 0.2) {
+        h.swipe(h.G.attacker.dir);
+        cuts++;
+      }
+    }
+    return cuts;
+  });
+  expect(cuts).toBe(1);
+  await expect(page.locator('#trialResult')).toContainText('1000 perfect cuts needed');
+  await expect(page.locator('#trialResult')).toContainText('Failed · Broken Reality');
+  await expect(page.locator('#trialResult')).toContainText('1,000 perfect cuts. No mistakes.');
+  await expect(page.locator('#trialList')).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('issen.trials'))).toBeNull();
+  await page.getByRole('button', { name: 'Back to title', exact: true }).click();
+  await expect(page.locator('#bTrials')).toBeVisible();
+  await page.locator('#bTrials').click();
+  await expect(page.locator('#trialResult')).toBeHidden();
+  await expect(page.locator('#trialList')).toBeVisible();
 });

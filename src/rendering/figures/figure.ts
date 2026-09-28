@@ -897,6 +897,32 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineTo(-0.36, -0.43);
       g.stroke();
     }
+    const p = f.pose,
+      gx = p.gx + lx,
+      gy = p.gy,
+      ca = Math.cos(p.ang),
+      sa = Math.sin(p.ang);
+    let h2: Point = [gx - ca * 0.075, gy - sa * 0.075];
+    function drawHeldWeapons() {
+      if (f.spear && !f.noSword) {
+        drawSpear(gx, gy, p.ang, C);
+      } else if (!f.noSword) {
+        drawSword(gx, gy, p.ang, C, f.blade);
+      }
+      if (f.twin) {
+        drawSword(-0.19 + lx, -0.5, Math.PI - p.ang, C, {
+          len: 0.38,
+          d: C.steelD,
+          m: C.steel,
+          l: C.steelL,
+          edge: 'rgba(255,253,246,.85)',
+        });
+      }
+    }
+    if (f.spear && !f.noSword) h2 = [gx - ca * 0.2, gy - sa * 0.2];
+    if (f.twin) h2 = [-0.19 + lx, -0.5];
+    // The player is viewed from behind, so the weapon passes behind the robe.
+    if (f.back) drawHeldWeapons();
     drawSleeve(-1, lx, C, d, t, wv);
     drawSleeve(1, lx, C, d, t, wv);
     let gr = g.createLinearGradient(-0.3, 0, 0.3, 0);
@@ -1119,29 +1145,6 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.fillRect(cx - 0.009, cy + 0.022, 0.018, 0.004);
     }
     drawHead(f, C, d, lx);
-    const p = f.pose,
-      gx = p.gx + lx,
-      gy = p.gy,
-      ca = Math.cos(p.ang),
-      sa = Math.sin(p.ang);
-    let h2: Point = [gx - ca * 0.075, gy - sa * 0.075];
-    if (f.noSword) {
-    } else if (f.spear) {
-      drawSpear(gx, gy, p.ang, C);
-      h2 = [gx - ca * 0.2, gy - sa * 0.2];
-    } else drawSword(gx, gy, p.ang, C, f.blade);
-    if (f.twin) {
-      const g2x = -0.19 + lx,
-        g2y = -0.5;
-      drawSword(g2x, g2y, Math.PI - p.ang, C, {
-        len: 0.38,
-        d: C.steelD,
-        m: C.steel,
-        l: C.steelL,
-        edge: 'rgba(255,253,246,.85)',
-      });
-      h2 = [g2x, g2y];
-    }
     const h1: Point = [gx, gy],
       sh: Point[] = [
         [-0.15 + lx, -0.765],
@@ -1168,6 +1171,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineTo(hd[0], hd[1]);
       g.stroke();
     }
+    // Front-facing attackers hold their weapons in front of their sleeves and arms.
+    if (!f.back) drawHeldWeapons();
     g.fillStyle = C.skin;
     for (const hd of hands) {
       g.beginPath();

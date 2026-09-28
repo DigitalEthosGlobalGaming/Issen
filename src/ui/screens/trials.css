@@ -37,6 +37,24 @@
 #trialResult {
   border-color: var(--seal);
 }
+.trial-failed .trials-heading,
+.trial-failed #trialsAccess,
+.trial-failed .trials-rules,
+.trial-failed #trialList {
+  display: none;
+}
+.trial-failed .trials-box {
+  max-width: 440px;
+  text-align: center;
+}
+#trialResult .trial-result-objective {
+  color: var(--paper);
+}
+.trial-failed #trialResult .btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+}
 #trialObjective {
   position: absolute;
   bottom: max(18px, env(safe-area-inset-bottom, 0px));

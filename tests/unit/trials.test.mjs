@@ -64,3 +64,26 @@ test('Rewards are exclusive cosmetics and completion reconciles interrupted writ
   grantTrialRewards(restored, unlocks);
   assert.equal(unlocks.size, TRIALS.length + 1);
 });
+
+test('Endurance trials require 1,000 enemies and Broken Reality allows no ordinary cuts', () => {
+  for (const id of ['golden-sovereign', 'broken-reality']) {
+    const trial = TRIALS.find((entry) => entry.id === id);
+    assert.equal(trial.wave.total, 1000);
+    assert.equal(
+      trialPassed(trial, { kills: 999, perfects: 999, bossesSlain: 0, failed: false }),
+      false,
+    );
+    assert.equal(
+      trialPassed(trial, { kills: 1000, perfects: 1000, bossesSlain: 0, failed: false }),
+      true,
+    );
+    assert.equal(
+      trialPassed(trial, { kills: 1000, perfects: 1000, bossesSlain: 0, failed: true }),
+      false,
+    );
+  }
+  const trial = TRIALS.find((entry) => entry.id === 'broken-reality');
+  assert.equal(trialFailureAfterCut(trial, { kills: 999, perfects: 999 }), null);
+  assert.ok(trialFailureAfterCut(trial, { kills: 1, perfects: 0 }));
+  assert.ok(trialFailureAfterCut(trial, { kills: 1000, perfects: 999 }));
+});

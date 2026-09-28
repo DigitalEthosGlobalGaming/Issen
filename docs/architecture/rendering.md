@@ -85,6 +85,9 @@ Figures are constructed from normalized proportions relative to their height.
 pose and optional costume or weapon details. `src/rendering/figures/figure.ts`
 turns that model into Canvas paths. Poses are small data objects and are blended
 or approached by the animation modules instead of being separate images.
+Within each figure, the back-facing player's weapons are painted behind the robe,
+while front-facing enemies paint their arms before their weapons. Hands finish over
+the grip in both views.
 
 The same principle applies to the scene. `src/rendering/layout.ts` derives the
 horizon, ground, combat slots, player, strike and boss positions from viewport

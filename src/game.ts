@@ -2247,7 +2247,18 @@ export function startGame(): () => void {
     if (id === 'template') renderTemplate($('templateContent'), META, saveMeta);
     if (id === 'admin') showAdmin();
     if (id === 'trials')
-      renderTrials($('trials'), TRIAL_PROGRESS, playerStats.roninWave, trialResult, startTrial);
+      renderTrials(
+        $('trials'),
+        TRIAL_PROGRESS,
+        playerStats.roninWave,
+        trialResult,
+        startTrial,
+        () => {
+          trialResult = null;
+          G.panel = null;
+          showScreen('title');
+        },
+      );
     showScreen(id);
   }
   const setupScreen = createSetupScreen(
@@ -3145,7 +3156,7 @@ export function startGame(): () => void {
       g.fillStyle = 'rgba(120,18,12,0.16)';
       g.fillRect(0, 0, W, H);
     }
-    applyFilm(g, W, H, cvs, EQ.film);
+    applyFilm(g, W, H, cvs, EQ.film, time);
     frameN++;
     const pat = grainPats[frameN % 3];
     if (pat) {

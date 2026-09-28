@@ -115,6 +115,38 @@ export const TRIALS: readonly TrialDefinition[] = [
       f: 'Soft jade highlights over rose-grey shadows.',
     },
   },
+  {
+    id: 'golden-sovereign',
+    name: 'Golden Sovereign',
+    seed: 7707,
+    arrows: true,
+    objective: '1,000 cuts. No hits.',
+    description: 'Defeat 1,000 enemies in one unbroken wave.',
+    wave: { total: 1000, attack: 1.2, feint: 0, perfects: 0 },
+    reward: {
+      id: 'trial-gold',
+      type: 'film',
+      k: '帝',
+      n: 'Imperial gold',
+      f: 'Pure gold light, gilded highlights and deep bronze shadows.',
+    },
+  },
+  {
+    id: 'broken-reality',
+    name: 'Broken Reality',
+    seed: 8808,
+    arrows: true,
+    objective: '1,000 perfect cuts. No mistakes.',
+    description: 'Every cut must be perfect. One ordinary cut ends the trial.',
+    wave: { total: 1000, attack: 1.5, feint: 0, perfects: 1000 },
+    reward: {
+      id: 'trial-glitch',
+      type: 'film',
+      k: '裂',
+      n: 'Broken signal',
+      f: 'Fractured colours, displaced scanlines and electric screen noise.',
+    },
+  },
 ];
 
 export function trialRewardItems(): Item[] {

@@ -17,8 +17,10 @@ the **Trials unlocked** checkbox; ordinary player saves are unaffected.
 | Read the Blade | Cut 16 enemies without arrows, including feints, no mistakes | Comet trail kill effect |
 | Two Glints | Defeat Ronin Twin Fang without taking a hit | Burnished copper seal |
 | Three Masters | Defeat Ronin Kagemaru, Twin Fang and Mirror without hits, wrong counters or expired openings | Pale dawn film |
+| Golden Sovereign | Defeat 1,000 enemies in one wave without a hit | Imperial gold film |
+| Broken Reality | 1,000 perfect cuts in one wave; an ordinary cut or hit ends the attempt | Broken signal film |
 
-All six trials are available immediately after access. Each uses Tamahagane,
+All eight trials are available immediately after access. Each uses Tamahagane,
 Sumi, no charm/companion/crest, no Temple or awakened powers, no knives, no shrine
 and no recovery. A hit ends the attempt. Selected kill effects, seal colours and
 film looks remain visible. Wave timings and enemy counts are fixed by the trial
@@ -29,8 +31,10 @@ neutralized for trial combat. A trial ends on the first hit or missed opening
 required by its objective. True Edge also ends as soon as the remaining enemies
 cannot bring the perfect-cut count to 10; it allows at most two ordinary cuts.
 
-The HUD shows the objective and progress. Completion, failure or ending from
-pause returns to the Trials panel with the result and a Retry button. A failed
+The HUD shows the objective and progress. Failure or ending from pause opens a
+dedicated result view with the trial name, objective, failure reason, Retry and
+Back to title. Returning to the title clears that result. Completion returns to
+the Trials list with the reward and Retry button. A failed
 perfect-cut target grants nothing. Replays never duplicate rewards. All rewards
 are cosmetic and can be equipped in the Armoury in other modes.
 
@@ -58,11 +62,19 @@ are cosmetic and can be equipped in the Armoury in other modes.
 objectives, early impossible-target failure and idempotent reward reconciliation. Existing effect tests exercise
 the new kill effects' finite particles, expiry and preview isolation.
 `tests/browser/trials.spec.ts` covers the hidden title entry before access, portrait/landscape overflow,
-live failure/retry/quit, all six successful combat sequences, insufficient
-early impossible perfect-cut failure, seeded replay, reload persistence, equipping all six cosmetic
+live failure/retry/quit, all eight successful combat sequences, insufficient
+early impossible perfect-cut failure, seeded replay, reload persistence, equipping all eight cosmetic
 rewards and profile isolation. The renderer test iterates the film catalog,
 including both Trials films, to check canvas isolation and context restoration.
 Successful encounter tests instrument the served module only in the test browser
 to advance simulation and supply inputs; no testing hooks ship in the application.
 These checks do not establish human difficulty balance or physical touch-device
 usability.
+
+Imperial gold uses gold colour grading and soft golden light. Broken signal uses
+cyan/magenta colour fractures, displaced image strips, scanlines and pixel noise.
+Both apply to gameplay and Armoury previews. Broken signal gently warps the scene
+and shifts its torn strips using the renderer's animation time, without flashing.
+Film rendering accepts an explicit time in seconds, keeping preview animation
+independent of live combat. Both endurance trials have
+no feints, fixed attack timings and no intermediate duels or shrines.

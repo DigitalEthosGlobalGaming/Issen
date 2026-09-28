@@ -16,6 +16,7 @@ export function renderTrials(
   roninWave: number,
   result: TrialResult | null,
   start: (id: string) => void,
+  backToTitle: () => void,
 ): void {
   const doc = root.ownerDocument;
   const unlocked = trialsUnlocked(roninWave);
@@ -23,6 +24,7 @@ export function renderTrials(
     ? `Trials · ${progress.completed.length}/${TRIALS.length} complete`
     : `Ronin wave 10 required · ${Math.floor(roninWave)}/10`;
   const outcome = root.querySelector<HTMLElement>('#trialResult')!;
+  root.classList.toggle('trial-failed', !!result && !result.passed);
   outcome.replaceChildren();
   outcome.hidden = !result;
   if (result) {
@@ -42,9 +44,23 @@ export function renderTrials(
     retry.disabled = !unlocked;
     retry.onclick = () => start(trial.id);
     outcome.append(heading);
+    if (!result.passed) {
+      const objective = doc.createElement('p');
+      objective.textContent = trial.objective;
+      objective.className = 'trial-result-objective';
+      outcome.append(objective);
+    }
     if (result.message) outcome.append(message);
     if (result.passed) outcome.append(reward);
     outcome.append(retry);
+    if (!result.passed) {
+      const back = doc.createElement('button');
+      back.type = 'button';
+      back.className = 'btn';
+      back.textContent = 'Back to title';
+      back.onclick = backToTitle;
+      outcome.append(back);
+    }
   }
   const list = root.querySelector('#trialList')!;
   list.replaceChildren();

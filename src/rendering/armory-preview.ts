@@ -126,7 +126,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       renderer.drawFx();
       renderer.drawFx2();
     }
-    applyFilm(g, width, height, canvas, frame.film);
+    applyFilm(g, width, height, canvas, frame.film, frame.time);
   }
 
   return { demo, draw };
