@@ -35,6 +35,7 @@ test('Trials access is editable in the isolated profile and controls the title e
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.keyboard.press('Control+Shift+A');
+  await expect(trials).toBeChecked();
   await trials.uncheck();
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.stats')!).roninWave),
