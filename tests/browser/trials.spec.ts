@@ -58,14 +58,25 @@ async function instrument(page: Page) {
   });
 }
 
-test('Trials show the Ronin gate, allow inspection, and fit portrait and landscape', async ({
+test('Trials stay off the title until Ronin wave 10, then fit portrait and landscape', async ({
   page,
 }) => {
   await seed(page, 9);
   await page.goto('/');
+  await expect(page.locator('#bTrials')).toBeHidden();
+  await page.evaluate(() => {
+    const stats = JSON.parse(localStorage.getItem('issen.stats')!);
+    stats.roninWave = 10;
+    localStorage.setItem('issen.stats', JSON.stringify(stats));
+  });
+  await page.reload();
+  await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('Best: 9 / 10');
-  await expect(page.locator('[data-trial]:disabled')).toHaveCount(6);
+  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/6 complete');
+  await expect(page.locator('.trials-rules')).toHaveText('One hit ends the trial.');
+  await expect(page.locator('[data-trial="true-edge"]').locator('..')).toContainText(
+    '10 perfect cuts in 12. No hits.',
+  );
   for (const viewport of [
     { width: 390, height: 844 },
     { width: 844, height: 390 },
@@ -86,7 +97,7 @@ test('Live failure, retry and quitting preserve the main profile', async ({ page
   await page.locator('[data-trial="unbroken"]').click();
   await expect(page.locator('#trialObjective')).toContainText('Unbroken');
   await expect(page.locator('#trialResult')).toContainText('Too slow', { timeout: 10000 });
-  await page.getByRole('button', { name: 'Retry trial', exact: true }).click();
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
   await page.keyboard.press('p');
   await expect(page.locator('#trialObjective')).toBeHidden();
   await page.locator('#bEnd').click();
@@ -138,14 +149,14 @@ test('All six encounters complete through combat and persist exclusive rewards w
       return h.G.state === 'title';
     });
     expect(completed, id).toBe(true);
-    await expect(page.locator('#trialResult')).toContainText('Trial complete');
+    await expect(page.locator('#trialResult')).toContainText('Complete');
     await expect(page.locator('#trialResult')).toContainText('Unlocked:');
   }
   expect(await saves(page)).toEqual(before);
-  await expect(page.locator('#trialsAccess')).toContainText('6 / 6');
+  await expect(page.locator('#trialsAccess')).toContainText('6/6');
   await page.reload();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('6 / 6');
+  await expect(page.locator('#trialsAccess')).toContainText('6/6');
   expect(
     await page.evaluate(
       () =>

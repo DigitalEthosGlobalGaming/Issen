@@ -1,0 +1,84 @@
+#paused {
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+#paused .pause-layout {
+  margin-top: 0;
+  width: min(100%, 430px);
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+#paused .pause-heading {
+  flex: 0 0 auto;
+}
+#paused .o-k {
+  font-size: clamp(36px, 9dvh, 72px);
+}
+#paused .pause-blessings {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(220, 210, 190, 0.24);
+  background: rgba(12, 11, 10, 0.7);
+  padding: 10px;
+  text-align: left;
+}
+#paused .pause-blessings h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+#paused .pause-blessing-list {
+  min-height: 44px;
+  max-height: 32dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#paused .pause-blessing {
+  display: flex;
+  gap: 10px;
+  padding: 7px 2px;
+  border-top: 1px solid rgba(220, 210, 190, 0.13);
+}
+#paused .pause-blessing-glyph {
+  min-width: 32px;
+  font-size: 22px;
+  color: var(--seal);
+}
+#paused .pause-blessing strong,
+#paused .pause-blessing small {
+  display: block;
+}
+#paused .pause-blessing small {
+  color: var(--paper-dim);
+  line-height: 1.35;
+}
+#paused .pause-actions {
+  flex: 0 0 auto;
+}
+#paused .pause-actions .row {
+  justify-content: center;
+  margin-top: 8px;
+}
+@media (max-height: 420px) {
+  #paused .pause-layout {
+    gap: 4px;
+  }
+  #paused .pause-blessings {
+    padding: 6px;
+  }
+  #paused .pause-blessings h2 {
+    margin-bottom: 3px;
+  }
+  #paused .pause-blessing-list {
+    max-height: 28dvh;
+  }
+}

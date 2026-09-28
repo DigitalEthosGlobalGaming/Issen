@@ -114,6 +114,17 @@
   font-size: 14px;
   line-height: 1.45;
 }
+.result-benefit,
+.result-tradeoff {
+  max-width: 320px;
+  font-size: 14px;
+}
+.result-benefit {
+  color: #eee0bb;
+}
+.result-tradeoff {
+  color: #aaa399;
+}
 .result-next {
   color: #d6c7ae;
   font-size: 13px;

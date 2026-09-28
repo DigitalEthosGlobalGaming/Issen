@@ -4,6 +4,7 @@ import type { Statistics, BladeStats } from '../../game/progression/statistics.t
 import { SPECIAL } from '../../game/content/awakenings.ts';
 import { ROBE_AWAKENINGS } from '../../game/content/robe-awakenings.ts';
 import { isNewArmoryItem, markArmoryItemViewed } from '../../game/progression/armory-seen.ts';
+import { itemPresentation } from './item-presentation.ts';
 
 const ARM: readonly (readonly [ItemCategory, string])[] = [
   ['blade', 'Blades'],
@@ -173,19 +174,23 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     const own = UNL.has(it.id),
       awk = activeAwakening(it),
       sp = awk ? awakening(it) : undefined;
+    const display = itemPresentation(it);
     if (it.hidden && !own) {
       $('armInfo').innerHTML =
         `<div class="nm">？ Hidden<small>Secret</small></div><div class="fl">Hint: ${it.hint}</div>`;
       return;
     }
     $('armInfo').innerHTML =
-      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? it.f : 'To unlock: ' + it.d}</div>` +
+      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
       (sp
         ? `<div class="awakening-active"><div class="awakening-label">Awakened active</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
-        : (it.pk ? `<div class="pk">+ ${it.pk}</div>` : '') +
-          (it.tr ? `<div class="tr">− ${it.tr}</div>` : '') +
+        : (display.benefit ? `<div class="pk">+ ${display.benefit}</div>` : '') +
+          (display.tradeoff ? `<div class="tr">− ${display.tradeoff}</div>` : '') +
           (own && it.role ? `<div class="item-role">${it.role}</div>` : '')) +
-      spInfo(it, own);
+      spInfo(it, own) +
+      (own && display.unlockCondition
+        ? `<div class="arm-unlock-condition">Unlocked: ${display.unlockCondition}</div>`
+        : '');
   }
   function spInfo(it: Item, own: boolean) {
     if (!access(it.type) || !own || (it.type !== 'blade' && it.type !== 'robe')) return '';

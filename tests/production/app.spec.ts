@@ -12,10 +12,7 @@ test('built assets include fresh onboarding, Template and isolated testing tools
   page.on('pageerror', (error) => errors.push(error.message));
   await page.addInitScript(() => localStorage.removeItem('issen.meta'));
   await page.goto('/');
-  await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('Reach wave 10 in Ronin Waves');
-  await expect(page.locator('[data-trial]:disabled')).toHaveCount(6);
-  await page.locator('#trials [data-back]').click();
+  await expect(page.locator('#bTrials')).toBeHidden();
   await page.locator('#bTutorial').click();
   await expect(page.locator('.tutorial-overlay')).toBeVisible();
   await page.getByRole('button', { name: 'Skip tutorial' }).click();

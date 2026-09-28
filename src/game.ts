@@ -126,6 +126,8 @@ import {
   grantTrialRewards,
 } from './game/progression/trials.ts';
 import { renderTrials } from './ui/screens/trials.ts';
+import { renderPauseBlessings } from './ui/screens/pause.ts';
+import { itemPresentation } from './ui/screens/item-presentation.ts';
 import type { TrialResult } from './ui/screens/trials.ts';
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
 import { deathsTotal } from './game/progression/statistics.ts';
@@ -750,7 +752,7 @@ export function startGame(): () => void {
   }
   const banner = hudView.showBanner;
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
-  const runResults = createRunResults($('over'));
+  const runResults = createRunResults($('over'), () => sfx.reveal());
   function hint(key: string, text: string, dur = 3500) {
     if (activeTrial) return;
     if (G.hints[key]) return;
@@ -783,16 +785,18 @@ export function startGame(): () => void {
         G.newUnlocks.push(it);
         const base = id.replace(/\+$/, '');
         const source = ITEM_BY[base];
+        const display = source ? itemPresentation(source) : null;
         const awakened = id.endsWith('+') ? (SPECIAL[base] ?? ROBE_AWAKENINGS[base]) : null;
-        const perk = awakened?.pk ?? source?.pk;
-        const tradeoff = awakened?.tr ?? source?.tr;
+        const perk = awakened?.pk ?? display?.benefit;
+        const tradeoff = awakened?.tr ?? display?.tradeoff;
         runItemReveals.push({
           key: it.k,
           name: it.n,
           kind: TYPE_WORD[it.type],
-          description: perk
-            ? `${perk}${tradeoff ? ` · ${tradeoff}` : ''}`
-            : source?.f || 'View it in the Armoury.',
+          description: display?.flavor || 'View it in the Armoury.',
+          benefit: perk,
+          tradeoff,
+          item: true,
         });
       },
       { access: META.upgrades.awakening, progress: AWAKENING },
@@ -1069,7 +1073,7 @@ export function startGame(): () => void {
         message ||
         trialFailure ||
         (passed
-          ? 'Every condition met.'
+          ? ''
           : `You landed ${G.perfects} perfect cuts; ${trial.wave?.perfects ?? 0} were required.`),
     };
     activeTrial = null;
@@ -2189,8 +2193,7 @@ export function startGame(): () => void {
         key: '試',
         name: 'Trials',
         kind: 'mode',
-        description:
-          'Fixed mastery challenges. Earn exclusive kill effects, seals and film looks from the title menu.',
+        description: 'Preset challenges are now on the title screen.',
       });
     markModeRevealsSeen(META);
     saveMeta();
@@ -2209,9 +2212,7 @@ export function startGame(): () => void {
     setBestLine();
   }
   function setBestLine() {
-    $('bTrials').textContent = trialsUnlocked(playerStats.roninWave)
-      ? 'Trials'
-      : 'Trials · Ronin wave 10';
+    $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
     $('tBest').textContent =
       (ST.bestScore ? `Best ${ST.bestScore.toLocaleString()}` : '') +
       (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
@@ -2748,6 +2749,7 @@ export function startGame(): () => void {
       G.pausedFrom = G.state;
       G.state = 'paused';
       audio.setPaused(true);
+      renderPauseBlessings($('paused'), G.bless);
       showScreen('paused');
       renderTrialObjective();
     }

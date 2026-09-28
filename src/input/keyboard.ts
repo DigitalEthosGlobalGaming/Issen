@@ -54,7 +54,7 @@ export function bindKeyboard(actions: KeyboardActions): () => void {
       return;
     }
     if (phase === 'paused') {
-      if (!onButton) actions.resume();
+      if (event.key === 'Escape' || event.key === 'p') actions.resume();
       return;
     }
     if (event.key === 'Escape' || event.key === 'p') {

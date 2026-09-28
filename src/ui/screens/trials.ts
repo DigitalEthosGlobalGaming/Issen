@@ -20,28 +20,31 @@ export function renderTrials(
   const doc = root.ownerDocument;
   const unlocked = trialsUnlocked(roninWave);
   root.querySelector('#trialsAccess')!.textContent = unlocked
-    ? `${progress.completed.length} / ${TRIALS.length} completed · Master the encounter, earn its reward.`
-    : `Reach wave 10 in Ronin Waves to unlock Trials. Best: ${Math.floor(roninWave)} / 10. Endless does not count.`;
+    ? `Trials · ${progress.completed.length}/${TRIALS.length} complete`
+    : `Ronin wave 10 required · ${Math.floor(roninWave)}/10`;
   const outcome = root.querySelector<HTMLElement>('#trialResult')!;
   outcome.replaceChildren();
   outcome.hidden = !result;
   if (result) {
     const trial = TRIALS.find((entry) => entry.id === result.id)!;
     const heading = doc.createElement('h3');
-    heading.textContent = `${result.passed ? 'Trial complete' : 'Try again'} · ${trial.name}`;
+    heading.textContent = `${result.passed ? 'Complete' : 'Failed'} · ${trial.name}`;
     const message = doc.createElement('p');
     message.textContent = result.message;
     const reward = doc.createElement('p');
     reward.textContent = result.passed
-      ? `${result.newlyCompleted ? 'Unlocked' : 'Already earned'}: ${trial.reward.n} ${ITEM_TYPE_LABEL[trial.reward.type]}. Equip it in the Armoury.`
-      : 'Your best attempt starts with the next cut.';
+      ? `${result.newlyCompleted ? 'Unlocked' : 'Earned'}: ${trial.reward.n} ${ITEM_TYPE_LABEL[trial.reward.type]}`
+      : '';
     const retry = doc.createElement('button');
     retry.className = 'btn primary';
     retry.type = 'button';
-    retry.textContent = 'Retry trial';
+    retry.textContent = 'Retry';
     retry.disabled = !unlocked;
     retry.onclick = () => start(trial.id);
-    outcome.append(heading, message, reward, retry);
+    outcome.append(heading);
+    if (result.message) outcome.append(message);
+    if (result.passed) outcome.append(reward);
+    outcome.append(retry);
   }
   const list = root.querySelector('#trialList')!;
   list.replaceChildren();
@@ -51,19 +54,20 @@ export function renderTrials(
     const heading = doc.createElement('h3');
     heading.textContent = `${progress.completed.includes(trial.id) ? '✓ ' : ''}${trial.name}`;
     const description = doc.createElement('p');
-    description.textContent = trial.description;
+    description.textContent = trial.objective;
     const reward = doc.createElement('p');
     reward.className = 'trial-reward';
-    reward.textContent = `${trial.reward.k} · ${trial.reward.n} · ${ITEM_TYPE_LABEL[trial.reward.type]}`;
+    reward.textContent = `Reward: ${trial.reward.n} ${ITEM_TYPE_LABEL[trial.reward.type]}`;
     const button = doc.createElement('button');
     button.type = 'button';
     button.className = 'btn';
     button.dataset.trial = trial.id;
     button.textContent = !unlocked
-      ? 'Locked · Ronin wave 10'
+      ? 'Locked'
       : progress.completed.includes(trial.id)
-        ? 'Replay trial'
-        : 'Begin trial';
+        ? 'Replay'
+        : 'Begin';
+    button.setAttribute('aria-label', `${button.textContent} ${trial.name}: ${trial.objective}`);
     button.disabled = !unlocked;
     button.onclick = () => start(trial.id);
     card.append(heading, description, reward, button);

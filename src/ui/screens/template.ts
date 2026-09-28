@@ -63,14 +63,9 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     description.textContent = upgrade.description;
     const current = document.createElement('p');
     const next = document.createElement('p');
-    const eligibility = document.createElement('p');
     const value = (n: number) => effectText(upgrade.id, n);
     current.textContent = `Current: ${value(rank)}`;
     if (rank < upgrade.maxRank) next.textContent = `Next: ${value(rank + 1)}`;
-    eligibility.textContent =
-      upgrade.id === 'awakening'
-        ? 'Challenges become available in the Armoury after purchase.'
-        : 'Applies to guided Normal Waves on Normal difficulty with Normal lives and permanent upgrades On.';
     const buy = document.createElement('button');
     buy.className = 'btn';
     buy.textContent = blocked
@@ -86,9 +81,10 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
         root.querySelector<HTMLElement>('.template-detail')?.focus();
       }
     };
-    card.append(illustration(upgrade.id), title, description, current);
+    card.append(illustration(upgrade.id), title, description);
+    if (rank > 0) card.append(current);
     if (rank < upgrade.maxRank) card.append(next);
-    card.append(eligibility, buy);
+    card.append(buy);
     details.append(card);
   }
 }
@@ -96,7 +92,7 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
     case 'vitality':
-      return `${2 + rank} Normal starting lives before equipment bonuses`;
+      return `${2 + rank} starting lives`;
     case 'focus':
       return rank ? `Duel parry window ${rank * 5}% longer` : 'Standard duel parry window';
     case 'offerings':

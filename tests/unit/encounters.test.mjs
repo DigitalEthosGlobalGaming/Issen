@@ -23,6 +23,50 @@ test('feint probability and attack speed respect bounds and equipment', () => {
   assert.equal(waveConfig(7, 'normal', custom).gap, waveConfig(7, 'normal', normal).gap * 1.5);
 });
 
+test('waves 7–12 ease the third stage and ramp into late pressure in both modes', () => {
+  const neutral = computeModifiers([], new Set());
+  for (const [mode, expected] of [
+    [
+      'normal',
+      [
+        [11, 0.16, 1.65],
+        [12, 0.18, 1.55],
+        [13, 0.2, 1.5],
+        [13, 0.2, 1.45],
+        [16, 0.3, 1.32],
+        [19, 0.4, 1.1],
+        [22, 0.5, 0.87],
+      ],
+    ],
+    [
+      'ronin',
+      [
+        [15, 0.3, 1.14],
+        [16, 0.28, 1.12],
+        [16, 0.3, 1.08],
+        [16, 0.3, 1.04],
+        [18, 0.36, 0.98],
+        [20, 0.43, 0.85],
+        [22, 0.5, 0.72],
+      ],
+    ],
+  ]) {
+    for (let wave = 6; wave <= 12; wave++) {
+      const actual = waveConfig(wave, mode, neutral);
+      const [total, feint, atk] = expected[wave - 6];
+      assert.equal(actual.total, total, `${mode} wave ${wave} count`);
+      assert.ok(Math.abs(actual.feint - feint) < 0.0001, `${mode} wave ${wave} feints`);
+      assert.ok(Math.abs(actual.atk - atk) < 0.001, `${mode} wave ${wave} attack`);
+    }
+  }
+  const custom = computeModifiers([{ feint: 0.1, atk: 1.2, gap: 1.5 }], new Set(['calm']));
+  const base = waveConfig(8, 'normal', neutral);
+  const changed = waveConfig(8, 'normal', custom);
+  assert.ok(Math.abs(changed.feint - 0.15) < 0.0001);
+  assert.ok(Math.abs(changed.atk - base.atk * 1.2) < 0.0001);
+  assert.ok(Math.abs(changed.gap - base.gap * 1.5) < 0.0001);
+});
+
 test('boss windows retain difficulty floors and equipment scaling', () => {
   const modifiers = computeModifiers([{ parry: 1.5, stag: 2 }], new Set());
   const late = bossParameters(100, 'normal', modifiers);

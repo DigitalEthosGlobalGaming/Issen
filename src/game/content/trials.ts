@@ -4,6 +4,7 @@ export interface TrialDefinition {
   id: string;
   name: string;
   description: string;
+  objective: string;
   seed: number;
   arrows: boolean;
   wave?: { total: number; attack: number; feint: number; perfects: number };
@@ -19,6 +20,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'Unbroken',
     seed: 1101,
     arrows: true,
+    objective: '20 cuts. No mistakes.',
     description:
       'Cut 20 ordered opponents without a mistake. Their attacks take around 1.2 seconds.',
     wave: { total: 20, attack: 1.2, feint: 0, perfects: 0 },
@@ -35,6 +37,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'True Edge',
     seed: 2202,
     arrows: true,
+    objective: '10 perfect cuts in 12. No hits.',
     description: 'Cut 12 opponents without a mistake. Land at least 10 perfect cuts.',
     wave: { total: 12, attack: 1.5, feint: 0, perfects: 10 },
     reward: {
@@ -50,6 +53,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'Still Water',
     seed: 3303,
     arrows: true,
+    objective: '16 feinting foes. No hits.',
     description: 'Cut 16 opponents without a mistake. Every blade feints; wait for it to turn.',
     wave: { total: 16, attack: 1.35, feint: 1, perfects: 0 },
     reward: {
@@ -65,6 +69,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'Read the Blade',
     seed: 4404,
     arrows: false,
+    objective: '16 foes. No arrows or hits.',
     description:
       'Cut 16 opponents without arrows or mistakes. Read the blade; some opponents feint.',
     wave: { total: 16, attack: 1.3, feint: 0.35, perfects: 0 },
@@ -81,6 +86,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'Two Glints',
     seed: 5505,
     arrows: true,
+    objective: 'Defeat Twin Fang. No hits.',
     description: 'Defeat the Twin Fang in a Ronin duel without taking a hit. Parry both glints.',
     bosses: [4],
     reward: {
@@ -96,6 +102,7 @@ export const TRIALS: readonly TrialDefinition[] = [
     name: 'Three Masters',
     seed: 6606,
     arrows: true,
+    objective: 'Defeat three masters. No mistakes.',
     description:
       'Defeat Kagemaru, Twin Fang and the Mirror in Ronin duels. No hits, wrong counters or missed openings.',
     bosses: [1, 4, 6],

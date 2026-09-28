@@ -3,7 +3,7 @@
 Trials is a separate title-menu mode, unlocked by reaching **wave 10 in Ronin
 Waves** (after the third duel). The existing `issen.stats.roninWave` record grants
 access to established players too. Boss Rush and Endless do not advance that
-record. Locked players can inspect the challenges and rewards.
+record. The title button appears only after that milestone is saved.
 
 ## Encounters and rewards
 
@@ -53,7 +53,7 @@ are cosmetic and can be equipped in the Armoury in other modes.
 `tests/unit/trials.test.mjs` covers access, malformed completion data, full
 objectives and idempotent reward reconciliation. Existing effect tests exercise
 the new kill effects' finite particles, expiry and preview isolation.
-`tests/browser/trials.spec.ts` covers the locked menu, portrait/landscape overflow,
+`tests/browser/trials.spec.ts` covers the hidden title entry before access, portrait/landscape overflow,
 live failure/retry/quit, all six successful combat sequences, insufficient
 perfect cuts, seeded replay, reload persistence, equipping all six cosmetic
 rewards and profile isolation. The renderer test iterates the film catalog,

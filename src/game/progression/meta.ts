@@ -41,7 +41,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
   {
     id: 'vitality',
     name: 'Vitality',
-    description: 'Add 1 starting life per rank in Normal Waves. Equipment bonuses stack.',
+    description: '+1 starting life per rank.',
     costs: [100, 200, 350],
     maxRank: 3,
   },
@@ -64,7 +64,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'awakening',
     name: 'Awakening Access',
     description:
-      'Unlock Blade Awakening challenges, then Outfit Awakening challenges. Complete them in the Armoury to activate new forms.',
+      'Unlock Blade Awakening challenges, then Outfit Awakening challenges in the Armoury.',
     costs: [200, 300],
     maxRank: 2,
   },

@@ -280,6 +280,10 @@ export function createAudio(initialMuted: boolean) {
       tn({ f0: 1318, dur: 0.6, g: 0.1 });
       tn({ f0: 1976, dur: 0.8, g: 0.08, delay: 0.12 });
     },
+    reveal() {
+      tn({ f0: 880, f1: 1175, dur: 0.24, g: 0.16 });
+      tn({ f0: 1760, dur: 0.3, g: 0.11, delay: 0.06 });
+    },
   };
   function ambient(raw: number, w: string | null) {
     if (!A.ctx || A.muted || A.paused) return;

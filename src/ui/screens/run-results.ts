@@ -5,6 +5,9 @@ export interface ResultReveal {
   name: string;
   kind: string;
   description: string;
+  benefit?: string;
+  tradeoff?: string;
+  item?: boolean;
 }
 
 export interface RunResults {
@@ -14,7 +17,7 @@ export interface RunResults {
 }
 
 /** A presentation-only sequence. Rewards and unlocks must already be settled. */
-export function createRunResults(root: HTMLElement): RunResults {
+export function createRunResults(root: HTMLElement, onUnlock?: () => void): RunResults {
   const sequence = root.querySelector<HTMLElement>('#runResultSequence');
   const summary = root.querySelector<HTMLElement>('#overSummary');
   const number = root.querySelector<HTMLElement>('#resultEmbers');
@@ -22,8 +25,23 @@ export function createRunResults(root: HTMLElement): RunResults {
   const label = root.querySelector<HTMLElement>('#resultLabel');
   const kind = root.querySelector<HTMLElement>('#resultKind');
   const description = root.querySelector<HTMLElement>('#resultDescription');
+  const glyph = root.querySelector<HTMLElement>('.result-flame');
+  const benefit = root.querySelector<HTMLElement>('#resultBenefit');
+  const tradeoff = root.querySelector<HTMLElement>('#resultTradeoff');
   const accessible = root.querySelector<HTMLElement>('#resultAccessible');
-  if (!sequence || !summary || !number || !gain || !label || !kind || !description || !accessible)
+  if (
+    !sequence ||
+    !summary ||
+    !number ||
+    !gain ||
+    !label ||
+    !kind ||
+    !description ||
+    !accessible ||
+    !glyph ||
+    !benefit ||
+    !tradeoff
+  )
     throw new Error('Missing run result sequence element');
 
   let reward: RewardSettlement = { before: 0, gained: 0, after: 0 };
@@ -43,6 +61,8 @@ export function createRunResults(root: HTMLElement): RunResults {
     animating = false;
     sequence.classList.remove('animating');
     if (step === 0) {
+      glyph.textContent = '火';
+      benefit.hidden = tradeoff.hidden = true;
       number.textContent = reward.after.toLocaleString();
       gain.hidden = true;
       accessible.textContent = `${reward.gained} Embers earned. ${reward.after} available.`;
@@ -63,6 +83,8 @@ export function createRunResults(root: HTMLElement): RunResults {
     animating = !reduceMotion() && (step > 0 || reward.gained > 0);
     sequence.classList.toggle('animating', animating);
     if (step === 0) {
+      glyph.textContent = '火';
+      benefit.hidden = tradeoff.hidden = true;
       sequence.classList.toggle('has-gain', reward.gained > 0);
       label.textContent = 'Embers gathered';
       kind.textContent = '';
@@ -88,10 +110,16 @@ export function createRunResults(root: HTMLElement): RunResults {
       } else finishAnimation();
     } else {
       const reveal = reveals[step - 1]!;
+      glyph.textContent = reveal.key;
       label.textContent = reveal.name;
       kind.textContent = reveal.kind;
       description.textContent = reveal.description;
-      accessible.textContent = `${reveal.kind} unlocked: ${reveal.name}. ${reveal.description}`;
+      benefit.textContent = reveal.benefit ? `+ ${reveal.benefit}` : '';
+      tradeoff.textContent = reveal.tradeoff ? `− ${reveal.tradeoff}` : '';
+      benefit.hidden = !reveal.benefit;
+      tradeoff.hidden = !reveal.tradeoff;
+      accessible.textContent = `${reveal.kind} unlocked: ${reveal.name}. ${reveal.description} ${benefit.textContent} ${tradeoff.textContent}`;
+      if (reveal.item) onUnlock?.();
       if (animating) timeout = window.setTimeout(finishAnimation, 650);
       else finishAnimation();
     }

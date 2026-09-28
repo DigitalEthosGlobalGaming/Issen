@@ -60,6 +60,7 @@ test('landing cue is a short low impact with restrained metal and finite envelop
   try {
     const audio = createAudio(false);
     audio.init();
+    const master = nodes.find((node) => node.kind === 'gain');
     nodes.length = 0;
     audio.cues.clink();
     const tones = nodes.filter((n) => n.kind === 'tone');
@@ -76,6 +77,12 @@ test('landing cue is a short low impact with restrained metal and finite envelop
     for (const n of nodes)
       for (const p of [n.gain, n.frequency])
         assert.ok(p.events.flat().every((value) => Number.isFinite(value) && value > 0));
+    nodes.length = 0;
+    audio.cues.reveal();
+    assert.equal(nodes.filter((node) => node.kind === 'tone').length, 2);
+    assert.ok(nodes.filter((node) => node.kind === 'tone').every((node) => node.stopAt < 1.42));
+    audio.setMuted(true);
+    assert.equal(master.gain.value, 0);
     await audio.dispose();
   } finally {
     if (previous === undefined) delete globalThis.window;

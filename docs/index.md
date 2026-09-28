@@ -1,5 +1,7 @@
 # Repository documentation
 
+- [Feature plan 05 — clearer progression and a fairer third stage](features/feature-plan-05.md):
+  implemented Trials, rewards, Temple, wave-balance and pause-screen changes.
 - [Trials](features/trials.md): Ronin-gated preset mastery encounters, exclusive
   cosmetic rewards, isolated progression and verification.
 
