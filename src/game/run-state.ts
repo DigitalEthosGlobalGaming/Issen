@@ -9,6 +9,8 @@ import type { Random } from '../shared/random.ts';
 import { computeModifiers } from './equipment/modifiers.ts';
 import type { Modifiers } from './equipment/modifiers.ts';
 import { FORTUNES } from './content/fortunes.ts';
+import { createBlessingTriggers } from './shrine/triggered.ts';
+import type { BlessingTriggers } from './shrine/triggered.ts';
 
 export type RunPhase =
   'title' | 'playing' | 'boss' | 'between' | 'standoff' | 'shrine' | 'dead' | 'over' | 'paused';
@@ -51,6 +53,7 @@ export interface RunState {
   event: 'blood' | 'fog' | null;
   wardUsed: boolean;
   runWards: number;
+  blessingTriggers: BlessingTriggers;
   m: Modifiers;
   so: Standoff | null;
   lastEv: number;
@@ -138,6 +141,7 @@ export function createRunState(savedHints: unknown = {}): RunState {
     event: null,
     wardUsed: false,
     runWards: 0,
+    blessingTriggers: createBlessingTriggers(),
     m: computeModifiers([], new Set()),
     so: null,
     lastEv: -9,
@@ -251,6 +255,7 @@ export function resetRun(
     manekiN: 0,
     scars: 0,
     bless: new Set<string>(),
+    blessingTriggers: createBlessingTriggers(),
     lostLife: false,
     zanKey: -1,
     slowT: 0,

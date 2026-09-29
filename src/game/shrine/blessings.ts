@@ -13,6 +13,7 @@ export interface BlessingState {
   lives: number;
   maxLives: number;
   runWards: number;
+  maxKnives?: number;
 }
 
 /** Effects with a real duel, score, or life consumer in boss rush. Keep this
@@ -44,9 +45,25 @@ export function blessingEligible(state: BlessingState, blessing: Blessing): bool
   return (
     !state.bless.has(blessing.id) &&
     (!state.rush || BOSS_RUSH_BLESSINGS.has(blessing.id)) &&
+    (blessing.id !== 'knifedance' || (state.maxKnives ?? 0) > 0) &&
     (!blessing.lives || (!state.zen && !state.hard)) &&
-    (blessing.id !== 'blood' || state.lives > 1)
+    (blessing.id !== 'blood' || state.lives > 1) &&
+    (blessing.id !== 'crossroads' || availableCurses(state).length > 0)
   );
+}
+
+function availableCurses(state: BlessingState): Blessing[] {
+  return BLESS.filter((b) => b.t === 2 && blessingEligible(state, b));
+}
+
+/** Crossroads always grants an eligible curse immediately; randomness is run seeded. */
+export function crossroadsCurse(state: BlessingState, random: Random): Blessing | null {
+  const curses = availableCurses(state);
+  if (!curses.length) return null;
+  const curse = curses[Math.floor(random() * curses.length)]!;
+  state.bless.add(curse.id);
+  applyBlessing(state, curse.id, random);
+  return curse;
 }
 
 function twinTargets(state: BlessingState): number {

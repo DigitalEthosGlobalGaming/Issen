@@ -48,7 +48,7 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
   });
   await page.goto('/');
   await page.locator('#bPlay').click();
-  await expect(page.locator('#setupLoadout')).toContainText('Normal lives: 5');
+  await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');
   await page.locator('[data-k="upgrades"] [data-v="0"]').click();
   await expect(page.locator('#setupLoadout')).toBeEmpty();

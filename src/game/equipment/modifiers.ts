@@ -150,5 +150,6 @@ export function computeModifiers(
     m.noArc = 1;
     m.score *= 1.7;
   }
+  if (B.has('crossroads')) m.shrineN += 2;
   return m;
 }

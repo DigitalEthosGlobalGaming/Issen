@@ -1,6 +1,7 @@
 import type { RunState, Screen } from '../game/run-state.ts';
 import { comboMultiplier } from '../game/progression/scoring.ts';
 import { TIER, BLESS_BY } from '../game/content/blessings.ts';
+import { availableWards } from '../game/shrine/triggered.ts';
 
 export const SCREENS: readonly Screen[] = [
   'title',
@@ -28,6 +29,9 @@ type HudState = Pick<
   | 'combo'
   | 'maxCombo'
   | 'm'
+  | 'wardUsed'
+  | 'runWards'
+  | 'blessingTriggers'
 > &
   Partial<Pick<RunState, 'knives' | 'maxKnives' | 'upgradesEnabled'>>;
 
@@ -58,6 +62,14 @@ export function createHud(root: HTMLElement) {
 
   function renderLives(run: HudState): void {
     health(lives, run.zen || run.hard ? 0 : run.maxLives || 2, run.lives);
+    const wards = availableWards(run);
+    lives.classList.toggle('warded', wards > 0);
+    lives.setAttribute(
+      'aria-label',
+      wards
+        ? `${run.lives} lives, ${wards} ${wards === 1 ? 'ward' : 'wards'} ready`
+        : `${run.lives} lives`,
+    );
   }
 
   function render(run: HudState, visible: boolean): void {

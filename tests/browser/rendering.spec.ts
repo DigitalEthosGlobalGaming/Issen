@@ -36,6 +36,7 @@ test('Steel third form draws animated lightning along its blade', async ({ page 
   });
   expect(strokes.filter((color) => color === 'rgba(239, 253, 255, 0.96)')).toHaveLength(2);
   expect(strokes).toContain('rgba(24, 172, 255, 0.48)');
+  expect(strokes).not.toContain('rgba(43, 189, 255, 0.5)');
 });
 
 test('player sword is behind the back-facing body', async ({ page }) => {

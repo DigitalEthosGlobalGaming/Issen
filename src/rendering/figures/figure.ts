@@ -49,20 +49,6 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineWidth = 0.011;
       g.stroke();
     }
-    for (let i = 0; i < Math.round(3 * (env.effectDensity ?? 1)); i++) {
-      const x = length * (0.24 + i * 0.25);
-      const side = i % 2 ? 1 : -1;
-      g.beginPath();
-      g.moveTo(x, -length * 0.038 * (x / length));
-      g.lineTo(x + length * 0.05, side * 0.035);
-      g.lineTo(x + length * 0.09, side * 0.07);
-      g.strokeStyle = 'rgba(43,189,255,.5)';
-      g.lineWidth = 0.028;
-      g.stroke();
-      g.strokeStyle = 'rgba(242,253,255,.9)';
-      g.lineWidth = 0.005;
-      g.stroke();
-    }
   }
   function drawSleeve(s: number, lx: number, C: Palette, d: FigureSeed, t: number, wv: number) {
     g.fillStyle = s < 0 ? C.robeD : C.robe;

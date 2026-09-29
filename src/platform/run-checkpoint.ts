@@ -7,6 +7,7 @@ import type { RunRewardLedger } from '../game/progression/run-rewards.ts';
 import type { WeatherState } from '../rendering/scene/weather-state.ts';
 import { store } from './storage.ts';
 import { STAGES } from '../game/content/stages.ts';
+import { createBlessingTriggers } from '../game/shrine/triggered.ts';
 
 const KEY = 'issen.runCheckpoint';
 export interface RunCheckpoint {
@@ -126,6 +127,21 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
     !Number.isSafeInteger(raw.bossMilestone)
   )
     return null;
+  const triggers = run.blessingTriggers;
+  if (triggers !== undefined) {
+    if (!record(triggers)) return null;
+    const defaults = createBlessingTriggers();
+    for (const [key, fallback] of Object.entries(defaults)) {
+      const value = triggers[key];
+      if (
+        value !== undefined &&
+        (typeof value !== typeof fallback ||
+          (typeof value === 'number' && (!Number.isSafeInteger(value) || value < 0)))
+      )
+        return null;
+    }
+    run.blessingTriggers = { ...defaults, ...triggers };
+  } else run.blessingTriggers = createBlessingTriggers();
   return raw as unknown as RunCheckpoint;
 }
 export function readRunCheckpoint(): RunCheckpoint | null {

@@ -68,6 +68,38 @@ test('HUD handles life modes, combo scoring, and exclusive screen navigation', a
   });
 });
 
+test('life display outlines an available ward and clears it when spent', async ({ page }) => {
+  await page.goto('/');
+  const states = await page.evaluate(async () => {
+    const { createHud } = await import('/src/ui/hud.ts');
+    const { createRunState } = await import('/src/game/run-state.ts');
+    const root = document.querySelector('#app')!.cloneNode(true) as HTMLElement;
+    const hud = createHud(root);
+    const run = createRunState();
+    run.lives = 2;
+    hud.renderLives(run);
+    const before = root.querySelector('#lives')!.classList.contains('warded');
+    run.blessingTriggers.flourishWard = true;
+    hud.renderLives(run);
+    const protectedState = {
+      outlined: root.querySelector('#lives')!.classList.contains('warded'),
+      label: root.querySelector('#lives')!.getAttribute('aria-label'),
+    };
+    run.blessingTriggers.flourishWard = false;
+    hud.renderLives(run);
+    return {
+      before,
+      protectedState,
+      after: root.querySelector('#lives')!.classList.contains('warded'),
+    };
+  });
+  expect(states).toEqual({
+    before: false,
+    protectedState: { outlined: true, label: '2 lives, 1 ward ready' },
+    after: false,
+  });
+});
+
 test('armory preserves locked equipment and toggles awakened blades only on repeat selection', async ({
   page,
 }) => {

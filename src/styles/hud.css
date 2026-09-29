@@ -43,8 +43,26 @@
   margin-top: 9px;
   padding-left: 2px;
 }
-#lives:empty {
+#lives:empty:not(.warded) {
   display: none;
+}
+#lives.warded {
+  width: max-content;
+  align-items: center;
+  padding: 5px 8px 5px 7px;
+  border: 1px solid rgba(164, 220, 255, 0.9);
+  border-radius: 12px;
+  background: rgba(35, 100, 135, 0.2);
+  box-shadow:
+    0 0 12px rgba(104, 195, 255, 0.55),
+    inset 0 0 8px rgba(104, 195, 255, 0.23);
+}
+#lives.warded::after {
+  content: '守';
+  color: #d3f2ff;
+  font-size: 12px;
+  line-height: 1;
+  text-shadow: 0 0 7px #74caff;
 }
 #lives i {
   width: 10px;

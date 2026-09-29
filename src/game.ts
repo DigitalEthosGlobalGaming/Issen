@@ -65,7 +65,13 @@ import { createEffectRenderer } from './rendering/effects/draw.ts';
 import { createEffects } from './rendering/effects/state.ts';
 import { createEffectQuality, scaledCount } from './rendering/effects/quality.ts';
 import { updateEffects } from './rendering/effects/update.ts';
-import { shrineOffers, applyBlessing } from './game/shrine/blessings.ts';
+import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
+import {
+  startBlessingWave,
+  recordBlessingCut,
+  recordComboBreak,
+  nextBlessingAttacker,
+} from './game/shrine/triggered.ts';
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
@@ -1264,6 +1270,7 @@ export function startGame(): () => void {
     G.wave = n;
     G.event = null;
     G.wardUsed = false;
+    G.blessingTriggers.flourishWard = false;
     G.kikuUsed = 0;
     G.foxUsed = false;
     G.kagamiUsed = false;
@@ -1281,8 +1288,10 @@ export function startGame(): () => void {
   }
   function startWave(n: number, skipEvent = false) {
     G.wave = n;
+    startBlessingWave(G);
     G.event = null;
     G.wardUsed = false;
+    renderLives();
     G.kikuUsed = 0;
     G.foxUsed = false;
     G.kagamiUsed = false;
@@ -1390,6 +1399,18 @@ export function startGame(): () => void {
       {
         spawn: (slot) => spawnEnemy(slot),
         attack: (c) => {
+          const blessing = nextBlessingAttacker(G);
+          if (blessing === 'lightning') {
+            const p = c.pos;
+            effectSpawner().killFx('bolt', p.x, p.y - p.h * 0.55, -Math.PI / 2, p.h / 160);
+            killEnemy(c, c.dir, true, true);
+            pop(p.x, p.y - p.h, '雷', Math.max(20, 26 * S));
+            return;
+          }
+          if (blessing === 'hesitate') {
+            c.T += 0.75;
+            pop(c.pos.x, c.pos.y - c.pos.h, '間', Math.max(18, 22 * S));
+          }
           sfx.step();
           dust(c.pos.x, c.pos.y, c.pos.h * 0.4);
         },
@@ -1405,7 +1426,7 @@ export function startGame(): () => void {
       combatRandom,
     );
   }
-  function killEnemy(e: Enemy, dir: Direction, chained = false) {
+  function killEnemy(e: Enemy, dir: Direction, chained = false, preserveStreak = false) {
     const wasAtk = e === G.attacker,
       p = e.state === 'attack' ? clamp(e.p) : 0,
       perfect =
@@ -1448,7 +1469,8 @@ export function startGame(): () => void {
       G.attacker = null;
       G.gapT = waveConfiguration().gap;
     }
-    G.combo++;
+    const comboGrew = perfect || !G.bless.has('oath');
+    if (comboGrew) G.combo++;
     G.kills++;
     ST.kills++;
     earn('kill');
@@ -1519,6 +1541,24 @@ export function startGame(): () => void {
         challenge('p');
       }
       G.pStreak++;
+      if (!chained) {
+        const reward = recordBlessingCut(G, true);
+        if (reward.knife) {
+          G.knives++;
+          hud(true);
+          pop(P0.x, P0.y - P0.h * 1.4, 'Knife +1');
+        }
+        if (reward.precisionWard) {
+          renderLives();
+          pop(P0.x, P0.y - P0.h * 1.4, 'Ward ready');
+        }
+        if (reward.stormCharged) pop(P0.x, P0.y - P0.h * 1.5, 'Lightning charged');
+        if (reward.rekindled) {
+          bumpCombo();
+          setScore();
+          pop(P0.x, P0.y - P0.h * 1.5, `Rekindle +${reward.rekindled}`);
+        }
+      }
       ST.bestPStreak = Math.max(ST.bestPStreak, G.pStreak);
       G.petT = 0.7;
       if (G.m.freeze) {
@@ -1549,7 +1589,10 @@ export function startGame(): () => void {
       buzz([10, 30, 30]);
       if (pts) void 0;
     } else {
-      if (wasAtk) G.pStreak = 0;
+      if (!preserveStreak) {
+        if (wasAtk) G.pStreak = 0;
+        if (!chained) recordBlessingCut(G, false);
+      }
       addScore(
         Math.round((100 + (wasAtk ? 40 : 20)) * comboMult() * G.m.normal),
         P0.x,
@@ -1559,15 +1602,26 @@ export function startGame(): () => void {
       hitStop = 0.055;
       flash(0.08);
     }
+    if (
+      !chained &&
+      perfect &&
+      G.bless.has('finalflourish') &&
+      G.toSpawn <= 0 &&
+      !G.pendingSpawns.length &&
+      !G.enemies.some(
+        (other) => other.state === 'idle' || other.state === 'attack' || other.state === 'enter',
+      )
+    )
+      G.blessingTriggers.flourishPending = true;
     if (activeTrial) trialFailure ||= trialFailureAfterCut(activeTrial, G) || '';
-    if (G.combo % 10 === 0 && G.m.comboBonus)
+    if (comboGrew && G.combo > 0 && G.combo % 10 === 0 && G.m.comboBonus)
       addScore((G.m.comboBonus * G.combo) / 10, 0, 0, '歌舞伎');
-    if (G.combo % 10 === 0 && G.m.furin) {
+    if (comboGrew && G.combo > 0 && G.combo % 10 === 0 && G.m.furin) {
       G.slowT = Math.max(G.slowT, 2);
       pop(0, 0, '風鈴');
       sfx.chime();
     }
-    if (G.combo % 10 === 0) {
+    if (comboGrew && G.combo > 0 && G.combo % 10 === 0) {
       stamp(kanji(G.combo) + '連', W / 2, H * 0.2, Math.max(40, 54 * S), false, 1.2);
       gustLeaves(26);
       sfx.drum();
@@ -1728,6 +1782,8 @@ export function startGame(): () => void {
 
   /* ---------------- boss ---------------- */
   function startBoss() {
+    G.blessingTriggers.flourishWard = false;
+    renderLives();
     G.bossCount++;
     const b = createBoss(G.bossCount, G.mode, G.m, bossPos),
       { def, lap } = b;
@@ -2170,10 +2226,19 @@ export function startGame(): () => void {
       pop(W / 2, H * 0.4, 'Composure · combo kept');
       return;
     }
+    const previous = G.combo;
     G.combo = G.bless && G.bless.has('banner') && G.combo >= 10 ? 10 : 0;
+    if (G.combo < previous) recordComboBreak(G, previous);
   }
   function applyPick(id: string) {
     const extras = applyBlessing(G, id, combatRandom);
+    if (id === 'crossroads') {
+      const curse = crossroadsCurse(G, combatRandom);
+      if (curse) {
+        ST.curses++;
+        toast({ k: curse.k, msg: `Crossroads curse: ${curse.n}` });
+      }
+    }
     renderLives();
     if (extras.length)
       toast({ k: '双', msg: 'Twin blessing: ' + extras.map((b) => b.n).join(' and ') });
@@ -2254,6 +2319,7 @@ export function startGame(): () => void {
       label = label || '菊';
     }
     const lost = G.combo;
+    recordBlessingCut(G, false);
     if (!keep) {
       breakCombo();
       G.pStreak = 0;
@@ -2309,9 +2375,8 @@ export function startGame(): () => void {
       saveStats();
       checkUnlocks();
     }
-    const oldLives = G.lives,
-      outcome = resolveDamage(G, reason);
-    if (oldLives !== G.lives) renderLives();
+    const outcome = resolveDamage(G, reason);
+    renderLives();
     if (outcome.kind === 'hurt') {
       if (outcome.lifeLost) inkPulse = 1;
       struck(killer, outcome.keepCombo, outcome.label);
@@ -2461,25 +2526,8 @@ export function startGame(): () => void {
       hasVitality: () => META.upgrades.vitality >= 1,
       getReveals: () => pendingModeReveals(META),
       getLoadoutSummary: () => {
-        const enabled = SETUP.upgrades !== false && META.upgrades.awakening > 0;
-        const blade =
-          enabled && EQ.bladeThird && UNL.has('steel++')
-            ? STEEL_THIRD.m
-            : enabled && EQ.bladeSp && UNL.has(EQ.blade + '+')
-              ? SPECIAL[EQ.blade]?.m
-              : ITEM_BY[EQ.blade]?.m;
-        const robe =
-          enabled && META.upgrades.awakening >= 2 && EQ.robeSp && UNL.has(EQ.robe + '+')
-            ? ROBE_AWAKENINGS[EQ.robe]?.m
-            : ITEM_BY[EQ.robe]?.m;
-        const mods = computeModifiers(
-          [blade, robe, ITEM_BY[EQ.charm]?.m, templateModifiers(META, SETUP)],
-          new Set(),
-        );
         const power = templatePowers(META, SETUP);
         const summary: string[] = [];
-        const lives = normalLives(mods.lives);
-        if (SETUP.lives === '3' && lives !== 2) summary.push(`Normal lives: ${lives}`);
         if (power.knives > 0) summary.push(`${power.knives} knives`);
         if (power.composure > 0) summary.push(`${power.composure} combo protections`);
         if (EQ.charm === 'omikuji') summary.push('Fortune rolled at run start');

@@ -61,6 +61,10 @@ rewards and records have been written.
 timing. The runtime applies it to leaves, weather and effect spawning while
 keeping the restorable gameplay random stream independent.
 
+`game/shrine/triggered.ts` owns the counters and wards for triggered blessings.
+`game/shrine/blessings.ts` owns offer eligibility, immediate effects and forced
+Crossroads curses. The runtime connects cut, attack, wave and Shrine events.
+
 ## Boundaries that matter
 
 - Feature functions receive explicit state and dependencies. Randomized rules
