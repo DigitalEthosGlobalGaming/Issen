@@ -64,6 +64,7 @@ export interface Figure {
 }
 export interface FigureEnvironment {
   time: number;
+  effectDensity?: number;
   wind: number;
   petActive: boolean;
   width: number;

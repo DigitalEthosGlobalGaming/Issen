@@ -1,5 +1,43 @@
 import { expect, test } from '@playwright/test';
 
+test('Steel third form draws animated lightning along its blade', async ({ page }) => {
+  await page.goto('/');
+  const strokes = await page.evaluate(async () => {
+    const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
+    const { createPalette } = await import('/src/rendering/palette.ts');
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d')!;
+    const palette = createPalette().fog(0, [146, 141, 132]);
+    const strokes: string[] = [];
+    const g = new Proxy(context, {
+      get(target, key) {
+        if (key === 'stroke')
+          return () => {
+            strokes.push(String(target.strokeStyle));
+            return target.stroke();
+          };
+        const value = Reflect.get(target, key, target);
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+      set(target, key, value) {
+        return Reflect.set(target, key, value, target);
+      },
+    });
+    createFigureRenderer(g, {
+      time: 1,
+      wind: 0,
+      petActive: false,
+      width: 400,
+      height: 400,
+      palette: () => palette,
+      random: () => 0.5,
+    }).drawSword(0, 0, 0, palette, { len: 0.52, aura: { c: '170,225,255', mode: 'third' } });
+    return strokes;
+  });
+  expect(strokes.filter((color) => color === 'rgba(239, 253, 255, 0.96)')).toHaveLength(2);
+  expect(strokes).toContain('rgba(24, 172, 255, 0.48)');
+});
+
 test('player sword is behind the back-facing body', async ({ page }) => {
   await page.goto('/');
   const order = await page.evaluate(async () => {
