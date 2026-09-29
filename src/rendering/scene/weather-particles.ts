@@ -2,6 +2,7 @@ import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import type { Weather } from '../../game/content/stages.ts';
 import type { WeatherParticle, Bamboo } from './weather-state.ts';
+import { scaledCount } from '../effects/quality.ts';
 function particle(
   values: Pick<WeatherParticle, 'x' | 'y' | 'z'> & Partial<WeatherParticle>,
 ): WeatherParticle {
@@ -13,21 +14,22 @@ export function createWeatherParticles(
   H: number,
   S: number,
   R: Random = Math.random,
+  density = 1,
 ) {
   const wx: WeatherParticle[] = [],
     bamboo: Bamboo[] = [];
   if (w === 'rain' || w === 'storm') {
-    const n = Math.round((W * H) / (w === 'storm' ? 1600 : 2000));
+    const n = scaledCount((W * H) / (w === 'storm' ? 1600 : 2000), density);
     for (let i = 0; i < n; i++)
       wx.push(particle({ x: R() * W, y: R() * H, z: 0.5 + R(), l: (10 + R() * 18) * S }));
   }
   if (w === 'snow') {
-    const n = Math.round((W * H) / 4500);
+    const n = scaledCount((W * H) / 4500, density);
     for (let i = 0; i < n; i++)
       wx.push(particle({ x: R() * W, y: R() * H, z: 0.4 + R() * 1.4, ph: R() * TAU }));
   }
   if (w === 'sakura') {
-    const n = Math.round((W * H) / 9000);
+    const n = scaledCount((W * H) / 9000, density);
     for (let i = 0; i < n; i++)
       wx.push(
         particle({
@@ -42,7 +44,7 @@ export function createWeatherParticles(
       );
   }
   if (w === 'smoke') {
-    const n = Math.round((W * H) / 7000);
+    const n = scaledCount((W * H) / 7000, density);
     for (let i = 0; i < n; i++)
       wx.push(particle({ x: R() * W, y: R() * H, z: 0.4 + R(), ph: R() * TAU }));
   }

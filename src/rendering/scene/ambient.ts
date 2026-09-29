@@ -1,5 +1,6 @@
 import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
+import { scaledCount } from '../effects/quality.ts';
 export interface GrassBlade {
   x: number;
   y: number;
@@ -28,9 +29,11 @@ export interface AmbientEnvironment {
   scale: number;
   layout: { groundY: number; eH: number };
   random: Random;
+  density?: number;
 }
 export function createAmbient(env: AmbientEnvironment) {
   const { width: W, height: H, scale: S, layout: L, random: R } = env;
+  const count = (n: number) => scaledCount(n, env.density);
   function buildGrass(gl: number) {
     const fg: GrassBlade[] = [];
     const n = Math.round(W / 3);
@@ -89,12 +92,12 @@ export function createAmbient(env: AmbientEnvironment) {
   }
   function buildLeaves() {
     const leaves: Leaf[] = [];
-    const n = Math.round(38 + (W * H) / 11000);
+    const n = count(38 + (W * H) / 11000);
     for (let i = 0; i < n; i++) leaves.push(newLeaf(true));
     return leaves;
   }
   function gustLeaves(leaves: Leaf[], n: number) {
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < count(n); i++) {
       const l = newLeaf(false);
       l.z = 1.35 + R() * 1.1;
       l.s = (4 + R() * 6) * l.z * S * 1.3;
@@ -103,6 +106,19 @@ export function createAmbient(env: AmbientEnvironment) {
       l.gust = 1;
       l.col = `rgba(14,13,12,${0.7 + R() * 0.25})`;
       leaves.push(l);
+    }
+  }
+  function balanceLeaves(leaves: Leaf[]) {
+    const target = count(38 + (W * H) / 11000);
+    let ordinary = leaves.filter((leaf) => !leaf.gust).length;
+    for (let i = leaves.length - 1; i >= 0 && ordinary > target; i--)
+      if (!leaves[i]!.gust) {
+        leaves.splice(i, 1);
+        ordinary--;
+      }
+    while (ordinary < target) {
+      leaves.push(newLeaf(false));
+      ordinary++;
     }
   }
   function blades(
@@ -153,5 +169,14 @@ export function createAmbient(env: AmbientEnvironment) {
       }
     }
   }
-  return { buildGrass, newLeaf, buildLeaves, gustLeaves, blades, drawLeaves, updateLeaves };
+  return {
+    buildGrass,
+    newLeaf,
+    buildLeaves,
+    gustLeaves,
+    balanceLeaves,
+    blades,
+    drawLeaves,
+    updateLeaves,
+  };
 }

@@ -12,6 +12,9 @@ test('first play starts a run directly and the menu tutorial remains optional', 
   await expect(page.locator('#bResume')).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).runs)).toBe(1);
   await page.reload();
+  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await page.locator('#bEnd').click();
+  await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bTutorial').click();
   await expect(tutorial).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });

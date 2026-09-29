@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { defeatCurrentBoss } from './drive-boss.ts';
 
 // These regressions exercise established gameplay; onboarding has dedicated coverage.
 test.beforeEach(async ({ page }) => {
@@ -19,6 +20,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('boss rush victory opens a shrine and its choice starts the next duel', async ({ page }) => {
+  await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace(
+      'frameLoop.start();',
+      'window.__bossState = () => G.boss; frameLoop.start();',
+    );
+    await route.fulfill({ response, body });
+  });
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.addInitScript(() => {
@@ -58,19 +67,8 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
     page.evaluate((count) => {
       (window as unknown as { advanceGameFrames(count: number): void }).advanceGameFrames(count);
     }, count);
-  const cut = () =>
-    page.evaluate(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-    });
-  await advance(77);
-  await cut();
-  await expect(page.locator('#bossHp .gone')).toHaveCount(1);
-  await advance(54);
-  await cut();
-  await expect(page.locator('#bossHp .gone')).toHaveCount(2);
-  await advance(54);
-  await cut();
+  await defeatCurrentBoss(page);
+  await expect(page.locator('#bossHp .gone')).toHaveCount(3);
   await expect(page.locator('#bossbar')).not.toHaveClass(/on/);
   await advance(52);
   await expect(page.locator('#shrine')).toHaveClass(/on/);

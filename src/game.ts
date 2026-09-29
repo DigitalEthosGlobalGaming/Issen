@@ -63,6 +63,7 @@ import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 import { createEffectSpawner } from './rendering/effects/spawn.ts';
 import { createEffectRenderer } from './rendering/effects/draw.ts';
 import { createEffects } from './rendering/effects/state.ts';
+import { createEffectQuality, scaledCount } from './rendering/effects/quality.ts';
 import { updateEffects } from './rendering/effects/update.ts';
 import { shrineOffers, applyBlessing } from './game/shrine/blessings.ts';
 import { renderShrine } from './ui/screens/shrine.ts';
@@ -99,7 +100,7 @@ import {
 import { createSharing } from './platform/sharing.ts';
 import { createLayout } from './rendering/layout.ts';
 import { BLADES, ROBES } from './game/content/cosmetics.ts';
-import { SPECIAL } from './game/content/awakenings.ts';
+import { SPECIAL, STEEL_THIRD } from './game/content/awakenings.ts';
 import { ROBE_AWAKENINGS } from './game/content/robe-awakenings.ts';
 import { parseAwakeningProgress, recordChallenge } from './game/progression/awakening-progress.ts';
 import type { BladeStats } from './game/progression/statistics.ts';
@@ -109,6 +110,7 @@ import { FORTUNES } from './game/content/fortunes.ts';
 import { BLESS, TIER, TIERNAME, BLESS_BY } from './game/content/blessings.ts';
 import {
   loadStatistics,
+  parseStatistics,
   loadSetup,
   loadUnlocks,
   loadEquipment,
@@ -143,8 +145,14 @@ import {
 } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
 import { TAU, clamp, lerp, easeOut, easeInOut, angDiff } from './shared/math.ts';
-import { rng, shuffle } from './shared/random.ts';
-import { DIRS, OPP, DANG } from './shared/directions.ts';
+import { rng, restorableRng, newRunSeed, shuffle } from './shared/random.ts';
+import {
+  readRunCheckpoint,
+  writeRunCheckpoint,
+  clearRunCheckpoint,
+} from './platform/run-checkpoint.ts';
+import type { RunCheckpoint } from './platform/run-checkpoint.ts';
+import { DIRS, OPP, DANG, directionMatches } from './shared/directions.ts';
 import { kanji, roman } from './shared/format.ts';
 import { buzz } from './platform/haptics.ts';
 export function startGame(): () => void {
@@ -238,6 +246,7 @@ export function startGame(): () => void {
   let trialFailure = '';
   let trialResult: TrialResult | null = null;
   let combatRandom = R;
+  let runRandom = restorableRng(0);
   let runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
   const META = parseMeta(store.get('issen.meta', null), ST, UNL);
   const AWAKENING = parseAwakeningProgress(store.get('issen.awakening', null), ST.bl);
@@ -252,6 +261,98 @@ export function startGame(): () => void {
   let rewardLedger = createRunRewardLedger();
   let runBossMilestone = 0;
   let runItemReveals: ResultReveal[] = [];
+  let savedRun = readRunCheckpoint();
+  let shrineOfferIds: string[] | null = null;
+  function captureCheckpoint(status: RunCheckpoint['status'] = 'active') {
+    if (activeTrial || !['playing', 'boss', 'standoff', 'shrine', 'dead'].includes(G.state)) return;
+    const { card: _card, bless, ...run } = G;
+    const checkpoint: RunCheckpoint = {
+      version: 1,
+      status,
+      seed: G.seed,
+      randomState: runRandom.state(),
+      run: { ...run, bless: [...bless], attacker: null, panel: null },
+      stats: ST,
+      awakening: AWAKENING,
+      meta: META,
+      unlocks: [...UNL],
+      equipment: EQ,
+      setup: SETUP,
+      ledger: rewardLedger,
+      weather: WX,
+      bossMilestone: runBossMilestone,
+      offers: shrineOfferIds,
+    };
+    if (writeRunCheckpoint(checkpoint)) savedRun = readRunCheckpoint();
+    else toast({ k: '!', msg: 'Run could not be saved on this device.' });
+    updateSavedRunButtons();
+  }
+  function updateSavedRunButtons() {
+    const available = savedRun?.status === 'active';
+    $('bContinue').hidden = !available;
+    $('bAbandon').hidden = !available;
+    $('bPlay').textContent = available ? 'Start new run' : 'Draw your blade';
+    for (const id of ['bArmory', 'bStats', 'bTemplate', 'bTutorial', 'bTrials'])
+      ($(id) as HTMLButtonElement).disabled = available;
+    $('tSeed').textContent = available ? `Saved run · seed ${savedRun!.seed}` : '';
+  }
+  function restoreCheckpoint(checkpoint: RunCheckpoint) {
+    Object.assign(ST, parseStatistics(checkpoint.stats));
+    Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
+    Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
+    UNL.clear();
+    for (const id of checkpoint.unlocks) UNL.add(id);
+    Object.assign(SETUP, checkpoint.setup);
+    Object.assign(EQ, parseEquipment(checkpoint.equipment, UNL, ITEMS));
+    Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless), card: null });
+    if (G.so) G.so.e = G.enemies.find((e) => e.challenger) ?? G.so.e;
+    G.attacker = null;
+    G.panel = null;
+    shrineOfferIds = checkpoint.offers;
+    rewardLedger = checkpoint.ledger;
+    runBossMilestone = checkpoint.bossMilestone;
+    runTemplate = templateModifiers(META, SETUP);
+    runRandom = restorableRng(checkpoint.seed);
+    combatRandom = runRandom.next;
+    saveStats();
+    saveAwakening();
+    saveMeta();
+    store.set('issen.unlocks', [...UNL]);
+    store.set('issen.equip', EQ);
+    setStage(G.stage, false);
+    Object.assign(WX, checkpoint.weather);
+    runRandom.restore(checkpoint.randomState);
+    for (const enemy of G.enemies) enemy.pos = enemyPos(enemy);
+    if (G.boss) G.boss.pos = bossPos(G.boss);
+    computeMods();
+    renderLives();
+    setScore();
+    hud(true);
+    $('waveLbl').textContent =
+      G.state === 'boss' ? '決闘' : G.state === 'standoff' ? '挑' : `第${kanji(G.wave)}陣`;
+    if (G.boss) {
+      $('bossK').textContent = G.boss.def.k;
+      $('bossN').textContent = G.boss.def.n;
+      renderHp();
+      $('bossbar').classList.add('on');
+    } else $('bossbar').classList.remove('on');
+  }
+  function continueSavedRun() {
+    if (!savedRun || savedRun.status !== 'active') return;
+    const checkpoint = savedRun;
+    restoreCheckpoint(checkpoint);
+    if (G.state === 'shrine' && shrineOfferIds)
+      showShrineOffers(shrineOfferIds.map((id) => BLESS_BY[id]).filter((bl) => !!bl));
+    else showScreen(null);
+    frameLoop.resetClock();
+  }
+  function abandonSavedRun() {
+    if (!savedRun || savedRun.status !== 'active') return;
+    restoreCheckpoint(savedRun);
+    G.reason = 'quit';
+    captureCheckpoint('ended');
+    showOver();
+  }
   function earn(event: 'kill' | 'wave' | 'boss') {
     if (activeTrial) return;
     accrueRunReward(rewardLedger, event, { zen: G.zen, emberBonus: G.m.emberBonus });
@@ -328,7 +429,14 @@ export function startGame(): () => void {
       });
   }
   function ambient() {
-    return createAmbient({ width: W, height: H, scale: S, layout: L, random: R });
+    return createAmbient({
+      width: W,
+      height: H,
+      scale: S,
+      layout: L,
+      random: R,
+      density: effectQuality.density,
+    });
   }
   function buildGrass() {
     const built = ambient().buildGrass(STAGES[G.stage]!.gl);
@@ -345,10 +453,12 @@ export function startGame(): () => void {
     ambient().gustLeaves(leaves, n);
   }
   let bamboo: Bamboo[] = [],
-    smokeSprite: HTMLCanvasElement | null = null;
-  function buildWeather() {
+    smokeSprite: HTMLCanvasElement | null = null,
+    weatherDensity = 1;
+  function buildWeather(resetSimulation = true) {
     const w = STAGES[G.stage]!.weather;
-    const built = createWeatherParticles(w, W, H, S, R);
+    weatherDensity = effectQuality.density;
+    const built = createWeatherParticles(w, W, H, S, R, weatherDensity);
     wx = built.particles;
     bamboo = built.bamboo;
     if (w === 'smoke') {
@@ -364,7 +474,20 @@ export function startGame(): () => void {
         m.fillRect(0, 0, 128, 128);
       }
     }
-    Object.assign(WX, createWeatherState(R));
+    if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
+  }
+  function rebalanceWeather() {
+    const target = createWeatherParticles(
+      STAGES[G.stage]!.weather,
+      W,
+      H,
+      S,
+      R,
+      effectQuality.density,
+    );
+    if (wx.length > target.particles.length) wx.length = target.particles.length;
+    else if (wx.length < target.particles.length) wx.push(...target.particles.slice(wx.length));
+    weatherDensity = effectQuality.density;
   }
   function buildPost() {
     if (!grainCanv.length) {
@@ -492,6 +615,7 @@ export function startGame(): () => void {
       height: H,
       palette: cols,
       random: R,
+      effectDensity: effectQuality.density,
     });
   }
   function drawFigure(...args: Parameters<ReturnType<typeof createFigureRenderer>['drawFigure']>) {
@@ -647,6 +771,7 @@ export function startGame(): () => void {
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
   let fx = createEffects();
+  const effectQuality = createEffectQuality();
   function powersEnabled() {
     return G.state === 'title' || G.state === 'over' ? SETUP.upgrades !== false : G.upgradesEnabled;
   }
@@ -657,6 +782,15 @@ export function startGame(): () => void {
       EQ.bladeSp &&
       SPECIAL[EQ.blade] &&
       UNL.has(EQ.blade + '+')
+    );
+  }
+  function isSteelThird() {
+    return !!(
+      META.upgrades.awakening &&
+      powersEnabled() &&
+      EQ.blade === 'steel' &&
+      EQ.bladeThird &&
+      UNL.has('steel++')
     );
   }
   function isRobeSp() {
@@ -681,10 +815,22 @@ export function startGame(): () => void {
     saveAwakening();
   }
   function bladeMods() {
-    return isSp() ? SPECIAL[EQ.blade]!.m : (ITEM_BY[EQ.blade] || {}).m;
+    return isSteelThird()
+      ? STEEL_THIRD.m
+      : isSp()
+        ? SPECIAL[EQ.blade]!.m
+        : (ITEM_BY[EQ.blade] || {}).m;
   }
   function bladeStyle() {
     const b = BLADES[EQ.blade];
+    if (isSteelThird())
+      return {
+        ...(b || BASEBLADE),
+        aura: STEEL_THIRD.aura,
+        glow: 'rgba(170,225,255,.62)',
+        edge: 'rgba(225,248,255,.98)',
+        edgeW: 0.008,
+      };
     return isSp()
       ? Object.assign(
           {},
@@ -784,10 +930,15 @@ export function startGame(): () => void {
         }
         store.set('issen.unlocks', [...UNL]);
         G.newUnlocks.push(it);
-        const base = id.replace(/\+$/, '');
+        const base = id.replace(/\++$/, '');
         const source = ITEM_BY[base];
         const display = source ? itemPresentation(source) : null;
-        const awakened = id.endsWith('+') ? (SPECIAL[base] ?? ROBE_AWAKENINGS[base]) : null;
+        const awakened =
+          id === 'steel++'
+            ? STEEL_THIRD
+            : id.endsWith('+')
+              ? (SPECIAL[base] ?? ROBE_AWAKENINGS[base])
+              : null;
         const perk = awakened?.pk ?? display?.benefit;
         const tradeoff = awakened?.tr ?? display?.tradeoff;
         runItemReveals.push({
@@ -847,6 +998,7 @@ export function startGame(): () => void {
     return createEffectSpawner(state, {
       scale,
       random: R,
+      density: preview ? 1 : effectQuality.density,
       flash: preview ? () => {} : flash,
       sounds: sfx,
     });
@@ -912,6 +1064,11 @@ export function startGame(): () => void {
     });
   }
   function startRun() {
+    if (!activeTrial) {
+      clearRunCheckpoint();
+      savedRun = null;
+      shrineOfferIds = null;
+    }
     runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
     if (!activeTrial) Object.assign(SETUP, sanitizeSetup(SETUP, META));
     const setup = activeTrial
@@ -929,6 +1086,11 @@ export function startGame(): () => void {
     runItemReveals = [];
     guided.reset();
     audio.setPaused(false);
+    if (!activeTrial) {
+      G.seed = newRunSeed();
+      runRandom = restorableRng(G.seed);
+      combatRandom = runRandom.next;
+    }
     resetRun(G, setup, EQ, combatRandom);
     Object.assign(G, templatePowers(META, setup));
     G.maxKnives = G.knives;
@@ -950,6 +1112,7 @@ export function startGame(): () => void {
     saveStats();
     clearHints();
     if (G.stage !== 0) setStage(0, true);
+    else Object.assign(WX, createWeatherState(combatRandom));
     showScreen(null);
     hud(true);
     $('bossbar').classList.remove('on');
@@ -1162,8 +1325,13 @@ export function startGame(): () => void {
     saveStats();
     checkUnlocks();
     let ev: 'standoff' | 'blood' | 'fog' | null = null;
-    if (!skipEvent && n >= 4 && n - G.lastEv >= 2 && R() < 0.3 * (G.m.standoff > 1 ? 1.4 : 1)) {
-      const q = R();
+    if (
+      !skipEvent &&
+      n >= 4 &&
+      n - G.lastEv >= 2 &&
+      combatRandom() < 0.3 * (G.m.standoff > 1 ? 1.4 : 1)
+    ) {
+      const q = combatRandom();
       ev = q < (G.m.standoff > 1 ? 0.7 : 0.4) ? 'standoff' : q < 0.7 ? 'blood' : 'fog';
       G.lastEv = n;
     }
@@ -1181,7 +1349,11 @@ export function startGame(): () => void {
     G.toSpawn = waveConfiguration().total;
     G.gapT = 1.2;
     G.pendingSpawns = [];
-    G.pendingSpawns = initialSpawns(waveConfiguration().pack, !!((changed && n > 1) || ev), R);
+    G.pendingSpawns = initialSpawns(
+      waveConfiguration().pack,
+      !!((changed && n > 1) || ev),
+      combatRandom,
+    );
     if (changed && n > 1) {
       banner(st.k, `${st.n}${lap ? ' ' + roman(lap + 1) : ''}, wave ${n}`);
       G.gapT = 1.9;
@@ -1209,6 +1381,7 @@ export function startGame(): () => void {
       hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
     if (ev === 'fog')
       hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
+    captureCheckpoint();
   }
   function updateWave(dt: number) {
     simulateWave(
@@ -1269,7 +1442,8 @@ export function startGame(): () => void {
       });
     }
     for (const o of G.enemies)
-      if (o !== e && (o.state === 'idle' || o.state === 'attack')) o.flinch = 0.6 + 0.4 * R();
+      if (o !== e && (o.state === 'idle' || o.state === 'attack'))
+        o.flinch = 0.6 + 0.4 * combatRandom();
     if (wasAtk) {
       G.attacker = null;
       G.gapT = waveConfiguration().gap;
@@ -1401,7 +1575,7 @@ export function startGame(): () => void {
     if (notifications.activeHint === 'swipe') hideHint();
     if (waveConfiguration().refill && G.toSpawn > 0)
       G.pendingSpawns.push({ slot: e.slot, t: 0.45 });
-    if (!chained && G.m.serpent && R() < G.m.serpent) {
+    if (!chained && G.m.serpent && combatRandom() < G.m.serpent) {
       const nx = waveConfiguration().ordered
         ? liveOrdered()[0]
         : G.enemies.find((q) => (q.state === 'idle' || q.state === 'attack') && q.dir === dir);
@@ -1415,7 +1589,9 @@ export function startGame(): () => void {
       G.tempN = (G.tempN || 0) + 1;
       if (G.tempN % 5 === 0) {
         const c = G.enemies.filter((q) => q.state === 'idle' || q.state === 'attack');
-        const nx = waveConfiguration().ordered ? liveOrdered()[0] : c[(R() * c.length) | 0];
+        const nx = waveConfiguration().ordered
+          ? liveOrdered()[0]
+          : c[(combatRandom() * c.length) | 0];
         if (nx && (nx.state === 'idle' || nx.state === 'attack')) {
           killEnemy(nx, nx.dir, true);
           pop(0, 0, '颯');
@@ -1436,7 +1612,7 @@ export function startGame(): () => void {
   function weatherBurst(cx: number, cy: number, sc: number) {
     const w = STAGES[G.stage]!.weather;
     if (w === 'rain' || w === 'storm') {
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < scaledCount(16, effectQuality.density); i++) {
         const a = R() * TAU,
           sp = (120 + R() * 260) * sc;
         fx.splash.push({
@@ -1450,7 +1626,7 @@ export function startGame(): () => void {
         });
       }
     } else if (w === 'snow') {
-      for (let i = 0; i < 22; i++) {
+      for (let i = 0; i < scaledCount(22, effectQuality.density); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 200) * sc;
         fx.splash.push({
@@ -1466,7 +1642,7 @@ export function startGame(): () => void {
       }
       dust(cx, cy + 30 * sc, 60 * sc);
     } else if (w === 'sakura') {
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < scaledCount(14, effectQuality.density); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 240) * sc;
         fx.petals.push({
@@ -1482,7 +1658,7 @@ export function startGame(): () => void {
         });
       }
     } else if (w === 'smoke') {
-      for (let i = 0; i < 14; i++)
+      for (let i = 0; i < scaledCount(14, effectQuality.density); i++)
         fx.embers.push({
           x: cx + (R() - 0.5) * 30 * sc,
           y: cy,
@@ -1493,7 +1669,7 @@ export function startGame(): () => void {
           ph: R() * TAU,
         });
     } else if (w !== 'night') {
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < scaledCount(8, effectQuality.density); i++) {
         const l = newLeaf(false);
         l.x = cx + (R() - 0.5) * 40 * sc;
         l.y = cy + (R() - 0.5) * 40 * sc;
@@ -1532,6 +1708,7 @@ export function startGame(): () => void {
         ordered: waveConfiguration().ordered,
         centerX: W / 2,
         mirrorAvailable: !!(G.m.kagami && !G.kagamiUsed),
+        axisOnly: !!G.m.axisCut,
       });
       if (outcome.kind === 'cut') {
         if (outcome.mirror) G.kagamiUsed = true;
@@ -1571,6 +1748,7 @@ export function startGame(): () => void {
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
       hint('mirror', "The Mirror's blade flips before it settles. Wait for it, then cut.", 5000);
+    captureCheckpoint();
   }
   function renderHp() {
     hudView.renderBossHealth(G.boss);
@@ -1650,7 +1828,7 @@ export function startGame(): () => void {
   function onTap() {
     if (guided.tap()) return;
     if (G.state === 'playing') {
-      const target = throwKnife(G, R);
+      const target = throwKnife(G, combatRandom);
       if (!target) return;
       const pos = enemyPos(target);
       const wasAttacker = G.attacker === target;
@@ -1743,11 +1921,11 @@ export function startGame(): () => void {
     const p = b.pos,
       cx = p.x,
       cy = p.y - p.h * 0.55;
-    if (dir === b.sdir && b.chainLeft > 1) {
+    if (directionMatches(dir, b.sdir, !!G.m.axisCut) && b.chainLeft > 1) {
       blockHit(dir);
       return;
     }
-    if (dir === b.sdir) {
+    if (directionMatches(dir, b.sdir, !!G.m.axisCut)) {
       b.hp = Math.max(0, b.hp - G.m.bossDmg);
       renderHp();
       swingPlayer(dir);
@@ -1870,7 +2048,7 @@ export function startGame(): () => void {
       pos: { x: 0, y: 0, h: 0, fog: 0, alpha: 1 },
       slot: 2,
       fixed: { x: B.x, y: B.y, h: B.h * 0.82, fog: 0.05 },
-      dir: DIRS[(R() * 4) | 0]!,
+      dir: DIRS[(combatRandom() * 4) | 0]!,
       fake: null,
       switched: false,
       order: 0,
@@ -1880,7 +2058,7 @@ export function startGame(): () => void {
       p: 0,
       T: 1,
       k: 0,
-      d: makeFig((R() * 1e9) | 0),
+      d: makeFig((combatRandom() * 1e9) | 0),
       pose: { ...EPOSE.guard },
       snap: 0,
       lean: 0,
@@ -1890,7 +2068,7 @@ export function startGame(): () => void {
     };
     e.pos = enemyPos(e);
     G.enemies.push(e);
-    G.so = createStandoff(e, n, G.mode, G.m.parry, G.m.soWin, R);
+    G.so = createStandoff(e, n, G.mode, G.m.parry, G.m.soWin, combatRandom);
     banner(
       '挑',
       changed ? `A challenger in the ${st.n.toLowerCase()}` : 'A challenger blocks the road',
@@ -1903,6 +2081,7 @@ export function startGame(): () => void {
       'A standoff. Stay still. The instant he draws, cut the way his blade points. Moving early is death.',
       6500,
     );
+    captureCheckpoint();
   }
   function updateStandoff(dt: number) {
     simulateStandoff(
@@ -1920,12 +2099,12 @@ export function startGame(): () => void {
         },
         late: (e) => playerDie(e, 'late'),
       },
-      R,
+      combatRandom,
     );
   }
   function standoffSwipe(dir: Direction) {
     const so = G.so,
-      outcome = resolveStandoffSwipe(so, dir);
+      outcome = resolveStandoffSwipe(so, dir, !!G.m.axisCut);
     if (outcome === 'ignore' || !so) return;
     const e = so.e;
     if (outcome === 'cut') {
@@ -1994,7 +2173,7 @@ export function startGame(): () => void {
     G.combo = G.bless && G.bless.has('banner') && G.combo >= 10 ? 10 : 0;
   }
   function applyPick(id: string) {
-    const extras = applyBlessing(G, id, R);
+    const extras = applyBlessing(G, id, combatRandom);
     renderLives();
     if (extras.length)
       toast({ k: '双', msg: 'Twin blessing: ' + extras.map((b) => b.n).join(' and ') });
@@ -2027,12 +2206,17 @@ export function startGame(): () => void {
       nextStep();
       return;
     }
-    const opts = shrineOffers(G, R);
+    const opts = shrineOffers(G, combatRandom);
     if (!opts.length) {
       nextStep();
       return;
     }
     G.state = 'shrine';
+    shrineOfferIds = opts.map((bl) => bl.id);
+    captureCheckpoint();
+    showShrineOffers(opts);
+  }
+  function showShrineOffers(opts: (typeof BLESS)[number][]) {
     renderShrine($('blessList'), opts, (bl) => {
       if (G.state !== 'shrine') return;
       G.bless.add(bl.id);
@@ -2046,6 +2230,7 @@ export function startGame(): () => void {
       hud(true);
       showScreen(null);
       sfx.unlock();
+      shrineOfferIds = null;
       nextStep();
     });
     showScreen('shrine');
@@ -2136,6 +2321,7 @@ export function startGame(): () => void {
     G.state = 'dead';
     G.deathT = 0;
     G.reason = reason;
+    captureCheckpoint('lost');
     timeScale = 0.3;
     if (killer && !('def' in killer)) {
       killer.k = killer.state === 'attack' ? Math.pow(clamp(killer.p), 1.6) : killer.k || 0;
@@ -2170,6 +2356,7 @@ export function startGame(): () => void {
       return;
     }
     if (G.state === 'over') return;
+    if (G.state !== 'dead') captureCheckpoint('ended');
     G.state = 'over';
     guided.reset();
     audio.setPaused(false);
@@ -2203,6 +2390,7 @@ export function startGame(): () => void {
     G.card = null;
     G.claps = 0;
     renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled);
+    $('overSeed').textContent = `Seed ${G.seed}`;
     showScreen('over');
     hud(false);
     G.overReady = false;
@@ -2212,6 +2400,9 @@ export function startGame(): () => void {
       $('bAgain').disabled = false;
     });
     setBestLine();
+    clearRunCheckpoint();
+    savedRun = null;
+    updateSavedRunButtons();
   }
   function setBestLine() {
     $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
@@ -2272,9 +2463,11 @@ export function startGame(): () => void {
       getLoadoutSummary: () => {
         const enabled = SETUP.upgrades !== false && META.upgrades.awakening > 0;
         const blade =
-          enabled && EQ.bladeSp && UNL.has(EQ.blade + '+')
-            ? SPECIAL[EQ.blade]?.m
-            : ITEM_BY[EQ.blade]?.m;
+          enabled && EQ.bladeThird && UNL.has('steel++')
+            ? STEEL_THIRD.m
+            : enabled && EQ.bladeSp && UNL.has(EQ.blade + '+')
+              ? SPECIAL[EQ.blade]?.m
+              : ITEM_BY[EQ.blade]?.m;
         const robe =
           enabled && META.upgrades.awakening >= 2 && EQ.robeSp && UNL.has(EQ.robe + '+')
             ? ROBE_AWAKENINGS[EQ.robe]?.m
@@ -2340,6 +2533,7 @@ export function startGame(): () => void {
           id: id + '+',
           n: `${ITEM_BY[id]?.n ?? id} awakened`,
         })),
+        { id: 'steel++', n: 'Tamahagane third awakening' },
       ],
       STAGES,
       {
@@ -2359,6 +2553,7 @@ export function startGame(): () => void {
           const ids = [
             ...ITEMS.map((item) => item.id),
             ...Object.keys({ ...SPECIAL, ...ROBE_AWAKENINGS }).map((id) => id + '+'),
+            'steel++',
           ];
           for (const id of ids) {
             UNL.add(id);
@@ -2395,18 +2590,22 @@ export function startGame(): () => void {
         item: (id, action) => {
           if (!isTestProfile()) return;
           const awakened = id.endsWith('+');
-          const base = awakened ? id.slice(0, -1) : id;
+          const third = id === 'steel++';
+          const base = id.replace(/\++$/, '');
           const item = ITEM_BY[base];
           if (!item || (awakened && !SPECIAL[base] && !ROBE_AWAKENINGS[base])) return;
           if (action === 'remove') {
             if (!Object.values(DEFAULT_EQUIPMENT).includes(id)) revoked.add(id);
             if (!awakened) revoked.add(id + '+');
+            if (base === 'steel' && !awakened) revoked.add('steel++');
             UNL.delete(id);
             if (!awakened) UNL.delete(id + '+');
+            if (base === 'steel' && !awakened) UNL.delete('steel++');
             for (const value of Object.values(DEFAULT_EQUIPMENT))
               if (typeof value === 'string') UNL.add(value);
             Object.assign(EQ, parseEquipment(EQ, UNL, ITEMS));
             if (!UNL.has(EQ.blade + '+')) EQ.bladeSp = false;
+            if (!UNL.has('steel++')) EQ.bladeThird = false;
             if (!UNL.has(EQ.robe + '+')) EQ.robeSp = false;
           } else {
             revoked.delete(base);
@@ -2415,7 +2614,10 @@ export function startGame(): () => void {
             UNL.add(id);
             if (action === 'equip') {
               EQ[item.type] = base;
-              if (item.type === 'blade') EQ.bladeSp = awakened;
+              if (item.type === 'blade') {
+                EQ.bladeSp = awakened && !third;
+                EQ.bladeThird = third;
+              }
               if (item.type === 'robe') EQ.robeSp = awakened;
             }
           }
@@ -2468,8 +2670,9 @@ export function startGame(): () => void {
           store.set('issen.setup', SETUP);
         },
         completeChallenge: (id) => {
-          const base = id.replace(/\+$/, '');
-          const definition = SPECIAL[base] ?? ROBE_AWAKENINGS[base];
+          const base = id.replace(/\++$/, '');
+          const definition =
+            id === 'steel++' ? STEEL_THIRD : (SPECIAL[base] ?? ROBE_AWAKENINGS[base]);
           if (!definition) return;
           const table = SPECIAL[base] ? AWAKENING.blades : AWAKENING.robes;
           const row = (table[base] ??= { k: 0, p: 0, d: 0, w: 0, rw: 0, c: 0, sc: 0 });
@@ -2726,7 +2929,16 @@ export function startGame(): () => void {
   });
   lifecycle.listen($('bPlay'), 'click', () => {
     audioInit();
+    if (savedRun?.status === 'active') abandonSavedRun();
     openPanel('setup');
+  });
+  lifecycle.listen($('bContinue'), 'click', () => {
+    audioInit();
+    continueSavedRun();
+  });
+  lifecycle.listen($('bAbandon'), 'click', () => {
+    audioInit();
+    abandonSavedRun();
   });
   lifecycle.listen($('bBegin'), 'click', () => {
     audioInit();
@@ -2791,17 +3003,23 @@ export function startGame(): () => void {
       }
       G.pausedFrom = G.state;
       G.state = 'paused';
-      audio.setPaused(true);
-      renderPauseBlessings($('paused'), G.bless);
-      showScreen('paused');
-      renderTrialObjective();
+      showPauseScreen();
     }
+  }
+  function showPauseScreen() {
+    audio.setPaused(true);
+    renderPauseBlessings($('paused'), G.bless);
+    $('pauseSeed').textContent = activeTrial ? '' : `Seed ${G.seed}`;
+    showScreen('paused');
+    renderTrialObjective();
   }
   function resume() {
     if (G.state !== 'paused' || !G.pausedFrom) return;
     G.state = G.pausedFrom;
     audio.setPaused(guided.frozen);
-    showScreen(null);
+    if (G.state === 'shrine' && shrineOfferIds)
+      showShrineOffers(shrineOfferIds.map((id) => BLESS_BY[id]).filter((bl) => !!bl));
+    else showScreen(null);
     renderTrialObjective();
     frameLoop.resetClock();
   }
@@ -2809,6 +3027,7 @@ export function startGame(): () => void {
     if (G.state !== 'paused' || !G.pausedFrom) return;
     G.state = G.pausedFrom;
     G.reason = 'quit';
+    captureCheckpoint('ended');
     showOver();
   }
   lifecycle.listen(document, 'visibilitychange', () => {
@@ -2841,6 +3060,7 @@ export function startGame(): () => void {
       hazard: G.m.hazard,
       layout: L,
       random: R,
+      hazardRandom: combatRandom,
       flash,
       sounds: sfx,
       gustLeaves,
@@ -3377,6 +3597,12 @@ export function startGame(): () => void {
       afterRender: () => {
         if (G.panel === 'armory') drawPreview();
       },
+      sampleFrame: (interval, work) => {
+        if (G.state === 'paused' || document.hidden) return;
+        if (!effectQuality.sample(interval, work)) return;
+        ambient().balanceLeaves(leaves);
+        if (Math.abs(weatherDensity - effectQuality.density) >= 0.09) rebalanceWeather();
+      },
     },
   );
 
@@ -3394,7 +3620,7 @@ export function startGame(): () => void {
     buildMist();
     buildGrass();
     buildLeaves();
-    buildWeather();
+    buildWeather(false);
     buildPost();
     prevBg = null;
     stageFade = 0;
@@ -3408,10 +3634,21 @@ export function startGame(): () => void {
   computeMods();
   applySeal();
   resize();
-  setupAttract();
+  if (savedRun?.status === 'active') {
+    const active = savedRun;
+    restoreCheckpoint(active);
+    G.pausedFrom = G.state;
+    G.state = 'paused';
+    showPauseScreen();
+  } else if (savedRun) {
+    const terminal = savedRun;
+    restoreCheckpoint(terminal);
+    showOver();
+  } else setupAttract();
   setMuteIcon();
   refreshArmoryNew();
   setBestLine();
+  updateSavedRunButtons();
   if (document.fonts && document.fonts.load)
     document.fonts.load(`800 20px "Shippori Mincho B1"`, '一二三四五閃').catch(() => {});
   lifecycle.add(() => {

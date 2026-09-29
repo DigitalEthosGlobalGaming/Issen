@@ -50,6 +50,17 @@ implemented files.
 | Synthesized cues, audio context and ambience                            | `src/audio/audio.ts`                                                   |
 | Save validation, storage, sharing, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
 
+`platform/run-checkpoint.ts` validates the active run snapshot. `game.ts`
+captures it after each wave, duel, standoff or Shrine offer is prepared and
+restores it under a pause screen on startup. Continue resumes the saved phase. The gameplay random stream is stored with its
+state, including weather hazard timers; visual randomness stays separate. Fatal losses write a terminal snapshot
+before the death animation. Completed results clear that snapshot after profile
+rewards and records have been written.
+
+`rendering/effects/quality.ts` adjusts cosmetic density from sustained frame
+timing. The runtime applies it to leaves, weather and effect spawning while
+keeping the restorable gameplay random stream independent.
+
 ## Boundaries that matter
 
 - Feature functions receive explicit state and dependencies. Randomized rules

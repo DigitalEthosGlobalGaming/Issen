@@ -13,6 +13,8 @@ export interface WeatherEnvironment {
   hazard: number;
   layout: { eH: number; groundY: number };
   random: Random;
+  /** Independent stream for weather that changes encounter timing or visibility. */
+  hazardRandom?: Random;
   flash: (amount: number, color: string) => void;
   sounds: { thunder: () => void; gust: () => void };
   gustLeaves: (count: number) => void;
@@ -35,6 +37,7 @@ export function updateWeather(
     hazard,
     layout: L,
     random: R,
+    hazardRandom: HR = R,
     flash,
     sounds: sfx,
     gustLeaves,
@@ -55,14 +58,14 @@ export function updateWeather(
     if (w === 'rain') {
       WX.veilT -= dt;
       if (WX.veilT <= 0) {
-        WX.veilT = 1.2 + R() * 2.2;
-        WX.veilTarget = active && R() < 0.55 ? 0.8 : 0;
+        WX.veilT = 1.2 + HR() * 2.2;
+        WX.veilTarget = active && HR() < 0.55 ? 0.8 : 0;
       }
     }
     if (active) {
       WX.ltT -= dt;
       if (WX.ltT <= 0) {
-        WX.ltT = 5 + R() * 7;
+        WX.ltT = 5 + HR() * 7;
         flash(0.55, '232,232,238');
         sfx.thunder();
       }
@@ -71,7 +74,7 @@ export function updateWeather(
       if (active) {
         WX.surgeT -= dt;
         if (WX.surgeT <= 0) {
-          WX.surgeT = 6 + R() * 4;
+          WX.surgeT = 6 + HR() * 4;
           WX.surge = 2.2;
           sfx.gust();
         }
@@ -93,7 +96,7 @@ export function updateWeather(
     if (active) {
       WX.woT -= dt;
       if (WX.woT <= 0 && WX.woPhase === 0) {
-        WX.woT = 7 + R() * 5;
+        WX.woT = 7 + HR() * 5;
         WX.woPhase = 0.001;
         sfx.gust();
       }
@@ -138,7 +141,7 @@ export function updateWeather(
     if (active) {
       WX.smokeT -= dt;
       if (WX.smokeT <= 0) {
-        WX.smokeT = 5 + R() * 3;
+        WX.smokeT = 5 + HR() * 3;
         const h = L.eH * 1.5,
           puffs = [];
         for (let i = 0; i < 9; i++)
@@ -162,7 +165,7 @@ export function updateWeather(
   if (w === 'gust' && active) {
     WX.gustT -= dt;
     if (WX.gustT <= 0) {
-      WX.gustT = 6 + R() * 4;
+      WX.gustT = 6 + HR() * 4;
       gustLeaves(Math.round(70 * hazard));
       sfx.gust();
     }

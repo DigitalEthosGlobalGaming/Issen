@@ -1,4 +1,4 @@
-import { SPECIAL } from '../content/awakenings.ts';
+import { SPECIAL, STEEL_THIRD } from '../content/awakenings.ts';
 import { ROBE_AWAKENINGS } from '../content/robe-awakenings.ts';
 import type { AwakeningProgress } from './awakening-progress.ts';
 import type { Item, ItemCategory } from '../content/items.ts';
@@ -55,6 +55,17 @@ export function unlockEligibleItems(
       granted.add(awakenedId);
       changed = true;
       onUnlock(awakenedId, { k: '真', n: item.n + ' awakened', type: item.type });
+    }
+    if (
+      awakening?.access &&
+      unlocked.has('steel+') &&
+      !unlocked.has('steel++') &&
+      (awakening.progress.blades.steel?.k ?? 0) >= STEEL_THIRD.need[1]
+    ) {
+      unlocked.add('steel++');
+      granted.add('steel++');
+      changed = true;
+      onUnlock('steel++', { k: '極', n: 'Tamahagane third awakening', type: 'blade' });
     }
   } while (changed);
 }

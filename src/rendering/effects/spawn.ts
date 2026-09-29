@@ -1,14 +1,17 @@
 import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import type { Effects } from './state.ts';
+import { scaledCount } from './quality.ts';
 export interface EffectSpawning {
   scale: number;
+  density?: number;
   random: Random;
   flash: (amount: number, color: string) => void;
   sounds: Record<'zap' | 'shatter' | 'poof' | 'crackle' | 'popper' | 'squeak', () => void>;
 }
 export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
   const { scale: S, random: R, flash, sounds } = env;
+  const count = (n: number) => scaledCount(n, env.density);
   function addSlash(
     x1: number,
     y1: number,
@@ -21,7 +24,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     fx.slashes.push({ x1, y1, x2, y2, w, t: 0, life: life || 0.3, dark: !!dark });
   }
   function inkBurst(x: number, y: number, ang: number, n: number, sc: number) {
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < count(n); i++) {
       const a = ang + (R() - 0.5) * 1.5 + (R() < 0.35 ? Math.PI : 0),
         sp = (160 + R() * 480) * sc;
       fx.drops.push({
@@ -36,7 +39,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     }
   }
   function scraps(x: number, y: number, n: number, sc: number) {
-    for (let i = 0; i < n; i++)
+    for (let i = 0; i < count(n); i++)
       fx.scraps.push({
         x: x + (R() - 0.5) * 20 * sc,
         y: y + (R() - 0.5) * 30 * sc,
@@ -53,7 +56,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     fx.rings.push({ x, y, r0, r1, t: 0, life, w });
   }
   function sparks(x: number, y: number, n: number) {
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < count(n); i++) {
       const a = R() * TAU,
         sp = (280 + R() * 520) * S;
       fx.sparks.push({
@@ -67,7 +70,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     }
   }
   function dust(x: number, y: number, s: number) {
-    for (let i = 0; i < 4; i++)
+    for (let i = 0; i < count(4); i++)
       fx.dust.push({
         x: x + (R() - 0.5) * s,
         y,
@@ -84,7 +87,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         ring(cx, cy, (4 + i * 12) * sc, (65 + i * 28) * sc, 0.5 + i * 0.14, Math.max(1, 2 * sc));
     } else if (t === 'trial-comet') {
       inkBurst(cx, cy, ang, 5, sc);
-      for (let i = 0; i < 22; i++) {
+      for (let i = 0; i < count(22); i++) {
         const a = ang + (R() - 0.5) * 0.65;
         const speed = (160 + R() * 400) * sc;
         fx.px.push({
@@ -101,7 +104,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       }
     } else if (t === 'petals') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 26; i++) {
+      for (let i = 0; i < count(26); i++) {
         const a = R() * TAU,
           sp = (80 + R() * 320) * sc;
         fx.petals.push({
@@ -132,7 +135,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       sounds.zap();
     } else if (t === 'embers') {
       inkBurst(cx, cy, ang, 8, sc);
-      for (let i = 0; i < 24; i++)
+      for (let i = 0; i < count(24); i++)
         fx.embers.push({
           x: cx + (R() - 0.5) * 30 * sc,
           y: cy + (R() - 0.5) * 40 * sc,
@@ -155,7 +158,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       });
     } else if (t === 'flies') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 18; i++)
+      for (let i = 0; i < count(18); i++)
         fx.flies.push({
           x: cx + (R() - 0.5) * 50 * sc,
           y: cy + (R() - 0.3) * 60 * sc,
@@ -167,7 +170,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         });
     } else if (t === 'shatter') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 18; i++) {
+      for (let i = 0; i < count(18); i++) {
         const a = R() * TAU,
           sp = (120 + R() * 380) * sc;
         fx.shards.push({
@@ -187,7 +190,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     } else if (t === 'crescent') {
       inkBurst(cx, cy, ang, 6, sc);
       fx.px.push({ k: 'moon', x: cx, y: cy, rot: ang, s: 60 * sc, t: 0, life: 0.55 });
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < count(10); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 200) * sc;
         fx.px.push({
@@ -204,7 +207,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       }
     } else if (t === 'lanterns') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 5; i++)
+      for (let i = 0; i < count(5); i++)
         fx.px.push({
           k: 'lantern',
           x: cx + (R() - 0.5) * 50 * sc,
@@ -218,7 +221,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         });
     } else if (t === 'cranes') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < count(4); i++) {
         const sd = i % 2 ? 1 : -1;
         fx.px.push({
           k: 'crane',
@@ -234,7 +237,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       }
     } else if (t === 'koi') {
       inkBurst(cx, cy, ang, 6, sc);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < count(2); i++) {
         const sd = i ? 1 : -1;
         fx.px.push({
           k: 'koi',
@@ -250,7 +253,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         });
       }
     } else if (t === 'poof') {
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < count(10); i++) {
         const a = R() * TAU,
           sp = (30 + R() * 120) * sc;
         fx.px.push({
@@ -269,7 +272,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
     } else if (t === 'wave') {
       inkBurst(cx, cy, ang, 6, sc);
       fx.px.push({ k: 'wave', x: cx, y: cy + 30 * sc, s: 70 * sc, t: 0, life: 0.9 });
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < count(16); i++) {
         const a = -Math.PI * R(),
           sp = (120 + R() * 260) * sc;
         fx.splash.push({
@@ -290,7 +293,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         pts.push([u, (i % 2 ? 1 : -1) * 0.08 * R()]);
       }
       fx.px.push({ k: 'crack', x: cx, y: cy, rot: da, s: 70 * sc, pts, t: 0, life: 1.1 });
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < count(14); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 220) * sc;
         fx.px.push({
@@ -323,7 +326,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       });
     } else if (t === 'maple') {
       inkBurst(cx, cy, ang, 5, sc);
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < count(16); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 260) * sc;
         fx.px.push({
@@ -342,12 +345,12 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
         });
       }
     } else if (t === 'fireworks') {
-      for (let b = 0; b < 3; b++) {
+      for (let b = 0; b < count(3); b++) {
         const bx = cx + (R() - 0.5) * 120 * sc,
           by = cy - (80 + R() * 90) * sc,
           h = (R() * 360) | 0;
-        for (let i = 0; i < 22; i++) {
-          const a = (i / 22) * TAU,
+        for (let i = 0; i < count(22); i++) {
+          const a = (i / count(22)) * TAU,
             sp = (90 + R() * 60) * sc;
           fx.px.push({
             k: 'fw',
@@ -366,7 +369,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       }
       sounds.crackle();
     } else if (t === 'confetti') {
-      for (let i = 0; i < 40; i++)
+      for (let i = 0; i < count(40); i++)
         fx.px.push({
           k: 'conf',
           x: cx,
@@ -401,7 +404,7 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       sounds.squeak();
     } else if (t === 'crows') {
       inkBurst(cx, cy, ang, 10, sc);
-      for (let i = 0; i < 5; i++)
+      for (let i = 0; i < count(5); i++)
         fx.crows.push({
           x: cx + (R() - 0.5) * 40 * sc,
           y: cy + (R() - 0.5) * 40 * sc,

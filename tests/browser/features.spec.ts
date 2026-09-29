@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { defeatCurrentBoss } from './drive-boss.ts';
 
 test('fresh journey offers an optional tutorial, persists skip and hides locked modes', async ({
   page,
@@ -21,6 +22,9 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
     'skipped',
   );
   await page.reload();
+  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await page.locator('#bEnd').click();
+  await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await expect(page.locator('.tutorial-overlay')).toBeHidden();
@@ -54,6 +58,9 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(5);
   await page.reload();
+  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await page.locator('#bEnd').click();
+  await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();
   await page.locator('[data-v="rush"]').click();
   await page.locator('#bBegin').click();
@@ -109,6 +116,14 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
 test('boss victory waits until run end to award Embers and reveal Boss Rush once', async ({
   page,
 }) => {
+  await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace(
+      'frameLoop.start();',
+      'window.__bossState = () => G.boss; frameLoop.start();',
+    );
+    await route.fulfill({ response, body });
+  });
   await page.addInitScript(() => {
     sessionStorage.setItem('issen.testing', '1');
     if (!localStorage.getItem('issen.testing.meta'))
@@ -144,17 +159,7 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
     .getByRole('button', { name: 'Jump to boss', exact: true })
     .evaluate((b: HTMLButtonElement) => b.click());
   const advance = (n: number) => page.evaluate((n) => (window as any).advance(n), n);
-  const cut = () =>
-    page.evaluate(() => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-    });
-  await advance(77);
-  await cut();
-  await advance(54);
-  await cut();
-  await advance(54);
-  await cut();
+  await defeatCurrentBoss(page);
   const pending = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('issen.testing.meta')!),
   );

@@ -88,6 +88,8 @@ export interface RunState {
   card: HTMLCanvasElement | null;
   cardScore: number;
   runBlade: string;
+  runBladeThird: boolean;
+  seed: number;
   fortune: (typeof FORTUNES)[number] | null;
   darumaUsed: boolean;
   phoenixUsed: boolean;
@@ -173,6 +175,8 @@ export function createRunState(savedHints: unknown = {}): RunState {
     card: null,
     cardScore: 0,
     runBlade: '',
+    runBladeThird: false,
+    seed: 0,
     fortune: null,
     darumaUsed: false,
     phoenixUsed: false,
@@ -234,6 +238,7 @@ export function resetRun(
     panel: null,
     lap: 0,
     runBlade: equipment.blade,
+    runBladeThird: equipment.blade === 'steel' && equipment.bladeThird === true,
     fortune:
       equipment.charm === 'omikuji'
         ? (FORTUNES[Math.floor(random() * FORTUNES.length)] ?? null)

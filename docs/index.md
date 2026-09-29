@@ -1,5 +1,7 @@
 # Repository documentation
 
+- [Feature plan 06 — Steel's third form, seeded runs and checkpoints](features/feature-plan-06.md):
+  implemented Awakening, deterministic gameplay and crash recovery rules.
 - [Feature plan 05 — clearer progression and a fairer third stage](features/feature-plan-05.md):
   implemented Trials, rewards, Temple, wave-balance and pause-screen changes.
 - [Trials](features/trials.md): Ronin-gated preset mastery encounters, exclusive

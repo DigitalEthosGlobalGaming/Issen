@@ -46,6 +46,20 @@ Vite if necessary and can reuse an existing server. Tests that import the entry
 module must use its actual script URL, including Vite's timestamp when present,
 to avoid accidentally starting a second application instance.
 
+Ordinary runs now save `issen.runCheckpoint` at encounter boundaries and Shrine
+choices. Reload a run to test recovery on the pause screen; **Continue** resumes
+the saved encounter or Shrine choice. The pause and result screens show
+its seed. Use the testing profile for checkpoint and fatal-loss experiments so
+real player progress is not changed. The test profile uses
+`issen.testing.runCheckpoint` automatically. A fatal loss or explicit End run
+removes Continue after results settle.
+
+The renderer samples sustained frame time and adjusts cosmetic density toward a
+60 fps budget. Weather particles, leaves, gusts and impact effects scale down
+under load and recover gradually; gameplay rolls stay on the saved run's random
+stream. Test this with a live run on the target device rather than interpreting
+one slow startup frame as sustained performance.
+
 For production verification without writing `dist/`, run `npm run typecheck`,
 then `npx vite build --outDir .verification-build-next-features`. Set
 `ISSEN_PREVIEW_DIR=.verification-build-next-features` when running

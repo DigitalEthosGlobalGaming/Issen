@@ -1,4 +1,5 @@
 import type { Direction } from '../../shared/directions.ts';
+import { directionMatches } from '../../shared/directions.ts';
 import type { Enemy } from './enemy.ts';
 import { orderedEnemies } from './enemy-spawn.ts';
 
@@ -10,14 +11,15 @@ export function targetSwipe(
   enemies: readonly Enemy[],
   attacker: Enemy | null,
   direction: Direction,
-  options: { ordered: boolean; centerX: number; mirrorAvailable: boolean },
+  options: { ordered: boolean; centerX: number; mirrorAvailable: boolean; axisOnly?: boolean },
 ): SwipeOutcome {
   const alive = enemies.filter((enemy) => enemy.state === 'idle' || enemy.state === 'attack');
   if (!alive.length) return { kind: 'ignore' };
   if (options.ordered) {
     const target = orderedEnemies(enemies)[0];
     if (!target || target.state === 'enter') return { kind: 'ignore' };
-    if (target.dir === direction) return { kind: 'cut', target, mirror: false };
+    if (directionMatches(direction, target.dir, options.axisOnly))
+      return { kind: 'cut', target, mirror: false };
     if (options.mirrorAvailable) return { kind: 'cut', target, mirror: true };
     return {
       kind: 'miss',
@@ -26,10 +28,10 @@ export function targetSwipe(
     };
   }
   const target =
-    attacker?.dir === direction
+    attacker && directionMatches(direction, attacker.dir, options.axisOnly)
       ? attacker
       : alive
-          .filter((enemy) => enemy.dir === direction)
+          .filter((enemy) => directionMatches(direction, enemy.dir, options.axisOnly))
           .sort(
             (a, b) => Math.abs(a.pos.x - options.centerX) - Math.abs(b.pos.x - options.centerX),
           )[0];

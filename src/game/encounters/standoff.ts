@@ -1,5 +1,6 @@
 import type { Enemy } from '../combat/enemy.ts';
 import type { Direction } from '../../shared/directions.ts';
+import { directionMatches } from '../../shared/directions.ts';
 import type { Random } from '../../shared/random.ts';
 export interface Standoff {
   e: Enemy;
@@ -82,9 +83,10 @@ export function updateStandoff(
 export function resolveStandoffSwipe(
   so: Standoff | null,
   direction: Direction,
+  axisOnly = false,
 ): 'ignore' | 'cut' | 'early' | 'wrong' {
   if (!so || so.done) return 'ignore';
   so.done = true;
   so.e.glint = 0;
-  return !so.fired ? 'early' : direction === so.e.dir ? 'cut' : 'wrong';
+  return !so.fired ? 'early' : directionMatches(direction, so.e.dir, axisOnly) ? 'cut' : 'wrong';
 }

@@ -11,9 +11,14 @@ export interface Setup {
   /** False starts a run without permanent bonuses or awakened powers. */
   upgrades?: boolean;
 }
-export type Equipment = Record<ItemCategory, string> & { bladeSp: boolean; robeSp?: boolean };
+export type Equipment = Record<ItemCategory, string> & {
+  bladeSp: boolean;
+  bladeThird?: boolean;
+  robeSp?: boolean;
+};
 export const DEFAULT_EQUIPMENT: Equipment = {
   bladeSp: false,
+  bladeThird: false,
   robeSp: false,
   crest: 'nocrest',
   pet: 'nopet',
@@ -99,6 +104,9 @@ export function parseEquipment(
     if (saved[item.type] === item.id && unlocks.has(item.id)) equipment[item.type] = item.id;
   }
   equipment.bladeSp = saved.bladeSp === true;
+  equipment.bladeThird =
+    saved.bladeThird === true && equipment.blade === 'steel' && unlocks.has('steel++');
+  if (equipment.bladeThird) equipment.bladeSp = false;
   equipment.robeSp = saved.robeSp === true && unlocks.has(equipment.robe + '+');
   return equipment;
 }

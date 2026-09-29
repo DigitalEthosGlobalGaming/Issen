@@ -1,7 +1,7 @@
 import type { Item, ItemCategory } from '../../game/content/items.ts';
 import type { Equipment } from '../../platform/saves.ts';
 import type { Statistics, BladeStats } from '../../game/progression/statistics.ts';
-import { SPECIAL } from '../../game/content/awakenings.ts';
+import { SPECIAL, STEEL_THIRD } from '../../game/content/awakenings.ts';
 import { ROBE_AWAKENINGS } from '../../game/content/robe-awakenings.ts';
 import { isNewArmoryItem, markArmoryItemViewed } from '../../game/progression/armory-seen.ts';
 import { itemPresentation } from './item-presentation.ts';
@@ -64,7 +64,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     UNL.has(it.id + '+') &&
     !!awakening(it) &&
     (it.type === 'blade'
-      ? EQ.blade === it.id && EQ.bladeSp
+      ? EQ.blade === it.id && (EQ.bladeSp || (it.id === 'steel' && EQ.bladeThird))
       : it.type === 'robe'
         ? EQ.robe === it.id && EQ.robeSp
         : false);
@@ -149,11 +149,19 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         if (own) {
           if (armTab === 'blade') {
             if (again && spU) {
-              EQ.bladeSp = !EQ.bladeSp;
-              if (EQ.bladeSp && powersEnabled()) {
+              if (it.id === 'steel' && EQ.bladeSp && UNL.has('steel++')) {
+                EQ.bladeSp = false;
+                EQ.bladeThird = true;
+              } else if (EQ.bladeThird) {
+                EQ.bladeThird = false;
+              } else EQ.bladeSp = !EQ.bladeSp;
+              if ((EQ.bladeSp || EQ.bladeThird) && powersEnabled()) {
                 events.awaken();
               }
-            } else if (EQ.blade !== it.id) EQ.bladeSp = false;
+            } else if (EQ.blade !== it.id) {
+              EQ.bladeSp = false;
+              EQ.bladeThird = false;
+            }
           }
           if (armTab === 'robe') {
             if (again && spU) {
@@ -173,7 +181,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     if (!it) return;
     const own = UNL.has(it.id),
       awk = activeAwakening(it),
-      sp = awk ? awakening(it) : undefined;
+      sp = awk ? (it.id === 'steel' && EQ.bladeThird ? STEEL_THIRD : awakening(it)) : undefined;
     const display = itemPresentation(it);
     if (it.hidden && !own) {
       $('armInfo').innerHTML =
@@ -183,7 +191,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     $('armInfo').innerHTML =
       `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
       (sp
-        ? `<div class="awakening-active"><div class="awakening-label">Awakened active</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
+        ? `<div class="awakening-active"><div class="awakening-label">${it.id === 'steel' && EQ.bladeThird ? 'Third Awakening active' : 'Awakened active'}</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
         : (display.benefit ? `<div class="pk">+ ${display.benefit}</div>` : '') +
           (display.tradeoff ? `<div class="tr">− ${display.tradeoff}</div>` : '') +
           (own && it.role ? `<div class="item-role">${it.role}</div>` : '')) +
@@ -212,7 +220,17 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
           ? 'Ready. Select this tile, then tap it again to activate.'
           : 'Equip it, then tap again to awaken it.'
       : `Challenge: ${sp.need[2]} ${it.type === 'blade' ? 'with this blade' : 'while wearing this outfit'} (${cur.toLocaleString()}/${sp.need[1].toLocaleString()}).`;
-    return `<div class="spx">真 ${it.type === 'blade' ? 'Blade' : 'Outfit'} Awakening: ${st}</div>`;
+    const third =
+      it.id === 'steel'
+        ? `<div class="spx">極 Third Awakening: ${
+            UNL.has('steel++')
+              ? EQ.bladeThird
+                ? 'Selected. Tap again to return to normal.'
+                : 'Unlocked. Tap Steel again after its first Awakening to select.'
+              : `Requires Steel awakened and ${STEEL_THIRD.need[2]} (${Math.min(q?.k ?? 0, 3000).toLocaleString()}/3,000).`
+          }</div>`
+        : '';
+    return `<div class="spx">真 ${it.type === 'blade' ? 'Blade' : 'Outfit'} Awakening: ${st}</div>${third}`;
   }
   return {
     render,

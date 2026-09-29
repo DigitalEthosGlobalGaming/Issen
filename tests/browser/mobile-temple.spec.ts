@@ -113,6 +113,7 @@ test('admin clear requires confirmation and resets only test profile', async ({ 
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
   await expect(page.locator('#testBadge')).toBeVisible();
   await page.keyboard.press('Control+Shift+A');
+  await page.getByRole('spinbutton', { name: 'Ember balance' }).fill('1000');
   await page.getByRole('button', { name: 'Set Embers', exact: true }).click();
   await page.getByRole('button', { name: 'Clear test profile', exact: true }).click();
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();

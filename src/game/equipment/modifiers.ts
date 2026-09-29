@@ -28,6 +28,8 @@ const DEFAULT_MODIFIERS = {
   chain: 0,
   blind: 0,
   swipe: 1,
+  /** Steel's third form accepts either direction on the required axis. */
+  axisCut: 0,
   bossDmg: 1,
   noShrine: 0,
   kiku: 0,

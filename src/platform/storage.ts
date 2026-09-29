@@ -78,12 +78,22 @@ export const store = {
       return fallback;
     }
   },
-  set(key: string, value: unknown): void {
-    if (resettingProfile) return;
+  set(key: string, value: unknown): boolean {
+    if (resettingProfile) return false;
     try {
       localStorage.setItem(profileKey(key), JSON.stringify(value));
+      return true;
     } catch {
       /* Private browsing and quota failures must not interrupt a run. */
+      return false;
+    }
+  },
+  remove(key: string): void {
+    if (resettingProfile) return;
+    try {
+      localStorage.removeItem(profileKey(key));
+    } catch {
+      /* Storage is unavailable. */
     }
   },
 };

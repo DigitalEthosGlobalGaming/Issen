@@ -185,3 +185,13 @@ export const SPECIAL: Record<string, Awakening> = {
     aura: { c: '200,230,255', mode: 'frost' },
   },
 };
+
+/** Steel's third form is a complete replacement for its first Awakening. */
+export const STEEL_THIRD: Awakening = {
+  pk: 'Horizontal or vertical cuts work in either direction; score ×1.15',
+  tr: 'Enemies strike 5% faster',
+  m: { axisCut: 1, score: 1.15, atk: 0.95 },
+  need: ['k', 3000, 'Cut down 3,000 foes'],
+  aura: { c: '170,225,255', mode: 'third' },
+  st: { c: '170,225,255' },
+};

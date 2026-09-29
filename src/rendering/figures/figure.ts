@@ -11,6 +11,59 @@ import type {
 } from './types.ts';
 export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
   const { time, wind, petActive, width: W, height: H, palette: cols, random: R } = env;
+  function drawThirdLightning(length: number) {
+    const pulse = Math.floor(time * 18);
+    const arcs = (env.effectDensity ?? 1) < 0.55 ? 1 : 2;
+    g.lineCap = 'round';
+    g.lineJoin = 'round';
+    for (let arc = 0; arc < arcs; arc++) {
+      g.beginPath();
+      for (let i = 0; i <= 12; i++) {
+        const x = 0.025 + (length - 0.045) * (i / 12);
+        const jitter =
+          i === 0 || i === 12 ? 0 : Math.sin(i * 23.7 + pulse * 7.13 + arc * 19) * 0.019;
+        const y = -length * 0.038 * (x / length) + jitter + (arc ? 0.014 : -0.008);
+        if (i) g.lineTo(x, y);
+        else g.moveTo(x, y);
+      }
+      g.strokeStyle = 'rgba(24,172,255,.48)';
+      g.lineWidth = 0.042;
+      g.stroke();
+      g.strokeStyle = 'rgba(239,253,255,.96)';
+      g.lineWidth = 0.008;
+      g.stroke();
+      const head = (time * 1.1 + arc * 0.47) % 1;
+      g.beginPath();
+      for (let i = 0; i <= 4; i++) {
+        const u = Math.max(0, head - 0.2 + (i / 4) * 0.2);
+        const x = 0.025 + (length - 0.045) * u;
+        const y =
+          -length * 0.038 * (x / length) + Math.sin(u * 36 + pulse * 7.13 + arc * 19) * 0.014;
+        if (i) g.lineTo(x, y);
+        else g.moveTo(x, y);
+      }
+      g.strokeStyle = 'rgba(20,182,255,.72)';
+      g.lineWidth = 0.055;
+      g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,.98)';
+      g.lineWidth = 0.011;
+      g.stroke();
+    }
+    for (let i = 0; i < Math.round(3 * (env.effectDensity ?? 1)); i++) {
+      const x = length * (0.24 + i * 0.25);
+      const side = i % 2 ? 1 : -1;
+      g.beginPath();
+      g.moveTo(x, -length * 0.038 * (x / length));
+      g.lineTo(x + length * 0.05, side * 0.035);
+      g.lineTo(x + length * 0.09, side * 0.07);
+      g.strokeStyle = 'rgba(43,189,255,.5)';
+      g.lineWidth = 0.028;
+      g.stroke();
+      g.strokeStyle = 'rgba(242,253,255,.9)';
+      g.lineWidth = 0.005;
+      g.stroke();
+    }
+  }
   function drawSleeve(s: number, lx: number, C: Palette, d: FigureSeed, t: number, wv: number) {
     g.fillStyle = s < 0 ? C.robeD : C.robe;
     g.beginPath();
@@ -186,14 +239,16 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         }
         g.stroke();
       }
-      if (a.mode === 'frost' || a.mode === 'glow') {
-        for (let i = 0; i < 6; i++) {
-          const k = (t * 0.6 + i / 6) % 1,
+      if (a.mode === 'third') drawThirdLightning(Lb);
+      if (a.mode === 'frost' || a.mode === 'glow' || a.mode === 'third') {
+        const count = a.mode === 'third' ? Math.round(12 * (env.effectDensity ?? 1)) : 6;
+        for (let i = 0; i < count; i++) {
+          const k = (t * (a.mode === 'third' ? 0.85 : 0.6) + i / count) % 1,
             x = Lb * ((i * 0.37 + 0.1) % 1),
-            y = -Lb * 0.05 * (x / Lb) - 0.015 - k * 0.07;
+            y = -Lb * 0.05 * (x / Lb) - 0.015 - k * (a.mode === 'third' ? 0.13 : 0.07);
           g.fillStyle = `rgba(${c},${0.85 * (1 - k)})`;
           g.beginPath();
-          g.arc(x, y, a.mode === 'frost' ? 0.007 : 0.009, 0, TAU);
+          g.arc(x, y, a.mode === 'frost' ? 0.007 : a.mode === 'third' ? 0.011 : 0.009, 0, TAU);
           g.fill();
         }
       }

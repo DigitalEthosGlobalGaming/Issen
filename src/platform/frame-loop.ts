@@ -15,6 +15,7 @@ export interface FrameCallbacks {
   update(delta: number, raw: number): void;
   render(raw: number): void;
   afterRender(): void;
+  sampleFrame?(intervalMs: number, workMs: number): void;
 }
 
 /** Preserve real-time rendering while combat timing is slowed or paused. */
@@ -49,10 +50,12 @@ export function createFrameLoop(
     if (!running) return;
     const raw = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
+    const workStart = scheduler.now();
     const delta = frameDelta(raw, timing);
     if (!callbacks.paused()) callbacks.update(delta, raw);
     callbacks.render(raw);
     callbacks.afterRender();
+    callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
     if (running) handle = scheduler.request(frame);
   }
 
