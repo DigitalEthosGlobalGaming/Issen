@@ -180,6 +180,14 @@
   color: var(--paper-dim);
   opacity: 0.65;
 }
+.title-version a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.title-version a:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 4px;
+}
 #overSummary {
   width: min(100%, 420px);
   margin-inline: auto;

@@ -189,3 +189,8 @@ and deploys it to the `github-pages` environment. The published site is
 The Pages build uses `/Issen/` as Vite's base path because this is a project site.
 Keep `npm run build` at the root base so existing local preview and production tests
 continue to exercise `http://127.0.0.1:4173/`.
+
+The standalone privacy policy is maintained in `public/privacy/index.html` and
+published at https://digitalethosglobalgaming.github.io/Issen/privacy/. Vite copies
+it to the build. The title screen opens it in a separate tab. Keep the policy
+current when adding online services, analytics, ads or purchases.
