@@ -33,6 +33,8 @@ try {
             upgrades: { vitality: 1, focus: 1, offerings: 0, awakening: 0, knife: 1, composure: 0, recovery: 0 },
           }));
           localStorage.setItem('issen.unlocks', JSON.stringify(['kuro', 'scarecrow']));
+          localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
+          localStorage.setItem('issen.hints', JSON.stringify({ swipe: 1, rush: 1, parry: 1, stage0: 1 }));
         });
         const page = await context.newPage();
         const errors = [];
