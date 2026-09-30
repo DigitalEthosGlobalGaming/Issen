@@ -1,6 +1,6 @@
 # Issen 一閃
 
-A one-handed samurai swipe game for mobile browsers. Everything is drawn in code on a canvas. Development uses TypeScript 7 and Vite. The only external visual resource is the Shippori Mincho B1 font from Google Fonts, with system serif fallbacks.
+A one-handed samurai swipe game for mobile browsers, with an offline Android prototype. Everything is drawn in code on a canvas. Development uses TypeScript 7 and Vite. Web loads Shippori Mincho B1 from Google Fonts; Android bundles the font and its license.
 
 Play the published game at [digitalethosglobalgaming.github.io/Issen](https://digitalethosglobalgaming.github.io/Issen/).
 
@@ -29,6 +29,14 @@ npm run dev
 Open the local address printed by Vite. For phone testing on your local network, use `npm run dev -- --host 0.0.0.0` and your computer's IP address.
 
 `npm run typecheck` checks all application TypeScript. `npm run build` type-checks and builds `dist/`; `npm run preview` serves that output. `npm run build:pages` creates the GitHub Pages build with the repository base path. `npm test` runs rule tests. `npm run test:browser` runs isolated browser regression tests using an installed Microsoft Edge browser and starts Vite if needed. See [development guidance](docs/development/local-development.md) for verification scope.
+
+## Android prototype
+
+For Android, run `npm run android:apk` with Java 21 and Android SDK 36 installed.
+The test app uses `com.digitalethosglobalgaming.issen.debug` and can coexist with
+the future Play release. See [Android setup and Play release steps](docs/development/android.md).
+The prototype still needs physical-device validation before ads, purchases and
+store submission. GitHub Pages deployment is unchanged.
 
 ## Adding features
 

@@ -18,6 +18,12 @@ Use Node 24 (the migration was verified with 24.16.0), then run `npm install` an
 | `npm test` | Node test runner with native TypeScript stripping for rule tests |
 | `npm run test:browser` | Playwright tests using installed Microsoft Edge |
 | `npm run test:production` | Build, then test bundled assets through a dedicated Vite preview server |
+| `npm run android:apk` | Build/sync offline assets and assemble the Android test APK |
+| `npm run android:bundle` | Build/sync and produce a signed Play bundle with upload credentials |
+| `npm run test:android-web` | Exercise offline Android assets in a touch-enabled browser |
+
+See [Android development](android.md) for Java/SDK setup, physical-device testing
+and release signing. GitHub Pages continues to use `build:pages`.
 
 ## Fast feedback
 
@@ -185,6 +191,12 @@ Pushing `main` runs `.github/workflows/deploy-pages.yml`. The workflow installs 
 locked dependencies, runs `npm run build:pages`, uploads `dist/` as a Pages artifact
 and deploys it to the `github-pages` environment. The published site is
 `https://digitalethosglobalgaming.github.io/Issen/`.
+
+The standalone privacy policy is maintained in `public/privacy/index.html` and
+published at `https://digitalethosglobalgaming.github.io/Issen/privacy/`.
+Vite copies it into web and Android builds; it uses system fonts and loads no
+game scripts. The title screen opens it in a separate tab. Keep its data-handling
+statements in sync when adding online services, analytics, ads or purchases.
 
 The Pages build uses `/Issen/` as Vite's base path because this is a project site.
 Keep `npm run build` at the root base so existing local preview and production tests

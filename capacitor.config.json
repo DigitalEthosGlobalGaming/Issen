@@ -1,0 +1,8 @@
+{
+  "appId": "com.digitalethosglobalgaming.issen",
+  "appName": "Issen",
+  "webDir": ".mobile-build",
+  "android": {
+    "allowMixedContent": false
+  }
+}

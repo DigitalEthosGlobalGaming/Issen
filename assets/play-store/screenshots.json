@@ -1,0 +1,155 @@
+{
+  "source": "Compiled Android web assets rendered in Edge; simulated viewport sizes, not physical-device captures.",
+  "screenshots": [
+    {
+      "file": "phone/01-title.png",
+      "width": 1080,
+      "height": 1920,
+      "scene": "01-title"
+    },
+    {
+      "file": "phone/02-waves.png",
+      "width": 1080,
+      "height": 1920,
+      "scene": "02-waves"
+    },
+    {
+      "file": "phone/03-boss-duel.png",
+      "width": 1080,
+      "height": 1920,
+      "scene": "03-boss-duel"
+    },
+    {
+      "file": "phone/04-armoury.png",
+      "width": 1080,
+      "height": 1920,
+      "scene": "04-armoury"
+    },
+    {
+      "file": "phone/05-temple.png",
+      "width": 1080,
+      "height": 1920,
+      "scene": "05-temple"
+    },
+    {
+      "file": "tablet-7-inch/01-title.png",
+      "width": 1280,
+      "height": 720,
+      "scene": "01-title"
+    },
+    {
+      "file": "tablet-7-inch/02-waves.png",
+      "width": 1280,
+      "height": 720,
+      "scene": "02-waves"
+    },
+    {
+      "file": "tablet-7-inch/03-boss-duel.png",
+      "width": 1280,
+      "height": 720,
+      "scene": "03-boss-duel"
+    },
+    {
+      "file": "tablet-7-inch/04-armoury.png",
+      "width": 1280,
+      "height": 720,
+      "scene": "04-armoury"
+    },
+    {
+      "file": "tablet-7-inch/05-temple.png",
+      "width": 1280,
+      "height": 720,
+      "scene": "05-temple"
+    },
+    {
+      "file": "tablet-10-inch/01-title.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "01-title"
+    },
+    {
+      "file": "tablet-10-inch/02-waves.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "02-waves"
+    },
+    {
+      "file": "tablet-10-inch/03-boss-duel.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "03-boss-duel"
+    },
+    {
+      "file": "tablet-10-inch/04-armoury.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "04-armoury"
+    },
+    {
+      "file": "tablet-10-inch/05-temple.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "05-temple"
+    },
+    {
+      "file": "desktop/01-title.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "01-title"
+    },
+    {
+      "file": "desktop/02-waves.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "02-waves"
+    },
+    {
+      "file": "desktop/03-boss-duel.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "03-boss-duel"
+    },
+    {
+      "file": "desktop/04-armoury.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "04-armoury"
+    },
+    {
+      "file": "desktop/05-temple.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "05-temple"
+    },
+    {
+      "file": "pc/01-title.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "01-title"
+    },
+    {
+      "file": "pc/02-waves.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "02-waves"
+    },
+    {
+      "file": "pc/03-boss-duel.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "03-boss-duel"
+    },
+    {
+      "file": "pc/04-armoury.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "04-armoury"
+    },
+    {
+      "file": "pc/05-temple.png",
+      "width": 1920,
+      "height": 1080,
+      "scene": "05-temple"
+    }
+  ]
+}
