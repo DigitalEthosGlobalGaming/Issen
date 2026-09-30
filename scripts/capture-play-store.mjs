@@ -27,14 +27,35 @@ try {
       });
       try {
         await context.addInitScript(() => {
-          localStorage.setItem('issen.meta', JSON.stringify({
-            schemaVersion: 4, tutorial: 'completed', bossMilestone: 3, revealSeen: 3,
-            embers: 450, earned: 900,
-            upgrades: { vitality: 1, focus: 1, offerings: 0, awakening: 0, knife: 1, composure: 0, recovery: 0 },
-          }));
+          localStorage.setItem(
+            'issen.meta',
+            JSON.stringify({
+              schemaVersion: 4,
+              tutorial: 'completed',
+              bossMilestone: 3,
+              revealSeen: 3,
+              embers: 450,
+              earned: 900,
+              upgrades: {
+                vitality: 1,
+                focus: 1,
+                offerings: 0,
+                awakening: 0,
+                knife: 1,
+                composure: 0,
+                recovery: 0,
+              },
+            }),
+          );
           localStorage.setItem('issen.unlocks', JSON.stringify(['kuro', 'scarecrow']));
-          localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
-          localStorage.setItem('issen.hints', JSON.stringify({ swipe: 1, rush: 1, parry: 1, stage0: 1 }));
+          localStorage.setItem(
+            'issen.guidedLessons',
+            JSON.stringify({ order: true, bossParry: true }),
+          );
+          localStorage.setItem(
+            'issen.hints',
+            JSON.stringify({ swipe: 1, rush: 1, parry: 1, stage0: 1 }),
+          );
         });
         const page = await context.newPage();
         const errors = [];
@@ -43,23 +64,34 @@ try {
         await page.evaluate(() => document.fonts.ready);
         if (scene === '04-armoury') {
           await page.locator('#bArmory').click();
-          await page.locator('#armTiles').getByRole('button', { name: 'Kurogane', exact: true }).click();
+          await page
+            .locator('#armTiles')
+            .getByRole('button', { name: 'Kurogane', exact: true })
+            .click();
           await page.waitForTimeout(400);
         } else if (scene === '05-temple') {
           await page.locator('#bTemplate').click();
           await page.waitForTimeout(250);
         } else if (scene === '02-waves' || scene === '03-boss-duel') {
           await page.locator('#bPlay').click();
-          if (scene === '03-boss-duel') await page.locator('[data-k="mode"] [data-v="rush"]').click();
+          if (scene === '03-boss-duel')
+            await page.locator('[data-k="mode"] [data-v="rush"]').click();
           await page.locator('#bBegin').click();
           await page.waitForTimeout(scene === '02-waves' ? 1300 : 950);
         }
         if (errors.length) throw new Error(errors.join('\n'));
         const path = resolve(directory, `${scene}.png`);
         await page.screenshot({ path, fullPage: false });
-        manifest.push({ file: `${profile.name}/${scene}.png`, width: profile.width * profile.scale, height: profile.height * profile.scale, scene });
+        manifest.push({
+          file: `${profile.name}/${scene}.png`,
+          width: profile.width * profile.scale,
+          height: profile.height * profile.scale,
+          scene,
+        });
         console.log(`${profile.name}/${scene}.png`);
-      } finally { await context.close(); }
+      } finally {
+        await context.close();
+      }
     }
   }
   mkdirSync(resolve(output, 'pc'), { recursive: true });
@@ -67,5 +99,18 @@ try {
     copyFileSync(resolve(output, 'desktop', `${scene}.png`), resolve(output, 'pc', `${scene}.png`));
     manifest.push({ file: `pc/${scene}.png`, width: 1920, height: 1080, scene });
   }
-  writeFileSync(resolve(output, 'screenshots.json'), JSON.stringify({ source: 'Compiled Android web assets rendered in Edge; simulated viewport sizes, not physical-device captures.', screenshots: manifest }, null, 2) + '\n');
-} finally { await browser.close(); }
+  writeFileSync(
+    resolve(output, 'screenshots.json'),
+    JSON.stringify(
+      {
+        source:
+          'Compiled Android web assets rendered in Edge; simulated viewport sizes, not physical-device captures.',
+        screenshots: manifest,
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+} finally {
+  await browser.close();
+}

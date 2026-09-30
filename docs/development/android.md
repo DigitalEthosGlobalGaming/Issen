@@ -106,6 +106,12 @@ RevenueCat SDK is enabled yet; physical-device acceptance precedes monetization.
 
 ## Signed bundle for Google Play
 
+For the common listing's Feature graphic field, use
+[issen-feature-graphic-1024x500.jpg](../../assets/play-store/issen-feature-graphic-1024x500.jpg).
+It is a verified 1024x500 RGB JPEG, 61,207 bytes, exported from the existing splash
+branding. This is separate from the square app icon and the 16:9 PC feature graphic.
+`scripts/prepare-play-store-images.ps1` maintains the feature export.
+
 The listing icon is [issen-play-store-icon-512.png](../../assets/branding/issen-play-store-icon-512.png),
 a 512x512 full-square, opaque 32-bit PNG exported from the launcher master onto
 the matching dark background. Regenerate only this listing asset with
