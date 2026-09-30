@@ -3,7 +3,7 @@
 The first native target is Android, using the shared game inside Capacitor 8.4.3.
 Production application ID: `com.digitalethosglobalgaming.issen`. Debug installs
 use `com.digitalethosglobalgaming.issen.debug` and the label **Issen (test)**.
-Current version: 1.10.0; the native version name reads `package.json`.
+Current version: 1.11.0; the native version name reads `package.json`.
 
 ## Tooling
 
@@ -187,8 +187,17 @@ and test the signed release, complete the listing/screenshots, privacy policy,
 Data safety, ads, audience/content rating and any closed-testing requirement.
 Use real Google Play RevenueCat configuration for Play builds; a RevenueCat Test
 Store key must stay debug-only. Refer to the [release plan](../features/mobile-store-release-plan.md)
-for ad placements, product setup and launch gates.
+for Premium product setup and launch gates.
 
 Official references: [device setup](https://developer.android.com/studio/run/device),
 [app signing](https://developer.android.com/studio/publish/app-signing),
 [Capacitor Android](https://capacitorjs.com/docs/android).
+## Premium purchase configuration
+
+Version 1.11.0 adds an optional supporter purchase. See
+[Premium supporter purchase](../features/premium-supporter.md) for the public SDK
+key, non-consumable product/entitlement mapping, debug-only Test Store setting and
+physical Google Play sandbox checks. Premium is paused for closed testing:
+`VITE_PREMIUM_ENABLED` defaults to false and hides every paid feature. Keep it false
+even if SDK keys are already configured. Missing configuration also disables checkout.
+Use version code 2 or higher for an update to the first internal-testing upload.

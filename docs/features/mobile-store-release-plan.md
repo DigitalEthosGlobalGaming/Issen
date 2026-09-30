@@ -1,7 +1,9 @@
 # Mobile and app-store release plan
 
-Status: Android prototype APK built; physical-device acceptance
-and later milestones remain open. Researched 30 September 2026.
+Status: Android internal-testing release installed and working on the publisher's
+phone, as reported on 30 September 2026. Detailed device QA and later milestones
+remain open. Premium supporter implementation is retained but disabled by default
+for the closed-testing release; RevenueCat/store setup is paused.
 Store and SDK requirements must be checked again before submission.
 
 ## Release priority confirmed
@@ -63,21 +65,26 @@ for the implemented commands, tooling, signing and phone test checklist.
   performance, lifecycle, storage durability and signing require separate evidence.
 - Local debug APK compilation and APK signature verification passed. Its manifest
   reports the debug package ID, version 1.10.0-debug, minimum API 24 and target
-  API 36. No USB debugging device was connected; installed-app acceptance is pending.
-- GitHub Pages behavior is retained. No ads/purchases or iOS project are enabled.
+  API 36. The publisher subsequently installed the Google Play internal-testing
+  release and reported it working on their phone. This establishes installation
+  and basic operation; sustained performance, lifecycle and recovery QA remain open.
+- GitHub Pages behavior is retained. No ads or iOS project are enabled. Version
+  1.11.0 adds the Android Premium purchase bridge; checkout needs store configuration.
 
 ## Outcome and agreed scope
 
 Ship Issen as an installable Android game on Google Play and an iPhone game on
 the Apple App Store, retaining the existing browser version and shared gameplay.
-The user selected a free release with ads or in-app purchases and currently has
-no Mac available. Exact ad placements, products, prices and publisher identity
-are still decisions; the recommendations below are proposals.
+The user initially selected a free release with ads or in-app purchases, then
+requested an optional approximately A$5 supporter purchase with a special film
+look and a Premium title-screen label. Plan an ad-free game with that cosmetic
+purchase; defer advertising. The exact film design and price remain proposals.
+The user currently has no Mac available.
 
 The stores distribute signed app packages. The installed game should contain its
 own assets and work offline; it should not load the GitHub Pages site to play.
-Public support and privacy pages need web hosting. Ads and purchases need online
-services, but ordinary gameplay does not need a game server.
+Public support and privacy pages need web hosting. Purchases need online services,
+but ordinary gameplay does not need a game server.
 
 ## Recommended approach
 
@@ -122,7 +129,7 @@ later if transferring existing web progress becomes a launch requirement.
 
 ## Proposed first-release monetization
 
-### Android and iOS AdMob setup recorded
+### Android and iOS AdMob setup recorded — deferred
 
 The publisher has created Android and iOS AdMob apps and interstitial ad units, as
 reported on 30 September 2026:
@@ -144,23 +151,17 @@ separate from the Android application/package ID and iOS bundle ID. Keep each
 platform's identifiers in its own configuration.
 [AdMob identifier guidance](https://support.google.com/admob/answer/7356431?hl=en)
 
-During native integration, configure the Android App ID in the native manifest
-and use the interstitial Ad unit ID for the production placement. Development
-uses Google's sample interstitial unit or explicitly configured test devices,
-not ordinary live ad traffic.
-[AdMob test ads](https://developers.google.com/admob/android/test-ads)
-
-The unit's creation does not integrate ads into the current browser game or
-establish app approval/ad-serving readiness. Native packaging and consent/testing
-work remain pending. Both platforms' AdMob identifiers are now recorded;
-Remove ads purchase products are still pending.
+These identifiers are retained as setup history. No AdMob SDK is installed and
+the revised release does not integrate ads. Creating these units does not require
+using them. Revisit advertising only after a separate product decision and the
+appropriate consent, disclosure and testing work.
 
 ### RevenueCat Test Store setup recorded
 
 The publisher supplied the RevenueCat Test Store SDK key on 30 September 2026:
 `test_zJQiMzlfqLBNCRmWZVGpJdmnnGl`.
 This records the supplied configuration; the key has not been validated by a
-running SDK. No purchase integration or live-store connection is implemented.
+running SDK. Version 1.11.0 implements the Android RevenueCat bridge; no live-store connection has been verified.
 
 Use this key only in native debug builds. TestFlight and Google Play test-track
 builds use platform SDK keys and platform sandbox purchases, just like release
@@ -169,50 +170,58 @@ The documented minimum RevenueCat Capacitor SDK for Test Store is 11.2.6;
 verify compatibility with the chosen Capacitor version when installing.
 [RevenueCat Test Store guidance](https://www.revenuecat.com/docs/test-and-launch/sandbox/test-store)
 
-Proposed catalog: permanent/non-consumable product `issen_remove_ads`, entitlement
-`remove_ads`, offering `default` and a Lifetime package. The publisher has not yet
-confirmed creation/linking of these entries or the final price. Android/iOS
-RevenueCat SDK keys, native app identifiers and real-store product/credential
-setup remain pending. The AdMob identifiers above are not purchase identifiers.
+Revised proposed catalog: permanent/non-consumable product `issen_premium`,
+entitlement `premium`, offering `default` and a Lifetime package. This supersedes
+the earlier `issen_remove_ads` / `remove_ads` proposal; no creation of that old
+catalog was confirmed. The publisher has not yet confirmed creation/linking of
+the new entries or the final price. Android/iOS RevenueCat SDK keys and real-store
+product/credential setup remain pending. AdMob identifiers are not purchase IDs.
 
 ### Recommended behavior
 
-Recommend occasional interstitial ads at a completed-run boundary and a one-time,
-non-consumable **Remove ads** purchase. Set the price after market and revenue
-review. Keep all current gameplay and earned unlocks available to free players.
-Do not introduce currency sales or paid revives in the first release: they would
-change progression, challenge eligibility and checkpoint settlement rules.
+Offer an optional one-time **Support Issen — Premium** purchase, approximately
+A$5 (A$4.99 is a proposed Australian price, not yet configured). Friendly copy can
+say "Buy me a coffee", but explain clearly that the purchase permanently unlocks
+one exclusive film look and a **Premium** label on the title screen. Display the
+store's localized price rather than hard-coding AUD for every player.
 
-Suggested initial placement: after the result screen, when the player chooses
-to leave or start another run, at most once per three completed ordinary runs and
-with a three-minute minimum gap. Suppress ads during first-play teaching, Trials,
-combat, Shrine choices and purchase/restore flows. Treat those caps as starting
-product settings to validate in beta, not promises about revenue. No gameplay
-banners. Optional rewarded ads can be a later feature with an explicit reward
-design and exactly-once granting; do not silently attach rewards to existing
-Ember or revival rules.
+Keep the game free and ad-free. Preserve all existing gameplay, equipment and
+earned film unlocks. Add a new cosmetic film rather than placing an existing
+earned reward behind payment. There are no subscriptions, paid revives, currency
+sales or gameplay advantages in this proposal.
+
+Place a quiet Support Issen entry on the title/settings screen, with a film
+preview, the two permanent benefits, purchase and Restore purchases controls.
+Avoid recurring prompts or interruptions between runs. Premium owners can select
+the film in the existing film selector and switch back to any owned look; do not
+force the paid film on purchase. Decide the film palette/name before implementing
+it, and preserve contrast and combat telegraph readability.
+
+This is a digital-goods purchase because it includes a film and badge. Use Google
+Play Billing via RevenueCat on Android, followed by StoreKit via RevenueCat for
+iOS. A creator-tip exception does not cover payments granting digital perks.
+[Google Payments policy explanation](https://support.google.com/googleplay/android-developer/answer/10281818?hl=en)
+[RevenueCat non-subscription purchases](https://www.revenuecat.com/docs/platform-resources/non-subscriptions)
 
 Implementation requirements:
 
-- Native mobile ad SDK through a maintained, version-compatible bridge; evaluate
-  AdMob as the first candidate. Check support for both platforms, consent,
-  lifecycle callbacks and current native SDK requirements before choosing it.
-- Native StoreKit and Google Play Billing for the first-release purchase. This
-  avoids depending on regional alternative-payment programs. Evaluate either a
-  maintained purchase bridge with a small verification service or a managed
-  entitlement service; select one before implementing billing.
+- Use a maintained, Capacitor-compatible RevenueCat purchase plugin and pin the
+  verified version. Connect the Google Play app/product and configure RevenueCat's
+  platform SDK key, entitlement and offering before live-store testing.
 - Product IDs map to a separate entitlement, never an editable profile flag.
   Verify transactions, support Restore purchases, cancellation, pending payments,
   duplicate callbacks, refunds/revocation and reinstalls. A verified cached
-  entitlement keeps ads disabled offline. Profile reset must not delete ownership.
+  entitlement keeps the film and badge available offline. Profile reset must not
+  delete purchase ownership. Reconcile refunded/revoked access when online and
+  fall back to a free film safely if the exclusive look is no longer owned.
 - Grant entitlement only for completed verified payments, then complete the store
   transaction. Google purchases must be acknowledged within three days of reaching
   the purchased state to avoid automatic refund/revocation.
   [Google Billing integration](https://developer.android.com/google/play/billing/integrate)
 - Pause gameplay/audio before native dialogs; return safely without an automatic
-  live-combat resume. Ad load failure, no fill, offline state or purchase-service
-  failure must leave the game playable. Use test ads and sandbox purchases in QA.
-  [AdMob test ads](https://developers.google.com/admob/android/test-ads)
+  live-combat resume. Offline state or purchase-service failure must leave the
+  free game playable. Use Test Store for local debug QA and Google Play license
+  testers/platform sandbox purchases in the internal-testing release.
 - Web builds use unavailable/no-op monetization adapters. Do not assume purchases
   transfer between Apple, Google and web accounts; that needs a separate identity
   and entitlement design.
@@ -238,7 +247,7 @@ Owner: publisher for accounts/hardware; implementation owner for tooling.
   releases, but still needs certificate/provisioning setup and physical iPhone
   testing. Select the service and spending limit before buying hardware or hosting.
 - Select and pin a stable Capacitor release and matching official plugins;
-  verify third-party ad/billing compatibility. Do not select a prerelease simply
+  verify third-party billing compatibility. Do not select a prerelease simply
   because it appears in search results.
 - Define supported OS/device range, orientations, launch territories and target
   audience. Recommend phones first, with portrait and landscape retained if both
@@ -285,8 +294,8 @@ Owner: implementation owner.
   lifecycle disposer. Android Back closes the top dialog, navigates menus or
   pauses combat before an intentional exit.
   [Capacitor App API](https://capacitorjs.com/docs/apis/app)
-- Handle background/foreground, screen lock, phone/audio interruption, ad sheets
-  and purchase sheets. Returning to active combat requires Continue; reset the
+- Handle background/foreground, screen lock, phone/audio interruption and
+  purchase sheets. Returning to active combat requires Continue; reset the
   frame clock and recover the audio context without duplicate loops.
 - Use native Preferences or another suitable durable store for profile records.
   Capacitor warns that mobile OSs can clear WebView `localStorage`.
@@ -317,30 +326,32 @@ browser controls and save compatibility remain intact.
 
 Owner: implementation owner for integrations; publisher for products/disclosures.
 
-- Add separate ad, purchase and consent adapters and a touch-accessible settings
-  surface for Remove ads, Restore purchases, privacy choices and support.
-- Set up ad units and matching non-consumable products in both store consoles.
-  Confirm paid-app agreements, tax/banking and ad-network payment details.
-- Add verification/entitlement reconciliation, frequency caps and safe callbacks.
-  Test the exact ad and purchase flows in the proposed monetization section.
+- Add a purchase adapter and touch-accessible Support Issen screen with the
+  exclusive film preview, localized price and Restore purchases control.
+- Create the Android non-consumable Premium product and link it to RevenueCat's
+  `premium` entitlement and Lifetime offering package. Repeat on iOS later.
+  Confirm the applicable paid-app agreements and tax/banking details.
+- Add the new film through the existing film content/rendering owners; gate its
+  selection and the title-screen Premium label through verified entitlement state.
+  Keep ownership separate from ordinary earned-unlock and resettable profile data.
+- Test verification, reconciliation and safe callbacks, including cancellation,
+  pending payment, duplicate callbacks, offline cached ownership, restore after
+  reinstall, refunds/revocation and resetting gameplay progress.
 - Inventory every SDK's collected/shared data, permissions and network endpoints.
   Publish privacy and support pages and link the privacy policy in the app.
   Complete Google Data safety and Apple App Privacy declarations from the actual
-  shipped SDK behavior. Do not claim no data collection once advertising SDKs are
-  included. [Google Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)
-- For AdMob, implement its required regional consent flow and a way to reopen
-  privacy choices. Non-personalized ads do not automatically eliminate consent
-  requirements. [AdMob ad-serving and consent guidance](https://developers.google.com/admob/android/privacy/ad-serving-modes)
+  shipped SDK behavior. An ad-free game can still have purchase-service data
+  collection. [Google Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en)
 - On iOS, request ATT permission if the configured SDK behavior tracks across
   companies' apps/sites or accesses the advertising identifier. Denial must not
   block play; test all authorization states. Prefer a configuration that minimizes
   tracking, but verify the actual SDK behavior.
   [Apple privacy and ATT guidance](https://developer.apple.com/app-store/user-privacy-and-data-use/)
 - Add required Apple privacy manifests/reason declarations for the chosen plugins
-  and SDKs. Set audience and age-rating answers from the game's combat and ads;
+  and SDKs. Set audience and age-rating answers from the game's combat/content;
   evaluate child-directed requirements if that is the intended audience.
 
-Exit: sandbox transactions and test ads pass for the target store; privacy disclosures
+Exit: sandbox transactions and cosmetic ownership pass for the target store; privacy disclosures
 match the signed candidate. Core gameplay still works without network access.
 
 ### 4. Beta and store preparation
@@ -362,7 +373,7 @@ Owner: implementation owner for signed builds; publisher/testers for beta/listin
   small/notched phones, both orientations, OS minimum/latest and current WebViews.
 - Test clean install, app update with progress, process death, corrupted data,
   interrupted result settlement, rapid suspend/resume, permission/consent refusal,
-  offline launches, ad failure and canceled/duplicate/pending/restored purchases.
+  offline launches and canceled/duplicate/pending/restored purchases.
 
 Exit: no unresolved launch-blocking crashes, lost progress, reward duplication,
 failed entitlements, clipped essential controls or timing regressions. Keep a
@@ -375,12 +386,12 @@ Owner: publisher submits/releases; implementation owner fixes findings.
 - Submit the signed candidates and IAP for review. Allow time for rejections and
   resubmission; approval and review duration cannot be guaranteed.
 - Use controlled initial availability and monitor crash/ANR reports, save reports,
-  purchase failures and ad complaints. Expand after the initial evidence is sound.
+  purchase failures and cosmetic ownership reports. Expand after the initial evidence is sound.
 - Archive source revision, lockfile, build environment, signed artifacts and debug
   symbols for each release. Keep signing secrets outside Git and protect releases
   in CI. A store hotfix uses a new signed build; shipping the website does not
   update installed apps.
-- Maintain SDK/store deadlines, billing and ad dependencies, certificate access,
+- Maintain SDK/store deadlines, billing dependencies, certificate access,
   privacy disclosures and support. If a release regresses, halt further rollout
   where possible and ship a forward fix; users cannot be assumed to downgrade.
 
@@ -421,7 +432,7 @@ and run installed-app smoke tests after Capacitor sync. Repeat native release
 verification for iOS when that phase starts.
 
 The planning document originally left version **1.9.0** unchanged. Approved
-Android prototype implementation advances the app to **1.10.0**.
+Android prototype implementation advanced the app to **1.10.0**. Premium supporter implementation advances it to **1.11.0**.
 Keep `package.json`, `package-lock.json`, the title screen and native
 marketing versions aligned. Android `versionCode` and iOS build numbers increase
 for every uploaded candidate, including repeat builds of the same marketing version.
@@ -429,7 +440,7 @@ for every uploaded candidate, including repeat builds of the same marketing vers
 ## Sequence, effort and remaining decisions
 
 Suggested sequence: Android tooling/accounts -> Android prototype -> persistence
-and lifecycle -> mobile polish -> ads/IAP/privacy -> Play beta -> store review ->
+and lifecycle -> mobile polish -> Premium IAP/privacy -> Play beta -> store review ->
 Android launch -> iPhone prototype and release work.
 Recruit Google closed-test participants early. Mac access is a dependency for the
 later iPhone phase rather than the Android launch.
@@ -447,12 +458,23 @@ Decisions to record before the related implementation:
 2. Borrowed/rented/owned Mac or hosted macOS workflow, spending limit and real
    iPhone access.
 3. Minimum device/OS range, orientation behavior and tablet availability.
-4. Approval of proposed between-run ads + Remove ads model, frequency and price;
-   selected ad bridge and entitlement verification/service.
+4. Final Premium price, exclusive film name/palette and support-screen copy;
+   confirm real-store product setup and RevenueCat entitlement/offering mapping.
 5. Whether browser-progress transfer is required at launch; otherwise explain
    separate progress and the limits of uninstall/reinstall recovery.
 
-The current implementation-sized task is completing milestone 1: an installable
-offline Android build on the user's phone, with performance and input evidence. Complete it before
-adding commercial SDKs so the technical route is proven early. Keep GitHub Pages
-deployment and web monetization scope unchanged during this Android phase.
+The internal-testing installation now works on the user's phone. Complete the
+remaining device performance/input and native reliability checks alongside
+designing the Premium cosmetic; then integrate and sandbox-test billing before
+shipping the purchase. Keep GitHub Pages deployment and web monetization scope
+unchanged during this Android phase. Version 1.11.0 implements the purchase SDK bridge, Supporter Print film and Premium badge.
+See [Premium supporter purchase](premium-supporter.md) for the configuration and
+physical sandbox checks still required before commercial release.
+
+## Closed-testing decision
+
+The publisher requested a release without payment options while completing Google
+Play closed testing. `VITE_PREMIUM_ENABLED=false` is the default. It hides purchase
+and restore controls, Support Issen, the paid film and Premium badge and prevents
+RevenueCat initialization. Keep the billing code ready for a later explicit opt-in;
+no RevenueCat catalog or live-store setup is being pursued in this phase.

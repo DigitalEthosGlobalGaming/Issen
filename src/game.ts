@@ -1,3 +1,7 @@
+import { premium, premiumEnabled, listenToPurchases } from './platform/purchases.ts';
+import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
+import { PREMIUM_FILM } from './platform/premium.ts';
+import { renderSupport } from './ui/screens/support.ts';
 import type { Item, ItemCategory } from './game/content/items.ts';
 import type { Enemy } from './game/combat/enemy.ts';
 import type { Boss } from './game/encounters/boss.ts';
@@ -10,6 +14,7 @@ import { createLifecycle } from './platform/lifecycle.ts';
 import { createFrameLoop } from './platform/frame-loop.ts';
 import { createHud } from './ui/hud.ts';
 import { createRunState, resetRun } from './game/run-state.ts';
+import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
 import { createShareCard } from './ui/share-card.ts';
@@ -164,7 +169,7 @@ import { buzz } from './platform/haptics.ts';
 export function startGame(): () => void {
   const lifecycle = createLifecycle();
   ('use strict');
-  function $(id: 'c' | 'prevC'): HTMLCanvasElement;
+  function $(id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
   function $(id: 'shareImg'): HTMLImageElement;
   function $(id: 'bAgain'): HTMLButtonElement;
   function $(id: string): HTMLElement;
@@ -207,7 +212,10 @@ export function startGame(): () => void {
   const palette = createPalette();
   const cols = (fog: number) => palette.fog(fog, MIST);
   /* ---------------- armory data ---------------- */
-  const ITEMS = createItems(() => UNL);
+  const ITEMS = [
+    ...createItems(() => new Set([...UNL].filter((id) => id !== PREMIUM_FILM))),
+    ...(premiumEnabled ? [SUPPORTER_FILM_ITEM] : []),
+  ];
   const BASEBLADE = {
     len: 0.52,
     d: '#5c5a56',
@@ -245,6 +253,8 @@ export function startGame(): () => void {
   let ST = loadStatistics();
   const SETUP = loadSetup();
   const UNL = loadUnlocks();
+  UNL.delete(PREMIUM_FILM);
+  if (premium.state.owned) UNL.add(PREMIUM_FILM);
   const TRIAL_PROGRESS = parseTrialProgress(store.get('issen.trials', null));
   grantTrialRewards(TRIAL_PROGRESS, UNL);
   const playerStats = ST;
@@ -307,7 +317,8 @@ export function startGame(): () => void {
     Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
     Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
     UNL.clear();
-    for (const id of checkpoint.unlocks) UNL.add(id);
+    for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
+    if (premium.state.owned) UNL.add(PREMIUM_FILM);
     Object.assign(SETUP, checkpoint.setup);
     Object.assign(EQ, parseEquipment(checkpoint.equipment, UNL, ITEMS));
     Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless), card: null });
@@ -374,6 +385,8 @@ export function startGame(): () => void {
   );
   let EQ = loadEquipment(UNL, ITEMS);
   const playerEquipment = EQ;
+  const savedFilm = (store.get('issen.equip', {}) as { film?: unknown } | null)?.film;
+  let initialPurchaseCheck = true;
   const SEALS: Record<string, string> = {
     verm: '#a3271d',
     gold: '#a67c22',
@@ -2497,7 +2510,15 @@ export function startGame(): () => void {
   function openPanel(id: Screen) {
     G.panelFrom = hudView.activeScreen || 'title';
     G.panel = id;
-    if (id === 'armory') renderArmory();
+    if (id === 'support') {
+      supportPreview.draw(previewFrame(PREMIUM_FILM, false));
+      renderSupport($('support'), premium.state, premium.available);
+      void premium.refresh();
+    }
+    if (id === 'armory') {
+      renderArmory();
+      void premium.refresh();
+    }
     if (id === 'stats') renderStats();
     if (id === 'setup') renderSetup();
     if (id === 'template') renderTemplate($('templateContent'), META, saveMeta);
@@ -2760,6 +2781,7 @@ export function startGame(): () => void {
     items: ITEMS,
     equipment: EQ,
     unlocks: UNL,
+    owns: (id) => (id === PREMIUM_FILM ? premium.state.owned : UNL.has(id)),
     statistics: ST,
     seen: ARMORY_SEEN,
     onViewed: () => {
@@ -2908,12 +2930,25 @@ export function startGame(): () => void {
     now: () => performance.now(),
     sounds: sfx,
   });
+  const supportPreview = createArmoryPreview($('supportPreview'), {
+    random: rng(4242),
+    now: () => performance.now(),
+    sounds: sfx,
+  });
   function demoKill() {
     preview.demo(EQ.fx, !!(G.m && G.m.bonk));
   }
   function drawPreview() {
+    preview.draw(
+      previewFrame(
+        EQ.film === PREMIUM_FILM && !premium.state.owned ? 'mono' : EQ.film,
+        armory.tab === 'fx',
+      ),
+    );
+  }
+  function previewFrame(film: string, effectsVisible: boolean): PreviewFrame {
     const rb = ROBES[EQ.robe] || {};
-    preview.draw({
+    return {
       time,
       wind,
       petActive: G.petT > 0,
@@ -2933,12 +2968,12 @@ export function startGame(): () => void {
         pet: petOf(),
       },
       pet: EQ.pet,
-      film: EQ.film,
-      effectsVisible: armory.tab === 'fx',
+      film,
+      effectsVisible,
       font: FONT,
       seal: SEAL,
       mistSprite,
-    });
+    };
   }
 
   /* ---------------- share card ---------------- */
@@ -2992,6 +3027,56 @@ export function startGame(): () => void {
     audioInit();
     G.panel = null;
     startRun();
+  });
+  $('bSupport').hidden = !premiumEnabled;
+  $('support').hidden = !premiumEnabled;
+  lifecycle.add(
+    premium.subscribe((state) => {
+      if (lifecycle.disposed) return;
+      $('premiumBadge').hidden = !premiumEnabled || !state.owned;
+      if (state.owned) {
+        UNL.add(PREMIUM_FILM);
+        if (initialPurchaseCheck && savedFilm === PREMIUM_FILM && playerEquipment.film === 'mono') {
+          playerEquipment.film = PREMIUM_FILM;
+        }
+        initialPurchaseCheck = false;
+      } else {
+        UNL.delete(PREMIUM_FILM);
+        if (playerEquipment.film === PREMIUM_FILM) playerEquipment.film = 'mono';
+        if (EQ.film === PREMIUM_FILM) EQ.film = 'mono';
+      }
+      renderSupport($('support'), state, premium.available);
+      if (G.panel === 'armory') renderArmory();
+    }),
+  );
+  lifecycle.add(listenToPurchases());
+  void premium.refresh().finally(() => {
+    initialPurchaseCheck = false;
+  });
+  lifecycle.listen(document, 'visibilitychange', () => {
+    if (!document.hidden) void premium.refresh();
+  });
+  lifecycle.listen($('bSupport'), 'click', () => openPanel('support'));
+  const purchaseAction = async (action: () => Promise<void>) => {
+    pause();
+    audio.setPaused(true);
+    await action();
+    if (!lifecycle.disposed) audio.setPaused(G.state === 'paused' || guided.frozen);
+  };
+  lifecycle.listen($('bPurchasePremium'), 'click', () => {
+    void purchaseAction(premium.purchase);
+  });
+  lifecycle.listen($('bRestorePremium'), 'click', () => {
+    void purchaseAction(premium.restore);
+  });
+  lifecycle.listen($('bRefreshPremium'), 'click', () => {
+    void premium.refresh();
+  });
+  lifecycle.listen($('bEquipPremium'), 'click', () => {
+    if (!premium.state.owned) return;
+    playerEquipment.film = PREMIUM_FILM;
+    store.set('issen.equip', playerEquipment);
+    $('supportMessage').textContent = 'Supporter Print selected. Change films any time in Armory.';
   });
   lifecycle.listen($('bArmory'), 'click', () => openPanel('armory'));
   lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
@@ -3424,7 +3509,14 @@ export function startGame(): () => void {
       g.fillStyle = 'rgba(120,18,12,0.16)';
       g.fillRect(0, 0, W, H);
     }
-    applyFilm(g, W, H, cvs, EQ.film, time);
+    applyFilm(
+      g,
+      W,
+      H,
+      cvs,
+      EQ.film === PREMIUM_FILM && !premium.state.owned ? 'mono' : EQ.film,
+      time,
+    );
     frameN++;
     const pat = grainPats[frameN % 3];
     if (pat) {

@@ -15,6 +15,7 @@ export const SCREENS: readonly Screen[] = [
   'template',
   'admin',
   'trials',
+  'support',
 ];
 type HudState = Pick<
   RunState,

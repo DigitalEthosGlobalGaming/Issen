@@ -21,6 +21,7 @@ export interface ArmoryOptions {
   items: readonly Item[];
   equipment: Equipment;
   unlocks: ReadonlySet<string>;
+  owns?(id: string): boolean;
   statistics: Statistics;
   seen?: Set<string>;
   onViewed?(): void;
@@ -50,6 +51,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     return element;
   };
   const ITEM_BY: Record<string, Item> = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
+  const owns = (id: string) => options.owns?.(id) ?? UNL.has(id);
   const seen = options.seen ?? new Set<string>();
   const newItem = (item: Item) => isNewArmoryItem(item, UNL, seen);
   let armTab: ItemCategory = 'blade',
@@ -60,8 +62,8 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     it.type === 'blade' ? SPECIAL[it.id] : it.type === 'robe' ? ROBE_AWAKENINGS[it.id] : undefined;
   const selectedAwakening = (it: Item) =>
     access(it.type) &&
-    UNL.has(it.id) &&
-    UNL.has(it.id + '+') &&
+    owns(it.id) &&
+    owns(it.id + '+') &&
     !!awakening(it) &&
     (it.type === 'blade'
       ? EQ.blade === it.id && (EQ.bladeSp || (it.id === 'steel' && EQ.bladeThird))
@@ -81,7 +83,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     tabs.innerHTML = '';
     for (const [t, label] of ARM) {
       const all = ITEMS.filter((i) => i.type === t),
-        own = all.filter((i) => UNL.has(i.id)).length;
+        own = all.filter((i) => owns(i.id)).length;
       const b = doc.createElement('button');
       b.type = 'button';
       b.className = 'tab';
@@ -114,15 +116,15 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     if (!armSel || ITEM_BY[armSel]?.type !== armTab) armSel = EQ[armTab];
     const category = ITEMS.filter((i) => i.type === armTab);
     for (const it of [
-      ...category.filter((i) => UNL.has(i.id)),
-      ...category.filter((i) => !UNL.has(i.id)),
+      ...category.filter((i) => owns(i.id)),
+      ...category.filter((i) => !owns(i.id)),
     ]) {
-      const own = UNL.has(it.id),
+      const own = owns(it.id),
         on = EQ[armTab] === it.id;
       const b = doc.createElement('button');
       b.type = 'button';
       const hid = it.hidden && !own,
-        spU = own && access(it.type) && !!awakening(it) && UNL.has(it.id + '+'),
+        spU = own && access(it.type) && !!awakening(it) && owns(it.id + '+'),
         aw = on && activeAwakening(it);
       b.className =
         'tile' +
@@ -149,7 +151,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         if (own) {
           if (armTab === 'blade') {
             if (again && spU) {
-              if (it.id === 'steel' && EQ.bladeSp && UNL.has('steel++')) {
+              if (it.id === 'steel' && EQ.bladeSp && owns('steel++')) {
                 EQ.bladeSp = false;
                 EQ.bladeThird = true;
               } else if (EQ.bladeThird) {
@@ -179,7 +181,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     }
     const it = ITEM_BY[armSel];
     if (!it) return;
-    const own = UNL.has(it.id),
+    const own = owns(it.id),
       awk = activeAwakening(it),
       sp = awk ? (it.id === 'steel' && EQ.bladeThird ? STEEL_THIRD : awakening(it)) : undefined;
     const display = itemPresentation(it);
@@ -204,7 +206,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     if (!access(it.type) || !own || (it.type !== 'blade' && it.type !== 'robe')) return '';
     const sp = awakening(it);
     if (!sp) return '';
-    const u = UNL.has(it.id + '+'),
+    const u = owns(it.id + '+'),
       q = options.awakeningProgress
         ? options.awakeningProgress(it.id, it.type)
         : it.type === 'blade'
@@ -223,7 +225,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     const third =
       it.id === 'steel'
         ? `<div class="spx">極 Third Awakening: ${
-            UNL.has('steel++')
+            owns('steel++')
               ? EQ.bladeThird
                 ? 'Selected. Tap again to return to normal.'
                 : 'Unlocked. Tap Steel again after its first Awakening to select.'

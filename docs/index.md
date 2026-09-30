@@ -1,8 +1,11 @@
 # Repository documentation
 
 - [Mobile and app-store release plan](features/mobile-store-release-plan.md):
-  Android prototype implementation and remaining iPhone packaging, native reliability, ads and purchases,
+  Android prototype implementation and remaining iPhone packaging, native reliability, Premium purchases,
   device testing, publisher setup and store release milestones.
+
+- [Premium supporter purchase](features/premium-supporter.md): Android support
+  screen, cosmetic ownership, RevenueCat configuration and sandbox release checks.
 
 - [Shrine blessings](features/shrine-blessings.md): seven new encounter and
   resource effects, ward behavior and checkpoint recovery.

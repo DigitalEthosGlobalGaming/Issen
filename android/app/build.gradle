@@ -50,6 +50,14 @@ android {
 
 // Never silently produce an unsigned Play Store candidate.
 gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name in ['bundleRelease', 'assembleRelease'] }) {
+        def webAssets = file('src/main/assets/public/assets')
+        if (webAssets.exists() && fileTree(webAssets).matching { include '**/*.js' }.any {
+            (it.getText('UTF-8') =~ /test_[A-Za-z0-9]{10,}/).find()
+        }) {
+            throw new GradleException('RevenueCat Test Store keys are forbidden in release assets. Use a goog_ SDK key and sync again.')
+        }
+    }
     if (graph.allTasks.any { it.project == project && it.name in ['bundleRelease', 'assembleRelease'] }
         && !hasUploadSigning) {
         throw new GradleException('Release signing is missing. Configure ISSEN_UPLOAD_* environment variables; see docs/development/android.md.')

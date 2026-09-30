@@ -15,7 +15,7 @@ test('Android assets cold-load with external networking blocked, including local
   });
   await page.goto('/');
   await expect(page.locator('#title')).toHaveClass(/on/);
-  await expect(page.locator('.title-version')).toHaveText('v1.10.0');
+  await expect(page.locator('.title-version').first()).toHaveText('v1.11.0');
   expect(
     await page.evaluate(async () => {
       const loaded = await document.fonts.load('800 24px "Shippori Mincho B1"', 'Issen 一閃');

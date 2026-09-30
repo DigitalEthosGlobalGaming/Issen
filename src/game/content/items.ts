@@ -38,6 +38,15 @@ export interface Item {
    */
   ok: (stats: Statistics) => boolean;
 }
+export const SUPPORTER_FILM_ITEM: Item = {
+  id: 'supporter-print',
+  type: 'film',
+  k: '映',
+  n: 'Supporter Print',
+  f: 'Warm ivory light, deep ink shadows and the texture of a treasured print.',
+  d: 'Included with the optional Premium supporter purchase.',
+  ok: () => false,
+};
 export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {
   return [
     ...trialRewardItems(),

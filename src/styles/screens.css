@@ -26,6 +26,28 @@
 #title {
   touch-action: none;
 }
+#premiumBadge {
+  color: #e6c48e;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 6px 0;
+}
+.supporter-box {
+  text-align: left;
+}
+.supporter-box canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid #75634d;
+}
+.supporter-box .btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+.supporter-box p {
+  line-height: 1.5;
+}
 .screen > * {
   flex-shrink: 0;
 }
@@ -174,17 +196,18 @@
   margin-top: 12px;
   min-height: 1em;
 }
-.title-version {
+.title-version,
+.title-privacy {
   margin-top: 8px;
   font: 11px/1 var(--font);
   color: var(--paper-dim);
   opacity: 0.65;
 }
-.title-version a {
+.title-privacy a {
   color: inherit;
   text-underline-offset: 3px;
 }
-.title-version a:focus-visible {
+.title-privacy a:focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 4px;
 }

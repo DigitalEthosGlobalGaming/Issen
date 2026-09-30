@@ -8,7 +8,24 @@ export function applyFilm(
 ) {
   if (f === 'mono') return;
   g.save();
-  if (f === 'trial-gold') {
+  if (f === 'supporter-print') {
+    // Soft-light preserves coloured attack cues rather than replacing their hue.
+    const print = g.createLinearGradient(0, 0, 0, H);
+    print.addColorStop(0, 'rgba(255,235,199,.26)');
+    print.addColorStop(0.5, 'rgba(218,196,158,.08)');
+    print.addColorStop(1, 'rgba(12,20,29,.28)');
+    g.globalCompositeOperation = 'soft-light';
+    g.fillStyle = print;
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+    // Sparse deterministic grain: no gameplay RNG and no preview/live state sharing.
+    for (let i = 0; i < 180; i++) {
+      const x = (((i * 137 + Math.floor(time * 8) * 17) % 997) / 997) * W;
+      const y = (((i * 251) % 991) / 991) * H;
+      g.fillStyle = i % 2 ? 'rgba(255,242,215,.045)' : 'rgba(8,12,20,.045)';
+      g.fillRect(x, y, 1, 1);
+    }
+  } else if (f === 'trial-gold') {
     const gold = g.createLinearGradient(0, 0, 0, H);
     gold.addColorStop(0, '#ffe58a');
     gold.addColorStop(0.45, '#e8b923');
