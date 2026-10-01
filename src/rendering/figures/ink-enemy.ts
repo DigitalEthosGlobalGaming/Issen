@@ -32,7 +32,29 @@ export function createInkEnemyRenderer(doc: Document) {
   const images = new Map<string, HTMLImageElement>(),
     loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
+    tones = new Map<string, HTMLCanvasElement>(),
     finish = new Set<() => void>();
+  // Separate costly pixel recoloring from cheap fog composites. Both stores are bounded.
+  const budgets = { variants: 6_000_000, tones: 2_000_000 };
+  let variantPixels = 0,
+    tonePixels = 0;
+  function retain(store: Map<string, HTMLCanvasElement>, key: string, canvas: HTMLCanvasElement) {
+    store.set(key, canvas);
+    const isTone = store === tones;
+    if (isTone) tonePixels += canvas.width * canvas.height;
+    else variantPixels += canvas.width * canvas.height;
+    while (
+      store.size > (isTone ? 48 : 192) ||
+      (isTone ? tonePixels : variantPixels) > (isTone ? budgets.tones : budgets.variants)
+    ) {
+      const oldest = store.keys().next().value!;
+      const image = store.get(oldest)!;
+      if (isTone) tonePixels -= image.width * image.height;
+      else variantPixels -= image.width * image.height;
+      image.width = image.height = 0;
+      store.delete(oldest);
+    }
+  }
   let disposed = false,
     pending: Promise<boolean> | undefined;
   function prepare(): Promise<boolean> {
@@ -114,34 +136,45 @@ export function createInkEnemyRenderer(doc: Document) {
     c.height = Math.max(1, Math.round(sh * ratio));
     const g = c.getContext('2d');
     if (!g) return null;
-    g.drawImage(image, sx, sy, sw, sh, 0, 0, c.width, c.height);
     if (palette) {
-      const data = g.getImageData(0, 0, c.width, c.height),
-        a = rgb(palette.robeD),
-        b = rgb(palette.robeL);
-      for (let i = 0; i < data.data.length; i += 4) {
-        if (!data.data[i + 3]) continue;
-        const t = Math.max(
-          0,
-          Math.min(1, (data.data[i]! + data.data[i + 1]! + data.data[i + 2]!) / 3 / 110),
-        );
-        for (let j = 0; j < 3; j++) data.data[i + j] = a[j]! + (b[j]! - a[j]!) * t;
+      const toneKey = key + ':' + palette.robeD + ':' + palette.robeL;
+      let tone = tones.get(toneKey);
+      if (tone) {
+        tones.delete(toneKey);
+        tones.set(toneKey, tone);
+      } else {
+        tone = doc.createElement('canvas');
+        tone.width = c.width;
+        tone.height = c.height;
+        const tg = tone.getContext('2d');
+        if (!tg) {
+          c.width = c.height = 0;
+          return null;
+        }
+        tg.drawImage(image, sx, sy, sw, sh, 0, 0, tone.width, tone.height);
+        const data = tg.getImageData(0, 0, tone.width, tone.height),
+          a = rgb(palette.robeD),
+          b = rgb(palette.robeL);
+        for (let i = 0; i < data.data.length; i += 4) {
+          if (!data.data[i + 3]) continue;
+          const t = Math.max(
+            0,
+            Math.min(1, (data.data[i]! + data.data[i + 1]! + data.data[i + 2]!) / 3 / 110),
+          );
+          for (let j = 0; j < 3; j++) data.data[i + j] = a[j]! + (b[j]! - a[j]!) * t;
+        }
+        tg.putImageData(data, 0, 0);
+        retain(tones, toneKey, tone);
       }
-      g.putImageData(data, 0, 0);
-    }
+      g.drawImage(tone, 0, 0);
+    } else g.drawImage(image, sx, sy, sw, sh, 0, 0, c.width, c.height);
     if (fog) {
       g.globalCompositeOperation = 'source-atop';
       g.globalAlpha = fog;
       g.fillStyle = mist;
       g.fillRect(0, 0, c.width, c.height);
     }
-    cache.set(keyFull, c);
-    if (cache.size > 96) {
-      const first = cache.keys().next().value!;
-      const old = cache.get(first)!;
-      old.width = old.height = 0;
-      cache.delete(first);
-    }
+    retain(cache, keyFull, c);
     return c;
   }
   function stamp(
@@ -273,6 +306,10 @@ export function createInkEnemyRenderer(doc: Document) {
       ready: loaded.has('base'),
       loaded: [...loaded],
       cachedParts: cache.size,
+      toneParts: tones.size,
+      variantPixels,
+      tonePixels,
+      maxCachePixels: budgets.variants + budgets.tones,
       disposed,
     }),
     dispose() {
@@ -284,7 +321,10 @@ export function createInkEnemyRenderer(doc: Document) {
       }
       for (const fn of [...finish]) fn();
       for (const c of cache.values()) c.width = c.height = 0;
+      for (const c of tones.values()) c.width = c.height = 0;
       cache.clear();
+      tones.clear();
+      variantPixels = tonePixels = 0;
       images.clear();
       loaded.clear();
     },

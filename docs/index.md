@@ -1,7 +1,7 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
-- [Ink character puppets](features/character-art.md): modular player outfits and enemy parts, Steel sword, shared Artwork toggle and per-item Classic fallback.
+- [Ink character puppets](features/character-art.md): modular player outfits, enemies, blades, charms and companions with a single Ink renderer.
 
 - [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.
 
@@ -11,7 +11,7 @@
 
 - [Cinematic scene viewer](features/cinematic.md): title-logo entry, scene browsing, film comparisons, and session restore.
 
-- [Ink layer renderer preview](features/ink-renderer.md): optional AI sprite environments, responsive depth layers, live Classic/Ink switching and film compatibility.
+- [Ink layer renderer preview](features/ink-renderer.md): AI sprite environments, responsive depth layers, validated asset startup and film compatibility.
 
 - [Editions, haptics and mastery rewards](features/editions-and-mastery.md):
   implemented Free/Premium/Web access, combat vibration, kill effects, Temple upgrades,
@@ -64,3 +64,5 @@
   proposed module boundaries, file structure, migration order and verification.
 
 - [Changelog](features/changelog.md): release notes and persistent update indication.
+
+- [Artwork performance](features/rendering-performance.md): reproducible sprite stress workloads, bounded tint caches and measured results.
