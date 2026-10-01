@@ -1,3 +1,4 @@
+import { trialAccessible } from '../../platform/editions.ts';
 import { TRIALS } from '../../game/content/trials.ts';
 import { trialsUnlocked } from '../../game/progression/trials.ts';
 import type { TrialProgress } from '../../game/progression/trials.ts';
@@ -17,6 +18,7 @@ export function renderTrials(
   result: TrialResult | null,
   start: (id: string) => void,
   backToTitle: () => void,
+  premiumAccess = false,
 ): void {
   const doc = root.ownerDocument;
   const unlocked = trialsUnlocked(roninWave);
@@ -41,7 +43,7 @@ export function renderTrials(
     retry.className = 'btn primary';
     retry.type = 'button';
     retry.textContent = 'Retry';
-    retry.disabled = !unlocked;
+    retry.disabled = !unlocked || !trialAccessible(trial.id, premiumAccess);
     retry.onclick = () => start(trial.id);
     outcome.append(heading);
     if (!result.passed) {
@@ -78,13 +80,15 @@ export function renderTrials(
     button.type = 'button';
     button.className = 'btn';
     button.dataset.trial = trial.id;
-    button.textContent = !unlocked
-      ? 'Locked'
-      : progress.completed.includes(trial.id)
-        ? 'Replay'
-        : 'Begin';
+    button.textContent = !trialAccessible(trial.id, premiumAccess)
+      ? 'Requires Premium'
+      : !unlocked
+        ? 'Locked'
+        : progress.completed.includes(trial.id)
+          ? 'Replay'
+          : 'Begin';
     button.setAttribute('aria-label', `${button.textContent} ${trial.name}: ${trial.objective}`);
-    button.disabled = !unlocked;
+    button.disabled = !unlocked || !trialAccessible(trial.id, premiumAccess);
     button.onclick = () => start(trial.id);
     card.append(heading, description, reward, button);
     list.append(card);

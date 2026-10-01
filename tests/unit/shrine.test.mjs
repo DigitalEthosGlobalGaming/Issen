@@ -5,6 +5,7 @@ import {
   BOSS_RUSH_BLESSINGS,
   shrineOffers,
   applyBlessing,
+  rareChance,
 } from '../../src/game/shrine/blessings.ts';
 import { rng } from '../../src/shared/random.ts';
 import { computeModifiers } from '../../src/game/equipment/modifiers.ts';
@@ -39,9 +40,9 @@ test('Offerings ranks persist, retain the extra choice and add rarity to equipme
 
 test('rare chance improves rolls and guarantees stack without duplicates or exhausted-pool loops', () => {
   const run = state();
-  assert.ok(shrineOffers(run, () => 0.4).every((b) => b.t === 0));
+  assert.ok(shrineOffers(run, () => 0.2).every((b) => b.t === 0));
   run.m.rare = 0.2;
-  assert.ok(shrineOffers(run, () => 0.4).some((b) => b.t === 1));
+  assert.ok(shrineOffers(run, () => 0.2).some((b) => b.t === 1));
   run.m.rare = 0;
   run.m.rareShrine = 2;
   for (let seed = 0; seed < 100; seed++) {
@@ -66,6 +67,49 @@ const state = () => ({
   runWards: 0,
   bossCount: 0,
   m: { noShrine: 0, shrineN: 3, rare: 0, rareShrine: 0 },
+});
+
+test('rare odds rise with bosses and natural offers match the curve across fixed seeds', () => {
+  for (const [bosses, expected] of [
+    [1, 0.08],
+    [2, 0.12],
+    [3, 0.18],
+    [4, 0.18],
+    [5, 0.24],
+    [6, 0.24],
+    [7, 0.3],
+    [20, 0.3],
+  ]) {
+    assert.equal(rareChance(bosses), expected);
+    const run = state();
+    run.bossCount = bosses;
+    run.bless = new Set(BLESS.filter((b) => b.t === 2).map((b) => b.id));
+    let any = 0,
+      rareSlots = 0;
+    for (let seed = 0; seed < 5000; seed++) {
+      const offers = shrineOffers(run, rng(seed));
+      const count = offers.filter((b) => b.t === 1).length;
+      rareSlots += count;
+      if (count) any++;
+    }
+    assert.ok(
+      Math.abs(rareSlots / 15000 - expected) < 0.02,
+      `boss ${bosses}: ${rareSlots / 15000}`,
+    );
+    assert.ok(Math.abs(any / 5000 - (1 - (1 - expected) ** 3)) < 0.03);
+  }
+});
+test('rare bonuses add to early odds, extra choices use them, and extremes clamp', () => {
+  const run = state();
+  run.bossCount = 1;
+  run.m.shrineN = 5;
+  assert.ok(shrineOffers(run, () => 0.1).every((b) => b.t === 0));
+  run.m.rare = 0.15;
+  assert.equal(shrineOffers(run, () => 0.1).filter((b) => b.t === 1).length, 5);
+  run.m.rare = -5;
+  assert.ok(shrineOffers(run, () => 0).every((b) => b.t === 0));
+  run.m.rare = 5;
+  assert.ok(shrineOffers(run, () => 0.99).every((b) => b.t === 1));
 });
 
 test('shrine offers are deterministic, unique, and exclude owned or mode-ineligible blessings', () => {

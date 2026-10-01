@@ -194,6 +194,15 @@
 .tile.locked {
   opacity: 0.38;
 }
+.tile small {
+  font-size: 9px;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--paper);
+}
+.tile:has(small) {
+  opacity: 0.7;
+}
 .tile .spb {
   position: absolute;
   bottom: 4px;

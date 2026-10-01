@@ -5,11 +5,12 @@ store configuration and physical sandbox transactions remain unverified. No
 advertising SDK is included. GitHub Pages billing remains unavailable.
 
 **Paused for closed testing:** `VITE_PREMIUM_ENABLED` defaults to `false`. The
-closed-testing candidate hides Support Issen, purchase/restore controls, the
-Premium badge and Supporter Print catalog entry. RevenueCat is not configured or
-queried while disabled, even if a public SDK key is present. Saved paid-film IDs
-fall back to Monochrome; existing free films remain available. The implementation
-is retained for later, and RevenueCat/store setup work is paused.
+Free mobile build hides Support Issen and purchase/restore controls while billing
+is disabled. Premium collection entries remain visible with Requires Premium.
+RevenueCat is not configured or queried while disabled, even if a public SDK key
+is present. A build-granted Premium or Web edition independently grants collection
+access and its title label. Free builds fall back from unavailable paid selections.
+RevenueCat/store setup remains paused.
 Disabled builds also omit the configured SDK key from compiled web assets.
 
 ## Player experience
@@ -18,8 +19,11 @@ When explicitly enabled, the Android title screen offers **Support Issen**. One 
 grants **Supporter Print**, an exclusive warm-ivory/deep-ink film with restrained
 grain, and a **Premium** title label. The support screen has an isolated canvas
 preview, localized store price, restore and explicit film-selection buttons.
-Purchasing does not automatically change the equipped film. Existing gameplay,
-earned films and Trial rewards stay free; no subscriptions or repeat tips exist.
+Purchasing does not automatically change the equipped film. As of 1.13.0 it also
+opens the [mastery collection](editions-and-mastery.md), including earned kill
+effects, Temple upgrades, charms and two Trials. Existing free content stays free;
+no subscriptions or repeat tips exist. Web grants this access without purchases,
+and `VITE_GAME_EDITION=premium` enables a purchase-free beta build.
 
 ## Ownership and code boundaries
 
@@ -32,9 +36,9 @@ earned films and Trial rewards stay free; no subscriptions or repeat tips exist.
 - The SDK's native CustomerInfo cache supplies offline ownership. No localStorage
   Premium flag is trusted. Network failures retain ownership already obtained in
   the running session; later authoritative inactive data revokes access.
-- `game.ts` reconciles the film into the live unlock set, strips paid grants from
-  profile/checkpoint input and falls back to Monochrome on revoked access. Armory
-  selection checks entitlement independently of the ordinary unlock set.
+- `game.ts` reconciles Supporter Print, strips its profile/checkpoint grant and
+  falls back on unavailable selections. Build access and verified entitlements
+  open edition gates independently of earned unlocks/ranks; see the edition rules.
 - Content lives in `game/content/items.ts`; the shared explicit-canvas effect is
   in `rendering/effects/film.ts`; support markup/controller live in `ui/screens/`.
   Grain uses no combat randomness and previews use their own canvas.

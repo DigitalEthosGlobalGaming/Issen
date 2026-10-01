@@ -52,4 +52,6 @@ export interface Boss {
   pos: EnemyPosition;
   fromStrike?: boolean;
   zenBack?: boolean;
+  shadowTime?: number;
+  deathGround?: EnemyPosition;
 }

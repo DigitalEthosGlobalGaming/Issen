@@ -116,32 +116,43 @@ test('awakening purchases split weapons and outfits and preserve old combined ac
   );
 });
 
-test('seven upgrade catalog includes unified knives and enforces maximum ranks', () => {
+test('nine upgrade catalog includes unified knives and enforces maximum ranks', () => {
   const meta = parseMeta({ embers: 10000 });
-  assert.equal(TEMPLATE_UPGRADES.length, 7);
+  assert.equal(TEMPLATE_UPGRADES.length, 9);
   assert.equal(purchaseUpgrade(meta, 'pouch'), false);
   assert.equal(meta.embers, 10000);
   for (const upgrade of TEMPLATE_UPGRADES) {
     for (let rank = 0; rank < upgrade.maxRank; rank++) {
       const before = meta.embers;
-      assert.equal(purchaseUpgrade(meta, upgrade.id), true);
+      assert.equal(purchaseUpgrade(meta, upgrade.id, true), true);
       assert.equal(meta.embers, before - upgrade.costs[rank]);
     }
     assert.equal(purchaseUpgrade(meta, upgrade.id), false);
   }
-  assert.deepEqual(templatePowers(meta, normal), { knives: 3, composure: 2, recoveryEvery: 3 });
+  assert.deepEqual(templatePowers(meta, normal), {
+    knives: 3,
+    composure: 2,
+    recoveryEvery: 3,
+    shrineRerolls: 0,
+  });
   assert.equal(templateModifiers(meta, normal).lives, 3);
   assert.deepEqual(templatePowers(meta, { ...normal, upgrades: false }), {
     knives: 0,
     composure: 0,
     recoveryEvery: 0,
+    shrineRerolls: 0,
   });
   assert.equal(meta.upgrades.vitality, 3);
 });
 
 test('orphaned pouch ranks grant no knife and recovery rank one needs six waves', () => {
   const meta = parseMeta({ schemaVersion: 2, upgrades: { pouch: 2, recovery: 1 } });
-  assert.deepEqual(templatePowers(meta, normal), { knives: 0, composure: 0, recoveryEvery: 6 });
+  assert.deepEqual(templatePowers(meta, normal), {
+    knives: 0,
+    composure: 0,
+    recoveryEvery: 6,
+    shrineRerolls: 0,
+  });
 });
 
 test('boss positions unlock modes once and reveal state survives reload', () => {

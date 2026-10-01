@@ -5,7 +5,20 @@ import { updateEffects } from '../../src/rendering/effects/update.ts';
 import { createEffectSpawner } from '../../src/rendering/effects/spawn.ts';
 import { createItems } from '../../src/game/content/items.ts';
 import { rng } from '../../src/shared/random.ts';
+import { SHADOW_DURATION, BOSS_SHADOW_DURATION } from '../../src/rendering/figures/death.ts';
 const env = { scale: 1, wind: 0, time: 1, random: () => 0.5, onSwordStuck() {} };
+
+test('death ground marks expire in unscaled time even while combat is stopped', () => {
+  for (const life of [SHADOW_DURATION, BOSS_SHADOW_DURATION]) {
+    const fx = createEffects();
+    fx.stains.push({ x: 100, y: 200, rx: 30, t: 0, life });
+    updateEffects(fx, 0, life / 2, env);
+    assert.equal(fx.stains.length, 1);
+    assert.equal(fx.stains[0].t, life / 2);
+    updateEffects(fx, 0, life / 2, env);
+    assert.equal(fx.stains.length, 0);
+  }
+});
 
 test('every catalog kill effect spawns finite particles and expires independently', () => {
   const items = createItems(() => new Set()).filter((item) => item.type === 'fx');

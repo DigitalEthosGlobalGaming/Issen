@@ -72,7 +72,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/8 complete');
+  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/10 complete');
   await expect(page.locator('.trials-rules')).toHaveText('One hit ends the trial.');
   await expect(page.locator('[data-trial="true-edge"]').locator('..')).toContainText(
     '10 perfect cuts in 12. No hits.',
@@ -155,10 +155,10 @@ test('All eight encounters complete through combat and persist exclusive rewards
     await expect(page.locator('#trialResult')).toContainText('Unlocked:');
   }
   expect(await saves(page)).toEqual(before);
-  await expect(page.locator('#trialsAccess')).toContainText('8/8');
+  await expect(page.locator('#trialsAccess')).toContainText('8/10');
   await page.reload();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('8/8');
+  await expect(page.locator('#trialsAccess')).toContainText('8/10');
   expect(
     await page.evaluate(
       () =>

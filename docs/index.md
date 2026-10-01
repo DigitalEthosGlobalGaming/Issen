@@ -1,5 +1,13 @@
 # Repository documentation
 
+- [Editions, haptics and mastery rewards](features/editions-and-mastery.md):
+  implemented Free/Premium/Web access, combat vibration, kill effects, Temple upgrades,
+  Pilgrim's Bead, Quiet Blade and Duel Master with its scoring-charm reward.
+
+- [Release 1.12](features/feature-plan-07.md): implemented blessing rarity curve,
+  enemy shadow cleanup and death variety, Options submenus, and shorter Armoury
+  Trial reward requirements for 1.12.0.
+
 - [Mobile and app-store release plan](features/mobile-store-release-plan.md):
   Android prototype implementation and remaining iPhone packaging, native reliability, Premium purchases,
   device testing, publisher setup and store release milestones.

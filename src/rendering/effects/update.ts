@@ -48,7 +48,7 @@ export function updateEffects(fx: Effects, dt: number, raw: number, env: EffectE
     c.rot += c.vr * dt;
   }
   fx.scraps = fx.scraps.filter((c) => c.t < c.life);
-  for (const s of fx.stains) s.t += dt;
+  for (const s of fx.stains) s.t += raw;
   fx.stains = fx.stains.filter((s) => s.t < s.life);
   for (const q of fx.petals) {
     q.t += dt;

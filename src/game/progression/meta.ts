@@ -1,7 +1,15 @@
 import type { Setup } from '../../platform/saves.ts';
 
 export type UpgradeId =
-  'vitality' | 'focus' | 'offerings' | 'awakening' | 'knife' | 'composure' | 'recovery';
+  | 'vitality'
+  | 'focus'
+  | 'offerings'
+  | 'awakening'
+  | 'knife'
+  | 'composure'
+  | 'recovery'
+  | 'precision'
+  | 'discernment';
 export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze({
   vitality: 0,
   focus: 0,
@@ -10,6 +18,8 @@ export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze
   knife: 0,
   composure: 0,
   recovery: 0,
+  precision: 0,
+  discernment: 0,
 });
 export type TutorialStatus = 'new' | 'completed' | 'skipped';
 /** Persistent account progression. Pending combat rewards are settled only
@@ -34,10 +44,28 @@ export interface TemplateUpgrade {
   costs: readonly number[];
   maxRank: number;
   requires?: UpgradeId;
+  premium?: boolean;
 }
 /** Cost index equals owned rank. Extend the parser and modifier composition
  * alongside this catalog when introducing a new permanent upgrade. */
 export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
+  {
+    id: 'precision',
+    name: 'Precision',
+    description:
+      'Widen perfect-cut and duel parry windows by 5%, 10%, then 15%. Stacks with equipment.',
+    costs: [150, 250, 400],
+    maxRank: 3,
+    premium: true,
+  },
+  {
+    id: 'discernment',
+    name: 'Discernment',
+    description: 'Reroll one Shrine offer per run. The same rarity and eligibility rules apply.',
+    costs: [250],
+    maxRank: 1,
+    premium: true,
+  },
   {
     id: 'vitality',
     name: 'Vitality',
@@ -176,6 +204,8 @@ export function parseMeta(
             : 0,
       composure: integer(ranks.composure, 2),
       recovery: integer(ranks.recovery, 2),
+      precision: integer(ranks.precision, 3),
+      discernment: integer(ranks.discernment, 1),
     },
     bossMilestone,
     revealSeen: established ? 3 : integer(saved.revealSeen, bossMilestone),
@@ -187,9 +217,9 @@ export function parseMeta(
   };
 }
 /** Validated synchronous purchase; unaffordable or maximum-rank clicks do nothing. */
-export function purchaseUpgrade(meta: MetaProgress, id: string): boolean {
+export function purchaseUpgrade(meta: MetaProgress, id: string, premiumAccess = false): boolean {
   const upgrade = TEMPLATE_UPGRADES.find((entry) => entry.id === id);
-  if (!upgrade) return false;
+  if (!upgrade || (upgrade.premium && !premiumAccess)) return false;
   if (upgrade.requires && meta.upgrades[upgrade.requires] < 1) return false;
   const rank = meta.upgrades[upgrade.id];
   if (!Number.isInteger(rank) || rank < 0 || rank >= upgrade.maxRank) return false;
@@ -213,9 +243,11 @@ export function templateEligible(setup: Setup): boolean {
 export function templatePowers(
   meta: MetaProgress,
   setup: Setup,
-): { knives: number; composure: number; recoveryEvery: number } {
+  premiumAccess = false,
+): { knives: number; composure: number; recoveryEvery: number; shrineRerolls: number } {
   const ranks = templateEligible(setup) ? parseMeta(meta).upgrades : EMPTY_UPGRADES;
   return {
+    shrineRerolls: premiumAccess ? ranks.discernment : 0,
     knives: ranks.knife,
     composure: ranks.composure,
     recoveryEvery: ranks.recovery === 2 ? 3 : ranks.recovery === 1 ? 6 : 0,
@@ -224,13 +256,20 @@ export function templatePowers(
 export function templateModifiers(
   meta: MetaProgress,
   setup: Setup,
-): { lives: number; parry: number; shrineN: number; rare?: number; rareShrine?: number } {
-  const ranks = templateEligible(setup)
-    ? parseMeta(meta).upgrades
-    : { vitality: 0, focus: 0, offerings: 0 };
+  premiumAccess = false,
+): {
+  lives: number;
+  parry: number;
+  shrineN: number;
+  precision?: number;
+  rare?: number;
+  rareShrine?: number;
+} {
+  const ranks = templateEligible(setup) ? parseMeta(meta).upgrades : EMPTY_UPGRADES;
   return {
     lives: ranks.vitality,
-    parry: 1 + ranks.focus * 0.05,
+    parry: (1 + ranks.focus * 0.05) * (1 + (premiumAccess ? ranks.precision * 0.05 : 0)),
+    ...(premiumAccess && ranks.precision ? { precision: ranks.precision * 0.05 } : {}),
     shrineN: ranks.offerings ? 4 : 0,
     ...(ranks.offerings >= 2 ? { rare: 0.2 } : {}),
     ...(ranks.offerings >= 3 ? { rareShrine: 1 } : {}),

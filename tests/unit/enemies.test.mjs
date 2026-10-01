@@ -220,3 +220,24 @@ test('rapid deaths expire with their visual effects under small slow-motion step
   updateEnemies(state, 0.2, env);
   assert.equal(state.enemies.length, 0);
 });
+
+test('new deaths expire and shadows advance on unpaused raw time during slow motion', () => {
+  const { state, env } = fixture();
+  state.enemies = ['fall', 'crumple'].map((deathType) => ({
+    ...enemy(),
+    state: 'dying',
+    deathType,
+    shadowTime: 0,
+  }));
+  for (let i = 0; i < 8; i++) updateEnemies(state, 0.005, { ...env, rawDelta: 0.05 });
+  assert.equal(state.enemies.length, 2);
+  assert.ok(state.enemies.every((e) => Math.abs(e.shadowTime - 0.4) < 1e-9 && e.t < 0.05));
+  const before = state.enemies.map((e) => e.shadowTime);
+  updateEnemies(state, 0, { ...env, rawDelta: 0 });
+  assert.deepEqual(
+    state.enemies.map((e) => e.shadowTime),
+    before,
+  );
+  updateEnemies(state, 1.1, { ...env, rawDelta: 1.1 });
+  assert.equal(state.enemies.length, 0);
+});

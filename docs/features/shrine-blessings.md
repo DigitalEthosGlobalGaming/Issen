@@ -3,6 +3,19 @@
 Seven blessings add encounter, resource and ward choices without changing the
 saved run's seeded combat decisions. Shrine offer IDs remain fixed in checkpoints.
 
+## Rarity progression in 1.12
+
+Natural rare odds per ordinary choice are 8% after boss one, 12% after boss two,
+18% after bosses three/four, 24% after bosses five/six and 30% from boss seven.
+Equipment and Temple bonuses add percentage points; guarantees still work from
+the first Shrine. Curses retain their existing 40% insertion roll from boss two,
+occupying one choice. Offers remain unique and mode-filtered; an exhausted common
+pool can force rare fallback. Waves and Boss Rush use the same curve with their
+own boss count, and Boss Rush retains its duel-relevant pool. Existing checkpoint
+offers restore unchanged; newly generated offers use the new curve.
+
+## Blessing effects
+
 | Blessing | Tier | Rule |
 | --- | --- | --- |
 | Knife Dance | Common | Only enters the pool when this run can carry a Temple Throwing Knife. Every third consecutive perfect cut returns one knife, up to capacity. Unlocking it has no announcement. |

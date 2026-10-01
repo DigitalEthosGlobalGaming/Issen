@@ -1,4 +1,5 @@
 import type { Direction } from '../../shared/directions.ts';
+import type { DeathStyle } from '../../rendering/figures/death.ts';
 import type { FigureSeed, Pose } from '../../rendering/figures/types.ts';
 export interface EnemyPosition {
   x: number;
@@ -33,7 +34,10 @@ export interface Enemy {
   rang?: boolean;
   still?: boolean;
   zen?: boolean;
-  deathType?: string;
+  deathType?: DeathStyle;
+  /** Unpaused real time, separate from slowed combat/death animation time. */
+  shadowTime?: number;
+  deathGround?: EnemyPosition;
   cutAng?: number;
   fallDir?: number;
 }

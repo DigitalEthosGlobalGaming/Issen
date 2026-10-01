@@ -1,3 +1,5 @@
+import { drawJinbaori } from './jinbaori.ts';
+import { drawDemonMask } from './masks.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
 import type {
@@ -10,9 +12,10 @@ import type {
   Aura,
 } from './types.ts';
 export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
-  const { time, wind, petActive, width: W, height: H, palette: cols, random: R } = env;
+  const { time: clock, wind, petActive, width: W, height: H, palette: cols, random: R } = env;
+  const time = env.reducedMotion ? 0 : clock;
   function drawThirdLightning(length: number) {
-    const pulse = Math.floor(time * 18);
+    const pulse = env.reducedFlashes ? 0 : Math.floor(time * 18);
     const arcs = (env.effectDensity ?? 1) < 0.55 ? 1 : 2;
     g.lineCap = 'round';
     g.lineJoin = 'round';
@@ -32,7 +35,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.strokeStyle = 'rgba(239,253,255,.96)';
       g.lineWidth = 0.008;
       g.stroke();
-      const head = (time * 1.1 + arc * 0.47) % 1;
+      const head = env.reducedFlashes ? 0.5 : (time * 1.1 + arc * 0.47) % 1;
       g.beginPath();
       for (let i = 0; i <= 4; i++) {
         const u = Math.max(0, head - 0.2 + (i / 4) * 0.2);
@@ -265,7 +268,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
   function drawGlint(x: number, y: number, k: number) {
     g.save();
     g.globalCompositeOperation = 'lighter';
-    const s = k * (0.2 + 0.035 * Math.sin(time * 45));
+    const s = k * (0.2 + (env.reducedFlashes ? 0 : 0.035 * Math.sin(time * 45)));
     const rg = g.createRadialGradient(x, y, 0, x, y, s);
     rg.addColorStop(0, 'rgba(255,255,250,.95)');
     rg.addColorStop(0.25, 'rgba(255,250,235,.45)');
@@ -573,7 +576,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.quadraticCurveTo(hx, hy - 0.004, hx + 0.15, hy - 0.02);
       g.stroke();
     }
-    if (['oni', 'tengu', 'kitsune', 'noh'].includes(v)) {
+    if (v === 'oni' || v === 'tengu') drawDemonMask(g, v, hx, hy, !!f.back);
+    if (['kitsune', 'noh'].includes(v)) {
       const mx = hx + (f.back ? 0.045 : 0),
         my = hy - 0.004,
         pale = v === 'kitsune' || v === 'noh';
@@ -581,21 +585,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.beginPath();
       g.ellipse(mx, my, f.back ? 0.02 : 0.042, 0.05, 0, 0, TAU);
       g.fill();
-      if (v === 'oni') {
-        g.fillStyle = C.steelL;
-        g.beginPath();
-        g.moveTo(mx - 0.008, my - 0.045);
-        g.lineTo(mx - 0.002, my - 0.078);
-        g.lineTo(mx + 0.006, my - 0.045);
-        g.fill();
-      } else if (v === 'tengu') {
-        g.fillStyle = '#8c2a1f';
-        g.beginPath();
-        g.moveTo(mx + 0.012, my - 0.006);
-        g.lineTo(mx + 0.075, my + 0.004);
-        g.lineTo(mx + 0.012, my + 0.012);
-        g.fill();
-      } else if (v === 'kitsune') {
+      if (v === 'kitsune') {
         g.beginPath();
         g.moveTo(mx - 0.014, my - 0.035);
         g.lineTo(mx - 0.01, my - 0.07);
@@ -1104,19 +1094,6 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.stroke();
       }
     }
-    if (f.coat) {
-      g.fillStyle = '#5e4d3b';
-      g.beginPath();
-      g.moveTo(-0.17 + lx, -0.8);
-      g.lineTo(0.17 + lx, -0.8);
-      g.lineTo(0.25 + lx * 0.5, -0.36);
-      g.lineTo(-0.25 + lx * 0.5, -0.36);
-      g.closePath();
-      g.fill();
-      g.strokeStyle = '#b8923a';
-      g.lineWidth = 0.008;
-      g.stroke();
-    }
     if (f.cape) {
       g.fillStyle = C.straw;
       g.beginPath();
@@ -1161,7 +1138,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineTo(lx * 0.5, -0.52);
       g.stroke();
     }
-    if (f.back && f.crest && !f.cape) drawCrest(f.crest, lx * 0.75, -0.67, 0.06);
+
     g.fillStyle = C.obi;
     g.beginPath();
     g.moveTo(-0.118 + lx * 0.52, -0.545);
@@ -1170,6 +1147,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.lineTo(-0.116 + lx * 0.5, -0.495);
     g.closePath();
     g.fill();
+    if (f.coat) drawJinbaori(g, !!f.back, lx, time, wind);
+    if (f.back && f.crest && !f.cape) drawCrest(f.crest, lx * 0.75, -0.67, 0.06);
     if (f.charm) {
       const cx = 0.1 + lx * 0.5,
         cy = -0.49;
@@ -1238,6 +1217,18 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     }
     g.restore();
   }
+  function drawGroundShadow(f: Pick<Figure, 'x' | 'y' | 'h' | 'alpha'>, opacity = 1) {
+    if (opacity <= 0) return;
+    g.save();
+    g.globalAlpha *= opacity * (f.alpha ?? 1);
+    g.translate(f.x, f.y);
+    g.scale(f.h, f.h);
+    g.fillStyle = 'rgba(0,0,0,.25)';
+    g.beginPath();
+    g.ellipse(0.05, 0.004, 0.36, 0.035, 0, 0, TAU);
+    g.fill();
+    g.restore();
+  }
   function drawSplit(
     f: Figure,
     p: { x: number; y: number; h: number },
@@ -1257,15 +1248,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     // Ground contact belongs to the whole figure, not either moving fragment.
     // Drawing it inside each clipped half made shadows drift with falling bodies.
     if (!f.noShadow) {
-      g.save();
-      g.globalAlpha *= fade * (f.alpha ?? 1);
-      g.translate(p.x, p.y);
-      g.scale(p.h, p.h);
-      g.fillStyle = 'rgba(0,0,0,.25)';
-      g.beginPath();
-      g.ellipse(0.05, 0.004, 0.36, 0.035, 0, 0, TAU);
-      g.fill();
-      g.restore();
+      drawGroundShadow({ ...p, alpha: f.alpha }, fade);
     }
     for (const side of [1, -1]) {
       g.save();
@@ -1285,5 +1268,5 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     }
   }
 
-  return { drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf };
+  return { drawFigure, drawSplit, drawGroundShadow, drawPetAt, drawSword, drawGlint, tipOf };
 }

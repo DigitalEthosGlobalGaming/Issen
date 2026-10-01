@@ -46,7 +46,7 @@ test('All trial objectives require the full encounter, and failure overrides com
   }
 });
 
-test('Rewards are exclusive cosmetics and completion reconciles interrupted writes idempotently', () => {
+test('Trial rewards reconcile interrupted writes idempotently, including First Strike', () => {
   const progress = parseTrialProgress(null);
   const unlocks = new Set(['steel']);
   const items = createItems(() => unlocks);
@@ -55,9 +55,9 @@ test('Rewards are exclusive cosmetics and completion reconciles interrupted writ
     assert.equal(completeTrial(progress, trial.id), true);
     assert.equal(completeTrial(progress, trial.id), false);
     const item = items.find((entry) => entry.id === trial.reward.id);
-    assert.ok(['fx', 'film', 'seal'].includes(item.type));
+    assert.ok(['fx', 'film', 'seal', 'charm'].includes(item.type));
     assert.equal(item.ok({}), false);
-    assert.equal(item.m, undefined);
+    assert.deepEqual(item.m, trial.id === 'duel-master' ? { swift: 1 } : undefined);
   }
   const restored = parseTrialProgress(JSON.parse(JSON.stringify(progress)));
   grantTrialRewards(restored, unlocks);

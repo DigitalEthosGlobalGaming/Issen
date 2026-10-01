@@ -9,7 +9,11 @@ the **Trials unlocked** checkbox; ordinary player saves are unaffected.
 
 ## Encounters and rewards
 
-| Trial | Completion condition | Cosmetic reward |
+Armoury reward requirements name the Trial to complete. As of 1.12.0 they no
+longer repeat the mode's Ronin-wave unlock threshold; the access gate itself is
+unchanged. Shared reward reveals use the same shorter catalog copy.
+
+| Trial | Completion condition | Reward |
 | --- | --- | --- |
 | Unbroken | Cut 20 ordered enemies, no mistakes | Still ripples kill effect |
 | True Edge | Cut 12 enemies, at least 10 perfect cuts, no mistakes | Platinum seal |
@@ -19,12 +23,17 @@ the **Trials unlocked** checkbox; ordinary player saves are unaffected.
 | Three Masters | Defeat Ronin Kagemaru, Twin Fang and Mirror without hits, wrong counters or expired openings | Pale dawn film |
 | Golden Sovereign | Defeat 1,000 enemies in one wave without a hit | Imperial gold film |
 | Broken Reality | 1,000 perfect cuts in one wave; an ordinary cut or hit ends the attempt | Broken signal film |
+| Quiet Blade (Premium/Web) | 24 arrowless enemies, at least 18 perfect cuts, no mistakes | Quiet jade seal |
+| Duel Master (Premium/Web) | 20 consecutive accelerating counter-and-cut exchanges, no mistakes | First Strike charm |
 
-All eight trials are available immediately after access. Each uses Tamahagane,
+The original eight trials remain free after access. Quiet Blade and Duel Master
+require Premium or Web edition access. See [mastery rules](editions-and-mastery.md)
+for their timing, failure and reward details. Each uses Tamahagane,
 Sumi, no charm/companion/crest, no Temple or awakened powers, no knives, no shrine
 and no recovery. A hit ends the attempt. Selected kill effects, seal colours and
 film looks remain visible. Wave timings and enemy counts are fixed by the trial
-catalog. Duel timings use the existing Ronin boss rules. Combat uses a fresh
+catalog. Original duel timings use the existing Ronin boss rules; Duel Master
+uses its bounded accelerating curve. Combat uses a fresh
 seeded random stream on each attempt, separate from rendering and effects;
 identical input timing reproduces encounter choices. Visual weather hazards are
 neutralized for trial combat. A trial ends on the first hit or missed opening
@@ -35,12 +44,13 @@ The HUD shows the objective and progress. Failure or ending from pause opens a
 dedicated result view with the trial name, objective, failure reason, Retry and
 Back to title. Returning to the title clears that result. Completion returns to
 the Trials list with the reward and Retry button. A failed
-perfect-cut target grants nothing. Replays never duplicate rewards. All rewards
-are cosmetic and can be equipped in the Armoury in other modes.
+perfect-cut target grants nothing. Replays never duplicate rewards. Rewards
+can be equipped in the Armoury in other modes; First Strike is a scoring charm,
+while other rewards are cosmetic. Edition restrictions apply to new rewards.
 
 ## Ownership and persistence
 
-- `src/game/content/trials.ts` owns presets and cosmetic reward metadata.
+- `src/game/content/trials.ts` owns presets and cosmetic/charm reward metadata.
 - `src/game/progression/trials.ts` owns access, validation, objective checks and
   idempotent completion/reward grants.
 - `src/ui/screens/trials.*` owns the trial list, requirements, result and retry UI.

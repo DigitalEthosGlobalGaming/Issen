@@ -63,6 +63,8 @@ export interface Figure {
   rf?: { tail?: number; armor?: number; patches?: number; strawy?: number };
 }
 export interface FigureEnvironment {
+  reducedMotion?: boolean;
+  reducedFlashes?: boolean;
   time: number;
   effectDensity?: number;
   wind: number;

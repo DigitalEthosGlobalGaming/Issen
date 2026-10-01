@@ -10,6 +10,9 @@ const DEFAULT_MODIFIERS = {
   score: 1,
   /** Additive currency bonus; 0.1 means 10% more earned Embers. */
   emberBonus: 0,
+  pilgrim: 0,
+  swift: 0,
+  precision: 0,
   perfect: 1,
   normal: 1,
   feint: 0,

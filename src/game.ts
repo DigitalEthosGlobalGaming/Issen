@@ -1,5 +1,12 @@
 import { premium, premiumEnabled, listenToPurchases } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
+import {
+  editionAccess,
+  itemAccessible,
+  trialAccessible,
+  type GameEdition,
+} from './platform/editions.ts';
+import { swiftSlashPoints, precisionZone, duelMasterTimings } from './game/progression/mastery.ts';
 import { PREMIUM_FILM } from './platform/premium.ts';
 import { renderSupport } from './ui/screens/support.ts';
 import type { Item, ItemCategory } from './game/content/items.ts';
@@ -68,7 +75,17 @@ import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 import { createEffectSpawner } from './rendering/effects/spawn.ts';
 import { createEffectRenderer } from './rendering/effects/draw.ts';
 import { createEffects } from './rendering/effects/state.ts';
-import { createEffectQuality, scaledCount } from './rendering/effects/quality.ts';
+import { createEffectQuality, scaledCount, preferredDensity } from './rendering/effects/quality.ts';
+import {
+  chooseDeathStyle,
+  deathDuration,
+  deathShadowOpacity,
+  BOSS_SHADOW_DURATION,
+  SHADOW_DURATION,
+  applyDeathPose,
+} from './rendering/figures/death.ts';
+import { parseSettings, preferenceEnabled, sensitivityScale } from './platform/settings.ts';
+import { createOptions } from './ui/screens/options.ts';
 import { updateEffects } from './rendering/effects/update.ts';
 import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
 import {
@@ -165,7 +182,7 @@ import {
 import type { RunCheckpoint } from './platform/run-checkpoint.ts';
 import { DIRS, OPP, DANG, directionMatches } from './shared/directions.ts';
 import { kanji, roman } from './shared/format.ts';
-import { buzz } from './platform/haptics.ts';
+import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(): () => void {
   const lifecycle = createLifecycle();
   ('use strict');
@@ -187,6 +204,23 @@ export function startGame(): () => void {
     mainG = context2d(cvs);
   const g = mainG;
   const R = Math.random;
+  const settings = parseSettings(
+    store.get('issen.settings', null),
+    store.get('issen.muted', false) === true,
+  );
+  const systemMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const reducedMotion = () => preferenceEnabled(settings.reducedMotion, systemMotion.matches);
+  const reducedFlashes = () => preferenceEnabled(settings.reducedFlashes, systemMotion.matches);
+  const buzz = createHaptics(() => settings.vibration);
+  const combatHaptics = createCombatHaptics(
+    () => settings.vibration,
+    () => settings.vibrationStrength,
+  );
+  lifecycle.add(combatHaptics.stop);
+  const edition = import.meta.env.VITE_GAME_EDITION as GameEdition;
+  const premiumAccess = () => editionAccess(edition, premium.state.owned);
+  const accessible = (id: string) => itemAccessible(id, premiumAccess());
+  const density = () => preferredDensity(settings.quality, effectQuality.density, reducedMotion());
   const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
 
   const PZ = 0.78; // perfect-cut zone starts at this fraction of the attack ring
@@ -214,7 +248,7 @@ export function startGame(): () => void {
   /* ---------------- armory data ---------------- */
   const ITEMS = [
     ...createItems(() => new Set([...UNL].filter((id) => id !== PREMIUM_FILM))),
-    ...(premiumEnabled ? [SUPPORTER_FILM_ITEM] : []),
+    SUPPORTER_FILM_ITEM,
   ];
   const BASEBLADE = {
     len: 0.52,
@@ -224,6 +258,8 @@ export function startGame(): () => void {
     edge: 'rgba(255,253,246,.9)',
   };
   const CHARMCOL: Record<string, string> = {
+    'pilgrims-bead': '#7e654c',
+    'first-strike': '#b8322a',
     suzu: '#b8923a',
     maneki: '#b0322a',
     daruma: '#8c1f14',
@@ -254,7 +290,7 @@ export function startGame(): () => void {
   const SETUP = loadSetup();
   const UNL = loadUnlocks();
   UNL.delete(PREMIUM_FILM);
-  if (premium.state.owned) UNL.add(PREMIUM_FILM);
+  if (premiumAccess()) UNL.add(PREMIUM_FILM);
   const TRIAL_PROGRESS = parseTrialProgress(store.get('issen.trials', null));
   grantTrialRewards(TRIAL_PROGRESS, UNL);
   const playerStats = ST;
@@ -273,7 +309,7 @@ export function startGame(): () => void {
   const ARMORY_SEEN = parseArmorySeen(store.get('issen.armorySeen', null), UNL);
   store.set('issen.armorySeen', [...ARMORY_SEEN]);
   Object.assign(SETUP, sanitizeSetup(SETUP, META));
-  let runTemplate = templateModifiers(META, SETUP);
+  let runTemplate = templateModifiers(META, SETUP, premiumAccess());
   let rewardLedger = createRunRewardLedger();
   let runBossMilestone = 0;
   let runItemReveals: ResultReveal[] = [];
@@ -318,17 +354,18 @@ export function startGame(): () => void {
     Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
     UNL.clear();
     for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
-    if (premium.state.owned) UNL.add(PREMIUM_FILM);
+    if (premiumAccess()) UNL.add(PREMIUM_FILM);
     Object.assign(SETUP, checkpoint.setup);
-    Object.assign(EQ, parseEquipment(checkpoint.equipment, UNL, ITEMS));
+    Object.assign(EQ, parseEquipment(checkpoint.equipment, accessibleUnlocks(), ITEMS));
     Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless), card: null });
     if (G.so) G.so.e = G.enemies.find((e) => e.challenger) ?? G.so.e;
     G.attacker = null;
     G.panel = null;
+    G.shrineRerolls = premiumAccess() ? G.shrineRerolls : 0;
     shrineOfferIds = checkpoint.offers;
     rewardLedger = checkpoint.ledger;
     runBossMilestone = checkpoint.bossMilestone;
-    runTemplate = templateModifiers(META, SETUP);
+    runTemplate = templateModifiers(META, SETUP, premiumAccess());
     runRandom = restorableRng(checkpoint.seed);
     combatRandom = runRandom.next;
     saveStats();
@@ -372,7 +409,11 @@ export function startGame(): () => void {
   }
   function earn(event: 'kill' | 'wave' | 'boss') {
     if (activeTrial) return;
-    accrueRunReward(rewardLedger, event, { zen: G.zen, emberBonus: G.m.emberBonus });
+    accrueRunReward(rewardLedger, event, {
+      zen: G.zen,
+      emberBonus: G.m.emberBonus,
+      pilgrim: !!G.m.pilgrim,
+    });
   }
   const saveStats = () => {
     if (!activeTrial) store.set('issen.stats', ST);
@@ -383,9 +424,11 @@ export function startGame(): () => void {
       ? revokedSave.filter((id): id is string => typeof id === 'string')
       : [],
   );
-  let EQ = loadEquipment(UNL, ITEMS);
+  const accessibleUnlocks = () => new Set([...UNL].filter(accessible));
+  let EQ = loadEquipment(accessibleUnlocks(), ITEMS);
   const playerEquipment = EQ;
   const savedFilm = (store.get('issen.equip', {}) as { film?: unknown } | null)?.film;
+  const savedEquipment = store.get('issen.equip', {});
   let initialPurchaseCheck = true;
   const SEALS: Record<string, string> = {
     verm: '#a3271d',
@@ -395,6 +438,7 @@ export function startGame(): () => void {
     sumiseal: '#1b1a18',
     'trial-platinum': '#aebbc5',
     'trial-copper': '#c1845e',
+    'quiet-seal': '#678b7b',
   };
   let SEAL = '#a3271d',
     SEALARC = '#a3271d';
@@ -454,7 +498,7 @@ export function startGame(): () => void {
       scale: S,
       layout: L,
       random: R,
-      density: effectQuality.density,
+      density: density(),
     });
   }
   function buildGrass() {
@@ -476,7 +520,7 @@ export function startGame(): () => void {
     weatherDensity = 1;
   function buildWeather(resetSimulation = true) {
     const w = STAGES[G.stage]!.weather;
-    weatherDensity = effectQuality.density;
+    weatherDensity = density();
     const built = createWeatherParticles(w, W, H, S, R, weatherDensity);
     wx = built.particles;
     bamboo = built.bamboo;
@@ -496,17 +540,10 @@ export function startGame(): () => void {
     if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
   }
   function rebalanceWeather() {
-    const target = createWeatherParticles(
-      STAGES[G.stage]!.weather,
-      W,
-      H,
-      S,
-      R,
-      effectQuality.density,
-    );
+    const target = createWeatherParticles(STAGES[G.stage]!.weather, W, H, S, R, density());
     if (wx.length > target.particles.length) wx.length = target.particles.length;
     else if (wx.length < target.particles.length) wx.push(...target.particles.slice(wx.length));
-    weatherDensity = effectQuality.density;
+    weatherDensity = density();
   }
   function buildPost() {
     if (!grainCanv.length) {
@@ -634,7 +671,9 @@ export function startGame(): () => void {
       height: H,
       palette: cols,
       random: R,
-      effectDensity: effectQuality.density,
+      effectDensity: density(),
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
     });
   }
   function drawFigure(...args: Parameters<ReturnType<typeof createFigureRenderer>['drawFigure']>) {
@@ -746,7 +785,7 @@ export function startGame(): () => void {
   }
 
   /* ---------------- audio ---------------- */
-  const audio = createAudio(store.get('issen.muted', false) === true);
+  const audio = createAudio(settings.muted);
   const audioInit = audio.init,
     tn = audio.tone,
     sfx = audio.cues;
@@ -767,9 +806,8 @@ export function startGame(): () => void {
   lifecycle.listen($('mute'), 'pointerup', (e) => {
     e.stopPropagation();
     audioInit();
-    audio.setMuted(!audio.muted);
-    store.set('issen.muted', audio.muted);
-    setMuteIcon();
+    settings.muted = !settings.muted;
+    saveSettings();
   });
   lifecycle.listen($('mute'), 'pointerdown', (e) => e.stopPropagation());
 
@@ -874,14 +912,14 @@ export function startGame(): () => void {
       [
         bladeMods(),
         isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]!.m : (ITEM_BY[EQ.robe] || {}).m,
-        (ITEM_BY[EQ.charm] || {}).m,
+        accessible(EQ.charm) ? (ITEM_BY[EQ.charm] || {}).m : undefined,
         G.fortune?.m,
         runTemplate,
       ],
       G.bless,
     );
   }
-  const pz = () => clamp(PZ + (G.m ? G.m.pz : 0), 0.55, 0.92);
+  const pz = () => precisionZone(PZ, G.m?.pz ?? 0, G.m?.precision ?? 0);
   function pickLook(n: number) {
     return pickEnemyLook(n, R);
   }
@@ -918,7 +956,7 @@ export function startGame(): () => void {
   }
   const banner = hudView.showBanner;
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
-  const runResults = createRunResults($('over'), () => sfx.reveal());
+  const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
     if (activeTrial) return;
     if (G.hints[key]) return;
@@ -964,7 +1002,9 @@ export function startGame(): () => void {
           key: it.k,
           name: it.n,
           kind: TYPE_WORD[it.type],
-          description: display?.flavor || 'View it in the Armoury.',
+          description:
+            (!accessible(id) ? 'Requires Premium. Challenge earned. ' : '') +
+            (display?.flavor || 'View it in the Armoury.'),
           benefit: perk,
           tradeoff,
           item: true,
@@ -999,7 +1039,7 @@ export function startGame(): () => void {
     return pts;
   }
   function flash(a: number, col?: string) {
-    flashA = Math.max(flashA, a);
+    flashA = Math.max(flashA, reducedFlashes() ? Math.min(a, 0.035) : a);
     flashCol = col || '255,255,255';
   }
   function stamp(text: string, x: number, y: number, size: number, seal: boolean, life?: number) {
@@ -1017,7 +1057,7 @@ export function startGame(): () => void {
     return createEffectSpawner(state, {
       scale,
       random: R,
-      density: preview ? 1 : effectQuality.density,
+      density: density(),
       flash: preview ? () => {} : flash,
       sounds: sfx,
     });
@@ -1044,6 +1084,7 @@ export function startGame(): () => void {
     lbT = Math.max(lbT, d);
   }
   function punch(z: number, x: number, y: number) {
+    if (reducedMotion()) return;
     zoom = Math.max(zoom, z);
     zoomX = x;
     zoomY = y;
@@ -1070,8 +1111,9 @@ export function startGame(): () => void {
   function pickAttacker() {
     return selectAttacker(G.enemies, waveConfiguration().ordered, combatRandom);
   }
-  function updateEnemies(dt: number) {
+  function updateEnemies(dt: number, raw = dt) {
     simulateEnemies(G, dt, {
+      rawDelta: raw,
       surge: WX.surge,
       time,
       perfectZone: pz,
@@ -1099,7 +1141,7 @@ export function startGame(): () => void {
           upgrades: false,
         }
       : SETUP;
-    runTemplate = templateModifiers(META, setup);
+    runTemplate = templateModifiers(META, setup, premiumAccess());
     rewardLedger = createRunRewardLedger();
     runBossMilestone = 0;
     runItemReveals = [];
@@ -1111,7 +1153,7 @@ export function startGame(): () => void {
       combatRandom = runRandom.next;
     }
     resetRun(G, setup, EQ, combatRandom);
-    Object.assign(G, templatePowers(META, setup));
+    Object.assign(G, templatePowers(META, setup, premiumAccess()));
     G.maxKnives = G.knives;
     computeMods();
     G.runWards = G.m.runWard;
@@ -1174,7 +1216,13 @@ export function startGame(): () => void {
   }
   function startTrial(id: string) {
     const trial = TRIALS.find((entry) => entry.id === id);
-    if (!trial || activeTrial || !trialsUnlocked(playerStats.roninWave) || G.state !== 'title')
+    if (
+      !trial ||
+      !trialAccessible(id, premiumAccess()) ||
+      activeTrial ||
+      !trialsUnlocked(playerStats.roninWave) ||
+      G.state !== 'title'
+    )
       return;
     activeTrial = trial;
     trialFailure = '';
@@ -1223,6 +1271,12 @@ export function startGame(): () => void {
     } else {
       G.bossCount = trial.bosses![G.bossesSlain]! - 1;
       startBoss();
+      const duelBoss = G.boss as Boss | null;
+      if (trial.duelMaster && duelBoss) {
+        duelBoss.hp = duelBoss.maxHp = 20;
+        duelBoss.bp = duelMasterTimings(0);
+        renderHp();
+      }
     }
     banner('試練', trial.name);
     $('waveLbl').textContent = 'Trials';
@@ -1233,9 +1287,12 @@ export function startGame(): () => void {
     const visible = !!trial && ['playing', 'boss', 'between'].includes(G.state);
     $('trialObjective').hidden = !visible;
     if (!trial || !visible) return;
-    $('trialObjective').textContent = trial.wave
-      ? `${trial.name} · ${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · No mistakes`
-      : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
+    $('trialObjective').textContent =
+      trial.duelMaster && G.boss
+        ? `Duel Master · ${20 - G.boss.hp}/20 exchanges · No mistakes`
+        : trial.wave
+          ? `${trial.name} · ${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · No mistakes`
+          : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
   }
   function finishTrial(message?: string) {
     const trial = activeTrial;
@@ -1442,6 +1499,7 @@ export function startGame(): () => void {
   function killEnemy(e: Enemy, dir: Direction, chained = false, preserveStreak = false) {
     const wasAtk = e === G.attacker,
       p = e.state === 'attack' ? clamp(e.p) : 0,
+      swiftPoints = G.m.swift && !chained ? swiftSlashPoints(Math.max(0, e.life - 0.9), e.T) : null,
       perfect =
         !G.m.noPerfect &&
         ((wasAtk && p >= pz()) || (!chained && G.bless.has('flurry') && (G.combo + 1) % 10 === 0));
@@ -1450,14 +1508,13 @@ export function startGame(): () => void {
     e.t = 0;
     e.cutAng = DANG[dir];
     e.pos = enemyPos(e);
-    e.deathType = G.m.bonk
-      ? R() < 0.5
-        ? 'kneel'
-        : 'stagger'
-      : perfect
-        ? 'split'
-        : ['split', 'kneel', 'stagger', 'disarm'][Math.min(3, (R() * 4) | 0)];
-    e.fallDir = R() < 0.5 ? -1 : 1;
+    e.shadowTime = 0;
+    e.deathGround = { ...e.pos };
+    e.deathType =
+      !G.m.bonk && accessible(EQ.fx) && ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
+        ? 'dissolve'
+        : chooseDeathStyle(perfect, !!G.m.bonk, R);
+    e.fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
     if (e.deathType === 'disarm') {
       const q = e.pos,
         s2 = q.h / 160;
@@ -1524,12 +1581,12 @@ export function startGame(): () => void {
       y: P0.y + P0.h * 0.01,
       rx: P0.h * (0.12 + R() * 0.1),
       t: 0,
-      life: 6,
+      life: SHADOW_DURATION,
     });
     swingPlayer(dir);
     if (G.m.bonk) sfx.bonk();
     else sfx.slice();
-    buzz(14);
+    combatHaptics.play('slice');
     if (G.m.restore && !G.zen && !G.hard) {
       G.clean = (G.clean || 0) + 1;
       if (G.clean >= G.m.restore) {
@@ -1544,6 +1601,7 @@ export function startGame(): () => void {
     if (perfect) {
       G.perfects++;
       ST.perfects++;
+      if (!activeTrial) ST.bestRunPerfects = Math.max(ST.bestRunPerfects, G.perfects);
       if (G.bless.has('echo')) {
         G.combo += 2;
         bumpCombo();
@@ -1579,7 +1637,11 @@ export function startGame(): () => void {
         pop(W / 2, H * 0.4, '凍', Math.max(22, 28 * S));
       }
       const pts = addScore(
-        Math.round((400 + Math.min(500, (G.pStreak - 1) * 100)) * comboMult() * G.m.perfect),
+        Math.round(
+          (swiftPoints ?? 400 + Math.min(500, (G.pStreak - 1) * 100)) *
+            comboMult() *
+            (swiftPoints === null ? G.m.perfect : 1),
+        ),
         P0.x,
         P0.y - P0.h * 1.05,
       );
@@ -1599,7 +1661,7 @@ export function startGame(): () => void {
       hitStop = 0.15;
       flash(0.32);
       sfx.perfect();
-      buzz([10, 30, 30]);
+
       if (pts) void 0;
     } else {
       if (!preserveStreak) {
@@ -1607,7 +1669,11 @@ export function startGame(): () => void {
         if (!chained) recordBlessingCut(G, false);
       }
       addScore(
-        Math.round((100 + (wasAtk ? 40 : 20)) * comboMult() * G.m.normal),
+        Math.round(
+          (swiftPoints ?? 100 + (wasAtk ? 40 : 20)) *
+            comboMult() *
+            (swiftPoints === null ? G.m.normal : 1),
+        ),
         P0.x,
         P0.y - P0.h * 1.05,
       );
@@ -1679,7 +1745,7 @@ export function startGame(): () => void {
   function weatherBurst(cx: number, cy: number, sc: number) {
     const w = STAGES[G.stage]!.weather;
     if (w === 'rain' || w === 'storm') {
-      for (let i = 0; i < scaledCount(16, effectQuality.density); i++) {
+      for (let i = 0; i < scaledCount(16, density()); i++) {
         const a = R() * TAU,
           sp = (120 + R() * 260) * sc;
         fx.splash.push({
@@ -1693,7 +1759,7 @@ export function startGame(): () => void {
         });
       }
     } else if (w === 'snow') {
-      for (let i = 0; i < scaledCount(22, effectQuality.density); i++) {
+      for (let i = 0; i < scaledCount(22, density()); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 200) * sc;
         fx.splash.push({
@@ -1709,7 +1775,7 @@ export function startGame(): () => void {
       }
       dust(cx, cy + 30 * sc, 60 * sc);
     } else if (w === 'sakura') {
-      for (let i = 0; i < scaledCount(14, effectQuality.density); i++) {
+      for (let i = 0; i < scaledCount(14, density()); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 240) * sc;
         fx.petals.push({
@@ -1725,7 +1791,7 @@ export function startGame(): () => void {
         });
       }
     } else if (w === 'smoke') {
-      for (let i = 0; i < scaledCount(14, effectQuality.density); i++)
+      for (let i = 0; i < scaledCount(14, density()); i++)
         fx.embers.push({
           x: cx + (R() - 0.5) * 30 * sc,
           y: cy,
@@ -1736,7 +1802,7 @@ export function startGame(): () => void {
           ph: R() * TAU,
         });
     } else if (w !== 'night') {
-      for (let i = 0; i < scaledCount(8, effectQuality.density); i++) {
+      for (let i = 0; i < scaledCount(8, density()); i++) {
         const l = newLeaf(false);
         l.x = cx + (R() - 0.5) * 40 * sc;
         l.y = cy + (R() - 0.5) * 40 * sc;
@@ -1750,7 +1816,7 @@ export function startGame(): () => void {
   }
   function killFx(cx: number, cy: number, ang: number, sc: number) {
     weatherBurst(cx, cy, sc);
-    effectSpawner().killFx(EQ.fx, cx, cy, ang, sc);
+    effectSpawner().killFx(accessible(EQ.fx) ? EQ.fx : 'ink', cx, cy, ang, sc);
   }
   function swingPlayer(dir: Direction | 'block') {
     if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();
@@ -1828,8 +1894,9 @@ export function startGame(): () => void {
   function toIdle(b: Boss, base: number) {
     bossToIdle(b, base, combatRandom);
   }
-  function updateBoss(dt: number) {
+  function updateBoss(dt: number, raw = dt) {
     simulateBoss(G, dt, {
+      rawDelta: raw,
       random: combatRandom,
       sounds: sfx,
       flash,
@@ -1861,6 +1928,7 @@ export function startGame(): () => void {
       },
       combatRandom,
     );
+    if (activeTrial?.duelMaster) b.chainLeft = b.chainLen = 1;
     if (!second && G.bless.has('timestop')) G.slowT = Math.max(G.slowT, 1.4);
     if (counterDamage) {
       renderHp();
@@ -1873,7 +1941,7 @@ export function startGame(): () => void {
     hitStop = 0.09;
     flash(0.3);
     sfx.clang();
-    buzz(30);
+    combatHaptics.play('parry');
     letterbox(0.3);
     G.combo++;
     G.parries++;
@@ -1904,6 +1972,8 @@ export function startGame(): () => void {
       target.pos = pos;
       target.state = 'dying';
       target.t = 0;
+      target.shadowTime = 0;
+      target.deathGround = { ...pos };
       target.k = 0;
       target.deathType = 'stagger';
       target.fallDir = 1;
@@ -1986,7 +2056,12 @@ export function startGame(): () => void {
   }
   function bossSwipe(dir: Direction) {
     const b = G.boss;
-    if (!b || b.state !== 'stagger') return;
+    if (!b) return;
+    if (b.state !== 'stagger') {
+      if (activeTrial?.duelMaster && b.state !== 'enter' && b.state !== 'dying')
+        playerDie(b, 'early');
+      return;
+    }
     const p = b.pos,
       cx = p.x,
       cy = p.y - p.h * 0.55;
@@ -1995,7 +2070,9 @@ export function startGame(): () => void {
       return;
     }
     if (directionMatches(dir, b.sdir, !!G.m.axisCut)) {
+      const swiftPoints = G.m.swift ? swiftSlashPoints(b.t, b.window) : null;
       b.hp = Math.max(0, b.hp - G.m.bossDmg);
+      if (activeTrial?.duelMaster) b.bp = duelMasterTimings(20 - b.hp);
       renderHp();
       swingPlayer(dir);
       const a = DANG[dir],
@@ -2017,7 +2094,7 @@ export function startGame(): () => void {
       hitStop = 0.08;
       flash(0.15);
       sfx.slice();
-      buzz(20);
+      combatHaptics.play('slice');
       G.combo++;
       bumpCombo();
       if (notifications.activeHint === 'parry') hideHint();
@@ -2025,8 +2102,10 @@ export function startGame(): () => void {
         b.state = 'dying';
         b.t = 0;
         b.cutAng = a;
+        b.shadowTime = 0;
+        b.deathGround = { ...b.pos };
         addScore(
-          Math.round(1500 * G.bossCount * G.m.bossScore),
+          Math.round((swiftPoints ?? 1500 * G.bossCount) * G.m.bossScore),
           cx,
           p.y - p.h * 1.1,
           '討取',
@@ -2075,13 +2154,23 @@ export function startGame(): () => void {
         G.nextT = 2.2;
         $('bossbar').classList.remove('on');
         inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
-        fx.stains.push({ x: p.x, y: p.y + p.h * 0.01, rx: p.h * 0.3, t: 0, life: 8 });
+        fx.stains.push({
+          x: p.x,
+          y: p.y + p.h * 0.01,
+          rx: p.h * 0.3,
+          t: 0,
+          life: BOSS_SHADOW_DURATION,
+        });
         saveStats();
         checkUnlocks();
       } else {
         b.state = 'hurt';
         b.t = 0;
-        addScore(Math.round(300 * comboMult() * G.m.bossScore), cx, p.y - p.h * 1.05);
+        addScore(
+          Math.round((swiftPoints ?? 300) * comboMult() * G.m.bossScore),
+          cx,
+          p.y - p.h * 1.05,
+        );
       }
     } else {
       if (G.m.kage && (b.kageUsed || 0) < G.m.kage) {
@@ -2187,6 +2276,14 @@ export function startGame(): () => void {
       e.state = 'dying';
       e.t = 0;
       e.cutAng = a;
+      e.shadowTime = 0;
+      e.deathGround = { ...p };
+      if (
+        !G.m.bonk &&
+        accessible(EQ.fx) &&
+        ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
+      )
+        e.deathType = 'dissolve';
       e.k = 0;
       swingPlayer(dir);
       addSlash(cx - v[0] * M, cy - v[1] * M, cx + v[0] * M, cy + v[1] * M, Math.max(3, 3 * S), 0.6);
@@ -2198,7 +2295,7 @@ export function startGame(): () => void {
       hitStop = 0.22;
       flash(0.4);
       sfx.perfect();
-      buzz([10, 30, 40]);
+      combatHaptics.play('slice');
       G.combo++;
       bumpCombo();
       G.kills++;
@@ -2294,7 +2391,17 @@ export function startGame(): () => void {
     captureCheckpoint();
     showShrineOffers(opts);
   }
+  lifecycle.listen($('bRerollShrine'), 'click', () => {
+    if (G.state !== 'shrine' || G.shrineRerolls < 1 || !premiumAccess()) return;
+    const opts = shrineOffers(G, combatRandom);
+    if (!opts.length) return;
+    G.shrineRerolls--;
+    shrineOfferIds = opts.map((bl) => bl.id);
+    captureCheckpoint();
+    showShrineOffers(opts);
+  });
   function showShrineOffers(opts: (typeof BLESS)[number][]) {
+    ($('bRerollShrine') as HTMLButtonElement).hidden = G.shrineRerolls < 1 || !premiumAccess();
     renderShrine($('blessList'), opts, (bl) => {
       if (G.state !== 'shrine') return;
       G.bless.add(bl.id);
@@ -2353,7 +2460,7 @@ export function startGame(): () => void {
     shake = Math.max(shake, 12 * S);
     hitStop = 0.08;
     sfx.hurt();
-    buzz([40, 30, 60]);
+    combatHaptics.play('damage');
     pop(
       W / 2,
       H * 0.45,
@@ -2424,7 +2531,7 @@ export function startGame(): () => void {
     shake = Math.max(shake, 18 * S);
     letterbox(2.5);
     sfx.death();
-    buzz([60, 40, 150]);
+    combatHaptics.play('damage');
     clearHints();
     $('bossbar').classList.remove('on');
   }
@@ -2521,7 +2628,7 @@ export function startGame(): () => void {
     }
     if (id === 'stats') renderStats();
     if (id === 'setup') renderSetup();
-    if (id === 'template') renderTemplate($('templateContent'), META, saveMeta);
+    if (id === 'template') renderTemplate($('templateContent'), META, saveMeta, premiumAccess());
     if (id === 'admin') showAdmin();
     if (id === 'trials')
       renderTrials(
@@ -2535,6 +2642,7 @@ export function startGame(): () => void {
           G.panel = null;
           showScreen('title');
         },
+        premiumAccess(),
       );
     showScreen(id);
   }
@@ -2547,7 +2655,7 @@ export function startGame(): () => void {
       hasVitality: () => META.upgrades.vitality >= 1,
       getReveals: () => pendingModeReveals(META),
       getLoadoutSummary: () => {
-        const power = templatePowers(META, SETUP);
+        const power = templatePowers(META, SETUP, premiumAccess());
         const summary: string[] = [];
         if (power.knives > 0) summary.push(`${power.knives} knives`);
         if (power.composure > 0) summary.push(`${power.composure} combo protections`);
@@ -2562,11 +2670,15 @@ export function startGame(): () => void {
     },
   );
   const renderSetup = setupScreen.render;
-  const tutorial = createTutorial($('app'), (status) => {
-    META.tutorial = status;
-    saveMeta();
-    toTitle();
-  });
+  const tutorial = createTutorial(
+    $('app'),
+    (status) => {
+      META.tutorial = status;
+      saveMeta();
+      toTitle();
+    },
+    reducedMotion,
+  );
   function launchTutorial() {
     toTitle();
     tutorial.start();
@@ -2777,11 +2889,58 @@ export function startGame(): () => void {
     G.panel = null;
     showScreen(G.panelFrom);
   }
+  function applySettings() {
+    if (!settings.vibration) combatHaptics.stop();
+    audio.setMuted(settings.muted);
+    audio.setVolumes(settings.effectsVolume, settings.ambienceVolume);
+    setMuteIcon();
+    $('app').classList.toggle('large-text', settings.textSize === 'large');
+    $('app').classList.toggle('reduced-motion', reducedMotion());
+    document.documentElement.dataset.motion = settings.reducedMotion;
+    $('app').dataset.reducedFlashes = String(reducedFlashes());
+    if (reducedMotion()) {
+      shake = 0;
+      zoom = 1;
+    }
+    if (reducedFlashes()) flashA = Math.min(flashA, 0.035);
+    if (bg) {
+      ambient().balanceLeaves(leaves);
+      rebalanceWeather();
+    }
+  }
+  function saveSettings() {
+    store.set('issen.settings', settings);
+    store.set('issen.muted', settings.muted);
+    applySettings();
+  }
+  const options = createOptions(
+    $('options'),
+    settings,
+    () => {
+      audioInit();
+      saveSettings();
+    },
+    closePanel,
+  );
+  lifecycle.add(options.dispose);
+  lifecycle.listen(systemMotion, 'change', applySettings);
+  applySettings();
   const armory = createArmoryScreen($('armory'), {
     items: ITEMS,
     equipment: EQ,
     unlocks: UNL,
-    owns: (id) => (id === PREMIUM_FILM ? premium.state.owned : UNL.has(id)),
+    owns: (id) => accessible(id) && (id === PREMIUM_FILM ? premiumAccess() : UNL.has(id)),
+    accessible,
+    progress: (id) =>
+      id === 'falling-leaves'
+        ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
+        : id === 'ember-ash'
+          ? `Duels: ${Math.min(ST.duels, 50)} / 50`
+          : id === 'ink-wash'
+            ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
+            : id === 'pilgrims-bead'
+              ? `Duels: ${Math.min(ST.duels, 10)} / 10`
+              : '',
     statistics: ST,
     seen: ARMORY_SEEN,
     onViewed: () => {
@@ -2936,12 +3095,12 @@ export function startGame(): () => void {
     sounds: sfx,
   });
   function demoKill() {
-    preview.demo(EQ.fx, !!(G.m && G.m.bonk));
+    preview.demo(armory.tab === 'fx' ? (armory.selected ?? EQ.fx) : EQ.fx, !!(G.m && G.m.bonk));
   }
   function drawPreview() {
     preview.draw(
       previewFrame(
-        EQ.film === PREMIUM_FILM && !premium.state.owned ? 'mono' : EQ.film,
+        EQ.film === PREMIUM_FILM && !premiumAccess() ? 'mono' : EQ.film,
         armory.tab === 'fx',
       ),
     );
@@ -2951,6 +3110,9 @@ export function startGame(): () => void {
     return {
       time,
       wind,
+      effectDensity: density(),
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
       petActive: G.petT > 0,
       palette: cols,
       background: bg,
@@ -3004,7 +3166,7 @@ export function startGame(): () => void {
     activate: audioInit,
     threshold: () => {
       const k = G.m ? G.m.swipe : 1;
-      return Math.max(22 * k, Math.min(W, H) * 0.055 * k);
+      return Math.max(22 * k, Math.min(W, H) * 0.055 * k) * sensitivityScale(settings.sensitivity);
     },
     swipe: onSwipe,
     tapDown: onTapDown,
@@ -3033,9 +3195,16 @@ export function startGame(): () => void {
   lifecycle.add(
     premium.subscribe((state) => {
       if (lifecycle.disposed) return;
-      $('premiumBadge').hidden = !premiumEnabled || !state.owned;
-      if (state.owned) {
+      $('premiumBadge').hidden = !premiumAccess();
+      $('premiumBadge').textContent = edition === 'web' ? 'Web' : 'Premium';
+      if (premiumAccess()) {
         UNL.add(PREMIUM_FILM);
+        if (initialPurchaseCheck) {
+          const restored = parseEquipment(savedEquipment, accessibleUnlocks(), ITEMS);
+          for (const category of ['charm', 'fx', 'film', 'seal'] as const)
+            if (!itemAccessible(restored[category], false))
+              playerEquipment[category] = restored[category];
+        }
         if (initialPurchaseCheck && savedFilm === PREMIUM_FILM && playerEquipment.film === 'mono') {
           playerEquipment.film = PREMIUM_FILM;
         }
@@ -3045,8 +3214,22 @@ export function startGame(): () => void {
         if (playerEquipment.film === PREMIUM_FILM) playerEquipment.film = 'mono';
         if (EQ.film === PREMIUM_FILM) EQ.film = 'mono';
       }
+      if (!premiumAccess()) {
+        Object.assign(playerEquipment, parseEquipment(playerEquipment, accessibleUnlocks(), ITEMS));
+        if (EQ !== playerEquipment)
+          Object.assign(EQ, parseEquipment(EQ, accessibleUnlocks(), ITEMS));
+        if (G.state !== 'title') {
+          runTemplate = templateModifiers(META, SETUP, false);
+          G.shrineRerolls = 0;
+          computeMods();
+        }
+      }
       renderSupport($('support'), state, premium.available);
       if (G.panel === 'armory') renderArmory();
+      if (G.panel === 'template')
+        renderTemplate($('templateContent'), META, saveMeta, premiumAccess());
+      if (activeTrial && !trialAccessible(activeTrial.id, premiumAccess()))
+        trialFailure = 'Premium access is required for this Trial.';
     }),
   );
   lifecycle.add(listenToPurchases());
@@ -3073,7 +3256,7 @@ export function startGame(): () => void {
     void premium.refresh();
   });
   lifecycle.listen($('bEquipPremium'), 'click', () => {
-    if (!premium.state.owned) return;
+    if (!premiumAccess()) return;
     playerEquipment.film = PREMIUM_FILM;
     store.set('issen.equip', playerEquipment);
     $('supportMessage').textContent = 'Supporter Print selected. Change films any time in Armory.';
@@ -3083,6 +3266,13 @@ export function startGame(): () => void {
   lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
   lifecycle.listen($('bTutorial'), 'click', launchTutorial);
   lifecycle.listen($('bTrials'), 'click', () => openPanel('trials'));
+  const openOptions = () => {
+    if (G.panel === 'options') return;
+    openPanel('options');
+    options.open();
+  };
+  lifecycle.listen($('bOptions'), 'click', openOptions);
+  lifecycle.listen($('bPauseOptions'), 'click', openOptions);
   $('testBadge').hidden = !isTestProfile();
   lifecycle.listen(window, 'keydown', (event) => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyA') {
@@ -3114,8 +3304,9 @@ export function startGame(): () => void {
   lifecycle.listen($('bSave'), 'click', saveCard);
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
+    bindings: () => settings.bindings,
     state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
-    closePanel,
+    closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
     titleDirection: konamiInput,
     start: () => {
       audioInit();
@@ -3140,6 +3331,7 @@ export function startGame(): () => void {
     }
   }
   function showPauseScreen() {
+    combatHaptics.stop();
     audio.setPaused(true);
     renderPauseBlessings($('paused'), G.bless);
     $('pauseSeed').textContent = activeTrial ? '' : `Seed ${G.seed}`;
@@ -3223,7 +3415,7 @@ export function startGame(): () => void {
     if (G.petT > 0) G.petT -= dt;
     updateWeather(dt);
     updatePlayer(dt);
-    updateEnemies(dt);
+    updateEnemies(dt, raw);
     if (
       !activeTrial &&
       G.state === 'playing' &&
@@ -3231,7 +3423,7 @@ export function startGame(): () => void {
       liveOrdered()[0]?.state === 'idle'
     )
       guided.startOrder();
-    if (G.boss) updateBoss(dt);
+    if (G.boss) updateBoss(dt, raw);
     updateWave(dt);
     if (G.state === 'standoff') updateStandoff(dt);
     if (G.state === 'between') {
@@ -3293,25 +3485,15 @@ export function startGame(): () => void {
       return;
     }
     const t = e.t,
-      dtp = e.deathType;
-    if (!dtp || dtp === 'split') {
-      drawSplit(f, p, e.cutAng ?? 0, t, 0.9);
+      dtp = e.deathType ?? 'split';
+    figureRenderer().drawGroundShadow(e.deathGround ?? p, deathShadowOpacity(e.shadowTime ?? t));
+    f.noShadow = true;
+    f.glint = 0;
+    if (dtp === 'split' && !reducedMotion()) {
+      drawSplit(f, p, e.cutAng ?? 0, t, deathDuration(dtp));
       return;
     }
-    f.alpha = (f.alpha == null ? 1 : f.alpha) * (1 - clamp((t - 0.6) / 0.5));
-    if (dtp === 'kneel' || dtp === 'disarm') {
-      const k1 = easeOut(clamp(t / 0.3)),
-        k2 = easeInOut(clamp((t - 0.3) / 0.5));
-      f.y += p.h * 0.16 * k1;
-      f.sy = 1 - 0.22 * k1;
-      f.rot = (e.fallDir ?? 1) * 0.9 * k2;
-      f.noSword = dtp === 'disarm';
-    } else {
-      const k = easeOut(clamp(t / 0.6));
-      f.y -= p.h * 0.05 * k;
-      f.x += (e.fallDir ?? 1) * p.h * 0.08 * k;
-      f.rot = (e.fallDir ?? 1) * 0.5 * easeInOut(clamp((t - 0.2) / 0.6));
-    }
+    applyDeathPose(f, dtp, t, e.fallDir ?? 1, reducedMotion());
     drawFigure(f);
   }
   function drawBoss() {
@@ -3333,8 +3515,13 @@ export function startGame(): () => void {
       twin: b.def.twin,
       spear: b.def.spear,
     };
-    if (b.state === 'dying') drawSplit(f, p, b.cutAng, b.t, 1.6);
-    else drawFigure(f);
+    if (b.state === 'dying') {
+      figureRenderer().drawGroundShadow(
+        b.deathGround ?? p,
+        deathShadowOpacity(b.shadowTime ?? b.t, BOSS_SHADOW_DURATION),
+      );
+      drawSplit({ ...f, noShadow: true }, p, b.cutAng, b.t, 1.6);
+    } else drawFigure(f);
     if (G.m.ofuda && b.state === 'feint') {
       const w = Math.max(26, p.h * 0.12),
         hh = w * 2.2,
@@ -3509,31 +3696,28 @@ export function startGame(): () => void {
       g.fillStyle = 'rgba(120,18,12,0.16)';
       g.fillRect(0, 0, W, H);
     }
-    applyFilm(
-      g,
-      W,
-      H,
-      cvs,
-      EQ.film === PREMIUM_FILM && !premium.state.owned ? 'mono' : EQ.film,
-      time,
-    );
+    applyFilm(g, W, H, cvs, EQ.film === PREMIUM_FILM && !premiumAccess() ? 'mono' : EQ.film, time, {
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
+    });
     frameN++;
     const pat = grainPats[frameN % 3];
     if (pat) {
       g.save();
-      g.translate(-((R() * 180) | 0), -((R() * 180) | 0));
+      if (!reducedMotion() && !reducedFlashes())
+        g.translate(-((R() * 180) | 0), -((R() * 180) | 0));
       g.fillStyle = pat;
       g.fillRect(0, 0, W + 180, H + 180);
       g.restore();
     }
     const nit = EQ.film === 'nitrate';
-    if (nit && R() < 0.03) {
+    if (nit && !reducedFlashes() && R() < 0.03) {
       g.fillStyle = 'rgba(8,6,4,.55)';
       g.beginPath();
       g.arc(R() * W, R() * H, 6 + R() * 30, 0, TAU);
       g.fill();
     }
-    if (R() < (nit ? 0.4 : 0.07))
+    if (!reducedMotion() && !reducedFlashes() && R() < (nit ? 0.4 : 0.07))
       fx.scratches.push({
         x: R() * W,
         y0: R() < 0.5 ? 0 : R() * H * 0.5,
@@ -3552,7 +3736,7 @@ export function startGame(): () => void {
       g.stroke();
     }
     fx.scratches = fx.scratches.filter((s) => s.t < s.life);
-    for (let i = 0; i < ((R() * 3) | 0); i++) {
+    for (let i = 0; i < (reducedMotion() || reducedFlashes() ? 0 : (R() * 3) | 0); i++) {
       g.fillStyle = R() < 0.5 ? 'rgba(10,10,9,.35)' : 'rgba(230,225,215,.3)';
       g.beginPath();
       g.arc(R() * W, R() * H, 0.6 + R() * 1.6, 0, TAU);
@@ -3561,7 +3745,7 @@ export function startGame(): () => void {
     if (vig) {
       g.drawImage(vig, 0, 0, W, H);
       if (G.attacker && G.state === 'playing' && G.attacker.p >= pz() && !G.m.noArc) {
-        g.globalAlpha = 0.5 + 0.2 * Math.sin(time * 30);
+        g.globalAlpha = reducedFlashes() ? 0.5 : 0.5 + 0.2 * Math.sin(time * 30);
         g.drawImage(vig, 0, 0, W, H);
         g.globalAlpha = 1;
       }
@@ -3602,24 +3786,25 @@ export function startGame(): () => void {
       g.fillRect(0, 0, W, bh);
       g.fillRect(0, H - bh, W, bh);
     }
-    g.fillStyle = `rgba(0,0,0,${R() * (EQ.film === 'nitrate' ? 0.12 : 0.035)})`;
+    g.fillStyle = `rgba(0,0,0,${reducedFlashes() ? 0.02 : R() * (EQ.film === 'nitrate' ? 0.12 : 0.035)})`;
     g.fillRect(0, 0, W, H);
     if (flashA > 0) {
-      g.fillStyle = `rgba(${flashCol},${flashA})`;
+      g.fillStyle = `rgba(${flashCol},${reducedFlashes() ? Math.min(flashA, 0.035) : flashA})`;
       g.fillRect(0, 0, W, H);
       flashA = Math.max(0, flashA - raw * 2.4);
     }
   }
   function render(raw: number) {
     g.setTransform(DPR, 0, 0, DPR, 0, 0);
-    const sx = (R() - 0.5) * shake,
-      sy =
-        (R() - 0.5) * shake +
-        (EQ.film === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
+    const sx = reducedMotion() ? 0 : (R() - 0.5) * shake,
+      sy = reducedMotion()
+        ? 0
+        : (R() - 0.5) * shake +
+          (EQ.film === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
     shake = Math.max(0, shake - raw * 45 * S);
     g.save();
     g.translate(sx, sy);
-    if (zoom > 1.001) {
+    if (zoom > 1.001 && !reducedMotion()) {
       g.translate(zoomX, zoomY);
       g.scale(zoom, zoom);
       g.translate(-zoomX, -zoomY);
@@ -3741,7 +3926,7 @@ export function startGame(): () => void {
         if (G.state === 'paused' || document.hidden) return;
         if (!effectQuality.sample(interval, work)) return;
         ambient().balanceLeaves(leaves);
-        if (Math.abs(weatherDensity - effectQuality.density) >= 0.09) rebalanceWeather();
+        if (Math.abs(weatherDensity - density()) >= 0.09) rebalanceWeather();
       },
     },
   );
@@ -3764,8 +3949,14 @@ export function startGame(): () => void {
     buildPost();
     prevBg = null;
     stageFade = 0;
-    for (const e of G.enemies) e.pos = enemyPos(e);
-    if (G.boss) G.boss.pos = bossPos(G.boss);
+    for (const e of G.enemies) {
+      e.pos = enemyPos(e);
+      if (e.state === 'dying') e.deathGround = { ...e.pos };
+    }
+    if (G.boss) {
+      G.boss.pos = bossPos(G.boss);
+      if (G.boss.state === 'dying') G.boss.deathGround = { ...G.boss.pos };
+    }
   }
   lifecycle.listen(window, 'resize', () => {
     lifecycle.clearTimeout(rt);

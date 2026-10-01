@@ -67,7 +67,17 @@ test('Armoury sorts owned gear first and underlines unread gear until its detail
     if (!localStorage.getItem('issen.armorySeen'))
       localStorage.setItem(
         'issen.armorySeen',
-        JSON.stringify(['steel', 'sumi', 'nocrest', 'nopet', 'nocharm', 'ink', 'mono', 'verm']),
+        JSON.stringify([
+          'steel',
+          'sumi',
+          'nocrest',
+          'nopet',
+          'nocharm',
+          'ink',
+          'mono',
+          'verm',
+          'supporter-print',
+        ]),
       );
   });
   await page.goto('/');

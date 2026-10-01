@@ -17,6 +17,12 @@ It is disabled by default for closed testing via `VITE_PREMIUM_ENABLED=false`;
 no billing SDK initialization or paid UI occurs while disabled. Other prototype
 services use existing browser adapters. Advertising is deferred.
 
+`platform/editions.ts` separates Free/Premium/Web build access from purchases.
+Android defaults Free; web defaults Web; Premium builds grant the collection
+without billing. Catalog locks remain visible while billing is disabled. Runtime
+checks are independent of earned unlocks/ranks. See
+[editions and mastery](../features/editions-and-mastery.md).
+
 ## Startup and ownership
 
 Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
@@ -60,6 +66,8 @@ implemented files.
 | Screen fragments and controllers                                        | `src/ui/screens/`                                                      |
 | HUD/navigation, hints/toasts, share-card composition                    | `src/ui/`                                                              |
 | Pointer and keyboard adapters                                           | `src/input/`                                                           |
+| Validated profile settings and Options submenus                         | `src/platform/settings.ts`, `src/ui/screens/options.ts`                |
+| Death style selection, poses, durations and ground-shadow fading        | `src/rendering/figures/death.ts`, `figure.ts`                           |
 | Synthesized cues, audio context and ambience                            | `src/audio/audio.ts`                                                   |
 | Save validation, storage, sharing, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
 
@@ -77,6 +85,26 @@ keeping the restorable gameplay random stream independent.
 `game/shrine/triggered.ts` owns the counters and wards for triggered blessings.
 `game/shrine/blessings.ts` owns offer eligibility, immediate effects and forced
 Crossroads curses. The runtime connects cut, attack, wave and Shrine events.
+Rare selection now starts at 8% per ordinary Shrine slot and rises with bosses
+to 30%, before existing additive bonuses and guarantees. Saved offers restore by
+ID without rerolling. See [release 1.12](../features/feature-plan-07.md).
+
+`platform/settings.ts` validates the versioned `issen.settings` profile record,
+migrating the existing `issen.muted` preference. The runtime keeps both mute
+keys and the HUD button synchronized, applies audio channel volume, haptics and
+presentation preferences, and passes current bindings/sensitivity to input.
+Options owns category navigation, focus, binding capture and browser history;
+the Android activity forwards Back to Options only while that screen is open.
+Closing Options opened from pause returns to pause without resuming simulation.
+Settings never replace a checkpoint's loadout or gameplay RNG state.
+
+Enemy deaths select six typed cosmetic styles, with varied perfect-cut reactions.
+The runtime captures their ground position at death. Death shadows fade using
+unpaused raw elapsed time independently of slowed body animation. The explicit
+figure renderer draws them outside body/fragment transforms, disappearing after
+0.4 seconds for enemies and 0.7 for bosses. Dark ink ground marks use the same
+limits and fade immediately on the unscaled effects clock, rather than persisting
+for several simulation seconds. Preview clocks remain independent.
 
 ## Boundaries that matter
 
@@ -104,7 +132,7 @@ Crossroads curses. The runtime connects cut, attack, wave and Shrine events.
 - Trials unlock at Ronin wave 10 and use fixed encounters with disposable
   statistics/equipment objects. The runtime restores the player objects on exit;
   trial combat bypasses ordinary rewards, records and Awakening challenges.
-  `issen.trials` stores validated completion IDs, reconciled into cosmetic
+  `issen.trials` stores validated completion IDs, reconciled into cosmetic/charm
   ownership on load. See [Trials](../features/trials.md) for presets and rules.
 - `progression/meta.ts` validates the new `issen.meta` progression record. Temple
   modifiers and consumables are captured at run start and apply only to opted-in,

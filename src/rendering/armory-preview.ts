@@ -8,6 +8,7 @@ import { createEffectRenderer } from './effects/draw.ts';
 import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
+import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
 
 export interface PreviewFrame extends Omit<FigureEnvironment, 'width' | 'height' | 'random'> {
   background: HTMLCanvasElement | null;
@@ -36,6 +37,8 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     last = 0,
     dt = 0,
     cut = 0;
+  let density = 1;
+  let dissolving = false;
   const position = () => ({
     x: canvas.width * 0.8,
     y: canvas.height * 0.8,
@@ -46,6 +49,8 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   function demo(effect: string, bonk: boolean): void {
     const p = position();
     elapsed = 0;
+    dissolving = ['falling-leaves', 'ember-ash', 'ink-wash'].includes(effect) && !bonk;
+    for (const particles of Object.values(fx)) particles.length = 0;
     cut = services.random() < 0.5 ? 0 : Math.PI / 2;
     const cx = p.x,
       cy = p.y - p.h * 0.55,
@@ -57,6 +62,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       random: services.random,
       flash: () => {},
       sounds: services.sounds,
+      density,
     });
     spawn.addSlash(cx - dx, cy - dy, cx + dx, cy + dy, Math.max(3, p.h * 0.03), 0.3);
     spawn.killFx(effect, cx, cy, cut + Math.PI / 2, p.h / 160);
@@ -65,6 +71,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   }
 
   function draw(frame: PreviewFrame): void {
+    density = frame.effectDensity ?? 1;
     const g = context!;
     const width = canvas.width,
       height = canvas.height;
@@ -90,8 +97,17 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       elapsed += dt;
       const p = position();
       const figure: Figure = { ...p, fog: 0.2, alpha: 1, d: dummy, pose: EPOSE.guard, lean: 0 };
-      if (elapsed < 0.9) figures.drawSplit(figure, p, cut, elapsed, 0.9);
-      else {
+      if (elapsed < 0.9) {
+        figures.drawGroundShadow(figure, deathShadowOpacity(elapsed));
+        figure.noShadow = true;
+        if (dissolving) {
+          applyDeathPose(figure, 'dissolve', elapsed, 1, frame.reducedMotion);
+          figures.drawFigure(figure);
+        } else if (frame.reducedMotion) {
+          applyDeathPose(figure, 'split', elapsed, 1, true);
+          figures.drawFigure(figure);
+        } else figures.drawSplit(figure, p, cut, elapsed, 0.9);
+      } else {
         figure.alpha = clamp((elapsed - 1.1) / 0.4);
         if (figure.alpha > 0) figures.drawFigure(figure);
       }
@@ -126,7 +142,10 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       renderer.drawFx();
       renderer.drawFx2();
     }
-    applyFilm(g, width, height, canvas, frame.film, frame.time);
+    applyFilm(g, width, height, canvas, frame.film, frame.time, {
+      reducedMotion: frame.reducedMotion,
+      reducedFlashes: frame.reducedFlashes,
+    });
   }
 
   return { demo, draw };

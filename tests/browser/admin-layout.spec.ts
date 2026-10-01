@@ -30,7 +30,7 @@ test('Trials access is editable in the isolated profile and controls the title e
   await page.locator('#admin [data-back]').click();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('[data-trial]')).toHaveCount(8);
+  await expect(page.locator('[data-trial]')).toHaveCount(10);
   await page.locator('#trials [data-back]').click();
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();

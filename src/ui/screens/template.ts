@@ -5,7 +5,12 @@ import {
   type UpgradeId,
 } from '../../game/progression/meta.ts';
 
-export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () => void): void {
+export function renderTemplate(
+  root: HTMLElement,
+  meta: MetaProgress,
+  save: () => void,
+  premiumAccess = false,
+): void {
   root.replaceChildren();
   const balance = document.createElement('p');
   balance.textContent = `${meta.embers} Embers`;
@@ -27,7 +32,8 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
   for (const upgrade of TEMPLATE_UPGRADES) {
     const rank = meta.upgrades[upgrade.id];
     const cost = upgrade.costs[rank];
-    const blocked = !!upgrade.requires && meta.upgrades[upgrade.requires] < 1;
+    const premiumLocked = !!upgrade.premium && !premiumAccess;
+    const blocked = premiumLocked || (!!upgrade.requires && meta.upgrades[upgrade.requires] < 1);
     const tile = document.createElement('button');
     tile.type = 'button';
     tile.className = 'upgrade-tile';
@@ -38,7 +44,11 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     const owned = document.createElement('span');
     owned.textContent = `Rank ${rank}/${upgrade.maxRank}`;
     const state = document.createElement('span');
-    state.textContent = cost === undefined ? 'Max' : String(cost);
+    state.textContent = premiumLocked
+      ? 'Requires Premium'
+      : cost === undefined
+        ? 'Max'
+        : String(cost);
     tile.dataset.state = blocked
       ? 'locked'
       : cost === undefined
@@ -49,7 +59,7 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     tile.append(illustration(upgrade.id), name, owned, state);
     tile.onclick = () => {
       root.dataset.selectedUpgrade = upgrade.id;
-      renderTemplate(root, meta, save);
+      renderTemplate(root, meta, save, premiumAccess);
       root.querySelector<HTMLElement>('.template-detail')?.focus();
     };
     grid.append(tile);
@@ -68,16 +78,18 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
     if (rank < upgrade.maxRank) next.textContent = `Next: ${value(rank + 1)}`;
     const buy = document.createElement('button');
     buy.className = 'btn';
-    buy.textContent = blocked
-      ? 'Requires Throwing Knife'
-      : cost === undefined
-        ? 'Fully donated'
-        : `Donate ${cost} Embers`;
+    buy.textContent = premiumLocked
+      ? 'Requires Premium'
+      : blocked
+        ? 'Requires Throwing Knife'
+        : cost === undefined
+          ? 'Fully donated'
+          : `Donate ${cost} Embers`;
     buy.disabled = blocked || cost === undefined || meta.embers < cost;
     buy.onclick = () => {
-      if (purchaseUpgrade(meta, upgrade.id)) {
+      if (purchaseUpgrade(meta, upgrade.id, premiumAccess)) {
         save();
-        renderTemplate(root, meta, save);
+        renderTemplate(root, meta, save, premiumAccess);
         root.querySelector<HTMLElement>('.template-detail')?.focus();
       }
     };
@@ -91,6 +103,10 @@ export function renderTemplate(root: HTMLElement, meta: MetaProgress, save: () =
 
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
+    case 'precision':
+      return rank ? `Perfect-action windows ${rank * 5}% wider` : 'Standard perfect-action windows';
+    case 'discernment':
+      return rank ? 'One Shrine reroll per run' : 'No Shrine rerolls';
     case 'vitality':
       return `${2 + rank} starting lives`;
     case 'focus':
@@ -124,6 +140,8 @@ function effectText(id: UpgradeId, rank: number): string {
   }
 }
 const illustrations: Record<UpgradeId, string> = {
+  precision: '<circle cx="48" cy="48" r="28"/><path d="M28 48H68M48 28V68"/>',
+  discernment: '<path d="M72 32A28 28 0 1 0 75 60M72 12V32H52"/>',
   vitality: '<path d="M48 77C8 52 14 20 34 24L48 35L62 24C83 20 88 52 48 77Z"/>',
   focus:
     '<circle cx="48" cy="48" r="29"/><circle cx="48" cy="48" r="10"/><path d="M48 9V25M48 71V87M9 48H25M71 48H87"/>',

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('web cannot unlock Premium through forged profile data', async ({ page }) => {
+test('Free build cannot unlock Premium through forged profile data', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('issen.unlocks', JSON.stringify(['supporter-print']));
     localStorage.setItem('issen.equip', JSON.stringify({ film: 'supporter-print' }));
@@ -10,10 +10,17 @@ test('web cannot unlock Premium through forged profile data', async ({ page }) =
   await expect(page.locator('#premiumBadge')).toBeHidden();
   await page.locator('#bArmory').tap();
   await page.getByRole('tab', { name: /Film looks/ }).tap();
-  await expect(page.getByRole('button', { name: /Supporter Print/ })).toHaveCount(0);
+  await page.getByRole('button', { name: /Supporter Print/ }).tap();
+  await expect(page.locator('#armInfo')).toContainText('Requires Premium');
+  await expect(page.getByRole('button', { name: 'Monochrome', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 });
 
-test('native closed-testing build hides all Premium UI and paid film', async ({ page }) => {
+test('Free native closed-testing build hides billing and shows locked Premium film', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     (window as unknown as { androidBridge: object }).androidBridge = {};
     localStorage.setItem('issen.unlocks', JSON.stringify(['supporter-print']));
@@ -29,7 +36,8 @@ test('native closed-testing build hides all Premium UI and paid film', async ({ 
   await expect(page.locator('#premiumBadge')).toBeHidden();
   await page.locator('#bArmory').tap();
   await page.getByRole('tab', { name: /Film looks/ }).tap();
-  await expect(page.getByRole('button', { name: /Supporter Print/ })).toHaveCount(0);
+  await page.getByRole('button', { name: /Supporter Print/ }).tap();
+  await expect(page.locator('#armInfo')).toContainText('Requires Premium');
   await expect(page.getByRole('button', { name: 'Monochrome', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',

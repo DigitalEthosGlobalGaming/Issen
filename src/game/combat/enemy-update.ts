@@ -1,6 +1,7 @@
 import { clamp } from '../../shared/math.ts';
 import { EPOSE, approachPose } from '../../rendering/figures/model.ts';
 import type { Enemy, EnemyPosition } from './enemy.ts';
+import { deathDuration } from '../../rendering/figures/death.ts';
 export interface EnemyUpdateState {
   enemies: Enemy[];
   freezeT: number;
@@ -23,6 +24,7 @@ export interface EnemyUpdateEnvironment {
   foxSave: (enemy: Enemy) => void;
   playerDie: (enemy: Enemy, reason: 'late') => void;
   position: (enemy: Enemy) => EnemyPosition;
+  rawDelta?: number;
 }
 export function updateEnemies(G: EnemyUpdateState, dt: number, env: EnemyUpdateEnvironment) {
   const {
@@ -36,6 +38,7 @@ export function updateEnemies(G: EnemyUpdateState, dt: number, env: EnemyUpdateE
     position: enemyPos,
   } = env;
   for (const e of G.enemies) {
+    if (e.state === 'dying') e.shadowTime = (e.shadowTime ?? 0) + (env.rawDelta ?? dt);
     e.t +=
       dt *
       (e.state === 'attack' && G.freezeT > 0
@@ -124,7 +127,7 @@ export function updateEnemies(G: EnemyUpdateState, dt: number, env: EnemyUpdateE
   }
   G.enemies = G.enemies.filter(
     (e) =>
-      !(e.state === 'dying' && e.t >= (!e.deathType || e.deathType === 'split' ? 0.9 : 1.1)) &&
+      !(e.state === 'dying' && e.t >= deathDuration(e.deathType)) &&
       !(e.state === 'fade' && e.t >= 0.5),
   );
 }

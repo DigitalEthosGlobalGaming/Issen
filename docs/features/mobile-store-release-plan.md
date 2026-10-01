@@ -1,5 +1,11 @@
 # Mobile and app-store release plan
 
+Version 1.13.0 expands Premium through the [edition/mastery rules](editions-and-mastery.md).
+Web opens edition gates; a Premium beta build can grant access without billing.
+Free mobile visibly labels locked catalog entries even when purchases are disabled.
+This supersedes older supporter-only scope and hidden-paid-film descriptions below.
+Android packaging, physical haptics and live purchase testing remain release gates.
+
 Status: Android internal-testing release installed and working on the publisher's
 phone, as reported on 30 September 2026. Detailed device QA and later milestones
 remain open. Premium supporter implementation is retained but disabled by default

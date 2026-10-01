@@ -81,7 +81,57 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       });
   }
   function killFx(t: string, cx: number, cy: number, ang: number, sc: number) {
-    if (t === 'trial-ripple') {
+    if (t === 'falling-leaves') {
+      for (let i = 0; i < count(24); i++)
+        fx.px.push({
+          k: 'maple',
+          c: '#343c2b',
+          x: cx + (R() - 0.5) * 35 * sc,
+          y: cy + (R() - 0.5) * 85 * sc,
+          vx: Math.cos(ang) * (50 + R() * 130) * sc + (R() - 0.5) * 80 * sc,
+          vy: -80 * sc + R() * 100 * sc,
+          g: 65,
+          drag: 1.8,
+          rot: R() * TAU,
+          vr: (R() - 0.5) * 5,
+          s: (4 + R() * 5) * sc,
+          t: 0,
+          life: 1.2 + R() * 0.5,
+        });
+    } else if (t === 'ember-ash') {
+      for (let i = 0; i < count(22); i++) {
+        fx.embers.push({
+          x: cx + (R() - 0.5) * 40 * sc,
+          y: cy + (R() - 0.5) * 90 * sc,
+          vx: (R() - 0.5) * 70 * sc,
+          vy: -(40 + R() * 130) * sc,
+          ph: R() * TAU,
+          t: 0,
+          life: 0.7 + R() * 0.6,
+        });
+        fx.scraps.push({
+          x: cx,
+          y: cy + (R() - 0.5) * 80 * sc,
+          vx: (R() - 0.5) * 90 * sc,
+          vy: -R() * 90 * sc,
+          rot: R() * TAU,
+          vr: 2,
+          s: (1 + R() * 2) * sc,
+          t: 0,
+          life: 0.7 + R() * 0.5,
+        });
+      }
+    } else if (t === 'ink-wash') {
+      inkBurst(cx, cy, ang, 28, sc * 0.75);
+      for (let i = 0; i < 4; i++)
+        fx.stains.push({
+          x: cx + (R() - 0.5) * 30 * sc,
+          y: cy + (i - 1.5) * 25 * sc,
+          rx: (30 + R() * 20) * sc,
+          t: 0,
+          life: 0.7,
+        });
+    } else if (t === 'trial-ripple') {
       inkBurst(cx, cy, ang, 5, sc);
       for (let i = 0; i < 3; i++)
         ring(cx, cy, (4 + i * 12) * sc, (65 + i * 28) * sc, 0.5 + i * 0.14, Math.max(1, 2 * sc));

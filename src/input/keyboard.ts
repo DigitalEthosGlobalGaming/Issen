@@ -1,4 +1,6 @@
 import type { Direction } from '../shared/directions.ts';
+import { defaultSettings, controlKey } from '../platform/settings.ts';
+import type { Bindings } from '../platform/settings.ts';
 
 export interface KeyboardActions {
   state(): { phase: string; panelOpen: boolean; overReady: boolean };
@@ -10,6 +12,7 @@ export interface KeyboardActions {
   swipe(direction: Direction): void;
   tapDown(): boolean;
   tap(): void;
+  bindings?(): Bindings;
 }
 const arrows: Record<string, Direction> = {
   ArrowUp: 'up',
@@ -17,22 +20,19 @@ const arrows: Record<string, Direction> = {
   ArrowLeft: 'left',
   ArrowRight: 'right',
 };
-const controls: Record<string, Direction> = {
-  ...arrows,
-  w: 'up',
-  s: 'down',
-  a: 'left',
-  d: 'right',
-};
-
 export function bindKeyboard(actions: KeyboardActions): () => void {
   const listener = (event: KeyboardEvent) => {
     const { phase, panelOpen, overReady } = actions.state();
+    const bindings = actions.bindings?.() ?? defaultSettings().bindings;
+    const key = controlKey(event.key);
+    const pauseKey = event.key === 'Escape' || (!!key && bindings.pause.includes(key));
     if (panelOpen) {
       if (event.key === 'Escape') actions.closePanel();
       return;
     }
-    const onButton = document.activeElement?.tagName === 'BUTTON';
+    const onButton = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(
+      document.activeElement?.tagName ?? '',
+    );
     const startKey = event.key === 'Enter' || event.key === ' ';
     if (phase === 'title') {
       const direction = arrows[event.key];
@@ -54,18 +54,28 @@ export function bindKeyboard(actions: KeyboardActions): () => void {
       return;
     }
     if (phase === 'paused') {
-      if (event.key === 'Escape' || event.key === 'p') actions.resume();
+      if (pauseKey) actions.resume();
       return;
     }
-    if (event.key === 'Escape' || event.key === 'p') {
+    if (
+      event.ctrlKey ||
+      event.altKey ||
+      event.metaKey ||
+      ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName ?? '')
+    )
+      return;
+    if (pauseKey) {
+      event.preventDefault();
       actions.pause();
       return;
     }
-    const direction = controls[event.key];
+    const direction = key
+      ? (['up', 'down', 'left', 'right'] as Direction[]).find((dir) => bindings[dir].includes(key))
+      : undefined;
     if (direction) {
       event.preventDefault();
       actions.swipe(direction);
-    } else if (event.key === ' ') {
+    } else if (key && bindings.tap.includes(key)) {
       event.preventDefault();
       if (!actions.tapDown()) actions.tap();
     }

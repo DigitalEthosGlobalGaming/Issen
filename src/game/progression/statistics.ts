@@ -57,6 +57,7 @@ export const STAT0 = {
   shrines: 0,
   cleanDuels: 0,
   bestPStreak: 0,
+  bestRunPerfects: 0,
   bladeDuels: 0,
   runs: 0,
   kills: 0,

@@ -74,6 +74,10 @@ export interface ShrineState extends BlessingState {
   m: Pick<Modifiers, 'noShrine' | 'shrineN' | 'rare' | 'rareShrine'>;
 }
 
+/** Base rare chance per ordinary offer, increasing with bosses defeated. */
+export function rareChance(bosses: number): number {
+  return bosses >= 7 ? 0.3 : bosses >= 5 ? 0.24 : bosses >= 3 ? 0.18 : bosses >= 2 ? 0.12 : 0.08;
+}
 /** Returns offers in display order without changing the run or content catalog. */
 export function shrineOffers(state: ShrineState, random: Random = Math.random): Blessing[] {
   if (state.m.noShrine) return [];
@@ -95,7 +99,7 @@ export function shrineOffers(state: ShrineState, random: Random = Math.random): 
   if (curse.length && state.bossCount >= 2 && random() < 0.4) take(curse);
   while (offers.length < state.m.shrineN) {
     const items =
-      rare.length && random() < Math.max(0, Math.min(1, 0.3 + state.m.rare))
+      rare.length && random() < Math.max(0, Math.min(1, rareChance(state.bossCount) + state.m.rare))
         ? rare
         : common.length
           ? common

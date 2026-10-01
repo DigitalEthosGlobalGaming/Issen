@@ -5,7 +5,9 @@ export function applyFilm(
   source: CanvasImageSource,
   f: string,
   time = 0,
+  preferences: { reducedMotion?: boolean; reducedFlashes?: boolean } = {},
 ) {
+  if (preferences.reducedMotion || preferences.reducedFlashes) time = 0;
   if (f === 'mono') return;
   g.save();
   if (f === 'supporter-print') {
@@ -51,9 +53,10 @@ export function applyFilm(
       const y = Math.floor((strip * H) / 64);
       const h = Math.floor(((strip + 1) * H) / 64) - y;
       if (!h) continue;
-      const shift =
-        W * 0.005 * Math.sin(strip * 0.24 + time * 1.7) +
-        W * 0.002 * Math.sin(strip * 0.71 - time * 2.3);
+      const shift = preferences.reducedMotion
+        ? 0
+        : W * 0.005 * Math.sin(strip * 0.24 + time * 1.7) +
+          W * 0.002 * Math.sin(strip * 0.71 - time * 2.3);
       g.drawImage(source, (inset + shift) * sx, y * sy, (W - inset * 2) * sx, h * sy, 0, y, W, h);
     }
     const colours = ['#00ffd5', '#ff19d9', '#3822ff', '#d8ff00'];
@@ -69,8 +72,9 @@ export function applyFilm(
     for (let band = 1; band < 12; band += 2) {
       const y = Math.floor((band * H) / 12);
       const h = Math.max(1, Math.floor(H / 90));
-      const shift =
-        W * (band % 3 === 0 ? -0.035 : 0.025) * (0.7 + 0.3 * Math.sin(time * 1.9 + band));
+      const shift = preferences.reducedMotion
+        ? 0
+        : W * (band % 3 === 0 ? -0.035 : 0.025) * (0.7 + 0.3 * Math.sin(time * 1.9 + band));
       g.drawImage(source, 0, y * sy, W * sx, h * sy, shift, y, W, h);
     }
     g.globalCompositeOperation = 'overlay';

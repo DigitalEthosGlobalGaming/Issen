@@ -9,6 +9,7 @@ import shrine from './screens/shrine.html?raw';
 import pause from './screens/pause.html?raw';
 import trials from './screens/trials.html?raw';
 import support from './screens/support.html?raw';
+import options from './screens/options.html?raw';
 
 const screens: Record<string, string> = {
   title,
@@ -21,6 +22,7 @@ const screens: Record<string, string> = {
   pause,
   trials,
   support,
+  options,
 };
 
 export function mount(): HTMLElement {

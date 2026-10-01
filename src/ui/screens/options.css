@@ -1,0 +1,185 @@
+#options[hidden] {
+  display: none;
+}
+#options {
+  touch-action: pan-y;
+}
+.options-box {
+  text-align: left;
+  max-width: 540px;
+}
+.options-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.options-heading h2 {
+  margin: 0;
+  font-size: 26px;
+}
+.options-intro,
+.options-help,
+.options-status {
+  line-height: 1.55;
+  color: var(--paper-dim);
+}
+.option-category {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin: 14px 0;
+  padding: 20px;
+  text-align: left;
+}
+.option-category strong {
+  font-size: 19px;
+}
+.option-category small,
+.option-row small {
+  color: var(--paper-dim);
+  display: block;
+  line-height: 1.5;
+}
+.option-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(236, 230, 218, 0.15);
+}
+.option-row > div {
+  flex: 1;
+}
+.option-row label,
+.option-volume label {
+  font-weight: 700;
+}
+.option-row select {
+  flex-shrink: 0;
+  max-width: 44%;
+  min-height: 46px;
+  padding: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--paper-dim);
+  border-radius: 4px;
+  font: inherit;
+}
+.option-row input[type='checkbox'] {
+  width: 26px;
+  height: 26px;
+  accent-color: var(--paper);
+  flex-shrink: 0;
+}
+.option-volume {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  padding: 20px 0;
+}
+.option-volume input {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--paper);
+  touch-action: pan-y;
+}
+.options-status {
+  min-height: 1.55em;
+  color: var(--paper);
+}
+.options-box h3 {
+  margin-top: 26px;
+}
+.options-box :is(input, select):focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 4px;
+}
+#app.large-text
+  :is(
+    .screen p,
+    .screen small,
+    .screen label,
+    .screen select,
+    .screen output,
+    .screen .btn,
+    .screen .option-row > span,
+    .screen .rules,
+    .arm-detail,
+    .stat-row,
+    .pause-blessing-list,
+    #templateContent
+  ) {
+  font-size: max(18px, 1.1em);
+  line-height: 1.55;
+}
+#app.large-text .screen .row {
+  flex-wrap: wrap;
+}
+#app.large-text :is(.screen.panel, #paused, #over, #setup) {
+  justify-content: flex-start;
+}
+#app.large-text .screen:not(.panel) > :first-child {
+  margin-top: 0;
+}
+#app.large-text .screen {
+  touch-action: pan-y;
+}
+#app.large-text .armTop {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+#app.large-text
+  .armInfo
+  :is(.fl, .pk, .tr, .arm-unlock-condition, .spx, .item-role, .awakening-label) {
+  font-size: 18px;
+  line-height: 1.5;
+}
+#app.large-text .tiles {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+#app.large-text .tile {
+  aspect-ratio: auto;
+  min-height: 112px;
+}
+#app.large-text .tile .tn {
+  font-size: 16px;
+  line-height: 1.4;
+}
+#app.reduced-motion :is(.screen, .screen *) {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+}
+#app.reduced-motion .setup-reveal::after {
+  display: none;
+}
+#app.reduced-motion :is(.tutorial-card, .tutorial-card *) {
+  animation: none !important;
+  transition: none !important;
+}
+#app.large-text .tutorial-card :is(p, button) {
+  font-size: 18px;
+  line-height: 1.5;
+}
+@media (max-width: 420px) {
+  .options-heading h2 {
+    font-size: 23px;
+  }
+  .option-row {
+    gap: 10px;
+  }
+  .option-row .btn {
+    padding: 10px;
+  }
+  #app.large-text .option-row {
+    flex-wrap: wrap;
+  }
+  #app.large-text .option-row select {
+    max-width: 100%;
+  }
+}

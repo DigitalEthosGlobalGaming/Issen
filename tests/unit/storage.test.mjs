@@ -103,6 +103,7 @@ test('active player reset clears every player key but preserves test and unrelat
     'hints',
     'setup',
     'muted',
+    'settings',
     'revoked',
     'future',
   ])

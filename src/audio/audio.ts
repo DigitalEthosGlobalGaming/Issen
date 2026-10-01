@@ -18,6 +18,7 @@ interface AudioState {
   ctx: AudioContext | null;
   master: GainNode | null;
   ambience: GainNode | null;
+  effects: GainNode | null;
   noise: AudioBuffer | null;
   wg: GainNode | null;
   wbp: BiquadFilterNode | null;
@@ -32,6 +33,7 @@ export function createAudio(initialMuted: boolean) {
     ctx: null,
     master: null,
     ambience: null,
+    effects: null,
     noise: null,
     wg: null,
     wbp: null,
@@ -40,6 +42,8 @@ export function createAudio(initialMuted: boolean) {
     wt: 0,
     at: 0,
   };
+  let effectsVolume = 1,
+    ambienceVolume = 1;
   function audioInit() {
     if (A.ctx) {
       if (A.ctx.state === 'suspended') A.ctx.resume();
@@ -58,8 +62,11 @@ export function createAudio(initialMuted: boolean) {
       A.master.connect(comp);
       comp.connect(c.destination);
       A.ambience = c.createGain();
-      A.ambience.gain.value = A.paused ? 0 : 1;
+      A.ambience.gain.value = A.paused ? 0 : ambienceVolume;
       A.ambience.connect(A.master);
+      A.effects = c.createGain();
+      A.effects.gain.value = effectsVolume;
+      A.effects.connect(A.master);
       const len = c.sampleRate * 2,
         buf = c.createBuffer(1, len, c.sampleRate),
         d = buf.getChannelData(0);
@@ -101,7 +108,7 @@ export function createAudio(initialMuted: boolean) {
     gn.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     s.connect(f);
     f.connect(gn);
-    gn.connect(ambience ? A.ambience! : A.master);
+    gn.connect(ambience ? A.ambience! : A.effects!);
     s.start(t, Math.random() * 1.5);
     s.stop(t + o.dur + 0.05);
   }
@@ -118,7 +125,7 @@ export function createAudio(initialMuted: boolean) {
     gn.gain.exponentialRampToValueAtTime(o.g, t + (o.a || 0.004));
     gn.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     os.connect(gn);
-    gn.connect(ambience ? A.ambience! : A.master);
+    gn.connect(ambience ? A.ambience! : A.effects!);
     os.start(t);
     os.stop(t + o.dur + 0.05);
   }
@@ -349,7 +356,7 @@ export function createAudio(initialMuted: boolean) {
       if (A.ctx && A.ambience) {
         const now = A.ctx.currentTime;
         A.ambience.gain.cancelScheduledValues(now);
-        A.ambience.gain.setTargetAtTime(paused ? 0 : 1, now, paused ? 0.06 : 0.15);
+        A.ambience.gain.setTargetAtTime(paused ? 0 : ambienceVolume, now, paused ? 0.06 : 0.15);
       }
     },
     get muted() {
@@ -359,11 +366,21 @@ export function createAudio(initialMuted: boolean) {
       A.muted = muted;
       if (A.master) A.master.gain.value = muted ? 0 : 0.9;
     },
+    setVolumes(effects: number, ambience: number) {
+      effectsVolume = Number.isFinite(effects) ? clamp(effects) : 1;
+      ambienceVolume = Number.isFinite(ambience) ? clamp(ambience) : 1;
+      if (A.effects) A.effects.gain.value = effectsVolume;
+      if (A.ambience && A.ctx) {
+        A.ambience.gain.cancelScheduledValues(A.ctx.currentTime);
+        A.ambience.gain.setTargetAtTime(A.paused ? 0 : ambienceVolume, A.ctx.currentTime, 0.06);
+      }
+    },
     dispose() {
       const context = A.ctx;
       A.ctx = null;
       A.master = null;
       A.ambience = null;
+      A.effects = null;
       A.noise = null;
       A.wg = null;
       A.wbp = null;

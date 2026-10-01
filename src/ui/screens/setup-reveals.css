@@ -53,10 +53,10 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .setup-reveal {
+  :root:not([data-motion='off']) .setup-reveal {
     animation: none;
   }
-  .setup-reveal::after {
+  :root:not([data-motion='off']) .setup-reveal::after {
     display: none;
   }
 }

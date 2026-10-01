@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+const appVersion = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+).version;
 
 test('Android assets cold-load with external networking blocked, including local fonts', async ({
   page,
@@ -15,7 +20,7 @@ test('Android assets cold-load with external networking blocked, including local
   });
   await page.goto('/');
   await expect(page.locator('#title')).toHaveClass(/on/);
-  await expect(page.locator('.title-version').first()).toHaveText('v1.11.0');
+  await expect(page.locator('.title-version').first()).toHaveText(`v${appVersion}`);
   expect(
     await page.evaluate(async () => {
       const loaded = await document.fonts.load('800 24px "Shippori Mincho B1"', 'Issen 一閃');

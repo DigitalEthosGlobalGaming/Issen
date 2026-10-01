@@ -10,11 +10,50 @@ export interface TrialDefinition {
   wave?: { total: number; attack: number; feint: number; perfects: number };
   bosses?: readonly number[];
   cleanOpenings?: boolean;
-  reward: Pick<Item, 'id' | 'type' | 'k' | 'n' | 'f'>;
+  duelMaster?: boolean;
+  reward: Pick<Item, 'id' | 'type' | 'k' | 'n' | 'f'> & Partial<Pick<Item, 'm' | 'pk' | 'tr'>>;
 }
 
 /** Fixed encounters, independent of the player's purchases and ordinary setup. */
 export const TRIALS: readonly TrialDefinition[] = [
+  {
+    id: 'quiet-blade',
+    name: 'Quiet Blade',
+    seed: 9909,
+    arrows: false,
+    objective: '24 arrowless cuts, 18 perfect. No mistakes.',
+    description: 'Read the real blade through feints and land 18 perfect cuts in 24 opponents.',
+    wave: { total: 24, attack: 1.35, feint: 0.65, perfects: 18 },
+    reward: {
+      id: 'quiet-seal',
+      type: 'seal',
+      k: '静',
+      n: 'Quiet jade',
+      f: 'A muted jade seal for a steady eye.',
+    },
+  },
+  {
+    id: 'duel-master',
+    name: 'Duel Master',
+    seed: 10110,
+    arrows: true,
+    bosses: [1],
+    cleanOpenings: true,
+    duelMaster: true,
+    objective: '20 counter-and-cut exchanges in a row. Each becomes faster. No mistakes.',
+    description:
+      'Counter each glint, then slash in the opening direction. One mistake ends the attempt.',
+    reward: {
+      id: 'first-strike',
+      type: 'charm',
+      k: '先',
+      n: 'First Strike',
+      f: 'Seize the opening before it closes.',
+      pk: 'Earlier valid slashes earn up to 900 base points',
+      tr: 'Replaces normal and perfect slash timing points; automatic kills receive no speed bonus',
+      m: { swift: 1 },
+    },
+  },
   {
     id: 'unbroken',
     name: 'Unbroken',
@@ -152,7 +191,7 @@ export const TRIALS: readonly TrialDefinition[] = [
 export function trialRewardItems(): Item[] {
   return TRIALS.map((trial) => ({
     ...trial.reward,
-    d: `Complete the ${trial.name} trial. Trials unlock at Ronin wave 10.`,
+    d: `Complete the ${trial.name} trial.`,
     ok: () => false,
   }));
 }

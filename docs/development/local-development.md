@@ -1,5 +1,16 @@
 # Local development and verification
 
+## Edition builds
+
+Version 1.13.0 supports `VITE_GAME_EDITION=free|premium|web`. Web/Pages builds
+default to Web; Android mode defaults to Free. In PowerShell, set
+`$env:VITE_GAME_EDITION = 'premium'` before a build command for a Premium beta,
+then `Remove-Item Env:VITE_GAME_EDITION` to restore defaults. An ignored
+`.env.android.local` may also select the mobile edition. Invalid values fail the
+build. This grants edition access without inventing a purchase; native billing
+still requires its separate opt-in/key. See
+[edition rules](../features/editions-and-mastery.md).
+
 Use Node 24 (the migration was verified with 24.16.0), then run `npm install` and
 `npm run dev`. Vite prints the local URL. For phone testing use
 `npm run dev -- --host 0.0.0.0` and the computer's LAN address.
@@ -91,9 +102,23 @@ Production tests separately exercise bundled asset startup, armory, a run, shari
 and landscape layout. Native mobile share sheets and physical touch devices are not
 covered by desktop automation.
 
-Keyboard controls are arrows/WASD to cut, Space to tap/parry (or throw an owned,
-charged knife during an ordinary wave), and P/Escape to pause.
-On a paused screen, a keyboard press resumes when a button is not focused.
+Default keyboard controls are arrows/WASD to cut, Space to tap/parry (or throw an
+owned, charged knife during an ordinary wave), and P/Escape to pause or resume.
+Options, available from the title and pause screens, supports keyboard rebinding
+and Low/Normal/High swipe sensitivity. Escape remains reserved for pause and menu
+navigation. Settings input never becomes combat input. Closing Options from a
+paused run returns to pause; Continue resumes it.
+
+Options groups Audio, Controls, and Display and Accessibility into submenus.
+Sound effects and ambience have independent volume; master mute also matches the
+HUD button and retains legacy `issen.muted` compatibility. Display preferences
+cover reduced motion/flashes (System follows the OS reduced-motion preference),
+Normal/Large interface text, Auto/Low/High cosmetic density and optional vibration.
+`issen.settings` is validated, profile-aware and included in profile reset;
+testing sessions use `issen.testing.settings`. Category Restore defaults changes
+only that category. Test live controls, binding conflicts, Back/Escape and reload
+with `tests/browser/options.spec.ts`; verify shadow grounding and raw-time fade
+under slow motion with `tests/browser/death-presentation.spec.ts`.
 
 ## Testing tools and onboarding
 

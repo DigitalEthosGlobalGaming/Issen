@@ -260,8 +260,8 @@
   border: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .result-sequence,
-  .result-sequence * {
+  :root:not([data-motion='off']) .result-sequence,
+  :root:not([data-motion='off']) .result-sequence * {
     animation: none !important;
     transition: none !important;
   }

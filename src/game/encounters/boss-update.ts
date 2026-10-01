@@ -4,6 +4,7 @@ import type { Random } from '../../shared/random.ts';
 import type { Boss } from './boss.ts';
 import type { EnemyPosition } from '../combat/enemy.ts';
 export interface BossEnvironment {
+  rawDelta?: number;
   random: Random;
   sounds: { glint: () => void; feint: () => void };
   flash: (amount: number) => void;
@@ -26,6 +27,7 @@ export function updateBoss(
   const { random: R, sounds: sfx, flash, playerDie, recovered, position: bossPos } = env;
   const b = G.boss;
   if (!b) return;
+  if (b.state === 'dying') b.shadowTime = (b.shadowTime ?? 0) + (env.rawDelta ?? dt);
   const bp = b.bp;
   b.t += dt;
   b.life += dt;

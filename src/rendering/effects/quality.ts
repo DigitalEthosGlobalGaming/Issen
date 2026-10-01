@@ -30,3 +30,11 @@ export function createEffectQuality() {
 export function scaledCount(count: number, density = 1): number {
   return Math.max(1, Math.round(count * density));
 }
+export function preferredDensity(
+  quality: 'auto' | 'low' | 'high',
+  adaptive: number,
+  reducedMotion = false,
+): number {
+  const density = quality === 'low' ? 0.3 : quality === 'high' ? 1 : adaptive;
+  return reducedMotion ? Math.min(0.3, density) : density;
+}

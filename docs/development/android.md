@@ -3,7 +3,7 @@
 The first native target is Android, using the shared game inside Capacitor 8.4.3.
 Production application ID: `com.digitalethosglobalgaming.issen`. Debug installs
 use `com.digitalethosglobalgaming.issen.debug` and the label **Issen (test)**.
-Current version: 1.11.0; the native version name reads `package.json`.
+Current version: 1.12.1; the native version name reads `package.json`.
 
 ## Tooling
 
@@ -201,3 +201,12 @@ physical Google Play sandbox checks. Premium is paused for closed testing:
 `VITE_PREMIUM_ENABLED` defaults to false and hides every paid feature. Keep it false
 even if SDK keys are already configured. Missing configuration also disables checkout.
 Use version code 2 or higher for an update to the first internal-testing upload.
+
+## Options and device Back in 1.12
+
+The Android activity forwards Back to the Options screen while it is open.
+Back cancels binding capture, returns from a category to Options, then closes
+Options to its opening screen. A run stays paused throughout. Outside Options,
+Back retains the activity default. Validate this dispatcher on the Pixel, along
+with vibration support, audio controls, Large text and portrait/landscape layouts.
+Desktop browser dispatch tests cover the web handler, not the hardware gesture.

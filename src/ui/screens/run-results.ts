@@ -17,7 +17,11 @@ export interface RunResults {
 }
 
 /** A presentation-only sequence. Rewards and unlocks must already be settled. */
-export function createRunResults(root: HTMLElement, onUnlock?: () => void): RunResults {
+export function createRunResults(
+  root: HTMLElement,
+  onUnlock?: () => void,
+  reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches,
+): RunResults {
   const sequence = root.querySelector<HTMLElement>('#runResultSequence');
   const summary = root.querySelector<HTMLElement>('#overSummary');
   const number = root.querySelector<HTMLElement>('#resultEmbers');
@@ -51,7 +55,6 @@ export function createRunResults(root: HTMLElement, onUnlock?: () => void): RunR
   let frame = 0;
   let timeout = 0;
   let onDone: (() => void) | null = null;
-  const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const clearMotion = () => {
     cancelAnimationFrame(frame);
     clearTimeout(timeout);

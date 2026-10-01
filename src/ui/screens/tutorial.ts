@@ -4,6 +4,7 @@ import './tutorial.css';
 export function createTutorial(
   root: HTMLElement,
   onFinish: (status: 'completed' | 'skipped') => void,
+  reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches,
 ) {
   const overlay = document.createElement('section');
   overlay.className = 'tutorial-overlay';
@@ -38,7 +39,6 @@ export function createTutorial(
   const controls = overlay.querySelector<HTMLElement>('.tutorial-controls')!;
   const finishButton = overlay.querySelector<HTMLButtonElement>('.tutorial-finish')!;
   const listeners = new AbortController();
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false;
   let disposed = false;
   let step = 0;
@@ -183,7 +183,7 @@ export function createTutorial(
     g.beginPath();
     g.arc(x, y, r, -Math.PI / 2 + Math.PI * 2 * 0.62, -Math.PI / 2 + Math.PI * 2 * 0.94);
     g.stroke();
-    if ((step === 1 || step === 2) && !reducedMotion.matches) {
+    if ((step === 1 || step === 2) && !reducedMotion()) {
       const angle = phase(now) * Math.PI * 2 - Math.PI / 2;
       g.fillStyle = '#fff3d7';
       g.beginPath();

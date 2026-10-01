@@ -326,7 +326,7 @@ export function createEffectRenderer(g: CanvasRenderingContext2D, fx: Effects, e
         case 'maple': {
           g.rotate(q.rot ?? 0);
           g.scale(1, Math.cos((q.rot ?? 0) * 1.3));
-          g.fillStyle = '#b8322a';
+          g.fillStyle = q.c ?? '#b8322a';
           g.beginPath();
           for (let i = 0; i < 10; i++) {
             const a = (i / 10) * TAU - Math.PI / 2,
@@ -514,7 +514,7 @@ export function createEffectRenderer(g: CanvasRenderingContext2D, fx: Effects, e
   }
   function drawStains() {
     for (const s of fx.stains) {
-      g.fillStyle = `rgba(8,8,7,${0.5 * (1 - clamp((s.t - s.life * 0.6) / (s.life * 0.4))) * clamp(s.t * 4)})`;
+      g.fillStyle = `rgba(8,8,7,${0.5 * (1 - easeOut(clamp(s.t / s.life)))})`;
       g.beginPath();
       g.ellipse(s.x, s.y, s.rx * clamp(0.4 + s.t * 3), s.rx * 0.22, 0, 0, TAU);
       g.fill();

@@ -26,7 +26,8 @@ export type Screen =
   | 'template'
   | 'admin'
   | 'trials'
-  | 'support';
+  | 'support'
+  | 'options';
 
 export interface RunState {
   state: RunPhase;
@@ -38,6 +39,7 @@ export interface RunState {
   upgradesEnabled: boolean;
   knives: number;
   maxKnives: number;
+  shrineRerolls: number;
   composure: number;
   recoveryEvery: number;
   wavesCleared: number;
@@ -126,6 +128,7 @@ export function createRunState(savedHints: unknown = {}): RunState {
     upgradesEnabled: true,
     knives: 0,
     maxKnives: 0,
+    shrineRerolls: 0,
     composure: 0,
     recoveryEvery: 0,
     wavesCleared: 0,
@@ -211,6 +214,7 @@ export function resetRun(
     upgradesEnabled: setup.upgrades !== false,
     knives: 0,
     maxKnives: 0,
+    shrineRerolls: 0,
     composure: 0,
     recoveryEvery: 0,
     wavesCleared: 0,

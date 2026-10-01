@@ -22,6 +22,8 @@ export interface ArmoryOptions {
   equipment: Equipment;
   unlocks: ReadonlySet<string>;
   owns?(id: string): boolean;
+  accessible?(id: string): boolean;
+  progress?(id: string): string;
   statistics: Statistics;
   seen?: Set<string>;
   onViewed?(): void;
@@ -51,7 +53,8 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
     return element;
   };
   const ITEM_BY: Record<string, Item> = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
-  const owns = (id: string) => options.owns?.(id) ?? UNL.has(id);
+  const accessible = (id: string) => options.accessible?.(id) ?? true;
+  const owns = (id: string) => accessible(id) && (options.owns?.(id) ?? UNL.has(id));
   const seen = options.seen ?? new Set<string>();
   const newItem = (item: Item) => isNewArmoryItem(item, UNL, seen);
   let armTab: ItemCategory = 'blade',
@@ -138,7 +141,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         (hid ? 'Hidden outfit or item' : it.n) + (own ? '' : ' (locked)'),
       );
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
-      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${spU ? '<span class="spb">真</span>' : ''}`;
+      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${spU ? '<span class="spb">真</span>' : ''}`;
       if (newItem(it)) {
         b.classList.add('arm-unread');
         b.setAttribute('aria-description', 'Unviewed equipment');
@@ -173,9 +176,9 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
           }
           EQ[armTab] = it.id;
           events.equipped(EQ);
-          if (armTab === 'fx') events.preview();
         }
         render();
+        if (armTab === 'fx') events.preview();
       });
       tiles.appendChild(b);
     }
@@ -191,12 +194,15 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       return;
     }
     $('armInfo').innerHTML =
-      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
+      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${!accessible(it.id) ? 'Requires Premium' : own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
       (sp
         ? `<div class="awakening-active"><div class="awakening-label">${it.id === 'steel' && EQ.bladeThird ? 'Third Awakening active' : 'Awakened active'}</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
         : (display.benefit ? `<div class="pk">+ ${display.benefit}</div>` : '') +
           (display.tradeoff ? `<div class="tr">− ${display.tradeoff}</div>` : '') +
           (own && it.role ? `<div class="item-role">${it.role}</div>` : '')) +
+      (options.progress?.(it.id)
+        ? `<div class="arm-unlock-condition">${options.progress(it.id)}</div>`
+        : '') +
       spInfo(it, own) +
       (own && display.unlockCondition
         ? `<div class="arm-unlock-condition">Unlocked: ${display.unlockCondition}</div>`
@@ -237,6 +243,9 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   return {
     render,
     hasNew: () => ITEMS.some(newItem),
+    get selected() {
+      return armSel;
+    },
     get tab() {
       return armTab;
     },

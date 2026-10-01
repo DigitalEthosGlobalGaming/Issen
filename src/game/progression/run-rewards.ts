@@ -6,6 +6,7 @@ export interface RewardContext {
   tutorial?: boolean;
   testing?: boolean;
   emberBonus?: number;
+  pilgrim?: boolean;
 }
 
 const MAX_CURRENCY = 1_000_000_000;
@@ -36,7 +37,8 @@ export function accrueRunReward(
 ): void {
   if (ledger.settled || context.zen || context.tutorial || context.testing) return;
   const bonus = Number.isFinite(context.emberBonus) ? Math.max(0, context.emberBonus!) : 0;
-  ledger.pending += Math.round(BASE_REWARD[event] * (1 + bonus) * 50);
+  const factor = context.pilgrim ? (event === 'boss' ? 1.5 : event === 'kill' ? 0.75 : 1) : 1;
+  ledger.pending += Math.round(BASE_REWARD[event] * (1 + bonus) * factor * 50);
 }
 
 /** The sole account write for a finished run. Re-entry returns the same result

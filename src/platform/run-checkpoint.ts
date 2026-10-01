@@ -127,6 +127,7 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
     !Number.isSafeInteger(raw.bossMilestone)
   )
     return null;
+  run.shrineRerolls = run.shrineRerolls === 1 ? 1 : 0;
   const triggers = run.blessingTriggers;
   if (triggers !== undefined) {
     if (!record(triggers)) return null;
