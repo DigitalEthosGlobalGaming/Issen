@@ -1,8 +1,6 @@
 # Fallen petal ground atlas
 
-Generated for The Falling Blossom Path on 2026-10-01 with the built-in image-generation tool. Final image is `petal-ground-atlas.png`; the original, unchanged generated source remains at:
-
-`C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-d30cfa2e-4704-44ad-adaf-35eb22d34920.png`
+Generated for The Falling Blossom Path on 2026-10-01 with the built-in image-generation tool. Final image is `petal-ground-atlas.png`; it preserves the generated source unchanged.
 
 ## Geometry and rendering contract
 

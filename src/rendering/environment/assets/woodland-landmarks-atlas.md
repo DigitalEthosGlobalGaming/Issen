@@ -21,10 +21,7 @@ Use native aspect ratio. For a visible height target, calculate scale from the v
 
 ## Provenance and full prompts
 
-References: `pine-atlas.png` and `field-rocks-atlas.png` from this directory, inspected before generation. 
-
-Initial generation retained at `C:/Users/Trent/.codex/generated_images/01a0f69e-a725-7471-b799-ac4b88bc570f/exec-209a5f98-e851-4107-9079-6170129a4a6e.png`.
-Selected packing correction retained at `C:/Users/Trent/.codex/generated_images/01a0f69e-a725-7471-b799-ac4b88bc570f/exec-67c48a2a-59fc-4e69-9408-95c2a1dcd5a3.png`.
+References: `pine-atlas.png` and `field-rocks-atlas.png` from this directory, inspected before generation.
 
 ### Initial prompt
 
@@ -33,4 +30,3 @@ Use case: stylized-concept. Production environment landmark sprite atlas for Iss
 ### Packing correction prompt
 
 Edit this woodland landmark atlas only for clean sprite packing. Keep the SAME four tree identities, same ink style, same palette and silhouettes. Scale each whole object DOWN by about 25% within its own quadrant and recenter it: windswept pine top-left, bare forked dead tree top-right, split-trunk pine bottom-left, fallen rooted trunk bottom-right. Every COMPLETE object must fit wholly inside its exact quarter of this square canvas with at least 45 pixels of fully transparent margin on ALL sides. No part may cross the horizontal or vertical center lines. Leave a visibly wide clear central cross-shaped transparent gutter. Do not cut branches, canopy or roots. Preserve true transparent alpha background, no background/floor/shadow/grid/text. This is exact packing correction, not new scenery.
-

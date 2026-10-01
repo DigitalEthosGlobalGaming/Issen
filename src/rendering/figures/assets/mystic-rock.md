@@ -21,7 +21,7 @@ Generated2026-10-01 with the built-in imagegen tool. Actual references inspected
 - `src/rendering/figures/assets/player-ronin-simple.png`: primary broad flat minimal-detail character palette/facet style.
 - `src/rendering/environment/assets/rocks-atlas.png`: secondary irregular rock silhouette only; its ground and surface texture were explicitly excluded.
 
-Original generation filename: `exec-fff01c3a-27f1-42f2-8f2f-ab0196d3c216.png`. Saved project PNG is the unmodified original output.
+Saved project PNG is the unmodified original output.
 
 ## Full generation prompt
 

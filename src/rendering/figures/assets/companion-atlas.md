@@ -1,6 +1,6 @@
 # Companion atlas
 
-Original built-in imagegen PNG, 1254 × 1254 RGBA. Generated 2026-10-01 from `player-ronin-simple.png` as style reference. Source: `exec-ee7c7225-6074-467b-9311-b3f5be107a1b.png`. Original sheet retained unchanged here.
+Original built-in imagegen PNG, 1254 × 1254 RGBA. Generated 2026-10-01 from `player-ronin-simple.png` as style reference. Original sheet retained unchanged here.
 
 All existing companions: shiba, cat, crow; fourth image is the crow's raised-wing reaction. Animals face right. Broad flat facets and muted brown/ivory/charcoal support downstream film grading. No baked floor or shadow. These are complete sprites, not articulated limbs.
 

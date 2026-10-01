@@ -27,7 +27,6 @@ Art direction: near-black sumi-e dry brush, desaturated ivory highlights, angula
 faceted shapes, rough texture inside the silhouettes, no characters or labels.
 Final film looks and motion are applied in code, not baked into these assets.
 
-
 ## Foreground boulders
 
 foreground-boulders-atlas.png replaces the smooth foreground ellipses only in
@@ -40,7 +39,7 @@ lighting; current composition does not mirror or rotate them. Two variants are
 cached into the ground layer, before live animated grass and downstream film grading.
 
 Generated 2026-10-01 using the built-in image tool, with field-rocks-atlas.png as
-style reference. Source generation: exec-5a20ce24-065a-4df4-964c-6016c04504d5.png.
+style reference.
 Prompt: Four distinct complete low irregular angular boulders, strict 2 x 2 atlas,
 wide 2:1 canvas, shallow front/side view, upper-left light; fractured boulder,
 split slab, sloped wedge, compact crag. Charcoal, warm gray, muted ivory broad
@@ -48,7 +47,6 @@ facets, rough ink-paper texture inside rocks, dry brush edges, darker foreground
 contrast. True transparency and isolated complete cells. No smooth ovals,
 backdrop, fog, scenery, grass, figures, text, grids or extended cast shadows.
 Alpha inspected: transparent exterior with near-opaque textured interiors.
-
 
 ## Blossom assets
 

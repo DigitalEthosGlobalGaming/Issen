@@ -42,10 +42,8 @@ Visually inspected all pieces for front/back consistency and flat simple forms.
 981,043 full-sheet pixels have alpha0. Maximum alpha at each nominal cell perimeter
 is1/255, so no visible opaque adjacent piece crosses a cell. True transparency
 retained; no alpha cleanup or image repainting performed. Fine near-transparent
-specks may remain outside visible bounds. Full generated source retained:
-exec-b14c6e5f-d039-4c67-b88f-5a875dee44f7.png.
+specks may remain outside visible bounds. The project PNG preserves the full generated sheet unchanged.
 
 ## Full generation prompt
 
 Use case: stylized-concept. Create a square transparent 2x2 atlas of FOUR independent REAR VIEW modular player costume pieces. Match attached reference exact simple flat low-poly art: only a few broad clean charcoal/warmgray/ivory polygon planes, NO grain, texture, fine weave, stitches, tiny detail, or realism. Top-left: komuso basket hat covering whole head down to neck, rear view, tall tapered cylindrical straw basket, muted gray-tan, broad faceted bands imply woven material with NO fine weave. Top-right: kabuki broad ivory angular wild hair mane, REAR VIEW, layered large pointed ivory locks, small muted red strap and underside visible at neck, no face or mask. Bottom-left: tanuki brown cloth hood from BEHIND, rounded small animal ears, broad muted brown planes and darker ear interiors, short neck attachment, NO animal face, eyes or muzzle. Bottom-right: separate tanuki striped tail, horizontal curved appendage attached at its LEFT end to player body-right, extends right and curves slightly downward, three broad dark bands over muted brown, no fur texture. Each object complete within its own quadrant with at least15percent empty margin on all sides. TRUE transparent background and generous central gutter. No head/body/skin, figures, ground, shadow, glows, text, labels or grid. Common upper-left light. Must remain readable at tiny game scale. Four modular pieces, not a whole character.
-

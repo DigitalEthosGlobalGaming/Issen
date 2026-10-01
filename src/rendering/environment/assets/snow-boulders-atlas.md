@@ -21,6 +21,3 @@ Original full generated sheet is retained as snow-boulders-atlas.png. No pixel e
 ## Generation prompt
 
 Create full snow-covered sprite variants of the four boulders in the reference, matching charcoal faceted Japanese dry-ink illustration exactly. Preserve the four reference subjects in their same top-left/top-right/bottom-left/bottom-right order, basic silhouettes and view. Add physically resting ivory snow caps on upper branches or upward-facing rock ledges, irregular accumulated snow volumes, exposed dark sides/trunks still dominant. This is complete derived art not an overlay. Strict 2x2 wide 2:1 canvas with genuine transparent exterior. Keep each complete object inside its cell with generous 10 percent transparent margin; shrink uniformly inside each cell if necessary. No art crossing center divisions. Neutral ivory ash-gray charcoal, no saturated blue, no scenery, ground plate, sky, fog, falling snow particles, labels or grid. Upper-left soft light, rough brush texture inside forms, broad readable shapes.
-
-
-Source generation exec-e9e3d9ee-b5c9-44a0-8753-3481c00d8b56.png.

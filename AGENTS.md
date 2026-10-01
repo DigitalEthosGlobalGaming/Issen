@@ -10,6 +10,13 @@ Keep gameplay rules and data in their owning modules; connect presentation and
 transitions through the runtime. Pass explicit canvases to renderers and keep
 preview effects independent of live gameplay. Preserve `issen.*` save compatibility.
 
+Use repository-relative paths and links for file references in committed content.
+Do not record personal device details, absolute filesystem paths, or locations of
+files stored outside the repository. Asset notes may retain generation provenance,
+dates, tools, repository style references, prompts and validation details; omit
+external original-output locations and filenames. Keep machine-specific settings
+in environment variables or ignored local configuration.
+
 Use strict TypeScript checks and the unit/browser tests relevant to an implementation
 change. During iteration, target the affected test files or cases; do not run the
 full browser or production suite after every small edit. Run broader checks when

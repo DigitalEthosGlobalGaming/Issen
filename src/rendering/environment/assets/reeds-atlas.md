@@ -4,8 +4,7 @@ Generated2026-10-01 with the built-in image tool; retained original output witho
 
 Final PNG: `reeds-atlas.png`, RGBA **1254 × 1254**, uniform2×2 atlas, source cell **627 × 627px**. Not animation frames or seamless tiles. Preserve native cell aspect and transparent padding.
 
-Original final source: `C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-e9aeefe8-31e9-4b06-93de-e1f795e1b1b6.png`.
-Initial source preserved: `exec-a506ec28-2f03-4436-b130-81420e4f67c6.png` in the same generated-image folder.
+The accepted project PNG preserves the final generated output unchanged.
 
 All coordinates top-left origin. Source frames `(column*cellWidth,row*cellHeight,cellWidth,cellHeight)`. Anchor X is0.5 of frame width. Anchor Y below is normalized relative to frame height. Visible bounds exclude alpha<=16 and use cell-local pixel coordinates `(left,top,right,bottom)`; right/bottom are exclusive.
 

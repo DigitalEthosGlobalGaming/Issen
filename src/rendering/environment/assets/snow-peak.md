@@ -1,8 +1,7 @@
 # White Silence Pass snow peak
 
 Generated with built-in imagegen on 2026-10-01 using mountain-atlas.png as the
-style reference. Original output exec-d89e5fb4-c049-46f5-a6f2-c5ed30182d43.png
-is retained in the generated_images directory; the untouched project copy is
+style reference. The untouched project PNG is
 [snow-peak.png](snow-peak.png). Actual dimensions: 1881 x 836 RGBA.
 
 Single full-image frame (0,0,1881,836), normalized ground anchor (.5,.9).

@@ -19,9 +19,8 @@ Use each cutout as an independent landmark, not a seamless tile or an animation 
 
 ## Provenance
 
-Created 2026-10-02 with built-in imagegen; reference `src/rendering/environment/assets/field-rocks-atlas.png` was visually inspected and supplied. Final source: `exec-a4ca9ac5-8429-4335-a221-e21863d5e016.png`. Project PNG preserves the entire final generated sheet.
+Created 2026-10-02 with built-in imagegen; reference `src/rendering/environment/assets/field-rocks-atlas.png` was visually inspected and supplied. Project PNG preserves the entire final generated sheet.
 
 ## Initial generation prompt
 
 Production game environment sprite atlas: FOUR DISTINCTIVE LARGE STONE LANDMARKS in a generous 2x2 transparent sheet. Reference is art style only, NOT copy its low rock clusters. Match charcoal/warm-gray/ivory low-poly ink, broad simple angular faceted planes with restrained dry-brush texture INSIDE forms, common upper-left light. Readable 180–320px-wide midground silhouettes. TOP LEFT two tall jagged uneven rock spires standing close together with a clear vertical gap, TOP RIGHT one LOW WIDE eroded natural stone arch with a large open hole underneath, BOTTOM LEFT a distinctive balanced stack of three angular stones large capstone on narrow middle stone, BOTTOM RIGHT a single broken leaning angular stone marker with fractured top, uncarved NO text. All complete full forms at shallow side/front three-quarter view, clear ground-contact bottoms, NO ground plate, grass, extra pebbles, sky, landscape, fog, people, paper background, labels or grid. Each entire object inside its own quadrant with at least 12% transparent margin from all cell borders, generous central gutters. All four DIFFERENT shapes instantly distinguishable, not four generic boulders. True alpha transparency. Square canvas.
-

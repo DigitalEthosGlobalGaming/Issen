@@ -29,12 +29,9 @@ stay inside cells; cell 2 rightmost visible pixels have a modest 14px margin, no
 the requested 12 percent. Near-transparent dust remains around some trees. No
 people, labels, scenery plate or baked sky. Actual alpha exteriors preserved.
 
-Initial generation: exec-37b2aa3b-66a2-4b79-8d16-63db7686b2be.png.
-Final packing correction: exec-95d99a3e-d1be-427b-bcb7-84f2a5655e49.png.
 Initial output crossed the central division; it was rejected for integration.
 Imagegen correction shrank/repositioned the four objects while retaining style.
-The accepted full corrected sheet is the project PNG; generated originals remain
-in Codex generation storage.
+The accepted full corrected sheet is preserved unchanged in the project PNG.
 
 ## Initial prompt
 
@@ -49,4 +46,3 @@ current dimensions within its quadrant; preserve proportions, center root near
 transparent margins. No blossom/branch/dust at divisions or outer edges. Remove
 detached speckles; do not crop branches or add objects/text/background. Actual
 transparency. Inspect output rather than assuming the requested margins succeeded.
-

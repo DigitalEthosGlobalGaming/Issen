@@ -24,9 +24,6 @@ light direction. Inspect at intended180–260px scale and film grade.
 
 ## Provenance and prompts
 
-Initial: C:/Users/Trent/.codex/generated_images/01a0f695-0376-77a3-9c20-3f667b8e27a7/exec-7aae63b9-c54c-4766-806d-f78a4f8ae423.png
-Accepted packing edit: C:/Users/Trent/.codex/generated_images/01a0f695-0376-77a3-9c20-3f667b8e27a7/exec-d5f1af69-dd39-4670-b61b-bb9f35dec7c2.png
-
 Generation prompt:
 Use case: stylized-concept. New project asset: four DISTINCT cherry blossom landmark tree silhouettes in a 2x2 square sprite atlas with TRUE TRANSPARENT background. Input image is STYLE REFERENCE ONLY. Match its charcoal faceted Japanese dry-ink trunks and warm ivory very pale blush blossoms, but simplify into broad graphic low-poly planes and clusters so each reads at 180-260px height. Four complete separate objects: top-left tall narrow forked tree with a few blossoms on upward branches; top-right very wide low umbrella canopy on short thick twisted trunk; bottom-left dramatically wind-bent tree with crown leaning left and exposed roots; bottom-right low fallen flowering trunk with branches reaching upward. Side/front three-quarter landscape prop view, roots all shown, upper-left soft light, dry brush texture INSIDE forms. These must have clearly different silhouettes, not repeated tree with recoloring. Each complete object centered inside its own cell with at least 12% transparent margins on every side, no crossing center divisions. No ground plate, floor, landscape, sky, fog, people, animals, text, labels, grid lines, checkerboard or opaque backdrop. Each root can fade through compositing later; do not bake fog. Preserve neutral palette for runtime film grading. Produce only the sprite atlas.
 

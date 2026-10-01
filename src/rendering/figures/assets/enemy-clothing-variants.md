@@ -1,6 +1,6 @@
 # Enemy clothing variants
 
-Generated with built-in imagegen on 2026-10-02 using `enemy-ronin-simple.png` reference. Original preserved at `C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-a63eadd4-a0c5-4c86-a98f-256a526785f5.png`.
+Generated with built-in imagegen on 2026-10-02 using `enemy-ronin-simple.png` reference.
 
 1536x1024 RGBA, 54.54% fully transparent pixels. Packed 3x2 layout divides at y440, not y512. Frames include four pixels around alpha >16. No background rectangles; broad charcoal/gray facets, upper-left light. Runtime supplies tint/fog/film.
 

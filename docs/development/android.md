@@ -162,7 +162,7 @@ file permissions do not replace protection of the Windows account or disk.
 Alternatively, supply your own existing keystore through environment variables:
 
 ```powershell
-$env:ISSEN_UPLOAD_STORE_FILE = 'C:/private/issen-upload.jks'
+$env:ISSEN_UPLOAD_STORE_FILE = Read-Host 'Enter the absolute path to your upload keystore'
 $env:ISSEN_UPLOAD_KEY_ALIAS = 'issen-upload'
 $env:ISSEN_ANDROID_VERSION_CODE = '1'
 # Set ISSEN_UPLOAD_STORE_PASSWORD and ISSEN_UPLOAD_KEY_PASSWORD privately.

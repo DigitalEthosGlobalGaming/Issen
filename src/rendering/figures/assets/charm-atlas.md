@@ -33,13 +33,9 @@ ink-charms.ts owns image lifecycle and up to32 small cropped/tinted canvases eac
 
 ## Provenance
 
-Source: C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-1fca977d-8d09-45f7-a00f-548edf40968c.png
-
 Full prompt:
 
 Use case stylized-concept. Generate one transparent GAME CHARM SPRITE ATLAS, 4columns by3rows, landscape1536x1024. Attached player is STYLE REFERENCE ONLY. Twelve independent tiny waist pendants/omamori, broad simple flat polygon facets, charcoal warmgray mutedivory and restrained dull red/brass accents, minimal detail, readable at20px. Every complete charm vertically oriented with a small suspension loop at top, centered within its own cell, generous40px clear cellgutters, no cell overlap. ROW1 left-to-right:1 square charcoal cloth pouch with ivory geometric cross-like block symbol;2 slim ivory cloth talisman pouch with three charcoal rectangular marks;3 rounded muted brass-gold pouch with simple dark diamond block emblem;4 muted darkred diamond-shaped cloth pouch with ivory simple circle emblem. ROW2 left-to-right:5 tiny brass round SUZU BELL with red cord and single dark slit;6 ivory beckoning CAT figurine pendant simple pointed ears and raised paw, no fineface;7 squat mutedred DARUMA doll pendant with ivory oval facepatch and two black dots;8 paleivory and mutedblue FOXFLAME teardrop pendant broad angularflame silhouette. ROW3 left-to-right:9 grayivory glass WINDCHIME bell with narrow hanging paperstrip;10 rectangular ivory OFUDA paper ward with3large charcoal abstract block symbols;11 round dullbrass MIRROR pendant with darkrim and flat lightgray reflectivecenter;12 folded ivory FORTUNE PAPER strip tied as angular knot, no text. Orthographic front view. Same upperleft illumination and economical matte facets as reference. Loop included but no long cords beyondpieces. All twelve isolated on ACTUALTRANSPARENT background. No humans, scenery, labels, letters, readable writing, grid, border, castshadows, ground, ornamental detail, realistictexture. Do not copy player parts.
-
-
 
 Additional catalog recipes (1.26.1): First Strike uses frame1 with muted red
 #b8322a; Pilgrim's Bead uses round frame2 with wood-brown #7e654c. Together with

@@ -1,8 +1,7 @@
 # Ink katana
 
 Generated 2026-10-01 with the built-in image tool. Final project copy: `katana.png`.
-Original source retained unchanged:
-`C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-6c3ee169-423a-4dfa-a96e-f33ee5226906.png`.
+The project PNG preserves the generated source unchanged.
 
 Actual image: **2172 × 724 RGBA**. One complete side-view weapon, hilt left, tip right (+X). Charcoal wrapped hilt, warm gray guard and silver/ivory blade. No hand, scabbard, ground or effects. Physical sprite remains independent of aura, trails and glints.
 

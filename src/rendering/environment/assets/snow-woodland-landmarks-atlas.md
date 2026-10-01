@@ -23,7 +23,4 @@ Use native aspect ratio. For a visible height target, calculate scale from the v
 
 References: `pine-atlas.png` and `field-rocks-atlas.png` from this directory, inspected before generation. Seasonal edit additionally references the final `woodland-landmarks-atlas.png`.
 
-Selected generated original: `C:/Users/Trent/.codex/generated_images/01a0f69e-a725-7471-b799-ac4b88bc570f/exec-ef16109a-07c4-41bc-ab01-f37f17e0b604.png`.
-
 Use case: lighting-weather edit. Create a SNOW-COVERED seasonal counterpart of this exact four-object woodland landmark sprite atlas. Keep each object's identity, complete silhouette, position, scale, frame layout and large transparent gutters unchanged: broad windswept pine top-left, slender bare forked dead pine top-right, gnarled split-trunk pine bottom-left, fallen rooted trunk bottom-right. Add substantial graphic muted-IVORY snow caps on top-facing pine foliage pads, branch tops, fork crotches and roots, leaving charcoal trunks readable. Dead tree remains bare with small accumulated snow on branch forks; fallen trunk has snow along upper ridge and root tops. Broad simple angular snow planes, not fluffy realistic texture; same ink facets and restrained interior dry brush as source. True transparent alpha everywhere outside objects; no snowfall particles, ground strip, floor, scene, fog, shadow, labels or grid. All full roots/branches strictly inside own quarter, no changes to safe packing.
-

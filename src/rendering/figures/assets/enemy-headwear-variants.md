@@ -1,6 +1,6 @@
 # Enemy complete head variants
 
-Generated with built-in imagegen on 2026-10-02, referencing `enemy-ronin-simple.png`. Original preserved at `C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-80cb41ae-08ae-4c3b-a027-8143fcd9df2e.png`.
+Generated with built-in imagegen on 2026-10-02, referencing `enemy-ronin-simple.png`.
 
 1254×1254 RGBA; 57.25% fully transparent pixels. Four isolated complete heads, blank ivory faces. Frames add four transparent pixels around alpha >16 bounds. These replace the base head, avoiding double faces. Source neck contact maps to rig (lean*1.05,−.815); native aspect is preserved. The hood is a broad faceted travel hood; the helmet has a broad double crest rather than fine ornament.
 

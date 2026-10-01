@@ -1,6 +1,6 @@
 # Player ronin puppet atlas
 
-Original AI-generated RGBA atlas, 1254 × 1254. Created with built-in ImageGen on 2026-10-01, using environment pine-atlas.png as style-only reference. Source retained unchanged at C:/Users/Trent/.codex/generated_images/01a0f69e-a725-7471-b799-ac4b88bc570f/exec-22b0762c-de92-44f5-81b0-27d45aeb2a88.png. No downloaded artwork. Prompt requested nine separate rear-view charcoal/ivory ink-faceted puppet pieces with transparent gutters, no sword, no scenery.
+Original AI-generated RGBA atlas, 1254 × 1254. Created with built-in ImageGen on 2026-10-01, using environment pine-atlas.png as style-only reference. No downloaded artwork. Prompt requested nine separate rear-view charcoal/ivory ink-faceted puppet pieces with transparent gutters, no sword, no scenery.
 
 Source frames are [x,y,width,height] pixels; renderer uses measured tight frames rather than nominal 418² cells. Upper-right skirt extends a few pixels beneath nominal row boundary; right sleeve begins at y459 to exclude that skirt.
 

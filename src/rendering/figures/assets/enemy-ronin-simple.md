@@ -28,11 +28,8 @@ Preserve native aspect and use modest joint overlap to hide seams. Limb axes poi
 
 ## Provenance
 
-Source: C:/Users/Trent/.codex/generated_images/01a0f69e-ec38-7b32-ac7e-d8aba4341821/exec-d2d0e6bf-94a8-4350-a6cf-b672685a6a57.png
-
 Tool transparent_background: true. Reference: src/rendering/figures/assets/player-ronin-simple.png.
 
 Full prompt:
 
 Use case: stylized-concept. Create a modular FRONT VIEW ronin enemy sprite atlas, 3 columns by3 rows, square1254x1254 if possible, TRUE TRANSPARENT background. Attached image is rear-view STYLE+PROPORTION reference, but all NEW parts face the camera. Match very simple flat dark charcoal polygon facets, broad warm gray planes, clean angular silhouettes, no fine detail or texture. Nine separate COMPLETE parts evenly centered within their own cells, at least30px transparent margins within every cell; never crossing cell lines. Row1 left: front-facing sleeveless kimono TORSO neck-to-waist with simple overlapping V collar and broad obi waist band, no arms/head. Row1 middle: front-facing HEAD, tied dark hair/topknot, blank warm ivory faceted face silhouette, NO facial features, short neck, no shoulders. Row1 right: LEFT long flared robe skirt panel waist-to-ankle. Row2 left: RIGHT matching long flared robe skirt panel. Row2 middle: LEFT broad short kimono sleeve shoulder-to-elbow, neutral vertical axis. Row2 right: RIGHT matching sleeve shoulder-to-elbow. Row3 left: LEFT slim wrapped forearm elbow top wrist bottom, no hand. Row3 middle: RIGHT matching forearm, no hand. Row3 right: single compact warm ivory gripping HAND with small charcoal cuff, minimal faceted shape, no weapon. Pieces are rigging cutouts, NOT a diagram or complete assembled human. Concealed top joint overlap on limbs, keep native proportions like reference, all parts front-facing. Small economical value groups, strongest shapes, upper-left lighting, neutral film-gradeable palette. No labels, text, grid, background plates, shadows, ground, weapons, extra body parts, eyes/nose/mouth. Generous empty alpha gutters.
-

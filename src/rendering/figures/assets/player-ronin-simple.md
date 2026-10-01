@@ -1,6 +1,6 @@
 # Simplified rear-view ronin
 
-Built-in ImageGen edit, 2026-10-01. Input: player-ronin-atlas.png. Original output retained at C:/Users/Trent/.codex/generated_images/01a0f69e-a725-7471-b799-ac4b88bc570f/exec-62175d9d-7dbd-4562-99e1-30e6a2644b26.png. Repository PNG is an unchanged copy. RGBA 1254×1254; Canvas alpha measurement found 67.095% fully transparent pixels. Broad matte charcoal facets replace fabric grain and tiny detail.
+Built-in ImageGen edit, 2026-10-01. Input: player-ronin-atlas.png. Repository PNG is an unchanged copy. RGBA 1254×1254; Canvas alpha measurement found 67.095% fully transparent pixels. Broad matte charcoal facets replace fabric grain and tiny detail.
 
 Frames [x,y,width,height] in source pixels:
 

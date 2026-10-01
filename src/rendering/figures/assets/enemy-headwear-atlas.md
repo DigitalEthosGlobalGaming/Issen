@@ -34,8 +34,7 @@ are interchangeable modules, not animation frames.
 ## Inspection and provenance
 
 Generated2026-10-01 using built-in imagegen with transparent_background true.
-Initial source exec-f25dd826-7900-4e81-9ce8-2c146f26b10c.png; final source
-exec-cf7584e1-f995-4fd6-804e-76d785a0304d.png. Complete final sheet copied unchanged.
+Complete final sheet copied unchanged.
 Generation display showed background RGB/glow-like colors, so actual alpha was
 measured rather than trusting that display:1,013,920 pixels are fully transparent.
 Maximum alpha on the six explicit frame edges is1,1,0,1,1,1. Sampled kabuto,
@@ -51,4 +50,3 @@ Use case: stylized-concept. Create SIX modular FRONT VIEW enemy headwear cutouts
 ## Correction prompt
 
 Fix this game atlas: remove ALL background, ALL glows, ALL cast shadows and vignette so there is TRUE PNG TRANSPARENCY around each headwear object and INSIDE helmet/hair/hood face openings. Keep the exact six simple flat polygon objects but arrange in six equal 3column2row cells with each object scaled to fit within central70percent width and80percent height of own cell. No objects or halos may cross cell boundaries. Hats must remain complete with brims fully inside cells. Kasa, kabuto, hair in top row; mask, jingasa, hood bottom row. Pure flat neutral charcoal/gray planes, NO lighting halos. These are isolated transparent cutout sprites, NOT an atmospheric presentation board. No background pixels, no drop shadow, no text. Keep face openings actually transparent, not black filled cavities.
-

@@ -1,6 +1,6 @@
 # Flat faceted armour modules
 
-Generated 2026-10-01 with built-in imagegen. Source: exec-34026f7a-06e4-4bb7-a47b-58db4f1da021.png.
+Generated 2026-10-01 with built-in imagegen.
 Reference: [player-ronin-simple.png](player-ronin-simple.png), inspected before generation.
 Project original: [armour-plates-atlas.png](armour-plates-atlas.png), unmodified full1254 x1254 RGBA PNG.
 
@@ -49,4 +49,3 @@ assembly are the integration renderer's validation responsibility.
 ## Full generation prompt
 
 Use case: stylized-concept. Generate a game armor module atlas matching the provided player sprite's EXACT SIMPLE FLAT LOW-POLY STYLE: large flat charcoal and gray polygon planes, minimal muted ivory highlights, no texture, no grain, no ink brush noise, no weave, no fine lacing, no photoreal material. Reference is only a style and rear-view anatomy reference. FOUR separate modules on square transparent canvas in strict 2x2 cells. Top-left: back-facing lamellar cuirass panel for the rear torso, broad roughly square upper back, slightly tapered waist, only four broad horizontal overlapping plate bands. No attached arms or neck/body. Top-right: LEFT hanging rectangular shoulder guard (sode), three broad segmented horizontal plates, seen from behind, top attachment at center, slightly angled outward left. Bottom-left: RIGHT shoulder counterpart facing right, common lighting and same proportions. Bottom-right: lower-waist segmented skirt plate cluster, three broad hanging panels, rear view, top attachment belt line and modest outward flare. Pieces neutral dark charcoal and muted gray, subtly lighter top-left planes. Rear torso intended width .35 and height .355 relative to player total height1; shoulders independently attach to rear rig, no bodies baked in. All pieces complete with 15 percent transparent gutters around each cell, no overlap or cut edges. No characters, hands, faces, swords, text, grid, shadows, background or extra objects. Actual transparent exterior. Clear readable simple armor at small game scale.
-
