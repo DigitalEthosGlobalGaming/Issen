@@ -15,6 +15,8 @@ const FRAMES = [
   [1179, 681, 227, 293],
 ] as const;
 const RECIPES: Record<string, readonly [number, string?]> = {
+  'first-strike': [1, '#b8322a'],
+  'pilgrims-bead': [2, '#7e654c'],
   hisshou: [0, '#9b3930'],
   kaiun: [2],
   yakuyoke: [0, '#586766'],

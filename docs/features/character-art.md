@@ -233,3 +233,10 @@ are unchanged. Runtime and Armoury own and dispose separate charm loaders;
 missing/unknown sprites preserve the procedural pouch. Cached variants cap at32.
 Strict TypeScript, eleven focused character checks, the complete nineteen-charm
 gallery and representative held-player compositions passed without a full build.
+
+
+Version 1.26.1 completes the whole catalog: First Strike (trial reward) and
+Pilgrim's Bead (progression item) reuse the long ward/pouch and round faceted
+charm frames respectively, giving 21 charms total without another image.
+A full catalog coverage check includes trial rewards and excludes only No Charm.
+The complete charm gallery and focused tests were rerun after this correction.

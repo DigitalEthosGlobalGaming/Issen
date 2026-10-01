@@ -1,3 +1,6 @@
+import { createItems } from '../../src/game/content/items.ts';
+import { createInkCharmRenderer } from '../../src/rendering/figures/ink-charms.ts';
+import { supportsInkBlade } from '../../src/rendering/figures/blade-recipes.ts';
 import { BLADES } from '../../src/game/content/cosmetics.ts';
 import { enemyAppearance } from '../../src/rendering/figures/enemy-appearance.ts';
 import test from 'node:test';
@@ -331,4 +334,19 @@ test('sprite charms replace the pouch but preserve the cord, alpha and Classic f
   assert.ok(fallback.fills.includes('#abc123'));
   assert.ok(classic.fills.includes('#abc123'));
   assert.deepEqual(classic.charms, []);
+});
+
+test('Ink recipes cover the complete item catalog including trial and progression charms', () => {
+  const items = createItems(() => new Set());
+  const charms = items
+    .filter((i) => i.type === 'charm' && i.id !== 'nocharm')
+    .map((i) => i.id)
+    .sort();
+  const kit = createInkCharmRenderer({});
+  assert.deepEqual(kit.snapshot().supported.sort(), charms);
+  kit.dispose();
+  for (const item of items.filter((i) => i.type === 'blade'))
+    assert.ok(supportsInkBlade(item.id), item.id);
+  for (const item of items.filter((i) => i.type === 'robe'))
+    assert.ok(Object.hasOwn(ROBES, item.id), item.id);
 });
