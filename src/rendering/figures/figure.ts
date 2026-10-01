@@ -1041,7 +1041,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.globalAlpha = A0;
     }
     const rf = f.rf || {};
-    if (rf.tail) {
+    if (rf.tail && !inkBody) {
       g.save();
       g.translate(0.13, -0.44);
       g.rotate(0.35 + Math.sin(time * 2) * 0.1);
@@ -1085,7 +1085,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.restore();
       }
     }
-    if (rf.patches) {
+    if (rf.patches && !inkBody) {
       for (const q of [
         [-0.08, -0.7, 0.06, 0.05],
         [0.06, -0.6, 0.05, 0.06],
@@ -1101,7 +1101,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.setLineDash([]);
       }
     }
-    if (rf.strawy) {
+    if (rf.strawy && !inkBody) {
       g.strokeStyle = C.straw;
       g.lineWidth = 0.006;
       g.lineCap = 'round';

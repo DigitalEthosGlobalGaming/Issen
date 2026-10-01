@@ -1,6 +1,6 @@
 import type { Figure } from './types.ts';
 
-type AtlasKey = 'armour' | 'headwear' | 'cloth';
+type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
 type Frame = readonly [number, number, number, number];
 type Attachment = {
   atlas: AtlasKey;
@@ -9,11 +9,15 @@ type Attachment = {
   y: number;
   width: number;
   tint?: string;
+  anchorX?: number;
+  anchorY?: number;
 };
 type Recipe = {
   required: AtlasKey[];
   body: Attachment[];
   head: Attachment[];
+  replaceHead?: boolean;
+  tone?: string;
   shoulders?: boolean;
   bracers?: boolean;
 };
@@ -25,9 +29,78 @@ const piece = (
   width: number,
   tint?: string,
 ): Attachment => ({ atlas, frame, x, y, width, tint });
+const anchored = (
+  atlas: AtlasKey,
+  frame: number,
+  width: number,
+  ax: number,
+  ay: number,
+  x = 0,
+  y = -0.815,
+): Attachment => ({ ...piece(atlas, frame, x, y, width), anchorX: ax, anchorY: ay });
 /** Explicit supported recipes keep equipment effects separate from presentation. */
 export const INK_OUTFIT_RECIPES: Record<string, Recipe> = {
   sumi: { required: [], body: [], head: [] },
+  hai: { required: [], body: [], head: [], tone: 'hai' },
+  aka: { required: [], body: [], head: [] },
+  shiro: { required: [], body: [], head: [], tone: 'shiro' },
+  kasa: { required: ['headwear'], body: [], head: [piece('headwear', 1, 0, -1, 0.31)] },
+  monk: {
+    required: ['headwear'],
+    body: [piece('headwear', 3, 0, -0.845, 0.2, '#bdb6a6')],
+    head: [piece('headwear', 2, 0, -0.98, 0.16, '#aaa393')],
+    replaceHead: true,
+  },
+  oni: {
+    required: ['masks'],
+    body: [],
+    head: [anchored('masks', 0, 0.16, 215 / 436, 500 / 535)],
+    replaceHead: true,
+  },
+  tengu: {
+    required: ['masks'],
+    body: [],
+    head: [anchored('masks', 1, 0.19, 209 / 525, 461 / 497)],
+    replaceHead: true,
+  },
+  kitsune: {
+    required: ['masks'],
+    body: [],
+    head: [anchored('masks', 2, 0.16, 222 / 458, 516 / 555)],
+    replaceHead: true,
+  },
+  noh: {
+    required: ['masks'],
+    body: [],
+    head: [anchored('masks', 3, 0.135, 198 / 381, 461 / 497)],
+    replaceHead: true,
+  },
+  komuso: {
+    required: ['special'],
+    body: [],
+    head: [anchored('special', 0, 0.15, 179 / 357, 460 / 501)],
+    replaceHead: true,
+  },
+  kabuki: {
+    required: ['special'],
+    body: [],
+    head: [anchored('special', 1, 0.22, 240 / 494, 455 / 507)],
+    replaceHead: true,
+  },
+  tanuki: {
+    required: ['special'],
+    body: [anchored('special', 3, 0.3, 30 / 526, 77 / 369, 0.1, -0.35)],
+    head: [anchored('special', 2, 0.19, 229 / 458, 356 / 411)],
+    replaceHead: true,
+    tone: 'tanuki',
+  },
+  rags: { required: [], body: [], head: [], tone: 'rags' },
+  scarecrow: {
+    required: ['cloth', 'headwear'],
+    body: [piece('cloth', 2, 0, -0.82, 0.43, '#998152')],
+    head: [piece('headwear', 1, 0, -1, 0.31, '#998152')],
+    tone: 'scarecrow',
+  },
   yoroi: {
     required: ['armour', 'headwear'],
     body: [
@@ -44,6 +117,7 @@ export const INK_OUTFIT_RECIPES: Record<string, Recipe> = {
     shoulders: true,
   },
   shinobi: {
+    replaceHead: true,
     required: ['headwear', 'cloth'],
     body: [piece('headwear', 3, 0, -0.845, 0.2)],
     head: [piece('headwear', 2, 0, -0.97, 0.16)],
@@ -65,12 +139,26 @@ export function supportsInkOutfit(id?: string): boolean {
 }
 
 const SOURCES = {
+  masks: new URL('./assets/player-mask-atlas.png', import.meta.url).href,
+  special: new URL('./assets/player-special-headwear-atlas.png', import.meta.url).href,
   armour: new URL('./assets/armour-plates-atlas.png', import.meta.url).href,
   headwear: new URL('./assets/outfit-headwear-atlas.png', import.meta.url).href,
   cloth: new URL('./assets/outfit-cloth-atlas.png', import.meta.url).href,
 };
 // Updated from each atlas's measured alpha bounds, not nominal grid cell bounds.
 const FRAMES: Record<AtlasKey, readonly Frame[]> = {
+  masks: [
+    [150, 40, 436, 535],
+    [692, 79, 525, 497],
+    [144, 589, 458, 555],
+    [733, 654, 381, 497],
+  ],
+  special: [
+    [147, 92, 357, 501],
+    [703, 85, 494, 507],
+    [101, 702, 458, 411],
+    [690, 783, 526, 369],
+  ],
   armour: [
     [77, 72, 588, 538],
     [847, 114, 349, 476],
@@ -157,16 +245,60 @@ export function createOutfitKit(doc: Document) {
       source = c;
     }
     const h = (a.width * sh) / sw;
-    if (a.tint) g.drawImage(source, a.x + lean - a.width / 2, a.y, a.width, h);
-    else g.drawImage(source, sx, sy, sw, sh, a.x + lean - a.width / 2, a.y, a.width, h);
+    const x = a.x + lean - a.width * (a.anchorX ?? 0.5),
+      y = a.y - h * (a.anchorY ?? 0);
+    if (a.tint) g.drawImage(source, x, y, a.width, h);
+    else g.drawImage(source, sx, sy, sw, sh, x, y, a.width, h);
   }
   return {
     prepare,
     ready,
+    recipe: (id?: string) => (id ? INK_OUTFIT_RECIPES[id] : undefined),
     draw(g: CanvasRenderingContext2D, stage: 'body' | 'head', f: Figure) {
       const recipe = INK_OUTFIT_RECIPES[f.robeId!];
       if (!recipe) return;
       for (const a of recipe[stage]) stamp(g, a, (f.lean || 0) * (stage === 'head' ? 1.05 : 0.8));
+      if (stage === 'body') {
+        const l = f.lean || 0;
+        if (f.robeId === 'aka') {
+          g.fillStyle = '#86352c';
+          g.beginPath();
+          g.moveTo(-0.115 + l * 0.5, -0.54);
+          g.lineTo(0.115 + l * 0.5, -0.535);
+          g.lineTo(0.11 + l * 0.5, -0.502);
+          g.lineTo(-0.11 + l * 0.5, -0.505);
+          g.closePath();
+          g.fill();
+        }
+        if (f.robeId === 'rags') {
+          g.fillStyle = '#625b4c';
+          for (const [x, y, w, h] of [
+            [-0.09, -0.71, 0.055, 0.06],
+            [0.045, -0.35, 0.07, 0.09],
+            [-0.18, -0.14, 0.055, 0.06],
+          ]) {
+            g.save();
+            g.translate(x! + l * 0.5, y!);
+            g.rotate(0.12);
+            g.fillRect(0, 0, w!, h!);
+            g.strokeStyle = '#aaa08a';
+            g.lineWidth = 0.003;
+            g.strokeRect(0.005, 0.005, w! - 0.01, h! - 0.01);
+            g.restore();
+          }
+        }
+        if (f.robeId === 'scarecrow') {
+          g.strokeStyle = '#9b895b';
+          g.lineWidth = 0.007;
+          for (let i = 0; i < 7; i++) {
+            const x = (i - 3) * 0.048;
+            g.beginPath();
+            g.moveTo(x, -0.075);
+            g.lineTo(x + (i - 3) * 0.006, 0.012 + (i % 2) * 0.02);
+            g.stroke();
+          }
+        }
+      }
     },
     drawArm(
       g: CanvasRenderingContext2D,

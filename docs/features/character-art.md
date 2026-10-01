@@ -1,6 +1,6 @@
-# Ink player puppet
+# Ink character puppets
 
-Version 1.18.1 uses one **Options > Display and Accessibility > Artwork > Ink**
+Artwork uses one **Options > Display and Accessibility > Artwork > Ink**
 selection for scenes, player parts and weapons. Backtick switches the same mode.
 Classic remains the default. The existing `renderer` save key is authoritative;
 older character-only preferences are read only when that key is missing/invalid.
@@ -13,7 +13,8 @@ Switching changes drawing, not encounter state, equipment or attack timing.
 | Rear-view player wearing Sumi (`sumi`) | Modular torso, robe panels, head and articulated arms | Classic while unavailable |
 | Player Steel sword (`steel`) | Separate katana aligned to grip and tip | Classic while unavailable |
 | Yoroi, Helm, Shinobi, Jinbaori, Mino | Shared modular armour and clothing kit (1.19.0) | Classic while required pieces are unavailable |
-| Other robes and weapons | No replacement yet | Existing procedural drawing |
+| All 20 primary player outfits | Shared cloth rig with modular colour, masks, headwear and accessories (1.21.0) | Classic while required pieces are unavailable |
+| Other weapons | No replacement yet | Existing procedural drawing |
 | Enemies and bosses | Modular front-view body, articulated arms/hands and interchangeable headwear (1.20.0) | Classic while required pieces are unavailable |
 
 Body and sword selection are independent: a new sword can accompany a Classic
@@ -30,17 +31,17 @@ player pose targets, lean and death transforms remain the animation inputs.
 The rear-view forearms/hands draw before the torso so they reach around the body,
 rather than appearing folded behind the back. Ink uses its own simple waist
 join instead of overlaying the Classic rectangular belt.
-The runtime owns one pair of loaders; each armoury/support preview owns its own
-pair and releases them on disposal. Missing images do not hide the character.
+The runtime owns the player, enemy and sword loaders; each armoury/support
+preview owns its own set and releases them on disposal. Missing images do not hide the character.
 
 Assets are cutout parts, not pre-rendered animation frames. Sleeve and forearm
 sprites rotate between shoulder, elbow and hand anchors; overlapping cuffs hide
 joins. The overlapping robe panels sway together around their waist anchor. The sword is registered to the existing
 weapon grip and tip so glints and effects keep their established coordinates.
 
-Sumi supplies the common rear-view body and puppet joints. Five outfit recipes
-combine reusable armour and clothing pieces over that body. Other outfits keep
-their existing appearance; enemy front views use a separate modular kit.
+Sumi supplies the common rear-view body and puppet joints. All primary outfit
+recipes combine reusable cloth, armour, headwear and accessories over that body.
+Enemy front views use a separate modular kit.
 
 ## Reusable source assets
 
@@ -133,3 +134,50 @@ shadow and aura checks passed. Desktop/tablet galleries cover all enemy/boss
 looks, fog, Mirror, twin swords, spear and unknown-look fallback. Running scene
 screenshots and paused Artwork switching were inspected without changing
 combat RNG, pose or saved checkpoint. No production build or full suite ran.
+
+
+## All primary player outfits (version 1.21.0)
+
+The primary equipment catalog has 20 outfits. All use the same normalized puppet
+and modular recipe system in Ink mode. Awakening designs are outside this art pass;
+existing powers/effects remain in their shared rendering and gameplay owners.
+The first five armour recipes above stay available alongside the added recipes:
+
+| Outfit | Reused body and distinctive pieces |
+| --- | --- |
+| Sumi | Neutral charcoal cloth and tied hair |
+| Hai | Ash cloth recolour |
+| Aka | Charcoal cloth with restrained red sash |
+| Shiro | Pale ivory cloth recolour |
+| Kasa | Shared straw hat |
+| Oni | Horned red mask and rear hair |
+| Tengu | Long-nosed red mask and rear hair |
+| Monk | Wrapped hood and collar |
+| Kitsune | Ivory fox mask with pointed ears |
+| Noh | Smooth ivory theatre mask |
+| Komuso | Basket head cover |
+| Rags | Muted worn cloth and large patch accents |
+| Kabuki | Broad ivory mane |
+| Scarecrow | Straw cloth, kasa and cape accents |
+| Tanuki | Brown cloth, rounded-ear hood and separate striped tail |
+
+Whole-head replacements register their measured neck anchors at the collar.
+The mask family uses rear three-quarter silhouettes so mask edges remain visible
+from the player's rear camera. Reusable source sheets stay intact and allow later
+mixing; saved outfit IDs select recipes without creating new equipment.
+
+- [Player masks and rear head contract](../../src/rendering/figures/assets/player-mask-atlas.md)
+- [Special headwear and tail contract](../../src/rendering/figures/assets/player-special-headwear-atlas.md)
+
+
+Cloth recolours are cached once per recipe/frame at the source frame resolution
+so the large foreground player and Armoury crops retain the atlas detail.
+Classic tail, patch and straw overlays are suppressed after a successful Ink
+body; the recipe supplies matching modular or simple faceted accents instead.
+The enemy under-robe join now receives the same fog blend as its sprite panels.
+
+Version 1.21.0 verification: strict TypeScript and 18 focused checks passed.
+All 20 primary outfits were inspected in six combat poses, plus desktop/tablet
+catalog galleries. A deliberately blocked mask atlas fell back for the entire
+Oni body/head/arms while Sumi and Tanuki remained available. Disposal released
+the loaded kit. The local preview is available; no full build or suite ran.

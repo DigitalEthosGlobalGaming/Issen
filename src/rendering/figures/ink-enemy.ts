@@ -207,7 +207,10 @@ export function createInkEnemyRenderer(doc: Document) {
           ? 0
           : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 + env.wind * 0.003;
       g.rotate(sway);
-      g.fillStyle = (f.pal || env.palette(Math.round(f.fog * 4) / 4)).robeD;
+      const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
+      const dark = rgb((f.pal || env.palette(0)).robeD);
+      const mist = rgb(env.palette(1).robe);
+      g.fillStyle = `rgb(${dark.map((v, i) => Math.round(v + (mist[i]! - v) * fog)).join(',')})`;
       g.beginPath();
       g.moveTo(-0.12, -0.008);
       g.lineTo(0.12, -0.008);

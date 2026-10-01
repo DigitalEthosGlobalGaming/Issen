@@ -1,3 +1,4 @@
+import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
@@ -21,6 +22,36 @@ export type InkPlayerRenderer = ReturnType<typeof createInkPlayerRenderer>;
 /** Per-runtime atlas ownership. draw/drawPart inherit normalized figure transforms and alpha. */
 export function createInkPlayerRenderer(doc: Document) {
   const outfits = createOutfitKit(doc);
+  const palettes = createPalette();
+  const tones = new Map<string, HTMLCanvasElement>();
+  let currentTone: string | undefined;
+  function tonePart(key: keyof typeof PLAYER_FRAMES): HTMLCanvasElement | null {
+    if (!currentTone || key === 'head' || key === 'hand' || !atlas) return null;
+    const id = currentTone + ':' + key,
+      prior = tones.get(id);
+    if (prior) return prior;
+    const [sx, sy, sw, sh] = PLAYER_FRAMES[key],
+      c = doc.createElement('canvas');
+    // Keep source detail for the large foreground and Armoury crops.
+    c.width = sw;
+    c.height = sh;
+    const cg = c.getContext('2d');
+    if (!cg) return null;
+    cg.drawImage(atlas, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    const data = cg.getImageData(0, 0, c.width, c.height),
+      pal = palettes.robe(currentTone),
+      parse = (v: string) => (v.match(/[\d.]+/g) || []).map(Number),
+      dark = parse(pal.robeD),
+      light = parse(pal.robeL);
+    for (let i = 0; i < data.data.length; i += 4) {
+      if (!data.data[i + 3]) continue;
+      const t = Math.min(1, (data.data[i]! + data.data[i + 1]! + data.data[i + 2]!) / 330);
+      for (let n = 0; n < 3; n++) data.data[i + n] = dark[n]! + (light[n]! - dark[n]!) * t;
+    }
+    cg.putImageData(data, 0, 0);
+    tones.set(id, c);
+    return c;
+  }
   let atlas: HTMLImageElement | null = null;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
   let pending: Promise<boolean> | null = null;
@@ -62,7 +93,9 @@ export function createInkPlayerRenderer(doc: Document) {
     h: number,
   ) {
     const [sx, sy, sw, sh] = PLAYER_FRAMES[key];
-    g.drawImage(atlas!, sx, sy, sw, sh, x, y, w, h);
+    const tinted = tonePart(key);
+    if (tinted) g.drawImage(tinted, x, y, w, h);
+    else g.drawImage(atlas!, sx, sy, sw, sh, x, y, w, h);
   }
   function joints(f: Figure) {
     const l = f.lean || 0,
@@ -104,12 +137,13 @@ export function createInkPlayerRenderer(doc: Document) {
     env: FigureEnvironment,
   ): boolean {
     if (!f.back || !supportsInkOutfit(f.robeId)) return false;
-    if (part === 'head' && f.robeId === 'sumi' && f.variant) return false;
     if (state !== 'ready' || !atlas) {
       if (state === 'idle') void prepare();
       return false;
     }
     if (!outfits.ready(f.robeId)) return false;
+    const recipe = outfits.recipe(f.robeId);
+    currentTone = recipe?.tone;
     const l = f.lean || 0;
     g.save();
     if (part === 'body') {
@@ -122,7 +156,7 @@ export function createInkPlayerRenderer(doc: Document) {
       g.rotate(sway);
       // Opaque under-robe joins the separately posed panels across the broad obi.
       // It tapers into their overlapping hems rather than exposing the backdrop.
-      g.fillStyle = '#20201f';
+      g.fillStyle = currentTone ? palettes.robe(currentTone).robeD : '#20201f';
       g.beginPath();
       g.moveTo(-0.12, -0.008);
       g.lineTo(0.12, -0.008);
@@ -143,7 +177,7 @@ export function createInkPlayerRenderer(doc: Document) {
       stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355);
       outfits.draw(g, 'body', f);
     } else if (part === 'head') {
-      if (f.robeId !== 'shinobi') stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171);
+      if (!recipe?.replaceHead) stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171);
       outfits.draw(g, 'head', f);
     } else {
       joints(f).forEach((j, i) => {
@@ -178,10 +212,13 @@ export function createInkPlayerRenderer(doc: Document) {
       ready: state === 'ready',
       parts: state === 'ready' ? 9 : 0,
       outfits: outfits.snapshot(),
+      toneParts: tones.size,
     }),
     dispose() {
       state = 'disposed';
       outfits.dispose();
+      for (const c of tones.values()) c.width = c.height = 0;
+      tones.clear();
       if (atlas) {
         atlas.onload = null;
         atlas.onerror = null;

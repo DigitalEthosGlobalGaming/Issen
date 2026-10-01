@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
 import { createPalette } from '../../src/rendering/palette.ts';
+import { ROBES } from '../../src/game/content/cosmetics.ts';
 import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
 function render({ body = true, enemy = false, sword = true, mode = 'ink', figure = {} } = {}) {
@@ -149,7 +150,7 @@ test('unsupported equipment, enemies and Classic mode retain their own artwork',
     assert.deepEqual(calls.swords, []);
     assert.equal(calls.steelGradients, 1);
   }
-  const robe = render({ figure: { robeId: 'hai' } });
+  const robe = render({ figure: { robeId: 'unknown-outfit' } });
   assert.deepEqual(robe.parts, []);
   assert.equal(robe.swords.length, 1, 'supported sword is independent of unsupported robe');
   const blade = render({ figure: { bladeId: 'other' } });
@@ -224,4 +225,24 @@ test('missing enemy art preserves Classic figure drawing', () => {
   assert.deepEqual(fallback.strokes, classic.strokes);
   assert.equal(fallback.steelGradients, classic.steelGradients);
   assert.deepEqual(classic.enemyParts, []);
+});
+
+test('every primary outfit uses the shared Ink puppet while Classic remains available', () => {
+  for (const robeId of Object.keys(ROBES)) {
+    const figure = {
+      robeId,
+      variant: ROBES[robeId].variant,
+      rf: ROBES[robeId],
+      cape: ROBES[robeId].cape,
+      coat: ROBES[robeId].coat,
+    };
+    const ink = render({ figure }),
+      classic = render({ mode: 'classic', figure });
+    assert.deepEqual(
+      ink.parts.map((c) => c.part),
+      ['arms', 'body', 'head'],
+      robeId,
+    );
+    assert.deepEqual(classic.parts, [], robeId);
+  }
 });
