@@ -512,3 +512,9 @@
   justify-content: center;
   margin: 0 0 4px;
 }
+.title-privacy a.has-update {
+  color: var(--gold, #e3b875);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

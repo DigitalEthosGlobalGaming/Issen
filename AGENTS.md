@@ -23,4 +23,7 @@ affected documentation when ownership or behavior changes. Do not edit generated
 When implementing an approved feature plan, increase the app's SemVer version
 appropriately (minor for new features, patch for fixes, major for breaking changes).
 Keep `package.json`, `package-lock.json`, and the title-screen version in sync.
+For every implementation change, add concise player-facing release notes to
+`public/changelog/index.html` under the matching version. See
+[changelog maintenance](docs/features/changelog.md) for update-indicator behavior.
 Planning-only documents do not bump the version.

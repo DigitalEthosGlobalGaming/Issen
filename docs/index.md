@@ -62,3 +62,5 @@
 - [Android development and release](development/android.md): offline builds, Pixel installation, signing and Play testing.
 - [TypeScript and Vite migration plan](architecture/typescript-migration.md):
   proposed module boundaries, file structure, migration order and verification.
+
+- [Changelog](features/changelog.md): release notes and persistent update indication.

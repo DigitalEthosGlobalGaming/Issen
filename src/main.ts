@@ -3,6 +3,7 @@ import { mount } from './ui/mount';
 import { startGame } from './game.ts';
 import { createArtworkPreloader } from './platform/artwork-preload.ts';
 import { mountStartupLoading } from './ui/startup-loading.ts';
+import { mountChangelogLink } from './ui/changelog-link.ts';
 
 const artwork = import.meta.glob<string>(
   '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
@@ -20,6 +21,7 @@ const urls = [
 ];
 let root: HTMLElement | null = null;
 let stop: (() => void) | null = null;
+let stopChangelog: (() => void) | null = null;
 let disposed = false;
 const loading = mountStartupLoading(() => {
   void begin();
@@ -29,6 +31,7 @@ async function begin() {
   if ((await preloader.run()) && !disposed && !root) {
     loading.remove();
     root = mount();
+    stopChangelog = mountChangelogLink(root);
     stop = startGame();
   }
 }
@@ -38,6 +41,7 @@ export function dispose(): void {
   preloader.dispose();
   loading.remove();
   stop?.();
+  stopChangelog?.();
   root?.remove();
 }
 
