@@ -1,6 +1,6 @@
 # Stage sprite inventory
 
-Status: implemented inventory, updated 2026-10-01 for version 1.17.0.
+Status: implemented inventory, updated 2026-10-02 for version 1.31.0.
 All nine scenes use their dedicated composition. The original planning targets
 below remain useful for future reuse; the implementation table is authoritative.
 
@@ -14,20 +14,31 @@ the table below records the complete implemented scene kits.
 
 ## Implemented kits
 
-Each scene visit now adds a deterministic, subtle arrangement of two or three
-small edge props to the cached near plane. The cosmetic visit seed is separate
-from combat randomness and never enters run checkpoints. Resize, pause, film
-changes and cache rebuilding retain that visit's plan; entering a different
-stage or beginning another run creates a fresh one. Cinematic entry/browsing
-uses its own visit sequence and refreshes the standing enemy figures. Leaving
-the viewer restores the original stage and cosmetic seed.
+Each scene visit adds two prominent midground landmarks to the cached near
+plane; courtyard stones use the distant plane behind its architecture so they
+cannot cover the gateway. The cosmetic visit seed is separate from combat randomness and never
+enters run checkpoints. Resize, pause, film changes and cache rebuilding retain
+that visit's plan. Cinematic uses its own visit sequence and restores the live
+scene seed on exit. Cycling all nine scenes changes the returning primary silhouette.
 
-The variation pass uses existing kit images only, keeps the central 68% clear,
-and preserves the Ridge's left pine shoulder and Shore's right land bank. Snow
-uses its documented packed crop windows and contact anchors without mirroring;
-Temple adds only small rocks. Low quality omits the third prop without moving
-the first two. Plans live in `rendering/environment/stage-variation.ts` and are
-painted once by the environment cache builder, not during each animation frame.
+Five new source families provide complete, independently reusable silhouettes:
+`woodland-landmarks-atlas.png`, `snow-woodland-landmarks-atlas.png`,
+`landmark-stones-atlas.png`, `bamboo-landmarks-atlas.png`, and
+`cherry-landmarks-atlas.png`. Field/Ridge/Hollow/Shore/Moonwatch share woodland;
+Blossom uses cherry, Bamboo uses bamboo, Snow uses two distinct snow woodland
+cells, and Temple uses stones. Other scenes share a smaller stone landmark on
+the opposite edge. Existing fixed compositions stay intact.
+
+Primary width is 30–34% of the viewport and secondary width 18–22%, subject to
+native-aspect height caps of 38–42% and 23% of viewport height. Their feet sit
+near `groundY - enemyHeight * .30`, above foreground grass. Cropped measured
+bounds and normalized root pivots come from `landmark-layout.ts`; root offsets
+and mirroring preserve the silhouette center and keep the central 34–66% clear,
+except courtyard stones: the primary is 26% wide, capped at 30% height and centered
+at 55% in the distant gap between architecture. Its feet remain grounded.
+Primary opacity is .68–.80, secondary .52–.64. Ridge keeps its dominant landmark
+left, Shore right. Low quality retains both cached landmarks. Plans live in
+`stage-variation.ts` and paint only when a composition cache is rebuilt.
 
 | Scene | Existing assets used | New assets used |
 | --- | --- | --- |
@@ -41,7 +52,8 @@ painted once by the environment cache builder, not during each animation frame.
 | Shore | E01/E02/E04/E06/E07 | N13/N14 |
 | Moonwatch | E01/E02/E06/E10 | N09/N12 |
 
-N01-N04 and N06-N14 are generated and integrated (13 new atlases, 24 total).
+N01-N04 and N06-N14 are generated and integrated (13 scene additions).
+The five visit landmark sheets bring the library to 29 atlases.
 N05 stumps and N15 separate moon landmark are deferred: fallen bamboo and the
 shared temple gate/steps cover those needs. Snow sheets are complete variants,
 not registered overlays. Temple sheets require explicit variable-width frames.

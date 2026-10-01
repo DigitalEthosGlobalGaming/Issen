@@ -232,3 +232,25 @@ Crow toe pivots use y525 in both packed poses and the figure shoulder anchor is
 Body-local grass tufts are removed because they rotated and hopped with enemies.
 The runtime's animated mid/foreground field grass is unchanged; makeFig retains
 its serialized grass seed data to preserve saves and random-stream compatibility.
+
+## Enemy clothing and complete heads
+
+Regular varied enemies now assemble three generated torso/lower-robe pairs with
+four complete generated heads, independently selected from the existing saved
+visual seed. This changes silhouettes as well as palette and width. Authored
+boss outfits and explicit head variants retain their existing parts; arm joints,
+weapon grip and combat animation are unchanged. Complete heads replace the base
+face and anchor at the neck, avoiding overlapping faces.
+
+[Clothing frames and provenance](../../src/rendering/figures/assets/enemy-clothing-variants.md)
+and [head frames and provenance](../../src/rendering/figures/assets/enemy-headwear-variants.md)
+record measured packed windows. The clothing row split is y440, not half-height.
+Both new families use the existing bounded palette/fog caches (8 million pixels
+combined). Renderer readiness requires all four enemy image families. Appearance
+selection uses no gameplay random calls or new saved fields.
+
+New clothing keeps native aspect at fixed torso/lower heights (.355/.52),
+centered on the existing waist anchors. The monk silhouette therefore stays
+slimmer without shifting the sleeve joints. Desktop/tablet galleries cover
+guard, left, right, up, down and an extended forward grip. A six-enemy working
+set produces no additional pixel recoloring after warmup across pose/fog changes.

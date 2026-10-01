@@ -9,6 +9,8 @@ export function enemyAppearance(f: Figure) {
   return {
     variant: f.variant || hats[seed % hats.length]!,
     palette: f.pal || palettes.robe(tones[Math.floor(seed / hats.length) % tones.length]!),
+    clothing: Math.floor(seed / 7) % 3,
+    head: seed % 4,
     width: 0.94 + (Math.floor(seed / 29) % 7) * 0.02,
   };
 }

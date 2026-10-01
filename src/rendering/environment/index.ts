@@ -72,20 +72,25 @@ const ASSET_URLS = [
   new URL('./assets/foam-strips-atlas.png', import.meta.url).href,
   new URL('./assets/fallen-bamboo-atlas.png', import.meta.url).href,
   new URL('./assets/snow-peak.png', import.meta.url).href,
+  new URL('./assets/woodland-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-woodland-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/landmark-stones-atlas.png', import.meta.url).href,
+  new URL('./assets/bamboo-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/cherry-landmarks-atlas.png', import.meta.url).href,
 ];
 
 /** Decode only the current scene's kit; shared images survive a scene switch. */
 function sceneAssets(stage: number): number[] {
-  if (stage === 0) return [2, 3, 4, 5, 6, 7, 8, 9, 10];
-  if (stage === 1) return [2, 3, 4, 5, 6];
-  if (stage === 2) return [3, 4, 5, 6, 11, 12];
-  if (stage === 3) return [2, 3, 4, 5, 6, 7, 13];
-  if (stage === 4) return [0, 3, 4, 6, 23];
-  if (stage === 5) return [3, 14, 15, 16, 24];
-  if (stage === 6) return [2, 3, 6, 17, 18, 19, 20];
-  if (stage === 7) return [2, 3, 4, 6, 10, 21, 22];
-  if (stage === 8) return [2, 3, 6, 9, 17, 20];
-  return [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  if (stage === 0) return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
+  if (stage === 1) return [2, 3, 4, 5, 6, 25, 27];
+  if (stage === 2) return [3, 4, 5, 6, 11, 12, 27, 29];
+  if (stage === 3) return [2, 3, 4, 5, 6, 7, 13, 25, 27];
+  if (stage === 4) return [0, 3, 4, 6, 23, 27, 28];
+  if (stage === 5) return [3, 14, 15, 16, 24, 26];
+  if (stage === 6) return [2, 3, 6, 17, 18, 19, 20, 27];
+  if (stage === 7) return [2, 3, 4, 6, 10, 21, 22, 25, 27];
+  if (stage === 8) return [2, 3, 6, 9, 17, 20, 25, 27];
+  return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
 }
 
 /** Instance-owned image loading and caches; safe for independent previews. */
@@ -129,6 +134,11 @@ export function createEnvironmentRenderer(doc: Document) {
           new Promise<void>((resolve) => {
             const existing = images[index];
             if (existing?.complete && existing.naturalWidth) {
+              if (
+                index >= 25 &&
+                (existing.naturalWidth !== 1254 || existing.naturalHeight !== 1254)
+              )
+                failed = true;
               resolve();
               return;
             }
@@ -141,7 +151,12 @@ export function createEnvironmentRenderer(doc: Document) {
                 resolve();
                 return;
               }
-              if (!image.naturalWidth || !image.naturalHeight) failed = true;
+              if (
+                !image.naturalWidth ||
+                !image.naturalHeight ||
+                (index >= 25 && (image.naturalWidth !== 1254 || image.naturalHeight !== 1254))
+              )
+                failed = true;
               image.onload = image.onerror = null;
               resolve();
             };
@@ -229,15 +244,18 @@ export function createEnvironmentRenderer(doc: Document) {
     nearby = near.target;
     if (!far.context || !near.context) return false;
     const finish = () => {
+      // Courtyard landmarks belong behind its gateway, never across the roof or posts.
+      const variationContext = frame.stage === 6 ? far.context! : near.context!;
+      variationContext.save();
+      if (frame.stage === 6) variationContext.globalCompositeOperation = 'destination-over';
       drawStageVariations(
-        near.context!,
+        variationContext,
         {
-          pines: images[2],
-          shrubs: images[5],
-          bamboo: images[0],
-          rocks: images[6],
-          snowPines: images[14],
-          snowRocks: images[16],
+          woodland: images[25],
+          snowWoodland: images[26],
+          stones: images[27],
+          bambooLandmarks: images[28],
+          cherryLandmarks: images[29],
         },
         frame.stage,
         frame.stageSeed ?? 0,
@@ -245,6 +263,7 @@ export function createEnvironmentRenderer(doc: Document) {
         h,
         frame.lowQuality,
       );
+      variationContext.restore();
       cached = canvas;
       builds++;
       return true;

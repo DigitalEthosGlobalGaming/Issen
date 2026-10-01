@@ -1,8 +1,8 @@
 # Environment asset library
 
-Measured and visually reviewed on 2026-10-01 in the main checkout.
-This catalog covers 24 reusable PNG atlases plus one standalone snow peak: eleven original landscape sheets
-and thirteen additions for the remaining scenes. Use the
+Measured and visually reviewed through 2026-10-02 in the main checkout.
+This catalog covers 29 reusable PNG atlases plus one standalone snow peak: eleven original landscape sheets,
+thirteen scene additions and five visit landmark families. Use the
 [stage inventory](stage-sprite-inventory.md) for implemented kits and optional
 future families, and [stage art plan](stage-art-plan.md) for composition.
 [Asset provenance](../../src/rendering/environment/assets/README.md) records sources.
@@ -396,3 +396,37 @@ small magical prop. Keep its native aspect ratio. The current companion renderer
 anchors the full frame at (580,1350), uses 1157 source pixels per visible-height
 unit and moves the rock and ring together. Reduced motion freezes the bob.
 See [measured bounds and generation provenance](../../src/rendering/figures/assets/mystic-rock.md).
+
+
+## Visit landmark families (version 1.31.0)
+
+These five transparent 1254 × 1254 sheets add twenty distinct silhouettes.
+Original sheets remain intact. Their adjacent contracts include generation
+prompts, reference paths, measured source windows, contact anchors and alpha
+observations. Runtime crops use [landmark-layout.ts](../../src/rendering/environment/landmark-layout.ts):
+alpha-above-16 bounds plus four pixels of padding, with root anchors normalized
+inside each crop. Do not assume uniform quadrants; bamboo and cherry packing
+requires explicit windows.
+
+| Family / contract | Cells 0–3 | Intended reuse |
+| --- | --- | --- |
+| [Woodland](../../src/rendering/environment/assets/woodland-landmarks-atlas.md) | Windswept pine, forked dead pine, split pine, fallen rooted tree | Field, ridge, hollow, shore and moonwatch |
+| [Snow woodland](../../src/rendering/environment/assets/snow-woodland-landmarks-atlas.md) | Matching four woodland forms with snow | White Silence Pass; complete derived sprites, not overlay masks |
+| [Landmark stones](../../src/rendering/environment/assets/landmark-stones-atlas.md) | Jagged pair, low arch, balanced stack, broken leaning marker | Courtyard landmarks and secondary accents in other scenes |
+| [Bamboo landmarks](../../src/rendering/environment/assets/bamboo-landmarks-atlas.md) | Crossed stalks, sparse broken stalks, fan foliage, low fallen cluster | Hollow Bamboo Road |
+| [Cherry landmarks](../../src/rendering/environment/assets/cherry-landmarks-atlas.md) | Tall forked tree, wide umbrella, wind-bent tree, fallen flowering branch | Falling Blossom Path |
+
+[stage-variation.ts](../../src/rendering/environment/stage-variation.ts) chooses
+one primary and one secondary landmark from the cosmetic visit seed. Native
+aspect, height caps, mirrored root compensation and ground fading keep the forms
+registered across desktop and tablet. Shapes sit above the grass transition and
+outside the central combat corridor, except the courtyard's primary stone in
+the distant gap between its gateway and wall. Courtyard landmarks render behind
+architecture; both remain present at low quality. Their
+composition is cached, rather than redrawn or regenerated every frame. Existing
+animated grass, base scenery and downstream film grading remain independent.
+
+Desktop (1440 × 900) and tablet (768 × 1024) review covered every scene with two
+fixed visit seeds. Strong pixel changes occupied over 1.5% of each full frame (over 3% outside
+the courtyard);
+this verifies visible silhouette changes rather than only a different seed.

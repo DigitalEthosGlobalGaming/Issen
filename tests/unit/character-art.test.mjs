@@ -212,7 +212,9 @@ test('every primary outfit uses the shared Ink puppet without a mode gate', () =
 test('regular enemy appearance is stable per saved figure, varied, and preserves authored looks', () => {
   const hats = new Set(),
     colors = new Set(),
-    widths = new Set();
+    widths = new Set(),
+    clothing = new Set(),
+    heads = new Set();
   for (let seed = 0; seed < 80; seed++) {
     const f = { d: makeFig(seed), variant: null },
       before = structuredClone(f);
@@ -220,12 +222,16 @@ test('regular enemy appearance is stable per saved figure, varied, and preserves
     assert.deepEqual(enemyAppearance(f), a);
     assert.deepEqual(f, before);
     hats.add(a.variant);
+    clothing.add(a.clothing);
+    heads.add(a.head);
     colors.add(a.palette.robe);
     widths.add(a.width);
     assert.ok(a.width >= 0.94 && a.width <= 1.061);
   }
   assert.ok(hats.size >= 5);
   assert.equal(colors.size, 4);
+  assert.equal(clothing.size, 3);
+  assert.equal(heads.size, 4);
   assert.ok(widths.size >= 5);
   const f = { d: makeFig(1), variant: 'mask', pal: createPalette().robe('shiro') };
   assert.equal(enemyAppearance(f).variant, 'mask');

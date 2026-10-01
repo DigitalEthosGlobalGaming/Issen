@@ -22,8 +22,29 @@ const HEAD_FRAMES: Record<string, Frame> = {
   jingasa: [490, 588, 576, 301],
   monk: [1110, 527, 396, 452],
 };
+// Packed windows measured from alpha; clothing rows divide at y440, not half-height.
+const CLOTHING_FRAMES: readonly Frame[] = [
+  [85, 34, 367, 378],
+  [562, 22, 400, 413],
+  [1117, 42, 286, 377],
+  [53, 459, 427, 509],
+  [538, 460, 481, 532],
+  [1102, 459, 377, 522],
+];
+const VARIANT_HEAD_FRAMES: readonly Frame[] = [
+  [54, 110, 493, 468],
+  [653, 79, 577, 522],
+  [82, 660, 494, 504],
+  [724, 632, 423, 540],
+];
+// Neck centers in source pixels. Complete heads replace, rather than overlay, the base face.
+const HEAD_NECKS = [360, 932, 333, 945];
+const HEAD_BOTTOMS = [574, 570, 1160, 1168];
+const HEAD_WIDTHS = [0.19, 0.235, 0.205, 0.165];
 const LOOKS = new Set(['', 'mask', 'monk', 'jingasa', 'kasa', 'kabuto', 'hair']);
 const URLS = {
+  clothing: new URL('./assets/enemy-clothing-variants.png', import.meta.url).href,
+  variationHeads: new URL('./assets/enemy-headwear-variants.png', import.meta.url).href,
   base: new URL('./assets/enemy-ronin-simple.png', import.meta.url).href,
   heads: new URL('./assets/enemy-headwear-atlas.png', import.meta.url).href,
 };
@@ -76,8 +97,8 @@ export function createInkEnemyRenderer(doc: Document) {
             image.onload = () => {
               if (
                 !disposed &&
-                image.naturalWidth === (key === 'base' ? 1254 : 1536) &&
-                image.naturalHeight === (key === 'base' ? 1254 : 1024)
+                image.naturalWidth === (key === 'base' || key === 'variationHeads' ? 1254 : 1536) &&
+                image.naturalHeight === (key === 'base' || key === 'variationHeads' ? 1254 : 1024)
               )
                 loaded.add(key);
               done();
@@ -86,7 +107,7 @@ export function createInkEnemyRenderer(doc: Document) {
             image.src = url;
           }),
       ),
-    ).then(() => loaded.has('base'));
+    ).then(() => Object.keys(URLS).every((key) => loaded.has(key)));
     return pending;
   }
   function supports(f: Figure) {
@@ -96,6 +117,7 @@ export function createInkEnemyRenderer(doc: Document) {
       !f.back &&
       LOOKS.has(v) &&
       loaded.has('base') &&
+      (!f.varied || (loaded.has('clothing') && loaded.has('variationHeads'))) &&
       (v === '' || loaded.has('heads'))
     );
   }
@@ -109,7 +131,13 @@ export function createInkEnemyRenderer(doc: Document) {
     env: FigureEnvironment,
     cloth: boolean,
   ): HTMLCanvasElement | null {
-    const family = key.startsWith('head:') ? 'heads' : 'base',
+    const family = key.startsWith('clothing:')
+        ? 'clothing'
+        : key.startsWith('variationHead:')
+          ? 'variationHeads'
+          : key.startsWith('head:')
+            ? 'heads'
+            : 'base',
       image = images.get(family);
     if (!image) return null;
     const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
@@ -230,6 +258,7 @@ export function createInkEnemyRenderer(doc: Document) {
     env: FigureEnvironment,
   ): boolean {
     const appearance = f.varied ? enemyAppearance(f) : undefined;
+    const useVariantHead = !!appearance && !f.variant;
     if (appearance) f = { ...f, variant: appearance.variant, pal: appearance.palette };
     if (!pending && !disposed) void prepare();
     if (!supports(f)) return false;
@@ -244,43 +273,72 @@ export function createInkEnemyRenderer(doc: Document) {
           ? 0
           : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 + env.wind * 0.003;
       g.rotate(sway);
-      const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
-      const dark = rgb((f.pal || env.palette(0)).robeD);
-      const mist = rgb(env.palette(1).robe);
-      g.fillStyle = `rgb(${dark.map((v, i) => Math.round(v + (mist[i]! - v) * fog)).join(',')})`;
-      g.beginPath();
-      g.moveTo(-0.12, -0.008);
-      g.lineTo(0.12, -0.008);
-      g.lineTo(0.19, 0.47);
-      g.lineTo(0.04, 0.51);
-      g.lineTo(-0.17, 0.47);
-      g.closePath();
-      g.fill();
-      g.save();
-      g.transform(1, 0, -0.065, 1, 0, 0);
-      stamp(g, 'leftPanel', -0.26, 0, 0.325, 0.52, f, env);
+      if (appearance) {
+        const i = appearance.clothing + 3;
+        const lower = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
+        const frame = CLOTHING_FRAMES[i]!,
+          width = (0.52 * frame[2]) / frame[3];
+        if (lower) g.drawImage(lower, -width / 2, 0, width, 0.52);
+      } else {
+        const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
+        const dark = rgb((f.pal || env.palette(0)).robeD);
+        const mist = rgb(env.palette(1).robe);
+        g.fillStyle = `rgb(${dark.map((v, i) => Math.round(v + (mist[i]! - v) * fog)).join(',')})`;
+        g.beginPath();
+        g.moveTo(-0.12, -0.008);
+        g.lineTo(0.12, -0.008);
+        g.lineTo(0.19, 0.47);
+        g.lineTo(0.04, 0.51);
+        g.lineTo(-0.17, 0.47);
+        g.closePath();
+        g.fill();
+        g.save();
+        g.transform(1, 0, -0.065, 1, 0, 0);
+        stamp(g, 'leftPanel', -0.26, 0, 0.325, 0.52, f, env);
+        g.restore();
+        g.save();
+        g.transform(1, 0, 0.065, 1, 0, 0);
+        stamp(g, 'rightPanel', -0.065, 0, 0.325, 0.52, f, env);
+        g.restore();
+      }
       g.restore();
-      g.save();
-      g.transform(1, 0, 0.065, 1, 0, 0);
-      stamp(g, 'rightPanel', -0.065, 0, 0.325, 0.52, f, env);
-      g.restore();
-      g.restore();
-      stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355, f, env);
+      if (appearance) {
+        const i = appearance.clothing;
+        const torso = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
+        const frame = CLOTHING_FRAMES[i]!,
+          width = (0.355 * frame[2]) / frame[3];
+        if (torso) g.drawImage(torso, -width / 2 + l * 0.8, -0.835, width, 0.355);
+      } else stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355, f, env);
     } else if (part === 'head') {
-      stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171, f, env);
-      const v = f.variant || '',
-        frame = HEAD_FRAMES[v];
-      if (frame) {
-        const im = sprite('head:' + v, frame, f, env, false);
-        if (im) {
-          const w = v === 'kasa' || v === 'jingasa' ? 0.28 : v === 'kabuto' ? 0.23 : 0.17;
+      if (appearance && useVariantHead) {
+        const i = appearance.head,
+          frame = VARIANT_HEAD_FRAMES[i]!;
+        const im = sprite('variationHead:' + i, frame, f, env, false);
+        const scale = HEAD_WIDTHS[i]! / frame[2];
+        if (im)
           g.drawImage(
             im,
-            l * 1.05 - w / 2,
-            v === 'mask' ? -0.935 : -1.0,
-            w,
-            (w * frame[3]) / frame[2],
+            l * 1.05 - (HEAD_NECKS[i]! - frame[0]) * scale,
+            -0.815 - (HEAD_BOTTOMS[i]! - frame[1]) * scale,
+            frame[2] * scale,
+            frame[3] * scale,
           );
+      } else {
+        stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171, f, env);
+        const v = f.variant || '',
+          frame = HEAD_FRAMES[v];
+        if (frame) {
+          const im = sprite('head:' + v, frame, f, env, false);
+          if (im) {
+            const w = v === 'kasa' || v === 'jingasa' ? 0.28 : v === 'kabuto' ? 0.23 : 0.17;
+            g.drawImage(
+              im,
+              l * 1.05 - w / 2,
+              v === 'mask' ? -0.935 : -1.0,
+              w,
+              (w * frame[3]) / frame[2],
+            );
+          }
         }
       }
     } else
@@ -303,7 +361,7 @@ export function createInkEnemyRenderer(doc: Document) {
     prepare,
     drawPart,
     snapshot: () => ({
-      ready: loaded.has('base'),
+      ready: Object.keys(URLS).every((key) => loaded.has(key)),
       loaded: [...loaded],
       cachedParts: cache.size,
       toneParts: tones.size,

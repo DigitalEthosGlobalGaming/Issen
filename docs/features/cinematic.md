@@ -31,11 +31,18 @@ active worktree's dev server when checking the feature; a server from another
 checkout will not contain these changes.
 # Cinematic discovery reward
 
-Browsing scenes refreshes both small decorative edge props and the standing
+Browsing scenes refreshes both large midground landmarks and the standing
 enemy lineup. Those cosmetic visit choices remain stable during resize and
 film changes. They use presentation randomness, leaving combat RNG and saved
 checkpoints unchanged. Exiting restores the title's original stage and scene
 variation seed.
+
+Version 1.31.0 adds four silhouettes per landmark family: woodland, snowy
+woodland, stones, bamboo and cherry trees. Two landmarks frame each scene at
+native aspect, with measured root anchors and fading ground contact. Regular
+standing enemies combine three new clothing shapes and four complete heads;
+authored bosses retain their own artwork. See the [asset library](environment-asset-library.md)
+and [character art contracts](character-art.md) for reuse.
 
 Entering the scene viewer permanently discovers the cosmetic Mystic Rock companion.
 It is granted immediately, including session-restored entry, without ending a run.

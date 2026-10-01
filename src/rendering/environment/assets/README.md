@@ -70,3 +70,15 @@ Alpha inspected: transparent exterior with near-opaque textured interiors.
 - [Foam Strips](foam-strips-atlas.md): Broken Shore: shallow wave foam strips.
 
 - [Dedicated snow peak](snow-peak.md): standalone higher-resolution mountain for White Silence Pass, version 1.17.1.
+
+## Visit landmarks: version 1.31.0
+
+- [Woodland landmarks](woodland-landmarks-atlas.md): four pine, deadwood and fallen-tree silhouettes.
+- [Snow woodland landmarks](snow-woodland-landmarks-atlas.md): complete snow variants of those forms.
+- [Landmark stones](landmark-stones-atlas.md): jagged pair, low arch, balanced stack and broken marker.
+- [Bamboo landmarks](bamboo-landmarks-atlas.md): upright, broken, leafy and fallen groups.
+- [Cherry landmarks](cherry-landmarks-atlas.md): forked, spreading, wind-bent and fallen flowering trees.
+
+Use measured crops and root anchors from ../landmark-layout.ts; preserve native
+aspect. These are prominent cached midground shapes, with fading ground contact
+and presentation-only visit selection. All five original transparent sheets are retained.

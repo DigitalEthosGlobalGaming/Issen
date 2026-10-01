@@ -4157,7 +4157,7 @@ export function startGame(): () => void {
     const failed = [
       inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
       !inkCompanion.ready ? 'companions' : null,
-      !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 2 ? 'enemies' : null,
+      !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
       !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
         ? 'outfits'
         : null,
