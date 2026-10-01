@@ -39,7 +39,11 @@ import {
 import { createRunResults } from './ui/screens/run-results.ts';
 import type { ResultReveal } from './ui/screens/run-results.ts';
 import { recordRun } from './game/progression/run-records.ts';
-import { recordSecretEvent } from './game/progression/secret-events.ts';
+import {
+  recordSecretEvent,
+  preserveSecretDiscoveries,
+  reconcileCinematicCompanion,
+} from './game/progression/secret-events.ts';
 import {
   createRunRewardLedger,
   accrueRunReward,
@@ -141,7 +145,7 @@ import { ROBE_AWAKENINGS } from './game/content/robe-awakenings.ts';
 import { parseAwakeningProgress, recordChallenge } from './game/progression/awakening-progress.ts';
 import type { BladeStats } from './game/progression/statistics.ts';
 import { normalLives } from './game/equipment/lives.ts';
-import { throwKnife } from './game/combat/knife.ts';
+import { throwKnife, refillDuelKnives } from './game/combat/knife.ts';
 import { FORTUNES } from './game/content/fortunes.ts';
 import { BLESS, TIER, TIERNAME, BLESS_BY } from './game/content/blessings.ts';
 import {
@@ -309,6 +313,7 @@ export function startGame(): () => void {
   let ST = loadStatistics();
   const SETUP = loadSetup();
   const UNL = loadUnlocks();
+  if (reconcileCinematicCompanion(ST, UNL)) store.set('issen.unlocks', [...UNL]);
   UNL.delete(PREMIUM_FILM);
   if (premiumAccess()) UNL.add(PREMIUM_FILM);
   const TRIAL_PROGRESS = parseTrialProgress(store.get('issen.trials', null));
@@ -369,11 +374,12 @@ export function startGame(): () => void {
     $('tSeed').textContent = available ? `Saved run · seed ${savedRun!.seed}` : '';
   }
   function restoreCheckpoint(checkpoint: RunCheckpoint) {
-    Object.assign(ST, parseStatistics(checkpoint.stats));
+    Object.assign(ST, preserveSecretDiscoveries(parseStatistics(checkpoint.stats), ST));
     Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
     Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
     UNL.clear();
     for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
+    reconcileCinematicCompanion(ST, UNL);
     if (premiumAccess()) UNL.add(PREMIUM_FILM);
     Object.assign(SETUP, checkpoint.setup);
     Object.assign(EQ, parseEquipment(checkpoint.equipment, accessibleUnlocks(), ITEMS));
@@ -809,6 +815,8 @@ export function startGame(): () => void {
     const pt = EQ.pet,
       p = L.player;
     if (pt === 'shiba') drawPetAt('shiba', p.x + p.h * 0.47, H - 2, p.h * 0.14);
+    else if (pt === 'mystic-rock')
+      drawPetAt(pt, p.x + p.h * 0.46, H - 2 - p.h * 0.12, Math.min(120, p.h * 0.23));
     else if (pt === 'cat') drawPetAt('cat', W * 0.85, H * 0.93 - W * 0.045, Math.max(W, H) * 0.045);
   }
   /* ---------------- ensō glyph ---------------- */
@@ -1907,6 +1915,7 @@ export function startGame(): () => void {
 
   /* ---------------- boss ---------------- */
   function startBoss() {
+    refillDuelKnives(G);
     G.blessingTriggers.flourishWard = false;
     renderLives();
     G.bossCount++;
@@ -3048,6 +3057,11 @@ export function startGame(): () => void {
     films: () =>
       ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
     enter(stage) {
+      if (recordSecretEvent(ST, { kind: 'cinematic' })) saveStats();
+      if (reconcileCinematicCompanion(ST, UNL)) {
+        store.set('issen.unlocks', [...UNL]);
+        toast({ k: '石', msg: 'Unlocked: Mystic Rock companion' });
+      }
       cinematicStage = G.stage;
       cinematicFilm = EQ.film;
       previewStage(stage);

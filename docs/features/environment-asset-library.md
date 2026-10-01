@@ -384,3 +384,15 @@ generation prompt](../../src/rendering/environment/assets/snow-peak.md).
 Ember Courtyard reuses its existing atlas pieces with a smaller left gate, roof
 eave aligned to the lintel, low threshold steps and a smaller adjacent wall.
 The steps no longer fill the doorway. No architectural images were replaced.
+
+## Reusable Mystic Rock companion
+
+![Mystic Rock](../../src/rendering/figures/assets/mystic-rock.png)
+
+The cinematic souvenir uses the same charcoal facets and ivory highlights as the
+environment rocks, with restrained lavender/gold fissures and a broken floating
+ring. It is a complete transparent 1145 × 1373 cutout, reusable as a companion or
+small magical prop. Keep its native aspect ratio. The current companion renderer
+anchors the full frame at (580,1350), uses 1157 source pixels per visible-height
+unit and moves the rock and ring together. Reduced motion freezes the bob.
+See [measured bounds and generation provenance](../../src/rendering/figures/assets/mystic-rock.md).

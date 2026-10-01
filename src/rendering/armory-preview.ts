@@ -159,6 +159,8 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     });
     if (frame.pet === 'shiba') figures.drawPetAt('shiba', width * 0.86, height - 4, height * 0.22);
     else if (frame.pet === 'cat') figures.drawPetAt('cat', width * 0.88, height - 4, height * 0.2);
+    else if (frame.pet === 'mystic-rock')
+      figures.drawPetAt('mystic-rock', width * 0.86, height - 4, height * 0.3);
     if (frame.effectsVisible) {
       updateEffects(fx, dt || 0.016, dt || 0.016, {
         scale: scale(),

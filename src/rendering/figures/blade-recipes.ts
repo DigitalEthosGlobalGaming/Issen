@@ -58,3 +58,38 @@ export const SPECIAL_FRAMES = { beam: [329, 96, 1102, 195], pan: [95, 336, 1589,
 export function supportsInkBlade(id?: string): boolean {
   return !!id && Object.hasOwn(BLADE_RECIPES, id);
 }
+
+/** Source-pixel centerlines sampled from the visible steel/wood, including the serpent bends.
+ * The same root-to-tip similarity transform as ink-sword.ts keeps every effect on its artwork.
+ */
+const PROFILE_CENTERLINES = [
+  [154, 166, 176, 180, 176, 163, 142, 113],
+  [352, 360, 368, 370, 365, 350, 334, 302],
+  [537, 548, 558, 563, 560, 550, 528, 488],
+  [733, 739, 727, 738, 760, 760, 747, 698],
+  [937, 937, 937, 937, 936, 934, 929, 894],
+  [1113, 1119, 1123, 1123, 1120, 1118, 1114, 1098],
+] as const;
+export function bladeEffectPoint(
+  id: string,
+  length: number,
+  fraction: number,
+): readonly [number, number] {
+  const t = Math.max(0, Math.min(1, fraction));
+  const recipe = BLADE_RECIPES[id] ?? BLADE_RECIPES.steel!;
+  if (recipe.special) return [0.016 + (length - 0.016) * t, 0];
+  const profile = BLADE_PROFILE_FRAMES[recipe.profile]!;
+  const samples = PROFILE_CENTERLINES[recipe.profile]!;
+  const section = Math.min(samples.length - 2, Math.floor(t * (samples.length - 1)));
+  const mix = t * (samples.length - 1) - section;
+  const dx = profile.tip[0] - profile.root[0],
+    dy = profile.tip[1] - profile.root[1];
+  const x = dx * t,
+    y = samples[section]! + (samples[section + 1]! - samples[section]!) * mix - profile.root[1];
+  const tx = length - 0.016,
+    ty = -length * 0.05;
+  const denominator = dx * dx + dy * dy;
+  const a = (tx * dx + ty * dy) / denominator,
+    b = (ty * dx - tx * dy) / denominator;
+  return [0.016 + a * x - b * y, b * x + a * y];
+}

@@ -1,4 +1,4 @@
-import { supportsInkBlade } from './blade-recipes.ts';
+import { bladeEffectPoint, supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
@@ -6,7 +6,15 @@ import type { Figure, FigureEnvironment, Pose, Point, BladeStyle, Aura } from '.
 export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
   const { time: clock, wind, petActive, width: W, height: H, palette: cols, random: R } = env;
   const time = env.reducedMotion ? 0 : clock;
-  function drawThirdLightning(length: number) {
+  function bladePath(length: number, bladeId: string) {
+    g.beginPath();
+    for (let i = 0; i <= 28; i++) {
+      const [x, y] = bladeEffectPoint(bladeId, length, i / 28);
+      if (i) g.lineTo(x, y);
+      else g.moveTo(x, y);
+    }
+  }
+  function drawThirdLightning(length: number, bladeId: string) {
     const pulse = env.reducedFlashes ? 0 : Math.floor(time * 18);
     const arcs = (env.effectDensity ?? 1) < 0.55 ? 1 : 2;
     g.lineCap = 'round';
@@ -14,10 +22,10 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     for (let arc = 0; arc < arcs; arc++) {
       g.beginPath();
       for (let i = 0; i <= 12; i++) {
-        const x = 0.025 + (length - 0.045) * (i / 12);
+        const [x, centerY] = bladeEffectPoint(bladeId, length, i / 12);
         const jitter =
           i === 0 || i === 12 ? 0 : Math.sin(i * 23.7 + pulse * 7.13 + arc * 19) * 0.019;
-        const y = -length * 0.038 * (x / length) + jitter + (arc ? 0.014 : -0.008);
+        const y = centerY + jitter + (arc ? 0.009 : -0.006);
         if (i) g.lineTo(x, y);
         else g.moveTo(x, y);
       }
@@ -31,9 +39,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.beginPath();
       for (let i = 0; i <= 4; i++) {
         const u = Math.max(0, head - 0.2 + (i / 4) * 0.2);
-        const x = 0.025 + (length - 0.045) * u;
-        const y =
-          -length * 0.038 * (x / length) + Math.sin(u * 36 + pulse * 7.13 + arc * 19) * 0.014;
+        const [x, centerY] = bladeEffectPoint(bladeId, length, u);
+        const y = centerY + Math.sin(u * 36 + pulse * 7.13 + arc * 19) * 0.014;
         if (i) g.lineTo(x, y);
         else g.moveTo(x, y);
       }
@@ -83,7 +90,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       return;
     }
     if (bs && bs.kind === 'pan') {
-      if (bs.aura) drawAura(Lb, bs.aura);
+      if (bs.aura) drawAura(Lb, bs.aura, bladeId);
       g.restore();
       return;
     }
@@ -91,9 +98,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.strokeStyle = bs.glow;
       g.lineWidth = 0.04;
       g.lineCap = 'round';
-      g.beginPath();
-      g.moveTo(0.03, -0.003);
-      g.quadraticCurveTo(Lb * 0.6, -0.006 - Lb * 0.045, Lb * 0.98, -Lb * 0.05);
+      bladePath(Lb, bladeId);
       g.stroke();
     }
     if (bs && bs.aura && bs.aura.mode === 'after') {
@@ -101,30 +106,27 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.save();
         g.rotate(-i * 0.11 - Math.sin(time * 3) * 0.03);
         g.globalAlpha *= 0.3 / i;
-        g.fillStyle = `rgb(${bs.aura.c})`;
-        g.beginPath();
-        g.moveTo(0.016, -0.009);
-        g.quadraticCurveTo(Lb * 0.6, -0.012 - Lb * 0.05, Lb, -Lb * 0.05);
-        g.quadraticCurveTo(Lb * 0.6, 0.006 - Lb * 0.035, 0.016, 0.008);
-        g.closePath();
-        g.fill();
+        g.strokeStyle = `rgb(${bs.aura.c})`;
+        g.lineWidth = 0.021;
+        g.lineCap = 'round';
+        bladePath(Lb, bladeId);
+        g.stroke();
         g.restore();
       }
     }
 
-    if (bs && bs.aura) drawAura(Lb, bs.aura);
+    if (bs && bs.aura) drawAura(Lb, bs.aura, bladeId);
     g.restore();
   }
-  function drawAura(Lb: number, a: Aura) {
+  function drawAura(Lb: number, a: Aura, bladeId: string) {
     const t = time,
       c = a.c;
     g.save();
-    g.globalAlpha = 1;
     if (a.mode === 'dark') {
       for (let i = 0; i < 7; i++) {
         const k = (t * 0.5 + i / 7) % 1,
-          x = Lb * (0.1 + 0.85 * ((i * 0.41) % 1)),
-          y = -0.02 - k * 0.1;
+          [x, centerY] = bladeEffectPoint(bladeId, Lb, 0.1 + 0.85 * ((i * 0.41) % 1)),
+          y = centerY - 0.02 - k * 0.1;
         g.fillStyle = `rgba(${c},${0.55 * (1 - k)})`;
         g.beginPath();
         g.ellipse(x, y, 0.035 * (0.6 + k), 0.02 * (0.6 + k), 0, 0, TAU);
@@ -133,9 +135,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.strokeStyle = `rgba(${c},.45)`;
       g.lineWidth = 0.05;
       g.lineCap = 'round';
-      g.beginPath();
-      g.moveTo(0.03, -0.003);
-      g.quadraticCurveTo(Lb * 0.6, -0.006 - Lb * 0.045, Lb * 0.98, -Lb * 0.05);
+      bladePath(Lb, bladeId);
       g.stroke();
     } else {
       g.globalCompositeOperation = 'lighter';
@@ -143,9 +143,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineCap = 'round';
       g.strokeStyle = `rgba(${c},${0.25 * pul})`;
       g.lineWidth = 0.065;
-      g.beginPath();
-      g.moveTo(0.03, -0.003);
-      g.quadraticCurveTo(Lb * 0.6, -0.006 - Lb * 0.045, Lb * 0.98, -Lb * 0.05);
+      bladePath(Lb, bladeId);
       g.stroke();
       g.lineWidth = 0.025;
       g.strokeStyle = `rgba(${c},${0.5 * pul})`;
@@ -154,21 +152,21 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.strokeStyle = `rgba(${c},.95)`;
         g.lineWidth = 0.006;
         g.beginPath();
-        let x = 0.03;
-        g.moveTo(x, 0);
-        while (x < Lb) {
-          x += 0.04;
-          g.lineTo(x, -Lb * 0.05 * (x / Lb) + (R() - 0.5) * 0.06);
+        for (let i = 0; i <= 14; i++) {
+          const [x, y] = bladeEffectPoint(bladeId, Lb, i / 14);
+          const offset = i === 0 || i === 14 ? 0 : (R() - 0.5) * 0.04;
+          if (i) g.lineTo(x, y + offset);
+          else g.moveTo(x, y);
         }
         g.stroke();
       }
-      if (a.mode === 'third') drawThirdLightning(Lb);
+      if (a.mode === 'third') drawThirdLightning(Lb, bladeId);
       if (a.mode === 'frost' || a.mode === 'glow' || a.mode === 'third') {
         const count = a.mode === 'third' ? Math.round(12 * (env.effectDensity ?? 1)) : 6;
         for (let i = 0; i < count; i++) {
           const k = (t * (a.mode === 'third' ? 0.85 : 0.6) + i / count) % 1,
-            x = Lb * ((i * 0.37 + 0.1) % 1),
-            y = -Lb * 0.05 * (x / Lb) - 0.015 - k * (a.mode === 'third' ? 0.13 : 0.07);
+            [x, centerY] = bladeEffectPoint(bladeId, Lb, (i * 0.37 + 0.1) % 1),
+            y = centerY - 0.015 - k * (a.mode === 'third' ? 0.13 : 0.07);
           g.fillStyle = `rgba(${c},${0.85 * (1 - k)})`;
           g.beginPath();
           g.arc(x, y, a.mode === 'frost' ? 0.007 : a.mode === 'third' ? 0.011 : 0.009, 0, TAU);
@@ -178,8 +176,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       if (a.mode === 'petal') {
         for (let i = 0; i < 6; i++) {
           const k = (t * 0.4 + i / 6) % 1,
-            x = Lb * (0.15 + 0.85 * ((i * 0.37) % 1)),
-            y = -0.02 - k * 0.13;
+            [x, centerY] = bladeEffectPoint(bladeId, Lb, 0.15 + 0.85 * ((i * 0.37) % 1)),
+            y = centerY - 0.02 - k * 0.13;
           g.fillStyle = `rgba(${c},${0.9 * (1 - k)})`;
           g.save();
           g.translate(x, y);

@@ -29,3 +29,12 @@ checkpoints remain available through Continue after leaving the viewer.
 Focused interaction coverage lives in tests/browser/cinematic.spec.ts. Use the
 active worktree's dev server when checking the feature; a server from another
 checkout will not contain these changes.
+# Cinematic discovery reward
+
+Entering the scene viewer permanently discovers the cosmetic Mystic Rock companion.
+It is granted immediately, including session-restored entry, without ending a run.
+The `cinematicVisits` profile flag repairs an interrupted ownership write on startup.
+The floating sprite follows the player beside their feet and appears in the Armoury;
+reduced-motion or reduced-flash settings freeze its gentle bob. It grants no combat
+bonus. Scene/film browsing still leaves live gameplay and equipment unchanged.
+

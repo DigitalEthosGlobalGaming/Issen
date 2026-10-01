@@ -100,6 +100,12 @@ test('every secret predicate grants exactly once after its recorded trigger', ()
       },
     ],
     [
+      'mystic-rock',
+      (s) => {
+        s.cinematicVisits = 1;
+      },
+    ],
+    [
       'fireworks',
       (s) => {
         s.midnight = 1;

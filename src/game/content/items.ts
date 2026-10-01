@@ -860,6 +860,17 @@ export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {
     },
     { id: 'nopet', type: 'pet', k: '無', n: 'Alone', f: 'Just you and the wind.', ok: () => true },
     {
+      id: 'mystic-rock',
+      type: 'pet',
+      hidden: 1,
+      k: '石',
+      n: 'Mystic Rock',
+      f: 'A quiet floating stone follows your journey. Cosmetic only.',
+      hint: 'Look beyond the title, where the landscapes wait.',
+      d: 'Visit the cinematic scene viewer.',
+      ok: (s) => s.cinematicVisits >= 1,
+    },
+    {
       id: 'crow',
       type: 'pet',
       k: '烏',

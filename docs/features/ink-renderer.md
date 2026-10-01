@@ -1,12 +1,10 @@
 # Ink layer renderer preview
 
-Version 1.14.0 adds an optional image-sprite environment. Choose **Options →
-Display and Accessibility → Artwork → Ink** from the title
-or a paused run. The backtick key also toggles artwork outside menus; typing, held keys, modifier chords, and custom combat bindings take precedence. Ink is the default from version 1.21.1 for new or missing preferences and Display Restore defaults; existing saved artwork choices are preserved; the choice is saved with the active
-profile's existing settings. Switching does not reset an encounter or alter its
-random stream, equipment, or checkpoint. Press the backtick key to toggle artwork
-from the title, during play, or while paused. The shortcut ignores held keys,
-modifier chords, text entry, and open panels; custom combat bindings take priority.
+Ink is the sole environment renderer from version 1.28.0. The old Artwork
+selector and backtick switch are removed; old saved renderer choices are ignored.
+Animated procedural grass, sky, terrain, weather and awakening effects remain
+where they complement the sprite artwork. Cinematic browsing changes scene and
+film without changing equipment or the saved run.
 
 ## Composition and ownership
 
@@ -39,9 +37,9 @@ or reduced flashes freezes parallax and mist drift. Existing weather, characters
 attack glyphs, and combat effects are still drawn by their current renderers.
 Armoury previews remain independent.
 
-## Prototype scope and fallback
+## Scene composition and readiness
 
-The first scene retains the classic sky, rolling field, and dense static
+The first scene retains the procedural sky, rolling field, and dense static
 grass as its base. The base omits its procedural pine row and edge tree; only
 generated pine sprites populate the distant foothills. A four-cell mountain atlas
 replaces the procedural ridges through a background rendering callback. Three
@@ -56,24 +54,23 @@ petal path, shallow rain pools, bamboo road, snow drifts, ruined temple, coastal
 stacks and a moonlit gate. Each has a dedicated composition module. scene-kit.ts
 supplies native-aspect stamps, packed frames, anchor rotation and cached contact
 fading. Water motion draws before figures and respects reduced motion/flashes.
-Character
-sprite replacement is also future work. Classic background glow overlays and
-the classic stage wipe are skipped while the ink background is active; stage
-palette changes rebuild the layered caches directly.
+Characters and primary equipment also use modular image artwork. Stage palette
+changes rebuild the layered caches directly. The former background glow and
+stage wipe paths have been removed.
 
-Classic scenery is drawn while atlases load and if an asset fails. The persisted
-choice stays Ink, allowing the next application load to retry. Each renderer
-instance owns its loaders and caches, and disposal releases them without touching
-the live scene or another preview.
+Ink is the only rendering path. Startup waits for image decoding and validates
+required figure and scene families. Failed assets display a retry screen instead
+of substituting old scenery. Each renderer instance owns its loaders and caches;
+disposal releases them without touching another preview.
 
 ## Verification
 
-The renderer-switch browser tests cover live switching during a paused run,
-unchanged checkpoint/random state/film selection, saved preference reload,
-tablet/desktop resize, default restoration, and unavailable assets.
-The layered-environment browser tests cover independent instances, cache reuse,
-allocation bounds, state restoration, disposal, and fallback pixels.
-Settings unit tests cover legacy/default/invalid renderer values.
+Focused browser checks cover legacy saved artwork flags, absence of the mode
+selector, inert backtick rendering behavior, cinematic film/scene persistence,
+and loading delay, disposal, failure and retry. Layered-environment checks cover
+independent instances, cache reuse, allocation bounds, context restoration,
+accessibility motion and missing-asset transparency. Settings unit tests verify
+old artwork flags are ignored while unrelated saved preferences survive.
 
 Use the main checkout's Vite server when testing. A server already running on
 port 5173 can belong to another checkout; do not interpret those test results
@@ -97,7 +94,7 @@ above that transition before characters are drawn. Reduced motion, reduced flash
 and Low effects quality freeze their movement. The three atlases have four
 variations each, drawn at native aspect ratio with soft, low-opacity edges.
 
-The Ink field omits the two original decorative Jizo statues at the left edge. Classic retains them and its original oval foreground rocks. The Ink field replaces those rocks with irregular faceted boulders from a separate atlas. Their frame rectangles and ground anchors live in foreground.ts; two variants are cached in the base before animated grass, preserving their native aspect ratio.
+The Ink field omits the two original decorative Jizo statues at the left edge. The Ink field replaces those rocks with irregular faceted boulders from a separate atlas. Their frame rectangles and ground anchors live in foreground.ts; two variants are cached in the base before animated grass, preserving their native aspect ratio.
 
 
 Use the [cinematic scene viewer](cinematic.md) to compare scene artwork and films without starting a run.
@@ -120,7 +117,7 @@ static and animated grass remain, and film looks still apply downstream.
 No new image was needed. See the [visual asset library](environment-asset-library.md)
 for all sheets, measured dimensions, cell descriptions, current anchors,
 and known packing limitations. Optional background hooks apply only when supplied;
-Classic artwork and the first Ink field keep their existing composition.
+The first Ink field keeps its existing composition.
 ## Version 1.17.0 art review
 
 All nine compositions were loaded through the local preview; new scenes were
@@ -131,16 +128,15 @@ suite was run during this art iteration. The original field grass is unchanged;
 Ink snow uses cached sparse short tips to expose snowdrifts, and Ink bamboo
 suppresses the classic foreground stalk overlay. Gameplay simulation is unchanged.
 
-Version 1.18.1 shares the Artwork selector with player and weapon replacements;
-unreplaced assets retain their Classic drawing. See [player artwork](character-art.md).
+Player and weapon replacements share the Ink presentation path. See
+[player artwork](character-art.md).
 
 
 ## Hollow Bamboo Road foreground (1.23.0)
 
 Stage 4 reuses the bamboo atlas in `bamboo-foreground.ts` as two near edge planes.
 `environmentRenderer.drawForeground()` runs after player/companions, before grass,
-weather and film grading. It only draws after a successful Ink background. Classic
-retains its procedural bamboo. Full-height native-aspect clumps have their roots
+weather and film grading. It only draws after a successful Ink background. Full-height native-aspect clumps have their roots
 below the viewport and fade toward the central encounter area. Portrait/tablet
 composition leaves the central 60% clear; landscape leaves 52% clear. Sway freezes
 for reduced motion/flashes. The private caches are capped at two million pixels

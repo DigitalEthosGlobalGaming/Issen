@@ -1,6 +1,7 @@
 import type { Statistics } from './statistics.ts';
 
 export type SecretEvent =
+  | { kind: 'cinematic' }
   | { kind: 'midnight'; hour: number }
   | { kind: 'titleTaps'; count: number }
   | { kind: 'konami' }
@@ -14,6 +15,10 @@ export type SecretEvent =
  * resolved at the next completed run (except applause, already post-run). */
 export function recordSecretEvent(stats: Statistics, event: SecretEvent): boolean {
   switch (event.kind) {
+    case 'cinematic':
+      if (stats.cinematicVisits) return false;
+      stats.cinematicVisits = 1;
+      return true;
     case 'midnight':
       if ((event.hour !== 23 && event.hour !== 0) || stats.midnight) return false;
       stats.midnight = 1;
@@ -47,4 +52,29 @@ export function recordSecretEvent(stats: Statistics, event: SecretEvent): boolea
       stats.mirrorClean = 1;
       return true;
   }
+}
+
+/** Checkpoints rewind encounters, but cannot un-discover a profile secret. */
+export function preserveSecretDiscoveries(restored: Statistics, current: Statistics): Statistics {
+  for (const key of [
+    'midnight',
+    'scarecrow',
+    'konami',
+    'omikuji',
+    'applause',
+    'fidget',
+    'feinted',
+    'mirrorClean',
+    'cinematicVisits',
+  ] as const)
+    restored[key] = Math.max(restored[key], current[key]);
+  restored.deaths.early = Math.max(restored.deaths.early || 0, current.deaths.early || 0);
+  return restored;
+}
+
+/** The cinematic souvenir is awarded immediately, including after interrupted writes. */
+export function reconcileCinematicCompanion(stats: Statistics, unlocked: Set<string>): boolean {
+  if (!stats.cinematicVisits || unlocked.has('mystic-rock')) return false;
+  unlocked.add('mystic-rock');
+  return true;
 }

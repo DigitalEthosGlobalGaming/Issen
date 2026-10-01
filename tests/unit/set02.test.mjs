@@ -4,7 +4,7 @@ import {
   parseAwakeningProgress,
   recordChallenge,
 } from '../../src/game/progression/awakening-progress.ts';
-import { throwKnife } from '../../src/game/combat/knife.ts';
+import { throwKnife, refillDuelKnives } from '../../src/game/combat/knife.ts';
 import { normalLives } from '../../src/game/equipment/lives.ts';
 import { parseMeta, templateModifiers } from '../../src/game/progression/meta.ts';
 import { unlockEligibleItems } from '../../src/game/progression/unlocks.ts';
@@ -145,4 +145,15 @@ test('Normal lives uses two baseline, uncapped bonuses and safe minimum', () => 
   assert.equal(normalLives(templateModifiers(meta, { ...setup, upgrades: false }).lives), 2);
   const migrated = parseMeta({ upgrades: { vitality: 1 } });
   assert.equal(normalLives(templateModifiers(migrated, setup).lives), 4);
+});
+test('each duel replenishes only the snapshotted knife capacity', () => {
+  const run = { knives: 0, maxKnives: 3 };
+  refillDuelKnives(run);
+  assert.equal(run.knives, 3);
+  run.knives = 1;
+  refillDuelKnives(run);
+  assert.equal(run.knives, 3);
+  run.maxKnives = 0;
+  refillDuelKnives(run);
+  assert.equal(run.knives, 0);
 });

@@ -212,3 +212,11 @@ stable. Lifetime Ember earnings are displayed in Stats.
 Follow-up verification: strict TypeScript, formatting, 93 unit tests, 51 browser
 tests and both production smoke tests passed. Portrait Temple/setup screenshots
 were reviewed. No real player saves were cleared.
+# Throwing knife refill update
+
+Each duel entry replenishes throwing knives to the capacity snapshotted at run
+start, including normal waves and Boss Rush. Duel checkpoint restoration retains
+the saved count rather than granting a second refill. Knives still target only
+ordinary enemies during waves; purchases during a run do not change its capacity.
+Temple descriptions and rank summaries state the refill cadence.
+

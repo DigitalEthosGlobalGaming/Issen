@@ -127,7 +127,7 @@ function effectText(id: UpgradeId, rank: number): string {
           : 'Awakening challenges locked';
     case 'knife':
       return rank
-        ? `${rank} starting throwing ${rank === 1 ? 'knife' : 'knives'}`
+        ? `${rank} throwing ${rank === 1 ? 'knife' : 'knives'} · refill every duel`
         : 'No throwing knives';
     case 'composure':
       return rank

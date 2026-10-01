@@ -100,7 +100,7 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     id: 'knife',
     name: 'Throwing Knife',
     description:
-      'Carry 1 throwing knife per rank. Tap during a wave to defeat an ordinary enemy; knives cannot target bosses or standoffs.',
+      'Carry 1 throwing knife per rank; refill at the start of every duel. Tap during a wave to defeat an ordinary enemy; knives cannot target bosses or standoffs.',
     costs: [125, 150, 250],
     maxRank: 3,
   },

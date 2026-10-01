@@ -45,3 +45,12 @@ Give the starting Steel blade a long-term third form, make each ordinary run's g
 - Browser tests: earn and select each Steel form, preview and upgrades-off rendering, same-seed run equivalence, reload at a wave/boss/standoff/Shrine, unchanged Shrine offers, Continue after close, and no Continue after fatal loss or End run. Verify no duplicate kills, Embers, records or unlocks across repeated reloads. Test the isolated testing profile and a malformed checkpoint. Check portrait and landscape UI.
 - During implementation run strict TypeScript and focused tests for changed modules. Because run transitions, persistence and random selection are shared runtime behavior, run the full unit/browser suites and `test:production` before release. `test:production` already builds and type-checks.
 - The app version is **1.8.1** in `package.json`, `package-lock.json` and the title screen.
+# Secret discovery recovery
+
+Restoring a saved encounter preserves the maximum profile and checkpoint values
+for secret-discovery flags, accumulated feint mistakes and early-parry deaths.
+Title discoveries made after the checkpoint therefore survive Continue or Abandon.
+Other encounter/run statistics still restore normally. Mystic Rock ownership is
+reconciled from its permanent cinematic discovery flag; other secrets retain their
+end-of-run settlement rule.
+

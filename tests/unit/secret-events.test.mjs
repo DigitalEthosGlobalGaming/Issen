@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STAT0 } from '../../src/game/progression/statistics.ts';
-import { recordSecretEvent } from '../../src/game/progression/secret-events.ts';
+import {
+  recordSecretEvent,
+  preserveSecretDiscoveries,
+  reconcileCinematicCompanion,
+} from '../../src/game/progression/secret-events.ts';
 import { recordRun } from '../../src/game/progression/run-records.ts';
 import { createItems } from '../../src/game/content/items.ts';
 import { unlockEligibleItems } from '../../src/game/progression/unlocks.ts';
@@ -33,6 +37,8 @@ test('every secret trigger sequence records once and grants only at settlement',
   assert.equal(recordSecretEvent(stats, { kind: 'mirrorVictory', clean: false }), false);
   assert.equal(recordSecretEvent(stats, { kind: 'mirrorVictory', clean: true }), true);
   assert.equal(stats.mirrorWins, 2);
+  assert.equal(recordSecretEvent(stats, { kind: 'cinematic' }), true);
+  assert.equal(recordSecretEvent(stats, { kind: 'cinematic' }), false);
   const earlyRun = {
     mode: 'normal',
     blade: false,
@@ -58,4 +64,26 @@ test('every secret trigger sequence records once and grants only at settlement',
     granted,
     hidden.map((item) => item.id),
   );
+});
+
+test('restoring an older encounter retains discoveries without restoring later run score', () => {
+  const current = structuredClone(STAT0),
+    old = structuredClone(STAT0);
+  current.konami = current.scarecrow = current.cinematicVisits = 1;
+  current.feinted = 3;
+  current.deaths.early = 5;
+  current.bestScore = 9000;
+  old.bestScore = 100;
+  old.mirrorClean = 1;
+  const restored = preserveSecretDiscoveries(old, current);
+  assert.equal(restored.konami, 1);
+  assert.equal(restored.scarecrow, 1);
+  assert.equal(restored.feinted, 3);
+  assert.equal(restored.deaths.early, 5);
+  assert.equal(restored.mirrorClean, 1);
+  assert.equal(restored.bestScore, 100);
+  const unlocked = new Set();
+  assert.equal(reconcileCinematicCompanion(restored, unlocked), true);
+  assert.equal(reconcileCinematicCompanion(restored, unlocked), false);
+  assert.deepEqual([...unlocked], ['mystic-rock']);
 });

@@ -1,4 +1,5 @@
 const COMPANION_URL = new URL('./assets/companion-atlas.png', import.meta.url).href;
+const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
 
 /** Explicit packed source rectangles; the generated animals cross the nominal half-height. */
 export const INK_COMPANION_FRAMES = {
@@ -23,10 +24,29 @@ export function createInkCompanionRenderer(doc: Document) {
   let finishLoad: (() => void) | null = null;
   let ready = false;
   let disposed = false;
+  let rock: HTMLImageElement | null = null;
+  let rockReady = false;
+  let finishRock: (() => void) | null = null;
 
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
+    const rockPending = new Promise<void>((resolve) => {
+      const sprite = doc.createElement('img');
+      rock = sprite;
+      const finish = () => {
+        sprite.onload = sprite.onerror = null;
+        finishRock = null;
+        resolve();
+      };
+      finishRock = finish;
+      sprite.onload = () => {
+        rockReady = !disposed && sprite.naturalWidth === 1145 && sprite.naturalHeight === 1373;
+        finish();
+      };
+      sprite.onerror = finish;
+      sprite.src = ROCK_URL;
+    });
     pending = new Promise<void>((resolve) => {
       const sprite = doc.createElement('img');
       image = sprite;
@@ -47,6 +67,7 @@ export function createInkCompanionRenderer(doc: Document) {
       };
       sprite.src = COMPANION_URL;
     });
+    pending = Promise.all([pending, rockPending]).then(() => {});
     return pending;
   }
 
@@ -62,12 +83,19 @@ export function createInkCompanionRenderer(doc: Document) {
   ): boolean {
     if (
       disposed ||
-      !['crow', 'shiba', 'cat'].includes(type) ||
+      !['crow', 'shiba', 'cat', 'mystic-rock'].includes(type) ||
       size <= 0 ||
       ![x, y, size, time].every(Number.isFinite)
     )
       return false;
     void prepare();
+    if (type === 'mystic-rock') {
+      if (!rockReady || !rock) return false;
+      const factor = size / 1157;
+      const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
+      g.drawImage(rock, x - 580 * factor, y - 1350 * factor + bob, 1145 * factor, 1373 * factor);
+      return true;
+    }
     if (!ready || !image) return false;
     // Raised wings are a single reaction pose, not an unrelated-frame animation loop.
     const key =
@@ -107,6 +135,13 @@ export function createInkCompanionRenderer(doc: Document) {
       image.removeAttribute('src');
     }
     finishLoad?.();
+    if (rock) {
+      rock.onload = rock.onerror = null;
+      rock.removeAttribute('src');
+    }
+    finishRock?.();
+    rock = null;
+    rockReady = false;
     image = null;
   }
   return {
@@ -114,7 +149,7 @@ export function createInkCompanionRenderer(doc: Document) {
     draw,
     dispose,
     get ready() {
-      return ready;
+      return ready && rockReady;
     },
   };
 }

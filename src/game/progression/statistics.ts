@@ -30,6 +30,7 @@ export interface ModeRecord {
   wave: number;
 }
 export const STAT0 = {
+  cinematicVisits: 0,
   midnight: 0,
   applause: 0,
   fidget: 0,

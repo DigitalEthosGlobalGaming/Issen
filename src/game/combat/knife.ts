@@ -1,6 +1,11 @@
 import type { Enemy } from './enemy.ts';
 import type { Random } from '../../shared/random.ts';
 
+/** Refill the run's snapshotted capacity; upgrades never change an active run. */
+export function refillDuelKnives(run: { knives: number; maxKnives: number }): void {
+  run.knives = run.maxKnives;
+}
+
 /** Spend only after selecting a target. Bosses, standoffs and UI never qualify. */
 export function throwKnife(
   run: { state: string; panel?: unknown; knives: number; enemies: Enemy[] },
