@@ -1,3 +1,4 @@
+import { supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
 import { drawJinbaori } from './jinbaori.ts';
 import { drawDemonMask } from './masks.ts';
@@ -78,19 +79,23 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     C: Palette,
     bs?: BladeStyle | null,
     ink = false,
+    bladeId = 'steel',
   ) {
     const Lb = bs ? bs.len : 0.52;
     g.save();
     g.translate(gx, gy);
     g.rotate(ang);
+    const inkBlade = ink && env.inkSword?.draw(g, 0, 0, 0, C, bs, bladeId) === true;
     if (bs && bs.kind === 'beam') {
       const c = bs.c || '120,190,255';
-      g.fillStyle = '#8f8d88';
-      g.fillRect(-0.16, -0.014, 0.17, 0.028);
-      g.fillStyle = '#2a2826';
-      for (let i = 0; i < 4; i++) g.fillRect(-0.15 + i * 0.035, -0.015, 0.012, 0.03);
-      g.fillStyle = '#d8d5ce';
-      g.fillRect(-0.005, -0.017, 0.015, 0.034);
+      if (!inkBlade) {
+        g.fillStyle = '#8f8d88';
+        g.fillRect(-0.16, -0.014, 0.17, 0.028);
+        g.fillStyle = '#2a2826';
+        for (let i = 0; i < 4; i++) g.fillRect(-0.15 + i * 0.035, -0.015, 0.012, 0.03);
+        g.fillStyle = '#d8d5ce';
+        g.fillRect(-0.005, -0.017, 0.015, 0.034);
+      }
       g.save();
       g.globalCompositeOperation = 'lighter';
       g.lineCap = 'round';
@@ -112,6 +117,11 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       return;
     }
     if (bs && bs.kind === 'pan') {
+      if (inkBlade) {
+        if (bs.aura) drawAura(Lb, bs.aura);
+        g.restore();
+        return;
+      }
       const gold = bs.gold;
       g.strokeStyle = '#3a2a1e';
       g.lineWidth = 0.03;
@@ -136,7 +146,6 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.restore();
       return;
     }
-    const inkBlade = ink && env.inkSword?.draw(g, 0, 0, 0, C, bs) === true;
     if (!inkBlade) {
       g.fillStyle = C.hilt;
       g.fillRect(-0.15, -0.012, 0.155, 0.024);
@@ -985,7 +994,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
           p.ang,
           C,
           f.blade,
-          env.artwork === 'ink' && !!f.back && f.bladeId === 'steel',
+          env.artwork === 'ink' && !!f.back && supportsInkBlade(f.bladeId),
+          f.bladeId,
         );
       }
       if (f.twin) {

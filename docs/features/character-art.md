@@ -11,10 +11,10 @@ Switching changes drawing, not encounter state, equipment or attack timing.
 | Item / figure | Ink replacement | Fallback |
 | --- | --- | --- |
 | Rear-view player wearing Sumi (`sumi`) | Modular torso, robe panels, head and articulated arms | Classic while unavailable |
-| Player Steel sword (`steel`) | Separate katana aligned to grip and tip | Classic while unavailable |
+| Player Steel sword (`steel`) | Shared modular katana aligned to grip and tip | Classic while unavailable |
 | Yoroi, Helm, Shinobi, Jinbaori, Mino | Shared modular armour and clothing kit (1.19.0) | Classic while required pieces are unavailable |
 | All 20 primary player outfits | Shared cloth rig with modular colour, masks, headwear and accessories (1.21.0) | Classic while required pieces are unavailable |
-| Other weapons | No replacement yet | Existing procedural drawing |
+| All 20 primary blades | Modular profile, grip and guard recipes; beam emitter and pan (1.24.0) | Classic while required families are unavailable |
 | Enemies and bosses | Modular front-view body, articulated arms/hands and interchangeable headwear (1.20.0) | Classic while required pieces are unavailable |
 
 Body and sword selection are independent: a new sword can accompany a Classic
@@ -198,3 +198,24 @@ weapons, reach, glyphs and encounter timing stay at their original coordinates.
 Authored masks remain selected; bosses retain their authored look and palette.
 Strict TypeScript, nine focused character checks and desktop/tablet galleries
 passed. No full build or Android test ran.
+
+
+## Modular blades (1.24.0)
+
+`blade-recipes.ts` maps every primary blade ID to a profile, grip, guard and
+restrained colour treatment. `ink-sword.ts` assembles cached cutouts from three
+source families. Measured blade roots/tips align with the existing grip and
+item-specific reach; short, long, serpent, heavy and wooden profiles remain
+distinct. The beam retains its procedural energy effect over the sprite emitter,
+and the pan uses its separate full shape. Aura, glow, transparency and film
+passes remain caller-owned. Unknown IDs and unavailable required families fall
+back to Classic, independently of the player outfit. The previous single-katana
+source remains as provenance and is not used by the active renderer.
+
+- [Blade profiles and item recipe mapping](../../src/rendering/figures/assets/blade-profile-atlas.md)
+- [Reusable grips and guards](../../src/rendering/figures/assets/handle-guard-atlas.md)
+- [Beam emitter and pan](../../src/rendering/figures/assets/special-weapons-atlas.md)
+
+Strict TypeScript and ten focused character checks passed. All 20 weapons were
+inspected as an assembled gallery and representative forms in held combat poses.
+No full build or Android test ran.

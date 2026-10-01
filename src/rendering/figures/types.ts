@@ -103,6 +103,7 @@ export interface SwordArtwork {
     ang: number,
     palette: Palette,
     style?: BladeStyle | null,
+    id?: string,
   ): boolean;
 }
 export interface FigureEnvironment {

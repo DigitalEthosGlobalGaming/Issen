@@ -1,3 +1,4 @@
+import { BLADES } from '../../src/game/content/cosmetics.ts';
 import { enemyAppearance } from '../../src/rendering/figures/enemy-appearance.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -85,8 +86,8 @@ function render({ body = true, enemy = false, sword = true, mode = 'ink', figure
       },
     },
     inkSword: {
-      draw(g, gx, gy, angle) {
-        calls.swords.push({ gx, gy, angle, alpha: g.globalAlpha });
+      draw(g, gx, gy, angle, palette, style, id) {
+        calls.swords.push({ gx, gy, angle, id, alpha: g.globalAlpha });
         return sword;
       },
     },
@@ -269,4 +270,37 @@ test('regular enemy appearance is stable per saved figure, varied, and preserves
   const f = { d: makeFig(1), variant: 'mask', pal: createPalette().robe('shiro') };
   assert.equal(enemyAppearance(f).variant, 'mask');
   assert.equal(enemyAppearance(f).palette, f.pal);
+});
+
+test('all primary blades including beam and pan reach the Ink weapon hook', () => {
+  const ids = [
+    'steel',
+    'kuro',
+    'beni',
+    'tsuki',
+    'oboro',
+    'mura',
+    'raijin',
+    'sakura',
+    'kage',
+    'bokken',
+    'kodachi',
+    'doji',
+    'kiku',
+    'yuki',
+    'masamune',
+    'orochi',
+    'onikiri',
+    'tsubame',
+    'koken',
+    'pan',
+  ];
+  for (const bladeId of ids) {
+    const figure = { bladeId, blade: BLADES[bladeId] || null };
+    const ink = render({ figure }),
+      classic = render({ mode: 'classic', figure });
+    assert.equal(ink.swords.length, 1, bladeId);
+    assert.equal(ink.swords[0].id, bladeId);
+    assert.deepEqual(classic.swords, [], bladeId);
+  }
 });
