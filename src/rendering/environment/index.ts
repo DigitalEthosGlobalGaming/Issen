@@ -1,3 +1,10 @@
+import { drawRainwaterHollow, drawHollowMotion } from './hollow.ts';
+import { drawHollowBambooRoad } from './bamboo.ts';
+import { drawWhiteSilencePass } from './winter.ts';
+import { drawEmberCourtyard } from './temple.ts';
+import { drawBrokenShore, drawShoreMotion } from './shore.ts';
+import { drawMoonwatchClearing } from './moonwatch.ts';
+import { drawFallingBlossomPath } from './blossom.ts';
 import { drawLastLightRidge } from './ridge.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -21,6 +28,8 @@ export interface EnvironmentFrame {
   lowQuality: boolean;
 }
 
+const CHERRY_URL = new URL('./assets/cherry-trees-atlas.png', import.meta.url).href;
+const PETALS_URL = new URL('./assets/petal-ground-atlas.png', import.meta.url).href;
 const BAMBOO_URL = new URL('./assets/bamboo-atlas.png', import.meta.url).href;
 const ROCKS_URL = new URL('./assets/rocks-atlas.png', import.meta.url).href;
 const PINE_URL = new URL('./assets/pine-atlas.png', import.meta.url).href;
@@ -34,6 +43,47 @@ const FOREGROUND_BOULDERS_URL = new URL('./assets/foreground-boulders-atlas.png'
   .href;
 const FOG_WISPS_URL = new URL('./assets/fog-wisps-atlas.png', import.meta.url).href;
 
+const ASSET_URLS = [
+  BAMBOO_URL,
+  ROCKS_URL,
+  PINE_URL,
+  MOUNTAIN_URL,
+  BANKS_URL,
+  SHRUBS_URL,
+  FIELD_ROCKS_URL,
+  GRASS_EDGES_URL,
+  MEADOW_PATCHES_URL,
+  FOG_WISPS_URL,
+  FOREGROUND_BOULDERS_URL,
+  CHERRY_URL,
+  PETALS_URL,
+  new URL('./assets/reeds-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-pines-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-boulders-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-rocks-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-posts-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-walls-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-roofs-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-steps-atlas.png', import.meta.url).href,
+  new URL('./assets/sea-stacks-atlas.png', import.meta.url).href,
+  new URL('./assets/foam-strips-atlas.png', import.meta.url).href,
+  new URL('./assets/fallen-bamboo-atlas.png', import.meta.url).href,
+];
+
+/** Decode only the current scene's kit; shared images survive a scene switch. */
+function sceneAssets(stage: number): number[] {
+  if (stage === 0) return [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  if (stage === 1) return [2, 3, 4, 5, 6];
+  if (stage === 2) return [3, 4, 5, 6, 11, 12];
+  if (stage === 3) return [2, 3, 4, 5, 6, 7, 13];
+  if (stage === 4) return [0, 3, 4, 6, 23];
+  if (stage === 5) return [3, 14, 15, 16];
+  if (stage === 6) return [2, 3, 6, 17, 18, 19, 20];
+  if (stage === 7) return [2, 3, 4, 6, 10, 21, 22];
+  if (stage === 8) return [2, 3, 6, 9, 17, 20];
+  return [2, 3, 4, 5, 6, 7, 8, 9, 10];
+}
+
 /** Instance-owned image loading and caches; safe for independent previews. */
 export function createEnvironmentRenderer(doc: Document) {
   let disposed = false;
@@ -41,6 +91,8 @@ export function createEnvironmentRenderer(doc: Document) {
   let ready = false;
   let failed = false;
   let pending: Promise<void> | undefined;
+  let preparedStage = -1;
+  let generation = 0;
   let images: HTMLImageElement[] = [];
   let cached: HTMLCanvasElement | undefined;
   let distant: HTMLCanvasElement | undefined;
@@ -49,45 +101,60 @@ export function createEnvironmentRenderer(doc: Document) {
   let builds = 0;
   const settleLoads: Array<() => void> = [];
 
-  function prepare(): Promise<void> {
-    if (pending) return pending;
+  function prepare(stage = 0): Promise<void> {
+    if (pending && stage === preparedStage) return pending;
     if (disposed) return Promise.resolve();
+    const request = ++generation;
+    preparedStage = stage;
+    ready = false;
+    failed = false;
+    const required = sceneAssets(stage);
+    for (const settle of settleLoads.splice(0)) settle();
+    images.forEach((image, index) => {
+      image.onload = image.onerror = null;
+      if (!required.includes(index)) {
+        image.removeAttribute('src');
+        delete images[index];
+      }
+    });
     status = 'loading';
     pending = Promise.all(
-      [
-        BAMBOO_URL,
-        ROCKS_URL,
-        PINE_URL,
-        MOUNTAIN_URL,
-        BANKS_URL,
-        SHRUBS_URL,
-        FIELD_ROCKS_URL,
-        GRASS_EDGES_URL,
-        MEADOW_PATCHES_URL,
-        FOG_WISPS_URL,
-        FOREGROUND_BOULDERS_URL,
-      ].map(
-        (url) =>
+      required.map(
+        (index) =>
           new Promise<void>((resolve) => {
+            const existing = images[index];
+            if (existing?.complete && existing.naturalWidth) {
+              resolve();
+              return;
+            }
             settleLoads.push(resolve);
-            const image = doc.createElement('img');
-            images.push(image);
+            const image = existing ?? doc.createElement('img');
+            images[index] = image;
             image.decoding = 'async';
             image.onload = () => {
+              if (request !== generation) {
+                resolve();
+                return;
+              }
               if (!image.naturalWidth || !image.naturalHeight) failed = true;
               image.onload = image.onerror = null;
               resolve();
             };
             image.onerror = () => {
+              if (request !== generation) {
+                resolve();
+                return;
+              }
               failed = true;
               image.onload = image.onerror = null;
               resolve();
             };
-            image.src = url;
+            image.src = ASSET_URLS[index]!;
           }),
       ),
     ).then(() => {
-      if (!disposed) {
+      if (!disposed && request === generation) {
+        settleLoads.length = 0;
         ready = !failed;
         status = failed ? 'unavailable' : 'layered';
       }
@@ -173,6 +240,44 @@ export function createEnvironmentRenderer(doc: Document) {
         scale,
         frame.lowQuality,
       );
+      cached = canvas;
+      builds++;
+      return true;
+    }
+    if (frame.stage === 2) {
+      drawFallingBlossomPath(
+        ctx,
+        far.context,
+        near.context,
+        {
+          cherries: images[11]!,
+          petals: images[12]!,
+          mountains: images[3]!,
+          banks: images[4]!,
+          shrubs: images[5]!,
+          rocks: images[6]!,
+        },
+        w,
+        h,
+        scale,
+        frame.lowQuality,
+      );
+      cached = canvas;
+      builds++;
+      return true;
+    }
+    const compose = [undefined, undefined, undefined, drawRainwaterHollow,
+      drawHollowBambooRoad, drawWhiteSilencePass, drawEmberCourtyard,
+      drawBrokenShore, drawMoonwatchClearing][frame.stage];
+    if (compose) {
+      compose(ctx, far.context, near.context, {
+        bamboo: images[0]!, pines: images[2]!, mountains: images[3]!, banks: images[4]!,
+        shrubs: images[5]!, rocks: images[6]!, fieldRocks: images[6]!, grassEdges: images[7]!,
+        fogWisps: images[9]!, boulders: images[10]!, reeds: images[13]!,
+        snowPines: images[14]!, snowBoulders: images[15]!, snowRocks: images[16]!,
+        templePosts: images[17]!, templeWalls: images[18]!, templeRoofs: images[19]!,
+        templeSteps: images[20]!, seaStacks: images[21]!, foam: images[22]!, fallenBamboo: images[23]!,
+      }, w, h, scale, frame.lowQuality);
       cached = canvas;
       builds++;
       return true;
@@ -349,7 +454,7 @@ export function createEnvironmentRenderer(doc: Document) {
         frame.height > 0 &&
         Number.isFinite(frame.dpr);
       if (!disposed && mode === 'ink' && valid) {
-        void prepare();
+        void prepare(frame.stage);
         if (ready) {
           const key = JSON.stringify([
             frame.width,
@@ -374,6 +479,8 @@ export function createEnvironmentRenderer(doc: Document) {
                 : Math.sin(frame.time * 0.12);
             if (distant) ctx.drawImage(distant, motion * 1.5, 0, frame.width, frame.height);
             if (nearby) ctx.drawImage(nearby, motion * 3, 0, frame.width, frame.height);
+            if (frame.stage === 3) drawHollowMotion(ctx, frame);
+            if (frame.stage === 7) drawShoreMotion(ctx, frame);
             if (frame.stage === 0) drawMeadowFog(ctx, images[9]!, frame);
             if (!frame.lowQuality && frame.stage !== 0) {
               const { groundY, horizonY } = createLayout(frame.width, frame.height);
@@ -412,8 +519,10 @@ export function createEnvironmentRenderer(doc: Document) {
 
   function dispose() {
     disposed = true;
+    generation++;
     status = 'classic';
     for (const image of images) {
+      if (!image) continue;
       image.onload = image.onerror = null;
       image.removeAttribute('src');
     }
@@ -441,6 +550,7 @@ export function createEnvironmentRenderer(doc: Document) {
     snapshot: () => ({
       backend: status,
       builds,
+      loadedImages: images.filter((image) => image?.naturalWidth).length,
       width: cached?.width ?? 0,
       height: cached?.height ?? 0,
       layers: [cached, distant, nearby].filter(Boolean).length,

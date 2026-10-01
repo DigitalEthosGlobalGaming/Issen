@@ -1,6 +1,6 @@
 # Environment asset library
 
-Measured and visually reviewed on 2026-10-01 in the Ink renderer worktree.
+Measured and visually reviewed on 2026-10-01 in the main checkout.
 This catalog describes the eleven existing PNG atlases (44 indexed cells), not
 future assets. Use the [stage inventory](stage-sprite-inventory.md) for proposed
 families and scene mapping, and [stage art plan](stage-art-plan.md) for composition.
@@ -264,3 +264,33 @@ Ridge ground props now fade through their lower 30% toward transparent ground co
 During cached composition, midground props rotate around their anchors to follow
 the local hillside slope (capped at about 10 degrees); foreground edge rocks stay
 level. This is a renderer treatment, not a change to the source atlases.
+
+## Blossom additions (N01 / N02)
+
+### N01 — Cherry trees
+
+<a href="../../src/rendering/environment/assets/cherry-trees-atlas.png"><img src="../../src/rendering/environment/assets/cherry-trees-atlas.png" width="560" alt="Four cherry tree variants" /></a>
+
+1254 × 1254 RGBA, four 627 × 627 cells: broad leaning, upright open canopy,
+low spreading, and smaller bent-trunk tree. 72.75% fully transparent. Visible
+art stays within the cells; cell 2 has a tight 14px right margin. Trunk contact
+anchors differ between variants. Used as a cropped upper edge canopy and smaller
+orchard trees in The Falling Blossom Path. Keep foliage above combat silhouettes.
+
+[Frame rectangles, anchors, alpha observations, prompts and provenance](../../src/rendering/environment/assets/cherry-trees-atlas.md).
+
+### N02 — Fallen petal deposits
+
+<a href="../../src/rendering/environment/assets/petal-ground-atlas.png"><img src="../../src/rendering/environment/assets/petal-ground-atlas.png" width="560" alt="Four shallow fallen-petal deposits" /></a>
+
+1659 × 948 RGBA, four 829.5 × 474 source cells: thin scatter, crescent drift,
+dense shallow patch, and broken strip. 78.73% fully transparent. Visible art above
+alpha 16 is clear of cell boundaries; faint dust remains in gutters. These are
+independent ground variations, not airborne petals or animation frames. Preserve
+native aspect and use per-cell ground anchors, slight terrain angles and base fading.
+
+[Frame rectangles, contact anchors, alpha observations, prompt and provenance](../../src/rendering/environment/assets/petal-ground-atlas.md).
+
+The blossom composition reuses E01/E04/E05/E06 for distant land, banks, shrubs,
+and stones. The path is a cached feathered ground ribbon, and existing procedural
+grass and falling-petal weather remain independent of the static atlases.

@@ -1,9 +1,9 @@
 # Stage art and composition plan
 
-Status: mixed implementation and planned art direction, updated 2026-10-01.
-The first Ink field is the established baseline. Last Light Ridge is implemented
-in version 1.16.0 using shared sprites. Stages 3–9 remain planned and currently
-use prototype Ink artwork. No new weather hazards or gameplay rules are proposed.
+Status: all nine Ink compositions implemented in version 1.17.0, updated 2026-10-01.
+The first field keeps its established grass and composition. Each later scene
+has a dedicated composition module and reusable sprite kit. Existing weather
+and gameplay rules remain unchanged; art remains open to visual feedback.
 
 Current stage order and weather come from
 [src/game/content/stages.ts](../../src/game/content/stages.ts). See
@@ -28,8 +28,7 @@ layouts can expose additional scenery at the sides; tablet layouts must retain
 the defining feature and readable enemies. Background canopies, architecture,
 and ground detail should not obscure blade silhouettes.
 
-Names below follow the existing stage order. Last Light Ridge is applied in code;
-the other replacement names remain proposed. Existing weather themes and gameplay behavior remain the baseline;
+All names below are applied in code in the existing stage order. Existing weather themes and gameplay behavior remain the baseline;
 the visual ideas below do not authorize new hazards or balance changes.
 
 ## 1. The Whispering Field
@@ -49,7 +48,7 @@ and sparse ground fog. Keep the existing procedural static and animated grass.
 Reuse: this is the core landscape kit for the other stages.
 
 New assets: none planned. Treat the current scene as essentially finished,
-subject to visual feedback. Its proposed name is not yet applied.
+subject to visual feedback. Its name is applied in version 1.17.0.
 
 ## 2. Last Light Ridge
 

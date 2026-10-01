@@ -25,7 +25,7 @@ export interface Stage {
 export const STAGES: Stage[] = [
   {
     k: '野',
-    n: 'Windswept Field',
+    n: 'The Whispering Field',
     sky: ['#1b1a18', '#4d4a44', '#a19c92', '#bcb7ac'],
     sunF: 0.4,
     sunA: 1,
@@ -64,7 +64,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '桜',
-    n: 'Cherry Blossom',
+    n: 'The Falling Blossom Path',
     sky: ['#1e1c1c', '#555050', '#b3aba6', '#d6cfca'],
     sunF: 0.45,
     sunA: 0.85,
@@ -85,7 +85,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '雨',
-    n: 'Rain',
+    n: 'Rainwater Hollow',
     sky: ['#101010', '#262524', '#55534f', '#737069'],
     sunF: 0.35,
     sunA: 0.28,
@@ -105,7 +105,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '竹',
-    n: 'Bamboo Grove',
+    n: 'The Hollow Bamboo Road',
     sky: ['#141514', '#343834', '#7a7f78', '#a3a79f'],
     sunF: 0.4,
     sunA: 0.5,
@@ -126,7 +126,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '雪',
-    n: 'Snow',
+    n: 'White Silence Pass',
     sky: ['#3b3a37', '#76736d', '#b7b4ac', '#d9d6ce'],
     sunF: 0.5,
     sunA: 0.45,
@@ -146,7 +146,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '炎',
-    n: 'Burning Temple',
+    n: 'The Ember Courtyard',
     sky: ['#0e0b0a', '#2e2420', '#6e5a50', '#a38c7e'],
     sunF: 0.55,
     sunA: 0.35,
@@ -167,7 +167,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '嵐',
-    n: 'Stormy Shore',
+    n: 'The Broken Shore',
     sky: ['#0c0d0e', '#262a2d', '#565c60', '#767c80'],
     sunF: 0.3,
     sunA: 0.2,
@@ -188,7 +188,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '夜',
-    n: 'Moonlit Night',
+    n: 'The Moonwatch Clearing',
     sky: ['#040404', '#0f0f0e', '#262523', '#393834'],
     sunF: 0.32,
     sunA: 0.55,

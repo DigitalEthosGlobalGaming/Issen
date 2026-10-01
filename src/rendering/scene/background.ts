@@ -36,6 +36,8 @@ export function createBackground(
     fieldRocks?: boolean;
     fieldMist?: number;
     stageProps?: boolean;
+    /** Ink scene modules supply their own temple, sea, and grove landmarks. */
+    landmarks?: boolean;
     hillHeight?: (x: number) => number;
     hillShade?: { top: string; bottom: string };
     mountains?: (context: CanvasRenderingContext2D) => void;
@@ -562,7 +564,7 @@ export function createBackground(
       b.fillRect(0, ly.base - ly.amp * 0.5, W, ly.amp * 0.5 + H * 0.05);
     }
     options.mountains?.(b);
-    if (st.bgx === 'temple') drawTemple(b, r, hz);
+    if (options.landmarks !== false && st.bgx === 'temple') drawTemple(b, r, hz);
     const hillBase = gy - L.eH * 0.3;
     const hf = ridgeFn(r);
     const hillY = options.hillHeight ?? ((x: number) => hillBase - H * 0.035 * hf(x / W));
@@ -595,8 +597,8 @@ export function createBackground(
     b.fillStyle = mg2;
     b.fillRect(0, hillBase - H * 0.05, W, H * 0.08);
     b.restore();
-    if (st.bgx === 'shore') drawSea(b, r, hz, hillBase);
-    if (st.bgx === 'bamboo') drawGrove(b, r, hillBase);
+    if (options.landmarks !== false && st.bgx === 'shore') drawSea(b, r, hz, hillBase);
+    if (options.landmarks !== false && st.bgx === 'bamboo') drawGrove(b, r, hillBase);
     const ft = gy - L.eH * 0.18;
     gr = b.createLinearGradient(0, ft, 0, H);
     gr.addColorStop(0, st.field[0]);

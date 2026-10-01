@@ -15,13 +15,13 @@ user-supplied charcoal bamboo duel image as an atmosphere reference.
 - foreground-boulders-atlas.png: four irregular foreground boulders; explicit integer frames.
 - rocks-atlas.png: rocks, grasses, boulder, and rubble, 2 by 2 equal cells.
 
-All eleven files have transparent backgrounds. Cells are selected with Canvas drawImage
+The original eleven files have transparent backgrounds. Cells are selected with Canvas drawImage
 source rectangles and reused at multiple depths; no baked full-screen picture is
 used. Keep transparent margins when replacing cells so scaling and mirroring do
 not include neighbouring artwork. Existing sheets do not all meet this ideal:
 pine canopy, meadow patches and fog have artwork at/across cell divisions.
 See the [measured visual catalog](../../../../docs/features/environment-asset-library.md)
-for all eleven source previews, cell descriptions, dimensions, alpha and reuse limits.
+for source previews, cell descriptions, dimensions, alpha and reuse limits.
 
 Art direction: near-black sumi-e dry brush, desaturated ivory highlights, angular
 faceted shapes, rough texture inside the silhouettes, no characters or labels.
@@ -48,3 +48,9 @@ facets, rough ink-paper texture inside rocks, dry brush edges, darker foreground
 contrast. True transparency and isolated complete cells. No smooth ovals,
 backdrop, fog, scenery, grass, figures, text, grids or extended cast shadows.
 Alpha inspected: transparent exterior with near-opaque textured interiors.
+
+
+## Blossom assets
+
+- [Cherry tree atlas and provenance](cherry-trees-atlas.md): four complete trees with variant-specific trunk anchors.
+- [Fallen petal atlas and provenance](petal-ground-atlas.md): four independent ground deposits with transparent surrounds.

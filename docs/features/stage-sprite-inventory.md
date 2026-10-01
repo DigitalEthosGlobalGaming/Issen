@@ -1,9 +1,8 @@
 # Stage sprite inventory
 
-Status: planning inventory, recorded 2026-10-01. Existing files were checked
-against the Ink worktree. New names and variant counts are production targets,
-not generated assets or promises about atlas dimensions. No assets are created
-by this document.
+Status: implemented inventory, updated 2026-10-01 for version 1.17.0.
+All nine scenes use their dedicated composition. The original planning targets
+below remain useful for future reuse; the implementation table is authoritative.
 
 Use with the [stage art plan](stage-art-plan.md), which owns scene descriptions
 and composition. This inventory owns the shared asset list and scene mapping.
@@ -11,7 +10,28 @@ The existing [asset provenance](../../src/rendering/environment/assets/README.md
 records generated sources. The [visual asset library](environment-asset-library.md)
 documents actual dimensions, cell contents, anchors, packing limitations, and
 implemented reuse. Last Light Ridge now uses E01, E02, E04, E05, and E06;
-the additional reuse listed below remains a plan.
+the table below records the complete implemented scene kits.
+
+## Implemented kits
+
+| Scene | Existing assets used | New assets used |
+| --- | --- | --- |
+| Field | E01/E02/E04–E10 | None |
+| Ridge | E01/E02/E04/E05/E06 | None |
+| Blossom | E01/E04/E05/E06 | N01/N02 |
+| Hollow | E01/E02/E04/E05/E06/E08 | N03 |
+| Bamboo | E01/E03/E04/E06 | N04 |
+| Snow | E01 | N06/N07/N08 |
+| Temple | E01/E02/E06 | N09/N10/N11/N12 |
+| Shore | E01/E02/E04/E06/E07 | N13/N14 |
+| Moonwatch | E01/E02/E06/E10 | N09/N12 |
+
+N01–N04 and N06–N14 are generated and integrated (13 new atlases, 24 total).
+N05 stumps and N15 separate moon landmark are deferred: fallen bamboo and the
+shared temple gate/steps cover those needs. Snow sheets are complete variants,
+not registered overlays. Temple sheets require explicit variable-width frames.
+See the [asset library](environment-asset-library.md) and linked per-atlas contracts
+for actual packing, source windows, contact anchors and generation provenance.
 
 ## Scene key
 
@@ -59,7 +79,7 @@ base object's shape and readable values.
 ## Proposed vegetation and ground additions
 
 Each row is an object family, normally one separate atlas. Suggested filenames
-are planning names and do not currently exist.
+are original planning targets; status and actual files are recorded above.
 
 | ID | Proposed atlas | Target variations | Scene use and composition contract |
 | --- | --- | --- | --- |
@@ -173,5 +193,4 @@ Retain originals and verify derived snow registration.
 
 During future production, mark each N entry as proposed, generated, integrated,
 or visually accepted, with the actual filename and scene usage. Keep fallback
-and conditional decisions explicit. This documentation pass does not change
-code, assets, stage names, version, or gameplay.
+and conditional decisions explicit. Version 1.17.0 implements these kits and names without changing gameplay.
