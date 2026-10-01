@@ -12,7 +12,6 @@ export interface Settings {
   reducedFlashes: Preference;
   textSize: 'normal' | 'large';
   quality: 'auto' | 'low' | 'high';
-  renderer: 'classic' | 'ink';
   vibration: boolean;
   vibrationStrength: 'light' | 'full';
 }
@@ -44,7 +43,6 @@ export function defaultSettings(muted = false): Settings {
     reducedFlashes: 'system',
     textSize: 'normal',
     quality: 'auto',
-    renderer: 'ink',
     vibration: true,
     vibrationStrength: 'full',
   };
@@ -105,11 +103,6 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     reducedFlashes: choice('reducedFlashes', ['system', 'on', 'off'], 'system'),
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
     quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
-    renderer: choice(
-      'renderer',
-      ['classic', 'ink'],
-      choice('characterRenderer', ['classic', 'ink'], defaults.renderer),
-    ),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),
   };

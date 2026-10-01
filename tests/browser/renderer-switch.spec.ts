@@ -1,126 +1,25 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
 
-const displayOptions = async (page: Page, paused = false) => {
-  await page.locator(paused ? '#bPauseOptions' : '#bOptions').click();
+test('legacy classic preference loads Ink and exposes no artwork switch', async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'issen.settings',
+      JSON.stringify({
+        version: 1,
+        renderer: 'classic',
+        characterRenderer: 'classic',
+        muted: true,
+      }),
+    ),
+  );
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await page.locator('#bOptions').click();
   await page
     .locator('#options')
     .getByRole('button', { name: /^Display/ })
     .click();
-};
-
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    if (!localStorage.getItem('issen.meta'))
-      localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }));
-  });
-});
-
-test('shared artwork switches in a paused run without changing encounter or saved progress', async ({
-  page,
-}) => {
-  await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
-    const response = await route.fetch();
-    await route.fulfill({
-      response,
-      body: (await response.text())
-        .replace(
-          'return createFigureRenderer(g, {',
-          'window.__figureArtwork = artwork; return createFigureRenderer(g, {',
-        )
-        .replace(
-          'frameLoop.start();',
-          'window.__rendererHarness = { G, randomState: () => runRandom.state(), film: () => EQ.film }; frameLoop.start();',
-        ),
-    });
-  });
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.locator('#bPlay').click();
-  await page.locator('#bBegin').click();
-  await page.keyboard.press('p');
-  await displayOptions(page, true);
-  const snapshot = () =>
-    page.evaluate(() => {
-      const { G, randomState, film } = (window as any).__rendererHarness;
-      return {
-        state: G.state,
-        score: G.score,
-        stage: G.stage,
-        times: G.enemies.map((e: any) => e.t),
-        random: randomState(),
-        film: film(),
-        checkpoint: localStorage.getItem('issen.runCheckpoint'),
-      };
-    });
-  const before = await snapshot();
-  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
-  await expect.poll(() => page.evaluate(() => (window as any).__figureArtwork)).toBe('ink');
-  expect(await snapshot()).toEqual(before);
-  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
-  await expect.poll(() => page.evaluate(() => (window as any).__figureArtwork)).toBe('classic');
-  expect(await snapshot()).toEqual(before);
-  await page.keyboard.press('Escape');
-  await page.locator('#options').getByRole('button', { name: 'Done', exact: true }).click();
-  await expect(page.locator('#paused')).toHaveClass(/on/);
-  await page.locator('#bResume').click();
-  await expect.poll(async () => (await snapshot()).state).toBe('playing');
-});
-
-test('artwork defaults to ink, preserves classic on reload, and restores ink defaults', async ({
-  page,
-}) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await displayOptions(page);
-  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
-  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
-  await displayOptions(page);
-  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
+  await expect(page.getByLabel('Artwork', { exact: true })).toHaveCount(0);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
-  for (const viewport of [
-    { width: 1024, height: 768 },
-    { width: 1440, height: 900 },
-    { width: 768, height: 1024 },
-  ]) {
-    await page.setViewportSize(viewport);
-    await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
-    await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
-    await expect
-      .poll(() =>
-        page.locator('#c').evaluate((canvas: HTMLCanvasElement) => canvas.width / canvas.height),
-      )
-      .toBeCloseTo(viewport.width / viewport.height, 1);
-  }
-  await displayOptions(page);
-  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
-  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
-  await page
-    .locator('#options')
-    .getByRole('button', { name: 'Restore defaults', exact: true })
-    .click();
-  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
-});
-
-test('failed ink asset requests fall back to classic scenery and remain switchable', async ({
-  page,
-}) => {
-  await page.route('**/environment/assets/**', (route) => route.abort());
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await displayOptions(page);
-  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'unavailable');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
-  await expect(page.locator('#c')).toBeVisible();
-  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
 });

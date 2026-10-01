@@ -10,14 +10,7 @@ import { createPalette } from '../../src/rendering/palette.ts';
 import { ROBES } from '../../src/game/content/cosmetics.ts';
 import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
-function render({
-  body = true,
-  enemy = false,
-  charmInk = false,
-  sword = true,
-  mode = 'ink',
-  figure = {},
-} = {}) {
+function render({ body = true, enemy = false, charmInk = false, sword = true, figure = {} } = {}) {
   const calls = {
     charms: [],
     parts: [],
@@ -82,7 +75,6 @@ function render({
     height: 844,
     palette: (fog) => palette.fog(fog, [100, 110, 120]),
     random: () => 0.5,
-    artwork: mode,
     inkPlayer: {
       drawPart(g, part, f) {
         calls.parts.push({ part, alpha: g.globalAlpha, pose: { ...f.pose } });
@@ -104,6 +96,7 @@ function render({
     },
     inkSword: {
       draw(g, gx, gy, angle, palette, style, id) {
+        calls.order.push('weapon');
         calls.swords.push({ gx, gy, angle, id, alpha: g.globalAlpha });
         return sword;
       },
@@ -132,64 +125,21 @@ function render({
   return calls;
 }
 
-test('player body and steel sword fall back independently while preserving figure opacity', () => {
-  const bodyOnly = render({ body: true, sword: false });
-  assert.deepEqual(
-    bodyOnly.parts.map((call) => call.part),
-    ['arms', 'body', 'head'],
-    'rear-view forearms paint before the torso so crossing arms are occluded',
-  );
-  assert.equal(bodyOnly.swords.length, 1);
-  assert.equal(bodyOnly.steelGradients, 1, 'unavailable sword keeps classic steel');
-  const swordOnly = render({ body: false, sword: true });
-  assert.deepEqual(
-    swordOnly.parts.map((call) => call.part),
-    ['arms', 'body'],
-  );
-  assert.equal(swordOnly.swords.length, 1);
-  assert.equal(swordOnly.steelGradients, 0, 'available sword replaces classic blade');
-  assert.ok(
-    swordOnly.fills.length > bodyOnly.fills.length,
-    'unavailable body still paints classic clothing',
-  );
-  for (const call of [
-    ...bodyOnly.parts,
-    ...bodyOnly.swords,
-    ...swordOnly.parts,
-    ...swordOnly.swords,
-  ]) {
-    assert.ok(Math.abs(call.alpha - 0.42) < 1e-10, 'hooks inherit caller and figure alpha');
+test('modular hooks preserve opacity and never substitute removed geometry when unavailable', () => {
+  const ready = render(),
+    missing = render({ body: false, sword: false });
+  for (const calls of [ready, missing]) {
+    assert.deepEqual(
+      calls.parts.map((call) => call.part),
+      ['arms', 'body', 'head'],
+    );
+    assert.equal(calls.swords.length, 1);
+    assert.equal(calls.steelGradients, 0);
+    for (const call of [...calls.parts, ...calls.swords])
+      assert.ok(Math.abs(call.alpha - 0.42) < 1e-10);
   }
-});
-
-test('unsupported equipment, enemies and Classic mode retain their own artwork', () => {
-  for (const scenario of [{ mode: 'classic' }, { figure: { back: false } }]) {
-    const calls = render(scenario);
-    assert.deepEqual(calls.parts, []);
-    assert.deepEqual(calls.swords, []);
-    assert.equal(calls.steelGradients, 1);
-  }
-  const robe = render({ figure: { robeId: 'unknown-outfit' } });
-  assert.deepEqual(robe.parts, []);
-  assert.equal(robe.swords.length, 1, 'supported sword is independent of unsupported robe');
-  const blade = render({ figure: { bladeId: 'other' } });
-  assert.equal(blade.parts.length, 3);
-  assert.deepEqual(blade.swords, []);
-  assert.equal(blade.steelGradients, 1);
-  const unlabelled = render({ figure: { robeId: undefined, bladeId: undefined } });
-  assert.deepEqual(unlabelled.parts, []);
-  assert.deepEqual(unlabelled.swords, []);
-});
-
-test('an unavailable body and sword preserve the complete Classic draw path', () => {
-  const fallback = render({ body: false, sword: false });
-  const classic = render({ mode: 'classic' });
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(fallback.fills)),
-    JSON.parse(JSON.stringify(classic.fills)),
-  );
-  assert.deepEqual(fallback.strokes, classic.strokes);
-  assert.equal(fallback.steelGradients, classic.steelGradients);
+  assert.deepEqual(missing.fills, ready.fills);
+  assert.deepEqual(missing.strokes, ready.strokes);
 });
 
 test('awakened steel aura remains visible with sprite body and sword', () => {
@@ -229,24 +179,12 @@ test('front enemy limbs hold weapons between arms and hands, preserving inherite
     assert.deepEqual(calls.parts, []);
   }
   const twin = render({ enemy: true, figure: { back: false, twin: 1 } });
-  assert.equal(twin.steelGradients, 2, 'both swords stay visible');
+  assert.equal(twin.swords.length, 2, 'both swords use modular artwork');
   const spear = render({ enemy: true, figure: { back: false, spear: 1 } });
   assert.equal(spear.steelGradients, 0, 'spear retains its existing drawing');
 });
 
-test('missing enemy art preserves Classic figure drawing', () => {
-  const fallback = render({ figure: { back: false } }),
-    classic = render({ mode: 'classic', figure: { back: false } });
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(fallback.fills)),
-    JSON.parse(JSON.stringify(classic.fills)),
-  );
-  assert.deepEqual(fallback.strokes, classic.strokes);
-  assert.equal(fallback.steelGradients, classic.steelGradients);
-  assert.deepEqual(classic.enemyParts, []);
-});
-
-test('every primary outfit uses the shared Ink puppet while Classic remains available', () => {
+test('every primary outfit uses the shared Ink puppet without a mode gate', () => {
   for (const robeId of Object.keys(ROBES)) {
     const figure = {
       robeId,
@@ -255,14 +193,12 @@ test('every primary outfit uses the shared Ink puppet while Classic remains avai
       cape: ROBES[robeId].cape,
       coat: ROBES[robeId].coat,
     };
-    const ink = render({ figure }),
-      classic = render({ mode: 'classic', figure });
+    const ink = render({ figure });
     assert.deepEqual(
       ink.parts.map((c) => c.part),
       ['arms', 'body', 'head'],
       robeId,
     );
-    assert.deepEqual(classic.parts, [], robeId);
   }
 });
 
@@ -314,26 +250,21 @@ test('all primary blades including beam and pan reach the Ink weapon hook', () =
   ];
   for (const bladeId of ids) {
     const figure = { bladeId, blade: BLADES[bladeId] || null };
-    const ink = render({ figure }),
-      classic = render({ mode: 'classic', figure });
+    const ink = render({ figure });
     assert.equal(ink.swords.length, 1, bladeId);
     assert.equal(ink.swords[0].id, bladeId);
-    assert.deepEqual(classic.swords, [], bladeId);
   }
 });
 
-test('sprite charms replace the pouch but preserve the cord, alpha and Classic fallback', () => {
+test('sprite charms preserve the cord and alpha without a rectangle fallback', () => {
   const figure = { charmId: 'suzu', charm: '#abc123' };
-  const ink = render({ figure, charmInk: true }),
-    fallback = render({ figure }),
-    classic = render({ figure, mode: 'classic' });
-  assert.equal(ink.charms.length, 1);
-  assert.equal(ink.charms[0].id, 'suzu');
-  assert.ok(Math.abs(ink.charms[0].alpha - 0.42) < 1e-10);
-  assert.ok(!ink.fills.includes('#abc123'));
-  assert.ok(fallback.fills.includes('#abc123'));
-  assert.ok(classic.fills.includes('#abc123'));
-  assert.deepEqual(classic.charms, []);
+  for (const charmInk of [true, false]) {
+    const calls = render({ figure, charmInk });
+    assert.equal(calls.charms[0].id, 'suzu');
+    assert.ok(Math.abs(calls.charms[0].alpha - 0.42) < 1e-10);
+    assert.ok(!calls.fills.includes('#abc123'));
+    assert.ok(calls.strokes.some((call) => call.style === '#d9d3c4'));
+  }
 });
 
 test('Ink recipes cover the complete item catalog including trial and progression charms', () => {

@@ -231,15 +231,6 @@ export function createOptions(
         }),
       );
     } else {
-      select(
-        'renderer',
-        'Artwork',
-        [
-          ['Classic', 'classic'],
-          ['Ink', 'ink'],
-        ],
-        'Applies to scenes and available player and weapon art, with Classic fallback for other assets. Press backtick outside menus to switch.',
-      );
       const preferences = [
         ['System', 'system'],
         ['On', 'on'],
@@ -312,7 +303,7 @@ export function createOptions(
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
             settings.quality = 'auto';
-            settings.renderer = defaults.renderer;
+
             settings.vibration = true;
             settings.vibrationStrength = 'full';
           }

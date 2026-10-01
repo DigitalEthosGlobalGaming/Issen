@@ -55,7 +55,7 @@ test('cinematic scenes isolate gameplay, support remapped keys and swipes, and e
   await page.mouse.move(100, 240, { steps: 4 });
   await page.mouse.up();
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '1');
-  await page.getByLabel('Preview artwork').selectOption('ink');
+  await expect(page.getByLabel('Preview artwork')).toHaveCount(0);
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
   await page.waitForTimeout(250);
   expect(await snapshot()).toEqual(before);
@@ -69,18 +69,16 @@ test('cinematic scenes isolate gameplay, support remapped keys and swipes, and e
   expect(await page.evaluate(() => sessionStorage.getItem('issen.cinematic'))).toBeNull();
 });
 
-test('cinematic session restores scene and artwork on refresh; exit clears restoration', async ({
-  page,
-}) => {
+test('cinematic session restores scene on refresh; exit clears restoration', async ({ page }) => {
   await page.goto('/');
   await openViewer(page);
   await page.getByRole('button', { name: 'Next scene' }).click();
   await page.getByRole('button', { name: 'Next scene' }).click();
-  await page.getByLabel('Preview artwork').selectOption('ink');
+  await expect(page.getByLabel('Preview artwork')).toHaveCount(0);
   await page.reload();
   await expect(page.locator('#cinematic')).toBeVisible();
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '2');
-  await expect(page.getByLabel('Preview artwork')).toHaveValue('ink');
+  await expect(page.getByLabel('Preview artwork')).toHaveCount(0);
   await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.press('Escape');
   await page.reload();
@@ -139,7 +137,7 @@ test('session preview preserves a saved run across refresh and exit', async ({ p
 test('cinematic desktop and tablet visual captures', async ({ page }) => {
   await page.goto('/');
   await openViewer(page);
-  await page.getByLabel('Preview artwork').selectOption('ink');
+  await expect(page.getByLabel('Preview artwork')).toHaveCount(0);
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.waitForTimeout(150);

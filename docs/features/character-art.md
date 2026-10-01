@@ -1,26 +1,13 @@
 # Ink character puppets
 
-Artwork uses one **Options > Display and Accessibility > Artwork > Ink**
-selection for scenes, player parts and weapons. Backtick switches the same mode.
-Ink is the default from version 1.21.1 for new or missing preferences and Display Restore defaults; existing saved artwork choices are preserved. The existing `renderer` save key is authoritative;
-older character-only preferences are read only when that key is missing/invalid.
-Switching changes drawing, not encounter state, equipment or attack timing.
+Ink is the sole rendering path for all primary player outfits and blades,
+enemies, bosses, charms, and companions. Old artwork settings are ignored.
+There is no rendering mode selector or backtick toggle. Startup waits for decoded
+and validated assets and displays retry on failure, rather than drawing older
+procedural replacements. The catalog's gameplay identities and timing stay unchanged.
 
-## Replacement coverage
-
-| Item / figure | Ink replacement | Fallback |
-| --- | --- | --- |
-| Rear-view player wearing Sumi (`sumi`) | Modular torso, robe panels, head and articulated arms | Classic while unavailable |
-| Player Steel sword (`steel`) | Shared modular katana aligned to grip and tip | Classic while unavailable |
-| Yoroi, Helm, Shinobi, Jinbaori, Mino | Shared modular armour and clothing kit (1.19.0) | Classic while required pieces are unavailable |
-| All 20 primary player outfits | Shared cloth rig with modular colour, masks, headwear and accessories (1.21.0) | Classic while required pieces are unavailable |
-| All 20 primary blades | Modular profile, grip and guard recipes; beam emitter and pan (1.24.0) | Classic while required families are unavailable |
-| Enemies and bosses | Modular front-view body, articulated arms/hands and interchangeable headwear (1.20.0) | Classic while required pieces are unavailable |
-
-Body and sword selection are independent: a new sword can accompany a Classic
-outfit, and the new player body can hold an unreplaced weapon. Crests, charms,
-robe auras and weapon effects retain their existing drawing. Final film grading
-still applies to the assembled character. These old drawings use Canvas 2D.
+Procedural crests, robe auras, weapon effects, and spear geometry remain shared.
+Final film grading applies to the assembled character.
 
 ## Ownership and rig
 
@@ -32,7 +19,7 @@ The rear-view forearms/hands draw before the torso so they reach around the body
 rather than appearing folded behind the back. Ink uses its own simple waist
 join instead of overlaying the Classic rectangular belt.
 The runtime owns the player, enemy and sword loaders; each armoury/support
-preview owns its own set and releases them on disposal. Missing images do not hide the character.
+preview owns its own set and releases them on disposal. Missing required images block scene startup with a retry option.
 
 Assets are cutout parts, not pre-rendered animation frames. Sleeve and forearm
 sprites rotate between shoulder, elbow and hand anchors; overlapping cuffs hide
@@ -68,8 +55,7 @@ changing pose, combat RNG or saved checkpoint. No full suite or production build
 
 The simplified player revision uses broad dark facets and minimal interior detail;
 the original detailed atlas is retained as an unused source reference. It is not
-loaded by the active player renderer. Cinematic Artwork selection applies the same
-mode to all available replacements within that preview.
+loaded by the active player renderer. Cinematic uses the same artwork path.
 
 Version 1.18.1 verification: type checking and ten focused unit checks passed.
 A focused browser test confirmed the shared Artwork mode reaches both scene and
@@ -96,10 +82,9 @@ The headwear atlas separates helmet, kasa, hood and collar. The cloth atlas
 separates left/right coat panels, cape and bracer. These are reusable components,
 not five baked full-character images. Opposite sides retain their own frames.
 
-A recipe requires its source families before replacing the Classic outfit.
-Missing armour does not prevent the base Sumi kit from drawing. Classic armour,
-coat and cape overlays are suppressed only when the Ink body succeeds, avoiding
-duplicate clothing. Crests, charms, auras and the final film pass remain shared.
+A recipe requires its source families. Startup checks every primary outfit's
+readiness. Modular clothing replaces the former armour, coat, and cape geometry;
+crests, charms, auras, and final film grading remain shared.
 
 Atlas contracts contain measured frame rectangles, pivots, permitted transforms,
 transparency inspection and generation prompts:
@@ -119,11 +104,10 @@ measured frame geometry stay in the renderer; encounter identities, timing,
 weapon reach and unlock rules stay in their gameplay owners.
 
 Front arms draw after the body; weapons draw after arms; separate hands draw
-last at the existing grip targets. Twin swords and the spear retain their
-existing weapon shapes and pose geometry. Death clipping, opacity, fog and
-film grading remain shared. Unknown looks or missing source families fall
-back to Classic. Runtime and isolated Armoury previews own and dispose their
-loaders independently. The single Artwork option applies to both views.
+last at the existing grip targets. Twin swords use modular Steel; the spear retains
+its procedural shape and pose geometry. Death clipping, opacity, fog and film
+grading remain shared. Runtime and isolated Armoury previews own and dispose
+their loaders independently. Missing sources do not invoke older geometry.
 
 - [Front-view modular body contract](../../src/rendering/figures/assets/enemy-ronin-simple.md)
 - [Front-view headwear contract](../../src/rendering/figures/assets/enemy-headwear-atlas.md)

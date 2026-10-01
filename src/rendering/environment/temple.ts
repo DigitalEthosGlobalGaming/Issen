@@ -85,10 +85,6 @@ export function drawEmberCourtyard(
   const unit = Math.min(height, width * 1.3);
   const foot = groundY - eH * 0.28;
   const terrain = createBackground(width, height, scale, 6, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
-    landmarks: false,
     fieldMist: 0.25,
     mountains(g) {
       drawAtlasSprite(

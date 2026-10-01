@@ -24,7 +24,6 @@ export function createWeatherRenderer(g: CanvasRenderingContext2D, env: WeatherD
     wind,
     hazard,
     particles: wx,
-    bamboo,
     state: WX,
     smokeSprite,
   } = env;
@@ -96,38 +95,5 @@ export function createWeatherRenderer(g: CanvasRenderingContext2D, env: WeatherD
       }
     g.globalAlpha = 1;
   }
-  function drawBamboo() {
-    if (!bamboo.length) return;
-    g.save();
-    g.globalAlpha = Math.min(1, 0.95 * hazard + 0.05);
-    for (const t of bamboo) {
-      const off = Math.sin(time * t.sp + t.ph) * t.amp * (0.6 + wind * 0.3),
-        xb = t.x0 + off * 0.3,
-        xt = t.x0 + off;
-      const gr = g.createLinearGradient(xb - t.w, 0, xb + t.w, 0);
-      gr.addColorStop(0, '#0f100e');
-      gr.addColorStop(0.6, '#262922');
-      gr.addColorStop(1, '#3a3e36');
-      g.fillStyle = gr;
-      g.beginPath();
-      g.moveTo(xb - t.w / 2, H + 10);
-      g.lineTo(xt - t.w / 2, -10);
-      g.lineTo(xt + t.w / 2, -10);
-      g.lineTo(xb + t.w / 2, H + 10);
-      g.closePath();
-      g.fill();
-      g.strokeStyle = 'rgba(120,126,112,.5)';
-      g.lineWidth = Math.max(1.5, t.w * 0.18);
-      for (let y = H * 0.1; y < H; y += H * 0.16) {
-        const x = lerp(xb, xt, 1 - y / H);
-        g.beginPath();
-        g.moveTo(x - t.w / 2, y);
-        g.lineTo(x + t.w / 2, y);
-        g.stroke();
-      }
-    }
-    g.restore();
-  }
-
-  return { drawWeather, drawSmoke, drawBamboo };
+  return { drawWeather, drawSmoke };
 }

@@ -2,11 +2,11 @@
 
 Issen uses two rendering surfaces. The duel scene uses Canvas 2D, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
-Classic uses procedural artwork; the optional Ink preview adds layered PNG sprite atlases.
+Ink uses layered PNG atlases for environments and modular figure artwork, alongside procedural grass, weather and effects.
 
 The only SVG in the application is small inline interface artwork, such as the
 mute control in `src/ui/shell.html` and the alternate mute icons assigned by
-`src/game.ts`. Characters, classic scenery, weather, particles and combat effects are
+`src/game.ts`. Characters, layered scenery, weather, particles and combat effects are
 drawn through `CanvasRenderingContext2D` paths, rectangles, ellipses, text,
 gradients and compositing operations.
 
@@ -86,15 +86,11 @@ secondary surfaces match the live game.
 Figures are constructed from normalized proportions relative to their height.
 `src/rendering/figures/types.ts` describes a figure as position, height, palette,
 pose and optional costume or weapon details. `src/rendering/figures/figure.ts`
-turns that model into Canvas paths. Poses are small data objects and are blended
+composes that model through modular image renderers and shared effects. Poses are small data objects and are blended
 or approached by the animation modules instead of being separate images.
-`src/rendering/figures/masks.ts` draws the oni and tengu lacquer masks with carved
-features, paired oni horns and tusks, and a rounded tengu nose. Both views share
-the same geometry, compressed at the right temple for the back-facing player;
-the live scene and Armoury use the same drawing function.
-`src/rendering/figures/jinbaori.ts` draws the sleeveless war coat over the robe
-and belt, with an open front, raised collar and split back hem. Equipped crests
-are painted over the coat; its cloth motion uses the renderer's visual clock.
+Measured atlas parts replace masks, coats, armour, body and weapon geometry.
+`ink-player.ts`, `outfit-kit.ts`, and `ink-enemy.ts` attach those parts to the
+same normalized pose coordinates. Crests and effects remain procedural.
 Within each figure, the back-facing player's weapons are painted behind the robe,
 while front-facing enemies paint their arms before their weapons. Hands finish over
 the grip in both views.

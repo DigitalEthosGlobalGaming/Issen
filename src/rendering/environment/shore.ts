@@ -41,10 +41,6 @@ export function drawBrokenShore(
     { horizonY, groundY } = createLayout(width, height),
     unit = Math.min(height, width * 1.3);
   const terrain = createBackground(width, height, scale, 7, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
-    landmarks: false,
     fieldMist: 0.2,
     hillHeight: (x) => coastline(x, width, height),
     hillShade: { top: '#353a39', bottom: stage.field[0] },

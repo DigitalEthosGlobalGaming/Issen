@@ -99,7 +99,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     gradient.addColorStop(1, 'rgba(10,10,9,.5)');
     g.fillStyle = gradient;
     g.fillRect(0, 0, width, height);
-    if (frame.artwork === 'ink') {
+    {
       void inkCharm.prepare();
       void inkCompanion.prepare();
       void inkEnemy.prepare();

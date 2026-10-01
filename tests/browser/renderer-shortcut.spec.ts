@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('backtick toggles artwork, preserves a paused encounter, and ignores typing and repeats', async ({
-  page,
-}) => {
+test('backtick leaves Ink artwork and paused encounter unchanged', async ({ page }) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }));
@@ -21,17 +19,17 @@ test('backtick toggles artwork, preserves a paused encounter, and ignores typing
   const canvas = page.locator('#c');
   await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.press('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.press('Backquote');
   await expect(canvas).toHaveAttribute('data-renderer-backend', 'layered');
   await page.keyboard.down('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.down('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.up('Backquote');
   await page.keyboard.press('Control+Backquote');
   await page.keyboard.press('Shift+Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.evaluate(() => {
     const input = document.createElement('input');
     input.id = 'shortcut-test-input';
@@ -39,7 +37,7 @@ test('backtick toggles artwork, preserves a paused encounter, and ignores typing
     input.focus();
   });
   await page.keyboard.press('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   await page.locator('#shortcut-test-input').evaluate((el) => el.remove());
   await page.keyboard.press('Backquote');
   await expect(canvas).toHaveAttribute('data-renderer', 'ink');
@@ -63,9 +61,9 @@ test('backtick toggles artwork, preserves a paused encounter, and ignores typing
   const before = await snapshot();
   expect(before.state).toBe('paused');
   await page.keyboard.press('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
   expect(await snapshot()).toEqual(before);
   await page.locator('#bPauseOptions').click();
   await page.keyboard.press('Backquote');
-  await expect(canvas).toHaveAttribute('data-renderer', 'classic');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
 });

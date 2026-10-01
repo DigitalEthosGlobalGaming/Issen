@@ -6,13 +6,11 @@ interface CinematicActions {
   stage(): number;
   scenes: string[];
   bindings(): Bindings;
-  renderer(): string;
   film(): string;
   films(): { id: string; n: string }[];
   enter(stage: number): void;
   scene(stage: number): void;
   leave(): void;
-  artwork(value: 'classic' | 'ink'): void;
   grade(value: string): void;
 }
 const SESSION_KEY = 'issen.cinematic';
@@ -27,7 +25,7 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   root.setAttribute('aria-label', 'Cinematic scene viewer');
   root.innerHTML = `<button type="button" class="cinematic-exit">Exit</button>
     <div class="cinematic-toolbar"><div class="cinematic-scenes"><button type="button" aria-label="Previous scene">←</button><span role="status"></span><button type="button" aria-label="Next scene">→</button></div>
-    <div class="cinematic-looks"><label>Artwork <select aria-label="Preview artwork"><option value="classic">Classic</option><option value="ink">Ink</option></select></label><label>Film <select aria-label="Preview film"></select></label></div><small></small></div>`;
+    <div class="cinematic-looks"><label>Film <select aria-label="Preview film"></select></label></div><small></small></div>`;
   app.append(root);
   const buttons = root.querySelectorAll('button');
   const exit = buttons[0]!,
@@ -35,7 +33,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
     next = buttons[2]!;
   const label = root.querySelector('[role="status"]')!;
   const help = root.querySelector('small')!;
-  const artwork = root.querySelector<HTMLSelectElement>('[aria-label="Preview artwork"]')!;
   const film = root.querySelector<HTMLSelectElement>('[aria-label="Preview film"]')!;
   function refreshFilms() {
     film.replaceChildren();
@@ -51,8 +48,7 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
     scene = 0,
     clicks = 0,
     lastClick = 0;
-  let stored: { active: true; scene: number; renderer?: 'classic' | 'ink'; film?: string } | null =
-    null;
+  let stored: { active: true; scene: number; film?: string } | null = null;
   try {
     const value = JSON.parse(win.sessionStorage.getItem(SESSION_KEY) ?? 'null');
     if (
@@ -70,7 +66,7 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
       if (active)
         win.sessionStorage.setItem(
           SESSION_KEY,
-          JSON.stringify({ active: true, scene, renderer: artwork.value, film: film.value }),
+          JSON.stringify({ active: true, scene, film: film.value }),
         );
       else win.sessionStorage.removeItem(SESSION_KEY);
     } catch {
@@ -89,7 +85,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
     scene = target;
     clicks = 0;
     refreshFilms();
-    artwork.value = actions.renderer();
     film.value = actions.film();
     actions.enter(scene);
     root.hidden = false;
@@ -117,16 +112,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   exit.addEventListener('click', close, { signal: events.signal });
   previous.addEventListener('click', () => move(-1), { signal: events.signal });
   next.addEventListener('click', () => move(1), { signal: events.signal });
-  artwork.addEventListener(
-    'change',
-    () => {
-      actions.artwork(artwork.value as 'classic' | 'ink');
-      save();
-    },
-    {
-      signal: events.signal,
-    },
-  );
   film.addEventListener(
     'change',
     () => {
@@ -171,13 +156,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
       } else if (key && bindings.pause.includes(key)) {
         event.preventDefault();
         close();
-      } else if (
-        event.code === 'Backquote' &&
-        !Object.values(bindings).some((keys) => key && keys.includes(key))
-      ) {
-        artwork.value = artwork.value === 'ink' ? 'classic' : 'ink';
-        actions.artwork(artwork.value as 'classic' | 'ink');
-        save();
       }
     },
     { capture: true, signal: events.signal },
@@ -203,10 +181,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
       if (stored) {
         const value = stored;
         open(value.scene);
-        if (value.renderer === 'ink' || value.renderer === 'classic') {
-          artwork.value = value.renderer;
-          actions.artwork(value.renderer);
-        }
         if (value.film && actions.films().some((item) => item.id === value.film)) {
           film.value = value.film;
           actions.grade(value.film);

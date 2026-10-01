@@ -199,14 +199,14 @@ the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
 handles native-aspect frames, ground anchors and contact fades. Runtime weather
 and final film grading remain separate from image assets.
 
-All artwork is selected by `settings.renderer` (Artwork in Options).
-The figure compositor retains procedural fallback per supported item and calls
-instance-owned Ink player/sword renderers. Runtime and armoury canvases own
-separate loaders. See [Ink player puppet](../features/character-art.md).
+Ink is the rendering path for all nine environments and migrated figures,
+weapons, charms, and companions. Runtime and armoury canvases own separate
+loaders. Startup waits for artwork decoding and module validation; failures
+show a retry screen instead of substituting older geometry. Legacy saved
+renderer preferences are ignored without changing other settings.
 
-
-Character Ink rendering uses `rendering/figures/ink-player.ts`, `outfit-kit.ts`
+Character rendering uses `rendering/figures/ink-player.ts`, `outfit-kit.ts`
 and `ink-enemy.ts`; figure composition owns rear/front limb and weapon order.
-Optional image hooks fall back to the existing Canvas geometry. The single
-Artwork preference selects environment and character replacements together.
-See [character artwork](../features/character-art.md) for coverage and contracts.
+Procedural grass, sky, terrain, weather, awakening effects, and unmigrated spear
+geometry remain independent. See [character artwork](../features/character-art.md)
+for asset coverage and contracts.

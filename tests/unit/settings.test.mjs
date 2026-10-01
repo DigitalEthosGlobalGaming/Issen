@@ -85,34 +85,21 @@ test('disabled vibration never calls the optional browser capability', () => {
   }
 });
 
-test('scene renderer defaults to ink and preserves explicit saved preferences', () => {
-  assert.equal(defaultSettings().renderer, 'ink');
-  assert.equal(parseSettings({ version: 1 }).renderer, 'ink');
-  assert.equal(parseSettings({ version: 1, renderer: 'unknown' }).renderer, 'ink');
-  assert.equal(parseSettings({ ...defaultSettings(), renderer: 'ink' }).renderer, 'ink');
-});
-
-test('single artwork preference migrates the former character setting only as a fallback', () => {
-  assert.equal('characterRenderer' in defaultSettings(), false);
-  for (const renderer of ['classic', 'ink']) {
-    for (const characterRenderer of ['classic', 'ink']) {
-      const loaded = parseSettings({ version: 1, renderer, characterRenderer });
-      assert.equal(loaded.renderer, renderer, 'valid Artwork setting takes precedence');
-      assert.equal('characterRenderer' in loaded, false);
-      assert.deepEqual(loaded.bindings, defaultSettings().bindings);
-    }
+test('legacy artwork preferences are ignored without changing other saved settings', () => {
+  for (const renderer of ['classic', 'ink', 'invalid']) {
+    const loaded = parseSettings({
+      ...defaultSettings(),
+      renderer,
+      characterRenderer: 'classic',
+      muted: true,
+      quality: 'low',
+      reducedMotion: 'on',
+    });
+    assert.equal('renderer' in loaded, false);
+    assert.equal('characterRenderer' in loaded, false);
+    assert.equal(loaded.muted, true);
+    assert.equal(loaded.quality, 'low');
+    assert.equal(loaded.reducedMotion, 'on');
+    assert.deepEqual(loaded.bindings, defaultSettings().bindings);
   }
-  for (const renderer of [undefined, null, 'invalid', true]) {
-    assert.equal(parseSettings({ version: 1, renderer, characterRenderer: 'ink' }).renderer, 'ink');
-    assert.equal(
-      parseSettings({ version: 1, renderer, characterRenderer: 'classic' }).renderer,
-      'classic',
-    );
-    assert.equal(
-      parseSettings({ version: 1, renderer, characterRenderer: 'invalid' }).renderer,
-      'ink',
-    );
-  }
-  const migrated = parseSettings({ version: 1, characterRenderer: 'ink' });
-  assert.equal(parseSettings(JSON.parse(JSON.stringify(migrated))).renderer, 'ink');
 });

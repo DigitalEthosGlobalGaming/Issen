@@ -10,14 +10,13 @@ existing left/right bindings, initially arrows and A/D. Rebind these in
 Options → Controls. Scene navigation wraps around the stage list.
 
 Exit is in the top-right corner. Escape or the configured pause key also exits.
-The active viewer, selected scene, artwork, and film are stored in sessionStorage, so a refresh
+The active viewer, selected scene and film are stored in sessionStorage, so a refresh
 in the same tab restores them. Exiting clears that session preference. Storage
 failure does not prevent browsing.
 
-Artwork and Film selectors compare the available rendering modes and owned film
-looks without changing saved equipment or artwork preferences. Later Ink stages
-still use the existing prototype art; scene browsing does not create new stage
-assets.
+The Film selector previews owned film looks without changing saved equipment.
+All nine scenes use layered Ink artwork. The former Artwork selector and
+backtick rendering shortcut are removed; older session artwork fields are ignored.
 
 ## Ownership and isolation
 

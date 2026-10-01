@@ -49,10 +49,6 @@ export function drawRainwaterHollow(
   const unit = Math.min(height, width * 1.3),
     bankY = groundY - eH * 0.4;
   const terrain = createBackground(width, height, scale, 3, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
-    landmarks: false,
     fieldMist: 0.38,
     hillHeight: (x) => bankY - height * 0.005 * Math.sin((x / width) * Math.PI * 4),
     hillShade: { top: '#434640', bottom: stage.field[0] },

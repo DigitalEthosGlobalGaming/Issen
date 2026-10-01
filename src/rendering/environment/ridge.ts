@@ -96,9 +96,6 @@ export function drawLastLightRidge(
   const slope = (x: number) =>
     hillBase - height * 0.13 * Math.max(0, 1 - x / (width * 0.48)) ** 1.3;
   const terrain = createBackground(width, height, scale, 1, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
     fieldMist: 0.23,
     hillHeight: slope,
     hillShade: { top: stage.hill, bottom: stage.field[0] },

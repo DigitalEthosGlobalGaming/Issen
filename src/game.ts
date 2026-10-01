@@ -1,3 +1,4 @@
+import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
 import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
@@ -694,13 +695,9 @@ export function startGame(): () => void {
   function drawSmoke() {
     weatherRenderer().drawSmoke();
   }
-  function drawBamboo() {
-    weatherRenderer().drawBamboo();
-  }
   /* ---------------- figures ---------------- */
   function figureRenderer() {
-    const artwork = cinematic.active ? cinematicRenderer : settings.renderer;
-    if (artwork === 'ink') {
+    {
       void inkCharm.prepare();
       void inkCompanion.prepare();
       void inkEnemy.prepare();
@@ -708,7 +705,6 @@ export function startGame(): () => void {
       void inkSword.prepare();
     }
     return createFigureRenderer(g, {
-      artwork,
       inkCharm,
       inkCompanion,
       inkEnemy,
@@ -3027,7 +3023,6 @@ export function startGame(): () => void {
     else $('bArmory').removeAttribute('aria-description');
   }
   let cinematicStage = 0;
-  let cinematicRenderer: 'classic' | 'ink' = settings.renderer;
   let cinematicFilm = EQ.film;
   function previewStage(stage: number) {
     G.stage = stage;
@@ -3049,21 +3044,16 @@ export function startGame(): () => void {
     stage: () => G.stage,
     scenes: STAGES.map((stage) => stage.n),
     bindings: () => settings.bindings,
-    renderer: () => settings.renderer,
     film: () => EQ.film,
     films: () =>
       ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
     enter(stage) {
       cinematicStage = G.stage;
-      cinematicRenderer = settings.renderer;
       cinematicFilm = EQ.film;
       previewStage(stage);
     },
     scene: previewStage,
     leave: () => previewStage(cinematicStage),
-    artwork: (value) => {
-      cinematicRenderer = value;
-    },
     grade: (value) => {
       cinematicFilm = value;
     },
@@ -3221,7 +3211,6 @@ export function startGame(): () => void {
   function previewFrame(film: string, effectsVisible: boolean): PreviewFrame {
     const rb = ROBES[EQ.robe] || {};
     return {
-      artwork: settings.renderer,
       time,
       wind,
       effectDensity: density(),
@@ -3424,10 +3413,6 @@ export function startGame(): () => void {
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
     bindings: () => settings.bindings,
-    toggleRenderer: () => {
-      settings.renderer = settings.renderer === 'classic' ? 'ink' : 'classic';
-      saveSettings();
-    },
     state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
     closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
     titleDirection: konamiInput,
@@ -3950,63 +3935,19 @@ export function startGame(): () => void {
       g.scale(zoom, zoom);
       g.translate(-zoomX, -zoomY);
     }
-    const inkEnvironment = environmentRenderer.draw(
-      g,
-      {
-        width: W,
-        height: H,
-        dpr: DPR,
-        time,
-        stage: G.stage,
-        reducedMotion: reducedMotion(),
-        reducedFlashes: reducedFlashes(),
-        lowQuality: density() <= 0.3,
-      },
-      cinematic.active ? cinematicRenderer : settings.renderer,
-      bg,
-    );
-    cvs.dataset.renderer = cinematic.active ? cinematicRenderer : settings.renderer;
+    const inkEnvironment = environmentRenderer.draw(g, {
+      width: W,
+      height: H,
+      dpr: DPR,
+      time,
+      stage: G.stage,
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
+      lowQuality: density() <= 0.3,
+    });
+    cvs.dataset.renderer = 'ink';
     cvs.dataset.rendererBackend = environmentRenderer.backend;
-    cvs.dataset.artwork = cinematic.active ? cinematicRenderer : settings.renderer;
-    if (!inkEnvironment && L.glows && L.glows.length) {
-      g.save();
-      g.globalCompositeOperation = 'lighter';
-      for (const q of L.glows) {
-        const a = 0.22 + 0.08 * Math.sin(time * 9 + q.x) + 0.05 * Math.sin(time * 23);
-        const rg = g.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.r);
-        rg.addColorStop(0, `rgba(255,210,150,${a})`);
-        rg.addColorStop(1, 'rgba(255,210,150,0)');
-        g.fillStyle = rg;
-        g.fillRect(q.x - q.r, q.y - q.r, q.r * 2, q.r * 2);
-      }
-      g.restore();
-    }
-    // Ink layers use their own stage presentation; never wipe classic scenery over them.
-    if (!inkEnvironment && prevBg && stageFade > 0) {
-      const k = easeInOut(1 - stageFade),
-        ex = -W * 0.15 + k * W * 1.35,
-        stp = H / 40,
-        ed = (y: number) =>
-          ex + Math.sin(y * 0.021) * W * 0.035 + Math.sin(y * 0.07 + 1.7) * W * 0.012;
-      g.save();
-      g.beginPath();
-      g.moveTo(W + 60, -10);
-      g.lineTo(ed(-10), -10);
-      for (let y = 0; y <= H + stp; y += stp) g.lineTo(ed(y), y);
-      g.lineTo(W + 60, H + 10);
-      g.closePath();
-      g.clip();
-      g.drawImage(prevBg, 0, 0, W, H);
-      g.restore();
-      g.fillStyle = 'rgba(10,9,8,.9)';
-      for (let y = 0; y < H; y += 4) {
-        const hs = Math.abs(Math.sin(y * 12.9898) * 43758.5453) % 1,
-          len = W * (0.02 + 0.07 * hs);
-        g.globalAlpha = 0.55 + 0.45 * hs;
-        g.fillRect(ed(y) - len, y, len, 3);
-      }
-      g.globalAlpha = 1;
-    }
+    cvs.dataset.artwork = 'ink';
     if (mistSprite)
       for (const m of mists) {
         g.globalAlpha = m.a;
@@ -4040,7 +3981,6 @@ export function startGame(): () => void {
     }
     if (b) drawBoss();
     for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
-    if (!inkEnvironment) drawBamboo();
     if (!cinematic.active) {
       drawPlayer();
       drawPet();
@@ -4170,6 +4110,37 @@ export function startGame(): () => void {
     runResults.dispose();
     void audio.dispose()?.catch(() => {});
   });
-  frameLoop.start();
+  let artworkDisposed = false;
+  const artworkLoading = mountStartupLoading(() => location.reload());
+  lifecycle.add(() => {
+    artworkDisposed = true;
+    artworkLoading.remove();
+  });
+  void Promise.all([
+    inkCharm.prepare(),
+    inkCompanion.prepare(),
+    inkEnemy.prepare(),
+    inkPlayer.prepare(),
+    inkSword.prepare(),
+    environmentRenderer.prepare(G.stage),
+  ]).then(() => {
+    if (artworkDisposed) return;
+    const failed = [
+      inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
+      !inkCompanion.ready ? 'companions' : null,
+      !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 2 ? 'enemies' : null,
+      !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
+        ? 'outfits'
+        : null,
+      !inkSword.ready ? 'weapons' : null,
+      environmentRenderer.backend !== 'layered' ? 'scene' : null,
+    ].filter((name): name is string => !!name);
+    if (failed.length) {
+      artworkLoading.update({ loaded: 6 - failed.length, total: 6, pending: 0, failed });
+      return;
+    }
+    artworkLoading.remove();
+    frameLoop.start();
+  });
   return lifecycle.dispose;
 }

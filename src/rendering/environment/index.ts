@@ -15,8 +15,7 @@ import { drawMountainTiles } from './mountains.ts';
 import { drawFieldMidground } from './midground.ts';
 import { drawMeadowTransition, drawMeadowFog } from './meadow.ts';
 
-export type EnvironmentMode = 'classic' | 'ink';
-export type EnvironmentBackend = 'classic' | 'loading' | 'layered' | 'unavailable';
+export type EnvironmentBackend = 'loading' | 'layered' | 'unavailable';
 export interface EnvironmentFrame {
   width: number;
   height: number;
@@ -90,7 +89,7 @@ function sceneAssets(stage: number): number[] {
 export function createEnvironmentRenderer(doc: Document) {
   const foreground = createBambooForegroundRenderer(doc);
   let disposed = false;
-  let status: EnvironmentBackend = 'classic';
+  let status: EnvironmentBackend = 'loading';
   let ready = false;
   let failed = false;
   let pending: Promise<void> | undefined;
@@ -196,7 +195,7 @@ export function createEnvironmentRenderer(doc: Document) {
     ctx.restore();
   }
 
-  function build(frame: EnvironmentFrame, classicCanvas: HTMLCanvasElement | null) {
+  function build(frame: EnvironmentFrame) {
     const { width: w, height: h } = frame;
     const stage = STAGES[frame.stage] ?? STAGES[0]!;
     // Bound backing pixels for tablets/4K desktops without changing world geometry.
@@ -320,7 +319,7 @@ export function createEnvironmentRenderer(doc: Document) {
     }
     const { horizonY, groundY, eH } = createLayout(w, h);
     const openField = frame.stage === 0;
-    const restoredField = openField && classicCanvas !== null;
+    const restoredField = openField;
     const sky = ctx.createLinearGradient(0, 0, 0, h);
     sky.addColorStop(0, '#161713');
     sky.addColorStop((horizonY / h) * 0.7, stage.sky[1]);
@@ -333,9 +332,6 @@ export function createEnvironmentRenderer(doc: Document) {
     // Keep that full field beneath the image props; animated grass still draws in the runtime.
     if (restoredField) {
       const field = createBackground(w, h, scale, frame.stage, {
-        fieldTrees: false,
-        fieldStatues: false,
-        fieldRocks: false,
         fieldMist: 0.3,
         mountains: (g) => drawMountainTiles(g, images[3]!, w, h, stage),
       }).canvas;
@@ -475,12 +471,7 @@ export function createEnvironmentRenderer(doc: Document) {
     return true;
   }
 
-  function draw(
-    ctx: CanvasRenderingContext2D,
-    frame: EnvironmentFrame,
-    mode: EnvironmentMode,
-    classicCanvas: HTMLCanvasElement | null,
-  ): boolean {
+  function draw(ctx: CanvasRenderingContext2D, frame: EnvironmentFrame): boolean {
     ctx.save();
     try {
       const valid =
@@ -489,7 +480,7 @@ export function createEnvironmentRenderer(doc: Document) {
         frame.width > 0 &&
         frame.height > 0 &&
         Number.isFinite(frame.dpr);
-      if (!disposed && mode === 'ink' && valid) {
+      if (!disposed && valid) {
         void prepare(frame.stage);
         if (ready) {
           const key = JSON.stringify([
@@ -500,7 +491,7 @@ export function createEnvironmentRenderer(doc: Document) {
             frame.lowQuality,
           ]);
           if (key !== cacheKey) {
-            if (build(frame, classicCanvas)) cacheKey = key;
+            if (build(frame)) cacheKey = key;
             else {
               failed = true;
               ready = false;
@@ -545,8 +536,7 @@ export function createEnvironmentRenderer(doc: Document) {
           }
         }
         status = failed ? 'unavailable' : 'loading';
-      } else status = 'classic';
-      if (classicCanvas && valid) ctx.drawImage(classicCanvas, 0, 0, frame.width, frame.height);
+      } else status = 'loading';
       return false;
     } finally {
       ctx.restore();
@@ -557,7 +547,7 @@ export function createEnvironmentRenderer(doc: Document) {
     foreground.dispose();
     disposed = true;
     generation++;
-    status = 'classic';
+    status = 'loading';
     for (const image of images) {
       if (!image) continue;
       image.onload = image.onerror = null;

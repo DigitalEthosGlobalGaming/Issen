@@ -16,10 +16,6 @@ export function drawMoonwatchClearing(
   const { horizonY, groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
   const terrain = createBackground(width, height, scale, 8, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
-    landmarks: false,
     fieldMist: 0.12,
     mountains(g) {
       sprite(

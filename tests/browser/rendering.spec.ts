@@ -39,114 +39,66 @@ test('Steel third form draws animated lightning along its blade', async ({ page 
   expect(strokes).not.toContain('rgba(43, 189, 255, 0.5)');
 });
 
-test('player sword is behind the back-facing body', async ({ page }) => {
-  await page.goto('/');
-  const order = await page.evaluate(async () => {
-    const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
-    const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig } = await import('/src/rendering/figures/model.ts');
-    const { REST_POSE } = await import('/src/rendering/figures/player.ts');
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d')!;
-    const palette = createPalette().fog(0, [146, 141, 132]);
-    context.fillStyle = palette.obi;
-    const obi = context.fillStyle;
-    const order: string[] = [];
-    const g = new Proxy(context, {
-      get(target, key) {
-        if (key === 'fillRect')
-          return (x: number, y: number, w: number, h: number) => {
-            if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
-            return target.fillRect(x, y, w, h);
-          };
-        if (key === 'fill')
-          return (...args: Parameters<CanvasRenderingContext2D['fill']>) => {
-            if (target.fillStyle === obi) order.push('body');
-            return target.fill(...args);
-          };
-        const value = Reflect.get(target, key, target);
-        return typeof value === 'function' ? value.bind(target) : value;
-      },
-      set(target, key, value) {
-        return Reflect.set(target, key, value, target);
-      },
-    });
-    createFigureRenderer(g, {
-      time: 0,
-      wind: 0,
-      petActive: false,
-      width: 400,
-      height: 400,
-      palette: () => palette,
-      random: () => 0.5,
-    }).drawFigure({
-      x: 200,
-      y: 300,
-      h: 120,
-      fog: 0,
-      d: makeFig(7),
-      pose: REST_POSE,
-      back: true,
-      noShadow: true,
-    });
-    return order;
-  });
-  expect(order).toContain('sword');
-  expect(order).toContain('body');
-  expect(order.indexOf('sword')).toBeLessThan(order.indexOf('body'));
-});
-
-test('enemy attack arms sit behind the sword blade', async ({ page }) => {
-  await page.goto('/');
-  const order = await page.evaluate(async () => {
-    const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
-    const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d')!;
-    const palette = createPalette().fog(0, [146, 141, 132]);
-    const order: string[] = [];
-    const g = new Proxy(context, {
-      get(target, key) {
-        if (key === 'fillRect')
-          return (x: number, y: number, w: number, h: number) => {
-            if (x === -0.15 && y === -0.012 && w === 0.155 && h === 0.024) order.push('sword');
-            return target.fillRect(x, y, w, h);
-          };
-        if (key === 'stroke')
-          return (...args: Parameters<CanvasRenderingContext2D['stroke']>) => {
-            if (Math.abs(target.lineWidth - 0.075) < 0.001) order.push('arm');
-            return target.stroke(...args);
-          };
-        const value = Reflect.get(target, key, target);
-        return typeof value === 'function' ? value.bind(target) : value;
-      },
-      set(target, key, value) {
-        return Reflect.set(target, key, value, target);
-      },
-    });
-    createFigureRenderer(g, {
-      time: 0,
-      wind: 0,
-      petActive: false,
-      width: 400,
-      height: 400,
-      palette: () => palette,
-      random: () => 0.5,
-    }).drawFigure({
-      x: 200,
-      y: 300,
-      h: 120,
-      fog: 0,
-      d: makeFig(9),
-      pose: EPOSE.down,
-      noShadow: true,
-    });
-    return order;
-  });
-  expect(order.filter((part) => part === 'arm')).toHaveLength(2);
-  expect(order.indexOf('arm')).toBeLessThan(order.indexOf('sword'));
-});
+for (const back of [true, false]) {
+  test(
+    back
+      ? 'player sword is behind the back-facing body'
+      : 'enemy arms, sword, and hands compose in order',
+    async ({ page }) => {
+      await page.goto('/');
+      const order = await page.evaluate(async (back) => {
+        const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
+        const { createPalette } = await import('/src/rendering/palette.ts');
+        const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+        const { REST_POSE } = await import('/src/rendering/figures/player.ts');
+        const context = document.createElement('canvas').getContext('2d')!;
+        const order: string[] = [];
+        const artwork = {
+          drawPart: (_g: unknown, part: string) => {
+            order.push(part);
+            return true;
+          },
+        };
+        createFigureRenderer(context, {
+          time: 0,
+          wind: 0,
+          petActive: false,
+          width: 400,
+          height: 400,
+          palette: () => createPalette().fog(0, [146, 141, 132]),
+          random: () => 0.5,
+          inkPlayer: artwork,
+          inkEnemy: artwork,
+          inkSword: {
+            draw: () => {
+              order.push('sword');
+              return true;
+            },
+          },
+        }).drawFigure({
+          x: 200,
+          y: 300,
+          h: 120,
+          fog: 0,
+          d: makeFig(7),
+          pose: back ? REST_POSE : EPOSE.down,
+          back,
+          robeId: 'sumi',
+          bladeId: 'steel',
+          noShadow: true,
+        });
+        return order;
+      }, back);
+      expect(order).toContain('sword');
+      expect(order).toContain('body');
+      if (back) expect(order.indexOf('sword')).toBeLessThan(order.indexOf('body'));
+      else {
+        expect(order.indexOf('arms')).toBeLessThan(order.indexOf('sword'));
+        expect(order.indexOf('sword')).toBeLessThan(order.indexOf('hands'));
+      }
+    },
+  );
+}
 
 // These regressions exercise established gameplay; onboarding has dedicated coverage.
 test.beforeEach(async ({ page }) => {
@@ -298,7 +250,7 @@ test('weather layers render in both orientations without mutating simulation sta
       [390, 844],
       [844, 390],
     ]) {
-      for (const weather of ['rain', 'storm', 'snow', 'sakura', 'smoke', 'bamboo']) {
+      for (const weather of ['rain', 'storm', 'snow', 'sakura', 'smoke']) {
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
@@ -332,7 +284,6 @@ test('weather layers render in both orientations without mutating simulation sta
           smokeSprite: sprite,
         });
         renderer.drawWeather();
-        renderer.drawBamboo();
         if (weather === 'smoke') renderer.drawSmoke();
         if (before !== JSON.stringify({ particles, bamboo, state }))
           throw new Error('Renderer changed weather state');
@@ -345,7 +296,7 @@ test('weather layers render in both orientations without mutating simulation sta
     }
     return count;
   });
-  expect(count).toBe(12);
+  expect(count).toBe(10);
 });
 
 test('all decorative particles render on their own canvas without mutating effect state', async ({

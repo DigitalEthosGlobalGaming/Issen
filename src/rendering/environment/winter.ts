@@ -52,10 +52,6 @@ export function drawWhiteSilencePass(
   }
 
   const terrain = createBackground(width, height, scale, 5, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
-    landmarks: false,
     fieldMist: 0.15,
     hillShade: { top: '#b5b6b0', bottom: '#9da19d' },
     hillHeight: (x) => groundY - eH * 0.28 - height * (0.025 + 0.014 * Math.cos((x / width) * 5)),

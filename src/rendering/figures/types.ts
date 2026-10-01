@@ -118,7 +118,6 @@ export interface SwordArtwork {
   ): boolean;
 }
 export interface FigureEnvironment {
-  artwork?: 'classic' | 'ink';
   inkPlayer?: PlayerArtwork;
   inkEnemy?: EnemyArtwork;
   inkCompanion?: CompanionArtwork;

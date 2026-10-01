@@ -28,24 +28,23 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
       reducedFlashes: true,
       lowQuality: false,
     };
-    const loading = a.draw(ctx, frame, 'ink', classic);
+    const loading = a.draw(ctx, frame);
     const fallbackPixel = Array.from(ctx.getImageData(0, 0, 1, 1).data);
     await Promise.all([a.prepare(), b.prepare()]);
     ctx.globalAlpha = 0.7;
-    const layered = a.draw(ctx, frame, 'ink', classic);
+    const layered = a.draw(ctx, frame);
     const alpha = ctx.globalAlpha;
     const first = a.snapshot();
-    a.draw(ctx, { ...frame, time: 900 }, 'ink', classic);
+    a.draw(ctx, { ...frame, time: 900 });
     const cached = a.snapshot().builds === first.builds;
-    const classicResult = a.draw(ctx, frame, 'classic', classic);
-    a.draw(ctx, frame, 'ink', classic);
+    a.draw(ctx, frame);
     const sameAfterSwitch = a.snapshot().builds === first.builds;
     frame = { ...frame, width: 3840, height: 2160, dpr: 3 };
-    a.draw(ctx, frame, 'ink', classic);
+    a.draw(ctx, frame);
     const desktop = a.snapshot();
     a.dispose();
     const disposed = a.snapshot();
-    const other = b.draw(ctx, frame, 'ink', classic);
+    const other = b.draw(ctx, frame);
     b.dispose();
     return {
       loading,
@@ -53,7 +52,6 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
       layered,
       alpha,
       cached,
-      classicResult,
       sameAfterSwitch,
       desktop,
       disposed,
@@ -61,11 +59,10 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
     };
   });
   expect(result.loading).toBe(false);
-  expect(result.fallbackPixel).toEqual([255, 0, 0, 255]);
+  expect(result.fallbackPixel).toEqual([0, 0, 0, 0]);
   expect(result.layered).toBe(true);
   expect(result.alpha).toBeCloseTo(0.7);
   expect(result.cached).toBe(true);
-  expect(result.classicResult).toBe(false);
   expect(result.sameAfterSwitch).toBe(true);
   expect(result.desktop.pixels).toBeLessThanOrEqual(3_006_000);
   expect(result.desktop.layers).toBe(3);
@@ -74,8 +71,8 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
   expect(result.other).toBe(true);
 });
 
-test('missing sprite assets retain classic rendering', async ({ page }) => {
-  await page.route('**/bamboo-atlas.png*', (route) => route.abort());
+test('missing sprite assets report unavailable without substituted artwork', async ({ page }) => {
+  await page.route('**/mountain-atlas.png*', (route) => route.abort());
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
@@ -91,21 +88,16 @@ test('missing sprite assets retain classic rendering', async ({ page }) => {
     base.fillStyle = '#ff0000';
     base.fillRect(0, 0, 2, 2);
     await renderer.prepare();
-    const drawn = renderer.draw(
-      ctx,
-      {
-        width: 10,
-        height: 10,
-        dpr: 1,
-        time: 0,
-        stage: 0,
-        reducedMotion: false,
-        reducedFlashes: false,
-        lowQuality: false,
-      },
-      'ink',
-      classic,
-    );
+    const drawn = renderer.draw(ctx, {
+      width: 10,
+      height: 10,
+      dpr: 1,
+      time: 0,
+      stage: 0,
+      reducedMotion: false,
+      reducedFlashes: false,
+      lowQuality: false,
+    });
     const backend = renderer.backend;
     const pixel = Array.from(ctx.getImageData(0, 0, 1, 1).data);
     renderer.dispose();
@@ -113,7 +105,7 @@ test('missing sprite assets retain classic rendering', async ({ page }) => {
   });
   expect(result.drawn).toBe(false);
   expect(result.backend).toBe('unavailable');
-  expect(result.pixel).toEqual([255, 0, 0, 255]);
+  expect(result.pixel).toEqual([0, 0, 0, 0]);
 });
 
 test('ink layers retain film grading and freeze decorative motion for accessibility', async ({
@@ -141,7 +133,7 @@ test('ink layers retain film grading and freeze decorative motion for accessibil
     };
     const pixels = () => canvas.toDataURL();
     const render = (changes = {}) => {
-      renderer.draw(ctx, { ...frame, ...changes }, 'ink', null);
+      renderer.draw(ctx, { ...frame, ...changes });
       return pixels();
     };
     const stillA = render({ reducedMotion: true });

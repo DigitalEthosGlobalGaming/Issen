@@ -13,7 +13,6 @@ export interface KeyboardActions {
   tapDown(): boolean;
   tap(): void;
   bindings?(): Bindings;
-  toggleRenderer?(): void;
 }
 const arrows: Record<string, Direction> = {
   ArrowUp: 'up',
@@ -29,26 +28,6 @@ export function bindKeyboard(actions: KeyboardActions): () => void {
     const pauseKey = event.key === 'Escape' || (!!key && bindings.pause.includes(key));
     if (panelOpen) {
       if (event.key === 'Escape') actions.closePanel();
-      return;
-    }
-    const editable =
-      ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName ?? '') ||
-      (document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable);
-    // Keep custom combat bindings authoritative; ignore held keys and typing.
-    if (
-      event.code === 'Backquote' &&
-      !event.repeat &&
-      !event.isComposing &&
-      !event.ctrlKey &&
-      !event.altKey &&
-      !event.metaKey &&
-      !event.shiftKey &&
-      !editable &&
-      !(key && Object.values(bindings).some((keys) => keys.includes(key))) &&
-      actions.toggleRenderer
-    ) {
-      event.preventDefault();
-      actions.toggleRenderer();
       return;
     }
     const onButton = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(

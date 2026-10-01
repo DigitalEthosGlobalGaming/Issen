@@ -120,9 +120,6 @@ export function drawFallingBlossomPath(
   }
 
   const terrain = createBackground(width, height, scale, 2, {
-    fieldTrees: false,
-    fieldRocks: false,
-    stageProps: false,
     fieldMist: 0.4,
     hillHeight: slope,
     hillShade: { top: stage.hill, bottom: stage.field[0] },
