@@ -44,7 +44,7 @@ export const STAGES: Stage[] = [
   },
   {
     k: '夕',
-    n: 'Dusk',
+    n: 'Last Light Ridge',
     sky: ['#121110', '#3a3631', '#8b8174', '#e2d6c2'],
     sunF: 0.92,
     sunA: 1.2,
@@ -60,7 +60,7 @@ export const STAGES: Stage[] = [
     tex: '14,13,11',
     gl: -10,
     weather: 'gust',
-    hint: 'Dusk. Gusts of leaves will sweep across your view.',
+    hint: 'Last Light Ridge. Gusts of leaves will sweep across your view.',
   },
   {
     k: '桜',

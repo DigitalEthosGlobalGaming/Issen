@@ -1,14 +1,17 @@
 # Rendering and visual consistency
 
-Issen uses two rendering surfaces. The duel scene is procedural Canvas 2D, while
-the interface around it is regular HTML and CSS. It is not an SVG-rendered game
-and it does not use a sprite-sheet or image-asset pipeline.
+Issen uses two rendering surfaces. The duel scene uses Canvas 2D, while
+the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
+Classic uses procedural artwork; the optional Ink preview adds layered PNG sprite atlases.
 
 The only SVG in the application is small inline interface artwork, such as the
 mute control in `src/ui/shell.html` and the alternate mute icons assigned by
-`src/game.ts`. Characters, scenery, weather, particles and combat effects are
+`src/game.ts`. Characters, classic scenery, weather, particles and combat effects are
 drawn through `CanvasRenderingContext2D` paths, rectangles, ellipses, text,
 gradients and compositing operations.
+
+See [Ink layer renderer](../features/ink-renderer.md) for responsive image layers,
+live switching, shared film grading, and prototype limits.
 
 ## Rendering surfaces
 
@@ -161,6 +164,7 @@ returning. Leaked Canvas state can subtly recolor or displace every later layer.
 | Change | Owning location |
 | --- | --- |
 | Stage palette, weather choice or background theme | `src/game/content/stages.ts` |
+| Layered image environments and sprite atlases | `src/rendering/environment/` |
 | Static stage scenery and props | `src/rendering/scene/background.ts` |
 | Moving weather, leaves, grass or smoke | `src/rendering/scene/` |
 | Figure shape, clothing, weapon or pet drawing | `src/rendering/figures/` |

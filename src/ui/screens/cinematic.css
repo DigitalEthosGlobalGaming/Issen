@@ -1,0 +1,78 @@
+#title .t-k[role='button'] {
+  cursor: pointer;
+}
+.cinematic-active > :not(#c):not(#cinematic) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+#cinematic[hidden] {
+  display: none;
+}
+#cinematic button,
+#cinematic select {
+  pointer-events: auto;
+  min-height: 44px;
+  color: #e8dfcc;
+  background: #171713dc;
+  border: 1px solid #a79a7955;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font: inherit;
+}
+#cinematic button:focus-visible,
+#cinematic select:focus-visible {
+  outline: 2px solid #e8dfcc;
+  outline-offset: 3px;
+}
+.cinematic-exit {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+}
+.cinematic-toolbar {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(94%, 680px);
+  padding: 10px;
+  color: #e8dfcc;
+  text-align: center;
+  background: #12130ee0;
+  border-radius: 6px;
+}
+.cinematic-scenes,
+.cinematic-looks {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.cinematic-scenes span {
+  flex: 1;
+}
+.cinematic-looks {
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.cinematic-looks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.cinematic-looks select {
+  max-width: 165px;
+}
+.cinematic-toolbar small {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  opacity: 0.7;
+}

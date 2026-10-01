@@ -137,7 +137,8 @@ controls are unavailable in the player profile.
 **Clear test profile** asks for confirmation, removes only `issen.testing.*`, and
 reloads a fresh test profile. It blocks stale queued saves during reload.
 **Unlock all** grants the complete Armoury (including awakened unlocks) only in
-the test profile, without changing Temple ranks or equipment. Set Awakening Access
+the test profile, and grants at least Vitality rank 1 to expose Endless and No lives.
+Other Temple ranks and equipment stay unchanged. Set Awakening Access
 separately to reveal and use those forms.
 
 Stats also offers **Reset profile** for the active profile. Its modal warning

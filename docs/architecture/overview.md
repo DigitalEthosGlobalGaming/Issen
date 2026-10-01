@@ -38,6 +38,10 @@ main scene layer order and post-processing orchestration. These are not separate
 session/renderer services yet; do not assume the proposed migration tree describes
 implemented files.
 
+The optional Ink environment is owned by src/rendering/environment/. It supplies
+layered image scenery to the same Canvas composition and film pass.
+See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
+
 ## Where changes belong
 
 | Concern                                                                 | Maintained location                                                    |

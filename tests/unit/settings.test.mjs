@@ -84,3 +84,10 @@ test('disabled vibration never calls the optional browser capability', () => {
     else delete globalThis.navigator;
   }
 });
+
+test('scene renderer defaults preserve older saves and validate the optional preference', () => {
+  assert.equal(defaultSettings().renderer, 'classic');
+  assert.equal(parseSettings({ version: 1 }).renderer, 'classic');
+  assert.equal(parseSettings({ version: 1, renderer: 'unknown' }).renderer, 'classic');
+  assert.equal(parseSettings({ ...defaultSettings(), renderer: 'ink' }).renderer, 'ink');
+});

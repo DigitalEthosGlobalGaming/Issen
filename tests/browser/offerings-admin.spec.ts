@@ -19,7 +19,7 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
   ).toBe(3);
 });
 
-test('Unlock all grants only Armoury ownership and preserves Temple, equipment and player saves', async ({
+test('Unlock all grants Armoury and Endless access while preserving other ranks, equipment and player saves', async ({
   page,
 }) => {
   await page.goto('/');
@@ -58,7 +58,12 @@ test('Unlock all grants only Armoury ownership and preserves Temple, equipment a
   });
   expect(result.complete).toBe(true);
   expect(result.unique).toBe(true);
-  expect(result.meta).toBe(before.meta);
+  const originalMeta = JSON.parse(before.meta!);
+  const updatedMeta = JSON.parse(result.meta!);
+  expect(updatedMeta).toEqual({
+    ...originalMeta,
+    upgrades: { ...originalMeta.upgrades, vitality: Math.max(1, originalMeta.upgrades.vitality) },
+  });
   expect(result.equip).toBe(before.equip);
   expect(result.player).toEqual(player);
   await page.reload();
@@ -67,6 +72,8 @@ test('Unlock all grants only Armoury ownership and preserves Temple, equipment a
       () => JSON.parse(localStorage.getItem('issen.testing.meta')!).upgrades.awakening,
     ),
   ).toBe(0);
+  await page.locator('#bPlay').click();
+  await expect(page.locator('[data-k="lives"][data-v="zen"]')).toBeVisible();
 });
 
 test('admin unlocks Ronin only in the test profile and keeps it after reload', async ({ page }) => {

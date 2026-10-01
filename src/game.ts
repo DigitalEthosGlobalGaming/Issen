@@ -85,6 +85,7 @@ import {
   applyDeathPose,
 } from './rendering/figures/death.ts';
 import { parseSettings, preferenceEnabled, sensitivityScale } from './platform/settings.ts';
+import { createCinematic } from './ui/screens/cinematic.ts';
 import { createOptions } from './ui/screens/options.ts';
 import { updateEffects } from './rendering/effects/update.ts';
 import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
@@ -104,6 +105,7 @@ import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
 import { applyFilm } from './rendering/effects/film.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
+import { createEnvironmentRenderer } from './rendering/environment/index.ts';
 import { BASE, createPalette } from './rendering/palette.ts';
 import { drawEnso as renderEnso, enemyGlyphCue } from './rendering/glyphs.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
@@ -203,6 +205,8 @@ export function startGame(): () => void {
   const cvs = $('c'),
     mainG = context2d(cvs);
   const g = mainG;
+  const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
+  lifecycle.add(environmentRenderer.dispose);
   const R = Math.random;
   const settings = parseSettings(
     store.get('issen.settings', null),
@@ -469,6 +473,7 @@ export function startGame(): () => void {
   const grainCanv: HTMLCanvasElement[] = [],
     grainPats: (CanvasPattern | null)[] = [];
   const WX = createWeatherState(() => 0.5);
+  const cinematicWeather = createWeatherState(() => 0.5);
   function buildMist() {
     const st = STAGES[G.stage]!;
     mistSprite = document.createElement('canvas');
@@ -648,7 +653,7 @@ export function startGame(): () => void {
       hazard: G.m.hazard,
       particles: wx,
       bamboo,
-      state: WX,
+      state: cinematic.active ? cinematicWeather : WX,
       smokeSprite,
     });
   }
@@ -2742,7 +2747,11 @@ export function startGame(): () => void {
           }
           store.set('issen.revoked', [...revoked]);
           store.set('issen.unlocks', [...UNL]);
+          // Endless and No lives share the first Vitality access gate.
+          META.upgrades.vitality = Math.max(1, META.upgrades.vitality);
+          saveMeta();
           refreshArmoryNew();
+          showAdmin();
         },
         unlockRonin: () => {
           if (!isTestProfile() || META.bossMilestone >= 2) return;
@@ -2972,6 +2981,58 @@ export function startGame(): () => void {
     if (unread) $('bArmory').setAttribute('aria-description', 'Unviewed equipment');
     else $('bArmory').removeAttribute('aria-description');
   }
+  let cinematicStage = 0;
+  let cinematicRenderer: 'classic' | 'ink' = settings.renderer;
+  let cinematicFilm = EQ.film;
+  function previewStage(stage: number) {
+    G.stage = stage;
+    MIST = STAGES[stage]!.fog;
+    palette.clearFog();
+    prevBg = null;
+    stageFade = 0;
+    buildBG();
+    buildMist();
+    buildGrass();
+    buildWeather(false);
+    Object.assign(
+      cinematicWeather,
+      createWeatherState(() => 0.5),
+    );
+  }
+  const cinematic = createCinematic($('app'), {
+    canOpen: () => G.state === 'title' && !G.panel,
+    stage: () => G.stage,
+    scenes: STAGES.map((stage) => stage.n),
+    bindings: () => settings.bindings,
+    renderer: () => settings.renderer,
+    film: () => EQ.film,
+    films: () =>
+      ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
+    enter(stage) {
+      cinematicStage = G.stage;
+      cinematicRenderer = settings.renderer;
+      cinematicFilm = EQ.film;
+      previewStage(stage);
+    },
+    scene: previewStage,
+    leave: () => previewStage(cinematicStage),
+    artwork: (value) => {
+      cinematicRenderer = value;
+    },
+    grade: (value) => {
+      cinematicFilm = value;
+    },
+  });
+  lifecycle.add(cinematic.dispose);
+  const logo = document.querySelector<HTMLElement>('#title .t-k')!;
+  lifecycle.listen(logo, 'keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      cinematic.open();
+    }
+  });
+  const sceneFilm = () => (cinematic.active ? cinematicFilm : EQ.film);
   const KONAMI = 'up,up,down,down,left,right,left,right';
   let kseq: Direction[] = [];
   let tapN = 0,
@@ -3041,12 +3102,14 @@ export function startGame(): () => void {
     let sx = 0,
       sy = 0,
       id: number | null = null,
-      done = false;
+      done = false,
+      logoTarget = false;
     const el = $('title');
     lifecycle.listen(el, 'pointerdown', (e) => {
       if (e.target instanceof Element && e.target.closest('button')) return;
       if (id !== null) return;
       id = e.pointerId;
+      logoTarget = e.target instanceof Element && !!e.target.closest('.t-k, .t-wrap');
       done = false;
       sx = e.clientX;
       sy = e.clientY;
@@ -3070,7 +3133,10 @@ export function startGame(): () => void {
     lifecycle.listen(el, 'pointerup', (e) => {
       if (e.pointerId !== id) return;
       fire(e);
-      if (e.pointerId === id && !done) titleTap();
+      if (e.pointerId === id && !done) {
+        if (logoTarget) cinematic.logoTap();
+        else titleTap();
+      }
       id = null;
     });
     lifecycle.listen(el, 'pointercancel', (e) => {
@@ -3168,9 +3234,11 @@ export function startGame(): () => void {
       const k = G.m ? G.m.swipe : 1;
       return Math.max(22 * k, Math.min(W, H) * 0.055 * k) * sensitivityScale(settings.sensitivity);
     },
-    swipe: onSwipe,
-    tapDown: onTapDown,
-    tap: onTap,
+    swipe: (direction) => (cinematic.active ? cinematic.swipe(direction) : onSwipe(direction)),
+    tapDown: () => (cinematic.active ? false : onTapDown()),
+    tap: () => {
+      if (!cinematic.active) onTap();
+    },
   });
   lifecycle.listen($('bPlay'), 'click', () => {
     audioInit();
@@ -3305,6 +3373,10 @@ export function startGame(): () => void {
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
     bindings: () => settings.bindings,
+    toggleRenderer: () => {
+      settings.renderer = settings.renderer === 'classic' ? 'ink' : 'classic';
+      saveSettings();
+    },
     state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
     closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
     titleDirection: konamiInput,
@@ -3374,7 +3446,7 @@ export function startGame(): () => void {
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }
   function updateWeather(dt: number) {
-    simulateWeather(WX, wx, dt, {
+    simulateWeather(cinematic.active ? cinematicWeather : WX, wx, dt, {
       weather: STAGES[G.stage]!.weather,
       phase: G.state,
       width: W,
@@ -3385,7 +3457,7 @@ export function startGame(): () => void {
       hazard: G.m.hazard,
       layout: L,
       random: R,
-      hazardRandom: combatRandom,
+      hazardRandom: cinematic.active ? R : combatRandom,
       flash,
       sounds: sfx,
       gustLeaves,
@@ -3411,6 +3483,12 @@ export function startGame(): () => void {
       if (m.x - m.w / 2 > W) m.x = -m.w / 2;
     }
     ambient().updateLeaves(leaves, dt, time, wind);
+    // Cinematic mode advances cosmetic time only: no encounters, weather hazards or run RNG.
+    if (cinematic.active) {
+      updateWeather(reducedMotion() ? 0 : dt);
+      audio.update(raw, STAGES[G.stage]!.weather, wind, 0);
+      return;
+    }
     if (G.freezeT > 0) G.freezeT -= dt;
     if (G.petT > 0) G.petT -= dt;
     updateWeather(dt);
@@ -3696,10 +3774,18 @@ export function startGame(): () => void {
       g.fillStyle = 'rgba(120,18,12,0.16)';
       g.fillRect(0, 0, W, H);
     }
-    applyFilm(g, W, H, cvs, EQ.film === PREMIUM_FILM && !premiumAccess() ? 'mono' : EQ.film, time, {
-      reducedMotion: reducedMotion(),
-      reducedFlashes: reducedFlashes(),
-    });
+    applyFilm(
+      g,
+      W,
+      H,
+      cvs,
+      sceneFilm() === PREMIUM_FILM && !premiumAccess() ? 'mono' : sceneFilm(),
+      time,
+      {
+        reducedMotion: reducedMotion(),
+        reducedFlashes: reducedFlashes(),
+      },
+    );
     frameN++;
     const pat = grainPats[frameN % 3];
     if (pat) {
@@ -3710,7 +3796,7 @@ export function startGame(): () => void {
       g.fillRect(0, 0, W + 180, H + 180);
       g.restore();
     }
-    const nit = EQ.film === 'nitrate';
+    const nit = sceneFilm() === 'nitrate';
     if (nit && !reducedFlashes() && R() < 0.03) {
       g.fillStyle = 'rgba(8,6,4,.55)';
       g.beginPath();
@@ -3786,7 +3872,7 @@ export function startGame(): () => void {
       g.fillRect(0, 0, W, bh);
       g.fillRect(0, H - bh, W, bh);
     }
-    g.fillStyle = `rgba(0,0,0,${reducedFlashes() ? 0.02 : R() * (EQ.film === 'nitrate' ? 0.12 : 0.035)})`;
+    g.fillStyle = `rgba(0,0,0,${reducedFlashes() ? 0.02 : R() * (sceneFilm() === 'nitrate' ? 0.12 : 0.035)})`;
     g.fillRect(0, 0, W, H);
     if (flashA > 0) {
       g.fillStyle = `rgba(${flashCol},${reducedFlashes() ? Math.min(flashA, 0.035) : flashA})`;
@@ -3800,7 +3886,7 @@ export function startGame(): () => void {
       sy = reducedMotion()
         ? 0
         : (R() - 0.5) * shake +
-          (EQ.film === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
+          (sceneFilm() === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
     shake = Math.max(0, shake - raw * 45 * S);
     g.save();
     g.translate(sx, sy);
@@ -3809,8 +3895,24 @@ export function startGame(): () => void {
       g.scale(zoom, zoom);
       g.translate(-zoomX, -zoomY);
     }
-    if (bg) g.drawImage(bg, 0, 0, W, H);
-    if (L.glows && L.glows.length) {
+    const inkEnvironment = environmentRenderer.draw(
+      g,
+      {
+        width: W,
+        height: H,
+        dpr: DPR,
+        time,
+        stage: G.stage,
+        reducedMotion: reducedMotion(),
+        reducedFlashes: reducedFlashes(),
+        lowQuality: density() <= 0.3,
+      },
+      cinematic.active ? cinematicRenderer : settings.renderer,
+      bg,
+    );
+    cvs.dataset.renderer = cinematic.active ? cinematicRenderer : settings.renderer;
+    cvs.dataset.rendererBackend = environmentRenderer.backend;
+    if (!inkEnvironment && L.glows && L.glows.length) {
       g.save();
       g.globalCompositeOperation = 'lighter';
       for (const q of L.glows) {
@@ -3823,7 +3925,8 @@ export function startGame(): () => void {
       }
       g.restore();
     }
-    if (prevBg && stageFade > 0) {
+    // Ink layers use their own stage presentation; never wipe classic scenery over them.
+    if (!inkEnvironment && prevBg && stageFade > 0) {
       const k = easeInOut(1 - stageFade),
         ex = -W * 0.15 + k * W * 1.35,
         stp = H / 40,
@@ -3855,7 +3958,7 @@ export function startGame(): () => void {
       }
     g.globalAlpha = 1;
     blades(mid, time);
-    drawStains();
+    if (!cinematic.active) drawStains();
     drawLeaves(false);
     const b = G.boss;
     if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
@@ -3882,19 +3985,21 @@ export function startGame(): () => void {
     if (b) drawBoss();
     for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
     drawBamboo();
-    drawPlayer();
-    drawPet();
-    drawFoxfire();
-    drawFx();
-    drawFx2();
+    if (!cinematic.active) {
+      drawPlayer();
+      drawPet();
+      drawFoxfire();
+      drawFx();
+      drawFx2();
+    }
     blades(fg, time);
-    drawGlyphs();
+    if (!cinematic.active) drawGlyphs();
     drawSmoke();
     drawLeaves(true);
     drawWeather();
-    drawPops();
+    if (!cinematic.active) drawPops();
     g.restore();
-    drawStamps();
+    if (!cinematic.active) drawStamps();
     drawPost(raw);
   }
   const frameLoop = createFrameLoop(
@@ -3965,7 +4070,11 @@ export function startGame(): () => void {
   computeMods();
   applySeal();
   resize();
-  if (savedRun?.status === 'active') {
+  if (cinematic.restores) {
+    G.state = 'title';
+    setupAttract();
+    cinematic.restore();
+  } else if (savedRun?.status === 'active') {
     const active = savedRun;
     restoreCheckpoint(active);
     G.pausedFrom = G.state;

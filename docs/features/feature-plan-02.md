@@ -139,7 +139,8 @@ The admin **Clear test profile** action requires confirmation, removes only
 the departing runtime are suppressed; player saves are never removed.
 
 Admin **Unlock all** grants all Armoury items, including secret items and awakened
-forms, and removes their test revocations. It does not alter Temple ranks, currency,
+forms, and removes their test revocations. It also grants at least Vitality rank 1
+to expose Endless and No lives. It does not alter other Temple ranks, currency,
 equipped gear or player-profile saves. Awakening-access ranks still gate the forms.
 
 Acceptance: verify all four access/challenge/activation states, independent forms,

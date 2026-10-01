@@ -25,7 +25,22 @@ export function blob(
   b.restore();
 }
 
-export function createBackground(W: number, H: number, DPR: number, stage: number) {
+export function createBackground(
+  W: number,
+  H: number,
+  DPR: number,
+  stage: number,
+  options: {
+    fieldTrees?: boolean;
+    fieldStatues?: boolean;
+    fieldRocks?: boolean;
+    fieldMist?: number;
+    stageProps?: boolean;
+    hillHeight?: (x: number) => number;
+    hillShade?: { top: string; bottom: string };
+    mountains?: (context: CanvasRenderingContext2D) => void;
+  } = {},
+) {
   const portrait = H >= W * 0.9,
     S = Math.max(W, H) / 900;
   const L = { ...createLayout(W, H), glows: [] as { x: number; y: number; r: number }[] };
@@ -354,7 +369,7 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
     const s = L.eH,
       i = stage;
     L.glows = [];
-    if (i === 0) {
+    if (i === 0 && options.fieldStatues !== false) {
       jizo(b, W * 0.045, ft + H * 0.014, s * 0.3);
       jizo(b, W * 0.085, ft + H * 0.016, s * 0.26);
     }
@@ -525,6 +540,8 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
     for (const ly of lay) {
       const f = ridgeFn(r);
       const pu = 0.72 + r() * 0.12;
+      // Preserve the downstream terrain/grass seed when replacing the ridge artwork.
+      if (options.mountains) continue;
       b.fillStyle = ly.col;
       b.beginPath();
       b.moveTo(0, H);
@@ -544,29 +561,40 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
       b.fillStyle = mg;
       b.fillRect(0, ly.base - ly.amp * 0.5, W, ly.amp * 0.5 + H * 0.05);
     }
+    options.mountains?.(b);
     if (st.bgx === 'temple') drawTemple(b, r, hz);
     const hillBase = gy - L.eH * 0.3;
     const hf = ridgeFn(r);
-    const hillY = (x: number) => hillBase - H * 0.035 * hf(x / W);
-    b.fillStyle = st.hill;
+    const hillY = options.hillHeight ?? ((x: number) => hillBase - H * 0.035 * hf(x / W));
+    if (options.hillShade) {
+      const shade = b.createLinearGradient(0, hz, 0, gy);
+      shade.addColorStop(0, options.hillShade.top);
+      shade.addColorStop(1, options.hillShade.bottom);
+      b.fillStyle = shade;
+    } else b.fillStyle = st.hill;
     b.beginPath();
     b.moveTo(0, H);
     for (let x = 0; x <= W + 3; x += 3) b.lineTo(x, hillY(x));
     b.lineTo(W, H);
     b.closePath();
     b.fill();
+    // Still consume placement randomness so grass and terrain stay identical.
     for (let i = 0; i < Math.round(W / 18); i++) {
       const x = r() * W,
         s = (6 + r() * 12) * S,
         c = (st.pine + r() * 22) | 0;
-      pine(b, x, hillY(x) + s * 0.2, s, `rgba(${c},${c - 1},${Math.max(0, c - 3)},.92)`);
+      if (options.fieldTrees !== false)
+        pine(b, x, hillY(x) + s * 0.2, s, `rgba(${c},${c - 1},${Math.max(0, c - 3)},.92)`);
     }
     let mg2 = b.createLinearGradient(0, hillBase - H * 0.05, 0, hillBase + H * 0.03);
     mg2.addColorStop(0, `rgba(${st.mist},0)`);
     mg2.addColorStop(0.75, `rgba(${st.mist},.5)`);
     mg2.addColorStop(1, `rgba(${st.mist},.15)`);
+    b.save();
+    b.globalAlpha = clamp(options.fieldMist ?? 1);
     b.fillStyle = mg2;
     b.fillRect(0, hillBase - H * 0.05, W, H * 0.08);
+    b.restore();
     if (st.bgx === 'shore') drawSea(b, r, hz, hillBase);
     if (st.bgx === 'bamboo') drawGrove(b, r, hillBase);
     const ft = gy - L.eH * 0.18;
@@ -602,12 +630,16 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
     mg2 = b.createLinearGradient(0, ft - H * 0.02, 0, ft + H * 0.09);
     mg2.addColorStop(0, `rgba(${st.mist},.35)`);
     mg2.addColorStop(1, `rgba(${st.mist},0)`);
+    b.save();
+    b.globalAlpha = clamp(options.fieldMist ?? 1);
     b.fillStyle = mg2;
     b.fillRect(0, ft - H * 0.02, W, H * 0.11);
+    b.restore();
     for (const rk of [
       [W * 0.84, H * 0.93, W * 0.12],
       [W * 0.95, H * 0.88, W * 0.07],
     ] as const) {
+      if (options.fieldRocks === false) continue;
       b.fillStyle = '#1e1d1b';
       b.beginPath();
       b.ellipse(rk[0], rk[1], rk[2], rk[2] * 0.42, 0, 0, TAU);
@@ -622,48 +654,50 @@ export function createBackground(W: number, H: number, DPR: number, stage: numbe
         stage === 3 ? 0.7 : 0.25,
       );
     }
-    b.strokeStyle = '#22211f';
-    b.lineCap = 'round';
-    const tr = rng(77);
-    branch(
-      b,
-      W * (portrait ? 0.96 : 0.93),
-      ft + H * 0.01,
-      H * (portrait ? 0.065 : 0.1),
-      -Math.PI / 2 - (st.bgx === 'shore' ? 0.32 : 0.2),
-      (portrait ? 4 : 6) * S,
-      st.bgx === 'temple' ? 5 : 6,
-      tr,
-    );
-    if (st.bgx === 'sakura') {
-      drawBlossom(
-        b,
-        r,
-        W * (portrait ? 0.94 : 0.91),
-        ft - H * (portrait ? 0.13 : 0.2),
-        H * (portrait ? 0.074 : 0.106),
-      );
-      const lx2 = W * 0.06,
-        ly2 = ft + H * 0.01;
+    if (options.fieldTrees !== false) {
+      b.strokeStyle = '#22211f';
+      b.lineCap = 'round';
+      const tr = rng(77);
       branch(
         b,
-        lx2,
-        ly2,
-        H * (portrait ? 0.05 : 0.08),
-        -Math.PI / 2 + 0.2,
-        (portrait ? 3 : 5) * S,
-        5,
+        W * (portrait ? 0.96 : 0.93),
+        ft + H * 0.01,
+        H * (portrait ? 0.065 : 0.1),
+        -Math.PI / 2 - (st.bgx === 'shore' ? 0.32 : 0.2),
+        (portrait ? 4 : 6) * S,
+        st.bgx === 'temple' ? 5 : 6,
         tr,
       );
-      drawBlossom(
-        b,
-        r,
-        lx2 + H * 0.02,
-        ly2 - H * (portrait ? 0.1 : 0.15),
-        H * (portrait ? 0.058 : 0.084),
-      );
+      if (st.bgx === 'sakura') {
+        drawBlossom(
+          b,
+          r,
+          W * (portrait ? 0.94 : 0.91),
+          ft - H * (portrait ? 0.13 : 0.2),
+          H * (portrait ? 0.074 : 0.106),
+        );
+        const lx2 = W * 0.06,
+          ly2 = ft + H * 0.01;
+        branch(
+          b,
+          lx2,
+          ly2,
+          H * (portrait ? 0.05 : 0.08),
+          -Math.PI / 2 + 0.2,
+          (portrait ? 3 : 5) * S,
+          5,
+          tr,
+        );
+        drawBlossom(
+          b,
+          r,
+          lx2 + H * 0.02,
+          ly2 - H * (portrait ? 0.1 : 0.15),
+          H * (portrait ? 0.058 : 0.084),
+        );
+      }
     }
-    drawProps(b, ft, gy);
+    if (options.stageProps !== false) drawProps(b, ft, gy);
     return { canvas: bg, glows: L.glows };
   }
 

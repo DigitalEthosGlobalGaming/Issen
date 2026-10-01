@@ -1,5 +1,15 @@
 # Repository documentation
 
+- [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.
+
+- [Stage sprite inventory](features/stage-sprite-inventory.md): existing atlases, proposed sprite families, scene reuse, and procedural elements.
+
+- [Stage art and composition plan](features/stage-art-plan.md): scene names, compositions, shared sprites, and per-stage implementation status.
+
+- [Cinematic scene viewer](features/cinematic.md): title-logo entry, scene browsing, film comparisons, and session restore.
+
+- [Ink layer renderer preview](features/ink-renderer.md): optional AI sprite environments, responsive depth layers, live Classic/Ink switching and film compatibility.
+
 - [Editions, haptics and mastery rewards](features/editions-and-mastery.md):
   implemented Free/Premium/Web access, combat vibration, kill effects, Temple upgrades,
   Pilgrim's Bead, Quiet Blade and Duel Master with its scoring-charm reward.

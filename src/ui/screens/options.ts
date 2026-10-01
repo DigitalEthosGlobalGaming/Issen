@@ -231,6 +231,15 @@ export function createOptions(
         }),
       );
     } else {
+      select(
+        'renderer',
+        'Scene artwork',
+        [
+          ['Classic', 'classic'],
+          ['Ink layers (preview)', 'ink'],
+        ],
+        'Press the backtick key outside menus to switch instantly. Your film look and current run stay the same.',
+      );
       const preferences = [
         ['System', 'system'],
         ['On', 'on'],
@@ -303,6 +312,7 @@ export function createOptions(
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
             settings.quality = 'auto';
+            settings.renderer = 'classic';
             settings.vibration = true;
             settings.vibrationStrength = 'full';
           }
