@@ -6,12 +6,13 @@ Classic remains the default. The existing `renderer` save key is authoritative;
 older character-only preferences are read only when that key is missing/invalid.
 Switching changes drawing, not encounter state, equipment or attack timing.
 
-## Initial replacement coverage
+## Replacement coverage
 
 | Item / figure | Ink replacement | Fallback |
 | --- | --- | --- |
 | Rear-view player wearing Sumi (`sumi`) | Modular torso, robe panels, head and articulated arms | Classic while unavailable |
 | Player Steel sword (`steel`) | Separate katana aligned to grip and tip | Classic while unavailable |
+| Yoroi, Helm, Shinobi, Jinbaori, Mino | Shared modular armour and clothing kit (1.19.0) | Classic while required pieces are unavailable |
 | Other robes and weapons | No replacement yet | Existing procedural drawing |
 | Enemies and bosses | No replacement yet | Existing procedural drawing |
 
@@ -37,9 +38,9 @@ sprites rotate between shoulder, elbow and hand anchors; overlapping cuffs hide
 joins. The overlapping robe panels sway together around their waist anchor. The sword is registered to the existing
 weapon grip and tip so glints and effects keep their established coordinates.
 
-The first supported clothing kit is deliberately restricted to Sumi. Further
-outfits need measured compatible parts and their own availability mapping before
-being opted into the Ink path. Enemy front views require their own art.
+Sumi supplies the common rear-view body and puppet joints. Five outfit recipes
+combine reusable armour and clothing pieces over that body. Other outfits keep
+their existing appearance; enemy front views require their own art.
 
 ## Reusable source assets
 
@@ -73,3 +74,35 @@ Version 1.18.1 verification: type checking and ten focused unit checks passed.
 A focused browser test confirmed the shared Artwork mode reaches both scene and
 figure renderers without changing the paused encounter or checkpoint. Desktop,
 tablet and six-pose screenshots were inspected after replacing the atlas.
+
+## Modular outfit kit (version 1.19.0)
+
+`outfit-kit.ts` describes reusable part selection and placement per existing
+saved robe ID. `ink-player.ts` loads the source families and assembles the selected
+recipe at the existing torso, waist, head and arm anchors. The outfit IDs and
+unlock rules stay in the equipment catalog; these recipes change appearance.
+
+| Existing outfit | Composition |
+| --- | --- |
+| Yoroi | Heavy cuirass, paired shoulder guards, waist plates and kabuto |
+| Helm | Lighter plate arrangement and shared kabuto |
+| Shinobi | Dark cloth, wrapped hood and bracers |
+| Jinbaori | Open sleeveless coat halves and selected shared plates |
+| Mino | Straw cape and kasa over the shared cloth body |
+
+The armour atlas separates cuirass, left/right shoulder guards and waist plates.
+The headwear atlas separates helmet, kasa, hood and collar. The cloth atlas
+separates left/right coat panels, cape and bracer. These are reusable components,
+not five baked full-character images. Opposite sides retain their own frames.
+
+A recipe requires its source families before replacing the Classic outfit.
+Missing armour does not prevent the base Sumi kit from drawing. Classic armour,
+coat and cape overlays are suppressed only when the Ink body succeeds, avoiding
+duplicate clothing. Crests, charms, auras and the final film pass remain shared.
+
+Atlas contracts contain measured frame rectangles, pivots, permitted transforms,
+transparency inspection and generation prompts:
+
+- [Armour plates](../../src/rendering/figures/assets/armour-plates-atlas.md)
+- [Headwear](../../src/rendering/figures/assets/outfit-headwear-atlas.md)
+- [Cloth pieces](../../src/rendering/figures/assets/outfit-cloth-atlas.md)

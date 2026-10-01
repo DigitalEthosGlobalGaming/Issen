@@ -1,3 +1,4 @@
+import { supportsInkOutfit } from './outfit-kit.ts';
 import { drawJinbaori } from './jinbaori.ts';
 import { drawDemonMask } from './masks.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
@@ -974,7 +975,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     // The player is viewed from behind, so the weapon passes behind the robe.
     if (f.back) drawHeldWeapons();
     const playerArt =
-      env.artwork === 'ink' && f.back && f.robeId === 'sumi' ? env.inkPlayer : undefined;
+      env.artwork === 'ink' && f.back && supportsInkOutfit(f.robeId) ? env.inkPlayer : undefined;
     // Rear-view hands reach around the body; the torso occludes crossing forearms.
     const inkArms = playerArt?.drawPart(g, 'arms', f, env) === true;
     const inkBody = playerArt?.drawPart(g, 'body', f, env) === true;
@@ -1051,7 +1052,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       for (const x of [0.04, 0.1, 0.16]) g.fillRect(x, -0.065, 0.022, 0.13);
       g.restore();
     }
-    if (rf.armor) {
+    if (rf.armor && !inkBody) {
       for (let i = 0; i < 5; i++) {
         const y = -0.76 + i * 0.052,
           ox = lx * (0.9 - i * 0.08);
@@ -1120,7 +1121,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.stroke();
       }
     }
-    if (f.cape) {
+    if (f.cape && !inkBody) {
       g.fillStyle = C.straw;
       g.beginPath();
       g.moveTo(-0.2 + lx, -0.79);
@@ -1175,7 +1176,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.closePath();
       g.fill();
     }
-    if (f.coat) drawJinbaori(g, !!f.back, lx, time, wind);
+    if (f.coat && !inkBody) drawJinbaori(g, !!f.back, lx, time, wind);
     if (f.back && f.crest && !f.cape) drawCrest(f.crest, lx * 0.75, -0.67, 0.06);
     if (f.charm) {
       const cx = 0.1 + lx * 0.5,

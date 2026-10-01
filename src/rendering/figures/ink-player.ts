@@ -1,3 +1,4 @@
+import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
 const ATLAS_URL = new URL('./assets/player-ronin-simple.png', import.meta.url).href;
@@ -19,6 +20,7 @@ export type InkPlayerRenderer = ReturnType<typeof createInkPlayerRenderer>;
 
 /** Per-runtime atlas ownership. draw/drawPart inherit normalized figure transforms and alpha. */
 export function createInkPlayerRenderer(doc: Document) {
+  const outfits = createOutfitKit(doc);
   let atlas: HTMLImageElement | null = null;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
   let pending: Promise<boolean> | null = null;
@@ -26,6 +28,7 @@ export function createInkPlayerRenderer(doc: Document) {
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (state === 'disposed') return Promise.resolve(false);
+    void outfits.prepare();
     state = 'loading';
     const image = doc.createElement('img');
     atlas = image;
@@ -44,6 +47,10 @@ export function createInkPlayerRenderer(doc: Document) {
       };
     });
     image.src = ATLAS_URL;
+    pending = pending.then(async (ready) => {
+      await outfits.prepare();
+      return ready;
+    });
     return pending;
   }
   function stamp(
@@ -96,11 +103,13 @@ export function createInkPlayerRenderer(doc: Document) {
     f: Figure,
     env: FigureEnvironment,
   ): boolean {
-    if (!f.back || (part === 'head' ? !!f.variant : f.robeId !== 'sumi')) return false;
+    if (!f.back || !supportsInkOutfit(f.robeId)) return false;
+    if (part === 'head' && f.robeId === 'sumi' && f.variant) return false;
     if (state !== 'ready' || !atlas) {
       if (state === 'idle') void prepare();
       return false;
     }
+    if (!outfits.ready(f.robeId)) return false;
     const l = f.lean || 0;
     g.save();
     if (part === 'body') {
@@ -132,8 +141,10 @@ export function createInkPlayerRenderer(doc: Document) {
       g.restore();
       g.restore();
       stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355);
+      outfits.draw(g, 'body', f);
     } else if (part === 'head') {
-      stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171);
+      if (f.robeId !== 'shinobi') stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171);
+      outfits.draw(g, 'head', f);
     } else {
       joints(f).forEach((j, i) => {
         bone(g, i ? 'rightSleeve' : 'leftSleeve', j.shoulder, j.elbow, 0.135);
@@ -143,6 +154,7 @@ export function createInkPlayerRenderer(doc: Document) {
         g.rotate(f.pose.ang + Math.PI / 2);
         stamp(g, 'hand', -0.024, -0.024, 0.048, 0.058);
         g.restore();
+        outfits.drawArm(g, f, i, j.shoulder, j.elbow, j.hand);
       });
     }
     g.restore();
@@ -161,9 +173,15 @@ export function createInkPlayerRenderer(doc: Document) {
       drawPart(g, 'head', f, env);
       return body;
     },
-    snapshot: () => ({ status: state, ready: state === 'ready', parts: state === 'ready' ? 9 : 0 }),
+    snapshot: () => ({
+      status: state,
+      ready: state === 'ready',
+      parts: state === 'ready' ? 9 : 0,
+      outfits: outfits.snapshot(),
+    }),
     dispose() {
       state = 'disposed';
+      outfits.dispose();
       if (atlas) {
         atlas.onload = null;
         atlas.onerror = null;
