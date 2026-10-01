@@ -70,7 +70,14 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.closePath();
     g.fill();
   }
-  function drawSword(gx: number, gy: number, ang: number, C: Palette, bs?: BladeStyle | null) {
+  function drawSword(
+    gx: number,
+    gy: number,
+    ang: number,
+    C: Palette,
+    bs?: BladeStyle | null,
+    ink = false,
+  ) {
     const Lb = bs ? bs.len : 0.52;
     g.save();
     g.translate(gx, gy);
@@ -128,14 +135,17 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.restore();
       return;
     }
-    g.fillStyle = C.hilt;
-    g.fillRect(-0.15, -0.012, 0.155, 0.024);
-    g.fillStyle = C.robeL;
-    for (let i = 0; i < 5; i++) g.fillRect(-0.14 + i * 0.028, -0.009, 0.008, 0.018);
-    g.fillStyle = C.tsuba;
-    g.beginPath();
-    g.ellipse(0.008, 0, 0.009, 0.03, 0, 0, TAU);
-    g.fill();
+    const inkBlade = ink && env.inkSword?.draw(g, 0, 0, 0, C, bs) === true;
+    if (!inkBlade) {
+      g.fillStyle = C.hilt;
+      g.fillRect(-0.15, -0.012, 0.155, 0.024);
+      g.fillStyle = C.robeL;
+      for (let i = 0; i < 5; i++) g.fillRect(-0.14 + i * 0.028, -0.009, 0.008, 0.018);
+      g.fillStyle = C.tsuba;
+      g.beginPath();
+      g.ellipse(0.008, 0, 0.009, 0.03, 0, 0, TAU);
+      g.fill();
+    }
     if (bs && bs.glow) {
       g.strokeStyle = bs.glow;
       g.lineWidth = 0.04;
@@ -160,24 +170,26 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.restore();
       }
     }
-    if (bs && bs.alpha) g.globalAlpha *= bs.alpha;
-    const gr = g.createLinearGradient(0, -0.012, 0, 0.01);
-    gr.addColorStop(0, bs?.d ?? C.steelD);
-    gr.addColorStop(0.45, bs?.l ?? C.steelL);
-    gr.addColorStop(1, bs?.m ?? C.steel);
-    g.fillStyle = gr;
-    g.beginPath();
-    g.moveTo(0.016, -0.009);
-    g.quadraticCurveTo(Lb * 0.6, -0.012 - Lb * 0.05, Lb, -Lb * 0.05);
-    g.quadraticCurveTo(Lb * 0.6, 0.006 - Lb * 0.035, 0.016, 0.008);
-    g.closePath();
-    g.fill();
-    g.strokeStyle = bs?.edge ?? 'rgba(255,253,246,.85)';
-    g.lineWidth = (bs && bs.edgeW) || 0.004;
-    g.beginPath();
-    g.moveTo(0.03, -0.002);
-    g.quadraticCurveTo(Lb * 0.6, -0.004 - Lb * 0.043, Lb * 0.97, -Lb * 0.049);
-    g.stroke();
+    if (!inkBlade) {
+      if (bs && bs.alpha) g.globalAlpha *= bs.alpha;
+      const gr = g.createLinearGradient(0, -0.012, 0, 0.01);
+      gr.addColorStop(0, bs?.d ?? C.steelD);
+      gr.addColorStop(0.45, bs?.l ?? C.steelL);
+      gr.addColorStop(1, bs?.m ?? C.steel);
+      g.fillStyle = gr;
+      g.beginPath();
+      g.moveTo(0.016, -0.009);
+      g.quadraticCurveTo(Lb * 0.6, -0.012 - Lb * 0.05, Lb, -Lb * 0.05);
+      g.quadraticCurveTo(Lb * 0.6, 0.006 - Lb * 0.035, 0.016, 0.008);
+      g.closePath();
+      g.fill();
+      g.strokeStyle = bs?.edge ?? 'rgba(255,253,246,.85)';
+      g.lineWidth = (bs && bs.edgeW) || 0.004;
+      g.beginPath();
+      g.moveTo(0.03, -0.002);
+      g.quadraticCurveTo(Lb * 0.6, -0.004 - Lb * 0.043, Lb * 0.97, -Lb * 0.049);
+      g.stroke();
+    }
     if (bs && bs.aura) drawAura(Lb, bs.aura);
     g.restore();
   }
@@ -938,7 +950,14 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       if (f.spear && !f.noSword) {
         drawSpear(gx, gy, p.ang, C);
       } else if (!f.noSword) {
-        drawSword(gx, gy, p.ang, C, f.blade);
+        drawSword(
+          gx,
+          gy,
+          p.ang,
+          C,
+          f.blade,
+          env.artwork === 'ink' && !!f.back && f.bladeId === 'steel',
+        );
       }
       if (f.twin) {
         drawSword(-0.19 + lx, -0.5, Math.PI - p.ang, C, {
@@ -954,64 +973,71 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     if (f.twin) h2 = [-0.19 + lx, -0.5];
     // The player is viewed from behind, so the weapon passes behind the robe.
     if (f.back) drawHeldWeapons();
-    drawSleeve(-1, lx, C, d, t, wv);
-    drawSleeve(1, lx, C, d, t, wv);
-    let gr = g.createLinearGradient(-0.3, 0, 0.3, 0);
-    gr.addColorStop(0, C.robeD);
-    gr.addColorStop(0.62, C.robe);
-    gr.addColorStop(1, C.robeL);
-    g.fillStyle = gr;
-    g.beginPath();
-    g.moveTo(-0.115 + lx * 0.5, -0.5);
-    g.quadraticCurveTo(-0.2, -0.26, -0.3, 0);
-    for (let i = 0; i <= 12; i++)
-      g.lineTo(
-        -0.3 + (0.6 * i) / 12 + (i & 1 ? 0.012 * wv : 0),
-        -d.hem[i]! * 0.045 + Math.sin(t * 7 + i * 1.3 + d.seed) * 0.006 * wv,
-      );
-    g.quadraticCurveTo(0.2, -0.26, 0.115 + lx * 0.5, -0.5);
-    g.closePath();
-    g.fill();
-    g.globalAlpha = A0 * 0.75;
-    g.fillStyle = C.shadow;
-    g.beginPath();
-    g.moveTo(-0.05, 0.004);
-    g.lineTo(0.004, -0.21);
-    g.lineTo(0.055, 0.004);
-    g.closePath();
-    g.fill();
-    g.globalAlpha = A0 * 0.3;
-    g.strokeStyle = C.robeL;
-    g.lineWidth = 0.007;
-    for (const px of [-0.17, -0.08, 0.09, 0.18]) {
+    const playerArt =
+      env.artwork === 'ink' && f.back && f.robeId === 'sumi' ? env.inkPlayer : undefined;
+    // Rear-view hands reach around the body; the torso occludes crossing forearms.
+    const inkArms = playerArt?.drawPart(g, 'arms', f, env) === true;
+    const inkBody = playerArt?.drawPart(g, 'body', f, env) === true;
+    if (!inkBody) {
+      drawSleeve(-1, lx, C, d, t, wv);
+      drawSleeve(1, lx, C, d, t, wv);
+      let gr = g.createLinearGradient(-0.3, 0, 0.3, 0);
+      gr.addColorStop(0, C.robeD);
+      gr.addColorStop(0.62, C.robe);
+      gr.addColorStop(1, C.robeL);
+      g.fillStyle = gr;
       g.beginPath();
-      g.moveTo(px * 0.4 + lx * 0.5, -0.49);
-      g.quadraticCurveTo(px * 0.85, -0.24, px * 1.55, -0.02);
-      g.stroke();
-    }
-    g.globalAlpha = A0;
-    gr = g.createLinearGradient(-0.18, 0, 0.18, 0);
-    gr.addColorStop(0, C.robeD);
-    gr.addColorStop(0.55, C.robe);
-    gr.addColorStop(1, C.robeL);
-    g.fillStyle = gr;
-    g.beginPath();
-    g.moveTo(-0.115 + lx * 0.5, -0.49);
-    g.lineTo(-0.165 + lx, -0.765);
-    g.quadraticCurveTo(-0.13 + lx, -0.815, -0.045 + lx, -0.83);
-    g.lineTo(0.045 + lx, -0.83);
-    g.quadraticCurveTo(0.13 + lx, -0.815, 0.165 + lx, -0.765);
-    g.lineTo(0.115 + lx * 0.5, -0.49);
-    g.closePath();
-    g.fill();
-    for (const s of d.spots) {
-      g.globalAlpha = A0 * (s[3] ? 0.13 : 0.22);
-      g.fillStyle = s[3] ? C.robeL : C.shadow;
-      g.beginPath();
-      g.arc(s[0] + (s[1] < -0.5 ? lx * 0.7 : lx * 0.3), s[1], s[2], 0, TAU);
+      g.moveTo(-0.115 + lx * 0.5, -0.5);
+      g.quadraticCurveTo(-0.2, -0.26, -0.3, 0);
+      for (let i = 0; i <= 12; i++)
+        g.lineTo(
+          -0.3 + (0.6 * i) / 12 + (i & 1 ? 0.012 * wv : 0),
+          -d.hem[i]! * 0.045 + Math.sin(t * 7 + i * 1.3 + d.seed) * 0.006 * wv,
+        );
+      g.quadraticCurveTo(0.2, -0.26, 0.115 + lx * 0.5, -0.5);
+      g.closePath();
       g.fill();
+      g.globalAlpha = A0 * 0.75;
+      g.fillStyle = C.shadow;
+      g.beginPath();
+      g.moveTo(-0.05, 0.004);
+      g.lineTo(0.004, -0.21);
+      g.lineTo(0.055, 0.004);
+      g.closePath();
+      g.fill();
+      g.globalAlpha = A0 * 0.3;
+      g.strokeStyle = C.robeL;
+      g.lineWidth = 0.007;
+      for (const px of [-0.17, -0.08, 0.09, 0.18]) {
+        g.beginPath();
+        g.moveTo(px * 0.4 + lx * 0.5, -0.49);
+        g.quadraticCurveTo(px * 0.85, -0.24, px * 1.55, -0.02);
+        g.stroke();
+      }
+      g.globalAlpha = A0;
+      gr = g.createLinearGradient(-0.18, 0, 0.18, 0);
+      gr.addColorStop(0, C.robeD);
+      gr.addColorStop(0.55, C.robe);
+      gr.addColorStop(1, C.robeL);
+      g.fillStyle = gr;
+      g.beginPath();
+      g.moveTo(-0.115 + lx * 0.5, -0.49);
+      g.lineTo(-0.165 + lx, -0.765);
+      g.quadraticCurveTo(-0.13 + lx, -0.815, -0.045 + lx, -0.83);
+      g.lineTo(0.045 + lx, -0.83);
+      g.quadraticCurveTo(0.13 + lx, -0.815, 0.165 + lx, -0.765);
+      g.lineTo(0.115 + lx * 0.5, -0.49);
+      g.closePath();
+      g.fill();
+      for (const s of d.spots) {
+        g.globalAlpha = A0 * (s[3] ? 0.13 : 0.22);
+        g.fillStyle = s[3] ? C.robeL : C.shadow;
+        g.beginPath();
+        g.arc(s[0] + (s[1] < -0.5 ? lx * 0.7 : lx * 0.3), s[1], s[2], 0, TAU);
+        g.fill();
+      }
+      g.globalAlpha = A0;
     }
-    g.globalAlpha = A0;
     const rf = f.rf || {};
     if (rf.tail) {
       g.save();
@@ -1139,14 +1165,16 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.stroke();
     }
 
-    g.fillStyle = C.obi;
-    g.beginPath();
-    g.moveTo(-0.118 + lx * 0.52, -0.545);
-    g.lineTo(0.118 + lx * 0.52, -0.545);
-    g.lineTo(0.116 + lx * 0.5, -0.495);
-    g.lineTo(-0.116 + lx * 0.5, -0.495);
-    g.closePath();
-    g.fill();
+    if (!inkBody) {
+      g.fillStyle = C.obi;
+      g.beginPath();
+      g.moveTo(-0.118 + lx * 0.52, -0.545);
+      g.lineTo(0.118 + lx * 0.52, -0.545);
+      g.lineTo(0.116 + lx * 0.5, -0.495);
+      g.lineTo(-0.116 + lx * 0.5, -0.495);
+      g.closePath();
+      g.fill();
+    }
     if (f.coat) drawJinbaori(g, !!f.back, lx, time, wind);
     if (f.back && f.crest && !f.cape) drawCrest(f.crest, lx * 0.75, -0.67, 0.06);
     if (f.charm) {
@@ -1164,40 +1192,42 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.fillRect(cx - 0.009, cy + 0.012, 0.018, 0.004);
       g.fillRect(cx - 0.009, cy + 0.022, 0.018, 0.004);
     }
-    drawHead(f, C, d, lx);
-    const h1: Point = [gx, gy],
-      sh: Point[] = [
-        [-0.15 + lx, -0.765],
-        [0.15 + lx, -0.765],
-      ],
-      hands = h1[0] < h2[0] ? [h1, h2] : [h2, h1];
-    g.lineCap = 'round';
-    g.lineJoin = 'round';
-    for (let i = 0; i < 2; i++) {
-      const s = sh[i]!,
-        hd = hands[i]!,
-        side = i ? 1 : -1,
-        ex = (s[0] + hd[0]) / 2 + side * 0.05,
-        ey = (s[1] + hd[1]) / 2 + 0.05;
-      g.strokeStyle = i ? C.robe : C.robeD;
-      g.lineWidth = 0.075;
-      g.beginPath();
-      g.moveTo(s[0], s[1]);
-      g.lineTo(ex, ey);
-      g.stroke();
-      g.lineWidth = 0.048;
-      g.beginPath();
-      g.moveTo(ex, ey);
-      g.lineTo(hd[0], hd[1]);
-      g.stroke();
-    }
-    // Front-facing attackers hold their weapons in front of their sleeves and arms.
-    if (!f.back) drawHeldWeapons();
-    g.fillStyle = C.skin;
-    for (const hd of hands) {
-      g.beginPath();
-      g.arc(hd[0], hd[1], 0.022, 0, TAU);
-      g.fill();
+    if (!(inkBody && playerArt?.drawPart(g, 'head', f, env))) drawHead(f, C, d, lx);
+    if (!inkArms) {
+      const h1: Point = [gx, gy],
+        sh: Point[] = [
+          [-0.15 + lx, -0.765],
+          [0.15 + lx, -0.765],
+        ],
+        hands = h1[0] < h2[0] ? [h1, h2] : [h2, h1];
+      g.lineCap = 'round';
+      g.lineJoin = 'round';
+      for (let i = 0; i < 2; i++) {
+        const s = sh[i]!,
+          hd = hands[i]!,
+          side = i ? 1 : -1,
+          ex = (s[0] + hd[0]) / 2 + side * 0.05,
+          ey = (s[1] + hd[1]) / 2 + 0.05;
+        g.strokeStyle = i ? C.robe : C.robeD;
+        g.lineWidth = 0.075;
+        g.beginPath();
+        g.moveTo(s[0], s[1]);
+        g.lineTo(ex, ey);
+        g.stroke();
+        g.lineWidth = 0.048;
+        g.beginPath();
+        g.moveTo(ex, ey);
+        g.lineTo(hd[0], hd[1]);
+        g.stroke();
+      }
+      // Front-facing attackers hold their weapons in front of their sleeves and arms.
+      if (!f.back) drawHeldWeapons();
+      g.fillStyle = C.skin;
+      for (const hd of hands) {
+        g.beginPath();
+        g.arc(hd[0], hd[1], 0.022, 0, TAU);
+        g.fill();
+      }
     }
     if (f.glint != null && f.glint > 0) {
       const tp = tipOf(p, lx, f.spear ? 0.98 : f.blade ? f.blade.len : 0.52);

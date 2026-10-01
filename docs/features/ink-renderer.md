@@ -1,7 +1,7 @@
 # Ink layer renderer preview
 
 Version 1.14.0 adds an optional image-sprite environment. Choose **Options →
-Display and Accessibility → Scene artwork → Ink layers (preview)** from the title
+Display and Accessibility → Artwork → Ink** from the title
 or a paused run. The backtick key also toggles artwork outside menus; typing, held keys, modifier chords, and custom combat bindings take precedence. Classic remains the default; the choice is saved with the active
 profile's existing settings. Switching does not reset an encounter or alter its
 random stream, equipment, or checkpoint. Press the backtick key to toggle artwork
@@ -130,3 +130,6 @@ counts (four to nine). Strict TypeScript passed. No full build or broad browser
 suite was run during this art iteration. The original field grass is unchanged;
 Ink snow uses cached sparse short tips to expose snowdrifts, and Ink bamboo
 suppresses the classic foreground stalk overlay. Gameplay simulation is unchanged.
+
+Version 1.18.1 shares the Artwork selector with player and weapon replacements;
+unreplaced assets retain their Classic drawing. See [player artwork](character-art.md).

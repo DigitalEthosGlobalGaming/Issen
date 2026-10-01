@@ -27,7 +27,7 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   root.setAttribute('aria-label', 'Cinematic scene viewer');
   root.innerHTML = `<button type="button" class="cinematic-exit">Exit</button>
     <div class="cinematic-toolbar"><div class="cinematic-scenes"><button type="button" aria-label="Previous scene">←</button><span role="status"></span><button type="button" aria-label="Next scene">→</button></div>
-    <div class="cinematic-looks"><label>Artwork <select aria-label="Preview artwork"><option value="classic">Classic</option><option value="ink">Ink layers</option></select></label><label>Film <select aria-label="Preview film"></select></label></div><small></small></div>`;
+    <div class="cinematic-looks"><label>Artwork <select aria-label="Preview artwork"><option value="classic">Classic</option><option value="ink">Ink</option></select></label><label>Film <select aria-label="Preview film"></select></label></div><small></small></div>`;
   app.append(root);
   const buttons = root.querySelectorAll('button');
   const exit = buttons[0]!,

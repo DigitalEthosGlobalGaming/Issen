@@ -233,12 +233,12 @@ export function createOptions(
     } else {
       select(
         'renderer',
-        'Scene artwork',
+        'Artwork',
         [
           ['Classic', 'classic'],
-          ['Ink layers (preview)', 'ink'],
+          ['Ink', 'ink'],
         ],
-        'Press the backtick key outside menus to switch instantly. Your film look and current run stay the same.',
+        'Applies to scenes and available player and weapon art, with Classic fallback for other assets. Press backtick outside menus to switch.',
       );
       const preferences = [
         ['System', 'system'],

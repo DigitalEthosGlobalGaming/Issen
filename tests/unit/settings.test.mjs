@@ -91,3 +91,28 @@ test('scene renderer defaults preserve older saves and validate the optional pre
   assert.equal(parseSettings({ version: 1, renderer: 'unknown' }).renderer, 'classic');
   assert.equal(parseSettings({ ...defaultSettings(), renderer: 'ink' }).renderer, 'ink');
 });
+
+test('single artwork preference migrates the former character setting only as a fallback', () => {
+  assert.equal('characterRenderer' in defaultSettings(), false);
+  for (const renderer of ['classic', 'ink']) {
+    for (const characterRenderer of ['classic', 'ink']) {
+      const loaded = parseSettings({ version: 1, renderer, characterRenderer });
+      assert.equal(loaded.renderer, renderer, 'valid Artwork setting takes precedence');
+      assert.equal('characterRenderer' in loaded, false);
+      assert.deepEqual(loaded.bindings, defaultSettings().bindings);
+    }
+  }
+  for (const renderer of [undefined, null, 'invalid', true]) {
+    assert.equal(parseSettings({ version: 1, renderer, characterRenderer: 'ink' }).renderer, 'ink');
+    assert.equal(
+      parseSettings({ version: 1, renderer, characterRenderer: 'classic' }).renderer,
+      'classic',
+    );
+    assert.equal(
+      parseSettings({ version: 1, renderer, characterRenderer: 'invalid' }).renderer,
+      'classic',
+    );
+  }
+  const migrated = parseSettings({ version: 1, characterRenderer: 'ink' });
+  assert.equal(parseSettings(JSON.parse(JSON.stringify(migrated))).renderer, 'ink');
+});

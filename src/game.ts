@@ -1,3 +1,5 @@
+import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
+import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
 import { premium, premiumEnabled, listenToPurchases } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
 import {
@@ -207,6 +209,10 @@ export function startGame(): () => void {
   const g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
+  const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
+  const inkSword = createInkSwordRenderer(cvs.ownerDocument);
+  lifecycle.add(inkPlayer.dispose);
+  lifecycle.add(inkSword.dispose);
   const R = Math.random;
   const settings = parseSettings(
     store.get('issen.settings', null),
@@ -684,7 +690,15 @@ export function startGame(): () => void {
   }
   /* ---------------- figures ---------------- */
   function figureRenderer() {
+    const artwork = cinematic.active ? cinematicRenderer : settings.renderer;
+    if (artwork === 'ink') {
+      void inkPlayer.prepare();
+      void inkSword.prepare();
+    }
     return createFigureRenderer(g, {
+      artwork,
+      inkPlayer,
+      inkSword,
       time,
       wind,
       petActive: G.petT > 0,
@@ -3176,6 +3190,8 @@ export function startGame(): () => void {
     now: () => performance.now(),
     sounds: sfx,
   });
+  lifecycle.add(preview.dispose);
+  lifecycle.add(supportPreview.dispose);
   function demoKill() {
     preview.demo(armory.tab === 'fx' ? (armory.selected ?? EQ.fx) : EQ.fx, !!(G.m && G.m.bonk));
   }
@@ -3190,6 +3206,7 @@ export function startGame(): () => void {
   function previewFrame(film: string, effectsVisible: boolean): PreviewFrame {
     const rb = ROBES[EQ.robe] || {};
     return {
+      artwork: settings.renderer,
       time,
       wind,
       effectDensity: density(),
@@ -3203,6 +3220,8 @@ export function startGame(): () => void {
         pal: playerRobePalette(),
         robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
         blade: bladeStyle(),
+        bladeId: EQ.blade,
+        robeId: EQ.robe,
         variant: rb.variant,
         cape: rb.cape,
         coat: rb.coat,
@@ -3663,6 +3682,8 @@ export function startGame(): () => void {
       pal: playerRobePalette(),
       robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
       blade: bladeStyle(),
+      bladeId: EQ.blade,
+      robeId: EQ.robe,
       variant: (ROBES[EQ.robe] || {}).variant,
       cape: (ROBES[EQ.robe] || {}).cape,
       coat: (ROBES[EQ.robe] || {}).coat,
@@ -3928,6 +3949,7 @@ export function startGame(): () => void {
     );
     cvs.dataset.renderer = cinematic.active ? cinematicRenderer : settings.renderer;
     cvs.dataset.rendererBackend = environmentRenderer.backend;
+    cvs.dataset.artwork = cinematic.active ? cinematicRenderer : settings.renderer;
     if (!inkEnvironment && L.glows && L.glows.length) {
       g.save();
       g.globalCompositeOperation = 'lighter';

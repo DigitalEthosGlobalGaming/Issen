@@ -1,5 +1,7 @@
 # Repository documentation
 
+- [Ink player puppet](features/character-art.md): modular player parts, Steel sword, shared Artwork toggle and per-item Classic fallback.
+
 - [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.
 
 - [Stage sprite inventory](features/stage-sprite-inventory.md): implemented scene kits, reusable sprite families, and procedural elements.

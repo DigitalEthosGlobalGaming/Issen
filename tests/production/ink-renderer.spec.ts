@@ -12,7 +12,7 @@ test('bundled sprite atlases load and classic/ink switching works offline', asyn
     .locator('#options')
     .getByRole('button', { name: /^Display/ })
     .click();
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
   const images = await page.evaluate(() =>
     performance
@@ -27,10 +27,10 @@ test('bundled sprite atlases load and classic/ink switching works offline', asyn
   expect(images).toHaveLength(10);
   expect(images.every((name) => name.includes('/assets/'))).toBe(true);
   await context.setOffline(true);
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('classic');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
   await page.setViewportSize({ width: 1536, height: 864 });
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
   expect(errors).toEqual([]);
 });

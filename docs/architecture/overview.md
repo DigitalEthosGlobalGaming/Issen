@@ -196,3 +196,8 @@ Environment composition modules cover all nine stages. The router loads only
 the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
 handles native-aspect frames, ground anchors and contact fades. Runtime weather
 and final film grading remain separate from image assets.
+
+All artwork is selected by `settings.renderer` (Artwork in Options).
+The figure compositor retains procedural fallback per supported item and calls
+instance-owned Ink player/sword renderers. Runtime and armoury canvases own
+separate loaders. See [Ink player puppet](../features/character-art.md).

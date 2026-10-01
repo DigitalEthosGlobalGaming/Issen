@@ -16,17 +16,22 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('scene artwork switches in a paused run without changing encounter or saved progress', async ({
+test('shared artwork switches in a paused run without changing encounter or saved progress', async ({
   page,
 }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     await route.fulfill({
       response,
-      body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__rendererHarness = { G, randomState: () => runRandom.state(), film: () => EQ.film }; frameLoop.start();',
-      ),
+      body: (await response.text())
+        .replace(
+          'return createFigureRenderer(g, {',
+          'window.__figureArtwork = artwork; return createFigureRenderer(g, {',
+        )
+        .replace(
+          'frameLoop.start();',
+          'window.__rendererHarness = { G, randomState: () => runRandom.state(), film: () => EQ.film }; frameLoop.start();',
+        ),
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -48,11 +53,15 @@ test('scene artwork switches in a paused run without changing encounter or saved
       };
     });
   const before = await snapshot();
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
+  await expect.poll(() => page.evaluate(() => (window as any).__figureArtwork)).toBe('ink');
   expect(await snapshot()).toEqual(before);
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('classic');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
+  await expect.poll(() => page.evaluate(() => (window as any).__figureArtwork)).toBe('classic');
   expect(await snapshot()).toEqual(before);
   await page.keyboard.press('Escape');
   await page.locator('#options').getByRole('button', { name: 'Done', exact: true }).click();
@@ -66,9 +75,10 @@ test('artwork preference survives reload, scales across tablet and desktop, and 
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await displayOptions(page);
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
   for (const viewport of [
     { width: 1024, height: 768 },
     { width: 1440, height: 900 },
@@ -76,6 +86,7 @@ test('artwork preference survives reload, scales across tablet and desktop, and 
   ]) {
     await page.setViewportSize(viewport);
     await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+    await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
     await expect
       .poll(() =>
         page.locator('#c').evaluate((canvas: HTMLCanvasElement) => canvas.width / canvas.height),
@@ -83,13 +94,14 @@ test('artwork preference survives reload, scales across tablet and desktop, and 
       .toBeCloseTo(viewport.width / viewport.height, 1);
   }
   await displayOptions(page);
-  await expect(page.getByLabel('Scene artwork', { exact: true })).toHaveValue('ink');
+  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
   await page
     .locator('#options')
     .getByRole('button', { name: 'Restore defaults', exact: true })
     .click();
-  await expect(page.getByLabel('Scene artwork', { exact: true })).toHaveValue('classic');
+  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('classic');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
 });
 
 test('failed ink asset requests fall back to classic scenery and remain switchable', async ({
@@ -98,9 +110,11 @@ test('failed ink asset requests fall back to classic scenery and remain switchab
   await page.route('**/environment/assets/**', (route) => route.abort());
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await displayOptions(page);
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'unavailable');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
   await expect(page.locator('#c')).toBeVisible();
-  await page.getByLabel('Scene artwork', { exact: true }).selectOption('classic');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
 });

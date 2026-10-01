@@ -105,7 +105,11 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     reducedFlashes: choice('reducedFlashes', ['system', 'on', 'off'], 'system'),
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
     quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
-    renderer: choice('renderer', ['classic', 'ink'], 'classic'),
+    renderer: choice(
+      'renderer',
+      ['classic', 'ink'],
+      choice('characterRenderer', ['classic', 'ink'], 'classic'),
+    ),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),
   };

@@ -47,6 +47,9 @@ export interface Figure {
   pal?: Palette | null;
   variant?: string | null;
   back?: boolean;
+  /** Saved equipment identities select only explicitly supported sprite replacements. */
+  robeId?: string;
+  bladeId?: string;
   noShadow?: boolean;
   noSword?: boolean;
   spear?: number | boolean;
@@ -62,7 +65,28 @@ export interface Figure {
   glint?: number;
   rf?: { tail?: number; armor?: number; patches?: number; strawy?: number };
 }
+export interface PlayerArtwork {
+  drawPart(
+    g: CanvasRenderingContext2D,
+    part: 'body' | 'head' | 'arms',
+    f: Figure,
+    env: FigureEnvironment,
+  ): boolean;
+}
+export interface SwordArtwork {
+  draw(
+    g: CanvasRenderingContext2D,
+    gx: number,
+    gy: number,
+    ang: number,
+    palette: Palette,
+    style?: BladeStyle | null,
+  ): boolean;
+}
 export interface FigureEnvironment {
+  artwork?: 'classic' | 'ink';
+  inkPlayer?: PlayerArtwork;
+  inkSword?: SwordArtwork;
   reducedMotion?: boolean;
   reducedFlashes?: boolean;
   time: number;

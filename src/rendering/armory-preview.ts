@@ -1,3 +1,5 @@
+import { createInkPlayerRenderer } from './figures/ink-player.ts';
+import { createInkSwordRenderer } from './figures/ink-sword.ts';
 import { createFigureRenderer } from './figures/figure.ts';
 import { makeFig, EPOSE } from './figures/model.ts';
 import type { Figure, FigureEnvironment } from './figures/types.ts';
@@ -31,6 +33,8 @@ export interface PreviewServices {
 export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
+  const inkSword = createInkSwordRenderer(canvas.ownerDocument);
   const fx = createEffects();
   const dummy = makeFig(4242);
   let elapsed = 9,
@@ -89,7 +93,18 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     gradient.addColorStop(1, 'rgba(10,10,9,.5)');
     g.fillStyle = gradient;
     g.fillRect(0, 0, width, height);
-    const figures = createFigureRenderer(g, { ...frame, width, height, random: services.random });
+    if (frame.artwork === 'ink') {
+      void inkPlayer.prepare();
+      void inkSword.prepare();
+    }
+    const figures = createFigureRenderer(g, {
+      ...frame,
+      inkPlayer,
+      inkSword,
+      width,
+      height,
+      random: services.random,
+    });
     if (frame.effectsVisible) {
       const now = services.now();
       dt = Math.min(0.05, (now - (last || now)) / 1000);
@@ -148,5 +163,12 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     });
   }
 
-  return { demo, draw };
+  return {
+    demo,
+    draw,
+    dispose() {
+      inkPlayer.dispose();
+      inkSword.dispose();
+    },
+  };
 }
