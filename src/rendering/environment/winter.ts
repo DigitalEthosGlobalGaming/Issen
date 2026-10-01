@@ -65,11 +65,27 @@ export function drawWhiteSilencePass(
         fadeFrom: 0.76,
         fadeTo: 0.95,
       });
-      sprite(g, atlases.mountains!, 3, width * 0.66, horizonY + height * 0.095, unit * 1.55, {
-        alpha: 0.71,
-        fadeFrom: 0.79,
-        fadeTo: 0.96,
-      });
+      // A full-width source retains broad snow facets without enlarging a small atlas cell.
+      g.save();
+      g.imageSmoothingEnabled = true;
+      g.imageSmoothingQuality = 'high';
+      sprite(
+        g,
+        atlases.snowPeak!,
+        0,
+        width * 0.58,
+        horizonY + height * 0.1,
+        Math.min(unit * 1.5, width * 1.6),
+        {
+          columns: 1,
+          rows: 1,
+          alpha: 0.58,
+          anchorY: 0.9,
+          fadeFrom: 0.69,
+          fadeTo: 0.94,
+        },
+      );
+      g.restore();
     },
   }).canvas;
   base.drawImage(terrain, 0, 0, width, height);

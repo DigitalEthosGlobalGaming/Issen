@@ -68,6 +68,7 @@ const ASSET_URLS = [
   new URL('./assets/sea-stacks-atlas.png', import.meta.url).href,
   new URL('./assets/foam-strips-atlas.png', import.meta.url).href,
   new URL('./assets/fallen-bamboo-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-peak.png', import.meta.url).href,
 ];
 
 /** Decode only the current scene's kit; shared images survive a scene switch. */
@@ -77,7 +78,7 @@ function sceneAssets(stage: number): number[] {
   if (stage === 2) return [3, 4, 5, 6, 11, 12];
   if (stage === 3) return [2, 3, 4, 5, 6, 7, 13];
   if (stage === 4) return [0, 3, 4, 6, 23];
-  if (stage === 5) return [3, 14, 15, 16];
+  if (stage === 5) return [3, 14, 15, 16, 24];
   if (stage === 6) return [2, 3, 6, 17, 18, 19, 20];
   if (stage === 7) return [2, 3, 4, 6, 10, 21, 22];
   if (stage === 8) return [2, 3, 6, 9, 17, 20];
@@ -266,18 +267,51 @@ export function createEnvironmentRenderer(doc: Document) {
       builds++;
       return true;
     }
-    const compose = [undefined, undefined, undefined, drawRainwaterHollow,
-      drawHollowBambooRoad, drawWhiteSilencePass, drawEmberCourtyard,
-      drawBrokenShore, drawMoonwatchClearing][frame.stage];
+    const compose = [
+      undefined,
+      undefined,
+      undefined,
+      drawRainwaterHollow,
+      drawHollowBambooRoad,
+      drawWhiteSilencePass,
+      drawEmberCourtyard,
+      drawBrokenShore,
+      drawMoonwatchClearing,
+    ][frame.stage];
     if (compose) {
-      compose(ctx, far.context, near.context, {
-        bamboo: images[0]!, pines: images[2]!, mountains: images[3]!, banks: images[4]!,
-        shrubs: images[5]!, rocks: images[6]!, fieldRocks: images[6]!, grassEdges: images[7]!,
-        fogWisps: images[9]!, boulders: images[10]!, reeds: images[13]!,
-        snowPines: images[14]!, snowBoulders: images[15]!, snowRocks: images[16]!,
-        templePosts: images[17]!, templeWalls: images[18]!, templeRoofs: images[19]!,
-        templeSteps: images[20]!, seaStacks: images[21]!, foam: images[22]!, fallenBamboo: images[23]!,
-      }, w, h, scale, frame.lowQuality);
+      compose(
+        ctx,
+        far.context,
+        near.context,
+        {
+          bamboo: images[0]!,
+          pines: images[2]!,
+          mountains: images[3]!,
+          banks: images[4]!,
+          shrubs: images[5]!,
+          rocks: images[6]!,
+          fieldRocks: images[6]!,
+          grassEdges: images[7]!,
+          fogWisps: images[9]!,
+          boulders: images[10]!,
+          reeds: images[13]!,
+          snowPeak: images[24]!,
+          snowPines: images[14]!,
+          snowBoulders: images[15]!,
+          snowRocks: images[16]!,
+          templePosts: images[17]!,
+          templeWalls: images[18]!,
+          templeRoofs: images[19]!,
+          templeSteps: images[20]!,
+          seaStacks: images[21]!,
+          foam: images[22]!,
+          fallenBamboo: images[23]!,
+        },
+        w,
+        h,
+        scale,
+        frame.lowQuality,
+      );
       cached = canvas;
       builds++;
       return true;

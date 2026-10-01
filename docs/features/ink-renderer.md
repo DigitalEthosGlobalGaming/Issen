@@ -18,11 +18,12 @@ vary by scene. Atlas cells can be repeated, mirrored, positioned, and scaled
 independently before caching. Distant and near planes have different small
 horizontal offsets. No WebGL or recovered 3D geometry is required.
 
-The eleven PNG atlases contain four cells in a 2 by 2 grid. The foreground boulder sheet has explicit pixel rectangles because its height is odd. Drawing source
-rectangles selects a sprite without splitting files or stretching a full scene.
-The assets are AI-generated cutouts based on the user's ink-and-mist atmosphere
-reference: charcoal bamboo, rough ivory highlights, faceted rocks, and grasses.
-The generated full-scene concepts were exploration only and are not shipped.
+The 24 PNG atlases include four-cell grids and explicitly packed architectural
+frames. Per-atlas contracts record dimensions, safe source windows, ground
+anchors and provenance in the [asset library](environment-asset-library.md).
+Only the current scene's kit stays loaded. Shared images survive switches;
+unused sources are released and depth caches rebuilt. A generation counter
+prevents obsolete loading callbacks from changing the current scene.
 
 Scene placement is recomputed from viewport dimensions and the existing combat
 layout. Side framing stays near the edges, while smaller repeated bamboo supplies
@@ -50,9 +51,12 @@ with no shader dependency. Mountains are drawn before the original foothills and
 grass, so fog cannot wash out the playable field. Tree placement still consumes
 the same visual random sequence so the static grass pattern stays unchanged;
 no close image trees, extra ground strokes, or extra mist cover the field. Its
-existing midground and foreground animated grass are unchanged. Stages 3–9 currently use the bamboo
-preview with their stage palette, weather, and gameplay. Unique image sets for
-the shore, cherry blossom, temple, and other stages are future art work. Character
+existing midground and foreground animated grass are unchanged. All nine stages have distinct compositions in version 1.17.0: orchard canopy and
+petal path, shallow rain pools, bamboo road, snow drifts, ruined temple, coastal
+stacks and a moonlit gate. Each has a dedicated composition module. scene-kit.ts
+supplies native-aspect stamps, packed frames, anchor rotation and cached contact
+fading. Water motion draws before figures and respects reduced motion/flashes.
+Character
 sprite replacement is also future work. Classic background glow overlays and
 the classic stage wipe are skipped while the ink background is active; stage
 palette changes rebuild the layered caches directly.
@@ -71,9 +75,9 @@ The layered-environment browser tests cover independent instances, cache reuse,
 allocation bounds, state restoration, disposal, and fallback pixels.
 Settings unit tests cover legacy/default/invalid renderer values.
 
-Use the worktree's own Vite server when testing. A server already running on
+Use the main checkout's Vite server when testing. A server already running on
 port 5173 can belong to another checkout; do not interpret those test results
-as verification of this worktree.
+as verification of main.
 
 ## Midground field props
 
@@ -114,6 +118,15 @@ Native sprite proportions are retained at desktop and tablet sizes. Existing
 static and animated grass remain, and film looks still apply downstream.
 
 No new image was needed. See the [visual asset library](environment-asset-library.md)
-for all eleven sheets, measured dimensions, cell descriptions, current anchors,
+for all sheets, measured dimensions, cell descriptions, current anchors,
 and known packing limitations. Optional background hooks apply only when supplied;
 Classic artwork and the first Ink field keep their existing composition.
+## Version 1.17.0 art review
+
+All nine compositions were loaded through the local preview; new scenes were
+visually reviewed at desktop 1440 x 900 and tablet 768 x 1024. A focused loader
+check covered cache reuse, rapid scene changes, disposal and per-scene image
+counts (four to nine). Strict TypeScript passed. No full build or broad browser
+suite was run during this art iteration. The original field grass is unchanged;
+Ink snow uses cached sparse short tips to expose snowdrifts, and Ink bamboo
+suppresses the classic foreground stalk overlay. Gameplay simulation is unchanged.

@@ -54,3 +54,19 @@ Alpha inspected: transparent exterior with near-opaque textured interiors.
 
 - [Cherry tree atlas and provenance](cherry-trees-atlas.md): four complete trees with variant-specific trunk anchors.
 - [Fallen petal atlas and provenance](petal-ground-atlas.md): four independent ground deposits with transparent surrounds.
+
+## Additional scene kits: version 1.17.0
+
+- [Reeds](reeds-atlas.md): Rainwater Hollow: sparse reeds at pool margins.
+- [Fallen Bamboo](fallen-bamboo-atlas.md): Hollow Bamboo Road: broken culms at the road edge.
+- [Snow Pines](snow-pines-atlas.md): White Silence Pass: snow-bearing pines with safe explicit windows.
+- [Snow Boulders](snow-boulders-atlas.md): White Silence Pass: accumulated snow on angular boulders.
+- [Snow Rocks](snow-rocks-atlas.md): White Silence Pass: low exposed stone clusters.
+- [Temple Posts](temple-posts-atlas.md): Ember Courtyard and Moonwatch: gate, tall post and broken pillars.
+- [Temple Walls](temple-walls-atlas.md): Ember Courtyard: independent ruined wall segments.
+- [Temple Roofs](temple-roofs-atlas.md): Ember Courtyard: broken roof silhouettes.
+- [Temple Steps](temple-steps-atlas.md): Ember Courtyard and Moonwatch: stepped foundations.
+- [Sea Stacks](sea-stacks-atlas.md): Broken Shore: isolated distant and midrange rock stacks.
+- [Foam Strips](foam-strips-atlas.md): Broken Shore: shallow wave foam strips.
+
+- [Dedicated snow peak](snow-peak.md): standalone higher-resolution mountain for White Silence Pass, version 1.17.1.

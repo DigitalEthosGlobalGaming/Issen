@@ -1,9 +1,10 @@
 # Environment asset library
 
 Measured and visually reviewed on 2026-10-01 in the main checkout.
-This catalog describes the eleven existing PNG atlases (44 indexed cells), not
-future assets. Use the [stage inventory](stage-sprite-inventory.md) for proposed
-families and scene mapping, and [stage art plan](stage-art-plan.md) for composition.
+This catalog covers 24 reusable PNG atlases plus one standalone snow peak: eleven original landscape sheets
+and thirteen additions for the remaining scenes. Use the
+[stage inventory](stage-sprite-inventory.md) for implemented kits and optional
+future families, and [stage art plan](stage-art-plan.md) for composition.
 [Asset provenance](../../src/rendering/environment/assets/README.md) records sources.
 
 ## Shared style and reuse contract
@@ -249,8 +250,8 @@ normalized anchor (0.5, 0.94). This is a separate composition choice. Procedural
 sky, sun disc, ridge silhouette, terrain, grass and valley haze supply the rest;
 no new PNG family is required for this pass. It does not stamp the field's meadow,
 grass-edge, fog-wisp or foreground-boulder kit automatically.
-E03/E11 remain the separate bamboo/prototype kit. See the stage inventory for
-future scene suggestions; suggested use is not evidence of integration.
+E03 now defines Hollow Bamboo Road; E11 remains available as a legacy support
+kit. The stage inventory distinguishes implemented reuse from future suggestions.
 
 When adding an asset, append a measured entry here with a source preview, visible
 cell descriptions, actual rectangles, intended depth, alpha/gutter observations,
@@ -294,3 +295,92 @@ native aspect and use per-cell ground anchors, slight terrain angles and base fa
 The blossom composition reuses E01/E04/E05/E06 for distant land, banks, shrubs,
 and stones. The path is a cached feathered ground ribbon, and existing procedural
 grass and falling-petal weather remain independent of the static atlases.
+## Remaining scene kits (version 1.17.0)
+
+These eleven additions bring the library to 24 atlases. Each linked contract records
+actual dimensions, source rectangles, alpha observations and generation provenance.
+Use measured frames rather than assuming every sheet is an equal grid.
+
+### N03: Reeds
+
+<a href="../../src/rendering/environment/assets/reeds-atlas.png"><img src="../../src/rendering/environment/assets/reeds-atlas.png" width="480" alt="reeds variants" /></a>
+
+Rainwater Hollow: sparse reeds at pool margins. [Measured atlas contract and provenance](../../src/rendering/environment/assets/reeds-atlas.md).
+
+### N04: Fallen Bamboo
+
+<a href="../../src/rendering/environment/assets/fallen-bamboo-atlas.png"><img src="../../src/rendering/environment/assets/fallen-bamboo-atlas.png" width="480" alt="fallen bamboo variants" /></a>
+
+Hollow Bamboo Road: broken culms at the road edge. [Measured atlas contract and provenance](../../src/rendering/environment/assets/fallen-bamboo-atlas.md).
+
+### N06: Snow Pines
+
+<a href="../../src/rendering/environment/assets/snow-pines-atlas.png"><img src="../../src/rendering/environment/assets/snow-pines-atlas.png" width="480" alt="snow pines variants" /></a>
+
+White Silence Pass: snow-bearing pines with safe explicit windows. [Measured atlas contract and provenance](../../src/rendering/environment/assets/snow-pines-atlas.md).
+
+### N07: Snow Boulders
+
+<a href="../../src/rendering/environment/assets/snow-boulders-atlas.png"><img src="../../src/rendering/environment/assets/snow-boulders-atlas.png" width="480" alt="snow boulders variants" /></a>
+
+White Silence Pass: accumulated snow on angular boulders. [Measured atlas contract and provenance](../../src/rendering/environment/assets/snow-boulders-atlas.md).
+
+### N08: Snow Rocks
+
+<a href="../../src/rendering/environment/assets/snow-rocks-atlas.png"><img src="../../src/rendering/environment/assets/snow-rocks-atlas.png" width="480" alt="snow rocks variants" /></a>
+
+White Silence Pass: low exposed stone clusters. [Measured atlas contract and provenance](../../src/rendering/environment/assets/snow-rocks-atlas.md).
+
+### N09: Temple Posts
+
+<a href="../../src/rendering/environment/assets/temple-posts-atlas.png"><img src="../../src/rendering/environment/assets/temple-posts-atlas.png" width="480" alt="temple posts variants" /></a>
+
+Ember Courtyard and Moonwatch: gate, tall post and broken pillars. [Measured atlas contract and provenance](../../src/rendering/environment/assets/temple-posts-atlas.md).
+
+### N10: Temple Walls
+
+<a href="../../src/rendering/environment/assets/temple-walls-atlas.png"><img src="../../src/rendering/environment/assets/temple-walls-atlas.png" width="480" alt="temple walls variants" /></a>
+
+Ember Courtyard: independent ruined wall segments. [Measured atlas contract and provenance](../../src/rendering/environment/assets/temple-walls-atlas.md).
+
+### N11: Temple Roofs
+
+<a href="../../src/rendering/environment/assets/temple-roofs-atlas.png"><img src="../../src/rendering/environment/assets/temple-roofs-atlas.png" width="480" alt="temple roofs variants" /></a>
+
+Ember Courtyard: broken roof silhouettes. [Measured atlas contract and provenance](../../src/rendering/environment/assets/temple-roofs-atlas.md).
+
+### N12: Temple Steps
+
+<a href="../../src/rendering/environment/assets/temple-steps-atlas.png"><img src="../../src/rendering/environment/assets/temple-steps-atlas.png" width="480" alt="temple steps variants" /></a>
+
+Ember Courtyard and Moonwatch: stepped foundations. [Measured atlas contract and provenance](../../src/rendering/environment/assets/temple-steps-atlas.md).
+
+### N13: Sea Stacks
+
+<a href="../../src/rendering/environment/assets/sea-stacks-atlas.png"><img src="../../src/rendering/environment/assets/sea-stacks-atlas.png" width="480" alt="sea stacks variants" /></a>
+
+Broken Shore: isolated distant and midrange rock stacks. [Measured atlas contract and provenance](../../src/rendering/environment/assets/sea-stacks-atlas.md).
+
+### N14: Foam Strips
+
+<a href="../../src/rendering/environment/assets/foam-strips-atlas.png"><img src="../../src/rendering/environment/assets/foam-strips-atlas.png" width="480" alt="foam strips variants" /></a>
+
+Broken Shore: shallow wave foam strips. [Measured atlas contract and provenance](../../src/rendering/environment/assets/foam-strips-atlas.md).
+
+Snow variants are complete derived sprites, not registered overlay masks. Keep
+originals and use the safe source windows documented by winter.ts. Temple sheets
+contain variable-width objects. Moonwatch reuses the gate and steps.
+
+## Snow peak refinement (version 1.17.1)
+
+![Dedicated snow peak](../../src/rendering/environment/assets/snow-peak.png)
+
+White Silence Pass now uses a dedicated 1881 x 836 peak rather than enlarging an
+887px atlas cell for its dominant mountain. Broader snow facets, a feathered base
+and width-limited tablet placement improve definition and depth. The original
+mountain atlas remains shared elsewhere. [Source contract and full built-in
+generation prompt](../../src/rendering/environment/assets/snow-peak.md).
+
+Ember Courtyard reuses its existing atlas pieces with a smaller left gate, roof
+eave aligned to the lintel, low threshold steps and a smaller adjacent wall.
+The steps no longer fill the doorway. No architectural images were replaced.

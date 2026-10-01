@@ -191,3 +191,8 @@ See [rendering and visual consistency](rendering.md) for the Canvas/DOM split,
 scene layering and shared style patterns. See
 [development and verification](../development/local-development.md) for commands
 and the [migration record](typescript-migration.md) for completion evidence and coverage limits.
+
+Environment composition modules cover all nine stages. The router loads only
+the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
+handles native-aspect frames, ground anchors and contact fades. Runtime weather
+and final film grading remain separate from image assets.

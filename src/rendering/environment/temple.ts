@@ -130,19 +130,28 @@ export function drawEmberCourtyard(
     far.fillRect(0, 0, width, groundY);
   }
   const architecture = { fadeFrom: 0.72 };
-  piece(far, atlases.templeSteps!, 0, width * 0.17, foot + height * 0.018, unit * 0.43, {
+  // Assemble this ruin around one ground origin. The stair flight projects forward
+  // from the threshold; its top no longer fills the doorway behind the posts.
+  const gateX = width * 0.17;
+  const gateFoot = foot - unit * 0.02;
+  const gateWidth = unit * 0.32;
+  const roofWidth = unit * 0.36;
+  // Post lintel top is source y190; the roof eave contact is source y520.
+  // Derive their contact from the packed-frame scales rather than unrelated offsets.
+  const lintelY = gateFoot - ((0.925 * 724 - 190) * gateWidth) / 950;
+  const roofFoot = lintelY + ((0.83 * 724 - 520) * roofWidth) / 980;
+  piece(far, atlases.templeSteps!, 0, gateX, gateFoot + unit * 0.055, unit * 0.19, {
     ...architecture,
-    alpha: 0.53,
-    angle: -0.025,
+    alpha: 0.48,
   });
-  piece(far, atlases.templePosts!, 0, width * 0.19, foot, unit * 0.46, {
-    ...architecture,
-    alpha: 0.78,
+  piece(far, atlases.templePosts!, 0, gateX, gateFoot, gateWidth, {
+    fadeFrom: 0.85,
+    alpha: 0.79,
   });
-  piece(far, atlases.templeRoofs!, 1, width * 0.19, foot - unit * 0.22, unit * 0.54, {
-    alpha: 0.75,
+  piece(far, atlases.templeRoofs!, 1, gateX, roofFoot, roofWidth, {
+    alpha: 0.79,
   });
-  piece(far, atlases.templeWalls!, 0, -width * 0.045, foot + height * 0.016, unit * 0.46, {
+  piece(far, atlases.templeWalls!, 0, -width * 0.045, foot + height * 0.016, unit * 0.32, {
     ...architecture,
     alpha: 0.65,
     angle: 0.025,

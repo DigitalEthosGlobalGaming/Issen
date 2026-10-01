@@ -636,8 +636,24 @@ export function startGame(): () => void {
     buildGrass();
     buildWeather();
   }
-  function blades(list: GrassBlade[], t: number) {
-    ambient().blades(g, list, t, wind);
+  const snowGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
+  function blades(list: GrassBlade[], t: number, snowTips = false) {
+    let visible = list;
+    if (snowTips) {
+      let cached = snowGrass.get(list);
+      if (!cached) {
+        cached = list
+          .filter((_, index) => index % 9 === 0)
+          .map((blade) => ({
+            ...blade,
+            h: blade.h * 0.17,
+            w: blade.w * 0.6,
+          }));
+        snowGrass.set(list, cached);
+      }
+      visible = cached;
+    }
+    ambient().blades(g, visible, t, wind);
   }
   function drawLeaves(front: boolean) {
     ambient().drawLeaves(g, leaves, front);
@@ -3957,7 +3973,7 @@ export function startGame(): () => void {
         g.drawImage(mistSprite, m.x - m.w / 2, m.y - m.h / 2, m.w, m.h);
       }
     g.globalAlpha = 1;
-    blades(mid, time);
+    blades(mid, time, inkEnvironment && G.stage === 5);
     if (!cinematic.active) drawStains();
     drawLeaves(false);
     const b = G.boss;
@@ -3984,7 +4000,7 @@ export function startGame(): () => void {
     }
     if (b) drawBoss();
     for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
-    drawBamboo();
+    if (!inkEnvironment) drawBamboo();
     if (!cinematic.active) {
       drawPlayer();
       drawPet();
@@ -3992,7 +4008,7 @@ export function startGame(): () => void {
       drawFx();
       drawFx2();
     }
-    blades(fg, time);
+    blades(fg, time, inkEnvironment && G.stage === 5);
     if (!cinematic.active) drawGlyphs();
     drawSmoke();
     drawLeaves(true);

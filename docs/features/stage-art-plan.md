@@ -230,8 +230,8 @@ scale before integration.
 
 ## Production and review boundary
 
-Unimplemented sections remain plans. The original documentation pass created no
-images or code; implementation status is recorded per scene as work proceeds.
+All nine compositions are implemented. Individual asset suggestions below remain
+optional when omitted from the implemented kit table in the sprite inventory.
 
 When implementation begins, start by arranging existing sprites for a scene,
 then create only the missing defining assets. Review each composition in the

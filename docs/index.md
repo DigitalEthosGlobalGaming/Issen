@@ -2,7 +2,7 @@
 
 - [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.
 
-- [Stage sprite inventory](features/stage-sprite-inventory.md): existing atlases, proposed sprite families, scene reuse, and procedural elements.
+- [Stage sprite inventory](features/stage-sprite-inventory.md): implemented scene kits, reusable sprite families, and procedural elements.
 
 - [Stage art and composition plan](features/stage-art-plan.md): scene names, compositions, shared sprites, and per-stage implementation status.
 

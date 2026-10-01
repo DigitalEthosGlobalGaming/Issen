@@ -16,17 +16,17 @@ the table below records the complete implemented scene kits.
 
 | Scene | Existing assets used | New assets used |
 | --- | --- | --- |
-| Field | E01/E02/E04–E10 | None |
+| Field | E01/E02/E04-E10 | None |
 | Ridge | E01/E02/E04/E05/E06 | None |
 | Blossom | E01/E04/E05/E06 | N01/N02 |
 | Hollow | E01/E02/E04/E05/E06/E08 | N03 |
 | Bamboo | E01/E03/E04/E06 | N04 |
-| Snow | E01 | N06/N07/N08 |
+| Snow | E01 | N06/N07/N08 and standalone snow-peak.png (1.17.1) |
 | Temple | E01/E02/E06 | N09/N10/N11/N12 |
 | Shore | E01/E02/E04/E06/E07 | N13/N14 |
 | Moonwatch | E01/E02/E06/E10 | N09/N12 |
 
-N01–N04 and N06–N14 are generated and integrated (13 new atlases, 24 total).
+N01-N04 and N06-N14 are generated and integrated (13 new atlases, 24 total).
 N05 stumps and N15 separate moon landmark are deferred: fallen bamboo and the
 shared temple gate/steps cover those needs. Snow sheets are complete variants,
 not registered overlays. Temple sheets require explicit variable-width frames.
