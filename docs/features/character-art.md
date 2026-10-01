@@ -2,7 +2,7 @@
 
 Artwork uses one **Options > Display and Accessibility > Artwork > Ink**
 selection for scenes, player parts and weapons. Backtick switches the same mode.
-Classic remains the default. The existing `renderer` save key is authoritative;
+Ink is the default from version 1.21.1 for new or missing preferences and Display Restore defaults; existing saved artwork choices are preserved. The existing `renderer` save key is authoritative;
 older character-only preferences are read only when that key is missing/invalid.
 Switching changes drawing, not encounter state, equipment or attack timing.
 

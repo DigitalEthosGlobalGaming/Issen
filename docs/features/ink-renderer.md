@@ -2,7 +2,7 @@
 
 Version 1.14.0 adds an optional image-sprite environment. Choose **Options →
 Display and Accessibility → Artwork → Ink** from the title
-or a paused run. The backtick key also toggles artwork outside menus; typing, held keys, modifier chords, and custom combat bindings take precedence. Classic remains the default; the choice is saved with the active
+or a paused run. The backtick key also toggles artwork outside menus; typing, held keys, modifier chords, and custom combat bindings take precedence. Ink is the default from version 1.21.1 for new or missing preferences and Display Restore defaults; existing saved artwork choices are preserved; the choice is saved with the active
 profile's existing settings. Switching does not reset an encounter or alter its
 random stream, equipment, or checkpoint. Press the backtick key to toggle artwork
 from the title, during play, or while paused. The shortcut ignores held keys,

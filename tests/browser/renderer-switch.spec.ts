@@ -70,10 +70,15 @@ test('shared artwork switches in a paused run without changing encounter or save
   await expect.poll(async () => (await snapshot()).state).toBe('playing');
 });
 
-test('artwork preference survives reload, scales across tablet and desktop, and resets to classic', async ({
+test('artwork defaults to ink, preserves classic on reload, and restores ink defaults', async ({
   page,
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await displayOptions(page);
+  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
   await displayOptions(page);
   await page.getByLabel('Artwork', { exact: true }).selectOption('ink');
   await page.reload({ waitUntil: 'domcontentloaded' });
@@ -95,13 +100,14 @@ test('artwork preference survives reload, scales across tablet and desktop, and 
   }
   await displayOptions(page);
   await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
+  await page.getByLabel('Artwork', { exact: true }).selectOption('classic');
   await page
     .locator('#options')
     .getByRole('button', { name: 'Restore defaults', exact: true })
     .click();
-  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'classic');
-  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'classic');
+  await expect(page.getByLabel('Artwork', { exact: true })).toHaveValue('ink');
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await expect(page.locator('#c')).toHaveAttribute('data-artwork', 'ink');
 });
 
 test('failed ink asset requests fall back to classic scenery and remain switchable', async ({

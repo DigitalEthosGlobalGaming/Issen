@@ -44,7 +44,7 @@ export function defaultSettings(muted = false): Settings {
     reducedFlashes: 'system',
     textSize: 'normal',
     quality: 'auto',
-    renderer: 'classic',
+    renderer: 'ink',
     vibration: true,
     vibrationStrength: 'full',
   };
@@ -108,7 +108,7 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     renderer: choice(
       'renderer',
       ['classic', 'ink'],
-      choice('characterRenderer', ['classic', 'ink'], 'classic'),
+      choice('characterRenderer', ['classic', 'ink'], defaults.renderer),
     ),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),

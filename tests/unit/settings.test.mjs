@@ -85,10 +85,10 @@ test('disabled vibration never calls the optional browser capability', () => {
   }
 });
 
-test('scene renderer defaults preserve older saves and validate the optional preference', () => {
-  assert.equal(defaultSettings().renderer, 'classic');
-  assert.equal(parseSettings({ version: 1 }).renderer, 'classic');
-  assert.equal(parseSettings({ version: 1, renderer: 'unknown' }).renderer, 'classic');
+test('scene renderer defaults to ink and preserves explicit saved preferences', () => {
+  assert.equal(defaultSettings().renderer, 'ink');
+  assert.equal(parseSettings({ version: 1 }).renderer, 'ink');
+  assert.equal(parseSettings({ version: 1, renderer: 'unknown' }).renderer, 'ink');
   assert.equal(parseSettings({ ...defaultSettings(), renderer: 'ink' }).renderer, 'ink');
 });
 
@@ -110,7 +110,7 @@ test('single artwork preference migrates the former character setting only as a 
     );
     assert.equal(
       parseSettings({ version: 1, renderer, characterRenderer: 'invalid' }).renderer,
-      'classic',
+      'ink',
     );
   }
   const migrated = parseSettings({ version: 1, characterRenderer: 'ink' });

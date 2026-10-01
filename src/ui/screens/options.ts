@@ -312,7 +312,7 @@ export function createOptions(
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
             settings.quality = 'auto';
-            settings.renderer = 'classic';
+            settings.renderer = defaults.renderer;
             settings.vibration = true;
             settings.vibrationStrength = 'full';
           }

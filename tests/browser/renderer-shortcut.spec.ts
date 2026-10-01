@@ -19,6 +19,8 @@ test('backtick toggles artwork, preserves a paused encounter, and ignores typing
   });
   await page.goto('/');
   const canvas = page.locator('#c');
+  await expect(canvas).toHaveAttribute('data-renderer', 'ink');
+  await page.keyboard.press('Backquote');
   await expect(canvas).toHaveAttribute('data-renderer', 'classic');
   await page.keyboard.press('Backquote');
   await expect(canvas).toHaveAttribute('data-renderer-backend', 'layered');
