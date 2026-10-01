@@ -60,6 +60,7 @@ export interface Figure {
   cape?: number | boolean;
   crest?: string | null;
   charm?: string;
+  charmId?: string;
   pet?: string;
   blade?: BladeStyle | null;
   /** Outfit aura, independent of the blade; callers omit it for suppressed powers. */
@@ -81,6 +82,16 @@ export interface EnemyArtwork {
     part: 'body' | 'head' | 'arms' | 'hands',
     f: Figure,
     env: FigureEnvironment,
+  ): boolean;
+}
+export interface CharmArtwork {
+  draw(
+    g: CanvasRenderingContext2D,
+    id: string | undefined,
+    x: number,
+    y: number,
+    size: number,
+    color?: string,
   ): boolean;
 }
 export interface CompanionArtwork {
@@ -111,6 +122,7 @@ export interface FigureEnvironment {
   inkPlayer?: PlayerArtwork;
   inkEnemy?: EnemyArtwork;
   inkCompanion?: CompanionArtwork;
+  inkCharm?: CharmArtwork;
   inkSword?: SwordArtwork;
   reducedMotion?: boolean;
   reducedFlashes?: boolean;

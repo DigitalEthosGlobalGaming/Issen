@@ -1,3 +1,4 @@
+import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
 import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
@@ -211,10 +212,12 @@ export function startGame(): () => void {
   const g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
+  const inkCharm = createInkCharmRenderer(cvs.ownerDocument);
   const inkCompanion = createInkCompanionRenderer(cvs.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
+  lifecycle.add(inkCharm.dispose);
   lifecycle.add(inkCompanion.dispose);
   lifecycle.add(inkEnemy.dispose);
   lifecycle.add(inkPlayer.dispose);
@@ -698,6 +701,7 @@ export function startGame(): () => void {
   function figureRenderer() {
     const artwork = cinematic.active ? cinematicRenderer : settings.renderer;
     if (artwork === 'ink') {
+      void inkCharm.prepare();
       void inkCompanion.prepare();
       void inkEnemy.prepare();
       void inkPlayer.prepare();
@@ -705,6 +709,7 @@ export function startGame(): () => void {
     }
     return createFigureRenderer(g, {
       artwork,
+      inkCharm,
       inkCompanion,
       inkEnemy,
       inkPlayer,
@@ -3237,6 +3242,7 @@ export function startGame(): () => void {
         coat: rb.coat,
         rf: rb,
         charm: CHARMCOL[EQ.charm],
+        charmId: EQ.charm,
         crest: EQ.crest === 'nocrest' ? null : EQ.crest,
         pet: petOf(),
       },
@@ -3700,6 +3706,7 @@ export function startGame(): () => void {
       coat: (ROBES[EQ.robe] || {}).coat,
       rf: ROBES[EQ.robe],
       charm: CHARMCOL[EQ.charm],
+      charmId: EQ.charm,
       crest: EQ.crest === 'nocrest' ? null : EQ.crest,
       pet: petOf(),
     });

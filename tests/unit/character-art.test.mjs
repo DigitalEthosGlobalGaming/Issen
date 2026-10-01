@@ -7,8 +7,16 @@ import { createPalette } from '../../src/rendering/palette.ts';
 import { ROBES } from '../../src/game/content/cosmetics.ts';
 import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
-function render({ body = true, enemy = false, sword = true, mode = 'ink', figure = {} } = {}) {
+function render({
+  body = true,
+  enemy = false,
+  charmInk = false,
+  sword = true,
+  mode = 'ink',
+  figure = {},
+} = {}) {
   const calls = {
+    charms: [],
     parts: [],
     enemyParts: [],
     order: [],
@@ -76,6 +84,12 @@ function render({ body = true, enemy = false, sword = true, mode = 'ink', figure
       drawPart(g, part, f) {
         calls.parts.push({ part, alpha: g.globalAlpha, pose: { ...f.pose } });
         return body;
+      },
+    },
+    inkCharm: {
+      draw(g, id, x, y, size, color) {
+        calls.charms.push({ id, x, y, size, color, alpha: g.globalAlpha });
+        return charmInk;
       },
     },
     inkEnemy: {
@@ -303,4 +317,18 @@ test('all primary blades including beam and pan reach the Ink weapon hook', () =
     assert.equal(ink.swords[0].id, bladeId);
     assert.deepEqual(classic.swords, [], bladeId);
   }
+});
+
+test('sprite charms replace the pouch but preserve the cord, alpha and Classic fallback', () => {
+  const figure = { charmId: 'suzu', charm: '#abc123' };
+  const ink = render({ figure, charmInk: true }),
+    fallback = render({ figure }),
+    classic = render({ figure, mode: 'classic' });
+  assert.equal(ink.charms.length, 1);
+  assert.equal(ink.charms[0].id, 'suzu');
+  assert.ok(Math.abs(ink.charms[0].alpha - 0.42) < 1e-10);
+  assert.ok(!ink.fills.includes('#abc123'));
+  assert.ok(fallback.fills.includes('#abc123'));
+  assert.ok(classic.fills.includes('#abc123'));
+  assert.deepEqual(classic.charms, []);
 });

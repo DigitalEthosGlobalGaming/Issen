@@ -1226,11 +1226,15 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.moveTo(cx, cy - 0.02);
       g.lineTo(cx, cy);
       g.stroke();
-      g.fillStyle = f.charm;
-      g.fillRect(cx - 0.015, cy, 0.03, 0.045);
-      g.fillStyle = 'rgba(255,255,255,.4)';
-      g.fillRect(cx - 0.009, cy + 0.012, 0.018, 0.004);
-      g.fillRect(cx - 0.009, cy + 0.022, 0.018, 0.004);
+      const inkCharm =
+        env.artwork === 'ink' && env.inkCharm?.draw(g, f.charmId, cx, cy, 0.05, f.charm);
+      if (!inkCharm) {
+        g.fillStyle = f.charm;
+        g.fillRect(cx - 0.015, cy, 0.03, 0.045);
+        g.fillStyle = 'rgba(255,255,255,.4)';
+        g.fillRect(cx - 0.009, cy + 0.012, 0.018, 0.004);
+        g.fillRect(cx - 0.009, cy + 0.022, 0.018, 0.004);
+      }
     }
     if (!(inkBody && (playerArt || enemyArt)?.drawPart(g, 'head', f, env))) drawHead(f, C, d, lx);
     const inkFrontArms = inkBody && enemyArt?.drawPart(g, 'arms', f, env) === true;

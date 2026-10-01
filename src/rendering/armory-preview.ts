@@ -1,3 +1,4 @@
+import { createInkCharmRenderer } from './figures/ink-charms.ts';
 import { createInkCompanionRenderer } from './figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
@@ -35,6 +36,7 @@ export interface PreviewServices {
 export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  const inkCharm = createInkCharmRenderer(canvas.ownerDocument);
   const inkCompanion = createInkCompanionRenderer(canvas.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
@@ -98,6 +100,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     g.fillStyle = gradient;
     g.fillRect(0, 0, width, height);
     if (frame.artwork === 'ink') {
+      void inkCharm.prepare();
       void inkCompanion.prepare();
       void inkEnemy.prepare();
       void inkPlayer.prepare();
@@ -105,6 +108,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     }
     const figures = createFigureRenderer(g, {
       ...frame,
+      inkCharm,
       inkCompanion,
       inkEnemy,
       inkPlayer,
@@ -183,6 +187,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     demo,
     draw,
     dispose() {
+      inkCharm.dispose();
       inkCompanion.dispose();
       inkEnemy.dispose();
       inkPlayer.dispose();

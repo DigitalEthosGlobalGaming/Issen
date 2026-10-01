@@ -219,3 +219,17 @@ source remains as provenance and is not used by the active renderer.
 Strict TypeScript and ten focused character checks passed. All 20 weapons were
 inspected as an assembled gallery and representative forms in held combat poses.
 No full build or Android test ran.
+
+
+## Charm artwork (1.25.0)
+
+All 19 physical charms use `ink-charms.ts` and a single twelve-piece
+[charm atlas](../../src/rendering/figures/assets/charm-atlas.md). Shared pouch
+shapes receive restrained palette variants, while bell, cat, Daruma, fox-fire,
+wind chime, ward, mirror and fortune slip keep distinct silhouettes. `charmId`
+selects the recipe; the existing colour field retains Classic fallback. The
+suspension cord stays at the original waist anchor. Powers and triggered effects
+are unchanged. Runtime and Armoury own and dispose separate charm loaders;
+missing/unknown sprites preserve the procedural pouch. Cached variants cap at32.
+Strict TypeScript, eleven focused character checks, the complete nineteen-charm
+gallery and representative held-player compositions passed without a full build.
