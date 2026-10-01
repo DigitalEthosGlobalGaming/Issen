@@ -3151,7 +3151,7 @@ export function startGame(): () => void {
       logoTarget = false;
     const el = $('title');
     lifecycle.listen(el, 'pointerdown', (e) => {
-      if (e.target instanceof Element && e.target.closest('button')) return;
+      if (e.target instanceof Element && e.target.closest('button, a')) return;
       if (id !== null) return;
       id = e.pointerId;
       logoTarget = e.target instanceof Element && !!e.target.closest('.t-k, .t-wrap');
