@@ -12,6 +12,7 @@ import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
 function render({ body = true, enemy = false, charmInk = false, sword = true, figure = {} } = {}) {
   const calls = {
+    companions: [],
     charms: [],
     parts: [],
     enemyParts: [],
@@ -75,6 +76,12 @@ function render({ body = true, enemy = false, charmInk = false, sword = true, fi
     height: 844,
     palette: (fog) => palette.fog(fog, [100, 110, 120]),
     random: () => 0.5,
+    inkCompanion: {
+      draw(type, _g, x, y, size) {
+        calls.companions.push({ type, x, y, size });
+        return true;
+      },
+    },
     inkPlayer: {
       drawPart(g, part, f) {
         calls.parts.push({ part, alpha: g.globalAlpha, pose: { ...f.pose } });
@@ -280,4 +287,18 @@ test('Ink recipes cover the complete item catalog including trial and progressio
     assert.ok(supportsInkBlade(item.id), item.id);
   for (const item of items.filter((i) => i.type === 'robe'))
     assert.ok(Object.hasOwn(ROBES, item.id), item.id);
+});
+
+test('crow follows the shoulder lean and figures never draw body-attached grass', () => {
+  for (const lean of [-0.08, 0, 0.08]) {
+    const calls = render({ figure: { pet: 'crow', lean, rot: 0.3 } });
+    assert.deepEqual(calls.companions[0], {
+      type: 'crow',
+      x: 0.14 + lean * 0.8,
+      y: -0.755,
+      size: 0.1,
+    });
+    const grass = createPalette().fog(0, [100, 110, 120]).grass;
+    assert.ok(!calls.fills.includes(grass), 'ground grass must remain in scene coordinates');
+  }
 });

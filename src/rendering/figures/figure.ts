@@ -4,7 +4,7 @@ import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
 import type { Figure, FigureEnvironment, Pose, Point, BladeStyle, Aura } from './types.ts';
 export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
-  const { time: clock, wind, petActive, width: W, height: H, palette: cols, random: R } = env;
+  const { time: clock, petActive, width: W, height: H, palette: cols, random: R } = env;
   const time = env.reducedMotion ? 0 : clock;
   function bladePath(length: number, bladeId: string) {
     g.beginPath();
@@ -377,16 +377,13 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
   }
   function drawFigure(f: Figure) {
     const C = f.pal || cols(f.fog),
-      d = f.d,
       lx = f.lean || 0,
-      wv = wind,
       t = time;
     g.save();
     g.translate(f.x, f.y);
     if (f.rot) g.rotate(f.rot);
     g.scale(f.h, f.h * (f.sy || 1));
     if (f.alpha != null && f.alpha < 1) g.globalAlpha *= f.alpha;
-    const A0 = g.globalAlpha;
     if (f.robeAura) {
       // Small, stateless fabric halo behind the body. It follows figure opacity
       // and never borrows sword aura state or either preview's effect particles.
@@ -495,18 +492,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       const tp = tipOf(p, lx, f.spear ? 0.98 : f.blade ? f.blade.len : 0.52);
       drawGlint(tp[0], tp[1], f.glint);
     }
-    if (f.pet === 'crow') drawCrow(0.16 + lx, -0.785, 0.1);
-    if (!f.noShadow) {
-      g.fillStyle = C.grass;
-      for (const b of d.grass) {
-        const sw = (wind * 0.5 + Math.sin(t * 2.4 + b[2]) * 0.3) * b[1] * 0.5;
-        g.beginPath();
-        g.moveTo(b[0] - 0.008, 0.02 + b[3]);
-        g.quadraticCurveTo(b[0], -b[1] * 0.5, b[0] + sw, -b[1] + 0.02);
-        g.quadraticCurveTo(b[0] + 0.004, -b[1] * 0.5, b[0] + 0.008, 0.02 + b[3]);
-        g.fill();
-      }
-    }
+    if (f.pet === 'crow') drawCrow(0.14 + lx * 0.8, -0.755, 0.1);
+    // Ground vegetation belongs to the scene, never to moving or split figure transforms.
     g.restore();
   }
   function drawGroundShadow(f: Pick<Figure, 'x' | 'y' | 'h' | 'alpha'>, opacity = 1) {

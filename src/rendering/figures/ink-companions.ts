@@ -5,19 +5,19 @@ const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
 export const INK_COMPANION_FRAMES = {
   shiba: { x: 0, y: 0, width: 660, height: 665, pivotX: 433, pivotY: 637, scale: 1.14 / 591 },
   cat: { x: 660, y: 0, width: 594, height: 665, pivotX: 364, pivotY: 640, scale: 1.08 / 555 },
-  crow: { x: 0, y: 665, width: 660, height: 589, pivotX: 397, pivotY: 518, scale: 1.65 / 583 },
+  crow: { x: 0, y: 665, width: 660, height: 589, pivotX: 397, pivotY: 525, scale: 1.65 / 583 },
   crowRaised: {
     x: 660,
     y: 665,
     width: 594,
     height: 589,
     pivotX: 366,
-    pivotY: 518,
+    pivotY: 525,
     scale: 1.65 / 583,
   },
 } as const;
 
-/** Caller owns item selection and classic fallback; coordinates use its existing pet size units. */
+/** Caller owns item selection and rendering order; coordinates use its existing pet size units. */
 export function createInkCompanionRenderer(doc: Document) {
   let image: HTMLImageElement | null = null;
   let pending: Promise<void> | null = null;

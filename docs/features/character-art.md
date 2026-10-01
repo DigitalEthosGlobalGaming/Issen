@@ -224,3 +224,11 @@ Pilgrim's Bead (progression item) reuse the long ward/pouch and round faceted
 charm frames respectively, giving 21 charms total without another image.
 A full catalog coverage check includes trial rewards and excludes only No Charm.
 The complete charm gallery and focused tests were rerun after this correction.
+
+## Ground contact and Crow placement (1.29.1)
+
+Crow toe pivots use y525 in both packed poses and the figure shoulder anchor is
+(.14 + lean*.8, -.755). These follow the torso lean rather than full grip lean.
+Body-local grass tufts are removed because they rotated and hopped with enemies.
+The runtime's animated mid/foreground field grass is unchanged; makeFig retains
+its serialized grass seed data to preserve saves and random-stream compatibility.
