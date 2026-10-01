@@ -31,6 +31,12 @@ active worktree's dev server when checking the feature; a server from another
 checkout will not contain these changes.
 # Cinematic discovery reward
 
+Browsing scenes refreshes both small decorative edge props and the standing
+enemy lineup. Those cosmetic visit choices remain stable during resize and
+film changes. They use presentation randomness, leaving combat RNG and saved
+checkpoints unchanged. Exiting restores the title's original stage and scene
+variation seed.
+
 Entering the scene viewer permanently discovers the cosmetic Mystic Rock companion.
 It is granted immediately, including session-restored entry, without ending a run.
 The `cinematicVisits` profile flag repairs an interrupted ownership write on startup.

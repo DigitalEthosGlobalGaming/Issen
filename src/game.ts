@@ -1,4 +1,5 @@
 import { mountStartupLoading } from './ui/startup-loading.ts';
+import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
 import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
 import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
@@ -475,6 +476,9 @@ export function startGame(): () => void {
   }
 
   /* ---------------- background ---------------- */
+  const stageVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
+  const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
+  let stageSeed = stageVisits.enter(0);
   let bg: HTMLCanvasElement | null = null,
     prevBg: HTMLCanvasElement | null = null,
     stageFade = 0;
@@ -646,6 +650,7 @@ export function startGame(): () => void {
     hbT = 0,
     hbP = 0;
   function setStage(si: number, anim: boolean) {
+    stageSeed = stageVisits.enter(si);
     if (anim && bg) {
       prevBg = bg;
       stageFade = 1;
@@ -1207,6 +1212,7 @@ export function startGame(): () => void {
       combatRandom = runRandom.next;
     }
     resetRun(G, setup, EQ, combatRandom);
+    stageSeed = stageVisits.enter(G.stage, true);
     Object.assign(G, templatePowers(META, setup, premiumAccess()));
     G.maxKnives = G.knives;
     computeMods();
@@ -3032,9 +3038,12 @@ export function startGame(): () => void {
     else $('bArmory').removeAttribute('aria-description');
   }
   let cinematicStage = 0;
+  let cinematicStageSeed = stageSeed;
   let cinematicFilm = EQ.film;
-  function previewStage(stage: number) {
+  function previewStage(stage: number, newVisit = true) {
+    if (newVisit) stageSeed = previewVisits.enter(stage, true);
     G.stage = stage;
+    if (newVisit) setupAttract();
     MIST = STAGES[stage]!.fog;
     palette.clearFog();
     prevBg = null;
@@ -3063,11 +3072,16 @@ export function startGame(): () => void {
         toast({ k: '石', msg: 'Unlocked: Mystic Rock companion' });
       }
       cinematicStage = G.stage;
+      cinematicStageSeed = stageSeed;
       cinematicFilm = EQ.film;
       previewStage(stage);
     },
     scene: previewStage,
-    leave: () => previewStage(cinematicStage),
+    leave: () => {
+      stageSeed = cinematicStageSeed;
+      previewStage(cinematicStage, false);
+      setupAttract();
+    },
     grade: (value) => {
       cinematicFilm = value;
     },
@@ -3950,6 +3964,7 @@ export function startGame(): () => void {
       g.translate(-zoomX, -zoomY);
     }
     const inkEnvironment = environmentRenderer.draw(g, {
+      stageSeed,
       width: W,
       height: H,
       dpr: DPR,

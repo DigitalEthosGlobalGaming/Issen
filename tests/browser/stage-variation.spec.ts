@@ -1,0 +1,79 @@
+import { expect, test } from '@playwright/test';
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 768, height: 1024 },
+]) {
+  test(`cinematic visits vary scenery and standing enemies without touching a saved run ${viewport.width}`, async ({
+    page,
+  }, info) => {
+    test.setTimeout(90000);
+    await page.setViewportSize(viewport);
+    await page.addInitScript(() => {
+      if (!localStorage.getItem('issen.meta'))
+        localStorage.setItem(
+          'issen.meta',
+          JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }),
+        );
+    });
+    await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({
+        response,
+        body: (await response.text()).replace(
+          'frameLoop.start();',
+          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: runRandom.state(), cache: environmentRenderer.snapshot() }); frameLoop.start();',
+        ),
+      });
+    });
+    await page.goto('/');
+    await page.locator('#bPlay').click();
+    await page.locator('#bBegin').click();
+    await expect
+      .poll(() => page.evaluate(() => !!localStorage.getItem('issen.runCheckpoint')))
+      .toBe(true);
+    await page.evaluate(() =>
+      sessionStorage.setItem(
+        'issen.cinematic',
+        JSON.stringify({ active: true, scene: 0, film: 'mono' }),
+      ),
+    );
+    await page.reload();
+    await expect(page.locator('#cinematic')).toBeVisible();
+    const read = () =>
+      page.evaluate(() => ({
+        ...(window as any).__visitAudit(),
+        checkpoint: localStorage.getItem('issen.runCheckpoint'),
+      }));
+    await expect
+      .poll(() => page.evaluate(() => typeof (window as any).__visitAudit))
+      .toBe('function');
+    const before = await read();
+    for (let i = 1; i <= 9; i++) {
+      const previousBuilds = (await read()).cache.builds;
+      await page.getByRole('button', { name: 'Next scene', exact: true }).click();
+      await expect.poll(async () => (await read()).stage).toBe(i % 9);
+      await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+      await expect.poll(async () => (await read()).cache.builds).toBeGreaterThan(previousBuilds);
+    }
+    const returned = await read();
+    expect(returned.seed).not.toBe(before.seed);
+    expect(returned.enemies).not.toEqual(before.enemies);
+    expect(returned.random).toBe(before.random);
+    expect(returned.checkpoint).toBe(before.checkpoint);
+    const oldBuilds = returned.cache.builds;
+    await page.setViewportSize({ width: viewport.width - 20, height: viewport.height - 10 });
+    await expect.poll(async () => (await read()).cache.builds).toBeGreaterThan(oldBuilds);
+    const resized = await read();
+    expect(resized.seed).toBe(returned.seed);
+    expect(resized.enemies).toEqual(returned.enemies);
+    expect(resized.random).toBe(before.random);
+    expect(resized.checkpoint).toBe(before.checkpoint);
+    await page.screenshot({ path: info.outputPath(`stage-variation-${viewport.width}.png`) });
+    await page.getByRole('button', { name: 'Exit', exact: true }).click();
+    const exited = await read();
+    expect(exited.stage).toBe(0);
+    expect(exited.seed).toBe(before.originalSeed);
+    expect(exited.checkpoint).toBe(before.checkpoint);
+  });
+}

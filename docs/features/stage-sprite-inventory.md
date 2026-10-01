@@ -14,6 +14,21 @@ the table below records the complete implemented scene kits.
 
 ## Implemented kits
 
+Each scene visit now adds a deterministic, subtle arrangement of two or three
+small edge props to the cached near plane. The cosmetic visit seed is separate
+from combat randomness and never enters run checkpoints. Resize, pause, film
+changes and cache rebuilding retain that visit's plan; entering a different
+stage or beginning another run creates a fresh one. Cinematic entry/browsing
+uses its own visit sequence and refreshes the standing enemy figures. Leaving
+the viewer restores the original stage and cosmetic seed.
+
+The variation pass uses existing kit images only, keeps the central 68% clear,
+and preserves the Ridge's left pine shoulder and Shore's right land bank. Snow
+uses its documented packed crop windows and contact anchors without mirroring;
+Temple adds only small rocks. Low quality omits the third prop without moving
+the first two. Plans live in `rendering/environment/stage-variation.ts` and are
+painted once by the environment cache builder, not during each animation frame.
+
 | Scene | Existing assets used | New assets used |
 | --- | --- | --- |
 | Field | E01/E02/E04-E10 | None |

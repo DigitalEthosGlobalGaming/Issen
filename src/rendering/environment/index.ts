@@ -1,5 +1,6 @@
 import { createBambooForegroundRenderer } from './bamboo-foreground.ts';
 import { drawRainwaterHollow, drawHollowMotion } from './hollow.ts';
+import { drawStageVariations } from './stage-variation.ts';
 import { drawHollowBambooRoad } from './bamboo.ts';
 import { drawWhiteSilencePass } from './winter.ts';
 import { drawEmberCourtyard } from './temple.ts';
@@ -17,6 +18,8 @@ import { drawMeadowTransition, drawMeadowFog } from './meadow.ts';
 
 export type EnvironmentBackend = 'loading' | 'layered' | 'unavailable';
 export interface EnvironmentFrame {
+  /** Cosmetic visit identity, independent of the saved run RNG. */
+  stageSeed?: number;
   width: number;
   height: number;
   dpr: number;
@@ -225,6 +228,27 @@ export function createEnvironmentRenderer(doc: Document) {
     distant = far.target;
     nearby = near.target;
     if (!far.context || !near.context) return false;
+    const finish = () => {
+      drawStageVariations(
+        near.context!,
+        {
+          pines: images[2],
+          shrubs: images[5],
+          bamboo: images[0],
+          rocks: images[6],
+          snowPines: images[14],
+          snowRocks: images[16],
+        },
+        frame.stage,
+        frame.stageSeed ?? 0,
+        w,
+        h,
+        frame.lowQuality,
+      );
+      cached = canvas;
+      builds++;
+      return true;
+    };
     if (frame.stage === 1) {
       drawLastLightRidge(
         ctx,
@@ -242,9 +266,7 @@ export function createEnvironmentRenderer(doc: Document) {
         scale,
         frame.lowQuality,
       );
-      cached = canvas;
-      builds++;
-      return true;
+      return finish();
     }
     if (frame.stage === 2) {
       drawFallingBlossomPath(
@@ -264,9 +286,7 @@ export function createEnvironmentRenderer(doc: Document) {
         scale,
         frame.lowQuality,
       );
-      cached = canvas;
-      builds++;
-      return true;
+      return finish();
     }
     const compose = [
       undefined,
@@ -313,9 +333,7 @@ export function createEnvironmentRenderer(doc: Document) {
         scale,
         frame.lowQuality,
       );
-      cached = canvas;
-      builds++;
-      return true;
+      return finish();
     }
     const { horizonY, groundY, eH } = createLayout(w, h);
     const openField = frame.stage === 0;
@@ -466,9 +484,7 @@ export function createEnvironmentRenderer(doc: Document) {
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, w, h);
     }
-    cached = canvas;
-    builds++;
-    return true;
+    return finish();
   }
 
   function draw(ctx: CanvasRenderingContext2D, frame: EnvironmentFrame): boolean {
@@ -488,6 +504,7 @@ export function createEnvironmentRenderer(doc: Document) {
             frame.height,
             frame.dpr,
             frame.stage,
+            frame.stageSeed ?? 0,
             frame.lowQuality,
           ]);
           if (key !== cacheKey) {
