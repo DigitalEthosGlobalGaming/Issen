@@ -181,3 +181,20 @@ All 20 primary outfits were inspected in six combat poses, plus desktop/tablet
 catalog galleries. A deliberately blocked mask atlas fell back for the entire
 Oni body/head/arms while Sumi and Tanuki remained available. Disposal released
 the loaded kit. The local preview is available; no full build or suite ran.
+
+
+## Companions and regular enemy variety (1.22.0)
+
+`ink-companions.ts` supplies Shiba, Cat and perched/raised-wing Crow from one
+[companion atlas](../../src/rendering/figures/assets/companion-atlas.md).
+Existing foot/shoulder anchors and pet reactions remain shared. Reduced motion
+freezes the pose; Classic or unavailable sprites retain procedural companions.
+Runtime and Armoury each own and release a companion loader.
+
+Regular enemy Ink appearance uses `enemy-appearance.ts`: six head silhouettes,
+four muted cloth palettes and subtle body-width variation derived from the saved
+figure seed. No extra combat RNG calls or saved gameplay fields are added. Hands,
+weapons, reach, glyphs and encounter timing stay at their original coordinates.
+Authored masks remain selected; bosses retain their authored look and palette.
+Strict TypeScript, nine focused character checks and desktop/tablet galleries
+passed. No full build or Android test ran.

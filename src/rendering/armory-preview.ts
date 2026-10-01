@@ -1,3 +1,4 @@
+import { createInkCompanionRenderer } from './figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
 import { createInkSwordRenderer } from './figures/ink-sword.ts';
@@ -34,6 +35,7 @@ export interface PreviewServices {
 export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  const inkCompanion = createInkCompanionRenderer(canvas.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
   const inkSword = createInkSwordRenderer(canvas.ownerDocument);
@@ -96,12 +98,14 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     g.fillStyle = gradient;
     g.fillRect(0, 0, width, height);
     if (frame.artwork === 'ink') {
+      void inkCompanion.prepare();
       void inkEnemy.prepare();
       void inkPlayer.prepare();
       void inkSword.prepare();
     }
     const figures = createFigureRenderer(g, {
       ...frame,
+      inkCompanion,
       inkEnemy,
       inkPlayer,
       inkSword,
@@ -115,7 +119,15 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       last = now;
       elapsed += dt;
       const p = position();
-      const figure: Figure = { ...p, fog: 0.2, alpha: 1, d: dummy, pose: EPOSE.guard, lean: 0 };
+      const figure: Figure = {
+        varied: true,
+        ...p,
+        fog: 0.2,
+        alpha: 1,
+        d: dummy,
+        pose: EPOSE.guard,
+        lean: 0,
+      };
       if (elapsed < 0.9) {
         figures.drawGroundShadow(figure, deathShadowOpacity(elapsed));
         figure.noShadow = true;
@@ -171,6 +183,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     demo,
     draw,
     dispose() {
+      inkCompanion.dispose();
       inkEnemy.dispose();
       inkPlayer.dispose();
       inkSword.dispose();

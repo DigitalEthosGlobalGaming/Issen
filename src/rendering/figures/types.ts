@@ -47,6 +47,8 @@ export interface Figure {
   pal?: Palette | null;
   variant?: string | null;
   back?: boolean;
+  /** Cosmetic regular-enemy variation; bosses retain their authored identity. */
+  varied?: boolean;
   /** Saved equipment identities select only explicitly supported sprite replacements. */
   robeId?: string;
   bladeId?: string;
@@ -81,6 +83,18 @@ export interface EnemyArtwork {
     env: FigureEnvironment,
   ): boolean;
 }
+export interface CompanionArtwork {
+  draw(
+    type: string,
+    g: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    time?: number,
+    active?: boolean,
+    reducedMotion?: boolean,
+  ): boolean;
+}
 export interface SwordArtwork {
   draw(
     g: CanvasRenderingContext2D,
@@ -95,6 +109,7 @@ export interface FigureEnvironment {
   artwork?: 'classic' | 'ink';
   inkPlayer?: PlayerArtwork;
   inkEnemy?: EnemyArtwork;
+  inkCompanion?: CompanionArtwork;
   inkSword?: SwordArtwork;
   reducedMotion?: boolean;
   reducedFlashes?: boolean;

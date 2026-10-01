@@ -1,3 +1,4 @@
+import { enemyAppearance } from '../../src/rendering/figures/enemy-appearance.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
@@ -245,4 +246,27 @@ test('every primary outfit uses the shared Ink puppet while Classic remains avai
     );
     assert.deepEqual(classic.parts, [], robeId);
   }
+});
+
+test('regular enemy appearance is stable per saved figure, varied, and preserves authored looks', () => {
+  const hats = new Set(),
+    colors = new Set(),
+    widths = new Set();
+  for (let seed = 0; seed < 80; seed++) {
+    const f = { d: makeFig(seed), variant: null },
+      before = structuredClone(f);
+    const a = enemyAppearance(f);
+    assert.deepEqual(enemyAppearance(f), a);
+    assert.deepEqual(f, before);
+    hats.add(a.variant);
+    colors.add(a.palette.robe);
+    widths.add(a.width);
+    assert.ok(a.width >= 0.94 && a.width <= 1.061);
+  }
+  assert.ok(hats.size >= 5);
+  assert.equal(colors.size, 4);
+  assert.ok(widths.size >= 5);
+  const f = { d: makeFig(1), variant: 'mask', pal: createPalette().robe('shiro') };
+  assert.equal(enemyAppearance(f).variant, 'mask');
+  assert.equal(enemyAppearance(f).palette, f.pal);
 });

@@ -1,3 +1,4 @@
+import { enemyAppearance } from './enemy-appearance.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
 type Part = 'body' | 'head' | 'arms' | 'hands';
@@ -195,11 +196,14 @@ export function createInkEnemyRenderer(doc: Document) {
     f: Figure,
     env: FigureEnvironment,
   ): boolean {
+    const appearance = f.varied ? enemyAppearance(f) : undefined;
+    if (appearance) f = { ...f, variant: appearance.variant, pal: appearance.palette };
     if (!pending && !disposed) void prepare();
     if (!supports(f)) return false;
     const l = f.lean || 0;
     g.save();
     if (part === 'body') {
+      g.scale(appearance?.width ?? 1, 1);
       g.save();
       g.translate(l * 0.5, -0.51);
       const sway =

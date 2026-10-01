@@ -1,3 +1,4 @@
+import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
@@ -210,9 +211,11 @@ export function startGame(): () => void {
   const g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
+  const inkCompanion = createInkCompanionRenderer(cvs.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
+  lifecycle.add(inkCompanion.dispose);
   lifecycle.add(inkEnemy.dispose);
   lifecycle.add(inkPlayer.dispose);
   lifecycle.add(inkSword.dispose);
@@ -695,12 +698,14 @@ export function startGame(): () => void {
   function figureRenderer() {
     const artwork = cinematic.active ? cinematicRenderer : settings.renderer;
     if (artwork === 'ink') {
+      void inkCompanion.prepare();
       void inkEnemy.prepare();
       void inkPlayer.prepare();
       void inkSword.prepare();
     }
     return createFigureRenderer(g, {
       artwork,
+      inkCompanion,
       inkEnemy,
       inkPlayer,
       inkSword,
@@ -3596,6 +3601,7 @@ export function startGame(): () => void {
       pose: e.pose,
       lean: e.lean,
       variant: e.look,
+      varied: true,
       glint: e.glint,
     };
     if (e.state !== 'dying') {

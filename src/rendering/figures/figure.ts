@@ -742,6 +742,20 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.restore();
   }
   function drawCrow(x: number, y: number, s: number) {
+    if (
+      env.artwork === 'ink' &&
+      env.inkCompanion?.draw(
+        'crow',
+        g,
+        x,
+        y,
+        s,
+        time,
+        petActive,
+        !!env.reducedMotion || !!env.reducedFlashes,
+      )
+    )
+      return;
     const fl = petActive ? Math.sin(time * 30) : 0,
       bob = Math.sin(time * 2.3) * s * 0.06;
     g.save();
@@ -779,6 +793,20 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.restore();
   }
   function drawPetAt(type: string, x: number, y: number, sz: number) {
+    if (
+      env.artwork === 'ink' &&
+      env.inkCompanion?.draw(
+        type,
+        g,
+        x,
+        y,
+        sz,
+        time,
+        petActive,
+        !!env.reducedMotion || !!env.reducedFlashes,
+      )
+    )
+      return;
     g.save();
     g.translate(x, y);
     g.scale(sz, sz);
