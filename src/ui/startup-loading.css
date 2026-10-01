@@ -1,0 +1,46 @@
+.startup-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #171716;
+  color: #e4dfd2;
+  font-family: Georgia, serif;
+  text-align: center;
+}
+.startup-loading section {
+  width: min(100%, 420px);
+}
+.startup-mark {
+  font-size: 64px;
+  margin: 0 0 24px;
+}
+.startup-loading h1 {
+  font-size: 24px;
+  font-weight: normal;
+}
+.startup-loading progress {
+  width: 100%;
+  height: 10px;
+  accent-color: #d9d0ba;
+}
+.startup-error {
+  line-height: 1.6;
+}
+.startup-loading button {
+  padding: 12px 24px;
+  color: #171716;
+  background: #e4dfd2;
+  border: 1px solid #e4dfd2;
+  font: inherit;
+  cursor: pointer;
+}
+.startup-loading button:focus-visible {
+  outline: 3px solid #cf985f;
+  outline-offset: 5px;
+}
+.startup-loading [hidden] {
+  display: none;
+}

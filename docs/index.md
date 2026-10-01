@@ -1,3 +1,4 @@
+- [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
 - [Ink character puppets](features/character-art.md): modular player outfits and enemy parts, Steel sword, shared Artwork toggle and per-item Classic fallback.

@@ -26,7 +26,9 @@ checks are independent of earned unlocks/ranks. See
 ## Startup and ownership
 
 Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
-shell and screen fragments, then calls `startGame()` in `src/game.ts`.
+shell and screen fragments after every bundled image loads and decodes, then calls
+`startGame()` in `src/game.ts`. Startup loading/progress and retry are owned by
+`platform/artwork-preload.ts` and `ui/startup-loading.ts`.
 The returned disposer stops the runtime. `main.ts` removes the mounted root and
 registers disposal with Vite HMR before a replacement instance starts.
 
