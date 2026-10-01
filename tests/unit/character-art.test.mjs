@@ -4,8 +4,16 @@ import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
 import { createPalette } from '../../src/rendering/palette.ts';
 import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
-function render({ body = true, sword = true, mode = 'ink', figure = {} } = {}) {
-  const calls = { parts: [], swords: [], fills: [], strokes: [], steelGradients: 0 };
+function render({ body = true, enemy = false, sword = true, mode = 'ink', figure = {} } = {}) {
+  const calls = {
+    parts: [],
+    enemyParts: [],
+    order: [],
+    swords: [],
+    fills: [],
+    strokes: [],
+    steelGradients: 0,
+  };
   const stack = [];
   const state = {
     globalAlpha: 0.7,
@@ -35,8 +43,10 @@ function render({ body = true, sword = true, mode = 'ink', figure = {} } = {}) {
           if (
             key === 'createLinearGradient' &&
             JSON.stringify(args) === JSON.stringify([0, -0.012, 0, 0.01])
-          )
+          ) {
             calls.steelGradients++;
+            calls.order.push('weapon');
+          }
           return {
             kind: key,
             args,
@@ -63,6 +73,13 @@ function render({ body = true, sword = true, mode = 'ink', figure = {} } = {}) {
       drawPart(g, part, f) {
         calls.parts.push({ part, alpha: g.globalAlpha, pose: { ...f.pose } });
         return body;
+      },
+    },
+    inkEnemy: {
+      drawPart(g, part, f) {
+        calls.enemyParts.push({ part, alpha: g.globalAlpha });
+        calls.order.push(part);
+        return enemy;
       },
     },
     inkSword: {
@@ -167,4 +184,44 @@ test('awakened steel aura remains visible with sprite body and sword', () => {
     ),
     'shared aura pass still paints',
   );
+});
+
+test('five modular player outfits replace the body without duplicate Classic armour', () => {
+  for (const robeId of ['yoroi', 'helm', 'shinobi', 'jinbaori', 'mino']) {
+    const calls = render({ figure: { robeId, rf: { armor: 1 }, cape: 1, coat: 1 } });
+    assert.deepEqual(
+      calls.parts.map((c) => c.part),
+      ['arms', 'body', 'head'],
+    );
+    assert.ok(!calls.fills.includes('#3a1612'), 'Classic armour is suppressed');
+  }
+});
+
+test('front enemy limbs hold weapons between arms and hands, preserving inherited opacity', () => {
+  for (const variant of ['', 'mask', 'monk', 'jingasa', 'kasa', 'kabuto', 'hair']) {
+    const calls = render({ enemy: true, figure: { back: false, variant } });
+    assert.deepEqual(
+      calls.enemyParts.map((c) => c.part),
+      ['body', 'head', 'arms', 'hands'],
+    );
+    assert.deepEqual(calls.order, ['body', 'head', 'arms', 'weapon', 'hands']);
+    assert.ok(calls.enemyParts.every((c) => Math.abs(c.alpha - 0.42) < 1e-10));
+    assert.deepEqual(calls.parts, []);
+  }
+  const twin = render({ enemy: true, figure: { back: false, twin: 1 } });
+  assert.equal(twin.steelGradients, 2, 'both swords stay visible');
+  const spear = render({ enemy: true, figure: { back: false, spear: 1 } });
+  assert.equal(spear.steelGradients, 0, 'spear retains its existing drawing');
+});
+
+test('missing enemy art preserves Classic figure drawing', () => {
+  const fallback = render({ figure: { back: false } }),
+    classic = render({ mode: 'classic', figure: { back: false } });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(fallback.fills)),
+    JSON.parse(JSON.stringify(classic.fills)),
+  );
+  assert.deepEqual(fallback.strokes, classic.strokes);
+  assert.equal(fallback.steelGradients, classic.steelGradients);
+  assert.deepEqual(classic.enemyParts, []);
 });

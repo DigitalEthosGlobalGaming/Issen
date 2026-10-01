@@ -1,6 +1,6 @@
 # Repository documentation
 
-- [Ink player puppet](features/character-art.md): modular player parts, Steel sword, shared Artwork toggle and per-item Classic fallback.
+- [Ink character puppets](features/character-art.md): modular player outfits and enemy parts, Steel sword, shared Artwork toggle and per-item Classic fallback.
 
 - [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.
 

@@ -14,7 +14,7 @@ Switching changes drawing, not encounter state, equipment or attack timing.
 | Player Steel sword (`steel`) | Separate katana aligned to grip and tip | Classic while unavailable |
 | Yoroi, Helm, Shinobi, Jinbaori, Mino | Shared modular armour and clothing kit (1.19.0) | Classic while required pieces are unavailable |
 | Other robes and weapons | No replacement yet | Existing procedural drawing |
-| Enemies and bosses | No replacement yet | Existing procedural drawing |
+| Enemies and bosses | Modular front-view body, articulated arms/hands and interchangeable headwear (1.20.0) | Classic while required pieces are unavailable |
 
 Body and sword selection are independent: a new sword can accompany a Classic
 outfit, and the new player body can hold an unreplaced weapon. Crests, charms,
@@ -40,7 +40,7 @@ weapon grip and tip so glints and effects keep their established coordinates.
 
 Sumi supplies the common rear-view body and puppet joints. Five outfit recipes
 combine reusable armour and clothing pieces over that body. Other outfits keep
-their existing appearance; enemy front views require their own art.
+their existing appearance; enemy front views use a separate modular kit.
 
 ## Reusable source assets
 
@@ -87,7 +87,7 @@ unlock rules stay in the equipment catalog; these recipes change appearance.
 | Yoroi | Heavy cuirass, paired shoulder guards, waist plates and kabuto |
 | Helm | Lighter plate arrangement and shared kabuto |
 | Shinobi | Dark cloth, wrapped hood and bracers |
-| Jinbaori | Open sleeveless coat halves and selected shared plates |
+| Jinbaori | Open sleeveless coat halves |
 | Mino | Straw cape and kasa over the shared cloth body |
 
 The armour atlas separates cuirass, left/right shoulder guards and waist plates.
@@ -106,3 +106,30 @@ transparency inspection and generation prompts:
 - [Armour plates](../../src/rendering/figures/assets/armour-plates-atlas.md)
 - [Headwear](../../src/rendering/figures/assets/outfit-headwear-atlas.md)
 - [Cloth pieces](../../src/rendering/figures/assets/outfit-cloth-atlas.md)
+
+
+## Front-view enemy kit (version 1.20.0)
+
+`ink-enemy.ts` owns a front-view torso, paired robe panels, upper/lower arms,
+hand and interchangeable head pieces. Current regular enemy looks (plain,
+mask, monk and jingasa) and boss looks (kasa, kabuto, swept hair, mask and
+jingasa) share this kit. Mirror retains its pale robe palette. Recipes and
+measured frame geometry stay in the renderer; encounter identities, timing,
+weapon reach and unlock rules stay in their gameplay owners.
+
+Front arms draw after the body; weapons draw after arms; separate hands draw
+last at the existing grip targets. Twin swords and the spear retain their
+existing weapon shapes and pose geometry. Death clipping, opacity, fog and
+film grading remain shared. Unknown looks or missing source families fall
+back to Classic. Runtime and isolated Armoury previews own and dispose their
+loaders independently. The single Artwork option applies to both views.
+
+- [Front-view modular body contract](../../src/rendering/figures/assets/enemy-ronin-simple.md)
+- [Front-view headwear contract](../../src/rendering/figures/assets/enemy-headwear-atlas.md)
+
+
+Version 1.20.0 verification: strict TypeScript and 17 focused figure, settings,
+shadow and aura checks passed. Desktop/tablet galleries cover all enemy/boss
+looks, fog, Mirror, twin swords, spear and unknown-look fallback. Running scene
+screenshots and paused Artwork switching were inspected without changing
+combat RNG, pose or saved checkpoint. No production build or full suite ran.

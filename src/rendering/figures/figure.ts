@@ -977,8 +977,9 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     const playerArt =
       env.artwork === 'ink' && f.back && supportsInkOutfit(f.robeId) ? env.inkPlayer : undefined;
     // Rear-view hands reach around the body; the torso occludes crossing forearms.
+    const enemyArt = env.artwork === 'ink' && !f.back ? env.inkEnemy : undefined;
     const inkArms = playerArt?.drawPart(g, 'arms', f, env) === true;
-    const inkBody = playerArt?.drawPart(g, 'body', f, env) === true;
+    const inkBody = (playerArt || enemyArt)?.drawPart(g, 'body', f, env) === true;
     if (!inkBody) {
       drawSleeve(-1, lx, C, d, t, wv);
       drawSleeve(1, lx, C, d, t, wv);
@@ -1142,7 +1143,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.stroke();
       }
     }
-    if (!f.back) {
+    if (!f.back && !inkBody) {
       g.fillStyle = C.inner;
       g.beginPath();
       g.moveTo(-0.04 + lx, -0.828);
@@ -1157,7 +1158,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.lineTo(-0.002 + lx * 0.85, -0.655);
       g.lineTo(0.05 + lx, -0.83);
       g.stroke();
-    } else {
+    } else if (!inkBody) {
       g.strokeStyle = C.robeD;
       g.lineWidth = 0.008;
       g.beginPath();
@@ -1193,8 +1194,9 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       g.fillRect(cx - 0.009, cy + 0.012, 0.018, 0.004);
       g.fillRect(cx - 0.009, cy + 0.022, 0.018, 0.004);
     }
-    if (!(inkBody && playerArt?.drawPart(g, 'head', f, env))) drawHead(f, C, d, lx);
-    if (!inkArms) {
+    if (!(inkBody && (playerArt || enemyArt)?.drawPart(g, 'head', f, env))) drawHead(f, C, d, lx);
+    const inkFrontArms = inkBody && enemyArt?.drawPart(g, 'arms', f, env) === true;
+    if (!inkArms && !inkFrontArms) {
       const h1: Point = [gx, gy],
         sh: Point[] = [
           [-0.15 + lx, -0.765],
@@ -1229,6 +1231,10 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.arc(hd[0], hd[1], 0.022, 0, TAU);
         g.fill();
       }
+    }
+    if (inkFrontArms) {
+      drawHeldWeapons();
+      enemyArt?.drawPart(g, 'hands', f, env);
     }
     if (f.glint != null && f.glint > 0) {
       const tp = tipOf(p, lx, f.spear ? 0.98 : f.blade ? f.blade.len : 0.52);

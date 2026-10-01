@@ -1,3 +1,4 @@
+import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
 import { createInkSwordRenderer } from './figures/ink-sword.ts';
 import { createFigureRenderer } from './figures/figure.ts';
@@ -33,6 +34,7 @@ export interface PreviewServices {
 export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
   const inkSword = createInkSwordRenderer(canvas.ownerDocument);
   const fx = createEffects();
@@ -94,11 +96,13 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     g.fillStyle = gradient;
     g.fillRect(0, 0, width, height);
     if (frame.artwork === 'ink') {
+      void inkEnemy.prepare();
       void inkPlayer.prepare();
       void inkSword.prepare();
     }
     const figures = createFigureRenderer(g, {
       ...frame,
+      inkEnemy,
       inkPlayer,
       inkSword,
       width,
@@ -167,6 +171,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     demo,
     draw,
     dispose() {
+      inkEnemy.dispose();
       inkPlayer.dispose();
       inkSword.dispose();
     },

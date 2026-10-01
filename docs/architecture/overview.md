@@ -201,3 +201,10 @@ All artwork is selected by `settings.renderer` (Artwork in Options).
 The figure compositor retains procedural fallback per supported item and calls
 instance-owned Ink player/sword renderers. Runtime and armoury canvases own
 separate loaders. See [Ink player puppet](../features/character-art.md).
+
+
+Character Ink rendering uses `rendering/figures/ink-player.ts`, `outfit-kit.ts`
+and `ink-enemy.ts`; figure composition owns rear/front limb and weapon order.
+Optional image hooks fall back to the existing Canvas geometry. The single
+Artwork preference selects environment and character replacements together.
+See [character artwork](../features/character-art.md) for coverage and contracts.

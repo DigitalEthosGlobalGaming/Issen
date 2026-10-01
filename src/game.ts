@@ -1,3 +1,4 @@
+import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
 import { premium, premiumEnabled, listenToPurchases } from './platform/purchases.ts';
@@ -209,8 +210,10 @@ export function startGame(): () => void {
   const g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
+  const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
+  lifecycle.add(inkEnemy.dispose);
   lifecycle.add(inkPlayer.dispose);
   lifecycle.add(inkSword.dispose);
   const R = Math.random;
@@ -692,11 +695,13 @@ export function startGame(): () => void {
   function figureRenderer() {
     const artwork = cinematic.active ? cinematicRenderer : settings.renderer;
     if (artwork === 'ink') {
+      void inkEnemy.prepare();
       void inkPlayer.prepare();
       void inkSword.prepare();
     }
     return createFigureRenderer(g, {
       artwork,
+      inkEnemy,
       inkPlayer,
       inkSword,
       time,

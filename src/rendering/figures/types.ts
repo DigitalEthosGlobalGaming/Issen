@@ -73,6 +73,14 @@ export interface PlayerArtwork {
     env: FigureEnvironment,
   ): boolean;
 }
+export interface EnemyArtwork {
+  drawPart(
+    g: CanvasRenderingContext2D,
+    part: 'body' | 'head' | 'arms' | 'hands',
+    f: Figure,
+    env: FigureEnvironment,
+  ): boolean;
+}
 export interface SwordArtwork {
   draw(
     g: CanvasRenderingContext2D,
@@ -86,6 +94,7 @@ export interface SwordArtwork {
 export interface FigureEnvironment {
   artwork?: 'classic' | 'ink';
   inkPlayer?: PlayerArtwork;
+  inkEnemy?: EnemyArtwork;
   inkSword?: SwordArtwork;
   reducedMotion?: boolean;
   reducedFlashes?: boolean;
