@@ -1,3 +1,4 @@
+import { createBambooForegroundRenderer } from './bamboo-foreground.ts';
 import { drawRainwaterHollow, drawHollowMotion } from './hollow.ts';
 import { drawHollowBambooRoad } from './bamboo.ts';
 import { drawWhiteSilencePass } from './winter.ts';
@@ -87,6 +88,7 @@ function sceneAssets(stage: number): number[] {
 
 /** Instance-owned image loading and caches; safe for independent previews. */
 export function createEnvironmentRenderer(doc: Document) {
+  const foreground = createBambooForegroundRenderer(doc);
   let disposed = false;
   let status: EnvironmentBackend = 'classic';
   let ready = false;
@@ -552,6 +554,7 @@ export function createEnvironmentRenderer(doc: Document) {
   }
 
   function dispose() {
+    foreground.dispose();
     disposed = true;
     generation++;
     status = 'classic';
@@ -576,12 +579,22 @@ export function createEnvironmentRenderer(doc: Document) {
 
   return {
     draw,
+    drawForeground(ctx: CanvasRenderingContext2D, frame: EnvironmentFrame) {
+      return (
+        !disposed &&
+        status === 'layered' &&
+        frame.stage === 4 &&
+        !!images[0] &&
+        foreground.draw(ctx, images[0], frame)
+      );
+    },
     prepare,
     dispose,
     get backend(): EnvironmentBackend {
       return status;
     },
     snapshot: () => ({
+      foreground: foreground.snapshot(),
       backend: status,
       builds,
       loadedImages: images.filter((image) => image?.naturalWidth).length,

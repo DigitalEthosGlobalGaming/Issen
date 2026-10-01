@@ -133,3 +133,17 @@ suppresses the classic foreground stalk overlay. Gameplay simulation is unchange
 
 Version 1.18.1 shares the Artwork selector with player and weapon replacements;
 unreplaced assets retain their Classic drawing. See [player artwork](character-art.md).
+
+
+## Hollow Bamboo Road foreground (1.23.0)
+
+Stage 4 reuses the bamboo atlas in `bamboo-foreground.ts` as two near edge planes.
+`environmentRenderer.drawForeground()` runs after player/companions, before grass,
+weather and film grading. It only draws after a successful Ink background. Classic
+retains its procedural bamboo. Full-height native-aspect clumps have their roots
+below the viewport and fade toward the central encounter area. Portrait/tablet
+composition leaves the central 60% clear; landscape leaves 52% clear. Sway freezes
+for reduced motion/flashes. The private caches are capped at two million pixels
+and disposed with the environment renderer. See the
+[reuse contract](../../src/rendering/environment/assets/bamboo-foreground.md).
+Strict TypeScript and desktop/tablet cinematic previews passed without a build.

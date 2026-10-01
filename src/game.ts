@@ -4041,6 +4041,17 @@ export function startGame(): () => void {
       drawFx();
       drawFx2();
     }
+    if (inkEnvironment)
+      environmentRenderer.drawForeground(g, {
+        width: W,
+        height: H,
+        dpr: DPR,
+        time,
+        stage: G.stage,
+        reducedMotion: reducedMotion(),
+        reducedFlashes: reducedFlashes(),
+        lowQuality: density() <= 0.3,
+      });
     blades(fg, time, inkEnvironment && G.stage === 5);
     if (!cinematic.active) drawGlyphs();
     drawSmoke();
