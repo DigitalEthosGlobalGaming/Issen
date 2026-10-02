@@ -13,9 +13,12 @@
 .startup-loading section {
   width: min(100%, 420px);
 }
-.startup-mark {
-  font-size: 64px;
-  margin: 0 0 24px;
+.startup-logo {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  margin: 0 auto 16px;
+  object-fit: contain;
 }
 .startup-loading h1 {
   font-size: 24px;

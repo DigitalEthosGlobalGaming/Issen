@@ -10,6 +10,7 @@ export function createArtworkPreloader(
   urls: readonly string[],
   createImage: () => HTMLImageElement = () => new Image(),
   onProgress: (progress: ArtworkProgress) => void = () => {},
+  priorityUrls: readonly string[] = [],
 ) {
   const sources = [...new Set(urls)];
   const retained = new Map<string, HTMLImageElement>();
@@ -66,10 +67,13 @@ export function createArtworkPreloader(
     failed.clear();
     pending = missing.length;
     report();
-    running = Promise.all(missing.map(load)).then(() => {
+    running = (async () => {
+      const first = missing.filter((url) => priorityUrls.includes(url));
+      await Promise.all(first.map(load));
+      if (!disposed) await Promise.all(missing.filter((url) => !first.includes(url)).map(load));
       running = null;
       return !disposed && retained.size === sources.length;
-    });
+    })();
     return running;
   }
   function dispose() {

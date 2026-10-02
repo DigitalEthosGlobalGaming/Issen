@@ -2,7 +2,7 @@ import './styles/index.css';
 import { mount } from './ui/mount';
 import { startGame } from './game.ts';
 import { createArtworkPreloader } from './platform/artwork-preload.ts';
-import { mountStartupLoading } from './ui/startup-loading.ts';
+import { mountStartupLoading, STARTUP_LOGO_URL } from './ui/startup-loading.ts';
 import { mountChangelogLink } from './ui/changelog-link.ts';
 
 const artwork = import.meta.glob<string>(
@@ -26,7 +26,7 @@ let disposed = false;
 const loading = mountStartupLoading(() => {
   void begin();
 });
-const preloader = createArtworkPreloader(urls, undefined, loading.update);
+const preloader = createArtworkPreloader(urls, undefined, loading.update, [STARTUP_LOGO_URL]);
 async function begin() {
   if ((await preloader.run()) && !disposed && !root) {
     loading.remove();

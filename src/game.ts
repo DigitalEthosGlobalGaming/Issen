@@ -3633,6 +3633,7 @@ export function startGame(): () => void {
       lean: e.lean,
       variant: e.look,
       varied: true,
+      waiting: e.state === 'idle',
       glint: e.glint,
     };
     if (e.state !== 'dying') {

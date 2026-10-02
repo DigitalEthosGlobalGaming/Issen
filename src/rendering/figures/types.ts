@@ -49,6 +49,8 @@ export interface Figure {
   back?: boolean;
   /** Cosmetic regular-enemy variation; bosses retain their authored identity. */
   varied?: boolean;
+  /** Waiting enemies breathe cosmetically without modifying simulation poses. */
+  waiting?: boolean;
   /** Saved equipment identities select only explicitly supported sprite replacements. */
   robeId?: string;
   bladeId?: string;
