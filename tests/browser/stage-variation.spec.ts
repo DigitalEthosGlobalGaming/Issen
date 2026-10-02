@@ -49,10 +49,15 @@ for (const viewport of [
       .poll(() => page.evaluate(() => typeof (window as any).__visitAudit))
       .toBe('function');
     const before = await read();
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 10; i++) {
       const previousBuilds = (await read()).cache.builds;
       await page.getByRole('button', { name: 'Next scene', exact: true }).click();
-      await expect.poll(async () => (await read()).stage).toBe(i % 9);
+      await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', String(i % 10));
+      await expect.poll(async () => (await read()).stage).toBe(i < 9 ? i : 0);
+      if (i === 9) {
+        await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'demon-realm');
+        continue;
+      }
       await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
       await expect.poll(async () => (await read()).cache.builds).toBeGreaterThan(previousBuilds);
     }

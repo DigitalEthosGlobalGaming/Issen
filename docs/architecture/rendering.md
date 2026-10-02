@@ -59,6 +59,13 @@ rarity indicators, disabled opacity and focus outlines retain their own meaning.
 See the [atlas contract](../../src/ui/assets/button-atlas.md) for slice geometry
 and regeneration. Gameplay Canvas rendering does not consume these UI assets.
 
+Bounded panels use the heavier frames in `src/styles/panel-frames.css`, imported
+after button frames. Temple tiles use compact panel corners with selection and
+hover highlights; Temple details, pause containers, Trial cards/results, Testing
+tools groups and the cinematic toolbar use the normal container frame. Full-screen
+backdrops and inner scrolling retain their existing owners. See the
+[panel atlas contract](../../src/ui/assets/panel-atlas.md) for geometry and regeneration.
+
 The armory has its own canvas. `src/rendering/armory-preview.ts` reuses the figure,
 effect and film renderers but owns a separate animation clock and effect state.
 `src/ui/share-card.ts` creates another canvas, copies the live scene into it and

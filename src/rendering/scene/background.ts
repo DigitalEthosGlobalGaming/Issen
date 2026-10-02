@@ -3,6 +3,7 @@ import { rng } from '../../shared/random.ts';
 import type { Random } from '../../shared/random.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
+import { setSceneryAtmosphere } from '../environment/scene-kit.ts';
 export function blob(
   b: CanvasRenderingContext2D,
   x: number,
@@ -57,6 +58,7 @@ export function createBackground(
     bg.height = Math.round(H * DPR);
     const b = bg.getContext('2d');
     if (!b) throw new Error('Canvas 2D is unavailable');
+    setSceneryAtmosphere(b, `rgb(${st.fog.join(',')})`);
     b.setTransform(DPR, 0, 0, DPR, 0, 0);
     const r = rng(20260926 + stage * 97);
     const hz = L.horizonY,

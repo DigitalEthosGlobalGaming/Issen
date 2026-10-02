@@ -1,3 +1,5 @@
+import { drawAtlasSprite } from './scene-kit.ts';
+import { STAGES } from '../../game/content/stages.ts';
 import type { EnvironmentFrame } from './index.ts';
 
 /** Reuses the accepted bamboo atlas; these planes belong in front of figures, before film/HUD. */
@@ -61,24 +63,18 @@ export function createBambooForegroundRenderer(doc: Document) {
           g.translate(edge, 0);
           g.scale(-1, 1);
         }
-        g.globalAlpha = 0.82;
-        g.drawImage(
-          atlas,
-          (cell % 2) * sw,
-          Math.floor(cell / 2) * sh,
-          sw,
-          sh,
-          edge * 0.22 - wide * (side ? 0.35 : 0.5),
-          height * 1.13 - tall,
-          wide,
-          tall,
-        );
+        drawAtlasSprite(g, atlas, cell, edge * 0.22, height * 1.13, wide, {
+          anchorX: side ? 0.35 : 0.5,
+          anchorY: 1,
+          alpha: 0.95,
+          hazeColor: `rgb(${STAGES[4]!.fog.join(',')})`,
+        });
         g.restore();
         // Alpha mask only affects this private plane, never the already drawn player.
         g.globalCompositeOperation = 'destination-in';
         const fade = g.createLinearGradient(side ? edge : 0, 0, side ? 0 : edge, 0);
         fade.addColorStop(0, '#fff');
-        fade.addColorStop(0.52, '#fff');
+        fade.addColorStop(0.94, '#fff');
         fade.addColorStop(1, 'rgba(255,255,255,0)');
         g.fillStyle = fade;
         g.fillRect(0, 0, edge, height);

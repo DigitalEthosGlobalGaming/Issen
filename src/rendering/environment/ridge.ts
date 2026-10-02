@@ -1,3 +1,4 @@
+import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -36,38 +37,7 @@ export function drawLastLightRidge(
     anchor = 0.94,
     groundBlend = atlas !== atlases.mountains,
   ) {
-    const sw = atlas.naturalWidth / 2,
-      sh = atlas.naturalHeight / 2;
-    const h = (size * sh) / sw;
-    // Prepare the contact fade while building the cached layer, never per frame.
-    const cutout = groundBlend ? g.canvas.ownerDocument.createElement('canvas') : null;
-    if (cutout) {
-      cutout.width = Math.ceil(sw);
-      cutout.height = Math.ceil(sh);
-      const mask = cutout.getContext('2d');
-      if (mask) {
-        mask.drawImage(
-          atlas,
-          (cell % 2) * sw,
-          Math.floor(cell / 2) * sh,
-          sw,
-          sh,
-          0,
-          0,
-          cutout.width,
-          cutout.height,
-        );
-        mask.globalCompositeOperation = 'destination-in';
-        const fade = mask.createLinearGradient(0, cutout.height * 0.64, 0, cutout.height * anchor);
-        fade.addColorStop(0, 'rgba(0,0,0,1)');
-        fade.addColorStop(0.45, 'rgba(0,0,0,0.85)');
-        fade.addColorStop(1, 'rgba(0,0,0,0)');
-        mask.fillStyle = fade;
-        mask.fillRect(0, 0, cutout.width, cutout.height);
-      }
-    }
     g.save();
-    g.globalAlpha *= alpha;
     g.translate(x, foot);
     if (groundBlend && foot < groundY) {
       const sample = Math.max(1, size * 0.08);
@@ -75,22 +45,13 @@ export function drawLastLightRidge(
       // Rotate around ground contact, before mirroring, so both facings follow the hill.
       g.rotate(Math.max(-0.18, Math.min(0.18, angle)));
     }
-    g.scale(mirror ? -1 : 1, 1);
-    if (cutout) g.drawImage(cutout, -size / 2, -h * anchor, size, h);
-    else
-      g.drawImage(
-        atlas,
-        (cell % 2) * sw,
-        Math.floor(cell / 2) * sh,
-        sw,
-        sh,
-        -size / 2,
-        -h * anchor,
-        size,
-        h,
-      );
+    drawAtlasSprite(g, atlas, cell, 0, 0, size, {
+      alpha,
+      flip: mirror,
+      anchorY: anchor,
+      fadeFrom: groundBlend ? 0.64 : undefined,
+    });
     g.restore();
-    if (cutout) cutout.width = cutout.height = 0;
   }
   const hillBase = groundY - eH * 0.3;
   const slope = (x: number) =>

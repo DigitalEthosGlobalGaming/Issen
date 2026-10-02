@@ -92,6 +92,7 @@ export function drawBrokenShore(
     });
     stamp(far, atlases.foam!, 3, x * width, y + height * 0.004, unit * size * 0.84, {
       alpha: 0.22,
+      translucent: true,
       anchorY: 0.67,
     });
   }
@@ -111,7 +112,7 @@ export function drawBrokenShore(
       x,
       y - height * 0.004,
       unit * (0.21 + (i % 3) * 0.035),
-      { alpha: 0.3, anchorY: i % 2 ? 0.795 : 0.669, angle },
+      { alpha: 0.3, translucent: true, anchorY: i % 2 ? 0.795 : 0.669, angle },
     );
     if (i % 2 === 0)
       stamp(far, atlases.rocks!, i % 4, x + width * 0.025, y + height * 0.015, unit * 0.12, {
@@ -142,20 +143,12 @@ export function drawBrokenShore(
   // This preserved atlas has unequal row heights; use its explicit frame contract.
   const rockFrame = FOREGROUND_BOULDER_FRAMES[1];
   const rockScale = (unit * 0.48) / rockFrame.width;
-  near.save();
-  near.globalAlpha *= 0.8;
-  near.drawImage(
-    atlases.boulders!,
-    rockFrame.x,
-    rockFrame.y,
-    rockFrame.width,
-    rockFrame.height,
-    width * 1.01 - rockFrame.anchorX * rockScale,
-    height * 0.98 - rockFrame.anchorY * rockScale,
-    rockFrame.width * rockScale,
-    rockFrame.height * rockScale,
-  );
-  near.restore();
+  stamp(near, atlases.boulders!, 0, width * 1.01, height * 0.98, rockFrame.width * rockScale, {
+    frame: rockFrame,
+    anchorX: rockFrame.anchorX / rockFrame.width,
+    anchorY: rockFrame.anchorY / rockFrame.height,
+    alpha: 0.9,
+  });
   stamp(near, atlases.rocks!, 2, -width * 0.04, height * 0.92, unit * 0.2, {
     alpha: 0.75,
     anchorY: 0.94,

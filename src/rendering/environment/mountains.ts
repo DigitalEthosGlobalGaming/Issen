@@ -1,5 +1,6 @@
 import type { Stage } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
+import { drawAtlasSprite, setSceneryAtmosphere } from './scene-kit.ts';
 
 /** Overlapping cutouts, rather than edge-matched tiles. Widths preserve atlas aspect. */
 const RIDGES = [
@@ -21,9 +22,8 @@ export function drawMountainTiles(
   row.height = context.canvas.height;
   const g = row.getContext('2d');
   if (!g) return;
-  const sx = atlas.naturalWidth / 2,
-    sy = atlas.naturalHeight / 2;
   const fogColour = 'rgb(' + stage.mist + ')';
+  setSceneryAtmosphere(g, fogColour);
   const scaleX = row.width / width,
     scaleY = row.height / height;
   context.save();
@@ -45,7 +45,6 @@ export function drawMountainTiles(
       g.clearRect(0, 0, row.width, row.height);
       g.setTransform(scaleX, 0, 0, scaleY, 0, 0);
       const tileWidth = height * ridge.width;
-      const tileHeight = (tileWidth * sy) / sx;
       const step = tileWidth * 0.72;
       const base = horizonY + height * ridge.base;
       const count = Math.ceil(width / step) + 3;
@@ -56,17 +55,7 @@ export function drawMountainTiles(
         g.save();
         g.translate(x + tileWidth / 2, base + drift);
         g.scale((index + depth) % 2 ? -1 : 1, 1);
-        g.drawImage(
-          atlas,
-          (cell % 2) * sx,
-          Math.floor(cell / 2) * sy,
-          sx,
-          sy,
-          -tileWidth / 2,
-          -tileHeight * 0.92,
-          tileWidth,
-          tileHeight,
-        );
+        drawAtlasSprite(g, atlas, cell, 0, 0, tileWidth, { alpha: ridge.opacity, anchorY: 0.92 });
         g.restore();
       }
       // Recolour only the mountain alpha; sky and later grass cannot be washed out.
@@ -76,14 +65,14 @@ export function drawMountainTiles(
       g.fillRect(0, 0, width, height);
       g.globalAlpha = 1;
       g.globalCompositeOperation = 'destination-in';
-      const dissolve = g.createLinearGradient(0, base - height * 0.07, 0, base + height * 0.025);
+      const dissolve = g.createLinearGradient(0, base - height * 0.015, 0, base + height * 0.025);
       dissolve.addColorStop(0, 'rgba(0,0,0,1)');
       dissolve.addColorStop(0.65, 'rgba(0,0,0,.75)');
       dissolve.addColorStop(1, 'rgba(0,0,0,0)');
       g.fillStyle = dissolve;
       g.fillRect(0, 0, width, height);
       g.globalCompositeOperation = 'source-over';
-      context.globalAlpha = ridge.opacity;
+      context.globalAlpha = 1;
       context.drawImage(row, 0, 0, width, height);
     }
   } finally {

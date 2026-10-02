@@ -49,7 +49,7 @@ export function drawHollowBambooRoad(
   base.fillRect(0, 0, width, groundY);
   for (const side of [0, 1]) {
     const sign = side === 0 ? 1 : -1;
-    for (let i = 0; i < (lowQuality ? 3 : 5); i++) {
+    for (let i = (lowQuality ? 3 : 5) - 1; i >= 0; i--) {
       const x = side === 0 ? width * (0.06 + i * 0.055) : width * (0.94 - i * 0.05);
       drawAtlasSprite(
         far,

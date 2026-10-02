@@ -96,7 +96,6 @@ variations each, drawn at native aspect ratio with soft, low-opacity edges.
 
 The Ink field omits the two original decorative Jizo statues at the left edge. The Ink field replaces those rocks with irregular faceted boulders from a separate atlas. Their frame rectangles and ground anchors live in foreground.ts; two variants are cached in the base before animated grass, preserving their native aspect ratio.
 
-
 Use the [cinematic scene viewer](cinematic.md) to compare scene artwork and films without starting a run.
 
 See the [stage art and composition plan](stage-art-plan.md) for scene identities, asset reuse, and implementation status; stages 3–9 remain planned.
@@ -118,6 +117,7 @@ No new image was needed. See the [visual asset library](environment-asset-librar
 for all sheets, measured dimensions, cell descriptions, current anchors,
 and known packing limitations. Optional background hooks apply only when supplied;
 The first Ink field keeps its existing composition.
+
 ## Version 1.17.0 art review
 
 All nine compositions were loaded through the local preview; new scenes were
@@ -131,7 +131,6 @@ suppresses the classic foreground stalk overlay. Gameplay simulation is unchange
 Player and weapon replacements share the Ink presentation path. See
 [player artwork](character-art.md).
 
-
 ## Hollow Bamboo Road foreground (1.23.0)
 
 Stage 4 reuses the bamboo atlas in `bamboo-foreground.ts` as two near edge planes.
@@ -143,3 +142,25 @@ for reduced motion/flashes. The private caches are capped at two million pixels
 and disposed with the environment renderer. See the
 [reuse contract](../../src/rendering/environment/assets/bamboo-foreground.md).
 Strict TypeScript and desktop/tablet cinematic previews passed without a build.
+
+## Atmospheric scenery depth (1.40.3)
+
+All nine regular stages and the Demon realm use `environment/scene-kit.ts` for
+solid atlas scenery. The placement's retained-detail value blends artwork toward
+the stage fog colour, desaturates it and slightly softens its edges, without
+lowering the opacity of its body. Near planes receive a weaker colour treatment
+than distant planes; native sprite gaps remain transparent. Only a narrow ground
+contact edge dissolves. Distant silhouettes are drawn first, so nearer trees,
+rocks, architecture and the Demon skull occlude scenery behind them.
+
+Fog wisps and shore foam explicitly opt into translucent material. Grass,
+weather, water animation, figure fog and film grading keep their own renderers.
+Source atlases stay untouched. Prepared cutouts are cached with a shared eight
+million pixel budget, released when their images leave a renderer; static scenery
+does not regenerate each frame. The existing Demon obelisk skew remains static.
+
+`tests/browser/scenery-depth.spec.ts` checks solid occlusion over different
+backgrounds, cutout holes, contact fades, weaker near haze, genuine translucency
+and Canvas state restoration. It captures all ten compositions at desktop and
+tablet sizes; loader, visit variation and cinematic tests cover the owning caches
+and gameplay/save isolation.

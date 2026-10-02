@@ -54,4 +54,4 @@ bonus. Scene/film browsing still leaves live gameplay and equipment unchanged.
 
 Scene changes switch immediately, without a swipe overlay. Demon preview uses a separate presentation flag instead of adding a gameplay stage index, preserving checkpoint stage compatibility. Realm layouts vary by preview visit seed; Trial waves vary by trial seed and wave. Resize keeps the layout stable. Short ash-coloured grass covers the Demon scene; it reuses ordinary midground/foreground grass with reduced height and sparser foreground clumps. The stone floor and perspective plates are removed.
 
-The Demon backdrop reuses the mountain atlas in muted purple-ash tones, cached for the viewport and visit seed. The large distant obelisk has reduced opacity, desaturation, a soft edge and a slight static skew. Its treatment adds no motion.
+The Demon backdrop reuses the mountain atlas in muted purple-ash tones, cached for the viewport and visit seed. The large distant obelisk uses faded colours, desaturation, a soft edge and a slight static skew while retaining solid occlusion. Its treatment adds no motion.

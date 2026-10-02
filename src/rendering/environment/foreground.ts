@@ -1,3 +1,4 @@
+import { drawAtlasSprite } from './scene-kit.ts';
 /** Four independent boulder variants; frame geometry matches the preserved source sheet. */
 export const FOREGROUND_BOULDER_FRAMES = [
   { name: 'fractured', x: 0, y: 0, width: 887, height: 443, anchorX: 443.5, anchorY: 423 },
@@ -21,16 +22,11 @@ export function drawForegroundBoulders(
   for (const placement of placements) {
     const frame = FOREGROUND_BOULDER_FRAMES[placement.cell];
     const scale = placement.width / frame.width;
-    ctx.drawImage(
-      atlas,
-      frame.x,
-      frame.y,
-      frame.width,
-      frame.height,
-      placement.x - frame.anchorX * scale,
-      placement.foot - frame.anchorY * scale,
-      frame.width * scale,
-      frame.height * scale,
-    );
+    drawAtlasSprite(ctx, atlas, 0, placement.x, placement.foot, frame.width * scale, {
+      frame,
+      anchorX: frame.anchorX / frame.width,
+      anchorY: frame.anchorY / frame.height,
+      alpha: 0.95,
+    });
   }
 }

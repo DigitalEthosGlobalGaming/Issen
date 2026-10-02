@@ -26,29 +26,13 @@ export function drawWhiteSilencePass(
     anchorY: number,
     alpha: number,
   ) {
-    const cut = g.canvas.ownerDocument.createElement('canvas');
-    cut.width = rect[2];
-    cut.height = rect[3];
-    const c = cut.getContext('2d');
-    if (!c) return;
-    c.drawImage(image, ...rect, 0, 0, cut.width, cut.height);
-    c.globalCompositeOperation = 'destination-in';
-    const fade = c.createLinearGradient(
-      0,
-      cut.height * (anchorY - 0.07),
-      0,
-      cut.height * (anchorY + 0.015),
-    );
-    fade.addColorStop(0, '#000');
-    fade.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = fade;
-    c.fillRect(0, 0, cut.width, cut.height);
-    const h = (size * cut.height) / cut.width;
-    g.save();
-    g.globalAlpha *= alpha;
-    g.drawImage(cut, x - size / 2, foot - h * anchorY, size, h);
-    g.restore();
-    cut.width = cut.height = 0;
+    sprite(g, image, 0, x, foot, size, {
+      frame: { x: rect[0], y: rect[1], width: rect[2], height: rect[3] },
+      alpha,
+      anchorY,
+      fadeFrom: anchorY - 0.07,
+      fadeTo: anchorY + 0.015,
+    });
   }
 
   const terrain = createBackground(width, height, scale, 5, {

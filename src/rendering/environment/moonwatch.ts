@@ -69,7 +69,7 @@ export function drawMoonwatchClearing(
       width * (0.17 + i * 0.32),
       foot + height * 0.012,
       unit * 0.44,
-      { alpha: 0.045, anchorY: 0.9, fadeFrom: 0.75, fadeTo: 0.95 },
+      { alpha: 0.045, translucent: true, anchorY: 0.9, fadeFrom: 0.75, fadeTo: 0.95 },
     );
   sprite(near, atlases.fieldRocks!, 1, width * 0.035, height * 0.95, unit * 0.22, {
     alpha: 0.37,

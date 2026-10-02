@@ -15,6 +15,7 @@ import { drawForegroundBoulders } from './foreground.ts';
 import { drawMountainTiles } from './mountains.ts';
 import { drawFieldMidground } from './midground.ts';
 import { drawMeadowTransition, drawMeadowFog } from './meadow.ts';
+import { drawAtlasSprite, setSceneryAtmosphere, releaseSceneryCutouts } from './scene-kit.ts';
 
 export type EnvironmentBackend = 'loading' | 'layered' | 'unavailable';
 export interface EnvironmentFrame {
@@ -123,6 +124,7 @@ export function createEnvironmentRenderer(doc: Document) {
     images.forEach((image, index) => {
       image.onload = image.onerror = null;
       if (!required.includes(index)) {
+        releaseSceneryCutouts([image]);
         image.removeAttribute('src');
         delete images[index];
       }
@@ -195,22 +197,7 @@ export function createEnvironmentRenderer(doc: Document) {
     const sw = image.naturalWidth / 2,
       sh = image.naturalHeight / 2;
     const width = (height * sw) / sh;
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    ctx.translate(x, foot);
-    ctx.scale(flip ? -1 : 1, 1);
-    ctx.drawImage(
-      image,
-      (cell % 2) * sw,
-      Math.floor(cell / 2) * sh,
-      sw,
-      sh,
-      -width / 2,
-      -height,
-      width,
-      height,
-    );
-    ctx.restore();
+    drawAtlasSprite(ctx, image, cell, x, foot, width, { alpha: opacity, flip, anchorY: 1 });
   }
 
   function build(frame: EnvironmentFrame) {
@@ -243,6 +230,10 @@ export function createEnvironmentRenderer(doc: Document) {
     distant = far.target;
     nearby = near.target;
     if (!far.context || !near.context) return false;
+    const hazeColor = `rgb(${stage.fog.join(',')})`;
+    setSceneryAtmosphere(ctx, hazeColor);
+    setSceneryAtmosphere(far.context, hazeColor, 0.9);
+    setSceneryAtmosphere(near.context, hazeColor, 0.35);
     const finish = () => {
       // Courtyard landmarks belong behind its gateway, never across the roof or posts.
       const variationContext = frame.stage === 6 ? far.context! : near.context!;
@@ -402,16 +393,6 @@ export function createEnvironmentRenderer(doc: Document) {
       const height = openField
         ? unit * (0.045 + variation * 0.04)
         : unit * (0.3 + ((i * 7) % 11) * 0.012);
-      stamp(
-        far.context,
-        openField ? pines : bamboo,
-        i % 4,
-        x,
-        openField ? groundY - eH * 0.34 + h * variation * 0.009 : horizonY + h * 0.025,
-        height,
-        openField ? 0.24 + variation * 0.14 : 0.13 + Math.abs(x / w - 0.5) * 0.35,
-        i % 2 === 0,
-      );
       if (openField) {
         // A smaller, paler second group sits just beyond each visible grove.
         stamp(
@@ -425,6 +406,16 @@ export function createEnvironmentRenderer(doc: Document) {
           i % 2 !== 0,
         );
       }
+      stamp(
+        far.context,
+        openField ? pines : bamboo,
+        i % 4,
+        x,
+        openField ? groundY - eH * 0.34 + h * variation * 0.009 : horizonY + h * 0.025,
+        height,
+        openField ? 0.24 + variation * 0.14 : 0.13 + Math.abs(x / w - 0.5) * 0.35,
+        i % 2 === 0,
+      );
     }
     // Ground strokes follow the existing perspective, leaving target silhouettes clear.
     ctx.fillStyle = 'rgba(226,217,193,0.1)';
@@ -589,6 +580,7 @@ export function createEnvironmentRenderer(doc: Document) {
       image.onload = image.onerror = null;
       image.removeAttribute('src');
     }
+    releaseSceneryCutouts(images.filter(Boolean));
     images = [];
     for (const settle of settleLoads.splice(0)) settle();
     for (const layer of [cached, distant, nearby]) {

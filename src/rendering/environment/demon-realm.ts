@@ -1,4 +1,4 @@
-import { drawAtlasSprite } from './scene-kit.ts';
+import { drawAtlasSprite, releaseSceneryCutouts } from './scene-kit.ts';
 
 const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
 const terrainUrl = new URL('./assets/demon-terrain-atlas.png', import.meta.url).href;
@@ -45,16 +45,15 @@ export function createDemonRealmRenderer(doc: Document) {
           ];
     const [sx, sy, sw, sh] = frame;
     const anchor = image === terrain ? (cell === 2 ? 0.94 : 0.93) : landmarkBases[cell]! / 627;
-    const height = (width * sh) / sw;
     g.save();
-    g.globalAlpha = alpha;
     g.translate(x, base);
-    if (distant) {
-      // Static atmospheric haze and a small skew keep the far silhouette behind the figures.
-      g.filter = 'grayscale(.8) blur(.8px)';
-      g.transform(1, 0, 0.018, 0.98, 0, 0);
-    }
-    g.drawImage(image, sx!, sy!, sw, sh, -width / 2, -height * anchor, width, height);
+    if (distant) g.transform(1, 0, 0.018, 0.98, 0, 0);
+    drawAtlasSprite(g, image, cell, 0, 0, width, {
+      frame: { x: sx!, y: sy!, width: sw, height: sh },
+      anchorY: anchor,
+      alpha: image === terrain ? 0.94 : alpha === 1 ? 0.88 : alpha,
+      hazeColor: distant ? '#46354d' : '#382b3c',
+    });
     g.restore();
   }
   return {
@@ -106,17 +105,12 @@ export function createDemonRealmRenderer(doc: Document) {
                 (i - 0.5) * span * 0.7,
                 height * (0.59 + variation(i + 20) * 0.025),
                 span,
-                { flip: i % 2 === 0, fadeFrom: 0.65 },
+                { flip: i % 2 === 0, fadeFrom: 0.65, alpha: 0.45, hazeColor: '#584052' },
               );
-            far.globalCompositeOperation = 'source-atop';
-            far.globalAlpha = 0.82;
-            far.fillStyle = '#584052';
-            far.fillRect(0, 0, width, height);
             mountainKey = key;
           }
         }
         g.save();
-        g.globalAlpha = 0.6;
         g.drawImage(mountainLayer, 0, 0, width, height);
         g.restore();
       }
@@ -215,6 +209,7 @@ export function createDemonRealmRenderer(doc: Document) {
     },
     dispose() {
       disposed = true;
+      releaseSceneryCutouts([landmarks, terrain, mountains]);
       landmarks.removeAttribute('src');
       terrain.removeAttribute('src');
       mountains.removeAttribute('src');

@@ -84,6 +84,12 @@ test('pause lists current blessings and keeps actions visible in short landscape
   await expect(page.locator('#paused')).toHaveClass(/on/);
   await expect(page.locator('#bResume')).toBeInViewport();
   await expect(page.locator('#bEnd')).toBeInViewport();
+  await expect(page.locator('#paused')).toHaveCSS('opacity', '1');
+  await page.screenshot({ path: test.info().outputPath('pause-panels-landscape.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('#bResume')).toBeInViewport();
+  await expect(page.locator('#bEnd')).toBeInViewport();
+  await page.screenshot({ path: test.info().outputPath('pause-panels-portrait.png') });
 });
 
 test('item reveals match Armoury copy and cue once when each card appears', async ({ page }) => {

@@ -1,3 +1,4 @@
+import { drawAtlasSprite } from './scene-kit.ts';
 import { createLayout } from '../layout.ts';
 
 interface FieldAtlases {
@@ -28,25 +29,7 @@ export function drawFieldMidground(
     flip: boolean,
     anchor = 0.92,
   ) {
-    const sw = image.naturalWidth / 2,
-      sh = image.naturalHeight / 2;
-    const h = (size * sh) / sw;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(x, foot);
-    ctx.scale(flip ? -1 : 1, 1);
-    ctx.drawImage(
-      image,
-      (cell % 2) * sw,
-      Math.floor(cell / 2) * sh,
-      sw,
-      sh,
-      -size / 2,
-      -h * anchor,
-      size,
-      h,
-    );
-    ctx.restore();
+    drawAtlasSprite(ctx, image, cell, x, foot, size, { alpha, flip, anchorY: anchor });
   }
   for (let i = 0; i < count; i++) {
     const variation = ((i * 43 + 17) % 97) / 97;

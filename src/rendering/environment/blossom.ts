@@ -1,3 +1,4 @@
+import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -81,42 +82,19 @@ export function drawFallingBlossomPath(
   ) {
     const sw = atlas.naturalWidth / 2,
       sh = atlas.naturalHeight / 2;
-    const targetHeight = (size * sh) / sw;
     const cherry =
       atlas === atlases.cherries ? BLOSSOM_SPRITE_LAYOUT.cherries.frames[cell] : undefined;
     const anchorX = cherry ? cherry.anchorX / sw : 0.5;
     if (cherry) anchor = cherry.anchorY / sh;
     fadeFrom = Math.min(fadeFrom, anchor - 0.09);
-    const cutout = g.canvas.ownerDocument.createElement('canvas');
-    cutout.width = Math.ceil(sw);
-    cutout.height = Math.ceil(sh);
-    const mask = cutout.getContext('2d');
-    if (!mask) return;
-    mask.drawImage(
-      atlas,
-      (cell % 2) * sw,
-      Math.floor(cell / 2) * sh,
-      sw,
-      sh,
-      0,
-      0,
-      cutout.width,
-      cutout.height,
-    );
-    mask.globalCompositeOperation = 'destination-in';
-    const fade = mask.createLinearGradient(0, cutout.height * fadeFrom, 0, cutout.height * anchor);
-    fade.addColorStop(0, 'rgba(0,0,0,1)');
-    fade.addColorStop(0.6, 'rgba(0,0,0,0.75)');
-    fade.addColorStop(1, 'rgba(0,0,0,0)');
-    mask.fillStyle = fade;
-    mask.fillRect(0, 0, cutout.width, cutout.height);
-    g.save();
-    g.globalAlpha *= opacity;
-    g.translate(x, foot);
-    g.rotate(angle);
-    g.drawImage(cutout, -size * anchorX, -targetHeight * anchor, size, targetHeight);
-    g.restore();
-    cutout.width = cutout.height = 0;
+    drawAtlasSprite(g, atlas, cell, x, foot, size, {
+      alpha: opacity,
+      anchorX,
+      anchorY: anchor,
+      angle,
+      fadeFrom,
+      fadeTo: anchor,
+    });
   }
 
   const terrain = createBackground(width, height, scale, 2, {
