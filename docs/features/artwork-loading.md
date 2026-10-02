@@ -1,5 +1,10 @@
 # Startup artwork loading (1.26.0)
 
+As of 1.35.0 the loading screen displays the actual Issen logo. The preloader
+loads and decodes this priority asset before requesting ordinary artwork. Retry
+still retries only missing images, and disposal during the priority stage stops
+the remaining requests. The logo remains visible while the rest loads.
+
 `src/main.ts` discovers image files through Vite globs covering all of `src/`
 and `public/` (PNG, JPEG, WebP, AVIF, GIF and SVG, including uppercase extensions).
 New modular atlases enter this manifest automatically. Source images use Vite's
@@ -24,7 +29,6 @@ Focused checks: `node --test tests/unit/artwork-preload.test.mjs` and
 decode, load/decode failures, retries, deduplication, disposal, and browser startup
 gating. Android packaging and release builds need their normal release validation;
 the focused development checks do not replace that.
-
 
 Verified in this art pass: all 41 image files in the current src/public inventory
 appear in the manifest. Strict TypeScript, three preloader unit checks and three

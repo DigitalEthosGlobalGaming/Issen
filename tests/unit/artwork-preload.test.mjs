@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createArtworkPreloader } from '../../src/platform/artwork-preload.ts';
 
-function harness() {
+function harness(priority = []) {
   const images = [];
   const progress = [];
   const create = () => {
@@ -25,9 +25,26 @@ function harness() {
   return {
     images,
     progress,
-    loader: createArtworkPreloader(['a', 'a', 'b'], create, (p) => progress.push(p)),
+    loader: createArtworkPreloader(['a', 'a', 'b'], create, (p) => progress.push(p), priority),
   };
 }
+test('priority artwork decodes before any ordinary artwork request starts', async () => {
+  const { images, loader } = harness(['b']);
+  const run = loader.run();
+  assert.equal(images.length, 1);
+  assert.equal(images[0].src, 'b');
+  images[0].onload();
+  await Promise.resolve();
+  assert.equal(images.length, 1);
+  images[0].decoded.resolve();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(images.length, 2);
+  assert.equal(images[1].src, 'a');
+  images[1].onload();
+  images[1].decoded.resolve();
+  assert.equal(await run, true);
+  loader.dispose();
+});
 test('startup waits for load and decode, deduplicating sources', async () => {
   const { images, progress, loader } = harness();
   const run = loader.run();

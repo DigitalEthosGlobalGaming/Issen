@@ -14,6 +14,10 @@ test('startup remains blocked until delayed artwork loads and decodes', async ({
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Preparing Issen' })).toBeVisible();
   await expect(page.locator('#app')).toHaveCount(0);
+  await expect(page.locator('.startup-logo')).toBeVisible();
+  expect(
+    await page.locator('.startup-logo').evaluate((image: HTMLImageElement) => image.naturalWidth),
+  ).toBe(600);
   await expect(page.getByRole('status')).toContainText('artwork images ready');
   release();
   await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });

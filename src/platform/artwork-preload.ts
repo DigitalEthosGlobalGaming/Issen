@@ -69,7 +69,7 @@ export function createArtworkPreloader(
     report();
     running = (async () => {
       const first = missing.filter((url) => priorityUrls.includes(url));
-      await Promise.all(first.map(load));
+      if (first.length) await Promise.all(first.map(load));
       if (!disposed) await Promise.all(missing.filter((url) => !first.includes(url)).map(load));
       running = null;
       return !disposed && retained.size === sources.length;

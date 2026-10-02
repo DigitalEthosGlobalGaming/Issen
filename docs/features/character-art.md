@@ -1,5 +1,12 @@
 # Ink character puppets
 
+Version 1.35.0 adds regular-enemy blade variety and waiting motion through
+`src/rendering/figures/enemy-presence.ts`. Saved figure seeds select six weapon
+recipes, lengths and small angle offsets; no combat randomness is consumed.
+Waiting enemies breathe at different phases with their feet pinned. Reduced
+motion freezes breathing. Rendering copies the pose, preserving combat direction
+and attack timing; bosses retain their authored weapon identity.
+
 Ink is the sole rendering path for all primary player outfits and blades,
 enemies, bosses, charms, and companions. Old artwork settings are ignored.
 There is no rendering mode selector or backtick toggle. Startup waits for decoded
@@ -69,13 +76,13 @@ saved robe ID. `ink-player.ts` loads the source families and assembles the selec
 recipe at the existing torso, waist, head and arm anchors. The outfit IDs and
 unlock rules stay in the equipment catalog; these recipes change appearance.
 
-| Existing outfit | Composition |
-| --- | --- |
-| Yoroi | Heavy cuirass, paired shoulder guards, waist plates and kabuto |
-| Helm | Lighter plate arrangement and shared kabuto |
-| Shinobi | Dark cloth, wrapped hood and bracers |
-| Jinbaori | Open sleeveless coat halves |
-| Mino | Straw cape and kasa over the shared cloth body |
+| Existing outfit | Composition                                                    |
+| --------------- | -------------------------------------------------------------- |
+| Yoroi           | Heavy cuirass, paired shoulder guards, waist plates and kabuto |
+| Helm            | Lighter plate arrangement and shared kabuto                    |
+| Shinobi         | Dark cloth, wrapped hood and bracers                           |
+| Jinbaori        | Open sleeveless coat halves                                    |
+| Mino            | Straw cape and kasa over the shared cloth body                 |
 
 The armour atlas separates cuirass, left/right shoulder guards and waist plates.
 The headwear atlas separates helmet, kasa, hood and collar. The cloth atlas
@@ -92,7 +99,6 @@ transparency inspection and generation prompts:
 - [Armour plates](../../src/rendering/figures/assets/armour-plates-atlas.md)
 - [Headwear](../../src/rendering/figures/assets/outfit-headwear-atlas.md)
 - [Cloth pieces](../../src/rendering/figures/assets/outfit-cloth-atlas.md)
-
 
 ## Front-view enemy kit (version 1.20.0)
 
@@ -112,13 +118,11 @@ their loaders independently. Missing sources do not invoke older geometry.
 - [Front-view modular body contract](../../src/rendering/figures/assets/enemy-ronin-simple.md)
 - [Front-view headwear contract](../../src/rendering/figures/assets/enemy-headwear-atlas.md)
 
-
 Version 1.20.0 verification: strict TypeScript and 17 focused figure, settings,
 shadow and aura checks passed. Desktop/tablet galleries cover all enemy/boss
 looks, fog, Mirror, twin swords, spear and unknown-look fallback. Running scene
 screenshots and paused Artwork switching were inspected without changing
 combat RNG, pose or saved checkpoint. No production build or full suite ran.
-
 
 ## All primary player outfits (version 1.21.0)
 
@@ -127,23 +131,23 @@ and modular recipe system in Ink mode. Awakening designs are outside this art pa
 existing powers/effects remain in their shared rendering and gameplay owners.
 The first five armour recipes above stay available alongside the added recipes:
 
-| Outfit | Reused body and distinctive pieces |
-| --- | --- |
-| Sumi | Neutral charcoal cloth and tied hair |
-| Hai | Ash cloth recolour |
-| Aka | Charcoal cloth with restrained red sash |
-| Shiro | Pale ivory cloth recolour |
-| Kasa | Shared straw hat |
-| Oni | Horned red mask and rear hair |
-| Tengu | Long-nosed red mask and rear hair |
-| Monk | Wrapped hood and collar |
-| Kitsune | Ivory fox mask with pointed ears |
-| Noh | Smooth ivory theatre mask |
-| Komuso | Basket head cover |
-| Rags | Muted worn cloth and large patch accents |
-| Kabuki | Broad ivory mane |
-| Scarecrow | Straw cloth, kasa and cape accents |
-| Tanuki | Brown cloth, rounded-ear hood and separate striped tail |
+| Outfit    | Reused body and distinctive pieces                      |
+| --------- | ------------------------------------------------------- |
+| Sumi      | Neutral charcoal cloth and tied hair                    |
+| Hai       | Ash cloth recolour                                      |
+| Aka       | Charcoal cloth with restrained red sash                 |
+| Shiro     | Pale ivory cloth recolour                               |
+| Kasa      | Shared straw hat                                        |
+| Oni       | Horned red mask and rear hair                           |
+| Tengu     | Long-nosed red mask and rear hair                       |
+| Monk      | Wrapped hood and collar                                 |
+| Kitsune   | Ivory fox mask with pointed ears                        |
+| Noh       | Smooth ivory theatre mask                               |
+| Komuso    | Basket head cover                                       |
+| Rags      | Muted worn cloth and large patch accents                |
+| Kabuki    | Broad ivory mane                                        |
+| Scarecrow | Straw cloth, kasa and cape accents                      |
+| Tanuki    | Brown cloth, rounded-ear hood and separate striped tail |
 
 Whole-head replacements register their measured neck anchors at the collar.
 The mask family uses rear three-quarter silhouettes so mask edges remain visible
@@ -152,7 +156,6 @@ mixing; saved outfit IDs select recipes without creating new equipment.
 
 - [Player masks and rear head contract](../../src/rendering/figures/assets/player-mask-atlas.md)
 - [Special headwear and tail contract](../../src/rendering/figures/assets/player-special-headwear-atlas.md)
-
 
 Cloth recolours are cached once per recipe/frame at the source frame resolution
 so the large foreground player and Armoury crops retain the atlas detail.
@@ -165,7 +168,6 @@ All 20 primary outfits were inspected in six combat poses, plus desktop/tablet
 catalog galleries. A deliberately blocked mask atlas fell back for the entire
 Oni body/head/arms while Sumi and Tanuki remained available. Disposal released
 the loaded kit. The local preview is available; no full build or suite ran.
-
 
 ## Companions and regular enemy variety (1.22.0)
 
@@ -182,7 +184,6 @@ weapons, reach, glyphs and encounter timing stay at their original coordinates.
 Authored masks remain selected; bosses retain their authored look and palette.
 Strict TypeScript, nine focused character checks and desktop/tablet galleries
 passed. No full build or Android test ran.
-
 
 ## Modular blades (1.24.0)
 
@@ -204,7 +205,6 @@ Strict TypeScript and ten focused character checks passed. All 20 weapons were
 inspected as an assembled gallery and representative forms in held combat poses.
 No full build or Android test ran.
 
-
 ## Charm artwork (1.25.0)
 
 All 19 physical charms use `ink-charms.ts` and a single twelve-piece
@@ -217,7 +217,6 @@ are unchanged. Runtime and Armoury own and dispose separate charm loaders;
 missing/unknown sprites preserve the procedural pouch. Cached variants cap at32.
 Strict TypeScript, eleven focused character checks, the complete nineteen-charm
 gallery and representative held-player compositions passed without a full build.
-
 
 Version 1.26.1 completes the whole catalog: First Strike (trial reward) and
 Pilgrim's Bead (progression item) reuse the long ward/pouch and round faceted
