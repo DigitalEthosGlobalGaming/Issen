@@ -257,3 +257,9 @@ set produces no additional pixel recoloring after warmup across pose/fog changes
 ## Armoury room (1.37.0)
 
 The [empty private room](../../src/ui/assets/armoury-room.md) is cover-cropped behind the live equipment-preview model. `src/rendering/armory-preview.ts` owns its image lifecycle independently of combat and uses a full standing figure so gear changes remain visible. Armoury tabs keep the same weight when selected.
+
+## Articulated companions (1.38.0)
+
+`src/rendering/figures/ink-companions.ts` now assembles all four companions from the [sixteen-part atlas](../../src/rendering/figures/assets/companion-parts-atlas.md), using measured packed rectangles and source-pixel joints. Shiba and Cat breathe at fixed foot anchors while their heads, tails and active forelegs move independently. Crow layers body, head and two wings over the existing shoulder anchor. Mystic Rock layers its core, two detached shards and ring. No gameplay randomness or saved companion IDs change.
+
+Runtime and preview retain independent loader/disposal lifecycles. One validated 1254-square image supplies every rig; failure leaves the existing draw API unavailable rather than painting partial sprites. Reduced motion freezes joints and reaction poses. All transforms and opacity are restored. `tests/unit/mystic-rock.test.mjs` checks geometry, four distinct parts per rig, animation, reduced motion and disposal; `tests/browser/companion-rigs.spec.ts` inspects real assembled poses and canvas isolation.

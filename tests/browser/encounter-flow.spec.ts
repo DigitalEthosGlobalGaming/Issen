@@ -59,6 +59,7 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
     });
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.evaluate(() => {
     document.querySelector<HTMLButtonElement>('#bPlay')!.click();
     document.querySelector<HTMLButtonElement>('#bBegin')!.click();
@@ -100,6 +101,7 @@ test('Daruma revives a fallen player once before a later death ends the run', as
     localStorage.setItem('issen.equip', JSON.stringify({ charm: 'daruma' }));
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await expect(page.locator('#banner .l')).toHaveText('Seven times down, eight times up', {

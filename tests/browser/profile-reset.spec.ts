@@ -42,6 +42,7 @@ for (const testing of [false, true]) {
     }, testing);
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto('/');
+    await expect(page.locator('#app')).toHaveCount(1);
     const snapshot = () => page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
     const before = await snapshot();
     await page.locator('#bStats').click();

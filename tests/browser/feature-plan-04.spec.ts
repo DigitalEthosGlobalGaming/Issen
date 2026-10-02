@@ -13,6 +13,7 @@ test('portrait setup gates special lives until Vitality and hides Arrows until B
     );
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bPlay').click();
   await expect(page.locator('#livesOption')).toBeHidden();
   await expect(page.locator('#setup [data-k="lives"] [data-v="0"]')).toBeHidden();
@@ -41,6 +42,7 @@ test('reduced-motion result tally advances by keyboard without paying twice', as
     localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' }));
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await page.keyboard.press('p');
@@ -81,6 +83,7 @@ test('Armoury sorts owned gear first and underlines unread gear until its detail
       );
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('#bArmory .arm-label')).toHaveCSS('text-decoration-line', 'underline');
   await page.locator('#bArmory').click();
   await expect(page.locator('#armTabs [aria-selected="true"] .arm-label')).toHaveCSS(
@@ -137,6 +140,7 @@ for (const input of ['keyboard', 'touch'] as const) {
       };
     });
     await page.goto('/');
+    await expect(page.locator('#app')).toHaveCount(1);
     await page.keyboard.press('Control+Shift+A');
     await page.getByLabel('Wave within stage').selectOption('3');
     await page
@@ -216,6 +220,7 @@ test('first boss holds the glint until the player parries with touch', async ({ 
     };
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })

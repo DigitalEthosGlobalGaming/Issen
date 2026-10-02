@@ -6,14 +6,16 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
       localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 3, embers: 800 }));
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="offerings"]').click();
   for (const price of [150, 250, 400])
     await page.getByRole('button', { name: `Donate ${price} Embers`, exact: true }).click();
   await expect(page.locator('.template-detail')).toContainText('1 guaranteed rare');
   await expect(page.locator('.template-detail')).toContainText('Offerings · 3/3');
-  await expect(page.getByRole('button', { name: 'Fully donated' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
   await page.reload();
+  await expect(page.locator('#app')).toHaveCount(1);
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).upgrades.offerings),
   ).toBe(3);
@@ -23,6 +25,7 @@ test('Unlock all grants Armoury and Endless access while preserving other ranks,
   page,
 }) => {
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const player = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
@@ -67,13 +70,14 @@ test('Unlock all grants Armoury and Endless access while preserving other ranks,
   expect(result.equip).toBe(before.equip);
   expect(result.player).toEqual(player);
   await page.reload();
+  await expect(page.locator('#app')).toHaveCount(1);
   expect(
     await page.evaluate(
       () => JSON.parse(localStorage.getItem('issen.testing.meta')!).upgrades.awakening,
     ),
   ).toBe(0);
   await page.locator('#bPlay').click();
-  await expect(page.locator('[data-k="lives"][data-v="zen"]')).toBeVisible();
+  await expect(page.locator('[data-k="lives"] [data-v="zen"]')).toBeVisible();
 });
 
 test('admin unlocks Ronin only in the test profile and keeps it after reload', async ({ page }) => {
@@ -82,6 +86,7 @@ test('admin unlocks Ronin only in the test profile and keeps it after reload', a
       localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, bossMilestone: 0 }));
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const playerMeta = await page.evaluate(() => localStorage.getItem('issen.meta'));
   await page.keyboard.press('Control+Shift+A');
   await expect(page.getByRole('button', { name: 'Unlock Ronin mode' })).toHaveCount(0);
@@ -102,6 +107,7 @@ test('admin unlocks Ronin only in the test profile and keeps it after reload', a
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.setup')!).diff),
   ).toBe('ronin');
   await page.reload();
+  await expect(page.locator('#app')).toHaveCount(1);
   expect(
     await page.evaluate(
       () => JSON.parse(localStorage.getItem('issen.testing.meta')!).bossMilestone,
@@ -113,6 +119,7 @@ test('admin unlocks Ronin only in the test profile and keeps it after reload', a
     localStorage.setItem('issen.testing.meta', JSON.stringify(meta));
   });
   await page.reload();
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Unlock Ronin mode', exact: true }).click();
   expect(

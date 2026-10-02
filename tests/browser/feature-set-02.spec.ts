@@ -10,6 +10,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
     ),
   );
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   const balance = () => page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers);
   await expect(page.locator('.upgrade-tile')).toHaveCount(9);
@@ -20,7 +21,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await page.locator('[data-upgrade="knife"]').click();
   await page.getByRole('button', { name: 'Donate 125 Embers', exact: true }).click();
   expect(await balance()).toBe(875);
-  await expect(page.locator('#templateContent > [role="status"]')).toHaveCount(0);
+  await expect(page.locator('.temple-status')).toContainText('ready to donate');
   await expect(page.locator('.temple-header h2')).toHaveText('Temple');
   await page.getByRole('button', { name: 'Donate 150 Embers', exact: true }).click();
   expect(await balance()).toBe(725);
@@ -30,7 +31,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await expect(page.locator('.template-detail')).toContainText(
     '3 throwing knives · refill every duel',
   );
-  await expect(page.getByRole('button', { name: 'Fully donated' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
   await expect(page.locator('[data-upgrade="knife"]')).toHaveAttribute('aria-pressed', 'true');
 });
 
@@ -49,6 +50,7 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
       );
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bPlay').click();
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');
@@ -111,6 +113,7 @@ test('wave taps consume a knife only with a target and boss taps never consume o
     };
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const tap = () =>
     page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })));
   const advance = (count: number) => page.evaluate((n) => (window as any).advanceSet02(n), count);

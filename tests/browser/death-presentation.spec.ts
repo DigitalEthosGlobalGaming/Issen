@@ -14,6 +14,7 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#app')).toHaveCount(1);
   const result = await page.evaluate(() => {
     const {
       G,
@@ -83,6 +84,7 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#app')).toHaveCount(1);
   const results = await page.evaluate(() => {
     const { G, frameLoop, drawEnemy, updateEnemies } = (window as any).__deathHarness;
     frameLoop.stop();
@@ -98,6 +100,11 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
         shadows.push({ alpha: this.globalAlpha, transform: [m.a, m.b, m.c, m.d, m.e, m.f] });
       } else bodyFills++;
       return (fill as any).apply(this, args);
+    };
+    const drawImage = ctx.drawImage;
+    ctx.drawImage = function (...args: any[]) {
+      bodyFills++;
+      return (drawImage as any).apply(this, args);
     };
     const results = [];
     try {
@@ -133,6 +140,7 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
     } finally {
       ctx.fill = fill;
     }
+    ctx.drawImage = drawImage;
     return results;
   });
   for (const result of results) {

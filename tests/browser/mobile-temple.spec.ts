@@ -50,7 +50,7 @@ test('portrait title and setup fit while Temple uses compact top-centred details
     await expect(page.locator('#template')).not.toContainText(
       /earned through play|suppresses|challenge modes|Need .* more|Choose a blessing/,
     );
-    await expect(page.locator('[data-upgrade="vitality"] span').last()).toHaveText('100');
+    await expect(page.locator('[data-upgrade="vitality"] span').last()).toHaveText('100 Embers');
     const icon = await page.locator('.template-detail .symbol-art').boundingBox();
     const heading = await page.locator('.template-detail h3').boundingBox();
     expect(icon!.y + icon!.height).toBeLessThanOrEqual(heading!.y);

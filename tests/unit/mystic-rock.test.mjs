@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createInkCompanionRenderer } from '../../src/rendering/figures/ink-companions.ts';
+import {
+  createInkCompanionRenderer,
+  INK_COMPANION_FRAMES,
+} from '../../src/rendering/figures/ink-companions.ts';
 
 function fixture() {
   const images = [];
@@ -13,30 +16,65 @@ function fixture() {
   });
   return { renderer, images };
 }
-test('rock loads independently of animals, preserves aspect and freezes its bob', async () => {
-  const { renderer, images } = fixture();
-  const pending = renderer.prepare();
-  const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
-  rock.naturalWidth = 1145;
-  rock.naturalHeight = 1373;
-  rock.onload();
-  const animal = images.find((i) => i !== rock);
-  animal.onerror();
-  await pending;
-  const draws = [];
+function context() {
+  const calls = [];
+  let depth = 0;
   const ctx = {
-    drawImage(...args) {
-      draws.push(args);
+    save() {
+      depth++;
+    },
+    restore() {
+      assert.ok(depth > 0);
+      depth--;
+    },
+    translate(...args) {
+      calls.push(['translate', ...args]);
+    },
+    rotate(...args) {
+      calls.push(['rotate', ...args]);
+    },
+    scale(...args) {
+      calls.push(['scale', ...args]);
+    },
+    drawImage(_image, ...args) {
+      calls.push(['image', ...args]);
     },
   };
-  assert.equal(renderer.draw('mystic-rock', ctx, 100, 200, 120, 0, false, true), true);
-  assert.equal(renderer.draw('mystic-rock', ctx, 100, 200, 120, 99, false, true), true);
-  assert.deepEqual(draws[0], draws[1]);
-  assert.ok(Math.abs(draws[0][3] / draws[0][4] - 1145 / 1373) < 1e-9);
+  return { ctx, calls, depth: () => depth };
+}
+test('each rig composes four native-aspect parts, animates joints and freezes accessibility poses', async () => {
+  const { renderer, images } = fixture();
+  const pending = renderer.prepare();
+  assert.equal(images.length, 1);
+  assert.match(images[0].src, /companion-parts-atlas.png$/);
+  images[0].naturalWidth = images[0].naturalHeight = 1254;
+  images[0].onload();
+  await pending;
+  for (const type of ['shiba', 'cat', 'crow', 'mystic-rock']) {
+    const a = context(),
+      b = context(),
+      c = context();
+    assert.equal(renderer.draw(type, a.ctx, 100, 200, 120, 0, false, true), true);
+    renderer.draw(type, b.ctx, 100, 200, 120, 99, true, true);
+    assert.deepEqual(a.calls, b.calls, `${type} has a stable reduced-motion pose`);
+    renderer.draw(type, c.ctx, 100, 200, 120, 1.1, true);
+    assert.notDeepEqual(a.calls, c.calls, `${type} articulates individual parts`);
+    const draws = a.calls.filter((c) => c[0] === 'image');
+    assert.equal(draws.length, 4);
+    assert.equal(new Set(draws.map((c) => `${c[1]},${c[2]}`)).size, 4);
+    for (const d of draws) {
+      assert.ok(INK_COMPANION_FRAMES.some((f) => f.every((n, i) => n === d[i + 1])));
+      assert.equal(d[3] / d[4], d[7] / d[8]);
+    }
+    assert.equal(a.depth(), 0);
+    assert.equal(b.depth(), 0);
+    assert.equal(c.depth(), 0);
+  }
+  assert.equal(renderer.draw('unknown', context().ctx, 0, 0, 100), false);
   renderer.dispose();
-  assert.equal(renderer.draw('mystic-rock', ctx, 0, 0, 120), false);
+  assert.equal(renderer.draw('cat', context().ctx, 0, 0, 100), false);
 });
-test('disposing while both companion images load settles preparation', async () => {
+test('disposing during companion loading settles preparation and releases callbacks', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
   renderer.dispose();
@@ -46,4 +84,14 @@ test('disposing while both companion images load settles preparation', async () 
     assert.equal(image.onload, null);
     assert.equal(image.onerror, null);
   }
+});
+test('incorrect atlas geometry never renders incomplete parts', async () => {
+  const { renderer, images } = fixture();
+  const pending = renderer.prepare();
+  images[0].naturalWidth = 100;
+  images[0].naturalHeight = 200;
+  images[0].onload();
+  await pending;
+  assert.equal(renderer.ready, false);
+  assert.equal(renderer.draw('shiba', context().ctx, 0, 0, 100), false);
 });

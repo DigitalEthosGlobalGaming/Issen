@@ -7,6 +7,7 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTutorial').click();
   await expect(page.locator('.tutorial-overlay')).toBeVisible();
   await page.getByRole('button', { name: 'Skip tutorial' }).click();
@@ -40,6 +41,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
       );
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   await expect(page.locator('#template')).toHaveCSS('opacity', '1');
   await page.screenshot({ path: '.verification-build-next-features/template-portrait.png' });
@@ -49,7 +51,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.getByRole('button', { name: 'Donate 200 Embers' }).click();
   await page.getByRole('button', { name: 'Donate 350 Embers' }).click();
   await expect(page.locator('#templateContent')).toContainText('150 Embers');
-  await expect(page.getByRole('button', { name: 'Fully donated' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
   await page.reload();
   await page.locator('#bTemplate').click();
   await expect(page.locator('#templateContent')).toContainText('Vitality · 3/3');
@@ -79,6 +81,7 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
     );
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const original = await page.evaluate(() => localStorage.getItem('issen.meta'));
   await page.keyboard.press('Control+Shift+A');
   await expect(page.locator('#admin')).toHaveClass(/on/);
@@ -154,6 +157,7 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
     };
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })

@@ -23,6 +23,7 @@ test('runtime disposal stops animation and detached controls before remounting',
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const result = await page.evaluate(async () => {
     const mainPath = document.querySelector<HTMLScriptElement>('script[src*="/src/main.ts"]')!.src;
     const mountPath = '/src/ui/mount.ts',
@@ -57,6 +58,7 @@ test('ending a paused run renders records and allows a fresh run', async ({ page
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await page.keyboard.press('p');
@@ -108,6 +110,7 @@ test('malformed saves fall back safely and mute persists across reload', async (
     }
   });
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
   await page.locator('#mute').click();
@@ -121,6 +124,7 @@ test('title renders, a run starts, and keyboard pause/resume works', async ({ pa
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('#title')).toHaveClass(/on/);
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await expect(page.locator('#setup')).toHaveClass(/on/);
@@ -138,6 +142,7 @@ test('armory preview draws without errors in portrait and landscape', async ({ p
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Armory', exact: true }).click();
   await expect(page.locator('#armory')).toHaveClass(/on/);
   await expect(page.locator('#armTiles button').first()).toBeVisible();

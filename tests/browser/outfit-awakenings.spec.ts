@@ -4,6 +4,7 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
   page,
 }) => {
   await page.goto('/');
+  await expect(page.locator('#app')).toHaveCount(1);
   const result = await page.evaluate(async () => {
     const armoryPath = '/src/ui/screens/armory.ts';
     const itemsPath = '/src/game/content/items.ts';
