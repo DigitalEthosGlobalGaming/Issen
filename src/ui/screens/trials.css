@@ -28,6 +28,22 @@
 #trialResult h3 {
   margin: 0 0 8px;
 }
+.trial-card .symbol-art {
+  float: right;
+  width: 64px;
+  height: 64px;
+  margin: 0 0 10px 14px;
+}
+.trial-card::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+#trialResult .symbol-art {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 12px;
+}
 .trial-card .trial-reward {
   color: var(--paper);
 }

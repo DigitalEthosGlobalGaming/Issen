@@ -4,6 +4,7 @@ test('setup toggles permanent power, retains Normal save identifier and refreshe
   page,
 }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const result = await page.evaluate(async () => {
     const path = '/src/ui/screens/setup.ts';
     const { createSetupScreen } = await import(path);
@@ -47,6 +48,7 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
   page,
 }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const result = await page.evaluate(async () => {
     const path = '/src/ui/screens/setup.ts';
     const { createSetupScreen } = await import(path);
@@ -135,6 +137,7 @@ test('setup reveals respect reduced motion and legacy controller callers retain 
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const result = await page.evaluate(async () => {
     const path = '/src/ui/screens/setup.ts';
     const { createSetupScreen } = await import(path);

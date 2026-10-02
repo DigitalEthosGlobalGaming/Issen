@@ -44,9 +44,6 @@ export interface Boss {
   window: number;
   blockT: number;
   twinDone: boolean;
-  sfake: Direction | null;
-  sflip: number;
-  flipped: boolean;
   failed: boolean;
   kageUsed: number;
   pos: EnemyPosition;

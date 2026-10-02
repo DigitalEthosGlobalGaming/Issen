@@ -82,26 +82,20 @@
 .upgrade-tile[data-state='max'] {
   box-shadow: inset 0 -3px #ad945c;
 }
-.upgrade-tile svg,
-.template-detail svg {
+.upgrade-tile .symbol-art,
+.template-detail .symbol-art {
   width: 56px;
   height: 56px;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
 }
 .template-details {
   position: sticky;
   top: 0;
 }
-.template-detail svg {
+.template-detail .symbol-art {
   width: 76px;
   height: 76px;
   display: block;
   margin: 0 auto 10px;
-  color: #dec38c;
 }
 .template-detail .btn {
   width: 100%;
@@ -196,16 +190,16 @@
     font-size: 12px;
     line-height: 1.2;
   }
-  #template .upgrade-tile svg {
-    width: 30px;
-    height: 30px;
+  #template .upgrade-tile .symbol-art {
+    width: 48px;
+    height: 48px;
   }
   #template .upgrade-tile span {
     font-size: 10px;
   }
-  #template .template-detail svg {
-    width: 48px;
-    height: 48px;
+  #template .template-detail .symbol-art {
+    width: 64px;
+    height: 64px;
     margin-bottom: 4px;
   }
   #template .upgrade-card {

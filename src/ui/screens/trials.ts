@@ -3,6 +3,7 @@ import { TRIALS } from '../../game/content/trials.ts';
 import { trialsUnlocked } from '../../game/progression/trials.ts';
 import type { TrialProgress } from '../../game/progression/trials.ts';
 import { ITEM_TYPE_LABEL } from './game-over.ts';
+import { createSymbolArt } from '../symbol-art.ts';
 import './trials.css';
 
 export interface TrialResult {
@@ -45,7 +46,7 @@ export function renderTrials(
     retry.textContent = 'Retry';
     retry.disabled = !unlocked || !trialAccessible(trial.id, premiumAccess);
     retry.onclick = () => start(trial.id);
-    outcome.append(heading);
+    outcome.append(createSymbolArt(doc, 'trial', trial.id), heading);
     if (!result.passed) {
       const objective = doc.createElement('p');
       objective.textContent = trial.objective;
@@ -90,7 +91,7 @@ export function renderTrials(
     button.setAttribute('aria-label', `${button.textContent} ${trial.name}: ${trial.objective}`);
     button.disabled = !unlocked || !trialAccessible(trial.id, premiumAccess);
     button.onclick = () => start(trial.id);
-    card.append(heading, description, reward, button);
+    card.append(createSymbolArt(doc, 'trial', trial.id), heading, description, reward, button);
     list.append(card);
   }
   root.scrollTop = 0;

@@ -39,13 +39,11 @@ export function createBoss(
     window: 1,
     blockT: 0,
     twinDone: false,
-    sfake: null,
-    sflip: 0,
-    flipped: false,
     failed: false,
     kageUsed: 0,
     pos: { x: 0, y: 0, h: 0, fog: 0, alpha: 0 },
   };
+  if (def.mirror) b.bp.feint = 0;
   if (def.spear) {
     b.bp.flash *= 0.8;
     b.bp.wind *= 1.2;

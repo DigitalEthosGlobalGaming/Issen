@@ -4,6 +4,7 @@ import {
   type MetaProgress,
   type UpgradeId,
 } from '../../game/progression/meta.ts';
+import { createSymbolArt } from '../symbol-art.ts';
 
 export function renderTemplate(
   root: HTMLElement,
@@ -56,7 +57,7 @@ export function renderTemplate(
         : meta.embers >= cost
           ? 'affordable'
           : 'unaffordable';
-    tile.append(illustration(upgrade.id), name, owned, state);
+    tile.append(createSymbolArt(root.ownerDocument, 'temple', upgrade.id), name, owned, state);
     tile.onclick = () => {
       root.dataset.selectedUpgrade = upgrade.id;
       renderTemplate(root, meta, save, premiumAccess);
@@ -93,7 +94,7 @@ export function renderTemplate(
         root.querySelector<HTMLElement>('.template-detail')?.focus();
       }
     };
-    card.append(illustration(upgrade.id), title, description);
+    card.append(createSymbolArt(root.ownerDocument, 'temple', upgrade.id), title, description);
     if (rank > 0) card.append(current);
     if (rank < upgrade.maxRank) card.append(next);
     card.append(buy);
@@ -138,23 +139,4 @@ function effectText(id: UpgradeId, rank: number): string {
         ? `Restore 1 life every ${rank === 1 ? 6 : 3} cleared waves`
         : 'No wave-clear recovery';
   }
-}
-const illustrations: Record<UpgradeId, string> = {
-  precision: '<circle cx="48" cy="48" r="28"/><path d="M28 48H68M48 28V68"/>',
-  discernment: '<path d="M72 32A28 28 0 1 0 75 60M72 12V32H52"/>',
-  vitality: '<path d="M48 77C8 52 14 20 34 24L48 35L62 24C83 20 88 52 48 77Z"/>',
-  focus:
-    '<circle cx="48" cy="48" r="29"/><circle cx="48" cy="48" r="10"/><path d="M48 9V25M48 71V87M9 48H25M71 48H87"/>',
-  offerings: '<path d="M15 38H81M22 26H74M29 38V79M67 38V79M21 79H75M35 61H61M40 61V50H56V61"/>',
-  awakening: '<path d="M48 11L57 36L84 48L57 59L48 85L37 59L12 48L37 36Z"/>',
-  knife: '<path d="M19 78L35 59L41 65L25 84ZM35 59L70 16L77 11L78 21L41 65M29 52L49 71"/>',
-  composure: '<path d="M48 13L77 25V49Q73 72 48 84Q23 72 19 49V25ZM31 49L43 61L66 36"/>',
-  recovery: '<path d="M74 39A29 29 0 1 0 73 65M74 20V39H55M48 34V64M33 49H63"/>',
-};
-function illustration(id: UpgradeId): SVGSVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 96 96');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = illustrations[id];
-  return svg;
 }

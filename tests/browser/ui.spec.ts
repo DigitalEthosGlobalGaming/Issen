@@ -18,6 +18,7 @@ test.beforeEach(async ({ page }) => {
 
 test('HUD handles life modes, combo scoring, and exclusive screen navigation', async ({ page }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const result = await page.evaluate(async () => {
     const hudPath = '/src/ui/hud.ts',
       statePath = '/src/game/run-state.ts';
@@ -70,6 +71,7 @@ test('HUD handles life modes, combo scoring, and exclusive screen navigation', a
 
 test('life display outlines an available ward and clears it when spent', async ({ page }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const states = await page.evaluate(async () => {
     const { createHud } = await import('/src/ui/hud.ts');
     const { createRunState } = await import('/src/game/run-state.ts');
@@ -104,6 +106,7 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
   page,
 }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const result = await page.evaluate(async () => {
     const armoryPath = '/src/ui/screens/armory.ts';
     const savesPath = '/src/platform/saves.ts';
@@ -163,6 +166,7 @@ test('shrine screen replaces old offers and dispatches the chosen blessing once'
   page,
 }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   await page.evaluate(async () => {
     const screenPath = '/src/ui/screens/shrine.ts';
     const contentPath = '/src/game/content/blessings.ts';
@@ -200,6 +204,7 @@ test('statistics show saved records as text and can be reopened', async ({ page 
     );
   });
   await page.goto('/');
+  await page.locator('#app').waitFor();
   for (let i = 0; i < 2; i++) {
     await page.getByRole('button', { name: 'Stats', exact: true }).click();
     await expect(page.locator('#statGrid')).toContainText('1h 1m');
@@ -214,6 +219,7 @@ test('statistics show saved records as text and can be reopened', async ({ page 
 
 test('notifications preserve queue timing and dispose all pending work', async ({ page }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   await page.clock.install();
   await page.evaluate(async () => {
     const path = '/src/ui/notifications.ts';

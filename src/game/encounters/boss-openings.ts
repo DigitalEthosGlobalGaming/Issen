@@ -8,12 +8,8 @@ export function chainLength(count: number, mode: string, random: Random = Math.r
   if (count === 2) return 2;
   return (count <= 4 ? 2 : 3) + (random() < 0.5 ? 1 : 0);
 }
-export function setMirror(boss: Boss): void {
-  boss.flipped = false;
-  if (boss.def.mirror) {
-    boss.sfake = OPP[boss.sdir];
-    boss.sflip = boss.window * 0.42;
-  } else boss.sfake = null;
+export function bossShownDirection(boss: Boss) {
+  return boss.def.mirror ? OPP[boss.sdir] : boss.sdir;
 }
 export function parryOpening(
   boss: Boss,
@@ -38,7 +34,6 @@ export function parryOpening(
   boss.window = boss.bp.stag;
   boss.blockT = 0;
   boss.kageUsed = 0;
-  setMirror(boss);
   const counterDamage = input.counter && boss.hp > 1;
   if (counterDamage) boss.hp--;
   return { second, counterDamage };

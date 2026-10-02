@@ -58,7 +58,7 @@ import {
   resolveStandoffSwipe,
 } from './game/encounters/standoff.ts';
 import { targetSwipe } from './game/combat/targeting.ts';
-import { setMirror, parryOpening } from './game/encounters/boss-openings.ts';
+import { bossShownDirection, parryOpening } from './game/encounters/boss-openings.ts';
 import { createBoss } from './game/encounters/boss-create.ts';
 import { bossPosition } from './rendering/figures/boss-position.ts';
 import { bossToIdle, updateBoss as simulateBoss } from './game/encounters/boss-update.ts';
@@ -1943,7 +1943,7 @@ export function startGame(): () => void {
     if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
-      hint('mirror', "The Mirror's blade flips before it settles. Wait for it, then cut.", 5000);
+      hint('mirror', 'The Mirror never feints. Cut opposite to his arrow and blade.', 5000);
     captureCheckpoint();
   }
   function renderHp() {
@@ -2010,7 +2010,14 @@ export function startGame(): () => void {
     guided.bossParried();
     bumpCombo();
     addScore(Math.round(60 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05);
-    if (!second) hint('parry', 'An opening. Swipe the way his blade points.', 3000);
+    if (!second)
+      hint(
+        'parry',
+        b.def.mirror
+          ? 'An opening. Swipe opposite to his arrow and blade.'
+          : 'An opening. Swipe the way his blade points.',
+        3000,
+      );
   }
   function onTapDown() {
     // Finger-down begins a possible swipe. Consume taps on release during cut
@@ -2100,7 +2107,6 @@ export function startGame(): () => void {
     b.t = 0;
     b.window = Math.max(0.5, b.bp.stag * 0.72);
     b.blockT = 0.12;
-    setMirror(b);
     swingPlayer(dir);
     sparks(tw[0], tw[1], 16);
     ring(tw[0], tw[1], 3 * S, 70 * S, 0.28, Math.max(1.5, 2 * S));
@@ -2113,7 +2119,13 @@ export function startGame(): () => void {
     bumpCombo();
     addScore(Math.round(40 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05, 'Blocked');
     if (notifications.activeHint === 'parry') hideHint();
-    hint('chain', 'He blocked. Keep swiping the way his blade points.', 3500);
+    hint(
+      'chain',
+      b.def.mirror
+        ? 'He blocked. Keep swiping opposite to his arrow and blade.'
+        : 'He blocked. Keep swiping the way his blade points.',
+      3500,
+    );
   }
   function bossSwipe(dir: Direction) {
     const b = G.boss;
@@ -3787,13 +3799,11 @@ export function startGame(): () => void {
         r = clamp(p.h * 0.11, 22, 38),
         ex = p.x - p.h * 0.42,
         ey = Math.max(p.y - p.h * 0.78, r + 64);
-      const fk = b.sfake && b.t < b.sflip;
-      drawEnso(ex, ey, r, fk ? b.sfake! : b.sdir, {
+      drawEnso(ex, ey, r, bossShownDirection(b), {
         prog: clamp(b.t / b.window),
         alpha: 1,
         arrowA: G.blade || G.m.blind || G.m.duelBlind ? 0 : null,
         noArc: 1,
-        quiver: !!fk,
       });
       if (b.chainLen > 1) {
         const n = b.chainLen,

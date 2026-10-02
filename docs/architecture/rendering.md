@@ -51,6 +51,14 @@ HUD and screen content under `src/ui/` use HTML and CSS layered over the main
 canvas. CSS variables in `src/styles/tokens.css` provide the core ink, paper,
 seal and type values, and `src/styles/index.css` fixes the cascade order.
 
+Buttons use the shared ink nine-slice frames in `src/styles/button-frames.css`,
+imported after screen styles. It covers menu, HUD, tutorial, cinematic and startup
+buttons, including segmented choices, Armoury tiles and Temple upgrades. The
+normal and highlighted centres remain dark; existing labels, equipped badges,
+rarity indicators, disabled opacity and focus outlines retain their own meaning.
+See the [atlas contract](../../src/ui/assets/button-atlas.md) for slice geometry
+and regeneration. Gameplay Canvas rendering does not consume these UI assets.
+
 The armory has its own canvas. `src/rendering/armory-preview.ts` reuses the figure,
 effect and film renderers but owns a separate animation clock and effect state.
 `src/ui/share-card.ts` creates another canvas, copies the live scene into it and

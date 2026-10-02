@@ -51,7 +51,7 @@ test('portrait title and setup fit while Temple uses compact top-centred details
       /earned through play|suppresses|challenge modes|Need .* more|Choose a blessing/,
     );
     await expect(page.locator('[data-upgrade="vitality"] span').last()).toHaveText('100');
-    const icon = await page.locator('.template-detail svg').boundingBox();
+    const icon = await page.locator('.template-detail .symbol-art').boundingBox();
     const heading = await page.locator('.template-detail h3').boundingBox();
     expect(icon!.y + icon!.height).toBeLessThanOrEqual(heading!.y);
     const done = page.locator('#template [data-back]');
@@ -104,6 +104,7 @@ test('Temple rank one unlocks only weapons; rank two reveals outfit challenges',
 
 test('admin clear requires confirmation and resets only test profile', async ({ page }) => {
   await page.goto('/');
+  await page.locator('#app').waitFor();
   const player = await page.evaluate(() =>
     Object.fromEntries(
       Object.entries(localStorage).filter(([key]) => !key.startsWith('issen.testing.')),

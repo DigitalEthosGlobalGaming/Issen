@@ -1,0 +1,75 @@
+/* 24 source pixels become 8 CSS pixels; corners never stretch with the control. */
+:is(#app button, .tutorial-overlay button, .startup-loading button) {
+  --button-frame: url('../ui/assets/button-normal.png');
+  border-image-source: var(--button-frame);
+  border-image-slice: 24 fill;
+  border-image-width: 8px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-radius: 0;
+  background: #24221f;
+  background-clip: padding-box;
+}
+
+:is(#app button, .tutorial-overlay button, .startup-loading button):is(
+  .primary,
+  .on,
+  .sel,
+  [aria-pressed='true'],
+  [aria-selected='true'],
+  :focus-visible
+) {
+  --button-frame: url('../ui/assets/button-highlighted.png');
+}
+
+/* The highlight has a charcoal centre, keeping nested labels readable. */
+#app :is(.btn.primary, .seg button[aria-pressed='true'], .tab[aria-selected='true']) {
+  color: var(--paper);
+}
+
+/* Secondary mouse/trackpad pointers can hover even when touch is primary. */
+@media (any-hover: hover) {
+  :is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):hover {
+    --button-frame: url('../ui/assets/button-highlighted.png');
+  }
+}
+
+:is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):active {
+  --button-frame: url('../ui/assets/button-highlighted.png');
+}
+
+#app .seg {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  gap: 4px;
+}
+
+#app .seg button + button {
+  border-left: 0;
+}
+
+/* Retain the meaning of special cards without replacing their ink frame. */
+#app .item.rare {
+  box-shadow: inset 0 -3px #b8923a;
+}
+
+#app .item.cursed {
+  box-shadow: inset 0 -3px #b9392c;
+}
+
+body .startup-loading button {
+  color: var(--paper, #ece6da);
+}
+
+@media (forced-colors: active) {
+  :is(#app button, .tutorial-overlay button, .startup-loading button) {
+    border-image: none;
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+  #app :is(.btn.primary, .seg button[aria-pressed='true'], .tab[aria-selected='true']) {
+    color: ButtonText;
+  }
+}

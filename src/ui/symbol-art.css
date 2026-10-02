@@ -1,0 +1,8 @@
+.symbol-art {
+  display: block;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}

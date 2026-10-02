@@ -1,6 +1,10 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
+- [Calligraphic symbol art](features/symbol-art.md): shared symbol style, Temple and Trial atlas mapping, and menu integration.
+
+- [Mirror boss](features/mirror-boss.md): opposite-direction counters, chains and feint rules.
+
 - [Ink character puppets](features/character-art.md): modular player outfits, enemies, blades, charms and companions with a single Ink renderer.
 
 - [Environment asset library](features/environment-asset-library.md): visual catalog of existing atlases, cell descriptions, dimensions, anchors, and implemented reuse.

@@ -2,6 +2,7 @@ import { clamp, easeInOut, easeOut } from '../../shared/math.ts';
 import { EPOSE, mixPose, approachPose } from '../../rendering/figures/model.ts';
 import type { Random } from '../../shared/random.ts';
 import type { Boss } from './boss.ts';
+import { bossShownDirection } from './boss-openings.ts';
 import type { EnemyPosition } from '../combat/enemy.ts';
 export interface BossEnvironment {
   rawDelta?: number;
@@ -40,7 +41,7 @@ export function updateBoss(
       break;
     case 'idle':
       if (active && b.t >= b.idleT) {
-        if (!b.lastFeint && R() < bp.feint) {
+        if (!b.def.mirror && !b.lastFeint && R() < bp.feint) {
           b.state = 'feint';
           b.dur = bp.wind * (0.9 + R() * 0.3);
           b.lastFeint = true;
@@ -85,13 +86,7 @@ export function updateBoss(
       break;
     case 'stagger':
       {
-        const fk = b.sfake && b.t < b.sflip;
-        if (b.sfake && !fk && !b.flipped) {
-          b.flipped = true;
-          b.blockT = 0.1;
-          sfx.feint();
-        }
-        tgt = EPOSE[fk && b.sfake ? b.sfake : b.sdir];
+        tgt = EPOSE[bossShownDirection(b)];
         rate = b.blockT > 0 ? 42 : 22;
         if (b.blockT > 0) b.blockT -= dt;
         b.lean = 0.03;
@@ -107,7 +102,7 @@ export function updateBoss(
       if (b.t >= 0.35) bossToIdle(b, bp.idleMin, R);
       break;
     case 'hurt':
-      tgt = EPOSE[b.sdir];
+      tgt = EPOSE[bossShownDirection(b)];
       b.lean = 0.05 * (1 - clamp(b.t / 0.5));
       if (b.t >= 0.5) bossToIdle(b, bp.idleMin * 0.8, R);
       break;

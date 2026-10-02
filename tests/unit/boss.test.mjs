@@ -5,7 +5,12 @@ import { bossPosition } from '../../src/rendering/figures/boss-position.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
 import { EPOSE } from '../../src/rendering/figures/model.ts';
 import { createBoss } from '../../src/game/encounters/boss-create.ts';
-import { parryOpening, chainLength } from '../../src/game/encounters/boss-openings.ts';
+import {
+  bossShownDirection,
+  parryOpening,
+  chainLength,
+} from '../../src/game/encounters/boss-openings.ts';
+import { DIRS, OPP } from '../../src/shared/directions.ts';
 import { computeModifiers } from '../../src/game/equipment/modifiers.ts';
 import { bossParameters } from '../../src/game/encounters/configuration.ts';
 
@@ -48,14 +53,28 @@ test('Twin requires two parries and counter damage cannot finish the boss', () =
   assert.equal(parryOpening(boss, input, () => 0.5).counterDamage, false);
   assert.equal(boss.hp, 1);
 });
-test('Mirror openings use opposite direction and difficulty increases chain thresholds', () => {
+test('Mirror never feints and consistently shows the opposite counter direction', () => {
   const boss = createBoss(6, 'normal', computeModifiers([], new Set()), (b) =>
     bossPosition(b, createLayout(390, 844)),
   );
   parryOpening(boss, { count: 6, mode: 'normal', chainModifier: 0, counter: false }, () => 0);
   assert.equal(boss.sdir, 'up');
-  assert.equal(boss.sfake, 'down');
-  assert.equal(boss.sflip, boss.window * 0.42);
+  assert.equal(boss.bp.feint, 0);
+  for (const dir of DIRS) {
+    boss.sdir = dir;
+    assert.equal(bossShownDirection(boss), OPP[dir]);
+  }
+  const regular = createBoss(3, 'normal', computeModifiers([], new Set()), (b) =>
+    bossPosition(b, createLayout(390, 844)),
+  );
+  assert.ok(regular.bp.feint > 0);
+  assert.equal(bossShownDirection(regular), regular.sdir);
+  const ronin = createBoss(12, 'ronin', computeModifiers([], new Set()), (b) =>
+    bossPosition(b, createLayout(390, 844)),
+  );
+  assert.equal(ronin.bp.feint, 0);
+});
+test('difficulty increases chain thresholds', () => {
   assert.equal(
     chainLength(1, 'normal', () => 0),
     1,
@@ -75,6 +94,7 @@ test('Mirror openings use opposite direction and difficulty increases chain thre
 });
 function fixture() {
   const boss = {
+    def: {},
     state: 'enter',
     t: 0,
     life: 0,
@@ -86,9 +106,6 @@ function fixture() {
     lastFeint: false,
     twinDone: false,
     sdir: 'up',
-    sfake: null,
-    sflip: 0.42,
-    flipped: false,
     blockT: 0,
     window: 1,
     bp: { idleMin: 0.3, idleMax: 0.7, feint: 0, wind: 1, flash: 0.3 },
@@ -125,20 +142,29 @@ test('boss progresses through entry, windup and glint with one missed-parry outc
   assert.deepEqual(events, ['glint', 'flash', 'death']);
   assert.ok(Object.values(boss.pos).every(Number.isFinite));
 });
-test('mirror flips once and expired stagger recovers once', () => {
+test('Mirror holds the opposite blade pose throughout each opening and recovers once', () => {
   const { boss, state, events, env } = fixture();
   boss.state = 'stagger';
-  boss.sfake = 'down';
-  updateBoss(state, 0.5, env);
-  assert.equal(boss.flipped, true);
-  assert.deepEqual(events, ['feint']);
-  updateBoss(state, 0.5, env);
+  boss.def.mirror = 1;
+  for (const dir of DIRS) {
+    boss.sdir = dir;
+    boss.t = 0;
+    boss.pose = { ...EPOSE[OPP[dir]] };
+    for (let step = 0; step < 9; step++) {
+      updateBoss(state, 0.1, env);
+      assert.deepEqual(boss.pose, EPOSE[OPP[dir]]);
+      assert.equal(bossShownDirection(boss), OPP[dir]);
+      assert.equal(boss.state, 'stagger');
+    }
+  }
+  assert.deepEqual(events, []);
+  updateBoss(state, 0.11, env);
   assert.equal(boss.state, 'recover');
   assert.equal(boss.failed, true);
-  assert.deepEqual(events, ['feint', 'recovered']);
+  assert.deepEqual(events, ['recovered']);
   updateBoss(state, 0.35, env);
   assert.equal(boss.state, 'idle');
-  assert.deepEqual(events, ['feint', 'recovered']);
+  assert.deepEqual(events, ['recovered']);
 });
 test('feints recover without a glint and dying bosses are removed at the lifetime boundary', () => {
   const { boss, state, events, env } = fixture();

@@ -51,12 +51,70 @@ async function instrument(page: Page) {
       'frameLoop.start();',
       `
       window.__trialHarness = { G, step: update, swipe: onSwipe, tap: onTap,
+        startBoss, shownDirection: bossShownDirection,
         stop: () => frameLoop.stop(), getEquipment: () => EQ };
       frameLoop.start();`,
     );
     await route.fulfill({ response, body });
   });
 }
+
+test('Mirror accepts opposite displayed directions throughout a chain and rejects matching cuts', async ({
+  page,
+}) => {
+  await seed(page);
+  await instrument(page);
+  await page.addInitScript(() =>
+    localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true })),
+  );
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#bPlay')).toBeVisible({ timeout: 60000 });
+  await page.evaluate(() => (window as any).__trialHarness.stop());
+  await page.locator('#bPlay').click();
+  await page.locator('#bBegin').click();
+  const result = await page.evaluate(() => {
+    const h = (window as any).__trialHarness;
+    h.G.bossCount = 5;
+    h.startBoss();
+    const b = h.G.boss;
+    h.G.m.axisCut = 0;
+    h.G.m.kage = 0;
+    h.G.m.chain = 0;
+    h.G.m.bossDmg = 1;
+    // A restored legacy timing must not re-enable Mirror's attack feints.
+    b.bp.feint = 1;
+    b.state = 'idle';
+    b.idleT = 0;
+    h.step(0.02, 0.02);
+    if (b.state !== 'windup') throw new Error('Mirror feinted');
+    b.state = 'flash';
+    h.tap();
+    const hp = b.hp;
+    const opposite: Record<string, string> = {
+      up: 'down',
+      down: 'up',
+      left: 'right',
+      right: 'left',
+    };
+    const cuts = b.chainLeft;
+    for (let cut = 0; cut < cuts; cut++) {
+      const shown = h.shownDirection(b);
+      h.step(0.02, 0.02);
+      if (h.shownDirection(b) !== shown) throw new Error('Mirror cue changed with time');
+      h.swipe(opposite[shown]);
+      if (b.failed) throw new Error('Opposite counter failed');
+    }
+    const damage = hp - b.hp;
+    b.state = 'flash';
+    h.tap();
+    h.swipe(h.shownDirection(b));
+    return { cuts, damage, wrongState: b.state, failed: b.failed };
+  });
+  expect(result.cuts).toBeGreaterThanOrEqual(3);
+  expect(result.damage).toBe(1);
+  expect(result.wrongState).toBe('recover');
+  expect(result.failed).toBe(true);
+});
 
 test('Trials stay off the title until Ronin wave 10, then fit portrait and landscape', async ({
   page,
@@ -116,7 +174,8 @@ test('All eight encounters complete through combat and persist exclusive rewards
 }) => {
   await seed(page);
   await instrument(page);
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#bPlay')).toBeVisible({ timeout: 60000 });
   await page.evaluate(() => (window as any).__trialHarness.stop());
   const before = await saves(page);
   await page.locator('#bTrials').click();
@@ -145,8 +204,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
         if (h.G.state === 'playing' && h.G.attacker?.p >= 0.82) h.swipe(h.G.attacker.dir);
         const b = h.G.boss;
         if (h.G.state === 'boss' && b?.state === 'flash') h.tap();
-        else if (h.G.state === 'boss' && b?.state === 'stagger' && (!b.sfake || b.flipped))
-          h.swipe(b.sdir);
+        else if (h.G.state === 'boss' && b?.state === 'stagger') h.swipe(b.sdir);
       }
       return h.G.state === 'title';
     });

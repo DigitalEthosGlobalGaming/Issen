@@ -9,22 +9,26 @@ the **Trials unlocked** checkbox; ordinary player saves are unaffected.
 
 ## Encounters and rewards
 
+Each trial has a [calligraphic brush emblem](symbol-art.md) representing its
+challenge, shown on its list card and result panel. Objective and reward text
+remain the source of the encounter's exact rules.
+
 Armoury reward requirements name the Trial to complete. As of 1.12.0 they no
 longer repeat the mode's Ronin-wave unlock threshold; the access gate itself is
 unchanged. Shared reward reveals use the same shorter catalog copy.
 
-| Trial | Completion condition | Reward |
-| --- | --- | --- |
-| Unbroken | Cut 20 ordered enemies, no mistakes | Still ripples kill effect |
-| True Edge | Cut 12 enemies, at least 10 perfect cuts, no mistakes | Platinum seal |
-| Still Water | Cut 16 enemies who all feint, no mistakes | Violet dusk film |
-| Read the Blade | Cut 16 enemies without arrows, including feints, no mistakes | Comet trail kill effect |
-| Two Glints | Defeat Ronin Twin Fang without taking a hit | Burnished copper seal |
-| Three Masters | Defeat Ronin Kagemaru, Twin Fang and Mirror without hits, wrong counters or expired openings | Pale dawn film |
-| Golden Sovereign | Defeat 1,000 enemies in one wave without a hit | Imperial gold film |
-| Broken Reality | 1,000 perfect cuts in one wave; an ordinary cut or hit ends the attempt | Broken signal film |
-| Quiet Blade (Premium/Web) | 24 arrowless enemies, at least 18 perfect cuts, no mistakes | Quiet jade seal |
-| Duel Master (Premium/Web) | 20 consecutive accelerating counter-and-cut exchanges, no mistakes | First Strike charm |
+| Trial                     | Completion condition                                                                         | Reward                    |
+| ------------------------- | -------------------------------------------------------------------------------------------- | ------------------------- |
+| Unbroken                  | Cut 20 ordered enemies, no mistakes                                                          | Still ripples kill effect |
+| True Edge                 | Cut 12 enemies, at least 10 perfect cuts, no mistakes                                        | Platinum seal             |
+| Still Water               | Cut 16 enemies who all feint, no mistakes                                                    | Violet dusk film          |
+| Read the Blade            | Cut 16 enemies without arrows, including feints, no mistakes                                 | Comet trail kill effect   |
+| Two Glints                | Defeat Ronin Twin Fang without taking a hit                                                  | Burnished copper seal     |
+| Three Masters             | Defeat Ronin Kagemaru, Twin Fang and Mirror without hits, wrong counters or expired openings | Pale dawn film            |
+| Golden Sovereign          | Defeat 1,000 enemies in one wave without a hit                                               | Imperial gold film        |
+| Broken Reality            | 1,000 perfect cuts in one wave; an ordinary cut or hit ends the attempt                      | Broken signal film        |
+| Quiet Blade (Premium/Web) | 24 arrowless enemies, at least 18 perfect cuts, no mistakes                                  | Quiet jade seal           |
+| Duel Master (Premium/Web) | 20 consecutive accelerating counter-and-cut exchanges, no mistakes                           | First Strike charm        |
 
 The original eight trials remain free after access. Quiet Blade and Duel Master
 require Premium or Web edition access. See [mastery rules](editions-and-mastery.md)
