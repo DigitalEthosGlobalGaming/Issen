@@ -1,6 +1,7 @@
 import { bladeEffectPoint, supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
 import { enemyPresence } from './enemy-presence.ts';
+import { playerPresence } from './player-presence.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
 import type { Figure, FigureEnvironment, Pose, Point, BladeStyle, Aura } from './types.ts';
@@ -378,6 +379,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
   }
   function drawFigure(f: Figure) {
     f = enemyPresence(f, time, !!env.reducedMotion);
+    f = playerPresence(f, time, !!env.reducedMotion);
     const C = f.pal || cols(f.fog),
       lx = f.lean || 0,
       t = time;

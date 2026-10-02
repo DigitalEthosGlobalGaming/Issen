@@ -263,3 +263,9 @@ The [empty private room](../../src/ui/assets/armoury-room.md) is cover-cropped b
 `src/rendering/figures/ink-companions.ts` now assembles all four companions from the [sixteen-part atlas](../../src/rendering/figures/assets/companion-parts-atlas.md), using measured packed rectangles and source-pixel joints. Shiba and Cat breathe at fixed foot anchors while their heads, tails and active forelegs move independently. Crow layers body, head and two wings over the existing shoulder anchor. Mystic Rock layers its core, two detached shards and ring. No gameplay randomness or saved companion IDs change.
 
 Runtime and preview retain independent loader/disposal lifecycles. One validated 1254-square image supplies every rig; failure leaves the existing draw API unavailable rather than painting partial sprites. Reduced motion freezes joints and reaction poses. All transforms and opacity are restored. `tests/unit/mystic-rock.test.mjs` checks geometry, four distinct parts per rig, animation, reduced motion and disposal; `tests/browser/companion-rigs.spec.ts` inspects real assembled poses and canvas isolation.
+
+## Idle player and original Mystic Rock (1.40.0)
+
+The main player and Armoury preview breathe subtly while resting, with fixed foot coordinates and unchanged simulation poses. Gameplay swings and falls suppress that presentation; reduced motion freezes it. `src/rendering/figures/player-presence.ts` owns the visual transform.
+
+Mystic Rock once again uses the original `mystic-rock.png` sprite and gentle vertical bob, independently loaded alongside the articulated animal atlas. The three animals retain their separate head, tail, limb and wing animations. Preparation and disposal settle both image loaders; reduced motion freezes the rock.

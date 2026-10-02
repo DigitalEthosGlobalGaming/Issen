@@ -156,6 +156,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       y: height * 0.94,
       h: height * 0.82,
       back: true,
+      waiting: true,
       fog: 0,
       pose: { gx: 0.19, gy: -0.52, ang: 0.55 },
       noShadow: false,

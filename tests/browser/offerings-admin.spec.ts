@@ -13,7 +13,7 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
     await page.getByRole('button', { name: `Donate ${price} Embers`, exact: true }).click();
   await expect(page.locator('.template-detail')).toContainText('1 guaranteed rare');
   await expect(page.locator('.template-detail')).toContainText('Offerings · 3/3');
-  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);
   await page.reload();
   await expect(page.locator('#app')).toHaveCount(1);
   expect(

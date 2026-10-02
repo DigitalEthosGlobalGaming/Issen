@@ -21,7 +21,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await page.locator('[data-upgrade="knife"]').click();
   await page.getByRole('button', { name: 'Donate 125 Embers', exact: true }).click();
   expect(await balance()).toBe(875);
-  await expect(page.locator('.temple-status')).toContainText('ready to donate');
+  await expect(page.locator('.temple-status')).toHaveCount(0);
   await expect(page.locator('.temple-header h2')).toHaveText('Temple');
   await page.getByRole('button', { name: 'Donate 150 Embers', exact: true }).click();
   expect(await balance()).toBe(725);
@@ -31,7 +31,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await expect(page.locator('.template-detail')).toContainText(
     '3 throwing knives · refill every duel',
   );
-  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);
   await expect(page.locator('[data-upgrade="knife"]')).toHaveAttribute('aria-pressed', 'true');
 });
 

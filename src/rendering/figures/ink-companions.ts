@@ -1,4 +1,5 @@
 const COMPANION_URL = new URL('./assets/companion-parts-atlas.png', import.meta.url).href;
+const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
 
 /** Verified packed windows, with source-pixel joints and native aspect ratios. */
 export const INK_COMPANION_FRAMES = [
@@ -27,10 +28,30 @@ export function createInkCompanionRenderer(doc: Document) {
   let finishLoad: (() => void) | null = null;
   let ready = false;
   let disposed = false;
+  let rock: HTMLImageElement | null = null;
+  let rockReady = false;
+  let finishRock: (() => void) | null = null;
 
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
+    const rockPending = new Promise<void>((resolve) => {
+      rock = doc.createElement('img');
+      const sprite = rock;
+      sprite.decoding = 'async';
+      const finish = () => {
+        sprite.onload = sprite.onerror = null;
+        finishRock = null;
+        resolve();
+      };
+      finishRock = finish;
+      sprite.onload = () => {
+        rockReady = !disposed && sprite.naturalWidth === 1145 && sprite.naturalHeight === 1373;
+        finish();
+      };
+      sprite.onerror = finish;
+      sprite.src = ROCK_URL;
+    });
     pending = new Promise<void>((resolve) => {
       const sprite = doc.createElement('img');
       image = sprite;
@@ -48,6 +69,7 @@ export function createInkCompanionRenderer(doc: Document) {
       sprite.onerror = finish;
       sprite.src = COMPANION_URL;
     });
+    pending = Promise.all([pending, rockPending]).then(() => {});
     return pending;
   }
 
@@ -69,6 +91,18 @@ export function createInkCompanionRenderer(doc: Document) {
     )
       return false;
     void prepare();
+    if (type === 'mystic-rock') {
+      if (!rockReady || !rock) return false;
+      const factor = size / 1157;
+      const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
+      g.save();
+      try {
+        g.drawImage(rock, x - 580 * factor, y - 1350 * factor + bob, 1145 * factor, 1373 * factor);
+      } finally {
+        g.restore();
+      }
+      return true;
+    }
     if (!ready || !image) return false;
     const t = reducedMotion ? 0 : time;
     const reaction = active && !reducedMotion;
@@ -118,20 +152,6 @@ export function createInkCompanionRenderer(doc: Document) {
         part(8, 222, 205, 0, 0);
         part(10, 225, 85, 3, -93, 0.65, reaction ? 0.8 + flap : -0.2 - flap);
         part(9, 182, 185, 23, -90, 0.65, sine(1.8) * 0.04);
-      } else {
-        const bob = sine(1.4) * 5;
-        part(15, 157, 137, 0, -82 + bob, 1.2, sine(0.6) * 0.15);
-        part(13, 182, 132, -48 + sine(1.1) * 5, -194 + bob + sine(1.8) * 6, 0.55, sine(1.2) * 0.12);
-        part(12, 178, 129, 0, -90 + bob, 1, sine(0.7) * 0.025);
-        part(
-          14,
-          163,
-          137,
-          86 + sine(1.3, 1) * 5,
-          -34 + bob + sine(1.6, 2) * 5,
-          0.55,
-          sine(1.1, 1) * 0.12,
-        );
       }
       return true;
     } finally {
@@ -148,6 +168,13 @@ export function createInkCompanionRenderer(doc: Document) {
       image.removeAttribute('src');
     }
     finishLoad?.();
+    rockReady = false;
+    if (rock) {
+      rock.onload = rock.onerror = null;
+      rock.removeAttribute('src');
+    }
+    finishRock?.();
+    rock = null;
     image = null;
   }
   return {
@@ -155,7 +182,7 @@ export function createInkCompanionRenderer(doc: Document) {
     draw,
     dispose,
     get ready() {
-      return ready;
+      return ready && rockReady;
     },
   };
 }

@@ -15,7 +15,7 @@ in the same tab restores them. Exiting clears that session preference. Storage
 failure does not prevent browsing.
 
 The Film selector previews owned film looks without changing saved equipment.
-All nine scenes use layered Ink artwork. The former Artwork selector and
+The nine ordinary scenes use layered Ink artwork; Demon is a tenth scene composed from independent realm atlas parts. The former Artwork selector and
 backtick rendering shortcut are removed; older session artwork fields are ignored.
 
 ## Ownership and isolation
@@ -29,6 +29,7 @@ checkpoints remain available through Continue after leaving the viewer.
 Focused interaction coverage lives in tests/browser/cinematic.spec.ts. Use the
 active worktree's dev server when checking the feature; a server from another
 checkout will not contain these changes.
+
 # Cinematic discovery reward
 
 Browsing scenes refreshes both large midground landmarks and the standing
@@ -51,3 +52,4 @@ The floating sprite follows the player beside their feet and appears in the Armo
 reduced-motion or reduced-flash settings freeze its gentle bob. It grants no combat
 bonus. Scene/film browsing still leaves live gameplay and equipment unchanged.
 
+Scene changes capture the previous canvas and sweep it away with an irregular edge over 650 ms. Reduced motion changes scenes immediately. Navigation remains responsive during a swipe; closing or disposing cancels the overlay. Demon preview uses a separate presentation flag instead of adding a gameplay stage index, preserving checkpoint stage compatibility. Realm layouts vary by preview visit seed; Trial waves vary by trial seed and wave. Resize keeps the layout stable. A continuous ash floor and fractured perspective plates ground the figures.

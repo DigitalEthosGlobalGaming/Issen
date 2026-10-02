@@ -51,7 +51,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.getByRole('button', { name: 'Donate 200 Embers' }).click();
   await page.getByRole('button', { name: 'Donate 350 Embers' }).click();
   await expect(page.locator('#templateContent')).toContainText('150 Embers');
-  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);
   await page.reload();
   await page.locator('#bTemplate').click();
   await expect(page.locator('#templateContent')).toContainText('Vitality · 3/3');

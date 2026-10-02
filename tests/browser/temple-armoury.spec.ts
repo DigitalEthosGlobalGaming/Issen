@@ -11,14 +11,24 @@ test('Temple identifies affordable donations and refreshes the title after purch
   );
   await page.goto('/');
   await expect(page.locator('.startup-loading')).toHaveCount(0);
-  await expect(page.locator('#bTemplate')).toHaveText('Temple · 2 ready');
+  await expect(page.locator('#bTemplate')).toHaveText('Temple');
   await page.locator('#bTemplate').click();
-  await expect(page.locator('.temple-status')).toHaveText('2 upgrades ready to donate.');
-  await expect(page.locator('[data-upgrade="focus"]')).toContainText('Ready · 75 Embers');
+  await expect(page.locator('.temple-status')).toHaveCount(0);
+  await expect(page.locator('[data-upgrade="focus"]')).toHaveAttribute('data-state', 'affordable');
+  await expect(page.locator('[data-upgrade="awakening"]')).toHaveAttribute(
+    'data-state',
+    'unaffordable',
+  );
+  await expect(page.locator('[data-upgrade="focus"]')).toContainText('75 Embers');
+  const colours = await page
+    .locator('[data-upgrade="focus"], [data-upgrade="awakening"]')
+    .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).color));
+  expect(new Set(colours).size).toBe(2);
   await page.locator('[data-upgrade="focus"]').click();
   await page.getByRole('button', { name: 'Donate 75 Embers', exact: true }).click();
-  await expect(page.locator('.temple-status')).toHaveText(
-    'Save more Embers for your next upgrade.',
+  await expect(page.locator('[data-upgrade="focus"]')).toHaveAttribute(
+    'data-state',
+    'unaffordable',
   );
   await page.locator('#template [data-back]').click();
   await expect(page.locator('#bTemplate')).toHaveText('Temple');
@@ -49,9 +59,10 @@ test('fully donated Temple and room preview remain readable without selection sh
   );
   await page.goto('/');
   await expect(page.locator('.startup-loading')).toHaveCount(0);
-  await expect(page.locator('#bTemplate')).toHaveText('Temple · Complete');
+  await expect(page.locator('#bTemplate')).toHaveText('Temple');
   await page.locator('#bTemplate').click();
-  await expect(page.locator('.temple-status')).toHaveText('All available upgrades fully donated.');
+  await expect(page.locator('.temple-status')).toHaveCount(0);
+  await expect(page.locator('#templateContent')).not.toContainText('Fully donated');
   await expect(page.locator('[data-state="max"].upgrade-tile')).toHaveCount(9);
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();

@@ -45,12 +45,17 @@ function context() {
 test('each rig composes four native-aspect parts, animates joints and freezes accessibility poses', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
-  assert.equal(images.length, 1);
+  assert.equal(images.length, 2);
+  const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
+  rock.naturalWidth = 1145;
+  rock.naturalHeight = 1373;
+  rock.onload();
+  images.reverse();
   assert.match(images[0].src, /companion-parts-atlas.png$/);
   images[0].naturalWidth = images[0].naturalHeight = 1254;
   images[0].onload();
   await pending;
-  for (const type of ['shiba', 'cat', 'crow', 'mystic-rock']) {
+  for (const type of ['shiba', 'cat', 'crow']) {
     const a = context(),
       b = context(),
       c = context();
@@ -88,10 +93,29 @@ test('disposing during companion loading settles preparation and releases callba
 test('incorrect atlas geometry never renders incomplete parts', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
+  images.find((i) => i.src.endsWith('mystic-rock.png')).onerror();
+  images.reverse();
   images[0].naturalWidth = 100;
   images[0].naturalHeight = 200;
   images[0].onload();
   await pending;
   assert.equal(renderer.ready, false);
   assert.equal(renderer.draw('shiba', context().ctx, 0, 0, 100), false);
+});
+
+test('Mystic Rock retains the original floating sprite and freezes with reduced motion', async () => {
+  const { renderer, images } = fixture();
+  const pending = renderer.prepare();
+  const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
+  rock.naturalWidth = 1145;
+  rock.naturalHeight = 1373;
+  rock.onload();
+  images.find((i) => i !== rock).onerror();
+  await pending;
+  const a = context(),
+    b = context();
+  assert.equal(renderer.draw('mystic-rock', a.ctx, 100, 200, 120, 0, false, true), true);
+  renderer.draw('mystic-rock', b.ctx, 100, 200, 120, 99, true, true);
+  assert.deepEqual(a.calls, b.calls);
+  assert.equal(a.calls.filter((c) => c[0] === 'image').length, 1);
 });

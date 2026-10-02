@@ -43,4 +43,4 @@ scale, and portrait/landscape screens before accepting a new batch.
 
 Demon Mirror is the eleventh Trial and uses the dedicated calligraphic [horned mirror emblem](../../src/ui/assets/demon-mirror-symbol.png), alongside the original ten-emblem Trial atlas.
 
-Temple cards show **Ready** with the Ember price when affordable and **Fully donated** at maximum rank. The title button shows the available donation count or **Complete** for all upgrades available in the current edition. `templeStatus` in `src/ui/screens/template.ts` derives that presentation from the owning upgrade catalog.
+Temple upgrade tiles use gold for affordable ranks, muted grey for unavailable ranks and jade for maxed ranks. Selection uses a separate ivory outline. Prices and owned ranks remain visible; completion has no extra label and no donation count appears on the title menu.

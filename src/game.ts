@@ -124,7 +124,7 @@ import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 import { bindPointer } from './input/pointer.ts';
 import { bindKeyboard } from './input/keyboard.ts';
 import { createSetupScreen } from './ui/screens/setup.ts';
-import { renderTemplate, templeStatus } from './ui/screens/template.ts';
+import { renderTemplate } from './ui/screens/template.ts';
 import { renderAdmin } from './ui/screens/admin.ts';
 import { createTutorial } from './ui/screens/tutorial.ts';
 import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
@@ -2671,17 +2671,6 @@ export function startGame(): () => void {
     updateSavedRunButtons();
   }
   function setBestLine() {
-    const temple = templeStatus(META, premiumAccess());
-    $('bTemplate').textContent = temple.complete
-      ? 'Temple · Complete'
-      : temple.affordable
-        ? `Temple · ${temple.affordable} ready`
-        : 'Temple';
-    $('bTemplate').dataset.state = temple.complete
-      ? 'max'
-      : temple.affordable
-        ? 'affordable'
-        : 'unaffordable';
     $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
     $('tBest').textContent =
       (ST.bestScore ? `Best ${ST.bestScore.toLocaleString()}` : '') +
@@ -3069,14 +3058,16 @@ export function startGame(): () => void {
     if (unread) $('bArmory').setAttribute('aria-description', 'Unviewed equipment');
     else $('bArmory').removeAttribute('aria-description');
   }
+  let previewDemon = false;
   let cinematicStage = 0;
   let cinematicStageSeed = stageSeed;
   let cinematicFilm = EQ.film;
   function previewStage(stage: number, newVisit = true) {
     if (newVisit) stageSeed = previewVisits.enter(stage, true);
-    G.stage = stage;
+    previewDemon = stage === STAGES.length;
+    G.stage = previewDemon ? 0 : stage;
     if (newVisit) setupAttract();
-    MIST = STAGES[stage]!.fog;
+    MIST = previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
     palette.clearFog();
     prevBg = null;
     stageFade = 0;
@@ -3092,7 +3083,8 @@ export function startGame(): () => void {
   const cinematic = createCinematic($('app'), {
     canOpen: () => G.state === 'title' && !G.panel,
     stage: () => G.stage,
-    scenes: STAGES.map((stage) => stage.n),
+    scenes: [...STAGES.map((stage) => stage.n), 'Demon'],
+    reducedMotion,
     bindings: () => settings.bindings,
     film: () => EQ.film,
     films: () =>
@@ -3740,6 +3732,7 @@ export function startGame(): () => void {
       fog: 0,
       d: P.d,
       pose: P.pose,
+      waiting: P.swingT > 0.6 && !P.fall,
       lean: 0,
       rot: -P.fall * 0.28,
       noShadow: true,
@@ -3995,9 +3988,16 @@ export function startGame(): () => void {
       g.scale(zoom, zoom);
       g.translate(-zoomX, -zoomY);
     }
-    const demonRealm = activeTrial?.realm === 'demon';
+    const demonRealm = activeTrial?.realm === 'demon' || (cinematic.active && previewDemon);
     const inkEnvironment = demonRealm
-      ? demonRealmRenderer.draw(g, W, H, time, reducedMotion())
+      ? demonRealmRenderer.draw(
+          g,
+          W,
+          H,
+          time,
+          reducedMotion(),
+          activeTrial ? activeTrial.seed + G.wave * 997 : stageSeed,
+        )
       : environmentRenderer.draw(g, {
           stageSeed,
           width: W,
