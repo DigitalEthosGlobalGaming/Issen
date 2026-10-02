@@ -121,6 +121,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
 }) => {
   await seed(page, 9);
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await expect(page.locator('#bTrials')).toBeHidden();
   await page.evaluate(() => {
     const stats = JSON.parse(localStorage.getItem('issen.stats')!);
@@ -130,7 +131,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/10 complete');
+  await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/11 complete');
   await expect(page.locator('.trials-rules')).toHaveText('One hit ends the trial.');
   await expect(page.locator('[data-trial="true-edge"]').locator('..')).toContainText(
     '10 perfect cuts in 12. No hits.',
@@ -150,6 +151,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
 test('Live failure, retry and quitting preserve the main profile', async ({ page }) => {
   await seed(page);
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const before = await saves(page);
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="unbroken"]').click();
@@ -213,10 +215,10 @@ test('All eight encounters complete through combat and persist exclusive rewards
     await expect(page.locator('#trialResult')).toContainText('Unlocked:');
   }
   expect(await saves(page)).toEqual(before);
-  await expect(page.locator('#trialsAccess')).toContainText('8/10');
+  await expect(page.locator('#trialsAccess')).toContainText('8/11');
   await page.reload();
   await page.locator('#bTrials').click();
-  await expect(page.locator('#trialsAccess')).toContainText('8/10');
+  await expect(page.locator('#trialsAccess')).toContainText('8/11');
   expect(
     await page.evaluate(
       () =>
@@ -264,6 +266,7 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   await seed(page);
   await instrument(page);
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bTrials').click();
   const sequences: string[][] = [];
@@ -297,6 +300,7 @@ test('Broken Reality ends on the first ordinary cut', async ({ page }) => {
   await seed(page);
   await instrument(page);
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="broken-reality"]').click();

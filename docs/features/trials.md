@@ -19,6 +19,7 @@ unchanged. Shared reward reveals use the same shorter catalog copy.
 
 | Trial                     | Completion condition                                                                         | Reward                    |
 | ------------------------- | -------------------------------------------------------------------------------------------- | ------------------------- |
+| Demon Mirror              | Survive 13 waves of four mirrored enemies, no mistakes                                       | Inferno film              |
 | Unbroken                  | Cut 20 ordered enemies, no mistakes                                                          | Still ripples kill effect |
 | True Edge                 | Cut 12 enemies, at least 10 perfect cuts, no mistakes                                        | Platinum seal             |
 | Still Water               | Cut 16 enemies who all feint, no mistakes                                                    | Violet dusk film          |
@@ -92,3 +93,5 @@ and shifts its torn strips using the renderer's animation time, without flashing
 Film rendering accepts an explicit time in seconds, keeping preview animation
 independent of live combat. Both endurance trials have
 no feints, fixed attack timings and no intermediate duels or shrines.
+
+Demon Mirror uses 52 enemies in 13 groups of four, with no feints or refills. The arrow and blade show the opposite of the required swipe. `src/rendering/environment/demon-realm.ts` places independent landmark and terrain atlas sprites over a procedural sky and floor; ordinary scenery and weather are omitted. Inferno adds amber flames and embers, with animation frozen by reduced motion or reduced flashes. `tests/browser/demon-trial.spec.ts` checks all 13 waves, wrong-direction failure, reward unlocking and film canvas isolation.

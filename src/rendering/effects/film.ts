@@ -10,7 +10,40 @@ export function applyFilm(
   if (preferences.reducedMotion || preferences.reducedFlashes) time = 0;
   if (f === 'mono') return;
   g.save();
-  if (f === 'supporter-print') {
+  if (f === 'trial-inferno') {
+    const heat = g.createLinearGradient(0, 0, 0, H);
+    heat.addColorStop(0, '#4b1620');
+    heat.addColorStop(0.5, '#d34b15');
+    heat.addColorStop(1, '#ffca57');
+    g.globalCompositeOperation = 'color';
+    g.globalAlpha = 0.56;
+    g.fillStyle = heat;
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'screen';
+    g.globalAlpha = 1;
+    for (let i = 0; i < 22; i++) {
+      const x = (i / 21) * W;
+      const rise = H * (0.12 + (i % 5) * 0.021 + Math.sin(time * 2.1 + i) * 0.014);
+      const sway = Math.sin(time * 1.6 + i * 2.3) * W * 0.012;
+      const flame = g.createLinearGradient(x, H, x, H - rise);
+      flame.addColorStop(0, 'rgba(255,123,20,.34)');
+      flame.addColorStop(0.65, 'rgba(255,193,57,.14)');
+      flame.addColorStop(1, 'rgba(255,222,135,0)');
+      g.fillStyle = flame;
+      g.beginPath();
+      g.moveTo(x - W * 0.038, H);
+      g.quadraticCurveTo(x - W * 0.02, H - rise * 0.6, x + sway, H - rise);
+      g.quadraticCurveTo(x + W * 0.018, H - rise * 0.45, x + W * 0.038, H);
+      g.fill();
+    }
+    for (let i = 0; i < 36; i++) {
+      const progress = (time * 0.1 + i / 36) % 1;
+      const x = (((i * 137) % 997) / 997) * W + Math.sin(time + i) * 3;
+      const y = H * (1 - progress);
+      g.fillStyle = `rgba(255,${150 + (i % 75)},55,${(1 - progress) * 0.6})`;
+      g.fillRect(x, y, Math.max(1, W / 350), Math.max(2, H / 220));
+    }
+  } else if (f === 'supporter-print') {
     // Soft-light preserves coloured attack cues rather than replacing their hue.
     const print = g.createLinearGradient(0, 0, 0, H);
     print.addColorStop(0, 'rgba(255,235,199,.26)');

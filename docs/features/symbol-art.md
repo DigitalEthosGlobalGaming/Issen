@@ -40,3 +40,5 @@ rotate or mirror it in the UI: direction and composition are part of its
 meaning. Future atlas additions must update the ID mapping and atlas metadata
 together. Inspect the sheet, alpha boundaries, representative cells at menu
 scale, and portrait/landscape screens before accepting a new batch.
+
+Demon Mirror is the eleventh Trial and uses the dedicated calligraphic [horned mirror emblem](../../src/ui/assets/demon-mirror-symbol.png), alongside the original ten-emblem Trial atlas.

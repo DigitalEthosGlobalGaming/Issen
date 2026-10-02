@@ -29,6 +29,21 @@ test('Perfect-cut trials fail when the remaining cuts cannot reach the target', 
   assert.match(trialFailureAfterCut(trial, { kills: 3, perfects: 0 }), /10 perfect cuts needed/);
   assert.equal(trialFailureAfterCut(trial, { kills: 11, perfects: 10 }), null);
 });
+test('Demon Mirror requires all thirteen four-enemy waves and grants Inferno', () => {
+  const trial = TRIALS.find((entry) => entry.id === 'demon-mirror');
+  assert.equal(trial.waveCount, 13);
+  assert.equal(trial.enemiesPerWave, 4);
+  assert.equal(trial.wave.total, trial.waveCount * trial.enemiesPerWave);
+  assert.equal(trial.mirrored, true);
+  assert.equal(trial.realm, 'demon');
+  assert.equal(trial.wave.feint, 0);
+  assert.equal(trial.reward.id, 'trial-inferno');
+  assert.equal(
+    trialPassed(trial, { kills: 51, perfects: 51, bossesSlain: 0, failed: false }),
+    false,
+  );
+  assert.equal(trialPassed(trial, { kills: 52, perfects: 0, bossesSlain: 0, failed: false }), true);
+});
 
 test('All trial objectives require the full encounter, and failure overrides completion', () => {
   for (const trial of TRIALS) {

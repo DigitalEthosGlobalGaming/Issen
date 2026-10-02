@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 async function enterTestTools(page: import('@playwright/test').Page) {
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('#title')).toHaveClass(/on/);
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
   await expect(page.locator('#testBadge')).toBeVisible();
@@ -16,6 +18,7 @@ test('Trials access is editable in the isolated profile and controls the title e
       localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, bossMilestone: 0 }));
   });
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const playerMeta = await page.evaluate(() => localStorage.getItem('issen.meta'));
   await enterTestTools(page);
   const trials = page.getByRole('checkbox', { name: 'Trials unlocked' });
@@ -30,7 +33,7 @@ test('Trials access is editable in the isolated profile and controls the title e
   await page.locator('#admin [data-back]').click();
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
-  await expect(page.locator('[data-trial]')).toHaveCount(10);
+  await expect(page.locator('[data-trial]')).toHaveCount(11);
   await page.locator('#trials [data-back]').click();
   await page.reload();
   await expect(page.locator('#bTrials')).toBeVisible();
@@ -49,6 +52,7 @@ test('Trials access is editable in the isolated profile and controls the title e
 
 test('grouped controls remain reachable and reflect saved values', async ({ page }) => {
   await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await enterTestTools(page);
   for (const title of [
     'Profile',

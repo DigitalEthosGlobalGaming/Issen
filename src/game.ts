@@ -115,6 +115,7 @@ import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
 import { applyFilm } from './rendering/effects/film.ts';
+import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
 import { createEnvironmentRenderer } from './rendering/environment/index.ts';
 import { BASE, createPalette } from './rendering/palette.ts';
@@ -218,6 +219,8 @@ export function startGame(): () => void {
   const g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
+  const demonRealmRenderer = createDemonRealmRenderer(cvs.ownerDocument);
+  lifecycle.add(demonRealmRenderer.dispose);
   const inkCharm = createInkCharmRenderer(cvs.ownerDocument);
   const inkCompanion = createInkCompanionRenderer(cvs.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
@@ -1311,22 +1314,24 @@ export function startGame(): () => void {
     G.boss = null;
     G.event = null;
     G.toSpawn = 0;
-    G.wave = 1;
+    G.wave = trial.enemiesPerWave ? Math.floor(G.kills / trial.enemiesPerWave) + 1 : 1;
     G.cfg = waveCfg(1);
     if (trial.wave) {
+      const pack = trial.enemiesPerWave ?? 5;
+      const total = trial.enemiesPerWave ?? trial.wave.total;
       Object.assign(G.cfg, {
-        pack: 5,
-        refill: true,
+        pack,
+        refill: !trial.enemiesPerWave,
         ordered: true,
-        total: trial.wave.total,
+        total,
         atk: trial.wave.attack,
         gap: 0.25,
         feint: trial.wave.feint,
       });
-      G.toSpawn = trial.wave.total;
+      G.toSpawn = total;
       G.nextOrder = 1;
       G.gapT = 1.5;
-      G.pendingSpawns = initialSpawns(5, false, combatRandom);
+      G.pendingSpawns = initialSpawns(pack, false, combatRandom);
       G.state = 'playing';
     } else {
       G.bossCount = trial.bosses![G.bossesSlain]! - 1;
@@ -1338,8 +1343,11 @@ export function startGame(): () => void {
         renderHp();
       }
     }
-    banner('試練', trial.name);
-    $('waveLbl').textContent = 'Trials';
+    banner(
+      '試練',
+      trial.waveCount ? `${trial.name} · Wave ${G.wave}/${trial.waveCount}` : trial.name,
+    );
+    $('waveLbl').textContent = trial.waveCount ? `Wave ${G.wave}/${trial.waveCount}` : 'Trials';
     renderTrialObjective();
   }
   function renderTrialObjective() {
@@ -1351,7 +1359,7 @@ export function startGame(): () => void {
       trial.duelMaster && G.boss
         ? `Duel Master · ${20 - G.boss.hp}/20 exchanges · No mistakes`
         : trial.wave
-          ? `${trial.name} · ${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · No mistakes`
+          ? `${trial.name} · ${trial.waveCount ? `Wave ${G.wave}/${trial.waveCount} · ` : ''}${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
           : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
   }
   function finishTrial(message?: string) {
@@ -1897,7 +1905,7 @@ export function startGame(): () => void {
       return;
     }
     if (G.state === 'playing') {
-      const outcome = targetSwipe(G.enemies, G.attacker, dir, {
+      const outcome = targetSwipe(G.enemies, G.attacker, activeTrial?.mirrored ? OPP[dir] : dir, {
         ordered: waveConfiguration().ordered,
         centerX: W / 2,
         mirrorAvailable: !!(G.m.kagami && !G.kagamiUsed),
@@ -3585,6 +3593,7 @@ export function startGame(): () => void {
       if (G.nextT <= 0) {
         if (activeTrial) {
           if (trialFailure) finishTrial(trialFailure);
+          else if (activeTrial.waveCount && G.wave < activeTrial.waveCount) startTrialEncounter();
           else if (activeTrial.bosses && G.bossesSlain < activeTrial.bosses.length)
             startTrialEncounter();
           else finishTrial();
@@ -3974,19 +3983,22 @@ export function startGame(): () => void {
       g.scale(zoom, zoom);
       g.translate(-zoomX, -zoomY);
     }
-    const inkEnvironment = environmentRenderer.draw(g, {
-      stageSeed,
-      width: W,
-      height: H,
-      dpr: DPR,
-      time,
-      stage: G.stage,
-      reducedMotion: reducedMotion(),
-      reducedFlashes: reducedFlashes(),
-      lowQuality: density() <= 0.3,
-    });
+    const demonRealm = activeTrial?.realm === 'demon';
+    const inkEnvironment = demonRealm
+      ? demonRealmRenderer.draw(g, W, H, time, reducedMotion())
+      : environmentRenderer.draw(g, {
+          stageSeed,
+          width: W,
+          height: H,
+          dpr: DPR,
+          time,
+          stage: G.stage,
+          reducedMotion: reducedMotion(),
+          reducedFlashes: reducedFlashes(),
+          lowQuality: density() <= 0.3,
+        });
     cvs.dataset.renderer = 'ink';
-    cvs.dataset.rendererBackend = environmentRenderer.backend;
+    cvs.dataset.rendererBackend = demonRealm ? 'demon-realm' : environmentRenderer.backend;
     cvs.dataset.artwork = 'ink';
     if (mistSprite)
       for (const m of mists) {
@@ -3994,9 +4006,9 @@ export function startGame(): () => void {
         g.drawImage(mistSprite, m.x - m.w / 2, m.y - m.h / 2, m.w, m.h);
       }
     g.globalAlpha = 1;
-    blades(mid, time, inkEnvironment && G.stage === 5);
+    if (!demonRealm) blades(mid, time, inkEnvironment && G.stage === 5);
     if (!cinematic.active) drawStains();
-    drawLeaves(false);
+    if (!demonRealm) drawLeaves(false);
     const b = G.boss;
     if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
       const k = b.state === 'flash' ? 1 : clamp(b.t / b.dur);
@@ -4028,7 +4040,7 @@ export function startGame(): () => void {
       drawFx();
       drawFx2();
     }
-    if (inkEnvironment)
+    if (inkEnvironment && !demonRealm)
       environmentRenderer.drawForeground(g, {
         width: W,
         height: H,
@@ -4039,11 +4051,13 @@ export function startGame(): () => void {
         reducedFlashes: reducedFlashes(),
         lowQuality: density() <= 0.3,
       });
-    blades(fg, time, inkEnvironment && G.stage === 5);
+    if (!demonRealm) blades(fg, time, inkEnvironment && G.stage === 5);
     if (!cinematic.active) drawGlyphs();
-    drawSmoke();
-    drawLeaves(true);
-    drawWeather();
+    if (!demonRealm) {
+      drawSmoke();
+      drawLeaves(true);
+      drawWeather();
+    }
     if (!cinematic.active) drawPops();
     g.restore();
     if (!cinematic.active) drawStamps();

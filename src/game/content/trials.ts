@@ -11,11 +11,36 @@ export interface TrialDefinition {
   bosses?: readonly number[];
   cleanOpenings?: boolean;
   duelMaster?: boolean;
+  mirrored?: boolean;
+  waveCount?: number;
+  enemiesPerWave?: number;
+  realm?: 'demon';
   reward: Pick<Item, 'id' | 'type' | 'k' | 'n' | 'f'> & Partial<Pick<Item, 'm' | 'pk' | 'tr'>>;
 }
 
 /** Fixed encounters, independent of the player's purchases and ordinary setup. */
 export const TRIALS: readonly TrialDefinition[] = [
+  {
+    id: 'demon-mirror',
+    name: 'Demon Mirror',
+    seed: 131304,
+    arrows: true,
+    mirrored: true,
+    realm: 'demon',
+    waveCount: 13,
+    enemiesPerWave: 4,
+    objective: '13 waves of 4 mirrored foes. No mistakes.',
+    description:
+      'Survive the demon realm. Every arrow and blade points opposite to your required cut.',
+    wave: { total: 52, attack: 1.45, feint: 0, perfects: 0 },
+    reward: {
+      id: 'trial-inferno',
+      type: 'film',
+      k: '炎',
+      n: 'Inferno',
+      f: 'Burning amber light, rising flames and embers engulf the world.',
+    },
+  },
   {
     id: 'quiet-blade',
     name: 'Quiet Blade',

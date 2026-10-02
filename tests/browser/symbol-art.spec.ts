@@ -50,24 +50,26 @@ test('Temple and Trials show isolated atlas emblems in portrait and landscape', 
     await page.locator('#bTrials').click();
     await expect(page.locator('#trials')).toHaveCSS('opacity', '1');
     const trials = page.locator('.trial-card .symbol-art');
-    await expect(trials).toHaveCount(10);
+    await expect(trials).toHaveCount(11);
     expect(
       await trials.evaluateAll(
         (nodes) =>
           new Set(nodes.map((node) => (node as HTMLElement).style.backgroundPosition)).size,
       ),
-    ).toBe(10);
+    ).toBe(11);
     const fits = await page
       .locator('.trial-card')
       .evaluateAll((nodes) => nodes.every((node) => node.scrollWidth <= node.clientWidth + 1));
     expect(fits).toBe(true);
-    const atlasDimensions = await trials.first().evaluate(async (node) => {
-      const url = getComputedStyle(node).backgroundImage.slice(5, -2);
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      return { width: img.naturalWidth, height: img.naturalHeight };
-    });
+    const atlasDimensions = await page
+      .locator('[data-symbol="trial:quiet-blade"]')
+      .evaluate(async (node) => {
+        const url = getComputedStyle(node).backgroundImage.slice(5, -2);
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        return { width: img.naturalWidth, height: img.naturalHeight };
+      });
     expect(atlasDimensions.width / atlasDimensions.height).toBeCloseTo(4 / 3, 2);
     await page.screenshot({ path: info.outputPath(`trial-symbols-${viewport.width}.png`) });
     await page.locator('#trials [data-back]').click();
