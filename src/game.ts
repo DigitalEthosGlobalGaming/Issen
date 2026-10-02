@@ -3106,7 +3106,6 @@ export function startGame(): () => void {
     canOpen: () => G.state === 'title' && !G.panel,
     stage: () => G.stage,
     scenes: [...STAGES.map((stage) => stage.n), 'Demon'],
-    reducedMotion,
     bindings: () => settings.bindings,
     film: () => EQ.film,
     films: () =>

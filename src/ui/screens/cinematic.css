@@ -14,29 +14,6 @@
 #cinematic[hidden] {
   display: none;
 }
-.cinematic-wipe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    98% 9%,
-    100% 20%,
-    97% 36%,
-    99% 49%,
-    97% 63%,
-    100% 76%,
-    98% 90%,
-    100% 100%,
-    0 100%
-  );
-}
-.cinematic-wipe[hidden] {
-  display: none;
-}
 #cinematic > button,
 .cinematic-toolbar {
   z-index: 1;

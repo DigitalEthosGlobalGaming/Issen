@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Demon cinematic scene has varied scenery and directional swipe transitions', async ({
+test('Demon cinematic scene has varied scenery and immediate scene changes', async ({
   page,
 }, info) => {
   await page.goto('/');
@@ -10,8 +10,7 @@ test('Demon cinematic scene has varied scenery and directional swipe transitions
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '9');
   await expect(page.locator('#cinematic [role="status"]')).toContainText('Demon');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'demon-realm');
-  expect(await page.locator('.cinematic-wipe').evaluate((el) => el.getAnimations().length)).toBe(1);
-  await expect(page.locator('.cinematic-wipe')).toBeHidden();
+  await expect(page.locator('.cinematic-wipe')).toHaveCount(0);
   for (const [name, viewport] of [
     ['portrait', { width: 390, height: 844 }],
     ['landscape', { width: 844, height: 390 }],
@@ -58,5 +57,5 @@ test('reduced motion changes cinematic scenes immediately without the swipe over
   await page.locator('#title .t-k').click({ clickCount: 3 });
   await page.getByRole('button', { name: 'Next scene', exact: true }).click();
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '1');
-  await expect(page.locator('.cinematic-wipe')).toBeHidden();
+  await expect(page.locator('.cinematic-wipe')).toHaveCount(0);
 });

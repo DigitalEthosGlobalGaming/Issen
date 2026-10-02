@@ -1,5 +1,35 @@
 import { expect, test } from '@playwright/test';
 
+test('Temple keeps catalog order within unfinished and completed upgrades after a final donation', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'issen.meta',
+      JSON.stringify({
+        schemaVersion: 4,
+        tutorial: 'skipped',
+        embers: 1000,
+        upgrades: { precision: 2, discernment: 1, vitality: 3 },
+      }),
+    ),
+  );
+  await page.goto('/');
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await page.locator('#bTemplate').click();
+  const order = () =>
+    page
+      .locator('.upgrade-tile')
+      .evaluateAll((tiles) => tiles.map((tile) => (tile as HTMLElement).dataset.upgrade));
+  const remaining = ['focus', 'offerings', 'awakening', 'knife', 'composure', 'recovery'];
+  expect(await order()).toEqual(['precision', ...remaining, 'discernment', 'vitality']);
+  await page.locator('[data-upgrade="precision"]').click();
+  await page.getByRole('button', { name: 'Donate 400 Embers', exact: true }).click();
+  expect(await order()).toEqual([...remaining, 'precision', 'discernment', 'vitality']);
+  await expect(page.locator('[data-upgrade="precision"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-upgrade="precision"]')).toHaveAttribute('data-state', 'max');
+});
+
 test('Temple identifies affordable donations and refreshes the title after purchase', async ({
   page,
 }) => {

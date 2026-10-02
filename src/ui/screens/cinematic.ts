@@ -8,7 +8,6 @@ interface CinematicActions {
   bindings(): Bindings;
   film(): string;
   films(): { id: string; n: string }[];
-  reducedMotion?(): boolean;
   enter(stage: number): void;
   scene(stage: number): void;
   leave(): void;
@@ -35,16 +34,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   const label = root.querySelector('[role="status"]')!;
   const help = root.querySelector('small')!;
   const film = root.querySelector<HTMLSelectElement>('[aria-label="Preview film"]')!;
-  const wipe = doc.createElement('canvas');
-  wipe.className = 'cinematic-wipe';
-  wipe.hidden = true;
-  root.prepend(wipe);
-  let animation: Animation | null = null;
-  function clearWipe() {
-    animation?.cancel();
-    animation = null;
-    wipe.hidden = true;
-  }
   function refreshFilms() {
     film.replaceChildren();
     for (const item of actions.films()) {
@@ -106,7 +95,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   }
   function close() {
     if (!active) return;
-    clearWipe();
     active = false;
     actions.leave();
     root.hidden = true;
@@ -116,21 +104,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   }
   function move(delta: number) {
     if (!active) return;
-    clearWipe();
-    const source = app.querySelector<HTMLCanvasElement>('#c');
-    const motion =
-      actions.reducedMotion?.() ?? win.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (source && !motion) {
-      wipe.width = source.width;
-      wipe.height = source.height;
-      wipe.getContext('2d')?.drawImage(source, 0, 0);
-      wipe.hidden = false;
-      animation = wipe.animate(
-        [{ transform: 'translateX(0)' }, { transform: `translateX(${delta > 0 ? -110 : 110}%)` }],
-        { duration: 650, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' },
-      );
-      animation.onfinish = clearWipe;
-    }
     scene = (scene + delta + actions.scenes.length) % actions.scenes.length;
     actions.scene(scene);
     refresh();
@@ -228,7 +201,6 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
       else if (direction === 'right') move(-1);
     },
     dispose() {
-      clearWipe();
       events.abort();
       root.remove();
       app.classList.remove('cinematic-active');

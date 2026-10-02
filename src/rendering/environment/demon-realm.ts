@@ -1,13 +1,20 @@
+import { drawAtlasSprite } from './scene-kit.ts';
+
 const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
 const terrainUrl = new URL('./assets/demon-terrain-atlas.png', import.meta.url).href;
+const mountainUrl = new URL('./assets/mountain-atlas.png', import.meta.url).href;
 
 /** Independently placed atlas props over a procedural sky; no flattened backdrop. */
 export function createDemonRealmRenderer(doc: Document) {
   const landmarks = doc.createElement('img'),
-    terrain = doc.createElement('img');
-  landmarks.decoding = terrain.decoding = 'async';
+    terrain = doc.createElement('img'),
+    mountains = doc.createElement('img');
+  landmarks.decoding = terrain.decoding = mountains.decoding = 'async';
   landmarks.src = landmarkUrl;
   terrain.src = terrainUrl;
+  mountains.src = mountainUrl;
+  const mountainLayer = doc.createElement('canvas');
+  let mountainKey = '';
   let disposed = false;
   function stamp(
     g: CanvasRenderingContext2D,
@@ -17,6 +24,7 @@ export function createDemonRealmRenderer(doc: Document) {
     base: number,
     width: number,
     alpha = 1,
+    distant = false,
   ) {
     if (!image.complete || !image.naturalWidth) return;
     const terrainFrames = [
@@ -40,7 +48,13 @@ export function createDemonRealmRenderer(doc: Document) {
     const height = (width * sh) / sw;
     g.save();
     g.globalAlpha = alpha;
-    g.drawImage(image, sx!, sy!, sw, sh, x - width / 2, base - height * anchor, width, height);
+    g.translate(x, base);
+    if (distant) {
+      // Static atmospheric haze and a small skew keep the far silhouette behind the figures.
+      g.filter = 'grayscale(.8) blur(.8px)';
+      g.transform(1, 0, 0.018, 0.98, 0, 0);
+    }
+    g.drawImage(image, sx!, sy!, sw, sh, -width / 2, -height * anchor, width, height);
     g.restore();
   }
   return {
@@ -75,6 +89,37 @@ export function createDemonRealmRenderer(doc: Document) {
       g.beginPath();
       g.arc(moonX, moonY, radius, 0, Math.PI * 2);
       g.fill();
+      if (mountains.complete && mountains.naturalWidth) {
+        const key = `${width}:${height}:${seed}`;
+        if (mountainKey !== key) {
+          mountainLayer.width = Math.ceil(width);
+          mountainLayer.height = Math.ceil(height);
+          const far = mountainLayer.getContext('2d');
+          if (far) {
+            const span = Math.max(width * 0.62, height * 0.8);
+            const count = Math.ceil(width / (span * 0.7)) + 2;
+            for (let i = 0; i < count; i++)
+              drawAtlasSprite(
+                far,
+                mountains,
+                (i + Math.floor(variation(6) * 4)) % 4,
+                (i - 0.5) * span * 0.7,
+                height * (0.59 + variation(i + 20) * 0.025),
+                span,
+                { flip: i % 2 === 0, fadeFrom: 0.65 },
+              );
+            far.globalCompositeOperation = 'source-atop';
+            far.globalAlpha = 0.82;
+            far.fillStyle = '#584052';
+            far.fillRect(0, 0, width, height);
+            mountainKey = key;
+          }
+        }
+        g.save();
+        g.globalAlpha = 0.6;
+        g.drawImage(mountainLayer, 0, 0, width, height);
+        g.restore();
+      }
       stamp(
         g,
         landmarks,
@@ -82,7 +127,8 @@ export function createDemonRealmRenderer(doc: Document) {
         width * (0.32 + variation(1) * 0.26),
         height * 0.65,
         Math.min(Math.max(width * 1.15, height * 0.67), height * 0.78),
-        0.8,
+        0.3,
+        true,
       );
       stamp(
         g,
@@ -162,13 +208,17 @@ export function createDemonRealmRenderer(doc: Document) {
         landmarks.complete &&
         landmarks.naturalWidth > 0 &&
         terrain.complete &&
-        terrain.naturalWidth > 0
+        terrain.naturalWidth > 0 &&
+        mountains.complete &&
+        mountains.naturalWidth > 0
       );
     },
     dispose() {
       disposed = true;
       landmarks.removeAttribute('src');
       terrain.removeAttribute('src');
+      mountains.removeAttribute('src');
+      mountainLayer.width = mountainLayer.height = 0;
     },
   };
 }

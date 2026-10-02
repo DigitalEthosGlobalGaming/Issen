@@ -28,7 +28,10 @@ export function renderTemplate(
   details.className = 'template-details';
   layout.append(grid, details);
   root.append(layout);
-  for (const upgrade of TEMPLATE_UPGRADES) {
+  const upgrades = [...TEMPLATE_UPGRADES].sort(
+    (a, b) => Number(meta.upgrades[a.id] >= a.maxRank) - Number(meta.upgrades[b.id] >= b.maxRank),
+  );
+  for (const upgrade of upgrades) {
     const rank = meta.upgrades[upgrade.id];
     const cost = upgrade.costs[rank];
     const premiumLocked = !!upgrade.premium && !premiumAccess;
