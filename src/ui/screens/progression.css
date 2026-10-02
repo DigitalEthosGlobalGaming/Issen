@@ -99,10 +99,10 @@
   border-style: dashed;
 }
 .upgrade-tile[data-state='max'] {
-  color: #a9d3bc;
-  border-color: #79ac91;
-  background: #274a3c80;
-  box-shadow: inset 0 -3px #79ac91;
+  color: #d29c83;
+  border-color: #984b3b;
+  background: #48291f80;
+  box-shadow: inset 0 -3px #984b3b;
 }
 .upgrade-tile .symbol-art,
 .template-detail .symbol-art {

@@ -667,7 +667,8 @@ export function startGame(): () => void {
     buildWeather();
   }
   const snowGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
-  function blades(list: GrassBlade[], t: number, snowTips = false) {
+  const demonGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
+  function blades(list: GrassBlade[], t: number, snowTips = false, demonic = false) {
     let visible = list;
     if (snowTips) {
       let cached = snowGrass.get(list);
@@ -683,7 +684,28 @@ export function startGame(): () => void {
       }
       visible = cached;
     }
-    ambient().blades(g, visible, t, wind);
+    if (demonic) {
+      let cached = demonGrass.get(list);
+      if (!cached) {
+        const foreground = list === fg;
+        cached = list
+          .filter((_, index) => !foreground || index % 2 === 0)
+          .map((blade, index) => ({
+            ...blade,
+            h: blade.h * (foreground ? 0.28 : 0.65),
+            w: blade.w * 0.7,
+            col: index % 5 === 0 ? 'rgba(164,145,122,.65)' : 'rgba(86,71,64,.8)',
+          }));
+        demonGrass.set(list, cached);
+      }
+      visible = cached;
+    }
+    ambient().blades(
+      g,
+      visible,
+      demonic && reducedMotion() ? 0 : t,
+      demonic && reducedMotion() ? 1 : wind,
+    );
   }
   function drawLeaves(front: boolean) {
     ambient().drawLeaves(g, leaves, front);
@@ -4018,7 +4040,7 @@ export function startGame(): () => void {
         g.drawImage(mistSprite, m.x - m.w / 2, m.y - m.h / 2, m.w, m.h);
       }
     g.globalAlpha = 1;
-    if (!demonRealm) blades(mid, time, inkEnvironment && G.stage === 5);
+    blades(mid, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
     if (!cinematic.active) drawStains();
     if (!demonRealm) drawLeaves(false);
     const b = G.boss;
@@ -4063,7 +4085,7 @@ export function startGame(): () => void {
         reducedFlashes: reducedFlashes(),
         lowQuality: density() <= 0.3,
       });
-    if (!demonRealm) blades(fg, time, inkEnvironment && G.stage === 5);
+    blades(fg, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
     if (!cinematic.active) drawGlyphs();
     if (!demonRealm) {
       drawSmoke();

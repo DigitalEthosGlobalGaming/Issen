@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Demon cinematic scene has a varied ground plane and directional swipe transitions', async ({
+test('Demon cinematic scene has varied scenery and directional swipe transitions', async ({
   page,
 }, info) => {
   await page.goto('/');

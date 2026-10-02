@@ -1,7 +1,7 @@
 const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
 const terrainUrl = new URL('./assets/demon-terrain-atlas.png', import.meta.url).href;
 
-/** Independently placed atlas props over a procedural sky/floor; no flattened backdrop. */
+/** Independently placed atlas props over a procedural sky; no flattened backdrop. */
 export function createDemonRealmRenderer(doc: Document) {
   const landmarks = doc.createElement('img'),
     terrain = doc.createElement('img');
@@ -101,50 +101,6 @@ export function createDemonRealmRenderer(doc: Document) {
         height * 0.75,
         Math.min(Math.max(width * 0.36, height * 0.33), height * 0.55),
       );
-      const floor = g.createLinearGradient(0, height * 0.53, 0, height);
-      floor.addColorStop(0, 'rgba(54,43,58,0)');
-      floor.addColorStop(0.13, '#554955');
-      floor.addColorStop(0.48, '#49404a');
-      floor.addColorStop(1, '#302731');
-      g.fillStyle = floor;
-      g.fillRect(0, height * 0.53, width, height * 0.47);
-      // Broad fractured plates recede toward the horizon, with visible seams between them.
-      for (let row = 0; row < 5; row++) {
-        const near = height * (0.59 + ((row + 1) / 5) ** 1.7 * 0.43);
-        const far = height * (0.59 + (row / 5) ** 1.7 * 0.43);
-        for (let col = -1; col < 6; col++) {
-          const x = ((col + variation(row * 7 + col + 180) * 0.2) / 5) * width;
-          const w = width / 5;
-          const taper = (near - far) * 0.22;
-          g.fillStyle = `rgba(${col % 2 ? '111,92,106' : '36,26,42'},.24)`;
-          g.strokeStyle = 'rgba(16,9,22,.3)';
-          g.lineWidth = Math.max(0.7, (row + 1) * 0.35);
-          g.beginPath();
-          g.moveTo(x + taper, far);
-          g.lineTo(x + w - taper, far + (near - far) * 0.08);
-          g.lineTo(x + w, near);
-          g.lineTo(x, near - (near - far) * 0.06);
-          g.closePath();
-          g.fill();
-          g.stroke();
-        }
-      }
-      // Flat ash beds and low perspective slabs make the combat surface continuous.
-      for (let i = 0; i < 65; i++) {
-        const depth = variation(i + 10);
-        const y = height * (0.59 + depth * 0.4);
-        const x = variation(i + 90) * width;
-        const w = width * (0.012 + depth * 0.07);
-        const h = height * (0.002 + depth * 0.013);
-        g.fillStyle = i % 3 ? 'rgba(126,113,125,.15)' : 'rgba(13,10,18,.24)';
-        g.beginPath();
-        g.moveTo(x - w, y);
-        g.lineTo(x + w * 0.7, y - h);
-        g.lineTo(x + w, y + h * 0.4);
-        g.lineTo(x - w * 0.6, y + h);
-        g.closePath();
-        g.fill();
-      }
       stamp(
         g,
         terrain,
