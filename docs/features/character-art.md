@@ -253,3 +253,7 @@ centered on the existing waist anchors. The monk silhouette therefore stays
 slimmer without shifting the sleeve joints. Desktop/tablet galleries cover
 guard, left, right, up, down and an extended forward grip. A six-enemy working
 set produces no additional pixel recoloring after warmup across pose/fog changes.
+
+## Armoury room (1.37.0)
+
+The [empty private room](../../src/ui/assets/armoury-room.md) is cover-cropped behind the live equipment-preview model. `src/rendering/armory-preview.ts` owns its image lifecycle independently of combat and uses a full standing figure so gear changes remain visible. Armoury tabs keep the same weight when selected.

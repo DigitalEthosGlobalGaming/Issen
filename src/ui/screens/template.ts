@@ -6,6 +6,19 @@ import {
 } from '../../game/progression/meta.ts';
 import { createSymbolArt } from '../symbol-art.ts';
 
+export function templeStatus(meta: MetaProgress, premiumAccess: boolean) {
+  const available = TEMPLATE_UPGRADES.filter((u) => !u.premium || premiumAccess);
+  return {
+    complete: available.every((u) => meta.upgrades[u.id] >= u.maxRank),
+    affordable: available.filter((u) => {
+      const cost = u.costs[meta.upgrades[u.id]];
+      return (
+        cost !== undefined && meta.embers >= cost && (!u.requires || meta.upgrades[u.requires] > 0)
+      );
+    }).length,
+  };
+}
+
 export function renderTemplate(
   root: HTMLElement,
   meta: MetaProgress,
@@ -16,7 +29,14 @@ export function renderTemplate(
   const balance = document.createElement('p');
   balance.textContent = `${meta.embers} Embers`;
   const note = document.createElement('p');
-  note.textContent = 'Offer Embers for lasting strength.';
+  const status = templeStatus(meta, premiumAccess);
+  note.className = 'temple-status';
+  note.setAttribute('role', 'status');
+  note.textContent = status.complete
+    ? 'All available upgrades fully donated.'
+    : status.affordable
+      ? `${status.affordable} ${status.affordable === 1 ? 'upgrade' : 'upgrades'} ready to donate.`
+      : 'Save more Embers for your next upgrade.';
   root.append(balance, note);
   const selected =
     TEMPLATE_UPGRADES.find((u) => u.id === root.dataset.selectedUpgrade)?.id ?? 'vitality';
@@ -48,8 +68,12 @@ export function renderTemplate(
     state.textContent = premiumLocked
       ? 'Requires Premium'
       : cost === undefined
-        ? 'Max'
-        : String(cost);
+        ? 'Fully donated ✓'
+        : blocked
+          ? 'Requires Throwing Knife'
+          : meta.embers >= cost
+            ? `Ready · ${cost} Embers`
+            : `${cost} Embers`;
     tile.dataset.state = blocked
       ? 'locked'
       : cost === undefined

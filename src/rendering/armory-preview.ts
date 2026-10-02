@@ -14,6 +14,7 @@ import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
+import roomUrl from '../ui/assets/armoury-room.png';
 
 export interface PreviewFrame extends Omit<FigureEnvironment, 'width' | 'height' | 'random'> {
   background: HTMLCanvasElement | null;
@@ -36,6 +37,9 @@ export interface PreviewServices {
 export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  const room = canvas.ownerDocument.createElement('img');
+  room.decoding = 'async';
+  room.src = roomUrl;
   const inkCharm = createInkCharmRenderer(canvas.ownerDocument);
   const inkCompanion = createInkCompanionRenderer(canvas.ownerDocument);
   const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
@@ -87,12 +91,11 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       height = canvas.height;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, width, height);
-    const bg = frame.background;
-    if (bg) {
-      const zoom = Math.max(width / bg.width, height / bg.height) * 1.5;
-      const dw = bg.width * zoom,
-        dh = bg.height * zoom;
-      g.drawImage(bg, (width - dw) * 0.55, (height - dh) * 0.62, dw, dh);
+    if (room.complete && room.naturalWidth) {
+      const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
+      const dw = room.naturalWidth * zoom,
+        dh = room.naturalHeight * zoom;
+      g.drawImage(room, (width - dw) / 2, (height - dh) / 2, dw, dh);
     }
     const gradient = g.createLinearGradient(0, 0, 0, height);
     gradient.addColorStop(0, 'rgba(10,10,9,.1)');
@@ -150,12 +153,12 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     figures.drawFigure({
       ...frame.appearance,
       x: width * 0.42,
-      y: height * 1.28,
-      h: height * 1.2,
+      y: height * 0.94,
+      h: height * 0.82,
       back: true,
       fog: 0,
       pose: { gx: 0.19, gy: -0.52, ang: 0.55 },
-      noShadow: true,
+      noShadow: false,
     });
     if (frame.pet === 'shiba') figures.drawPetAt('shiba', width * 0.86, height - 4, height * 0.22);
     else if (frame.pet === 'cat') figures.drawPetAt('cat', width * 0.88, height - 4, height * 0.2);
@@ -189,6 +192,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     demo,
     draw,
     dispose() {
+      room.removeAttribute('src');
       inkCharm.dispose();
       inkCompanion.dispose();
       inkEnemy.dispose();

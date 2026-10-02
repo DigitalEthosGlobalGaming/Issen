@@ -42,3 +42,5 @@ together. Inspect the sheet, alpha boundaries, representative cells at menu
 scale, and portrait/landscape screens before accepting a new batch.
 
 Demon Mirror is the eleventh Trial and uses the dedicated calligraphic [horned mirror emblem](../../src/ui/assets/demon-mirror-symbol.png), alongside the original ten-emblem Trial atlas.
+
+Temple cards show **Ready** with the Ember price when affordable and **Fully donated** at maximum rank. The title button shows the available donation count or **Complete** for all upgrades available in the current edition. `templeStatus` in `src/ui/screens/template.ts` derives that presentation from the owning upgrade catalog.

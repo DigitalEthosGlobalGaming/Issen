@@ -124,7 +124,7 @@ import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 import { bindPointer } from './input/pointer.ts';
 import { bindKeyboard } from './input/keyboard.ts';
 import { createSetupScreen } from './ui/screens/setup.ts';
-import { renderTemplate } from './ui/screens/template.ts';
+import { renderTemplate, templeStatus } from './ui/screens/template.ts';
 import { renderAdmin } from './ui/screens/admin.ts';
 import { createTutorial } from './ui/screens/tutorial.ts';
 import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
@@ -2671,6 +2671,17 @@ export function startGame(): () => void {
     updateSavedRunButtons();
   }
   function setBestLine() {
+    const temple = templeStatus(META, premiumAccess());
+    $('bTemplate').textContent = temple.complete
+      ? 'Temple · Complete'
+      : temple.affordable
+        ? `Temple · ${temple.affordable} ready`
+        : 'Temple';
+    $('bTemplate').dataset.state = temple.complete
+      ? 'max'
+      : temple.affordable
+        ? 'affordable'
+        : 'unaffordable';
     $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
     $('tBest').textContent =
       (ST.bestScore ? `Best ${ST.bestScore.toLocaleString()}` : '') +
@@ -2972,6 +2983,7 @@ export function startGame(): () => void {
   }
   function closePanel() {
     G.panel = null;
+    if (G.panelFrom === 'title') setBestLine();
     showScreen(G.panelFrom);
   }
   function applySettings() {
