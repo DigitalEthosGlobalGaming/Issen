@@ -1,0 +1,97 @@
+{
+  "width": 768,
+  "height": 128,
+  "columns": 3,
+  "rows": 1,
+  "cellWidth": 256,
+  "cellHeight": 128,
+  "frames": {
+    "normal": {
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 128,
+      "pivot": [
+        128,
+        64
+      ],
+      "slice": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "image": "awakening-button-normal.png",
+      "alphaBounds": [
+        6,
+        7,
+        248,
+        120
+      ]
+    },
+    "awakened": {
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 128,
+      "pivot": [
+        128,
+        64
+      ],
+      "slice": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "image": "awakening-button-awakened.png",
+      "alphaBounds": [
+        6,
+        7,
+        248,
+        120
+      ]
+    },
+    "third": {
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 128,
+      "pivot": [
+        128,
+        64
+      ],
+      "slice": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "image": "awakening-button-third.png",
+      "alphaBounds": [
+        6,
+        7,
+        248,
+        120
+      ]
+    }
+  },
+  "origin": "top-left",
+  "pivotUnits": "frame-local pixels",
+  "alphaBoundsUnits": "frame-local pixels; inclusive; alpha > 0",
+  "sliceUnits": "source pixels, top right bottom left",
+  "transforms": {
+    "mirror": false,
+    "rotate": false
+  },
+  "rendering": {
+    "blend": "normal alpha",
+    "borderImageSlice": "32 fill",
+    "borderImageRepeat": "stretch",
+    "suggestedBorderWidth": [
+      8,
+      12
+    ]
+  },
+  "source": "scripts/generate-awakening-buttons.mjs"
+}
