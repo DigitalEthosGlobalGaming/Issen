@@ -7,13 +7,15 @@ figure. This effect uses the existing sprite atlases and sword renderer.
 
 `rendering/figures/figure.ts` draws the separate pieces on its explicit target
 canvas. `ink-enemy.ts` exposes the finer puppet parts; `death.ts` supplies stateless
-ballistic transforms derived from figure seed and elapsed death time. No gameplay
+ballistic transforms derived from figure seed and elapsed death time. Each fragment
+has a random launch angle, speed and spin that remain stable throughout its flight. No gameplay
 randomness, extra image assets or per-frame offscreen captures are involved.
 The ground shadow stays at the original contact position and follows the existing
 raw-time fade. Pieces disappear after 1.1 simulation seconds. Reduced motion uses
 the existing restrained whole-figure death pose. Bonk retains its blunt reactions.
 
-The Armoury preview owns its own dummy, clock and effects. The effect's particle
+The Armoury preview owns its own dummy, clock and effects, and reseeds its dummy
+for each scattered-armour demonstration so repeated previews vary. The effect's particle
 spawner does not add generic debris over the actual flying pieces.
 
 Verification: `tests/unit/death-presentation.test.mjs` checks motion, expiry and

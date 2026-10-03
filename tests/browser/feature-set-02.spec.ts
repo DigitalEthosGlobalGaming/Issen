@@ -13,7 +13,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   const balance = () => page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers);
-  await expect(page.locator('.upgrade-tile')).toHaveCount(9);
+  await expect(page.locator('.upgrade-tile')).toHaveCount(10);
   await expect(page.locator('[data-upgrade="pouch"]')).toHaveCount(0);
   for (const id of ['focus', 'recovery', 'knife'])
     await page.locator(`[data-upgrade="${id}"]`).click();

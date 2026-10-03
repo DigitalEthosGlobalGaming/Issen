@@ -34,7 +34,7 @@ type HudState = Pick<
   | 'runWards'
   | 'blessingTriggers'
 > &
-  Partial<Pick<RunState, 'knives' | 'maxKnives' | 'upgradesEnabled'>>;
+  Partial<Pick<RunState, 'tanto' | 'knives' | 'maxKnives' | 'upgradesEnabled'>>;
 
 export function createHud(root: HTMLElement) {
   const doc = root.ownerDocument;
@@ -87,6 +87,7 @@ export function createHud(root: HTMLElement) {
     if (run.blade) badge('刃', 'badge');
     if (run.zen) badge('無限', 'badge');
     if ((run.maxKnives ?? run.knives ?? 0) > 0) badge(`Knife ×${run.knives ?? 0}`, 'badge knives');
+    if ((run.tanto ?? 0) > 0) badge(`Tanto ×${run.tanto}`, 'badge tanto');
     if (runLabel) badge(runLabel, 'badge');
     else if (run.upgradesEnabled === false) badge('Upgrades off', 'badge');
     for (const id of run.bless) {

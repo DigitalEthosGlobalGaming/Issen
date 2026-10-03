@@ -60,3 +60,5 @@ system borders. Switching back or restoring Display defaults clears pending roll
 [Player presentation skill](../../.agents/skills/player-presentation/SKILL.md)
 keeps feature copy concise and prefers existing visual states to redundant labels.
 Runtime ownership remains in gameplay modules and explicit-canvas renderers.
+
+Version 1.42.0 reduces the Armoury player scale, preview height, scroll-top padding and equipment tile spacing.

@@ -1,5 +1,5 @@
 import { clamp, easeOut, easeInOut } from '../../shared/math.ts';
-import type { Random } from '../../shared/random.ts';
+import { rng, type Random } from '../../shared/random.ts';
 import type { Figure } from './types.ts';
 export const DEATH_STYLES = {
   split: { duration: 0.9 },
@@ -90,14 +90,21 @@ export function applyDeathPose(
 /** Stateless ballistic motion in figure units. It never consumes a gameplay RNG. */
 export function scatteredPartMotion(index: number, elapsed: number, angle: number, seed: number) {
   const t = Math.max(0, elapsed);
-  const phase = Math.sin(seed * 3.17 + index * 17.13);
-  const spread = index % 2 ? 1 : -1;
-  const vx = Math.cos(angle) * 0.26 + spread * (0.24 + Math.abs(phase) * 0.35);
-  const vy = Math.sin(angle) * 0.18 - 0.35 - Math.abs(Math.cos(index * 11.7 + seed)) * 0.28;
+  const random = rng(
+    (Math.imul(seed | 0, 1664525) ^
+      Math.imul(index + 1, 1013904223) ^
+      Math.round(angle * 100003)) >>>
+      0,
+  );
+  const launch = random() * Math.PI * 2;
+  const speed = 0.38 + random() * 0.65;
+  const vx = Math.cos(launch) * speed;
+  const vy = Math.sin(launch) * speed - 0.12;
+  const spin = (random() < 0.5 ? -1 : 1) * (1.6 + random() * 2.4);
   return {
     x: vx * t,
     y: vy * t + 0.72 * t * t,
-    rotation: spread * (1.6 + Math.abs(phase) * 2.4) * t,
+    rotation: spin * t,
     alpha: 1 - clamp((t - 0.45) / (deathDuration('scatter') - 0.45)),
   };
 }

@@ -134,6 +134,8 @@ function effectText(id: UpgradeId, rank: number): string {
       return rank
         ? `${rank} throwing ${rank === 1 ? 'knife' : 'knives'} · refill every duel`
         : 'No throwing knives';
+    case 'tanto':
+      return `${rank} automatic defensive ${rank === 1 ? 'strike' : 'strikes'} per run`;
     case 'composure':
       return rank
         ? `${rank} combo ${rank === 1 ? 'break' : 'breaks'} forgiven per run`

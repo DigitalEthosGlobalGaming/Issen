@@ -22,13 +22,19 @@ test('Temple and Trials show isolated atlas emblems in portrait and landscape', 
     await page.locator('#bTemplate').click();
     await expect(page.locator('#template')).toHaveCSS('opacity', '1');
     const upgrades = page.locator('.upgrade-tile .symbol-art');
-    await expect(upgrades).toHaveCount(9);
+    await expect(upgrades).toHaveCount(10);
     expect(
       await upgrades.evaluateAll(
         (nodes) =>
-          new Set(nodes.map((node) => (node as HTMLElement).style.backgroundPosition)).size,
+          new Set(
+            nodes.map(
+              (node) =>
+                (node as HTMLElement).style.backgroundImage +
+                (node as HTMLElement).style.backgroundPosition,
+            ),
+          ).size,
       ),
-    ).toBe(9);
+    ).toBe(10);
     for (const tile of await page.locator('.upgrade-tile').all()) {
       const id = await tile.getAttribute('data-upgrade');
       await tile.click();

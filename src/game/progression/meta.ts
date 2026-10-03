@@ -5,6 +5,7 @@ export type UpgradeId =
   | 'focus'
   | 'offerings'
   | 'awakening'
+  | 'tanto'
   | 'knife'
   | 'composure'
   | 'recovery'
@@ -15,6 +16,7 @@ export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze
   focus: 0,
   offerings: 0,
   awakening: 0,
+  tanto: 0,
   knife: 0,
   composure: 0,
   recovery: 0,
@@ -102,6 +104,13 @@ export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
     description:
       'Carry 1 throwing knife per rank; refill at the start of every duel. Tap during a wave to defeat an ordinary enemy; knives cannot target bosses or standoffs.',
     costs: [125, 150, 250],
+    maxRank: 3,
+  },
+  {
+    id: 'tanto',
+    name: 'Tanto',
+    description: '+1 automatic defensive strike per rank, per run.',
+    costs: [175, 300, 450],
     maxRank: 3,
   },
   {
@@ -202,6 +211,7 @@ export function parseMeta(
           : integer(ranks.knife, 1)
             ? 1 + integer(ranks.pouch, 2)
             : 0,
+      tanto: integer(ranks.tanto, 3),
       composure: integer(ranks.composure, 2),
       recovery: integer(ranks.recovery, 2),
       precision: integer(ranks.precision, 3),
@@ -244,10 +254,17 @@ export function templatePowers(
   meta: MetaProgress,
   setup: Setup,
   premiumAccess = false,
-): { knives: number; composure: number; recoveryEvery: number; shrineRerolls: number } {
+): {
+  tanto: number;
+  knives: number;
+  composure: number;
+  recoveryEvery: number;
+  shrineRerolls: number;
+} {
   const ranks = templateEligible(setup) ? parseMeta(meta).upgrades : EMPTY_UPGRADES;
   return {
     shrineRerolls: premiumAccess ? ranks.discernment : 0,
+    tanto: ranks.tanto,
     knives: ranks.knife,
     composure: ranks.composure,
     recoveryEvery: ranks.recovery === 2 ? 3 : ranks.recovery === 1 ? 6 : 0,

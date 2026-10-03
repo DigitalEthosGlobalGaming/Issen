@@ -116,9 +116,9 @@ test('awakening purchases split weapons and outfits and preserve old combined ac
   );
 });
 
-test('nine upgrade catalog includes unified knives and enforces maximum ranks', () => {
+test('ten upgrade catalog includes unified knives and enforces maximum ranks', () => {
   const meta = parseMeta({ embers: 10000 });
-  assert.equal(TEMPLATE_UPGRADES.length, 9);
+  assert.equal(TEMPLATE_UPGRADES.length, 10);
   assert.equal(purchaseUpgrade(meta, 'pouch'), false);
   assert.equal(meta.embers, 10000);
   for (const upgrade of TEMPLATE_UPGRADES) {
@@ -130,6 +130,7 @@ test('nine upgrade catalog includes unified knives and enforces maximum ranks', 
     assert.equal(purchaseUpgrade(meta, upgrade.id), false);
   }
   assert.deepEqual(templatePowers(meta, normal), {
+    tanto: 3,
     knives: 3,
     composure: 2,
     recoveryEvery: 3,
@@ -137,6 +138,7 @@ test('nine upgrade catalog includes unified knives and enforces maximum ranks', 
   });
   assert.equal(templateModifiers(meta, normal).lives, 3);
   assert.deepEqual(templatePowers(meta, { ...normal, upgrades: false }), {
+    tanto: 0,
     knives: 0,
     composure: 0,
     recoveryEvery: 0,
@@ -148,6 +150,7 @@ test('nine upgrade catalog includes unified knives and enforces maximum ranks', 
 test('orphaned pouch ranks grant no knife and recovery rank one needs six waves', () => {
   const meta = parseMeta({ schemaVersion: 2, upgrades: { pouch: 2, recovery: 1 } });
   assert.deepEqual(templatePowers(meta, normal), {
+    tanto: 0,
     knives: 0,
     composure: 0,
     recoveryEvery: 6,

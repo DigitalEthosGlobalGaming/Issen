@@ -36,6 +36,7 @@ export interface RunState {
   hard: boolean;
   rush: boolean;
   upgradesEnabled: boolean;
+  tanto: number;
   knives: number;
   maxKnives: number;
   shrineRerolls: number;
@@ -123,6 +124,7 @@ export function createRunState(savedHints: unknown = {}): RunState {
     hard: false,
     rush: false,
     upgradesEnabled: true,
+    tanto: 0,
     knives: 0,
     maxKnives: 0,
     shrineRerolls: 0,
@@ -207,6 +209,7 @@ export function resetRun(
     mode: setup.diff,
     rush: setup.mode === 'rush',
     upgradesEnabled: setup.upgrades !== false,
+    tanto: 0,
     knives: 0,
     maxKnives: 0,
     shrineRerolls: 0,

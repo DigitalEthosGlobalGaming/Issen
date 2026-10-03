@@ -1,5 +1,6 @@
 import templeAtlas from './assets/temple-symbols-atlas.png';
 import trialAtlas from './assets/trial-symbols-atlas.png';
+import tantoSymbol from './assets/tanto-symbol.svg';
 import demonSymbol from './assets/demon-mirror-symbol.png';
 import type { UpgradeId } from '../game/progression/meta.ts';
 import './symbol-art.css';
@@ -14,6 +15,7 @@ const templeCells: Record<UpgradeId, number> = {
   knife: 6,
   composure: 7,
   recovery: 8,
+  tanto: -1,
 };
 const trialCells: Record<string, number> = {
   'quiet-blade': 0,
@@ -44,8 +46,8 @@ export function createSymbolArt(
   art.className = 'symbol-art';
   art.dataset.symbol = `${family}:${id}`;
   art.setAttribute('aria-hidden', 'true');
-  if (demon) {
-    art.style.backgroundImage = `url("${demonSymbol}")`;
+  if (demon || (family === 'temple' && id === 'tanto')) {
+    art.style.backgroundImage = `url("${demon ? demonSymbol : tantoSymbol}")`;
     art.style.backgroundSize = '80% 80%';
     art.style.backgroundPosition = 'center';
     return art;

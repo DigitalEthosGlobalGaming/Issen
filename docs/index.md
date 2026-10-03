@@ -34,6 +34,7 @@
 - [Premium supporter purchase](features/premium-supporter.md): Android support
   screen, cosmetic ownership, RevenueCat configuration and sandbox release checks.
 
+- [Tanto defensive strikes](features/tanto.md): Temple ranks, automatic interception and saved charges.
 - [Shrine blessings](features/shrine-blessings.md): seven new encounter and
   resource effects, ward behavior and checkpoint recovery.
 - [Feature plan 06 — Steel's third form, seeded runs and checkpoints](features/feature-plan-06.md):

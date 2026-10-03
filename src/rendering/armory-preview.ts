@@ -46,7 +46,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
   const inkSword = createInkSwordRenderer(canvas.ownerDocument);
   const fx = createEffects();
-  const dummy = makeFig(4242);
+  let dummy = makeFig(4242);
   let elapsed = 9,
     last = 0,
     dt = 0,
@@ -65,6 +65,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     const p = position();
     elapsed = 0;
     scattering = effect === 'scattered-armour' && !bonk;
+    if (scattering) dummy = makeFig(Math.floor(services.random() * 0x100000000));
     dissolving = ['falling-leaves', 'ember-ash', 'ink-wash'].includes(effect) && !bonk;
     for (const particles of Object.values(fx)) particles.length = 0;
     cut = services.random() < 0.5 ? 0 : Math.PI / 2;
@@ -158,7 +159,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       ...frame.appearance,
       x: width * 0.42,
       y: height * 0.94,
-      h: height * 0.82,
+      h: height * 0.74,
       back: true,
       waiting: true,
       fog: 0,

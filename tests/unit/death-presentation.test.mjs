@@ -67,7 +67,7 @@ test('shadows vanish before bodies and raw-time fading is independent of simulat
   assert.ok(deathDuration('fall') > 0.4);
 });
 
-test('scattered parts begin assembled, separate independently, and expire without randomness', () => {
+test('scattered parts begin assembled, separate independently, and expire with stable cosmetic randomness', () => {
   const motions = [];
   for (let i = 0; i < 12; i++) {
     const initial = scatteredPartMotion(i, 0, Math.PI / 2, 42);
@@ -92,4 +92,11 @@ test('Scattered Armour is a selectable cosmetic earned at 500 lifetime kills', (
   assert.equal(item.ok({ ...STAT0, kills: 499 }), false);
   assert.equal(item.ok({ ...STAT0, kills: 500 }), true);
   assert.equal(item.m, undefined);
+});
+
+test('scattered parts launch in all directions and vary between enemies', () => {
+  const motions = Array.from({ length: 30 }, (_, i) => scatteredPartMotion(i, 0.05, 0, 42));
+  const quadrants = new Set(motions.map(({ x, y }) => `${Math.sign(x)},${Math.sign(y)}`));
+  assert.equal(quadrants.size, 4);
+  assert.notDeepEqual(scatteredPartMotion(0, 0.3, 0, 42), scatteredPartMotion(0, 0.3, 0, 43));
 });

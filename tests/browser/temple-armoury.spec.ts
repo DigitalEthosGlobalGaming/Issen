@@ -21,7 +21,7 @@ test('Temple keeps catalog order within unfinished and completed upgrades after 
     page
       .locator('.upgrade-tile')
       .evaluateAll((tiles) => tiles.map((tile) => (tile as HTMLElement).dataset.upgrade));
-  const remaining = ['focus', 'offerings', 'awakening', 'knife', 'composure', 'recovery'];
+  const remaining = ['focus', 'offerings', 'awakening', 'knife', 'tanto', 'composure', 'recovery'];
   expect(await order()).toEqual(['precision', ...remaining, 'discernment', 'vitality']);
   await page.locator('[data-upgrade="precision"]').click();
   await page.getByRole('button', { name: 'Donate 400 Embers', exact: true }).click();
@@ -81,6 +81,7 @@ test('fully donated Temple and room preview remain readable without selection sh
           offerings: 3,
           awakening: 2,
           knife: 3,
+          tanto: 3,
           composure: 2,
           recovery: 2,
         },
@@ -93,7 +94,7 @@ test('fully donated Temple and room preview remain readable without selection sh
   await page.locator('#bTemplate').click();
   await expect(page.locator('.temple-status')).toHaveCount(0);
   await expect(page.locator('#templateContent')).not.toContainText('Fully donated');
-  await expect(page.locator('[data-state="max"].upgrade-tile')).toHaveCount(9);
+  await expect(page.locator('[data-state="max"].upgrade-tile')).toHaveCount(10);
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   const tabs = page.getByRole('tab');

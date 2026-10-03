@@ -148,6 +148,7 @@ import { ROBE_AWAKENINGS } from './game/content/robe-awakenings.ts';
 import { parseAwakeningProgress, recordChallenge } from './game/progression/awakening-progress.ts';
 import type { BladeStats } from './game/progression/statistics.ts';
 import { normalLives } from './game/equipment/lives.ts';
+import { interceptWithTanto } from './game/combat/tanto.ts';
 import { throwKnife, refillDuelKnives } from './game/combat/knife.ts';
 import { FORTUNES } from './game/content/fortunes.ts';
 import { BLESS, TIER, TIERNAME, BLESS_BY } from './game/content/blessings.ts';
@@ -346,7 +347,11 @@ export function startGame(): () => void {
   let savedRun = readRunCheckpoint();
   let shrineOfferIds: string[] | null = null;
   function captureCheckpoint(status: RunCheckpoint['status'] = 'active') {
-    if (activeTrial || !['playing', 'boss', 'standoff', 'shrine', 'dead'].includes(G.state)) return;
+    if (
+      activeTrial ||
+      !['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state)
+    )
+      return;
     const { bless, ...run } = G;
     const checkpoint: RunCheckpoint = {
       version: 1,
@@ -432,7 +437,7 @@ export function startGame(): () => void {
       $('bossK').textContent = G.boss.def.k;
       $('bossN').textContent = G.boss.def.n;
       renderHp();
-      $('bossbar').classList.add('on');
+      $('bossbar').classList.toggle('on', G.state === 'boss');
     } else $('bossbar').classList.remove('on');
   }
   function continueSavedRun() {
@@ -1610,11 +1615,18 @@ export function startGame(): () => void {
       combatRandom,
     );
   }
-  function killEnemy(e: Enemy, dir: Direction, chained = false, preserveStreak = false) {
+  function killEnemy(
+    e: Enemy,
+    dir: Direction,
+    chained = false,
+    preserveStreak = false,
+    automatic = false,
+  ) {
     const wasAtk = e === G.attacker,
       p = e.state === 'attack' ? clamp(e.p) : 0,
       swiftPoints = G.m.swift && !chained ? swiftSlashPoints(Math.max(0, e.life - 0.9), e.T) : null,
       perfect =
+        !automatic &&
         !G.m.noPerfect &&
         ((wasAtk && p >= pz()) || (!chained && G.bless.has('flurry') && (G.combo + 1) % 10 === 0));
     e.k = e.state === 'attack' ? Math.pow(p, 1.6) : 0;
@@ -1681,7 +1693,7 @@ export function startGame(): () => void {
       cx = P0.x,
       cy = P0.y - P0.h * 0.55,
       v: [number, number] = [Math.cos(e.cutAng), Math.sin(e.cutAng)],
-      len = P0.h * 0.95,
+      len = P0.h * (automatic ? 0.55 : 0.95),
       sc = P0.h / 160;
     addSlash(
       cx - (v[0] * len) / 2,
@@ -1701,7 +1713,7 @@ export function startGame(): () => void {
       t: 0,
       life: SHADOW_DURATION,
     });
-    swingPlayer(dir);
+    if (!automatic) swingPlayer(dir);
     if (G.m.bonk) sfx.bonk();
     else sfx.slice();
     combatHaptics.play('slice');
@@ -2185,7 +2197,7 @@ export function startGame(): () => void {
       3500,
     );
   }
-  function bossSwipe(dir: Direction) {
+  function bossSwipe(dir: Direction, automatic = false) {
     const b = G.boss;
     if (!b) return;
     if (b.state !== 'stagger') {
@@ -2201,14 +2213,14 @@ export function startGame(): () => void {
       return;
     }
     if (directionMatches(dir, b.sdir, !!G.m.axisCut)) {
-      const swiftPoints = G.m.swift ? swiftSlashPoints(b.t, b.window) : null;
-      b.hp = Math.max(0, b.hp - G.m.bossDmg);
+      const swiftPoints = !automatic && G.m.swift ? swiftSlashPoints(b.t, b.window) : null;
+      b.hp = Math.max(0, b.hp - (automatic ? 1 : G.m.bossDmg));
       if (activeTrial?.duelMaster) b.bp = duelMasterTimings(20 - b.hp);
       renderHp();
-      swingPlayer(dir);
+      if (!automatic) swingPlayer(dir);
       const a = DANG[dir],
         v: [number, number] = [Math.cos(a), Math.sin(a)],
-        len = p.h * 0.9,
+        len = p.h * (automatic ? 0.55 : 0.9),
         sc = p.h / 170;
       addSlash(
         cx - (v[0] * len) / 2,
@@ -2622,6 +2634,25 @@ export function startGame(): () => void {
       return;
     }
     if (G.state === 'dead' || G.state === 'over') return;
+    if (interceptWithTanto(G, killer) && killer) {
+      if ('def' in killer) {
+        killer.failed = true;
+        killer.state = 'stagger';
+        killer.chainLeft = 1;
+        bossSwipe(killer.sdir, true);
+      } else {
+        if (G.so?.e === killer) {
+          G.so.done = true;
+          G.so.doneT = 0;
+          killer.glint = 0;
+        }
+        killEnemy(killer, killer.dir, true, false, true);
+      }
+      pop(killer.pos.x, killer.pos.y - killer.pos.h * 1.15, 'Tanto');
+      hud(true);
+      captureCheckpoint();
+      return;
+    }
     if (reason === 'feint') {
       recordSecretEvent(ST, { kind: 'feintMistake' });
       saveStats();
@@ -2822,6 +2853,7 @@ export function startGame(): () => void {
       getLoadoutSummary: () => {
         const power = templatePowers(META, SETUP, premiumAccess());
         const summary: string[] = [];
+        if (power.tanto > 0) summary.push(`${power.tanto} Tanto strikes`);
         if (power.knives > 0) summary.push(`${power.knives} knives`);
         if (power.composure > 0) summary.push(`${power.composure} combo protections`);
         if (EQ.charm === 'omikuji') summary.push('Fortune rolled at run start');

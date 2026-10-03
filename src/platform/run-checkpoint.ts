@@ -80,7 +80,9 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
     return null;
   const run = raw.run;
   if (
-    !['playing', 'boss', 'standoff', 'shrine', 'dead', 'over'].includes(String(run.state)) ||
+    !['playing', 'boss', 'standoff', 'between', 'shrine', 'dead', 'over'].includes(
+      String(run.state),
+    ) ||
     !['normal', 'ronin'].includes(String(run.mode)) ||
     !Array.isArray(run.bless) ||
     !run.bless.every((id) => typeof id === 'string') ||
@@ -136,6 +138,12 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
       return null;
     }
   }
+  if (
+    run.tanto !== undefined &&
+    (!Number.isInteger(run.tanto) || (run.tanto as number) < 0 || (run.tanto as number) > 3)
+  )
+    return null;
+  run.tanto = run.tanto ?? 0;
   run.shrineRerolls = run.shrineRerolls === 1 ? 1 : 0;
   const triggers = run.blessingTriggers;
   if (triggers !== undefined) {
