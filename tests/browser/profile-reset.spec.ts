@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test';
+test.beforeEach(async ({ page }) => {
+  await page.route('https://fonts.googleapis.com/**', (route) =>
+    route.fulfill({ body: '', contentType: 'text/css' }),
+  );
+});
 
 for (const testing of [false, true]) {
-  test(`Stats reset confirms and clears only the ${testing ? 'test' : 'player'} profile`, async ({
+  test(`Profile Management reset confirms and clears only the ${testing ? 'test' : 'player'} profile`, async ({
     page,
   }, info) => {
     await page.addInitScript((testing) => {
@@ -41,13 +46,14 @@ for (const testing of [false, true]) {
       localStorage.setItem('unrelated', 'keep');
     }, testing);
     await page.setViewportSize({ width: 360, height: 640 });
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#app')).toHaveCount(1);
     const snapshot = () => page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
     const before = await snapshot();
-    await page.locator('#bStats').click();
+    await page.locator('#bOptions').click();
+    await page.getByRole('button', { name: /^Profile Management/ }).click();
     await page.getByRole('button', { name: 'Reset profile', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: 'Reset your profile?' });
+    const dialog = page.getByRole('dialog', { name: /^Reset / });
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText('cannot be undone');
     await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();

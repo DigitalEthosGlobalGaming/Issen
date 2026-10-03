@@ -112,6 +112,9 @@ import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
 import { renderStatistics, bindProfileReset } from './ui/screens/stats.ts';
+import { bindSaveTransfer } from './ui/screens/save-transfer.ts';
+import { bindProfileManagement } from './ui/screens/profile-management.ts';
+import { deleteCurrentProfile } from './platform/storage.ts';
 import { createFigureRenderer } from './rendering/figures/figure.ts';
 import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
@@ -3360,7 +3363,28 @@ export function startGame(): () => void {
   function renderStats() {
     renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length, META.earned);
   }
-  lifecycle.add(bindProfileReset($('stats'), clearActiveProfile, isTestProfile()));
+  lifecycle.add(bindProfileReset($('options'), deleteCurrentProfile, isTestProfile()));
+  function flushProfile() {
+    store.set('issen.stats', playerStats);
+    store.set('issen.equip', playerEquipment);
+    saveMeta();
+    saveAwakening();
+    store.set('issen.unlocks', [...UNL]);
+  }
+  lifecycle.add(bindProfileManagement($('options'), flushProfile));
+  lifecycle.add(
+    bindSaveTransfer(
+      $('options'),
+      document.querySelector('.title-version')?.textContent || '',
+      () => {
+        store.set('issen.stats', playerStats);
+        store.set('issen.equip', playerEquipment);
+        saveMeta();
+        saveAwakening();
+        store.set('issen.unlocks', [...UNL]);
+      },
+    ),
+  );
   const preview = createArmoryPreview($('prevC'), {
     random: R,
     now: () => performance.now(),

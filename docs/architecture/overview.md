@@ -114,6 +114,13 @@ for several simulation seconds. Preview clocks remain independent.
 
 ## Boundaries that matter
 
+Profile Management lives in Options. `platform/storage.ts` retains the original
+`issen.*` player namespace, separate `issen.testing.*` data, and named profiles
+under `issen.profile.<id>.*`. Module-instance profile snapshots prevent stale
+writes from changing another profile. `platform/save-transfer.ts` owns portable
+backup validation, migrations and reward reconciliation; storage owns the import
+journal and recovery. See [save transfer](../features/save-transfer.md).
+
 - Feature functions receive explicit state and dependencies. Randomized rules
   accept a random source so tests can reproduce outcomes. State mutations and
   callbacks are synchronous; callers can observe phase changes immediately.

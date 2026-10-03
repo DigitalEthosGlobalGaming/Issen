@@ -6,13 +6,14 @@ import {
   keyLabel,
 } from '../../platform/settings.ts';
 import type { Settings, ControlAction } from '../../platform/settings.ts';
-type Category = 'audio' | 'controls' | 'display';
+type Category = 'audio' | 'controls' | 'display' | 'profile';
 type Page = Category | 'root';
 const TITLES: Record<Page, string> = {
   root: 'Options',
   audio: 'Audio',
   controls: 'Controls',
   display: 'Display and Accessibility',
+  profile: 'Profile Management',
 };
 export function createOptions(
   root: HTMLElement,
@@ -23,6 +24,7 @@ export function createOptions(
   const doc = root.ownerDocument,
     win = doc.defaultView!;
   const content = root.querySelector<HTMLElement>('#optionsContent')!;
+  const profiles = root.querySelector<HTMLElement>('#profileManagement')!;
   const events = new AbortController();
   let renderEvents = new AbortController();
   let page: Page = 'root',
@@ -153,6 +155,7 @@ export function createOptions(
     renderEvents.abort();
     renderEvents = new AbortController();
     content.replaceChildren();
+    profiles.hidden = page !== 'profile';
     root.scrollTop = 0;
     const header = node('div', '', 'options-heading'),
       heading = node('h2', TITLES[page]);
@@ -169,8 +172,9 @@ export function createOptions(
           : `Effects ${Math.round(settings.effectsVolume * 100)}% · Ambience ${Math.round(settings.ambienceVolume * 100)}%`,
         controls: `${settings.sensitivity[0]!.toUpperCase() + settings.sensitivity.slice(1)} swipe sensitivity · Keyboard bindings`,
         display: `${settings.textSize === 'large' ? 'Large' : 'Normal'} text · ${settings.quality === 'auto' ? 'Automatic' : settings.quality === 'low' ? 'Low' : 'High'} effects`,
+        profile: 'Profiles · Save backups',
       };
-      for (const category of ['audio', 'controls', 'display'] as const) {
+      for (const category of ['audio', 'controls', 'display', 'profile'] as const) {
         const el = button('', () => navigate(category), 'btn option-category');
         el.append(node('strong', TITLES[category]), node('small', summaries[category]));
         content.append(el);
@@ -230,6 +234,8 @@ export function createOptions(
           render(true);
         }),
       );
+    } else if (page === 'profile') {
+      // Persistent controls and modal listeners live outside the rerendered content.
     } else {
       select('menuStyle', 'Menus', [
         ['Classic', 'classic'],
@@ -288,7 +294,7 @@ export function createOptions(
     const status = node('p', message, 'options-status');
     status.setAttribute('role', 'status');
     content.append(status);
-    if (page !== 'root') {
+    if (page !== 'root' && page !== 'profile') {
       content.append(node('p', 'Restore defaults resets only this category.', 'options-help'));
       content.append(
         button('Restore defaults', () => {
@@ -328,7 +334,7 @@ export function createOptions(
       const state = win.history.state;
       if (
         state?.issenOptions === historyId &&
-        ['root', 'audio', 'controls', 'display'].includes(state.page)
+        ['root', 'audio', 'controls', 'display', 'profile'].includes(state.page)
       ) {
         page = state.page;
         capture = null;
@@ -349,6 +355,7 @@ export function createOptions(
     'keydown',
     (event) => {
       if (!open) return;
+      if (root.querySelector('dialog[open]')) return;
       // Keep all menu keys away from runtime shortcuts; native control defaults still work.
       event.stopImmediatePropagation();
       if (event.key === 'Escape') {
@@ -359,18 +366,19 @@ export function createOptions(
       if (event.key === 'Tab' && !capture) {
         const controls = Array.from(
           root.querySelectorAll<HTMLElement>(
-            'button:not(:disabled), input:not(:disabled), select:not(:disabled)',
+            'button:not(:disabled), input:not(:disabled):not([type="file"]), select:not(:disabled)',
           ),
         );
-        const current = controls.indexOf(doc.activeElement as HTMLElement);
+        const visible = controls.filter((el) => el.getClientRects().length);
+        const current = visible.indexOf(doc.activeElement as HTMLElement);
         event.preventDefault();
         const next =
           current < 0
             ? event.shiftKey
-              ? controls.length - 1
+              ? visible.length - 1
               : 0
-            : (current + (event.shiftKey ? -1 : 1) + controls.length) % controls.length;
-        controls[next]?.focus();
+            : (current + (event.shiftKey ? -1 : 1) + visible.length) % visible.length;
+        visible[next]?.focus();
         return;
       }
       if (!capture) return;

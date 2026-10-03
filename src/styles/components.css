@@ -68,6 +68,24 @@
   padding: 10px 0;
   border-top: 1px solid rgba(236, 230, 218, 0.18);
 }
+.save-transfer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+#importSaveDialog {
+  max-width: min(440px, 85vw);
+  color: var(--paper);
+  background: #211e19;
+  border: 1px solid #78674b;
+}
+#importSaveDialog::backdrop {
+  background: #000b;
+}
+#importSaveDialog p {
+  line-height: 1.5;
+}
 .stat b {
   display: block;
   font-size: 23px;

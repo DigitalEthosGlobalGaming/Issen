@@ -2,24 +2,28 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: ['**', '!gh-pages']
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
+# Every run updates the same combined site, including its stored snapshot.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
+    if: github.ref_type == 'branch' && github.ref_name != 'gh-pages'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out source branch
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -28,27 +32,89 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Restore combined site
+        id: snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_ref=$(git ls-remote --heads origin refs/heads/gh-pages)
+          if [ -n "$remote_ref" ]; then
+            git fetch origin gh-pages
+            git worktree add .pages-site FETCH_HEAD
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          else
+            mkdir .pages-site
+            echo 'exists=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out production for initial preview deployment
+        if: steps.snapshot.outputs.exists == 'false' && github.ref_name != 'main'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: .pages-production
+
+      - name: Seed production from main
+        if: steps.snapshot.outputs.exists == 'false' && github.ref_name != 'main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd .pages-production
+          npm ci
+          npm run build:pages
+          cd ..
+          node scripts/assemble-pages.mjs .pages-production/dist .pages-site main
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Build GitHub Pages site
-        run: npm run build:pages
+      - name: Test Pages assembly
+        run: node --test tests/unit/pages-deployment.test.mjs
+
+      - name: Build selected branch
+        id: build
+        run: npm run build:branch
+
+      - name: Update combined site
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+        run: node scripts/assemble-pages.mjs dist .pages-site "$SOURCE_BRANCH"
+
+      - name: Store site snapshot
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd .pages-site
+          if [ '${{ steps.snapshot.outputs.exists }}' = 'false' ]; then
+            git init -b gh-pages
+            git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+            git config http.extraheader "$(git -C .. config --get http.https://github.com/.extraheader)"
+          else
+            git switch -C gh-pages
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          if ! git diff --cached --quiet; then
+            git commit -m "Deploy $SOURCE_BRANCH at $GITHUB_SHA"
+            git push origin HEAD:gh-pages
+          fi
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload GitHub Pages artifact
+      - name: Upload combined GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: .pages-site
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Record branch URL
+        env:
+          BASE_PATH: ${{ steps.build.outputs.base }}
+        run: echo "Branch build https://${GITHUB_REPOSITORY_OWNER}.github.io${BASE_PATH}" >> "$GITHUB_STEP_SUMMARY"

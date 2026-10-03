@@ -205,9 +205,9 @@ localhost, LAN addresses and deployed sites have separate storage.
 
 ## GitHub Pages deployment
 
-Pushing `main` runs `.github/workflows/deploy-pages.yml`. The workflow installs the
-locked dependencies, runs `npm run build:pages`, uploads `dist/` as a Pages artifact
-and deploys it to the `github-pages` environment. The published site is
+Pushing a source branch runs `.github/workflows/deploy-pages.yml`. The workflow
+installs locked dependencies, builds the branch's Pages path, updates the combined
+site snapshot and deploys it to the `github-pages` environment. The production site is
 `https://digitalethosglobalgaming.github.io/Issen/`.
 
 The standalone privacy policy is maintained in `public/privacy/index.html` and
@@ -226,3 +226,57 @@ it to the build. The title screen opens it in a separate tab. Keep the policy
 current when adding online services, analytics, ads or purchases.
 
 Daily runs, midnight recovery and profile isolation have focused coverage in `tests/unit/daily.test.mjs` and `tests/browser/daily.spec.ts`. Options tests exercise Classic/Scrolls persistence, reset and reduced-motion disposal. The privacy policy links to the standalone AI disclosure; neither page loads game code.
+
+## Branch previews and feature batches
+
+Use the repository [release-feature-sets skill](../../.agents/skills/release-feature-sets/SKILL.md)
+for coherent feature batches. Work can stay on `develop` or any chosen source
+branch; production promotion requires a release request.
+
+`npm run build:develop` type-checks and builds `/Issen/develop/`.
+`npm run build:branch` detects the current Git branch (or `GITHUB_REF_NAME` in CI).
+Use `npm run build:branch -- --branch feature/combat` for an explicit target.
+Both support Vite options such as `--outDir .verification-build-pages`.
+`npm run build:pages` remains the production-only `/Issen/` build.
+
+Simple lowercase branch names such as `develop` or `combat-test` map directly to
+`/Issen/<branch-name>/`. Names containing slashes, uppercase characters, reserved
+production directories or other punctuation use a normalized name and a stable
+12-character hash; the build prints the exact base path. This prevents collisions
+between branches such as `feature/combat` and `feature-combat`.
+
+The Pages workflow runs for pushes to all source branches and for manual runs on
+the selected branch. It excludes `gh-pages`, which stores only the generated
+combined site. Builds on `main` replace production at `/Issen/`; other branches
+replace only their own preview. Serialized runs preserve other deployments,
+using `.issen-previews.json` to retain preview directories across production
+updates. The first preview deployment seeds production from committed `main` if
+no snapshot exists. Failed builds/assembly stop before deployment; a failed Pages
+publish can be retried manually from the same source branch. Do not edit generated
+snapshots as source code. Previews persist after a source branch is deleted;
+cleanup is deliberately manual.
+
+Keep Settings → Pages → Source set to **GitHub Actions**. The `github-pages`
+environment must permit deployment from the chosen source branches, and the
+workflow token needs `contents: write`, `pages: write` and `id-token: write`.
+Branch protection on `gh-pages` must allow workflow snapshot pushes. A workflow
+must be committed on the source branch to run there; existing feature branches
+need to incorporate this setup. The workflow summary prints the branch URL.
+Local changes do not publish until committed and pushed.
+
+Previews share the production browser origin and therefore its `issen.*` saves.
+Use a disposable browser context or the Testing tools test profile for experiments;
+do not reset real progress to test a branch. Local root and Android builds retain
+their current paths and save compatibility.
+
+Verify deployment changes with:
+
+```powershell
+node --test tests/unit/pages-deployment.test.mjs
+npm run build:develop -- --outDir .verification-build-pages
+npx playwright test --config playwright.pages.config.ts
+npm run test:production
+```
+
+The Pages smoke test verifies nested-path startup, artwork, Armoury and standalone
+pages. Set `ISSEN_PAGES_BASE` and `ISSEN_PREVIEW_DIR` to test another built branch.

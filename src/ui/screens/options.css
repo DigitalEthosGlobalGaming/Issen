@@ -96,6 +96,27 @@
 .options-box h3 {
   margin-top: 26px;
 }
+.profile-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+.profile-name-row input {
+  flex: 1 1 140px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px;
+  box-sizing: border-box;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--paper-dim);
+  font: inherit;
+}
+#profileManagement[hidden] {
+  display: none;
+}
 .options-box :is(input, select):focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 4px;
@@ -136,9 +157,24 @@
 }
 #app.large-text
   .armInfo
-  :is(.fl, .pk, .tr, .arm-unlock-condition, .spx, .item-role, .awakening-label) {
+  :is(
+    .fl,
+    .pk,
+    .tr,
+    .arm-unlock-condition,
+    .arm-challenge,
+    .arm-power-state,
+    .arm-details,
+    .item-role
+  ) {
   font-size: 18px;
   line-height: 1.5;
+}
+#app.large-text .arm-forms button {
+  font-size: 18px;
+}
+#app.large-text .armInfo:has(.arm-details) .nm {
+  padding-right: 90px;
 }
 #app.large-text .tiles {
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));

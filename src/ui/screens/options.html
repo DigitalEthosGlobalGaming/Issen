@@ -1,3 +1,60 @@
 <div id="options" class="screen panel" hidden aria-label="Options">
-  <div class="box options-box" id="optionsContent"></div>
+  <div class="box options-box">
+    <div id="optionsContent"></div>
+    <div id="profileManagement" hidden>
+      <div class="option-row">
+        <label for="playerProfile">Profile</label
+        ><select id="playerProfile"></select>
+      </div>
+      <div class="profile-name-row">
+        <label for="profileName">Name</label
+        ><input id="profileName" maxlength="40" autocomplete="off" />
+        <button class="btn" id="bCreateProfile" type="button">New profile</button>
+        <button class="btn" id="bRenameProfile" type="button">Rename</button>
+      </div>
+      <p id="profileMessage" role="status"></p>
+      <div class="save-transfer-actions">
+        <button class="btn" id="bDownloadSave" type="button">Download save</button>
+        <button class="btn" id="bImportSave" type="button">Import save</button>
+        <button class="btn" id="bPreviousSave" type="button">Previous backup</button>
+        <input id="saveFile" type="file" accept=".json,application/json" hidden />
+      </div>
+      <p id="saveTransferMessage" role="status"></p>
+      <dialog id="importSaveDialog" aria-labelledby="importSaveTitle">
+        <h2 id="importSaveTitle">Import your save?</h2>
+        <p>
+          Merge earned progress with this profile. Records and unlocks already earned stay yours.
+        </p>
+        <p id="importSaveSummary"></p>
+        <p id="importSaveWarnings" role="status"></p>
+        <button class="btn" id="bDownloadSaveBackup" type="button">Download current backup</button>
+        <div class="reset-actions">
+          <button class="btn" id="bCancelImportSave" type="button">Cancel</button>
+          <button class="btn primary" id="bConfirmImportSave" type="button">Import save</button>
+        </div>
+      </dialog>
+      <div class="profile-reset">
+        <button class="btn danger" id="bResetProfile" type="button">Reset profile</button>
+      </div>
+      <dialog
+        id="resetProfileDialog"
+        aria-labelledby="resetProfileTitle"
+        aria-describedby="resetProfileWarning"
+      >
+        <h2 id="resetProfileTitle">Reset your profile?</h2>
+        <p id="resetProfileWarning">
+          This permanently deletes all records, unlocks, awakenings, Temple upgrades, Embers and
+          settings for this profile. You will start again from the beginning. This cannot be undone.
+        </p>
+        <p id="resetProfileScope"></p>
+        <p id="resetProfileError" role="alert" hidden></p>
+        <div class="reset-actions">
+          <button class="btn" id="bCancelResetProfile" type="button" autofocus>Cancel</button>
+          <button class="btn danger" id="bConfirmResetProfile" type="button">
+            Delete all progress
+          </button>
+        </div>
+      </dialog>
+    </div>
+  </div>
 </div>

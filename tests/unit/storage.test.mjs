@@ -2,6 +2,69 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 let instance = 0;
+
+test('import commits a backup, blocks stale writes and stays inside the active profile', async (t) => {
+  const f = await fixture(t, true);
+  f.local.set('issen.stats', JSON.stringify({ kills: 99 }));
+  f.local.set('issen.testing.stats', JSON.stringify({ kills: 4 }));
+  assert.equal(f.importProfile({ stats: { kills: 8 }, unlocks: ['beni'] }), true);
+  assert.equal(JSON.parse(f.local.get('issen.stats')).kills, 99);
+  assert.equal(JSON.parse(f.local.get('issen.testing.stats')).kills, 8);
+  assert.equal(JSON.parse(f.local.get('issen.testing.importBackup')).stats.kills, 4);
+  assert.equal(f.store.set('issen.stats', { kills: 4 }), false);
+  assert.equal(f.local.has('issen.testing.importJournal'), false);
+});
+test('a mid-import write failure rolls back every changed section', async (t) => {
+  const f = await fixture(t);
+  f.local.set('issen.stats', JSON.stringify({ kills: 4 }));
+  f.local.set('issen.unlocks', JSON.stringify(['steel']));
+  const set = localStorage.setItem;
+  let failed = false;
+  localStorage.setItem = (key, value) => {
+    if (key === 'issen.unlocks' && !failed) {
+      failed = true;
+      throw new Error('quota');
+    }
+    set(key, value);
+  };
+  assert.equal(f.importProfile({ stats: { kills: 8 }, unlocks: ['beni'] }), false);
+  assert.equal(JSON.parse(f.local.get('issen.stats')).kills, 4);
+  assert.deepEqual(JSON.parse(f.local.get('issen.unlocks')), ['steel']);
+  assert.equal(f.local.has('issen.importJournal'), false);
+  assert.equal(f.store.set('issen.stats', { kills: 5 }), true);
+});
+test('startup recovers an interrupted transaction before profile reads', async (t) => {
+  const f = await fixture(t);
+  f.local.set('issen.stats', '{"kills":800}');
+  f.local.set(
+    'issen.importJournal',
+    JSON.stringify({ 'issen.stats': '{"kills":4}', 'issen.unlocks': null }),
+  );
+  f.local.set('issen.unlocks', '["beni"]');
+  const fresh = await import(`../../src/platform/storage.ts?recovery=${instance++}`);
+  assert.equal(fresh.store.get('issen.stats', {}).kills, 4);
+  assert.equal(f.local.has('issen.unlocks'), false);
+});
+
+test('named profiles isolate saves, exports, reset and deletion from the original player', async (t) => {
+  const f = await fixture(t);
+  f.local.set('issen.stats', '{"kills":44}');
+  const id = f.createPlayerProfile('Second');
+  assert.equal(f.switchPlayerProfile(id), true);
+  const named = await import(`../../src/platform/storage.ts?named=${instance++}`);
+  assert.equal(named.currentProfile().name, 'Second');
+  assert.deepEqual(named.store.get('issen.stats', {}), {});
+  named.store.set('issen.stats', { kills: 9 });
+  assert.equal(JSON.parse(f.local.get('issen.stats')).kills, 44);
+  assert.equal(named.snapshotProfile().stats.kills, 9);
+  assert.equal(named.snapshotProfile().profileList, undefined);
+  named.renamePlayerProfile('Renamed');
+  assert.equal(named.currentProfile().name, 'Renamed');
+  assert.equal(named.deleteCurrentProfile(), true);
+  assert.equal(f.local.has(`issen.profile.${id}.stats`), false);
+  assert.equal(f.local.get('issen.activeProfile'), 'default');
+  assert.equal(JSON.parse(f.local.get('issen.stats')).kills, 44);
+});
 async function fixture(t, testing = false) {
   const local = new Map();
   const session = new Map(testing ? [['issen.testing', '1']] : []);

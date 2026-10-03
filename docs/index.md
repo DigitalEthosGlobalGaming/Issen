@@ -1,6 +1,8 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
+- [Save transfer](features/save-transfer.md): portable profile backups, resilient import and recovery.
+
 - [Daily runs and world UI](features/daily-and-world-ui.md): preset daily challenges, quieter visual states, seal materials, Scattered Armour and optional scroll menus.
 
 - [Calligraphic symbol art](features/symbol-art.md): shared symbol style, Temple and Trial atlas mapping, and menu integration.

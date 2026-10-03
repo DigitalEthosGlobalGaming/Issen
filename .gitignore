@@ -52,3 +52,6 @@ credentials.json
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+.pages-site/
+.pages-production/
