@@ -18,7 +18,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
       response,
       body: (await response.text()).replace(
         'frameLoop.start();',
-        'window.__demon = { G, step: update, swipe: onSwipe, render, stop: () => frameLoop.stop() }; frameLoop.start();',
+        'window.__demon = { G, sceneSeeds: [], step: update, swipe: onSwipe, render, stop: () => frameLoop.stop() }; const drawRealm = demonRealmRenderer.draw; demonRealmRenderer.draw = (...args) => { window.__demon.sceneSeeds.push(args[5]); return drawRealm(...args); }; frameLoop.start();',
       ),
     });
   });
@@ -36,6 +36,17 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
   });
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'demon-realm');
   await expect(page.locator('#trialObjective')).toContainText('Wave 1/13');
+  const stableScene = await page.evaluate(() => {
+    const h = (window as any).__demon;
+    h.render(0);
+    const before = h.sceneSeeds.at(-1);
+    h.G.wave = 7;
+    h.render(0);
+    const after = h.sceneSeeds.at(-1);
+    h.G.wave = 1;
+    return before === after;
+  });
+  expect(stableScene).toBe(true);
   await page.screenshot({ path: info.outputPath('demon-realm-portrait.png') });
   await page.setViewportSize({ width: 844, height: 390 });
   await expect

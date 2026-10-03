@@ -67,7 +67,7 @@ export function renderTrials(
   }
   const list = root.querySelector('#trialList')!;
   list.replaceChildren();
-  for (const trial of TRIALS) {
+  for (const [index, trial] of TRIALS.entries()) {
     const card = doc.createElement('section');
     card.className = 'trial-card';
     const heading = doc.createElement('h3');
@@ -81,6 +81,13 @@ export function renderTrials(
     button.type = 'button';
     button.className = 'btn';
     button.dataset.trial = trial.id;
+    const completed = progress.completed.includes(trial.id);
+    if (completed) {
+      button.classList.add('trial-completed');
+      button.style.setProperty('--stroke-x', `${((index % 4) * 100) / 3}%`);
+      button.style.setProperty('--stroke-y', `${Math.floor((index % 8) / 4) * 100}%`);
+      button.setAttribute('aria-description', 'Trial completed');
+    }
     button.textContent = !trialAccessible(trial.id, premiumAccess)
       ? 'Requires Premium'
       : !unlocked

@@ -4131,7 +4131,7 @@ export function startGame(): () => void {
           H,
           time,
           reducedMotion(),
-          activeTrial ? activeTrial.seed + G.wave * 997 : stageSeed,
+          activeTrial ? activeTrial.seed : stageSeed,
         )
       : environmentRenderer.draw(g, {
           stageSeed,

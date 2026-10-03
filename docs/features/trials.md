@@ -96,4 +96,14 @@ no feints, fixed attack timings and no intermediate duels or shrines.
 
 Demon Mirror uses 52 enemies in 13 groups of four, with no feints or refills. The arrow and blade show the opposite of the required swipe. `src/rendering/environment/demon-realm.ts` places independent landmark and terrain atlas sprites over a procedural sky with tinted mountain silhouettes; ordinary scenery and weather are omitted. Inferno adds amber flames and embers, with animation frozen by reduced motion or reduced flashes. `tests/browser/demon-trial.spec.ts` checks all 13 waves, wrong-direction failure, reward unlocking and film canvas isolation.
 
-Demon realm geometry varies deterministically between its thirteen waves. The seed and wave determine landmark placement, moon position and mountain silhouettes; the scene remains stable within a wave and through resize. Short ash-coloured grass replaces the stone floor, beneath the independently placed terrain sprites.
+Demon realm geometry stays fixed across all thirteen waves of an attempt. Its
+seed determines landmark placement, moon position and mountain silhouettes;
+advancing waves changes combat without recomposing the scene. Resize retains
+the same composition seed. Short ash-coloured grass replaces the stone floor.
+
+Completed Trial buttons use one of eight left-to-right brush strokes from the
+[UI stroke atlas](../../src/ui/assets/ui-strokes-atlas.md). Catalog position
+selects a stable variation at 0.28 opacity behind the text; completion remains
+available to assistive technology and Replay remains usable. Unfinished Trials
+have no overlay. The atlas and its exact frame metadata are reproducible through
+`scripts/generate-ui-strokes.mjs`.
