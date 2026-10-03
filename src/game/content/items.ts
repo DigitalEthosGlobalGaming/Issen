@@ -51,6 +51,15 @@ export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {
   return [
     ...trialRewardItems(),
     {
+      id: 'scattered-armour',
+      type: 'fx',
+      k: '散',
+      n: 'Scattered Armour',
+      f: 'Armour, cloth and steel tumble apart along the cut.',
+      d: 'Defeat 500 enemies total.',
+      ok: (s) => s.kills >= 500,
+    },
+    {
       id: 'falling-leaves',
       type: 'fx',
       k: '葉',

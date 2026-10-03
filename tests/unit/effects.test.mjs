@@ -40,10 +40,14 @@ test('every catalog kill effect spawns finite particles and expires independentl
       0.5,
       0.7,
     );
-    assert.ok(
-      Object.values(preview).some((list) => list.length),
-      item.id,
-    );
+    if (item.id === 'scattered-armour') {
+      // Actual puppet pieces are drawn by the figure renderer, not duplicated as particles.
+      assert.deepEqual(preview, createEffects());
+    } else
+      assert.ok(
+        Object.values(preview).some((list) => list.length),
+        item.id,
+      );
     finite(preview);
     for (let i = 0; i < 200; i++) {
       updateEffects(preview, 0.025, 0.025, env);

@@ -1,10 +1,20 @@
+import { drawCrestSprite } from '../ui-art.ts';
 import { bladeEffectPoint, supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
+import { scatteredPartMotion } from './death.ts';
 import { enemyPresence } from './enemy-presence.ts';
 import { playerPresence } from './player-presence.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
-import type { Figure, FigureEnvironment, Pose, Point, BladeStyle, Aura } from './types.ts';
+import type {
+  Figure,
+  FigureEnvironment,
+  Pose,
+  Point,
+  BladeStyle,
+  Aura,
+  EnemyPart,
+} from './types.ts';
 export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
   const { time: clock, petActive, width: W, height: H, palette: cols, random: R } = env;
   const time = env.reducedMotion ? 0 : clock;
@@ -256,120 +266,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     g.restore();
   }
   function drawCrest(id: string, x: number, y: number, r: number) {
-    g.save();
-    g.translate(x, y);
-    const col = 'rgba(224,217,202,.88)';
-    g.fillStyle = col;
-    g.strokeStyle = col;
-    g.lineWidth = r * 0.12;
-    g.lineCap = 'round';
-    const ring = () => {
-      g.beginPath();
-      g.arc(0, 0, r, 0, TAU);
-      g.stroke();
-    };
-    if (id === 'tomoe') {
-      ring();
-      for (let i = 0; i < 3; i++) {
-        g.save();
-        g.rotate((i * TAU) / 3);
-        g.beginPath();
-        g.arc(0, -r * 0.5, r * 0.26, 0, TAU);
-        g.fill();
-        g.lineWidth = r * 0.16;
-        g.beginPath();
-        g.arc(0, 0, r * 0.5, -Math.PI / 2, Math.PI * 0.05);
-        g.stroke();
-        g.restore();
-      }
-    } else if (id === 'kikyo') {
-      for (let i = 0; i < 5; i++) {
-        g.save();
-        g.rotate((i * TAU) / 5);
-        g.beginPath();
-        g.moveTo(0, 0);
-        g.quadraticCurveTo(-r * 0.5, -r * 0.5, -r * 0.22, -r * 0.98);
-        g.lineTo(0, -r * 0.8);
-        g.lineTo(r * 0.22, -r * 0.98);
-        g.quadraticCurveTo(r * 0.5, -r * 0.5, 0, 0);
-        g.fill();
-        g.restore();
-      }
-      g.fillStyle = 'rgba(20,19,17,.8)';
-      g.beginPath();
-      g.arc(0, 0, r * 0.14, 0, TAU);
-      g.fill();
-    } else if (id === 'juji') {
-      ring();
-      g.lineWidth = r * 0.2;
-      g.lineCap = 'butt';
-      g.beginPath();
-      g.moveTo(-r * 0.72, 0);
-      g.lineTo(r * 0.72, 0);
-      g.moveTo(0, -r * 0.72);
-      g.lineTo(0, r * 0.72);
-      g.stroke();
-    } else if (id === 'aoi') {
-      ring();
-      for (let i = 0; i < 3; i++) {
-        g.save();
-        g.rotate((i * TAU) / 3);
-        g.beginPath();
-        g.moveTo(0, -r * 0.08);
-        g.quadraticCurveTo(-r * 0.5, -r * 0.3, -r * 0.3, -r * 0.66);
-        g.quadraticCurveTo(-r * 0.15, -r * 0.86, 0, -r * 0.7);
-        g.quadraticCurveTo(r * 0.15, -r * 0.86, r * 0.3, -r * 0.66);
-        g.quadraticCurveTo(r * 0.5, -r * 0.3, 0, -r * 0.08);
-        g.fill();
-        g.restore();
-      }
-    } else if (id === 'fuji') {
-      ring();
-      for (const sd of [-1, 1])
-        for (let k = 0; k < 6; k++) {
-          const t = k / 5;
-          g.beginPath();
-          g.arc(
-            sd * r * (0.12 + 0.42 * Math.sin(t * Math.PI * 0.9)),
-            -r * 0.62 + t * r * 1.15,
-            r * (0.17 - 0.018 * k),
-            0,
-            TAU,
-          );
-          g.fill();
-        }
-    } else if (id === 'tsuru') {
-      ring();
-      g.lineWidth = r * 0.2;
-      g.beginPath();
-      g.arc(0, r * 0.05, r * 0.62, Math.PI * 0.95, Math.PI * 2.05);
-      g.stroke();
-      g.beginPath();
-      g.arc(0, -r * 0.5, r * 0.16, 0, TAU);
-      g.fill();
-      g.lineWidth = r * 0.08;
-      g.beginPath();
-      g.moveTo(r * 0.1, -r * 0.5);
-      g.lineTo(r * 0.4, -r * 0.4);
-      g.stroke();
-      g.beginPath();
-      g.moveTo(0, -r * 0.35);
-      g.lineTo(0, r * 0.35);
-      g.stroke();
-    } else if (id === 'rokumon') {
-      for (let row = 0; row < 2; row++)
-        for (let c = 0; c < 3; c++) {
-          const cx = (c - 1) * r * 0.64,
-            cy = (row - 0.5) * r * 0.68;
-          g.fillStyle = col;
-          g.beginPath();
-          g.arc(cx, cy, r * 0.29, 0, TAU);
-          g.fill();
-          g.fillStyle = 'rgba(20,19,17,.85)';
-          g.fillRect(cx - r * 0.08, cy - r * 0.08, r * 0.16, r * 0.16);
-        }
-    }
-    g.restore();
+    drawCrestSprite(g, id, x, y, r);
   }
   function drawCrow(x: number, y: number, size: number) {
     env.inkCompanion?.draw('crow', g, x, y, size, time, petActive, env.reducedMotion);
@@ -551,5 +448,104 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     }
   }
 
-  return { drawFigure, drawSplit, drawGroundShadow, drawPetAt, drawSword, drawGlint, tipOf };
+  /** Draw the same puppet pieces that formed this enemy, with independent motion. */
+  function drawScattered(f: Figure, angle: number, elapsed: number) {
+    f = enemyPresence(f, time, !!env.reducedMotion);
+    const art = env.inkEnemy;
+    if (!art || f.back) return;
+    const l = f.lean || 0,
+      p = f.pose,
+      C = f.pal || cols(f.fog);
+    const hand: Point = [p.gx + l, p.gy];
+    const second: Point = f.twin
+      ? [-0.19 + l, -0.5]
+      : [
+          hand[0] - Math.cos(p.ang) * (f.spear ? 0.2 : 0.075),
+          hand[1] - Math.sin(p.ang) * (f.spear ? 0.2 : 0.075),
+        ];
+    const joints = [hand, second].map((h, i) => {
+      const side = i ? 1 : -1;
+      const shoulder: Point = [side * 0.15 + l, -0.765];
+      const elbow: Point = [
+        (shoulder[0] + h[0]) / 2 + side * 0.05,
+        (shoulder[1] + h[1]) / 2 + 0.05,
+      ];
+      return { h, shoulder, elbow };
+    });
+    const parts: { part: EnemyPart; pivot: Point }[] = [
+      { part: 'skirt', pivot: [l * 0.5, -0.26] },
+      { part: 'torso', pivot: [l * 0.8, -0.65] },
+      { part: 'head', pivot: [l * 1.05, -0.89] },
+    ];
+    for (const [i, j] of joints.entries()) {
+      parts.push({ part: i ? 'rightSleeve' : 'leftSleeve', pivot: j.shoulder });
+      parts.push({ part: i ? 'rightForearm' : 'leftForearm', pivot: j.elbow });
+      parts.push({ part: i ? 'rightHand' : 'leftHand', pivot: j.h });
+    }
+    g.save();
+    g.translate(f.x, f.y);
+    if (f.rot) g.rotate(f.rot);
+    g.scale(f.h, f.h * (f.sy || 1));
+    g.globalAlpha *= f.alpha ?? 1;
+    function fragment(index: number, pivot: Point, draw: () => void) {
+      const motion = scatteredPartMotion(index, elapsed, angle, f.d.seed);
+      if (motion.alpha <= 0) return;
+      g.save();
+      g.globalAlpha *= motion.alpha;
+      if (elapsed > 0) {
+        g.translate(pivot[0] + motion.x, pivot[1] + motion.y);
+        g.rotate(motion.rotation);
+        g.translate(-pivot[0], -pivot[1]);
+      }
+      draw();
+      g.restore();
+    }
+    // The waist scabbard is also part of the original silhouette.
+    fragment(parts.length + 2, [-0.2 + l * 0.5, -0.475], () => {
+      g.strokeStyle = C.hilt;
+      g.lineWidth = 0.02;
+      g.lineCap = 'round';
+      g.beginPath();
+      g.moveTo(-0.08 + l * 0.5, -0.52);
+      g.lineTo(-0.36, -0.43);
+      g.stroke();
+    });
+    for (const [index, { part, pivot }] of parts.entries())
+      if (!part.endsWith('Hand'))
+        fragment(index, pivot, () => {
+          art.drawPart(g, part, f, env);
+        });
+    if (!f.noSword)
+      fragment(parts.length, hand, () => {
+        if (f.spear) drawSpear(...hand, p.ang, C);
+        else drawSword(...hand, p.ang, C, f.blade, true, f.bladeId);
+      });
+    if (f.twin)
+      fragment(parts.length + 1, second, () => {
+        drawSword(...second, Math.PI - p.ang, C, {
+          len: 0.38,
+          d: C.steelD,
+          m: C.steel,
+          l: C.steelL,
+          edge: 'rgba(255,253,246,.85)',
+        });
+      });
+    for (const [index, { part, pivot }] of parts.entries())
+      if (part.endsWith('Hand'))
+        fragment(index, pivot, () => {
+          art.drawPart(g, part, f, env);
+        });
+    g.restore();
+  }
+
+  return {
+    drawFigure,
+    drawSplit,
+    drawScattered,
+    drawGroundShadow,
+    drawPetAt,
+    drawSword,
+    drawGlint,
+    tipOf,
+  };
 }

@@ -1,3 +1,4 @@
+import { dailyRun } from '../game/progression/daily.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { Equipment, Setup } from './saves.ts';
 import type { Statistics } from '../game/progression/statistics.ts';
@@ -15,7 +16,8 @@ export interface RunCheckpoint {
   status: 'active' | 'lost' | 'ended';
   seed: number;
   randomState: number;
-  run: Omit<RunState, 'bless' | 'card'> & { bless: string[] };
+  dailyDay?: string;
+  run: Omit<RunState, 'bless'> & { bless: string[] };
   stats: Statistics;
   awakening: AwakeningProgress;
   meta: MetaProgress;
@@ -127,6 +129,13 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
     !Number.isSafeInteger(raw.bossMilestone)
   )
     return null;
+  if (raw.dailyDay !== undefined) {
+    try {
+      if (typeof raw.dailyDay !== 'string' || dailyRun(raw.dailyDay).seed !== raw.seed) return null;
+    } catch {
+      return null;
+    }
+  }
   run.shrineRerolls = run.shrineRerolls === 1 ? 1 : 0;
   const triggers = run.blessingTriggers;
   if (triggers !== undefined) {

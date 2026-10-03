@@ -9,48 +9,60 @@
       aria-atomic="true"
       hidden
     ></div>
-    <div class="opt">
-      <div class="lab">Mode</div>
-      <div class="seg" data-k="mode" role="group" aria-label="Mode">
-        <button type="button" data-v="waves">Waves</button
-        ><button type="button" data-v="rush">決闘 Boss rush</button>
+    <button class="btn daily-entry" id="bDaily" type="button">
+      <span>今日</span><strong>Daily run</strong><small id="dailyDate"></small>
+    </button>
+    <p id="dailyLoadout" class="daily-loadout"></p>
+    <div class="setup-custom">
+      <div class="opt">
+        <div class="lab">Mode</div>
+        <div class="seg" data-k="mode" role="group" aria-label="Mode">
+          <button type="button" data-v="waves">Waves</button
+          ><button type="button" data-v="rush">決闘 Boss rush</button>
+        </div>
+        <div class="ds" id="dsMode"></div>
       </div>
-      <div class="ds" id="dsMode"></div>
-    </div>
-    <div class="opt" id="difficultyOption">
-      <div class="lab">Difficulty</div>
-      <div class="seg" data-k="diff" role="group" aria-label="Difficulty">
-        <button type="button" data-v="normal">Normal</button
-        ><button type="button" data-v="ronin">浪人 Ronin</button>
+      <div class="opt" id="difficultyOption">
+        <div class="lab">Difficulty</div>
+        <div class="seg" data-k="diff" role="group" aria-label="Difficulty">
+          <button type="button" data-v="normal">Normal</button
+          ><button type="button" data-v="ronin">浪人 Ronin</button>
+        </div>
+        <div class="ds" id="dsDiff"></div>
       </div>
-      <div class="ds" id="dsDiff"></div>
-    </div>
-    <div class="opt" id="arrowsOption">
-      <div class="lab">Arrows</div>
-      <div class="seg" data-k="arrows" role="group" aria-label="Arrows">
-        <button type="button" data-v="1">Shown</button
-        ><button type="button" data-v="0">Blade only</button>
+      <div class="opt" id="arrowsOption">
+        <div class="lab">Arrows</div>
+        <label class="setup-toggle"
+          ><input type="checkbox" id="setupArrows" role="switch" aria-label="Arrows" /><span
+            >Show arrows</span
+          ></label
+        >
+        <div class="ds" id="dsArrows"></div>
       </div>
-      <div class="ds" id="dsArrows"></div>
-    </div>
-    <div class="opt" id="livesOption">
-      <div class="lab">Lives</div>
-      <div class="seg" data-k="lives" role="group" aria-label="Lives">
-        <button type="button" data-v="3">Normal lives</button
-        ><button type="button" data-v="0">No lives</button
-        ><button type="button" data-v="zen">Endless</button>
+      <div class="opt" id="livesOption">
+        <div class="lab">Lives</div>
+        <div class="seg" data-k="lives" role="group" aria-label="Lives">
+          <button type="button" data-v="3">Normal lives</button
+          ><button type="button" data-v="0">No lives</button
+          ><button type="button" data-v="zen">Endless</button>
+        </div>
+        <div class="ds" id="dsDeath"></div>
       </div>
-      <div class="ds" id="dsDeath"></div>
-    </div>
-    <div class="opt">
-      <div class="lab">Temple upgrades</div>
-      <div class="seg" data-k="upgrades" role="group" aria-label="Temple upgrades">
-        <button type="button" data-v="1">On</button><button type="button" data-v="0">Off</button>
+      <div class="opt">
+        <div class="lab">Temple upgrades</div>
+        <label class="setup-toggle"
+          ><input
+            type="checkbox"
+            id="setupUpgrades"
+            role="switch"
+            aria-label="Temple upgrades"
+          /><span>Use upgrades</span></label
+        >
+        <div class="ds" id="dsUpgrades"></div>
+        <div class="ds" id="setupLoadout" role="status" aria-live="polite"></div>
       </div>
-      <div class="ds" id="dsUpgrades"></div>
-      <div class="ds" id="setupLoadout" role="status" aria-live="polite"></div>
+      <button class="btn primary" id="bBegin" type="button">Begin</button>
     </div>
-    <button class="btn primary" id="bBegin" type="button">Begin</button>
     <button class="btn back" type="button" data-back>Back</button>
   </div>
 </div>

@@ -19,7 +19,6 @@ export type Screen =
   | 'setup'
   | 'armory'
   | 'stats'
-  | 'share'
   | 'shrine'
   | 'over'
   | 'paused'
@@ -91,8 +90,6 @@ export interface RunState {
   newUnlocks: UnlockNotice[];
   panel: Screen | null;
   panelFrom: Screen;
-  card: HTMLCanvasElement | null;
-  cardScore: number;
   runBlade: string;
   runBladeThird: boolean;
   seed: number;
@@ -180,8 +177,6 @@ export function createRunState(savedHints: unknown = {}): RunState {
     newUnlocks: [],
     panel: null,
     panelFrom: 'title',
-    card: null,
-    cardScore: 0,
     runBlade: '',
     runBladeThird: false,
     seed: 0,

@@ -1,3 +1,4 @@
+import { drawSeal } from '../ui-art.ts';
 import { TAU, clamp, lerp, easeOut, easeInOut } from '../../shared/math.ts';
 import type { Effects } from './state.ts';
 export interface EffectDrawing {
@@ -552,11 +553,7 @@ export function createEffectRenderer(g: CanvasRenderingContext2D, fx: Effects, e
       if (s.seal) {
         const pw = tw + s.size * 0.5,
           ph = s.size * 1.3;
-        g.fillStyle = SEAL;
-        g.fillRect(-pw / 2, -ph / 2, pw, ph);
-        g.strokeStyle = 'rgba(244,237,225,.45)';
-        g.lineWidth = 2;
-        g.strokeRect(-pw / 2 + 5, -ph / 2 + 5, pw - 10, ph - 10);
+        drawSeal(g, 'wood', SEAL, -pw / 2, -ph / 2, pw, ph);
         g.fillStyle = '#f4ede1';
         g.fillText(s.text, 0, s.size * 0.04);
       } else {

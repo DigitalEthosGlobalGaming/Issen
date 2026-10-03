@@ -1,3 +1,6 @@
+import { setSealTextures } from './rendering/ui-art.ts';
+import { createScrollMenus } from './ui/scroll-menus.ts';
+import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.ts';
 import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
 import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
@@ -31,7 +34,6 @@ import { createRunState, resetRun } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
-import { createShareCard } from './ui/share-card.ts';
 import {
   appendGameOverUnlocks,
   renderGameOver,
@@ -139,7 +141,6 @@ import {
   markModeRevealsSeen,
   sanitizeSetup,
 } from './game/progression/meta.ts';
-import { createSharing } from './platform/sharing.ts';
 import { createLayout } from './rendering/layout.ts';
 import { BLADES, ROBES } from './game/content/cosmetics.ts';
 import { SPECIAL, STEEL_THIRD } from './game/content/awakenings.ts';
@@ -201,7 +202,6 @@ export function startGame(): () => void {
   const lifecycle = createLifecycle();
   ('use strict');
   function $(id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
-  function $(id: 'shareImg'): HTMLImageElement;
   function $(id: 'bAgain'): HTMLButtonElement;
   function $(id: string): HTMLElement;
   function $(id: string): HTMLElement {
@@ -324,6 +324,7 @@ export function startGame(): () => void {
   grantTrialRewards(TRIAL_PROGRESS, UNL);
   const playerStats = ST;
   let activeTrial: TrialDefinition | null = null;
+  let activeDaily: DailyRun | null = null;
   let trialFailure = '';
   let trialResult: TrialResult | null = null;
   let combatRandom = R;
@@ -346,7 +347,7 @@ export function startGame(): () => void {
   let shrineOfferIds: string[] | null = null;
   function captureCheckpoint(status: RunCheckpoint['status'] = 'active') {
     if (activeTrial || !['playing', 'boss', 'standoff', 'shrine', 'dead'].includes(G.state)) return;
-    const { card: _card, bless, ...run } = G;
+    const { bless, ...run } = G;
     const checkpoint: RunCheckpoint = {
       version: 1,
       status,
@@ -358,11 +359,12 @@ export function startGame(): () => void {
       meta: META,
       unlocks: [...UNL],
       equipment: EQ,
-      setup: SETUP,
+      setup: activeDaily?.setup ?? SETUP,
       ledger: rewardLedger,
       weather: WX,
       bossMilestone: runBossMilestone,
       offers: shrineOfferIds,
+      dailyDay: activeDaily?.day,
     };
     if (writeRunCheckpoint(checkpoint)) savedRun = readRunCheckpoint();
     else toast({ k: '!', msg: 'Run could not be saved on this device.' });
@@ -375,19 +377,28 @@ export function startGame(): () => void {
     $('bPlay').textContent = available ? 'Start new run' : 'Draw your blade';
     for (const id of ['bArmory', 'bStats', 'bTemplate', 'bTutorial', 'bTrials'])
       ($(id) as HTMLButtonElement).disabled = available;
-    $('tSeed').textContent = available ? `Saved run · seed ${savedRun!.seed}` : '';
+    $('tSeed').textContent = available
+      ? savedRun!.dailyDay
+        ? `Daily · ${savedRun!.dailyDay}`
+        : `Saved run · seed ${savedRun!.seed}`
+      : '';
   }
   function restoreCheckpoint(checkpoint: RunCheckpoint) {
+    activeDaily = checkpoint.dailyDay ? dailyRun(checkpoint.dailyDay) : null;
+    ST = activeDaily ? structuredClone(playerStats) : playerStats;
+    EQ = activeDaily ? { ...activeDaily.equipment } : playerEquipment;
     Object.assign(ST, preserveSecretDiscoveries(parseStatistics(checkpoint.stats), ST));
-    Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
-    Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
-    UNL.clear();
-    for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
-    reconcileCinematicCompanion(ST, UNL);
-    if (premiumAccess()) UNL.add(PREMIUM_FILM);
-    Object.assign(SETUP, checkpoint.setup);
-    Object.assign(EQ, parseEquipment(checkpoint.equipment, accessibleUnlocks(), ITEMS));
-    Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless), card: null });
+    if (!activeDaily) {
+      Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
+      Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
+      UNL.clear();
+      for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
+      reconcileCinematicCompanion(ST, UNL);
+      if (premiumAccess()) UNL.add(PREMIUM_FILM);
+      Object.assign(SETUP, checkpoint.setup);
+      Object.assign(EQ, parseEquipment(checkpoint.equipment, accessibleUnlocks(), ITEMS));
+    }
+    Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless) });
     if (G.so) G.so.e = G.enemies.find((e) => e.challenger) ?? G.so.e;
     G.attacker = null;
     G.panel = null;
@@ -395,14 +406,16 @@ export function startGame(): () => void {
     shrineOfferIds = checkpoint.offers;
     rewardLedger = checkpoint.ledger;
     runBossMilestone = checkpoint.bossMilestone;
-    runTemplate = templateModifiers(META, SETUP, premiumAccess());
+    runTemplate = templateModifiers(META, activeDaily?.setup ?? SETUP, premiumAccess());
     runRandom = restorableRng(checkpoint.seed);
     combatRandom = runRandom.next;
-    saveStats();
-    saveAwakening();
-    saveMeta();
-    store.set('issen.unlocks', [...UNL]);
-    store.set('issen.equip', EQ);
+    if (!activeDaily) {
+      saveStats();
+      saveAwakening();
+      saveMeta();
+      store.set('issen.unlocks', [...UNL]);
+      store.set('issen.equip', playerEquipment);
+    }
     setStage(G.stage, false);
     Object.assign(WX, checkpoint.weather);
     runRandom.restore(checkpoint.randomState);
@@ -411,6 +424,7 @@ export function startGame(): () => void {
     computeMods();
     renderLives();
     setScore();
+    applySeal();
     hud(true);
     $('waveLbl').textContent =
       G.state === 'boss' ? '決闘' : G.state === 'standoff' ? '挑' : `第${kanji(G.wave)}陣`;
@@ -438,7 +452,7 @@ export function startGame(): () => void {
     showOver();
   }
   function earn(event: 'kill' | 'wave' | 'boss') {
-    if (activeTrial) return;
+    if (activeTrial || activeDaily) return;
     accrueRunReward(rewardLedger, event, {
       zen: G.zen,
       emberBonus: G.m.emberBonus,
@@ -446,7 +460,7 @@ export function startGame(): () => void {
     });
   }
   const saveStats = () => {
-    if (!activeTrial) store.set('issen.stats', ST);
+    if (!activeTrial && !activeDaily) store.set('issen.stats', ST);
   };
   const revokedSave = store.get('issen.revoked', []);
   const revoked = new Set<string>(
@@ -476,6 +490,7 @@ export function startGame(): () => void {
     SEAL = SEALS[EQ.seal] || '#a3271d';
     SEALARC = EQ.seal === 'sumiseal' ? '#e9e3d6' : SEAL;
     document.documentElement.style.setProperty('--seal', SEAL);
+    void setSealTextures($('app'), SEAL);
   }
 
   /* ---------------- background ---------------- */
@@ -951,7 +966,7 @@ export function startGame(): () => void {
       : base;
   }
   function challenge(metric: keyof BladeStats, value = 1) {
-    if (G.zen || activeTrial) return;
+    if (G.zen || activeTrial || activeDaily) return;
     recordChallenge(AWAKENING, META.upgrades.awakening, G.runBlade, G.runRobe, metric, value);
     saveAwakening();
   }
@@ -1033,7 +1048,7 @@ export function startGame(): () => void {
     hudView.renderLives(G);
   }
   function hud(on: boolean) {
-    hudView.render(G, on);
+    hudView.render(G, on, activeDaily ? 'Daily' : undefined);
   }
   function setScore() {
     hudView.renderScore(G);
@@ -1042,7 +1057,7 @@ export function startGame(): () => void {
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
   const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
-    if (activeTrial) return;
+    if (activeTrial || activeDaily) return;
     if (G.hints[key]) return;
     G.hints[key] = 1;
     store.set('issen.hints', G.hints);
@@ -1057,7 +1072,7 @@ export function startGame(): () => void {
     });
   }
   function checkUnlocks() {
-    if (activeTrial) return;
+    if (activeTrial || activeDaily) return;
     if (G.state !== 'over') return;
     const before = UNL.size;
     unlockEligibleItems(
@@ -1224,7 +1239,7 @@ export function startGame(): () => void {
           lives: '0' as const,
           upgrades: false,
         }
-      : SETUP;
+      : (activeDaily?.setup ?? SETUP);
     runTemplate = templateModifiers(META, setup, premiumAccess());
     rewardLedger = createRunRewardLedger();
     runBossMilestone = 0;
@@ -1232,7 +1247,7 @@ export function startGame(): () => void {
     guided.reset();
     audio.setPaused(false);
     if (!activeTrial) {
-      G.seed = newRunSeed();
+      G.seed = activeDaily?.seed ?? newRunSeed();
       runRandom = restorableRng(G.seed);
       combatRandom = runRandom.next;
     }
@@ -1298,6 +1313,15 @@ export function startGame(): () => void {
         'Endless combo. You cannot die, but every mistake breaks your chain. End the run from pause.',
         6500,
       );
+  }
+  function startDaily() {
+    activeDaily = dailyRun();
+    ST = structuredClone(playerStats);
+    EQ = { ...activeDaily.equipment };
+    applySeal();
+    G.panel = null;
+    audioInit();
+    startRun();
   }
   function startTrial(id: string) {
     const trial = TRIALS.find((entry) => entry.id === id);
@@ -1601,9 +1625,13 @@ export function startGame(): () => void {
     e.shadowTime = 0;
     e.deathGround = { ...e.pos };
     e.deathType =
-      !G.m.bonk && accessible(EQ.fx) && ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
-        ? 'dissolve'
-        : chooseDeathStyle(perfect, !!G.m.bonk, R);
+      !G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour'
+        ? 'scatter'
+        : !G.m.bonk &&
+            accessible(EQ.fx) &&
+            ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
+          ? 'dissolve'
+          : chooseDeathStyle(perfect, !!G.m.bonk, R);
     e.fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
     if (e.deathType === 'disarm') {
       const q = e.pos,
@@ -1969,7 +1997,7 @@ export function startGame(): () => void {
     renderHp();
     $('bossbar').classList.add('on');
     sfx.drum();
-    if (!activeTrial) guided.startBoss();
+    if (!activeTrial && !activeDaily) guided.startBoss();
     if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
@@ -2381,7 +2409,8 @@ export function startGame(): () => void {
       e.cutAng = a;
       e.shadowTime = 0;
       e.deathGround = { ...p };
-      if (
+      if (!G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour') e.deathType = 'scatter';
+      else if (
         !G.m.bonk &&
         accessible(EQ.fx) &&
         ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
@@ -2638,7 +2667,38 @@ export function startGame(): () => void {
     clearHints();
     $('bossbar').classList.remove('on');
   }
+  function finishDaily() {
+    if (!activeDaily || G.state === 'over') return;
+    G.state = 'over';
+    const result = dailyResult(store.get('issen.daily', null), activeDaily.day, G);
+    store.set('issen.daily', result.records);
+    guided.reset();
+    audio.setPaused(false);
+    timeScale = 1;
+    lbT = 0;
+    clearHints();
+    $('bossbar').classList.remove('on');
+    const reward = { before: META.embers, after: META.embers, gained: 0 };
+    renderGameOver($('over'), G, result.record, result.newBest, STAGES[G.stage]!.n, reward, true);
+    $('overSeed').textContent = `Daily · ${activeDaily.day}`;
+    $('oModifier').hidden = true;
+    $('runResultSequence').hidden = true;
+    $('overSummary').hidden = false;
+    $('over').dataset.daily = 'true';
+    showScreen('over');
+    hud(false);
+    G.overReady = true;
+    $('bAgain').disabled = false;
+    clearRunCheckpoint();
+    savedRun = null;
+    updateSavedRunButtons();
+  }
   function showOver() {
+    if (activeDaily) {
+      finishDaily();
+      return;
+    }
+    delete $('over').dataset.daily;
     if (activeTrial) {
       finishTrial(G.reason === 'quit' ? 'You ended the attempt.' : 'A mistake ended the trial.');
       return;
@@ -2674,8 +2734,6 @@ export function startGame(): () => void {
       });
     markModeRevealsSeen(META);
     saveMeta();
-    G.cardScore = G.score;
-    G.card = null;
     G.claps = 0;
     renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled);
     $('overSeed').textContent = `Seed ${G.seed}`;
@@ -2699,6 +2757,10 @@ export function startGame(): () => void {
       (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
   }
   function toTitle() {
+    activeDaily = null;
+    ST = playerStats;
+    EQ = playerEquipment;
+    applySeal();
     G.panel = null;
     G.state = 'title';
     G.mode = 'normal';
@@ -2772,7 +2834,13 @@ export function startGame(): () => void {
       onRevealSound: () => sfx.glint(),
     },
   );
-  const renderSetup = setupScreen.render;
+  const renderSetup = () => {
+    setupScreen.render();
+    const daily = dailyRun();
+    $('dailyDate').textContent = daily.day;
+    $('dailyLoadout').textContent =
+      `${ITEM_BY[daily.equipment.blade]?.n} · ${ITEM_BY[daily.equipment.robe]?.n} · ${ITEM_BY[daily.equipment.charm]?.n}`;
+  };
   const tutorial = createTutorial(
     $('app'),
     (status) => {
@@ -2911,7 +2979,7 @@ export function startGame(): () => void {
           }
           store.set('issen.revoked', [...revoked]);
           store.set('issen.unlocks', [...UNL]);
-          store.set('issen.equip', EQ);
+          store.set('issen.equip', playerEquipment);
           computeMods();
           applySeal();
           G.runBlade = EQ.blade;
@@ -2997,7 +3065,10 @@ export function startGame(): () => void {
     if (G.panelFrom === 'title') setBestLine();
     showScreen(G.panelFrom);
   }
+  const scrollMenus = createScrollMenus($('app'));
+  lifecycle.add(scrollMenus.dispose);
   function applySettings() {
+    scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
     audio.setMuted(settings.muted);
     audio.setVolumes(settings.effectsVolume, settings.ambienceVolume);
@@ -3317,29 +3388,6 @@ export function startGame(): () => void {
     };
   }
 
-  /* ---------------- share card ---------------- */
-  const saveSharedCard = createSharing();
-  function makeCard() {
-    G.card = createShareCard(cvs, G, {
-      stage: STAGES[G.stage]!,
-      font: FONT,
-      seal: SEAL,
-      grain: grainCanv[0],
-    });
-    return G.card;
-  }
-  function openShare() {
-    const card = makeCard();
-    $('shareImg').src = card.toDataURL('image/png');
-    $('shareMsg').textContent = 'You can also press and hold the image to save it.';
-    openPanel('share');
-  }
-  async function saveCard() {
-    const card = G.card ?? makeCard();
-    const message = await saveSharedCard(card, G.cardScore);
-    if (message && !lifecycle.disposed) $('shareMsg').textContent = message;
-  }
-
   /* ---------------- input ---------------- */
   const disposePointer = bindPointer(cvs, {
     activate: audioInit,
@@ -3366,6 +3414,7 @@ export function startGame(): () => void {
     audioInit();
     abandonSavedRun();
   });
+  lifecycle.listen($('bDaily'), 'click', startDaily);
   lifecycle.listen($('bBegin'), 'click', () => {
     audioInit();
     G.panel = null;
@@ -3480,9 +3529,7 @@ export function startGame(): () => void {
     pause();
   });
   lifecycle.listen($('pauseBtn'), 'pointerdown', (e) => e.stopPropagation());
-  lifecycle.listen($('bShare'), 'click', openShare);
   lifecycle.listen($('bMenu'), 'click', toTitle);
-  lifecycle.listen($('bSave'), 'click', saveCard);
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
     bindings: () => settings.bindings,
@@ -3515,7 +3562,11 @@ export function startGame(): () => void {
     combatHaptics.stop();
     audio.setPaused(true);
     renderPauseBlessings($('paused'), G.bless);
-    $('pauseSeed').textContent = activeTrial ? '' : `Seed ${G.seed}`;
+    $('pauseSeed').textContent = activeDaily
+      ? `Daily · ${activeDaily.day}`
+      : activeTrial
+        ? ''
+        : `Seed ${G.seed}`;
     showScreen('paused');
     renderTrialObjective();
   }
@@ -3605,6 +3656,7 @@ export function startGame(): () => void {
     updateEnemies(dt, raw);
     if (
       !activeTrial &&
+      !activeDaily &&
       G.state === 'playing' &&
       waveConfiguration().ordered &&
       liveOrdered()[0]?.state === 'idle'
@@ -3679,6 +3731,10 @@ export function startGame(): () => void {
     figureRenderer().drawGroundShadow(e.deathGround ?? p, deathShadowOpacity(e.shadowTime ?? t));
     f.noShadow = true;
     f.glint = 0;
+    if (dtp === 'scatter' && !reducedMotion()) {
+      figureRenderer().drawScattered(f, e.cutAng ?? 0, t);
+      return;
+    }
     if (dtp === 'split' && !reducedMotion()) {
       drawSplit(f, p, e.cutAng ?? 0, t, deathDuration(dtp));
       return;
@@ -3710,7 +3766,9 @@ export function startGame(): () => void {
         b.deathGround ?? p,
         deathShadowOpacity(b.shadowTime ?? b.t, BOSS_SHADOW_DURATION),
       );
-      drawSplit({ ...f, noShadow: true }, p, b.cutAng, b.t, 1.6);
+      if (!G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour' && !reducedMotion())
+        figureRenderer().drawScattered({ ...f, noShadow: true }, b.cutAng, b.t * (1.1 / 1.6));
+      else drawSplit({ ...f, noShadow: true }, p, b.cutAng, b.t, 1.6);
     } else drawFigure(f);
     if (G.m.ofuda && b.state === 'feint') {
       const w = Math.max(26, p.h * 0.12),

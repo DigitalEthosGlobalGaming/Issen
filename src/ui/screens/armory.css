@@ -280,6 +280,12 @@
 .arm-unread .arm-label,
 .arm-unread .tn {
   text-decoration-line: underline;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 1px;
   text-underline-offset: 4px;
+}
+
+.crest-symbol {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
 }

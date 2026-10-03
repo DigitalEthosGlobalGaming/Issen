@@ -4,6 +4,7 @@ import type { Figure } from './types.ts';
 export const DEATH_STYLES = {
   split: { duration: 0.9 },
   dissolve: { duration: 0.9 },
+  scatter: { duration: 1.1 },
   kneel: { duration: 1.1 },
   stagger: { duration: 1.1 },
   disarm: { duration: 1.1 },
@@ -84,4 +85,19 @@ export function applyDeathPose(
     f.x += direction * f.h * 0.08 * k;
     f.rot = direction * 0.5 * easeInOut(clamp((t - 0.2) / 0.6));
   }
+}
+
+/** Stateless ballistic motion in figure units. It never consumes a gameplay RNG. */
+export function scatteredPartMotion(index: number, elapsed: number, angle: number, seed: number) {
+  const t = Math.max(0, elapsed);
+  const phase = Math.sin(seed * 3.17 + index * 17.13);
+  const spread = index % 2 ? 1 : -1;
+  const vx = Math.cos(angle) * 0.26 + spread * (0.24 + Math.abs(phase) * 0.35);
+  const vy = Math.sin(angle) * 0.18 - 0.35 - Math.abs(Math.cos(index * 11.7 + seed)) * 0.28;
+  return {
+    x: vx * t,
+    y: vy * t + 0.72 * t * t,
+    rotation: spread * (1.6 + Math.abs(phase) * 2.4) * t,
+    alpha: 1 - clamp((t - 0.45) / (deathDuration('scatter') - 0.45)),
+  };
 }

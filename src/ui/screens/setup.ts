@@ -47,6 +47,10 @@ export function createSetupScreen(
     return progression?.hasVitality?.() ?? true;
   }
   function renderControls(): void {
+    const arrows = root.querySelector<HTMLInputElement>('#setupArrows')!;
+    const upgrades = root.querySelector<HTMLInputElement>('#setupUpgrades')!;
+    arrows.checked = setup.arrows;
+    upgrades.checked = setup.upgrades !== false;
     const earned = milestone();
     let changed = false;
     if (!hasVitality() && setup.lives !== '3') {
@@ -65,6 +69,8 @@ export function createSetupScreen(
       setup.arrows = true;
       changed = true;
     }
+    arrows.checked = setup.arrows;
+    upgrades.checked = setup.upgrades !== false;
     if (changed) onChange(setup);
     const difficultyOption = root.querySelector<HTMLElement>('#difficultyOption');
     if (difficultyOption) difficultyOption.hidden = earned < 2;
@@ -72,6 +78,7 @@ export function createSetupScreen(
     if (livesOption) livesOption.hidden = !hasVitality();
     const arrowsOption = root.querySelector<HTMLElement>('#arrowsOption');
     if (arrowsOption) arrowsOption.hidden = earned < 3;
+    arrows.disabled = earned < 3;
     for (const group of groups) {
       const key = group.dataset.k;
       if (
@@ -106,15 +113,7 @@ export function createSetupScreen(
       dsArrows: descriptions.arrows[setup.arrows ? 1 : 0],
       dsDeath: descriptions.lives[setup.lives],
       dsMode: descriptions.mode[setup.mode],
-      dsUpgrades:
-        setup.upgrades === false
-          ? 'Temple and awakened powers off. Purchases stay saved.'
-          : setup.mode !== 'waves' ||
-              setup.diff !== 'normal' ||
-              setup.lives !== '3' ||
-              !setup.arrows
-            ? 'This mode disables Temple upgrades.'
-            : 'Purchased Temple upgrades apply to this run.',
+      dsUpgrades: '',
       setupLoadout: progression?.getLoadoutSummary?.() ?? '',
     })) {
       const element = root.querySelector(`#${id}`);
@@ -172,6 +171,24 @@ export function createSetupScreen(
         { signal: listeners.signal },
       );
     }
+  }
+  for (const [id, key] of [
+    ['setupArrows', 'arrows'],
+    ['setupUpgrades', 'upgrades'],
+  ] as const) {
+    root.querySelector<HTMLInputElement>('#' + id)!.addEventListener(
+      'change',
+      (event) => {
+        if (key === 'arrows' && milestone() < 3) {
+          renderControls();
+          return;
+        }
+        setup[key] = (event.target as HTMLInputElement).checked;
+        onChange(setup);
+        renderControls();
+      },
+      { signal: listeners.signal },
+    );
   }
   return { render, dispose: () => listeners.abort() };
 }

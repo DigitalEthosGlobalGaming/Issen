@@ -59,7 +59,11 @@ for (const edition of ['free', 'premium', 'web']) {
     await page.locator('#bArmory').click();
     await page.getByRole('tab', { name: /^Kill effects/ }).click();
     await page.locator('#armTiles button').filter({ hasText: 'Falling Leaves' }).click();
-    await expect(page.locator('#armInfo')).toContainText(allowed ? 'Equipped' : 'Requires Premium');
+    if (allowed)
+      await expect(
+        page.locator('#armTiles button').filter({ hasText: 'Falling Leaves' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    else await expect(page.locator('#armInfo')).toContainText('Requires Premium');
     await expect(page.locator('#armInfo')).toContainText('1,000');
     expect(
       await page.evaluate(() => (window as any).__mastery.equipment().fx === 'falling-leaves'),
@@ -91,7 +95,9 @@ test('Free verified purchase grants access; revocation suppresses equipment with
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Charms/ }).click();
   await page.locator('#armTiles button').filter({ hasText: "Pilgrim's Bead" }).click();
-  await expect(page.locator('#armInfo')).toContainText('Equipped');
+  await expect(
+    page.locator('#armTiles button').filter({ hasText: "Pilgrim's Bead" }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await page.evaluate(() =>
     (window as any).__mastery.premium.receive({
       entitlements: { verification: 'VERIFIED', active: {} },
@@ -168,7 +174,9 @@ test('Duel Master completes exactly 20 accelerating exchanges and awards First S
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Charms/ }).click();
   await page.locator('#armTiles button').filter({ hasText: 'First Strike' }).click();
-  await expect(page.locator('#armInfo')).toContainText('Equipped');
+  await expect(
+    page.locator('#armTiles button').filter({ hasText: 'First Strike' }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('Duel Master pauses without advancing and a wrong counter ends the attempt', async ({

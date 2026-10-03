@@ -243,7 +243,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
   ]) {
     await page.getByRole('tab', { name: new RegExp(`^${tab}`) }).click();
     await page.locator('#armTiles').getByRole('button', { name: name!, exact: true }).click();
-    await expect(page.locator('#armInfo')).toContainText('Equipped');
+    await expect(page.locator('#armInfo')).not.toContainText('Equipped');
     expect(
       await page.evaluate(
         (key) => JSON.parse(localStorage.getItem('issen.equip')!)[key!],

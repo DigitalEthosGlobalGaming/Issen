@@ -78,10 +78,23 @@ export interface PlayerArtwork {
     env: FigureEnvironment,
   ): boolean;
 }
+export type EnemyPart =
+  | 'body'
+  | 'head'
+  | 'arms'
+  | 'hands'
+  | 'torso'
+  | 'skirt'
+  | 'leftSleeve'
+  | 'rightSleeve'
+  | 'leftForearm'
+  | 'rightForearm'
+  | 'leftHand'
+  | 'rightHand';
 export interface EnemyArtwork {
   drawPart(
     g: CanvasRenderingContext2D,
-    part: 'body' | 'head' | 'arms' | 'hands',
+    part: EnemyPart,
     f: Figure,
     env: FigureEnvironment,
   ): boolean;

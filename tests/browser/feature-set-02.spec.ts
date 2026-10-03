@@ -54,7 +54,7 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
   await page.locator('#bPlay').click();
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');
-  await page.locator('[data-k="upgrades"] [data-v="0"]').click();
+  await page.locator('#setupUpgrades').uncheck();
   await expect(page.locator('#setupLoadout')).toBeEmpty();
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(2);
@@ -72,11 +72,8 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
   expect(saved.records).toEqual(['normal-base']);
   await page.reload();
   await page.locator('#bPlay').click();
-  await expect(page.locator('[data-k="upgrades"] [data-v="0"]')).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  await page.locator('[data-k="upgrades"] [data-v="1"]').click();
+  await expect(page.locator('#setupUpgrades')).not.toBeChecked();
+  await page.locator('#setupUpgrades').check();
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(5);
   await expect(page.locator('.badge.knives')).toHaveText('Knife ×3');

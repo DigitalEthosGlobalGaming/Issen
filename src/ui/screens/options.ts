@@ -231,6 +231,10 @@ export function createOptions(
         }),
       );
     } else {
+      select('menuStyle', 'Menus', [
+        ['Classic', 'classic'],
+        ['Scrolls', 'scroll'],
+      ]);
       const preferences = [
         ['System', 'system'],
         ['On', 'on'],
@@ -302,6 +306,7 @@ export function createOptions(
             settings.reducedMotion = 'system';
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
+            settings.menuStyle = 'classic';
             settings.quality = 'auto';
 
             settings.vibration = true;

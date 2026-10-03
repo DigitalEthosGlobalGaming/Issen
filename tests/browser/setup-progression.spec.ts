@@ -9,6 +9,7 @@ test('setup toggles permanent power, retains Normal save identifier and refreshe
     const path = '/src/ui/screens/setup.ts';
     const { createSetupScreen } = await import(path);
     const root = document.querySelector('#setup')!.cloneNode(true) as HTMLElement;
+    document.body.append(root);
     const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: true };
     let saves = 0;
     const controller = createSetupScreen(root, setup, () => saves++, {
@@ -22,23 +23,22 @@ test('setup toggles permanent power, retains Normal save identifier and refreshe
     const text = (id: string) => root.querySelector(id)!.textContent;
     const normalLabel = text('[data-k="lives"] [data-v="3"]');
     const before = text('#setupLoadout');
-    root.querySelector<HTMLButtonElement>('[data-k="upgrades"] [data-v="0"]')!.click();
+    root.querySelector<HTMLInputElement>('#setupUpgrades')!.click();
     const after = text('#setupLoadout');
-    const off = root
-      .querySelector('[data-k="upgrades"] [data-v="0"]')!
-      .getAttribute('aria-pressed');
+    const off = root.querySelector<HTMLInputElement>('#setupUpgrades')!.checked;
     root.querySelector<HTMLButtonElement>('[data-k="mode"] [data-v="rush"]')!.click();
-    root.querySelector<HTMLButtonElement>('[data-k="upgrades"] [data-v="1"]')!.click();
+    root.querySelector<HTMLInputElement>('#setupUpgrades')!.click();
     const excluded = text('#dsUpgrades');
     controller.dispose();
+    root.remove();
     return { normalLabel, before, after, off, excluded, saves, lives: setup.lives };
   });
   expect(result).toEqual({
     normalLabel: 'Normal lives',
     before: 'Starting lives: 5 · Knives: 3',
     after: 'Starting lives: 2 · Knives: 0',
-    off: 'true',
-    excluded: 'This mode disables Temple upgrades.',
+    off: false,
+    excluded: '',
     saves: 3,
     lives: '3',
   });
@@ -87,7 +87,9 @@ test('setup hides locked options, sanitizes stale selections, and reveals each e
       throw new Error('Difficulty shown before Ronin unlock');
     if (!root.querySelector('#livesOption')!.hasAttribute('hidden'))
       throw new Error('Lives shown before Vitality unlock');
-    const locked = [option('mode', 'rush'), option('diff', 'ronin'), option('arrows', '0')];
+    const locked = [option('mode', 'rush'), option('diff', 'ronin')];
+    if (!root.querySelector<HTMLInputElement>('#setupArrows')!.disabled)
+      throw new Error('Locked arrows enabled');
     if (locked.some((button) => !button.hidden || !button.disabled))
       throw new Error('Locked option visible or enabled');
     // Even synthetic dispatch must not bypass the gameplay lock.

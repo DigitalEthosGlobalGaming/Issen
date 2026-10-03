@@ -1,0 +1,119 @@
+/* A hanging scroll stays over the live scene; controls and scrolling retain their DOM layout. */
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) {
+  background: linear-gradient(90deg, #08070638, #08070686 50%, #08070638);
+  transition: none;
+  padding-top: 32px;
+  padding-bottom: 40px;
+  justify-content: flex-start;
+}
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child {
+  position: relative;
+  box-sizing: border-box;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 100%;
+  padding: 24px clamp(14px, 3vw, 28px);
+  border: 12px solid transparent;
+  isolation: isolate;
+  background: transparent;
+  box-shadow: 0 14px 42px #0009;
+  transform-origin: center top;
+}
+.scroll-paper {
+  display: none;
+}
+#app[data-menu-style='scroll'] .scroll-paper {
+  display: block;
+  position: absolute;
+  inset: -12px;
+  border: 12px solid transparent;
+  border-image: url('/src/ui/assets/world-ui-scroll-paper.png') 36 fill / 12px stretch;
+  filter: sepia(0.4) brightness(0.16);
+  pointer-events: none;
+  z-index: -1;
+}
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::before,
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  left: -22px;
+  right: -22px;
+  height: 14px;
+  border: 1px solid #78674b;
+  border-radius: 5px;
+  background: url('/src/ui/assets/world-ui-scroll-rod.png') center / 100% 100% no-repeat;
+  filter: sepia(0.5) brightness(0.7);
+  box-shadow: 0 3px 6px #0006;
+}
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::before {
+  top: -16px;
+}
+#app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::after {
+  bottom: -16px;
+}
+#app[data-menu-style='scroll'] .scroll-entering > :first-child {
+  animation: scroll-unroll 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+#app[data-menu-style='scroll'] .screen.scroll-leaving {
+  display: flex;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+#app[data-menu-style='scroll'] .scroll-leaving > :first-child {
+  animation: scroll-roll 240ms ease-in both;
+}
+@keyframes scroll-unroll {
+  from {
+    clip-path: inset(0 0 calc(100% - 24px));
+    transform: translateY(-12px) scaleY(0.92);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(-24px -32px -24px -32px);
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes scroll-roll {
+  from {
+    clip-path: inset(-24px -32px -24px -32px);
+    opacity: 1;
+  }
+  to {
+    clip-path: inset(0 0 calc(100% - 24px));
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+#app.reduced-motion[data-menu-style='scroll'] .screen > :first-child {
+  animation: none;
+}
+#app.reduced-motion[data-menu-style='scroll'] .screen.scroll-leaving {
+  opacity: 0;
+  display: none;
+}
+@media (max-width: 480px) {
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) {
+    padding: 24px 12px 30px;
+  }
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child {
+    border-width: 8px;
+    padding: 16px 8px;
+  }
+}
+@media (max-height: 460px) {
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+}
+@media (forced-colors: active) {
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child {
+    border-image: none;
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+}

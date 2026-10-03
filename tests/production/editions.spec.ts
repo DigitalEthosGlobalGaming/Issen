@@ -39,7 +39,11 @@ test('compiled edition gates, mastery selection and favicon match build configur
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Kill effects/ }).click();
   await page.locator('#armTiles button').filter({ hasText: 'Falling Leaves' }).click();
-  await expect(page.locator('#armInfo')).toContainText(access ? 'Equipped' : 'Requires Premium');
+  if (access) {
+    await expect(
+      page.locator('#armTiles button').filter({ hasText: 'Falling Leaves' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  } else await expect(page.locator('#armInfo')).toContainText('Requires Premium');
   await page.locator('#armory [data-back]').click();
   await page.locator('#bTrials').click();
   await expect(page.locator('[data-trial="duel-master"]')).toBeEnabled({ enabled: access });

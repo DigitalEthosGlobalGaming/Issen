@@ -1,3 +1,12 @@
+const crestUrls: Record<string, string> = {
+  tomoe: new URL('../assets/world-ui-crest-tomoe.png', import.meta.url).href,
+  kikyo: new URL('../assets/world-ui-crest-kikyo.png', import.meta.url).href,
+  juji: new URL('../assets/world-ui-crest-juji.png', import.meta.url).href,
+  aoi: new URL('../assets/world-ui-crest-aoi.png', import.meta.url).href,
+  fuji: new URL('../assets/world-ui-crest-fuji.png', import.meta.url).href,
+  tsuru: new URL('../assets/world-ui-crest-tsuru.png', import.meta.url).href,
+  rokumon: new URL('../assets/world-ui-crest-rokumon.png', import.meta.url).href,
+};
 import type { Item, ItemCategory } from '../../game/content/items.ts';
 import type { Equipment } from '../../platform/saves.ts';
 import type { Statistics, BladeStats } from '../../game/progression/statistics.ts';
@@ -141,7 +150,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         (hid ? 'Hidden outfit or item' : it.n) + (own ? '' : ' (locked)'),
       );
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
-      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${spU ? '<span class="spb">真</span>' : ''}`;
+      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : crestUrls[it.id] ? `<img class="crest-symbol" src="${crestUrls[it.id]}" alt="" />` : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${spU ? '<span class="spb">真</span>' : ''}`;
       if (newItem(it)) {
         b.classList.add('arm-unread');
         b.setAttribute('aria-description', 'Unviewed equipment');
@@ -194,7 +203,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       return;
     }
     $('armInfo').innerHTML =
-      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${!accessible(it.id) ? 'Requires Premium' : own ? (EQ[armTab] === it.id ? 'Equipped' : '') : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
+      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${!accessible(it.id) ? 'Requires Premium' : own ? '' : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
       (sp
         ? `<div class="awakening-active"><div class="awakening-label">${it.id === 'steel' && EQ.bladeThird ? 'Third Awakening active' : 'Awakened active'}</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
         : (display.benefit ? `<div class="pk">+ ${display.benefit}</div>` : '') +

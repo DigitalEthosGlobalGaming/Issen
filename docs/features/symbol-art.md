@@ -43,6 +43,8 @@ scale, and portrait/landscape screens before accepting a new batch.
 
 Demon Mirror is the eleventh Trial and uses the dedicated calligraphic [horned mirror emblem](../../src/ui/assets/demon-mirror-symbol.png), alongside the original ten-emblem Trial atlas.
 
-Temple upgrade tiles use gold for affordable ranks, muted grey for unavailable ranks and warm vermilion for maxed ranks. Selection uses a separate ivory outline. Prices and owned ranks remain visible; completion has no extra label and no donation count appears on the title menu.
+Temple upgrade tiles use normal ivory for affordable ranks, muted grey for unavailable ranks and a warm diagonal stripe for maxed ranks. Selection uses a separate ivory outline. Prices and owned ranks remain visible; completion has no extra label and no donation count appears on the title menu.
 
 Fully completed upgrades appear after the remaining upgrades. Both groups keep the catalog order; buying the final rank moves that upgrade to the completed group without changing the selected detail.
+
+Version 1.41.0 extends the editable UI artwork with the [world UI atlas](../../src/ui/assets/world-ui-atlas.md): textured grayscale seal materials and calligraphic crests. See [daily and world UI](daily-and-world-ui.md) for rendering and scroll menus.

@@ -320,3 +320,76 @@ test('explicit motion overrides control result tallies and setup reveal animatio
   });
   expect(animation).toBe('setup-ink-reveal');
 });
+
+test('scroll menus are opt-in, persist and reset with Display', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'classic');
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Display/ })
+    .click();
+  await page.getByLabel('Menus', { exact: true }).selectOption('scroll');
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
+  await page.locator('#bPlay').click();
+  await expect(page.locator('#setup')).toHaveClass(/on/);
+  await expect(page.locator('#bBegin')).toBeVisible();
+  await page.locator('#setup [data-back]').click();
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Display/ })
+    .click();
+  await page.getByLabel('Reduced motion', { exact: true }).selectOption('on');
+  await page.keyboard.press('Escape');
+  await options(page).getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.locator('.scroll-entering, .scroll-leaving')).toHaveCount(0);
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Display/ })
+    .click();
+  await options(page).getByRole('button', { name: 'Restore defaults', exact: true }).click();
+  await expect(page.getByLabel('Menus', { exact: true })).toHaveValue('classic');
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'classic');
+});
+
+test('scroll presentation disposes pending rolls and respects reduced motion', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const path = '/src/ui/scroll-menus.ts';
+    const { createScrollMenus } = await import(path);
+    const root = document.createElement('div');
+    root.innerHTML = '<div class="screen"><div class="box"><button>Choose</button></div></div>';
+    document.body.append(root);
+    const screen = root.firstElementChild as HTMLElement;
+    const menus = createScrollMenus(root);
+    const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+    menus.update('scroll', false);
+    screen.classList.add('on');
+    await flush();
+    const enters = screen.classList.contains('scroll-entering');
+    screen.classList.remove('on');
+    await flush();
+    const leaves = screen.classList.contains('scroll-leaving') && screen.inert;
+    menus.update('scroll', true);
+    const cleared = !screen.inert && !screen.classList.contains('scroll-leaving');
+    screen.classList.add('on');
+    await flush();
+    const still = !screen.classList.contains('scroll-entering');
+    menus.update('scroll', false);
+    screen.classList.remove('on');
+    await flush();
+    menus.dispose();
+    const disposed =
+      !screen.inert && !root.dataset.menuStyle && !screen.classList.contains('scroll-leaving');
+    root.remove();
+    return { enters, leaves, cleared, still, disposed };
+  });
+  expect(result).toEqual({
+    enters: true,
+    leaves: true,
+    cleared: true,
+    still: true,
+    disposed: true,
+  });
+});

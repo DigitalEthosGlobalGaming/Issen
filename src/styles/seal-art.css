@@ -1,0 +1,34 @@
+.seal,
+.sealk {
+  background: transparent;
+  border: 5px solid transparent;
+  border-image: var(--seal-paper) 36 fill / 5px stretch;
+  border-radius: 0;
+  box-shadow: none;
+}
+.seal {
+  border-image-width: 7px;
+}
+#toast .sealk {
+  border-image-source: var(--seal-wood);
+}
+.o-unlock .sealk {
+  border-image-source: var(--seal-silk);
+}
+#shrine .sealk {
+  border-image-source: var(--seal-stone);
+}
+#badges .chip {
+  border: 4px solid transparent;
+  border-image: var(--seal-metal) 36 fill / 4px stretch;
+}
+@media (forced-colors: active) {
+  .seal,
+  .sealk,
+  #badges .chip {
+    border-image: none;
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

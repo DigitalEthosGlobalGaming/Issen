@@ -52,7 +52,8 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     dt = 0,
     cut = 0;
   let density = 1;
-  let dissolving = false;
+  let dissolving = false,
+    scattering = false;
   const position = () => ({
     x: canvas.width * 0.8,
     y: canvas.height * 0.8,
@@ -63,6 +64,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   function demo(effect: string, bonk: boolean): void {
     const p = position();
     elapsed = 0;
+    scattering = effect === 'scattered-armour' && !bonk;
     dissolving = ['falling-leaves', 'ember-ash', 'ink-wash'].includes(effect) && !bonk;
     for (const particles of Object.values(fx)) particles.length = 0;
     cut = services.random() < 0.5 ? 0 : Math.PI / 2;
@@ -135,10 +137,12 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
         pose: EPOSE.guard,
         lean: 0,
       };
-      if (elapsed < 0.9) {
+      if (elapsed < (scattering ? 1.1 : 0.9)) {
         figures.drawGroundShadow(figure, deathShadowOpacity(elapsed));
         figure.noShadow = true;
-        if (dissolving) {
+        if (scattering && !frame.reducedMotion) {
+          figures.drawScattered(figure, cut, elapsed);
+        } else if (dissolving) {
           applyDeathPose(figure, 'dissolve', elapsed, 1, frame.reducedMotion);
           figures.drawFigure(figure);
         } else if (frame.reducedMotion) {

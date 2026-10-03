@@ -103,3 +103,11 @@ test('legacy artwork preferences are ignored without changing other saved settin
     assert.deepEqual(loaded.bindings, defaultSettings().bindings);
   }
 });
+
+test('menu style is opt-in and survives version-1 profile settings', () => {
+  assert.equal(defaultSettings().menuStyle, 'classic');
+  for (const menuStyle of [undefined, null, 'unknown', true])
+    assert.equal(parseSettings({ version: 1, menuStyle }).menuStyle, 'classic');
+  assert.equal(parseSettings({ ...defaultSettings(), menuStyle: 'scroll' }).menuStyle, 'scroll');
+  assert.equal(parseSettings({ ...defaultSettings(), menuStyle: 'classic' }).menuStyle, 'classic');
+});

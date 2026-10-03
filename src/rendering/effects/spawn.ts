@@ -81,7 +81,10 @@ export function createEffectSpawner(fx: Effects, env: EffectSpawning) {
       });
   }
   function killFx(t: string, cx: number, cy: number, ang: number, sc: number) {
-    if (t === 'falling-leaves') {
+    if (t === 'scattered-armour') {
+      // The figure renderer supplies the actual enemy parts; keep the cut clean.
+      return;
+    } else if (t === 'falling-leaves') {
       for (let i = 0; i < count(24); i++)
         fx.px.push({
           k: 'maple',

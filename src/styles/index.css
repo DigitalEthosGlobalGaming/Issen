@@ -6,6 +6,7 @@
 @import '../ui/screens/setup-reveals.css';
 @import './components.css';
 @import '../ui/screens/progression.css';
+@import '../ui/screens/setup.css';
 @import '../ui/screens/run-results.css';
 @import '../ui/screens/pause.css';
 @import '../ui/screens/admin.css';
@@ -14,3 +15,6 @@
 @import '../ui/screens/cinematic.css';
 @import './button-frames.css';
 @import './panel-frames.css';
+@import '../ui/scroll-menus.css';
+
+@import './seal-art.css';

@@ -93,14 +93,11 @@ Unit tests exercise deterministic rules, save validation, state isolation, timin
 effect expiry and lifecycle cleanup. Browser tests cover startup, pause/resume,
 end-run/restart, all twelve mode/difficulty/life-setting combinations, boss victory
 to shrine to next duel, Daruma revival, malformed saves, mute persistence, screen
-controllers, renderer isolation, portrait/landscape drawing, sharing fallback
-branches with mocked browser/host APIs, share-card generation and disposal/remount.
+controllers, renderer isolation, portrait/landscape drawing and disposal/remount.
 Feature-04 browser checks additionally exercise first live guided encounters,
 portrait setup gates, Armoury unread underlines, deferred boss rewards and run-end reveals.
 These tests are not proof of pixel-perfect parity or complete playthrough coverage.
-Production tests separately exercise bundled asset startup, armory, a run, sharing
-and landscape layout. Native mobile share sheets and physical touch devices are not
-covered by desktop automation.
+Production tests separately exercise bundled asset startup, armory, a run and landscape layout. Physical touch devices require additional verification.
 
 Default keyboard controls are arrows/WASD to cut, Space to tap/parry (or throw an
 owned, charged knife during an ordinary wave), and P/Escape to pause or resume.
@@ -200,16 +197,11 @@ and secret event sequences/predicates have focused unit coverage.
 skip/replay, cleanup and save isolation. The audio cue test verifies synthesis
 parameters; listening in combat is still needed to assess the sound's character.
 
-## Persistence and sharing
+## Persistence
 
 Use test contexts or a disposable browser profile when testing save corruption or
 reset behavior. Do not clear real player data. Saves belong to the browser origin;
 localhost, LAN addresses and deployed sites have separate storage.
-
-Sharing tries an optional host downloads API, then Web Share when file sharing is
-supported, then a PNG download link. Host downloads require the host integration;
-Web Share depends on browser/device support. The displayed image remains a manual
-save option. Native dialogs and actual mobile devices require separate verification.
 
 ## GitHub Pages deployment
 
@@ -232,3 +224,5 @@ The standalone privacy policy is maintained in `public/privacy/index.html` and
 published at https://digitalethosglobalgaming.github.io/Issen/privacy/. Vite copies
 it to the build. The title screen opens it in a separate tab. Keep the policy
 current when adding online services, analytics, ads or purchases.
+
+Daily runs, midnight recovery and profile isolation have focused coverage in `tests/unit/daily.test.mjs` and `tests/browser/daily.spec.ts`. Options tests exercise Classic/Scrolls persistence, reset and reduced-motion disposal. The privacy policy links to the standalone AI disclosure; neither page loads game code.

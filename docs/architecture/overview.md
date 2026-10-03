@@ -70,12 +70,12 @@ See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../featu
 | Particle state, spawning, updates, drawing, films                       | `src/rendering/effects/`                                               |
 | Isolated armory rendering                                               | `src/rendering/armory-preview.ts`                                      |
 | Screen fragments and controllers                                        | `src/ui/screens/`                                                      |
-| HUD/navigation, hints/toasts, share-card composition                    | `src/ui/`                                                              |
+| HUD/navigation, hints/toasts, scroll menu presentation                    | `src/ui/`                                                              |
 | Pointer and keyboard adapters                                           | `src/input/`                                                           |
 | Validated profile settings and Options submenus                         | `src/platform/settings.ts`, `src/ui/screens/options.ts`                |
 | Death style selection, poses, durations and ground-shadow fading        | `src/rendering/figures/death.ts`, `figure.ts`                           |
 | Synthesized cues, audio context and ambience                            | `src/audio/audio.ts`                                                   |
-| Save validation, storage, sharing, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
+| Save validation, storage, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
 
 `platform/run-checkpoint.ts` validates the active run snapshot. `game.ts`
 captures it after each wave, duel, standoff or Shrine offer is prepared and
@@ -122,7 +122,7 @@ for several simulation seconds. Preview clocks remain independent.
   their existing raw-time behavior. Resume resets the scheduler's clock. Guided
   lessons go directly to safe practice using that paused-simulation boundary.
   The first boss approaches at normal speed, then holds its parry glint.
-- Main rendering, armory previews and share cards use explicit target canvases.
+- Main rendering and armory previews use explicit target canvases.
   Preview instances own their particle and animation state; no global canvas swap
   is used. Palette caches are instance-owned.
 - `createLifecycle()` owns runtime listeners and timers. Input, setup, armory,
@@ -210,3 +210,5 @@ and `ink-enemy.ts`; figure composition owns rear/front limb and weapon order.
 Procedural grass, sky, terrain, weather, awakening effects, and unmigrated spear
 geometry remain independent. See [character artwork](../features/character-art.md)
 for asset coverage and contracts.
+
+Daily presets and date seeds belong to `game/progression/daily.ts`; the runtime keeps daily equipment/statistics separate from the player profile. Scroll menu presentation belongs to `ui/scroll-menus.ts`, and tintable seal/crest drawing to `rendering/ui-art.ts`. See [daily and world UI](../features/daily-and-world-ui.md).

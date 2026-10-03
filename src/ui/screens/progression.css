@@ -72,7 +72,7 @@
   left: 12px;
   right: 12px;
   bottom: 4px;
-  height: 3px;
+  height: 0;
   background: currentColor;
   opacity: 0.85;
 }
@@ -84,16 +84,14 @@
   outline-offset: 2px;
 }
 .upgrade-tile[data-state='affordable'] {
-  color: #e4c98e;
-  background: #5b472c80;
-  border-color: #e4c98e;
-  box-shadow: inset 0 0 0 1px #e4c98e60;
+  color: var(--paper);
 }
 .upgrade-tile[data-state='unaffordable'],
 .upgrade-tile[data-state='locked'] {
   color: #928a80;
   border-color: #665951;
   background: #211c1980;
+  opacity: 0.55;
 }
 .upgrade-tile[data-state='locked'] {
   border-style: dashed;
@@ -103,6 +101,16 @@
   border-color: #984b3b;
   background: #48291f80;
   box-shadow: inset 0 -3px #984b3b;
+}
+.upgrade-tile[data-state='max']::after {
+  left: 8%;
+  right: 8%;
+  bottom: 50%;
+  height: 2px;
+  transform: rotate(-27deg);
+  background: #d2b9a0;
+  opacity: 0.65;
+  pointer-events: none;
 }
 .upgrade-tile .symbol-art,
 .template-detail .symbol-art {

@@ -14,7 +14,7 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
   await expect(page.locator('.tutorial-overlay')).toBeHidden();
   await expect(page.locator('#title')).toHaveClass(/on/);
   await page.locator('#bPlay').click();
-  for (const selector of ['[data-v="rush"]', '[data-v="ronin"]', '[data-k="arrows"] [data-v="0"]'])
+  for (const selector of ['[data-v="rush"]', '[data-v="ronin"]', '#setupArrows'])
     await expect(page.locator('#setup ' + selector)).toBeHidden();
   await page.locator('#bBegin').click();
   await expect(page.locator('.tutorial-overlay')).toBeHidden();

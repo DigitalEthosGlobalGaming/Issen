@@ -11,6 +11,7 @@ export interface Settings {
   reducedMotion: Preference;
   reducedFlashes: Preference;
   textSize: 'normal' | 'large';
+  menuStyle: 'classic' | 'scroll';
   quality: 'auto' | 'low' | 'high';
   vibration: boolean;
   vibrationStrength: 'light' | 'full';
@@ -42,6 +43,7 @@ export function defaultSettings(muted = false): Settings {
     reducedMotion: 'system',
     reducedFlashes: 'system',
     textSize: 'normal',
+    menuStyle: 'classic',
     quality: 'auto',
     vibration: true,
     vibrationStrength: 'full',
@@ -102,6 +104,7 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     reducedMotion: choice('reducedMotion', ['system', 'on', 'off'], 'system'),
     reducedFlashes: choice('reducedFlashes', ['system', 'on', 'off'], 'system'),
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
+    menuStyle: choice('menuStyle', ['classic', 'scroll'], 'classic'),
     quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),

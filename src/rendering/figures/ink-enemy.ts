@@ -1,7 +1,7 @@
 import { enemyAppearance } from './enemy-appearance.ts';
-import type { Figure, FigureEnvironment, Point } from './types.ts';
+import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
-type Part = 'body' | 'head' | 'arms' | 'hands';
+type Part = EnemyPart;
 type Frame = readonly [number, number, number, number];
 const BASE_FRAMES = {
   torso: [63, 92, 343, 334],
@@ -264,51 +264,55 @@ export function createInkEnemyRenderer(doc: Document) {
     if (!supports(f)) return false;
     const l = f.lean || 0;
     g.save();
-    if (part === 'body') {
+    if (part === 'body' || part === 'torso' || part === 'skirt') {
       g.scale(appearance?.width ?? 1, 1);
-      g.save();
-      g.translate(l * 0.5, -0.51);
-      const sway =
-        env.reducedMotion || env.reducedFlashes
-          ? 0
-          : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 + env.wind * 0.003;
-      g.rotate(sway);
-      if (appearance) {
-        const i = appearance.clothing + 3;
-        const lower = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
-        const frame = CLOTHING_FRAMES[i]!,
-          width = (0.52 * frame[2]) / frame[3];
-        if (lower) g.drawImage(lower, -width / 2, 0, width, 0.52);
-      } else {
-        const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
-        const dark = rgb((f.pal || env.palette(0)).robeD);
-        const mist = rgb(env.palette(1).robe);
-        g.fillStyle = `rgb(${dark.map((v, i) => Math.round(v + (mist[i]! - v) * fog)).join(',')})`;
-        g.beginPath();
-        g.moveTo(-0.12, -0.008);
-        g.lineTo(0.12, -0.008);
-        g.lineTo(0.19, 0.47);
-        g.lineTo(0.04, 0.51);
-        g.lineTo(-0.17, 0.47);
-        g.closePath();
-        g.fill();
+      if (part !== 'torso') {
         g.save();
-        g.transform(1, 0, -0.065, 1, 0, 0);
-        stamp(g, 'leftPanel', -0.26, 0, 0.325, 0.52, f, env);
-        g.restore();
-        g.save();
-        g.transform(1, 0, 0.065, 1, 0, 0);
-        stamp(g, 'rightPanel', -0.065, 0, 0.325, 0.52, f, env);
+        g.translate(l * 0.5, -0.51);
+        const sway =
+          env.reducedMotion || env.reducedFlashes
+            ? 0
+            : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 + env.wind * 0.003;
+        g.rotate(sway);
+        if (appearance) {
+          const i = appearance.clothing + 3;
+          const lower = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
+          const frame = CLOTHING_FRAMES[i]!,
+            width = (0.52 * frame[2]) / frame[3];
+          if (lower) g.drawImage(lower, -width / 2, 0, width, 0.52);
+        } else {
+          const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
+          const dark = rgb((f.pal || env.palette(0)).robeD);
+          const mist = rgb(env.palette(1).robe);
+          g.fillStyle = `rgb(${dark.map((v, i) => Math.round(v + (mist[i]! - v) * fog)).join(',')})`;
+          g.beginPath();
+          g.moveTo(-0.12, -0.008);
+          g.lineTo(0.12, -0.008);
+          g.lineTo(0.19, 0.47);
+          g.lineTo(0.04, 0.51);
+          g.lineTo(-0.17, 0.47);
+          g.closePath();
+          g.fill();
+          g.save();
+          g.transform(1, 0, -0.065, 1, 0, 0);
+          stamp(g, 'leftPanel', -0.26, 0, 0.325, 0.52, f, env);
+          g.restore();
+          g.save();
+          g.transform(1, 0, 0.065, 1, 0, 0);
+          stamp(g, 'rightPanel', -0.065, 0, 0.325, 0.52, f, env);
+          g.restore();
+        }
         g.restore();
       }
-      g.restore();
-      if (appearance) {
-        const i = appearance.clothing;
-        const torso = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
-        const frame = CLOTHING_FRAMES[i]!,
-          width = (0.355 * frame[2]) / frame[3];
-        if (torso) g.drawImage(torso, -width / 2 + l * 0.8, -0.835, width, 0.355);
-      } else stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355, f, env);
+      if (part !== 'skirt') {
+        if (appearance) {
+          const i = appearance.clothing;
+          const torso = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
+          const frame = CLOTHING_FRAMES[i]!,
+            width = (0.355 * frame[2]) / frame[3];
+          if (torso) g.drawImage(torso, -width / 2 + l * 0.8, -0.835, width, 0.355);
+        } else stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355, f, env);
+      }
     } else if (part === 'head') {
       if (appearance && useVariantHead) {
         const i = appearance.head,
@@ -343,10 +347,12 @@ export function createInkEnemyRenderer(doc: Document) {
       }
     } else
       for (const [i, j] of joints(f).entries()) {
-        if (part === 'arms') {
+        const side = i ? 'right' : 'left';
+        if (part === 'arms' || part === side + 'Sleeve')
           bone(g, i ? 'rightSleeve' : 'leftSleeve', j.shoulder, j.elbow, 0.135, f, env);
+        if (part === 'arms' || part === side + 'Forearm')
           bone(g, i ? 'rightForearm' : 'leftForearm', j.elbow, j.hand, 0.055, f, env);
-        } else {
+        if (part === 'hands' || part === side + 'Hand') {
           g.save();
           g.translate(...j.hand);
           g.rotate(f.pose.ang + Math.PI / 2);

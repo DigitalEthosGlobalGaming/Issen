@@ -9,7 +9,6 @@ export const SCREENS: readonly Screen[] = [
   'paused',
   'armory',
   'stats',
-  'share',
   'setup',
   'shrine',
   'template',
@@ -74,7 +73,7 @@ export function createHud(root: HTMLElement) {
     );
   }
 
-  function render(run: HudState, visible: boolean): void {
+  function render(run: HudState, visible: boolean, runLabel?: string): void {
     renderLives(run);
     hud.classList.toggle('on', visible);
     badges.replaceChildren();
@@ -88,7 +87,8 @@ export function createHud(root: HTMLElement) {
     if (run.blade) badge('刃', 'badge');
     if (run.zen) badge('無限', 'badge');
     if ((run.maxKnives ?? run.knives ?? 0) > 0) badge(`Knife ×${run.knives ?? 0}`, 'badge knives');
-    if (run.upgradesEnabled === false) badge('Upgrades off', 'badge');
+    if (runLabel) badge(runLabel, 'badge');
+    else if (run.upgradesEnabled === false) badge('Upgrades off', 'badge');
     for (const id of run.bless) {
       const blessing = BLESS_BY[id];
       if (blessing) badge(blessing.k, `chip ${TIER[blessing.t]}`);

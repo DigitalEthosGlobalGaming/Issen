@@ -1,3 +1,4 @@
+import { drawSeal } from './ui-art.ts';
 import { TAU, clamp } from '../shared/math.ts';
 import { DANG } from '../shared/directions.ts';
 import type { Direction } from '../shared/directions.ts';
@@ -159,11 +160,7 @@ export function drawEnso(
     g.save();
     g.translate(r * 0.78, -r * 0.78);
     g.rotate(-0.08);
-    g.fillStyle = SEAL;
-    g.fillRect(-s / 2, -s / 2, s, s);
-    g.strokeStyle = 'rgba(244,237,225,.4)';
-    g.lineWidth = 1;
-    g.strokeRect(-s / 2 + 2, -s / 2 + 2, s - 4, s - 4);
+    drawSeal(g, 'paper', SEAL, -s / 2, -s / 2, s, s);
     g.fillStyle = '#f4ede1';
     g.font = `800 ${s * 0.7}px ${FONT}`;
     g.textAlign = 'center';

@@ -6,7 +6,10 @@ import {
   deathDuration,
   deathShadowOpacity,
   DEATH_STYLES,
+  scatteredPartMotion,
 } from '../../src/rendering/figures/death.ts';
+import { createItems } from '../../src/game/content/items.ts';
+import { STAT0 } from '../../src/game/progression/statistics.ts';
 import { rng } from '../../src/shared/random.ts';
 import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
 
@@ -24,7 +27,7 @@ test('perfect kills vary, Bonk never cuts or disarms, and all styles are reachab
   assert.deepEqual(
     [...normal].sort(),
     Object.keys(DEATH_STYLES)
-      .filter((s) => s !== 'dissolve')
+      .filter((s) => !['dissolve', 'scatter'].includes(s))
       .sort(),
   );
   assert.ok(!bonk.has('split') && !bonk.has('disarm'));
@@ -62,4 +65,31 @@ test('shadows vanish before bodies and raw-time fading is independent of simulat
   assert.equal(deathShadowOpacity(0.4), 0);
   assert.equal(deathShadowOpacity(0.7, 0.7), 0);
   assert.ok(deathDuration('fall') > 0.4);
+});
+
+test('scattered parts begin assembled, separate independently, and expire without randomness', () => {
+  const motions = [];
+  for (let i = 0; i < 12; i++) {
+    const initial = scatteredPartMotion(i, 0, Math.PI / 2, 42);
+    assert.equal(Math.abs(initial.x), 0);
+    assert.equal(Math.abs(initial.y), 0);
+    assert.equal(Math.abs(initial.rotation), 0);
+    assert.equal(initial.alpha, 1);
+    const airborne = scatteredPartMotion(i, 0.35, Math.PI / 2, 42);
+    assert.ok(Number.isFinite(airborne.y) && airborne.y !== 0);
+    assert.ok(airborne.alpha > 0);
+    assert.deepEqual(airborne, scatteredPartMotion(i, 0.35, Math.PI / 2, 42));
+    assert.equal(scatteredPartMotion(i, deathDuration('scatter'), 0, 42).alpha, 0);
+    motions.push(airborne);
+  }
+  assert.equal(new Set(motions.map((m) => m.rotation)).size, 12);
+  assert.ok(motions.some((m) => m.x < 0) && motions.some((m) => m.x > 0));
+});
+
+test('Scattered Armour is a selectable cosmetic earned at 500 lifetime kills', () => {
+  const item = createItems(() => new Set()).find((item) => item.id === 'scattered-armour');
+  assert.equal(item.type, 'fx');
+  assert.equal(item.ok({ ...STAT0, kills: 499 }), false);
+  assert.equal(item.ok({ ...STAT0, kills: 500 }), true);
+  assert.equal(item.m, undefined);
 });

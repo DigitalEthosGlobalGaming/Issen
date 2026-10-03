@@ -51,9 +51,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('built assets support startup, armory, a run, sharing, and landscape layout', async ({
-  page,
-}) => {
+test('built assets support startup, armory, a run, and landscape layout', async ({ page }) => {
   const errors: string[] = [],
     requests: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -75,17 +73,8 @@ test('built assets support startup, armory, a run, sharing, and landscape layout
   await page.keyboard.press('p');
   await page.getByRole('button', { name: 'End run', exact: true }).click();
   await finishResults(page);
-  await page.locator('#bShare').click();
-  await expect
-    .poll(() =>
-      page
-        .locator('#shareImg')
-        .evaluate((image: HTMLImageElement) => [image.naturalWidth, image.naturalHeight]),
-    )
-    .toEqual([1080, 1350]);
+  await expect(page.locator('#bShare, #share')).toHaveCount(0);
   await page.setViewportSize({ width: 844, height: 390 });
-  await expect(page.locator('#share')).toHaveClass(/on/);
-  await page.locator('#share [data-back]').click();
   await page.locator('#bAgain').click();
   await expect(page.locator('#hud')).toHaveClass(/on/);
   expect(requests.some((url) => /\/assets\/.*\.js/.test(url))).toBe(true);

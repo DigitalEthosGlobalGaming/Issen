@@ -80,17 +80,7 @@ test('ending a paused run renders records and allows a fresh run', async ({ page
   expect(stats.runs).toBe(1);
   expect(stats.deaths).toEqual({});
   expect(stats.rec.normal.wave).toBe(1);
-  await page.locator('#bShare').click();
-  await expect(page.locator('#share')).toHaveClass(/on/);
-  await expect
-    .poll(() =>
-      page
-        .locator('#shareImg')
-        .evaluate((image: HTMLImageElement) => [image.naturalWidth, image.naturalHeight]),
-    )
-    .toEqual([1080, 1350]);
-  await page.locator('#share [data-back]').click();
-  await expect(page.locator('#over')).toHaveClass(/on/);
+  await expect(page.locator('#bShare, #share')).toHaveCount(0);
   await page.locator('#bAgain').click();
   await expect(page.locator('#over')).not.toHaveClass(/on/);
   await expect(page.locator('#hud')).toHaveClass(/on/);

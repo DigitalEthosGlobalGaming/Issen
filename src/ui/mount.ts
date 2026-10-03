@@ -3,7 +3,6 @@ import title from './screens/title.html?raw';
 import gameOver from './screens/game-over.html?raw';
 import armory from './screens/armory.html?raw';
 import stats from './screens/stats.html?raw';
-import share from './screens/share.html?raw';
 import setup from './screens/setup.html?raw';
 import shrine from './screens/shrine.html?raw';
 import pause from './screens/pause.html?raw';
@@ -16,7 +15,6 @@ const screens: Record<string, string> = {
   'game-over': gameOver,
   armory,
   stats,
-  share,
   setup,
   shrine,
   pause,

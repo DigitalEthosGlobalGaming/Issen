@@ -182,58 +182,6 @@ test('armory preview effects stay local to their renderer instance', async ({ pa
   expect(result).toEqual({ unaffected: true, different: true, slices: 1 });
 });
 
-test('share cards preserve the source and render deterministic mode variants', async ({ page }) => {
-  await page.goto('/');
-  const results = await page.evaluate(async () => {
-    const modulePath = '/src/ui/share-card.ts';
-    const { createShareCard } = await import(modulePath);
-    const source = document.createElement('canvas');
-    source.width = 390;
-    source.height = 844;
-    const context = source.getContext('2d')!;
-    context.fillStyle = '#ff0000';
-    context.fillRect(0, 0, 390, 844);
-    const before = source.toDataURL();
-    const options = {
-      stage: { n: 'Bamboo', k: '竹' },
-      font: 'serif',
-      seal: '#a3271d',
-      date: new Date(2026, 8, 27),
-    };
-    const variants: string[] = [];
-    for (const flags of [
-      { mode: 'normal', zen: false, rush: false },
-      { mode: 'ronin', zen: true, rush: false },
-      { mode: 'normal', zen: false, rush: true },
-    ]) {
-      const run = Object.freeze({
-        ...flags,
-        blade: false,
-        hard: false,
-        reason: 'quit',
-        maxCombo: 12,
-        cardScore: 420,
-        bossesSlain: 1,
-        wave: 3,
-        kills: 20,
-        perfects: 10,
-        hits: 2,
-      });
-      const card = createShareCard(source, run, options);
-      if (card === source || card.width !== 1080 || card.height !== 1350)
-        throw new Error('Invalid output canvas');
-      const pixel = Array.from(card.getContext('2d')!.getImageData(540, 100, 1, 1).data);
-      if (pixel.join(',') !== '255,0,0,255') throw new Error('Source image was not copied');
-      const encoded = card.toDataURL();
-      if (encoded !== createShareCard(source, run, options).toDataURL())
-        throw new Error('Non-deterministic card');
-      variants.push(encoded);
-    }
-    return { unchanged: source.toDataURL() === before, distinct: new Set(variants).size };
-  });
-  expect(results).toEqual({ unchanged: true, distinct: 3 });
-});
-
 test('weather layers render in both orientations without mutating simulation state', async ({
   page,
 }) => {

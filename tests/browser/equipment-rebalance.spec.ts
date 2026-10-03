@@ -20,7 +20,7 @@ test('Jinbaori starts above five lives and retains its gear bonus with Temple up
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();
-  await page.locator('[data-k="upgrades"] [data-v="0"]').click();
+  await page.locator('#setupUpgrades').uncheck();
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(4);
