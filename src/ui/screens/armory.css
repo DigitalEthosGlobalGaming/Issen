@@ -10,7 +10,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  max-width: 560px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 .armTop {
@@ -42,10 +42,8 @@
 #prevC {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 2;
-  max-height: 20vh;
-  object-fit: contain;
+  height: clamp(180px, 27vh, 260px);
+  cursor: zoom-in;
   border-radius: 6px;
   background: #1c1b19;
 }
@@ -312,14 +310,13 @@
 .tile:focus-visible,
 .tab:focus-visible,
 .arm-forms button:focus-visible,
-.arm-category-arrow:focus-visible,
 .arm-details summary:focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 2px;
 }
 @media (orientation: portrait) and (max-height: 720px) {
   #prevC {
-    max-height: 100px;
+    height: 140px;
   }
 }
 @media (orientation: landscape) and (max-height: 560px) {
@@ -338,7 +335,7 @@
     padding: 0 12px;
   }
   #prevC {
-    max-height: 20vh;
+    height: 150px;
   }
   .armInfo {
     min-height: 0;
@@ -383,6 +380,63 @@
     border-width: 6px;
   }
   #app[data-menu-style='scroll'] #prevC {
-    max-height: 90px;
+    height: 140px;
+  }
+}
+
+#prevC:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+.arm-inspection {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #181510;
+  overflow: hidden;
+}
+.arm-inspection::backdrop {
+  background: #12100e;
+}
+#app .arm-inspection #prevC {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  cursor: default;
+}
+.arm-inspection-close {
+  position: absolute;
+  z-index: 1;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  min-height: 44px;
+}
+@media (min-width: 900px) and (min-height: 561px) {
+  .armWrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .armHead {
+    grid-column: 1 / -1;
+    padding-bottom: 4px;
+  }
+  .armTop {
+    max-height: none;
+  }
+  #prevC {
+    height: clamp(260px, 42vh, 440px);
+  }
+  .armBottom {
+    min-height: 0;
+    border-top: 0;
+    border-left: 1px solid #ece6da24;
   }
 }

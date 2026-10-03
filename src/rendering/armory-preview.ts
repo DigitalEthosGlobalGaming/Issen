@@ -15,6 +15,7 @@ import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
 import roomUrl from '../ui/assets/armoury-room.png';
+import { drawArmoryRoom, drawRoomWind, roomWindow } from './armory-room.ts';
 
 export interface PreviewFrame extends Omit<FigureEnvironment, 'width' | 'height' | 'random'> {
   background: HTMLCanvasElement | null;
@@ -63,6 +64,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     dt = 0,
     cut = 0;
   let density = 1;
+  let roomTime = 0;
   let dissolving = false,
     scattering = false;
   const position = () => ({
@@ -99,6 +101,15 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   }
 
   function draw(frame: PreviewFrame): void {
+    const now = services.now();
+    dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
+    last = now;
+    if (!frame.reducedMotion) roomTime += dt;
+    frame = {
+      ...frame,
+      time: roomTime,
+      wind: frame.reducedMotion ? 0 : Math.sin(roomTime * 0.7) * 0.35,
+    };
     density = frame.effectDensity ?? 1;
     const g = context!;
     const width = canvas.width,
@@ -110,10 +121,7 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       roomCache.height = height;
       const background = roomCache.getContext('2d')!;
       if ((roomReady || room.complete) && room.naturalWidth) {
-        const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
-        const dw = room.naturalWidth * zoom,
-          dh = room.naturalHeight * zoom;
-        background.drawImage(room, (width - dw) / 2, (height - dh) / 2, dw, dh);
+        drawArmoryRoom(background, room, width, height);
       }
       const gradient = background.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, 'rgba(10,10,9,.1)');
@@ -122,6 +130,13 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       background.fillRect(0, 0, width, height);
     }
     g.drawImage(roomCache, 0, 0);
+    if (room.naturalWidth)
+      drawRoomWind(
+        g,
+        roomWindow(width, height, room.naturalWidth, room.naturalHeight),
+        roomTime,
+        !!frame.reducedMotion,
+      );
     const figures = createFigureRenderer(g, {
       ...frame,
       inkCharm,
@@ -134,9 +149,6 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       random: services.random,
     });
     if (frame.effectsVisible) {
-      const now = services.now();
-      dt = Math.min(0.05, (now - (last || now)) / 1000);
-      last = now;
       elapsed += dt;
       const p = position();
       const figure: Figure = {
@@ -165,21 +177,26 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
         if (figure.alpha > 0) figures.drawFigure(figure);
       }
     }
+    const portrait = width / height < 1.1;
+    const playerHeight = Math.min(height * 0.82, width * (portrait ? 1.05 : 0.8));
     figures.drawFigure({
       ...frame.appearance,
-      x: width * 0.42,
+      x: width * (portrait ? 0.38 : 0.42),
       y: height * 0.94,
-      h: height * 0.74,
+      h: playerHeight,
       back: true,
       waiting: true,
       fog: 0,
-      pose: { gx: 0.19, gy: -0.52, ang: 0.55 },
+      pose: { gx: 0.19, gy: -0.52, ang: portrait ? -1.15 : 0.55 },
       noShadow: false,
     });
-    if (frame.pet === 'shiba') figures.drawPetAt('shiba', width * 0.86, height - 4, height * 0.22);
-    else if (frame.pet === 'cat') figures.drawPetAt('cat', width * 0.88, height - 4, height * 0.2);
+    const petHeight = Math.min(height, width * 1.3);
+    if (frame.pet === 'shiba')
+      figures.drawPetAt('shiba', width * 0.84, height * 0.94, petHeight * 0.22);
+    else if (frame.pet === 'cat')
+      figures.drawPetAt('cat', width * 0.86, height * 0.94, petHeight * 0.2);
     else if (frame.pet === 'mystic-rock')
-      figures.drawPetAt('mystic-rock', width * 0.86, height - 4, height * 0.3);
+      figures.drawPetAt('mystic-rock', width * 0.84, height * 0.94, petHeight * 0.3);
     if (frame.effectsVisible) {
       updateEffects(fx, dt || 0.016, dt || 0.016, {
         scale: scale(),

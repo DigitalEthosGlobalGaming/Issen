@@ -59,6 +59,8 @@ for (const menuStyle of ['classic', 'scroll']) {
         /Tap again|Awakening: Active|Selected\./,
       );
       await expect(page.locator('#armInfo .fl')).toBeHidden();
+      // A larger player preview shares a scrolling detail area on short screens.
+      await page.locator('#armInfo .tr').scrollIntoViewIfNeeded();
       const geometry = await page.evaluate(() => {
         const tiles = document.querySelector('#armTiles')!;
         const bounds = tiles.getBoundingClientRect();

@@ -269,3 +269,21 @@ Runtime and preview retain independent loader/disposal lifecycles. One validated
 The main player and Armoury preview breathe subtly while resting, with fixed foot coordinates and unchanged simulation poses. Gameplay swings and falls suppress that presentation; reduced motion freezes it. `src/rendering/figures/player-presence.ts` owns the visual transform.
 
 Mystic Rock once again uses the original `mystic-rock.png` sprite and gentle vertical bob, independently loaded alongside the articulated animal atlas. The three animals retain their separate head, tail, limb and wing animations. Preparation and disposal settle both image loaders; reduced motion freezes the rock.
+
+## Responsive Armoury presentation
+
+The Armoury uses the same modular player, sword, charm and companion sprites as
+combat. `src/rendering/armory-preview.ts` owns its independent foreground clock,
+room cache and effect demonstrations. `src/rendering/armory-room.ts` composes
+existing room regions as cropped wall/window sprites and a continuous floor on
+narrow layouts; wide layouts preserve the original room composition. Sprite
+proportions stay fixed. Window light and six bounded wind marks add movement;
+reduced motion freezes the room and player idle movement.
+
+The canvas backing size follows its CSS size at up to DPR 2. Mobile previews are
+larger, and wide screens place preview/details beside the collection.
+`src/ui/screens/armory-inspection.ts` moves the same canvas into a full-screen
+modal. Touch or Enter/Space opens inspection; Done, Escape and browser/Android
+Back restore it without changing equipment, Details or category selection.
+Effect demonstrations remain available by tapping the inspected player area or
+selecting an effect. No character artwork was added or replaced.

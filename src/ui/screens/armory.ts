@@ -14,6 +14,7 @@ import { SPECIAL, STEEL_THIRD } from '../../game/content/awakenings.ts';
 import { ROBE_AWAKENINGS } from '../../game/content/robe-awakenings.ts';
 import { isNewArmoryItem, markArmoryItemViewed } from '../../game/progression/armory-seen.ts';
 import { itemPresentation } from './item-presentation.ts';
+import { createArmoryInspection } from './armory-inspection.ts';
 
 const ARM: readonly (readonly [ItemCategory, string])[] = [
   ['blade', 'Blades'],
@@ -85,8 +86,10 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   const activeAwakening = (it: Item) => selectedAwakening(it) && powersEnabled();
   let detailsOpen = false;
   const tabs = $('armTabs');
-  const preview = $('prevC');
+  const preview = $('prevC') as HTMLCanvasElement;
+  const inspection = createArmoryInspection(root, preview);
   const onPreview = () => {
+    if (!inspection.expanded) inspection.open();
     if (armTab === 'fx') events.preview();
   };
   preview.addEventListener('click', onPreview);
@@ -289,6 +292,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       return armTab;
     },
     dispose() {
+      inspection.dispose();
       preview.removeEventListener('click', onPreview);
       $('armTabs').replaceChildren();
       $('armTiles').replaceChildren();
