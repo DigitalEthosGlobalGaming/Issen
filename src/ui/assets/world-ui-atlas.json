@@ -1,0 +1,115 @@
+{
+  "width": 768,
+  "height": 640,
+  "frames": {
+    "material-paper": {
+      "x": 0,
+      "y": 0,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "material-wood": {
+      "x": 192,
+      "y": 0,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "material-metal": {
+      "x": 384,
+      "y": 0,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "material-silk": {
+      "x": 576,
+      "y": 0,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "material-stone": {
+      "x": 0,
+      "y": 192,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "scroll-paper": {
+      "x": 192,
+      "y": 192,
+      "width": 192,
+      "height": 192,
+      "pivot": [96, 96],
+      "slice": 36
+    },
+    "scroll-rod": {
+      "x": 384,
+      "y": 192,
+      "width": 192,
+      "height": 48,
+      "pivot": [96, 24]
+    },
+    "crest-tomoe": {
+      "x": 0,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-kikyo": {
+      "x": 128,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-juji": {
+      "x": 256,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-aoi": {
+      "x": 384,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-fuji": {
+      "x": 512,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-tsuru": {
+      "x": 640,
+      "y": 384,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    },
+    "crest-rokumon": {
+      "x": 0,
+      "y": 512,
+      "width": 128,
+      "height": 128,
+      "pivot": [64, 64]
+    }
+  },
+  "origin": "top-left",
+  "pivotUnits": "frame-local pixels",
+  "color": "grayscale; opaque material interiors, white transparent crests",
+  "transforms": "do not mirror or rotate crests; materials use nine-slice",
+  "source": "scripts/generate-world-ui-atlas.mjs"
+}
