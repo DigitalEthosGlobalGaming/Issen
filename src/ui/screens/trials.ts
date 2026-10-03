@@ -83,9 +83,9 @@ export function renderTrials(
     button.dataset.trial = trial.id;
     const completed = progress.completed.includes(trial.id);
     if (completed) {
-      button.classList.add('trial-completed');
-      button.style.setProperty('--stroke-x', `${((index % 4) * 100) / 3}%`);
-      button.style.setProperty('--stroke-y', `${Math.floor((index % 8) / 4) * 100}%`);
+      card.classList.add('trial-completed');
+      card.style.setProperty('--stroke-x', `${((index % 4) * 100) / 3}%`);
+      card.style.setProperty('--stroke-y', `${Math.floor((index % 8) / 4) * 100}%`);
       button.setAttribute('aria-description', 'Trial completed');
     }
     button.textContent = !trialAccessible(trial.id, premiumAccess)

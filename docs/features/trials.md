@@ -101,9 +101,9 @@ seed determines landmark placement, moon position and mountain silhouettes;
 advancing waves changes combat without recomposing the scene. Resize retains
 the same composition seed. Short ash-coloured grass replaces the stone floor.
 
-Completed Trial buttons use one of eight left-to-right brush strokes from the
+Completed Trial cards use one of eight left-to-right brush strokes from the
 [UI stroke atlas](../../src/ui/assets/ui-strokes-atlas.md). Catalog position
-selects a stable variation at 0.28 opacity behind the text; completion remains
+selects a stable variation at 0.28 opacity across the whole card behind its text; completion remains
 available to assistive technology and Replay remains usable. Unfinished Trials
 have no overlay. The atlas and its exact frame metadata are reproducible through
 `scripts/generate-ui-strokes.mjs`.

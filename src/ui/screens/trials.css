@@ -57,7 +57,11 @@
 .trial-completed::before {
   content: '';
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 50%;
+  aspect-ratio: 3;
+  transform: translateY(-50%);
   z-index: -1;
   pointer-events: none;
   background: url('../assets/ui-strokes-atlas.png') var(--stroke-x) var(--stroke-y) / 400% 200%
