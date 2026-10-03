@@ -2,6 +2,47 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFrameLoop, frameDelta } from '../../src/platform/frame-loop.ts';
 
+test('high refresh displays retain real-time combat at 60 fps and menus at 30 fps', () => {
+  let now = 0,
+    callback,
+    fps = 60,
+    updates = [];
+  const loop = createFrameLoop(
+    { hitStop: 0, slowT: 0, timeScale: 1 },
+    {
+      maxFps: () => fps,
+      paused: () => false,
+      update: (delta) => updates.push(delta),
+      render() {},
+      afterRender() {},
+    },
+    {
+      now: () => now,
+      request: (cb) => {
+        callback = cb;
+        return 1;
+      },
+      cancel() {},
+    },
+  );
+  loop.start();
+  for (let i = 1; i <= 120; i++) {
+    now = (i * 1000) / 120;
+    callback(now);
+  }
+  assert.ok(updates.length >= 60 && updates.length <= 61);
+  assert.ok(Math.abs(updates.reduce((a, b) => a + b, 0) - 1) < 0.01);
+  fps = 30;
+  updates = [];
+  for (let i = 121; i <= 240; i++) {
+    now = (i * 1000) / 120;
+    callback(now);
+  }
+  assert.ok(updates.length >= 30 && updates.length <= 31);
+  assert.ok(Math.abs(updates.reduce((a, b) => a + b, 0) - 1) < 0.04);
+  loop.stop();
+});
+
 test('frame timing composes hit stop, slow motion and time scale', () => {
   const timing = { hitStop: 0.01, slowT: 1, timeScale: 0.3 };
   assert.equal(frameDelta(0.02, timing), 0.02 * 0.06 * 0.5 * 0.3);

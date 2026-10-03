@@ -45,6 +45,17 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
   const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
   const inkSword = createInkSwordRenderer(canvas.ownerDocument);
+  void inkCharm.prepare();
+  void inkCompanion.prepare();
+  void inkEnemy.prepare();
+  void inkPlayer.prepare();
+  void inkSword.prepare();
+  const roomCache = canvas.ownerDocument.createElement('canvas');
+  let roomReady = false;
+  room.onload = () => {
+    roomReady = true;
+    roomCache.width = 0;
+  };
   const fx = createEffects();
   let dummy = makeFig(4242);
   let elapsed = 9,
@@ -94,24 +105,23 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       height = canvas.height;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, width, height);
-    if (room.complete && room.naturalWidth) {
-      const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
-      const dw = room.naturalWidth * zoom,
-        dh = room.naturalHeight * zoom;
-      g.drawImage(room, (width - dw) / 2, (height - dh) / 2, dw, dh);
+    if (roomCache.width !== width || roomCache.height !== height) {
+      roomCache.width = width;
+      roomCache.height = height;
+      const background = roomCache.getContext('2d')!;
+      if ((roomReady || room.complete) && room.naturalWidth) {
+        const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
+        const dw = room.naturalWidth * zoom,
+          dh = room.naturalHeight * zoom;
+        background.drawImage(room, (width - dw) / 2, (height - dh) / 2, dw, dh);
+      }
+      const gradient = background.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, 'rgba(10,10,9,.1)');
+      gradient.addColorStop(1, 'rgba(10,10,9,.5)');
+      background.fillStyle = gradient;
+      background.fillRect(0, 0, width, height);
     }
-    const gradient = g.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, 'rgba(10,10,9,.1)');
-    gradient.addColorStop(1, 'rgba(10,10,9,.5)');
-    g.fillStyle = gradient;
-    g.fillRect(0, 0, width, height);
-    {
-      void inkCharm.prepare();
-      void inkCompanion.prepare();
-      void inkEnemy.prepare();
-      void inkPlayer.prepare();
-      void inkSword.prepare();
-    }
+    g.drawImage(roomCache, 0, 0);
     const figures = createFigureRenderer(g, {
       ...frame,
       inkCharm,
@@ -198,7 +208,9 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
     demo,
     draw,
     dispose() {
+      room.onload = null;
       room.removeAttribute('src');
+      roomCache.width = roomCache.height = 0;
       inkCharm.dispose();
       inkCompanion.dispose();
       inkEnemy.dispose();

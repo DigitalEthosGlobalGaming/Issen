@@ -1,3 +1,9 @@
+import {
+  activeNow,
+  pageActive,
+  requestActiveFrame,
+  cancelActiveFrame,
+} from '../../platform/activity.ts';
 import './tutorial.css';
 
 /** A practice scene with its own clock, canvas and inputs. It never touches a run or profile. */
@@ -76,7 +82,7 @@ export function createTutorial(
   }
   function setStep(next: number, message = '') {
     step = next;
-    started = performance.now();
+    started = activeNow();
     title.textContent = lessons[step]![0]!;
     lesson.textContent = lessons[step]![1]!;
     feedback.textContent = message;
@@ -89,7 +95,7 @@ export function createTutorial(
   function finish(status: 'completed' | 'skipped') {
     if (!active) return;
     active = false;
-    cancelAnimationFrame(frame);
+    cancelActiveFrame(frame);
     overlay.hidden = true;
     pointer = null;
     previousFocus?.focus();
@@ -99,7 +105,8 @@ export function createTutorial(
     if (!active) return;
     if (action === 'skip') return finish('skipped');
     if (action === 'finish' && step === 4) return finish('completed');
-    const now = performance.now();
+    if (!pageActive()) return;
+    const now = activeNow();
     if (step === 0 && action === 'right') setStep(1, 'Clean cut. Now try the timing.');
     else if (step === 1 && action === 'up' && ready(now)) setStep(2, 'Perfect. Now meet a boss.');
     else if (step === 2 && action === 'tap' && ready(now)) setStep(3, 'Parried! Cut left now.');
@@ -198,7 +205,7 @@ export function createTutorial(
       x,
       y + r * 0.25,
     );
-    frame = requestAnimationFrame(draw);
+    frame = requestActiveFrame(draw);
   }
   function keyboard(event: KeyboardEvent) {
     if (!active) return;
@@ -288,12 +295,12 @@ export function createTutorial(
       overlay.hidden = false;
       setStep(0);
       overlay.querySelector<HTMLButtonElement>('button')!.focus();
-      frame = requestAnimationFrame(draw);
+      frame = requestActiveFrame(draw);
     },
     dispose() {
       disposed = true;
       active = false;
-      cancelAnimationFrame(frame);
+      cancelActiveFrame(frame);
       listeners.abort();
       overlay.remove();
     },

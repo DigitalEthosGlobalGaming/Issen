@@ -44,9 +44,29 @@ export function createAudio(initialMuted: boolean) {
   };
   let effectsVolume = 1,
     ambienceVolume = 1;
+  let inactive = false;
+  const voices = new Set<AudioScheduledSourceNode>();
+  function track(source: AudioScheduledSourceNode, nodes: AudioNode[]) {
+    voices.add(source);
+    source.onended = () => {
+      voices.delete(source);
+      for (const node of nodes) node.disconnect();
+    };
+  }
+  function resumeContext() {
+    const context = A.ctx;
+    if (!context || inactive || context.state !== 'suspended') return;
+    void context
+      .resume()
+      .then(() => {
+        if (inactive && A.ctx === context) void context.suspend().catch(() => {});
+      })
+      .catch(() => {});
+  }
   function audioInit() {
+    if (inactive) return;
     if (A.ctx) {
-      if (A.ctx.state === 'suspended') A.ctx.resume();
+      resumeContext();
       return;
     }
     const Ctor =
@@ -93,7 +113,7 @@ export function createAudio(initialMuted: boolean) {
   }
   function nz(o: NoiseOptions, ambience = false) {
     const c = A.ctx;
-    if (!c || !A.noise || !A.master) return;
+    if (inactive || !c || !A.noise || !A.master) return;
     const t = c.currentTime + (o.delay || 0);
     const s = c.createBufferSource();
     s.buffer = A.noise;
@@ -109,12 +129,13 @@ export function createAudio(initialMuted: boolean) {
     s.connect(f);
     f.connect(gn);
     gn.connect(ambience ? A.ambience! : A.effects!);
+    track(s, [s, f, gn]);
     s.start(t, Math.random() * 1.5);
     s.stop(t + o.dur + 0.05);
   }
   function tn(o: ToneOptions, ambience = false) {
     const c = A.ctx;
-    if (!c || !A.master) return;
+    if (inactive || !c || !A.master) return;
     const t = c.currentTime + (o.delay || 0);
     const os = c.createOscillator();
     os.type = o.type || 'sine';
@@ -126,6 +147,7 @@ export function createAudio(initialMuted: boolean) {
     gn.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
     os.connect(gn);
     gn.connect(ambience ? A.ambience! : A.effects!);
+    track(os, [os, gn]);
     os.start(t);
     os.stop(t + o.dur + 0.05);
   }
@@ -323,7 +345,7 @@ export function createAudio(initialMuted: boolean) {
   }
 
   function update(raw: number, w: string | null, wind: number, whiteout: number) {
-    if (A.paused) return;
+    if (inactive || A.paused) return;
     if (A.ctx && A.wg && A.wbp) {
       A.wt += raw;
       if (A.wt > 0.25) {
@@ -350,6 +372,22 @@ export function createAudio(initialMuted: boolean) {
     tone: tn,
     cues: sfx,
     update,
+    setInactive(next: boolean) {
+      if (inactive === next) return;
+      inactive = next;
+      if (A.master) A.master.gain.value = inactive || A.muted ? 0 : 0.9;
+      if (inactive) {
+        for (const source of voices) {
+          try {
+            source.stop();
+          } catch {
+            /* Already ended. */
+          }
+        }
+        voices.clear();
+        if (A.ctx) void A.ctx.suspend().catch(() => {});
+      } else resumeContext();
+    },
     setPaused(paused: boolean) {
       if (A.paused === paused) return;
       A.paused = paused;
@@ -364,7 +402,7 @@ export function createAudio(initialMuted: boolean) {
     },
     setMuted(muted: boolean) {
       A.muted = muted;
-      if (A.master) A.master.gain.value = muted ? 0 : 0.9;
+      if (A.master) A.master.gain.value = inactive || muted ? 0 : 0.9;
     },
     setVolumes(effects: number, ambience: number) {
       effectsVolume = Number.isFinite(effects) ? clamp(effects) : 1;
@@ -376,6 +414,7 @@ export function createAudio(initialMuted: boolean) {
       }
     },
     dispose() {
+      voices.clear();
       const context = A.ctx;
       A.ctx = null;
       A.master = null;

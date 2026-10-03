@@ -1,3 +1,4 @@
+import { activeNow } from '../../platform/activity.ts';
 import { controlKey, keyLabel } from '../../platform/settings.ts';
 import type { Bindings } from '../../platform/settings.ts';
 
@@ -191,7 +192,7 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
     },
     open,
     logoTap() {
-      const now = win.performance.now();
+      const now = activeNow();
       clicks = now - lastClick < 600 ? clicks + 1 : 1;
       lastClick = now;
       if (clicks >= 3) open();

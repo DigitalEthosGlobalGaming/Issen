@@ -3,6 +3,7 @@ import { defaultSettings, controlKey } from '../platform/settings.ts';
 import type { Bindings } from '../platform/settings.ts';
 
 export interface KeyboardActions {
+  active?(): boolean;
   state(): { phase: string; panelOpen: boolean; overReady: boolean };
   closePanel(): void;
   titleDirection(direction: Direction): void;
@@ -22,6 +23,7 @@ const arrows: Record<string, Direction> = {
 };
 export function bindKeyboard(actions: KeyboardActions): () => void {
   const listener = (event: KeyboardEvent) => {
+    if (actions.active?.() === false) return;
     const { phase, panelOpen, overReady } = actions.state();
     const bindings = actions.bindings?.() ?? defaultSettings().bindings;
     const key = controlKey(event.key);

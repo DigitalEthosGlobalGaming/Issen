@@ -219,3 +219,7 @@ geometry remain independent. See [character artwork](../features/character-art.m
 for asset coverage and contracts.
 
 Daily presets and date seeds belong to `game/progression/daily.ts`; the runtime keeps daily equipment/statistics separate from the player profile. Scroll menu presentation belongs to `ui/scroll-menus.ts`, and tintable seal/crest drawing to `rendering/ui-art.ts`. See [daily and world UI](../features/daily-and-world-ui.md).
+
+Foreground suspension and presentation timers belong to `src/platform/activity.ts`;
+combat frame pacing belongs to `src/platform/frame-loop.ts`. Audio keeps a separate
+inactive gate so returning never overrides player pause or mute.

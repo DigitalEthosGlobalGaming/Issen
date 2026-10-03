@@ -33,6 +33,7 @@ import { createHud } from './ui/hud.ts';
 import { createRunState, resetRun } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
+import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
 import {
   appendGameOverUnlocks,
@@ -3253,7 +3254,7 @@ export function startGame(): () => void {
     tapLast = 0;
   function titleTap() {
     if (G.state !== 'title' || G.panel) return;
-    const now = performance.now();
+    const now = activeNow();
     tapN = now - tapLast < 1500 ? tapN + 1 : 1;
     tapLast = now;
     audioInit();
@@ -3387,12 +3388,12 @@ export function startGame(): () => void {
   );
   const preview = createArmoryPreview($('prevC'), {
     random: R,
-    now: () => performance.now(),
+    now: activeNow,
     sounds: sfx,
   });
   const supportPreview = createArmoryPreview($('supportPreview'), {
     random: rng(4242),
-    now: () => performance.now(),
+    now: activeNow,
     sounds: sfx,
   });
   lifecycle.add(preview.dispose);
@@ -3446,6 +3447,7 @@ export function startGame(): () => void {
 
   /* ---------------- input ---------------- */
   const disposePointer = bindPointer(cvs, {
+    active: pageActive,
     activate: audioInit,
     threshold: () => {
       const k = G.m ? G.m.swipe : 1;
@@ -3588,6 +3590,7 @@ export function startGame(): () => void {
   lifecycle.listen($('bMenu'), 'click', toTitle);
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
+    active: pageActive,
     bindings: () => settings.bindings,
     state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
     closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
@@ -3643,10 +3646,6 @@ export function startGame(): () => void {
     captureCheckpoint('ended');
     showOver();
   }
-  lifecycle.listen(document, 'visibilitychange', () => {
-    if (document.hidden) pause();
-  });
-  lifecycle.listen(window, 'blur', pause);
 
   /* ---------------- update ---------------- */
   function updateFx(dt: number, raw: number) {
@@ -4229,6 +4228,7 @@ export function startGame(): () => void {
       },
     },
     {
+      maxFps: () => (G.panel || ['title', 'over', 'paused'].includes(G.state) ? 30 : 60),
       paused: () => G.state === 'paused' || guided.frozen,
       update,
       render,
@@ -4236,12 +4236,22 @@ export function startGame(): () => void {
         if (G.panel === 'armory') drawPreview();
       },
       sampleFrame: (interval, work) => {
-        if (G.state === 'paused' || document.hidden) return;
+        if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
         if (!effectQuality.sample(interval, work)) return;
         ambient().balanceLeaves(leaves);
         if (Math.abs(weatherDensity - density()) >= 0.09) rebalanceWeather();
       },
     },
+  );
+  let artworkReady = false;
+  lifecycle.add(
+    onActivityChange((active) => {
+      audio.setInactive(!active);
+      if (!active) {
+        combatHaptics.stop();
+        frameLoop.stop();
+      } else if (artworkReady) frameLoop.start();
+    }),
   );
 
   /* ---------------- boot ---------------- */
@@ -4341,7 +4351,8 @@ export function startGame(): () => void {
       return;
     }
     artworkLoading.remove();
-    frameLoop.start();
+    artworkReady = true;
+    if (pageActive()) frameLoop.start();
   });
   return lifecycle.dispose;
 }

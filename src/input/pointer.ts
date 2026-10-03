@@ -1,6 +1,7 @@
 import type { Direction } from '../shared/directions.ts';
 
 export interface PointerActions {
+  active?(): boolean;
   activate(): void;
   threshold(): number;
   swipe(direction: Direction): void;
@@ -20,6 +21,7 @@ export function bindPointer(canvas: HTMLCanvasElement, actions: PointerActions):
     'pointerdown',
     (event) => {
       event.preventDefault();
+      if (actions.active?.() === false) return;
       actions.activate();
       pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, used: false };
       try {
@@ -34,6 +36,10 @@ export function bindPointer(canvas: HTMLCanvasElement, actions: PointerActions):
   canvas.addEventListener(
     'pointermove',
     (event) => {
+      if (actions.active?.() === false) {
+        pointer = null;
+        return;
+      }
       if (!pointer || event.pointerId !== pointer.id || pointer.used) return;
       const dx = event.clientX - pointer.x,
         dy = event.clientY - pointer.y;
@@ -46,6 +52,10 @@ export function bindPointer(canvas: HTMLCanvasElement, actions: PointerActions):
     { signal },
   );
   const end = (event: PointerEvent) => {
+    if (actions.active?.() === false) {
+      pointer = null;
+      return;
+    }
     if (!pointer || event.pointerId !== pointer.id) return;
     if (!pointer.used && event.type === 'pointerup') {
       const dx = event.clientX - pointer.x,
@@ -58,6 +68,20 @@ export function bindPointer(canvas: HTMLCanvasElement, actions: PointerActions):
   };
   canvas.addEventListener('pointerup', end, { signal });
   canvas.addEventListener('pointercancel', end, { signal });
+  window.addEventListener(
+    'blur',
+    () => {
+      pointer = null;
+    },
+    { signal },
+  );
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.hidden) pointer = null;
+    },
+    { signal },
+  );
   canvas.addEventListener(
     'lostpointercapture',
     (event) => {

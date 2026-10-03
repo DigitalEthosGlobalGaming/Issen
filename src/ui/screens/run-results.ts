@@ -1,3 +1,11 @@
+import {
+  activeNow,
+  pageActive,
+  requestActiveFrame,
+  cancelActiveFrame,
+  activeTimeout,
+  clearActiveTimeout,
+} from '../../platform/activity.ts';
 import type { RewardSettlement } from '../../game/progression/run-rewards.ts';
 
 export interface ResultReveal {
@@ -56,8 +64,8 @@ export function createRunResults(
   let timeout = 0;
   let onDone: (() => void) | null = null;
   const clearMotion = () => {
-    cancelAnimationFrame(frame);
-    clearTimeout(timeout);
+    cancelActiveFrame(frame);
+    clearActiveTimeout(timeout);
   };
   const finishAnimation = () => {
     clearMotion();
@@ -99,17 +107,17 @@ export function createRunResults(
       number.textContent = reward.before.toLocaleString();
       accessible.textContent = `${reward.before} Embers before this run.`;
       if (animating) {
-        const start = performance.now();
+        const start = activeNow();
         const tick = (now: number) => {
           const progress = Math.min(1, (now - start) / 1450);
           const fuel = Math.min(1, Math.max(0, (progress - 0.46) / 0.46));
           number.textContent = Math.floor(
             reward.before + reward.gained * (1 - (1 - fuel) ** 3),
           ).toLocaleString();
-          if (progress < 1) frame = requestAnimationFrame(tick);
+          if (progress < 1) frame = requestActiveFrame(tick);
           else finishAnimation();
         };
-        frame = requestAnimationFrame(tick);
+        frame = requestActiveFrame(tick);
       } else finishAnimation();
     } else {
       const reveal = reveals[step - 1]!;
@@ -123,12 +131,12 @@ export function createRunResults(
       tradeoff.hidden = !reveal.tradeoff;
       accessible.textContent = `${reveal.kind} unlocked: ${reveal.name}. ${reveal.description} ${benefit.textContent} ${tradeoff.textContent}`;
       if (reveal.item) onUnlock?.();
-      if (animating) timeout = window.setTimeout(finishAnimation, 650);
+      if (animating) timeout = activeTimeout(finishAnimation, 650);
       else finishAnimation();
     }
   };
   const advance = () => {
-    if (sequence.hidden) return;
+    if (sequence.hidden || !pageActive()) return;
     if (animating) finishAnimation();
     else {
       step++;

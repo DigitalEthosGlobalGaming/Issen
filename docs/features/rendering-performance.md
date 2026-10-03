@@ -79,3 +79,25 @@ changes, drives arbitrary palettes beyond both cache limits, and confirms dispos
 clears retained pixel counts. Timing benchmarks are diagnostic, not hardware-
 independent pass/fail performance assertions. Device release profiling remains
 necessary, particularly at higher DPR and under mobile memory pressure.
+
+## Foreground work and frame pacing
+
+From 1.48, combat and cinematics render at up to 60 fps; menus render at up to
+30 fps. Elapsed-time updates retain combat timing on high-refresh screens. Canvas
+resolution, scene layers, sprite detail and effect budgets are unchanged. Each
+Armoury preview caches its room crop and lighting at its current canvas size, and
+prepares its artwork once.
+
+`src/platform/activity.ts` owns foreground presentation time, frames and timers.
+Hidden documents, unfocused windows and page suspension stop the main loop,
+preview/tutorial/result animation and sound. Audio suspends its context and drops
+unfinished one-shot cues. Returning restarts the frame clock without catch-up,
+while preserving manual pause and mute. DOM animations and menu/notification
+timers also retain their remaining time. Network requests and save persistence
+are not gameplay clocks.
+
+A controlled 390×844, DPR 2 browser comparison over 1.5-second warm menu samples
+counted main and preview image stamps: title 8,099 → 4,005, Armoury 9,373 → 4,738,
+Stats 8,099 → 4,005. This measures approximately half the repeated drawing work;
+it is not a hardware battery or thermal measurement. Verify long sessions on
+physical mobile hardware before making thermal claims.

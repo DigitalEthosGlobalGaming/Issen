@@ -11,6 +11,7 @@ export interface FrameScheduler {
 }
 
 export interface FrameCallbacks {
+  maxFps?(): number;
   paused(): boolean;
   update(delta: number, raw: number): void;
   render(raw: number): void;
@@ -44,10 +45,17 @@ export function createFrameLoop(
   let last = scheduler.now();
   let handle: number | null = null;
   let running = false;
+  let due = last;
 
   function frame(now: number): void {
     handle = null;
     if (!running) return;
+    const interval = 1000 / (callbacks.maxFps?.() ?? Infinity);
+    if (now + 0.1 < due) {
+      handle = scheduler.request(frame);
+      return;
+    }
+    due = Math.max(due + interval, now);
     const raw = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
     const workStart = scheduler.now();
@@ -62,11 +70,13 @@ export function createFrameLoop(
   return {
     resetClock(): void {
       last = scheduler.now();
+      due = last;
     },
     start(): void {
       if (running) return;
       running = true;
       last = scheduler.now();
+      due = last;
       handle = scheduler.request(frame);
     },
     stop(): void {

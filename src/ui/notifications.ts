@@ -1,3 +1,4 @@
+import { activeTimeout, clearActiveTimeout } from '../platform/activity.ts';
 export interface ToastMessage {
   k: string;
   msg: string;
@@ -18,9 +19,9 @@ export function createNotifications(
   let activeHint: string | null = null;
   let toastBusy = false;
   let disposed = false;
-  let hintTimer: ReturnType<typeof setTimeout> | undefined;
-  let hintGap: ReturnType<typeof setTimeout> | undefined;
-  let toastTimer: ReturnType<typeof setTimeout> | undefined;
+  let hintTimer: number | undefined;
+  let hintGap: number | undefined;
+  let toastTimer: number | undefined;
 
   function nextHint() {
     const hint = hints.shift();
@@ -31,23 +32,23 @@ export function createNotifications(
     activeHint = hint.key;
     hintElement.textContent = hint.text;
     hintElement.classList.add('on');
-    clearTimeout(hintTimer);
-    hintTimer = setTimeout(hideHint, hint.duration);
+    clearActiveTimeout(hintTimer);
+    hintTimer = activeTimeout(hideHint, hint.duration);
   }
   function hideHint() {
     if (!activeHint) return;
-    clearTimeout(hintTimer);
+    clearActiveTimeout(hintTimer);
     hintElement.classList.remove('on');
     activeHint = null;
-    clearTimeout(hintGap);
-    hintGap = setTimeout(() => {
+    clearActiveTimeout(hintGap);
+    hintGap = activeTimeout(() => {
       if (!activeHint) nextHint();
     }, 450);
   }
   function clearHints() {
     hints.length = 0;
-    clearTimeout(hintTimer);
-    clearTimeout(hintGap);
+    clearActiveTimeout(hintTimer);
+    clearActiveTimeout(hintGap);
     activeHint = null;
     hintElement.classList.remove('on');
   }
@@ -66,9 +67,9 @@ export function createNotifications(
     toastElement.replaceChildren(seal, text);
     toastElement.classList.add('on');
     playUnlock();
-    toastTimer = setTimeout(() => {
+    toastTimer = activeTimeout(() => {
       toastElement.classList.remove('on');
-      toastTimer = setTimeout(nextToast, 420);
+      toastTimer = activeTimeout(nextToast, 420);
     }, 2600);
   }
   return {
@@ -90,7 +91,7 @@ export function createNotifications(
     dispose() {
       disposed = true;
       clearHints();
-      clearTimeout(toastTimer);
+      clearActiveTimeout(toastTimer);
       toasts.length = 0;
       toastBusy = false;
       toastElement.classList.remove('on');

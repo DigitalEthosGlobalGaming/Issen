@@ -110,6 +110,15 @@ test('pausing fades a single ambience source and does not schedule weather accen
   });
   class Context {
     currentTime = 1;
+    state = 'running';
+    suspend() {
+      this.state = 'suspended';
+      return Promise.resolve();
+    }
+    resume() {
+      this.state = 'running';
+      return Promise.resolve();
+    }
     sampleRate = 100;
     destination = {};
     node(kind) {
@@ -122,6 +131,7 @@ test('pausing fades a single ambience source and does not schedule weather accen
           this.destination = target;
         },
         start() {},
+        disconnect() {},
         stop() {},
       };
       nodes.push(node);
@@ -185,6 +195,23 @@ test('pausing fades a single ambience source and does not schedule weather accen
     const weatherTones = nodes.filter((node) => node.kind === 'tone').slice(tonesBeforePause);
     assert.ok(weatherTones.length > 0);
     assert.ok(weatherTones.every((node) => node.destination.destination === ambience));
+    const master = nodes.find((node) => node.kind === 'gain');
+    audio.setInactive(true);
+    assert.equal(master.gain.value, 0);
+    const hiddenNodes = nodes.length;
+    audio.cues.drum();
+    audio.init();
+    audio.setMuted(false);
+    audio.update(20, 'night', 1, 0);
+    assert.equal(nodes.length, hiddenNodes);
+    assert.equal(master.gain.value, 0);
+    audio.setMuted(true);
+    audio.setPaused(true);
+    audio.setInactive(false);
+    assert.equal(master.gain.value, 0, 'foregrounding preserves mute');
+    assert.deepEqual(ambience.gain.events.at(-1), ['target', 0], 'foregrounding preserves pause');
+    audio.setMuted(false);
+    assert.equal(master.gain.value, 0.9);
     await audio.dispose();
   } finally {
     if (previous === undefined) delete globalThis.window;

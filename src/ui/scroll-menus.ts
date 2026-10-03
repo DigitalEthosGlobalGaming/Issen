@@ -1,8 +1,8 @@
+import { activeTimeout, clearActiveTimeout } from '../platform/activity.ts';
 import type { Settings } from '../platform/settings.ts';
 
 /** Menu-only presentation: observers never delay navigation or gameplay callbacks. */
 export function createScrollMenus(root: HTMLElement) {
-  const win = root.ownerDocument.defaultView!;
   const screens = Array.from(
     root.querySelectorAll<HTMLElement>('.screen:not(#title):not(#cinematic)'),
   );
@@ -25,7 +25,7 @@ export function createScrollMenus(root: HTMLElement) {
     return !screen.hidden && screen.classList.contains('on');
   }
   function clear(screen: HTMLElement) {
-    win.clearTimeout(timers.get(screen));
+    clearActiveTimeout(timers.get(screen));
     timers.delete(screen);
     screen.classList.remove('scroll-entering', 'scroll-leaving');
     if (inertBeforeExit.has(screen)) {
@@ -51,7 +51,7 @@ export function createScrollMenus(root: HTMLElement) {
       // Exiting menus keep only their paint; hidden/on state continues to own input.
       timers.set(
         screen,
-        win.setTimeout(() => clear(screen), next ? 420 : 240),
+        activeTimeout(() => clear(screen), next ? 420 : 240),
       );
     }
   }
