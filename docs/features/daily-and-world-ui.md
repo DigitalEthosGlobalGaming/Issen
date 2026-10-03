@@ -47,13 +47,12 @@ parts, cosmetic deterministic trajectories and reduced-motion fallback.
 
 ## Scroll menus
 
-Options → Display → Menus offers Classic (default) or Scrolls. The validated
-`issen.settings.menuStyle` field follows the active player/test profile. Scrolls
-hang over the scene using textured paper and rollers, with unroll/roll transitions.
-`src/ui/scroll-menus.ts` observes menu visibility; navigation and gameplay callbacks
-remain synchronous. Exiting paint is inert and timers/observers clean up on disposal.
-Reduced motion retains the artwork and skips transitions; forced colors retains
-system borders. Switching back or restoring Display defaults clears pending rolls.
+Scrolls are the sole menu presentation. Existing Classic or absent preferences
+migrate to Scrolls, and Display reset retains them. There is no menu-style selector.
+Scrolls hang over the scene using textured paper and rollers, with unroll/roll
+transitions. Navigation and gameplay callbacks stay synchronous. Exiting paint
+is inert and timers/observers clean up on disposal. Reduced motion retains the
+artwork and skips transitions; forced colors retains system borders.
 
 ## Presentation guidance
 
@@ -62,3 +61,27 @@ keeps feature copy concise and prefers existing visual states to redundant label
 Runtime ownership remains in gameplay modules and explicit-canvas renderers.
 
 Version 1.42.0 reduces the Armoury player scale, preview height, scroll-top padding and equipment tile spacing.
+
+Version 1.43.0 gives the Armoury a wider, shorter room preview and caps the detail
+area so the equipment grid stays available on small screens, including Large
+text and Scrolls. The header and category strip remain visible while their detail
+and collection areas scroll independently. Category arrows expose the overflowing
+strip; ownership counts remain secondary. Owned flavour text and completed unlock
+conditions are under **Details**; locked requirements remain visible.
+
+Tiles use one equipped marker and a small selected-form emblem, with accessible
+equipped, form and unviewed states. Explicit **Normal / Awakened / Third** controls
+replace repeat-tap cycling. Steel's Third control appears after the first Awakening
+is owned and stays disabled until the third form is earned. Active Awakening effects
+use separate benefit/tradeoff lines without repeated activation instructions. The
+saved equipment fields and isolated preview renderer are unchanged.
+
+Focused mobile, disclosure, category navigation, keyboard, scroll preservation and
+unearned-form checks are in `tests/browser/armoury-mobile.spec.ts`; blade/outfit
+activation and suppression remain covered by `ui.spec.ts`, `feature-plan-06.spec.ts`
+and `outfit-awakenings.spec.ts`.
+
+Version 1.47.0 preserves Armoury Details across item/category selection, replaces
+category arrows with native scrolling, and gives form controls a silk nine-slice
+surface with gold selection and explicit keyboard focus. Run-result captions
+use opaque ivory for clearer contrast against the scroll surface.

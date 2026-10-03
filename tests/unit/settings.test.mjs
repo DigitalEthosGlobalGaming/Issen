@@ -104,10 +104,10 @@ test('legacy artwork preferences are ignored without changing other saved settin
   }
 });
 
-test('menu style is opt-in and survives version-1 profile settings', () => {
-  assert.equal(defaultSettings().menuStyle, 'classic');
+test('all old menu preferences migrate to Scrolls in version-1 settings', () => {
+  assert.equal(defaultSettings().menuStyle, 'scroll');
   for (const menuStyle of [undefined, null, 'unknown', true])
-    assert.equal(parseSettings({ version: 1, menuStyle }).menuStyle, 'classic');
+    assert.equal(parseSettings({ version: 1, menuStyle }).menuStyle, 'scroll');
   assert.equal(parseSettings({ ...defaultSettings(), menuStyle: 'scroll' }).menuStyle, 'scroll');
-  assert.equal(parseSettings({ ...defaultSettings(), menuStyle: 'classic' }).menuStyle, 'classic');
+  assert.equal(parseSettings({ ...defaultSettings(), menuStyle: 'classic' }).menuStyle, 'scroll');
 });

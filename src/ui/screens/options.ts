@@ -237,10 +237,6 @@ export function createOptions(
     } else if (page === 'profile') {
       // Persistent controls and modal listeners live outside the rerendered content.
     } else {
-      select('menuStyle', 'Menus', [
-        ['Classic', 'classic'],
-        ['Scrolls', 'scroll'],
-      ]);
       const preferences = [
         ['System', 'system'],
         ['On', 'on'],
@@ -312,7 +308,7 @@ export function createOptions(
             settings.reducedMotion = 'system';
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
-            settings.menuStyle = 'classic';
+            settings.menuStyle = 'scroll';
             settings.quality = 'auto';
 
             settings.vibration = true;

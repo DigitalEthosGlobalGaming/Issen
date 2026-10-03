@@ -1,15 +1,17 @@
 <div id="armory" class="screen panel">
   <div class="armWrap">
+    <div class="armHead">
+      <div class="ph">武具<span>Armory</span></div>
+      <button class="btn" type="button" data-back>Done</button>
+    </div>
     <div class="armTop">
-      <div class="armHead">
-        <div class="ph">武具<span>Armory</span></div>
-        <button class="btn" type="button" data-back>Done</button>
-      </div>
-      <div class="prev"><canvas id="prevC" width="600" height="440"></canvas></div>
+      <div class="prev"><canvas id="prevC" width="600" height="300"></canvas></div>
       <div id="armInfo" class="armInfo" aria-live="polite"></div>
     </div>
     <div class="armBottom">
-      <div class="tabs" id="armTabs" role="tablist"></div>
+      <div class="armCategories">
+        <div class="tabs" id="armTabs" role="tablist" aria-label="Equipment categories"></div>
+      </div>
       <div class="tiles" id="armTiles"></div>
     </div>
   </div>

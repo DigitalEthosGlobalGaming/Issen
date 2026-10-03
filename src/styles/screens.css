@@ -215,6 +215,12 @@
   width: min(100%, 420px);
   margin-inline: auto;
 }
+#over :is(.o-reason, .o-context, .o-stat span, .o-ember-total, .o-modifier) {
+  color: #e1d6c3;
+}
+#over .scroll-paper {
+  filter: sepia(0.35) brightness(0.21);
+}
 .o-k {
   font-size: clamp(64px, 19vw, 104px);
   font-weight: 800;

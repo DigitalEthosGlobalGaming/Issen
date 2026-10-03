@@ -83,15 +83,15 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         ? EQ.robe === it.id && EQ.robeSp
         : false);
   const activeAwakening = (it: Item) => selectedAwakening(it) && powersEnabled();
-  // Opening a category or selecting a different tile is not explicit activation.
-  let activationReady: string | null = null;
+  let detailsOpen = false;
+  const tabs = $('armTabs');
   const preview = $('prevC');
   const onPreview = () => {
     if (armTab === 'fx') events.preview();
   };
   preview.addEventListener('click', onPreview);
   function render() {
-    const tabs = $('armTabs');
+    const tabScroll = tabs.scrollLeft;
     tabs.innerHTML = '';
     for (const [t, label] of ARM) {
       const all = ITEMS.filter((i) => i.type === t),
@@ -109,21 +109,20 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       b.addEventListener('click', () => {
         armTab = t;
         armSel = null;
-        activationReady = null;
+        $('armTiles').scrollTop = 0;
+        root.querySelector<HTMLElement>('.armTop')!.scrollTop = 0;
         render();
+        const selected = tabs.querySelector<HTMLButtonElement>('[aria-selected="true"]')!;
+        const tr = tabs.getBoundingClientRect(),
+          ar = selected.getBoundingClientRect();
+        tabs.scrollLeft += ar.left - tr.left - (tr.width - ar.width) / 2;
+        selected.focus({ preventScroll: true });
       });
       tabs.appendChild(b);
     }
-    const act = tabs.querySelector('[aria-selected="true"]');
-    if (act) {
-      const tr = tabs.getBoundingClientRect(),
-        ar = act.getBoundingClientRect();
-      tabs.scrollLeft = Math.max(
-        0,
-        tabs.scrollLeft + (ar.left - tr.left) - tr.width / 2 + ar.width / 2,
-      );
-    }
+    tabs.scrollLeft = tabScroll;
     const tiles = $('armTiles');
+    const tileScroll = tiles.scrollTop;
     tiles.innerHTML = '';
     if (!armSel || ITEM_BY[armSel]?.type !== armTab) armSel = EQ[armTab];
     const category = ITEMS.filter((i) => i.type === armTab);
@@ -136,7 +135,6 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       const b = doc.createElement('button');
       b.type = 'button';
       const hid = it.hidden && !own,
-        spU = own && access(it.type) && !!awakening(it) && owns(it.id + '+'),
         aw = on && activeAwakening(it);
       b.className =
         'tile' +
@@ -150,47 +148,42 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         (hid ? 'Hidden outfit or item' : it.n) + (own ? '' : ' (locked)'),
       );
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
-      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : crestUrls[it.id] ? `<img class="crest-symbol" src="${crestUrls[it.id]}" alt="" />` : it.k}</span><span class="tn">${hid ? 'Hidden' : (aw ? '真 ' : '') + it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${spU ? '<span class="spb">真</span>' : ''}`;
+      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : crestUrls[it.id] ? `<img class="crest-symbol" src="${crestUrls[it.id]}" alt="" />` : it.k}</span><span class="tn">${hid ? 'Hidden' : it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${on ? '<span class="arm-equipped" aria-hidden="true">装</span>' : ''}${on && selectedAwakening(it) ? `<span class="arm-form-mark${aw ? '' : ' suppressed'}" aria-hidden="true">${it.id === 'steel' && EQ.bladeThird ? '極' : '真'}</span>` : ''}`;
+      const states = on ? ['Equipped'] : [];
+      if (on && selectedAwakening(it)) {
+        states.push(it.id === 'steel' && EQ.bladeThird ? 'Third Awakening' : 'Awakened');
+        if (!powersEnabled()) states.push('Powers off');
+      }
       if (newItem(it)) {
         b.classList.add('arm-unread');
-        b.setAttribute('aria-description', 'Unviewed equipment');
+        states.push('Unviewed equipment');
       }
+      if (states.length) b.setAttribute('aria-description', states.join(' · '));
       b.addEventListener('click', () => {
-        const again = activationReady === it.id && armSel === it.id && EQ[armTab] === it.id;
+        if (armSel !== it.id) {
+          root.querySelector<HTMLElement>('.armTop')!.scrollTop = 0;
+        }
         armSel = it.id;
         if (markArmoryItemViewed(it.id, UNL, seen)) options.onViewed?.();
-        activationReady = own ? it.id : null;
         if (own) {
-          if (armTab === 'blade') {
-            if (again && spU) {
-              if (it.id === 'steel' && EQ.bladeSp && owns('steel++')) {
-                EQ.bladeSp = false;
-                EQ.bladeThird = true;
-              } else if (EQ.bladeThird) {
-                EQ.bladeThird = false;
-              } else EQ.bladeSp = !EQ.bladeSp;
-              if ((EQ.bladeSp || EQ.bladeThird) && powersEnabled()) {
-                events.awaken();
-              }
-            } else if (EQ.blade !== it.id) {
-              EQ.bladeSp = false;
-              EQ.bladeThird = false;
-            }
+          if (armTab === 'blade' && EQ.blade !== it.id) {
+            EQ.bladeSp = false;
+            EQ.bladeThird = false;
           }
-          if (armTab === 'robe') {
-            if (again && spU) {
-              EQ.robeSp = !EQ.robeSp;
-              if (EQ.robeSp && powersEnabled()) events.awaken();
-            } else if (EQ.robe !== it.id) EQ.robeSp = false;
-          }
+          if (armTab === 'robe' && EQ.robe !== it.id) EQ.robeSp = false;
           EQ[armTab] = it.id;
           events.equipped(EQ);
         }
         render();
+        tiles
+          .querySelector<HTMLButtonElement>(`[data-item="${it.id}"]`)
+          ?.focus({ preventScroll: true });
         if (armTab === 'fx') events.preview();
       });
+      b.dataset.item = it.id;
       tiles.appendChild(b);
     }
+    tiles.scrollTop = tileScroll;
     const it = ITEM_BY[armSel];
     if (!it) return;
     const own = owns(it.id),
@@ -203,19 +196,52 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       return;
     }
     $('armInfo').innerHTML =
-      `<div class="nm">${awk ? '真 ' : ''}${it.k} ${it.n}<small>${!accessible(it.id) ? 'Requires Premium' : own ? '' : 'Locked'}</small></div><div class="fl">${own ? display.flavor : 'To unlock: ' + display.unlockCondition}</div>` +
+      `<div class="nm">${it.k} ${it.n}<small>${!accessible(it.id) ? 'Requires Premium' : own ? '' : 'Locked'}</small></div>` +
+      spInfo(it, own) +
+      (!own ? `<div class="fl">To unlock: ${display.unlockCondition}</div>` : '') +
       (sp
-        ? `<div class="awakening-active"><div class="awakening-label">${it.id === 'steel' && EQ.bladeThird ? 'Third Awakening active' : 'Awakened active'}</div><div class="pk">+ ${sp.pk}</div><div class="tr">− ${sp.tr}</div></div>`
+        ? `<div class="awakening-active">${effectLines(sp.pk, 'pk', '+')}${effectLines(sp.tr, 'tr', '−')}</div>`
         : (display.benefit ? `<div class="pk">+ ${display.benefit}</div>` : '') +
           (display.tradeoff ? `<div class="tr">− ${display.tradeoff}</div>` : '') +
           (own && it.role ? `<div class="item-role">${it.role}</div>` : '')) +
-      (options.progress?.(it.id)
+      (!own && options.progress?.(it.id)
         ? `<div class="arm-unlock-condition">${options.progress(it.id)}</div>`
         : '') +
-      spInfo(it, own) +
-      (own && display.unlockCondition
-        ? `<div class="arm-unlock-condition">Unlocked: ${display.unlockCondition}</div>`
+      (own && (display.flavor || display.unlockCondition)
+        ? `<details class="arm-details"${detailsOpen ? ' open' : ''}><summary>Details</summary><div class="fl">${display.flavor}</div>${display.unlockCondition ? `<div class="arm-unlock-condition">Unlocked: ${display.unlockCondition}</div>` : ''}</details>`
         : '');
+    const details = root.querySelector<HTMLDetailsElement>('.arm-details');
+    details?.addEventListener('toggle', () => {
+      if (!root.contains(details)) return;
+      detailsOpen = details.open;
+      if (details.open) details.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-form]')) {
+      button.addEventListener('click', () => {
+        const form = button.dataset.form;
+        if (button.disabled || button.getAttribute('aria-pressed') === 'true') return;
+        if (it.type === 'blade') {
+          EQ.bladeSp = form === 'awakened';
+          EQ.bladeThird = form === 'third';
+        } else EQ.robeSp = form === 'awakened';
+        events.equipped(EQ);
+        if (form !== 'normal' && powersEnabled()) events.awaken();
+        render();
+        root
+          .querySelector<HTMLButtonElement>(`[data-form="${form}"]`)
+          ?.focus({ preventScroll: true });
+      });
+    }
+  }
+
+  function effectLines(copy: string, className: string, sign: string) {
+    return copy
+      .split('; ')
+      .map(
+        (line) =>
+          `<div class="${className}">${sign} ${line.charAt(0).toUpperCase() + line.slice(1)}</div>`,
+      )
+      .join('');
   }
   function spInfo(it: Item, own: boolean) {
     if (!access(it.type) || !own || (it.type !== 'blade' && it.type !== 'robe')) return '';
@@ -228,26 +254,30 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
           ? ST.bl[it.id]
           : undefined,
       cur = Math.min(q?.[sp.need[0]] || 0, sp.need[1]);
-    const st = u
-      ? selectedAwakening(it)
-        ? powersEnabled()
-          ? 'Active. Tap again to return to normal.'
-          : 'Selected, but powers are suppressed by the current setup. Base stats apply. Tap again to return to normal.'
-        : EQ[it.type] === it.id
-          ? 'Ready. Select this tile, then tap it again to activate.'
-          : 'Equip it, then tap again to awaken it.'
-      : `Challenge: ${sp.need[2]} ${it.type === 'blade' ? 'with this blade' : 'while wearing this outfit'} (${cur.toLocaleString()}/${sp.need[1].toLocaleString()}).`;
-    const third =
-      it.id === 'steel'
-        ? `<div class="spx">極 Third Awakening: ${
-            owns('steel++')
-              ? EQ.bladeThird
-                ? 'Selected. Tap again to return to normal.'
-                : 'Unlocked. Tap Steel again after its first Awakening to select.'
-              : `Requires Steel awakened and ${STEEL_THIRD.need[2]} (${Math.min(q?.k ?? 0, 3000).toLocaleString()}/3,000).`
-          }</div>`
+    const selected = selectedAwakening(it)
+      ? it.id === 'steel' && EQ.bladeThird
+        ? 'third'
+        : 'awakened'
+      : 'normal';
+    const thirdUnlocked = u && owns('steel++');
+    const forms = [
+      ['normal', 'Normal', true],
+      ['awakened', 'Awakened', u],
+    ] as const;
+    const button = (form: string, label: string, unlocked: boolean) =>
+      `<button type="button" data-form="${form}" aria-pressed="${selected === form}"${unlocked ? '' : ' disabled aria-describedby="armFormChallenge"'}>${label}</button>`;
+    const challenge = !u
+      ? `Awakening: ${sp.need[2]} ${it.type === 'blade' ? 'with this blade' : 'while wearing this outfit'} (${cur.toLocaleString()}/${sp.need[1].toLocaleString()}).`
+      : it.id === 'steel' && !thirdUnlocked
+        ? `Third: ${STEEL_THIRD.need[2]} with this blade (${Math.min(q?.[STEEL_THIRD.need[0]] ?? 0, STEEL_THIRD.need[1]).toLocaleString()}/${STEEL_THIRD.need[1].toLocaleString()}).`
         : '';
-    return `<div class="spx">真 ${it.type === 'blade' ? 'Blade' : 'Outfit'} Awakening: ${st}</div>${third}`;
+    return (
+      `<div class="arm-forms" role="group" aria-label="${it.type === 'blade' ? 'Blade' : 'Outfit'} form">${forms.map(([form, label, unlocked]) => button(form, label, unlocked)).join('')}${it.id === 'steel' && u ? button('third', 'Third', thirdUnlocked) : ''}</div>` +
+      (selected !== 'normal' && !powersEnabled()
+        ? '<div class="arm-power-state">Powers off · normal effects apply</div>'
+        : '') +
+      (challenge ? `<div class="arm-challenge" id="armFormChallenge">${challenge}</div>` : '')
+    );
   }
   return {
     render,

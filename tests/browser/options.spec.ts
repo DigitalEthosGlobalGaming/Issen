@@ -321,14 +321,14 @@ test('explicit motion overrides control result tallies and setup reveal animatio
   expect(animation).toBe('setup-ink-reveal');
 });
 
-test('scroll menus are opt-in, persist and reset with Display', async ({ page }) => {
+test('Scrolls are permanent and survive legacy preferences and Display reset', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'classic');
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
   await page.locator('#bOptions').click();
   await options(page)
     .getByRole('button', { name: /^Display/ })
     .click();
-  await page.getByLabel('Menus', { exact: true }).selectOption('scroll');
+  await expect(page.getByLabel('Menus', { exact: true })).toHaveCount(0);
   await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
@@ -349,8 +349,8 @@ test('scroll menus are opt-in, persist and reset with Display', async ({ page })
     .getByRole('button', { name: /^Display/ })
     .click();
   await options(page).getByRole('button', { name: 'Restore defaults', exact: true }).click();
-  await expect(page.getByLabel('Menus', { exact: true })).toHaveValue('classic');
-  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'classic');
+  await expect(page.getByLabel('Menus', { exact: true })).toHaveCount(0);
+  await expect(page.locator('#app')).toHaveAttribute('data-menu-style', 'scroll');
 });
 
 test('scroll presentation disposes pending rolls and respects reduced motion', async ({ page }) => {
