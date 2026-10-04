@@ -106,6 +106,41 @@ RevenueCat SDK is enabled yet; physical-device acceptance precedes monetization.
 
 ## Signed bundle for Google Play
 
+### Release optimization
+
+Release builds enable R8 code shrinking, optimization and obfuscation with
+`proguard-android-optimize.txt`, plus resource shrinking. AGP 8.13 also enables
+the integrated resource optimizer through
+`android.r8.optimizedResourceShrinking=true` in `android/gradle.properties`.
+Debug APKs retain their normal unoptimized configuration.
+
+Capacitor supplies consumer keep rules for its native plugins; dependency
+consumer rules are merged automatically. Add only targeted application rules to
+`android/app/proguard-rules.pro` when needed for reflection or JavaScript bridge
+access, rather than keeping entire SDK packages.
+
+After bundling, retain `android/app/build/outputs/mapping/release/mapping.txt`
+with that release for decoding native crash reports. The Play bundle includes
+R8 metadata and the obfuscation mapping at
+`BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map`, which Play
+uses for Retrace/deobfuscation automatically; no separate mapping upload is
+needed for an AAB.
+
+Release builds also request `ndk.debugSymbolLevel 'FULL'` so available native
+library symbols (function names, files and line numbers) are included in the
+AAB. This applies to C/C++ `.so` libraries, not Java/Kotlin or the JavaScript
+game. The current app packages no `.so` libraries, so it has no native debug
+symbols to generate or upload. If a future dependency supplies stripped native
+libraries, its vendor must provide debug symbols; the build cannot recreate
+missing debug information. For APK releases with native code, the separate
+archive is `android/app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip`.
+
+Before publishing an optimized release,
+install it through Internal testing and check startup, Android Back, background
+and resume, and purchases/restoration when billing is enabled. Desktop web tests
+do not exercise optimized native code. Increase `ISSEN_ANDROID_VERSION_CODE`
+above the last Play upload each time; it is independent of the package version.
+
 For the common listing's Feature graphic field, use
 [issen-feature-graphic-1024x500.jpg](../../assets/play-store/issen-feature-graphic-1024x500.jpg).
 It is a verified 1024x500 RGB JPEG, 61,207 bytes, exported from the existing splash
