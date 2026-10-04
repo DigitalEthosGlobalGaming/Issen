@@ -137,7 +137,8 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
     );
     Math.random = () => 0.5;
     let next = 0,
-      time = 0;
+      time = performance.now();
+    Object.defineProperty(performance, 'now', { value: () => time });
     const pending = new Map<number, FrameRequestCallback>();
     window.requestAnimationFrame = (cb) => {
       pending.set(++next, cb);
@@ -147,7 +148,6 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
       pending.delete(id);
     };
     (window as any).advance = (count: number) => {
-      if (!time) time = performance.now();
       for (let i = 0; i < count; i++) {
         time += 50;
         const callbacks = [...pending.values()];

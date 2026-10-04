@@ -151,12 +151,14 @@ test('Tanto Temple emblem and compact scroll Armoury fit portrait and landscape'
     await page.setViewportSize(viewport);
     await expect(page.locator('#prevC')).toBeVisible();
     await expect(page.locator('.armWrap')).toHaveCSS('padding-top', '8px');
-    expect(
-      await page
-        .locator('.tile')
-        .first()
-        .evaluate((node) => node.getBoundingClientRect().width),
-    ).toBeLessThan(90);
+    const tileWidth = await page
+      .locator('.tile')
+      .first()
+      .evaluate((node) => node.getBoundingClientRect().width);
+    expect(tileWidth).toBeGreaterThanOrEqual(44);
+    expect(tileWidth).toBeLessThanOrEqual(
+      await page.locator('#armTiles').evaluate((node) => node.clientWidth / 3 + 1),
+    );
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );

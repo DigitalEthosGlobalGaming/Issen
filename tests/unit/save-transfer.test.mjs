@@ -78,3 +78,15 @@ test('unreadable or unrelated files reject without mutating the supplied save', 
     assert.throws(() => prepareImport(text, local));
   assert.equal(local.stats.kills, 7);
 });
+
+test('unfamiliar nested arrays survive import and export without losing values', () => {
+  const future = { records: [{ id: 'future', ranks: [1, 2, 3] }], flags: [true, false] };
+  const imported = prepareImport(JSON.stringify({ stats: { kills: 8 }, futureSystem: future }), {
+    transferArchive: { anotherSystem: { records: [{ id: 'older' }] } },
+  });
+  const output = JSON.parse(exportSave(imported.data, '1.50.1'));
+  assert.deepEqual(output.data.futureSystem, future);
+  assert.deepEqual(output.data.anotherSystem, { records: [{ id: 'older' }] });
+  const twice = prepareImport(JSON.stringify(output), imported.data);
+  assert.deepEqual(JSON.parse(exportSave(twice.data, '1.50.1')).data.futureSystem, future);
+});

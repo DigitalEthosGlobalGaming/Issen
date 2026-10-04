@@ -11,136 +11,72 @@
       "y": 0,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Loaded broad upward slash",
-      "alphaBounds": [
-        29,
-        32,
-        350,
-        99
-      ]
+      "alphaBounds": [29, 32, 350, 99]
     },
     "fine-rise": {
       "x": 384,
       "y": 0,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Fast thin rising cut",
-      "alphaBounds": [
-        29,
-        32,
-        351,
-        89
-      ]
+      "alphaBounds": [29, 32, 351, 89]
     },
     "dry-brush": {
       "x": 768,
       "y": 0,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Broken horizontal bristle sweep",
-      "alphaBounds": [
-        29,
-        48,
-        351,
-        87
-      ]
+      "alphaBounds": [29, 48, 351, 87]
     },
     "sweeping-arc": {
       "x": 1152,
       "y": 0,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Broad curved upward sweep",
-      "alphaBounds": [
-        28,
-        29,
-        349,
-        98
-      ]
+      "alphaBounds": [28, 29, 349, 98]
     },
     "double-streak": {
       "x": 0,
       "y": 128,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Two parallel accelerating cuts",
-      "alphaBounds": [
-        30,
-        33,
-        351,
-        100
-      ]
+      "alphaBounds": [30, 33, 351, 100]
     },
     "loaded-taper": {
       "x": 384,
       "y": 128,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Heavy contact narrowing to a long tail",
-      "alphaBounds": [
-        30,
-        40,
-        350,
-        82
-      ]
+      "alphaBounds": [30, 40, 350, 82]
     },
     "falling-cut": {
       "x": 768,
       "y": 128,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Downward slash with dry trailing edge",
-      "alphaBounds": [
-        30,
-        26,
-        350,
-        89
-      ]
+      "alphaBounds": [30, 26, 350, 89]
     },
     "low-sweep": {
       "x": 1152,
       "y": 128,
       "width": 384,
       "height": 128,
-      "pivot": [
-        192,
-        64
-      ],
+      "pivot": [192, 64],
       "description": "Shallow crescent with a raised finishing tip",
-      "alphaBounds": [
-        29,
-        43,
-        349,
-        89
-      ]
+      "alphaBounds": [29, 43, 349, 89]
     }
   },
   "family": "UI completion brush strokes",
@@ -156,18 +92,9 @@
   "blend": "normal alpha",
   "color": "grayscale light ink; tint to muted ivory if desired",
   "suggestedDisplay": {
-    "width": [
-      144,
-      288
-    ],
-    "height": [
-      48,
-      96
-    ],
-    "opacity": [
-      0.18,
-      0.32
-    ]
+    "width": [144, 288],
+    "height": [48, 96],
+    "opacity": [0.5, 0.65]
   },
   "source": "scripts/generate-ui-strokes.mjs"
 }

@@ -29,6 +29,17 @@ export default defineConfig(({ mode }) => {
       ),
     },
     base: mode === 'android' ? './' : '/',
+    server: {
+      watch: {
+        ignored: [
+          '**/.verification-build*/**',
+          '**/.mobile-build/**',
+          '**/.android-tools/**',
+          '**/android/**',
+          '**/test-results/**',
+        ],
+      },
+    },
     build: mode === 'android' ? { outDir: '.mobile-build', reportCompressedSize: false } : {},
     plugins:
       mode === 'android'

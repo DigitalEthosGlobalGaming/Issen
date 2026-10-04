@@ -103,6 +103,11 @@
     border-width: 8px;
     padding: 16px 8px;
   }
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::before,
+  #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) > :first-child::after {
+    left: -8px;
+    right: -8px;
+  }
 }
 @media (max-height: 460px) {
   #app[data-menu-style='scroll'] .screen:not(#title):not(#cinematic) {

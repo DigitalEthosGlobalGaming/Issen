@@ -102,7 +102,7 @@ test('life display outlines an available ward and clears it when spent', async (
   });
 });
 
-test('armory preserves locked equipment and toggles awakened blades only on repeat selection', async ({
+test('armory preserves locked equipment and changes forms only through explicit controls', async ({
   page,
 }) => {
   await page.goto('/');
@@ -115,6 +115,8 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
     const { DEFAULT_EQUIPMENT, parseStatistics } = await import(savesPath);
     const { createItems } = await import(itemsPath);
     const root = document.querySelector('#armory')!.cloneNode(true) as HTMLElement;
+    root.id = 'armory-test';
+    document.body.append(root);
     const equipment = { ...DEFAULT_EQUIPMENT };
     const unlocks = new Set(['steel', 'kuro', 'kuro+', 'ink']);
     let saves = 0,
@@ -140,10 +142,14 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
     if (equipment.blade !== 'kuro' || equipment.bladeSp)
       throw new Error('First selection must equip normally');
     click('[aria-label="Kurogane"]');
+    if (equipment.bladeSp) throw new Error('Repeat tile selection awakened the blade');
+    click('[data-form="awakened"]');
     if (!equipment.bladeSp || !root.querySelector('.awake'))
-      throw new Error('Repeat selection did not awaken');
+      throw new Error('Awakened control did not activate');
     click('[aria-label="Kurogane"]');
-    if (equipment.bladeSp) throw new Error('Repeat selection did not restore normal blade');
+    if (!equipment.bladeSp) throw new Error('Tile selection changed the form');
+    click('[data-form="normal"]');
+    if (equipment.bladeSp) throw new Error('Normal control did not restore normal blade');
     const tab = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')].find((el) =>
       el.textContent!.startsWith('Kill effects'),
     )!;
@@ -152,6 +158,7 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
     if (controller.tab !== 'fx' || previews !== 1) throw new Error('Preview tab not routed');
     controller.dispose();
     click('#prevC');
+    root.remove();
     return {
       saves,
       awakenings,
@@ -159,7 +166,7 @@ test('armory preserves locked equipment and toggles awakened blades only on repe
       remainingTiles: root.querySelector('#armTiles')!.childElementCount,
     };
   });
-  expect(result).toEqual({ saves: 3, awakenings: 1, previews: 1, remainingTiles: 0 });
+  expect(result).toEqual({ saves: 5, awakenings: 1, previews: 1, remainingTiles: 0 });
 });
 
 test('shrine screen replaces old offers and dispatches the chosen blessing once', async ({

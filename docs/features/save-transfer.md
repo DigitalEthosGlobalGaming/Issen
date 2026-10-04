@@ -9,7 +9,9 @@ Existing parsers migrate Temple and Awakening records. Trial rewards, ordinary
 unlock predicates and the cinematic companion are reconciled after recovery.
 Equipment and settings follow the imported selection after validation. Missing
 or damaged sections retain local progress. Unknown sections and reward IDs are
-archived for later exports rather than equipped as unavailable content.
+archived for later exports rather than equipped as unavailable content. The
+archive retains unfamiliar nested arrays and their original values; progression
+merge rules apply only to understood progress records.
 
 The confirmation shows recovered progress and warnings and offers a current
 backup download. Every successful import also stores a Previous backup locally.

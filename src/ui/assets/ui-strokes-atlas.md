@@ -11,24 +11,24 @@ origin; bounds include every pixel with alpha above zero and have inclusive
 maximum coordinates. Do not mirror or rotate these marks. Preserve the complete
 cell and its aspect ratio when displaying it.
 
-| Name | Frame x | Frame y | Visible alpha bounds within frame |
-| --- | ---: | ---: | --- |
-| broad-rise | 0 | 0 | 29, 32–350, 99 |
-| fine-rise | 384 | 0 | 29, 32–351, 89 |
-| dry-brush | 768 | 0 | 29, 48–351, 87 |
-| sweeping-arc | 1152 | 0 | 28, 29–349, 98 |
-| double-streak | 0 | 128 | 30, 33–351, 100 |
-| loaded-taper | 384 | 128 | 30, 40–350, 82 |
-| falling-cut | 768 | 128 | 30, 26–350, 89 |
-| low-sweep | 1152 | 128 | 29, 43–349, 89 |
+| Name          | Frame x | Frame y | Visible alpha bounds within frame |
+| ------------- | ------: | ------: | --------------------------------- |
+| broad-rise    |       0 |       0 | 29, 32–350, 99                    |
+| fine-rise     |     384 |       0 | 29, 32–351, 89                    |
+| dry-brush     |     768 |       0 | 29, 48–351, 87                    |
+| sweeping-arc  |    1152 |       0 | 28, 29–349, 98                    |
+| double-streak |       0 |     128 | 30, 33–351, 100                   |
+| loaded-taper  |     384 |     128 | 30, 40–350, 82                    |
+| falling-cut   |     768 |     128 | 30, 26–350, 89                    |
+| low-sweep     |    1152 |     128 | 29, 43–349, 89                    |
 
 Use normal alpha blending on a dark UI surface. Base ink is light grayscale,
 with restrained darker value inside each stroke. A muted ivory tint may match
 the surrounding symbol artwork. Intended full-cell width is 144–288 display
-pixels, with corresponding height 48–96 pixels. For completion overlays behind
-button labels, start around 0.24 opacity and inspect the actual card; the useful
-range is roughly 0.18–0.32. Text, focus, and selected-state indicators remain
-independent foreground elements. The strokes are decorative, so hide them from
+pixels, with corresponding height 48–96 pixels. Completed Trial cards place the
+stroke above their illustration and text at 0.6 opacity, spanning the whole card
+at its native 3:1 aspect ratio. The stroke ignores pointer events so controls and
+focus remain usable. The strokes are decorative, so hide them from
 assistive technology. The eight cells are variations, not animation frames.
 
 ## Style and provenance

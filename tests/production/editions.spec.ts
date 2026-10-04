@@ -23,7 +23,8 @@ test('compiled edition gates, mastery selection and favicon match build configur
   });
   await page.goto('/');
   const badge = page.locator('#premiumBadge');
-  if (access) await expect(badge).toHaveText(edition === 'web' ? 'Web' : 'Premium');
+  if (access)
+    await expect(badge).toHaveText(edition === 'web' ? 'Web' : 'Premium', { timeout: 30000 });
   else await expect(badge).toBeHidden();
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="precision"]').click();

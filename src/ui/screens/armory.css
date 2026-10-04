@@ -371,6 +371,14 @@
 #app[data-menu-style='scroll'] #armory:not(#title):not(#cinematic) > .armWrap {
   padding: 8px 6px;
 }
+#app[data-menu-style='scroll'] #armory > .armWrap > .scroll-paper {
+  inset: 0;
+}
+#app[data-menu-style='scroll'] #armory:not(#title):not(#cinematic) > .armWrap::before,
+#app[data-menu-style='scroll'] #armory:not(#title):not(#cinematic) > .armWrap::after {
+  left: 0;
+  right: 0;
+}
 @media (orientation: portrait) and (max-height: 720px) {
   #app[data-menu-style='scroll'] #armory:not(#title):not(#cinematic) {
     padding: 12px 8px 16px;

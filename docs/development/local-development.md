@@ -15,6 +15,10 @@ Use Node 24 (the migration was verified with 24.16.0), then run `npm install` an
 `npm run dev`. Vite prints the local URL. For phone testing use
 `npm run dev -- --host 0.0.0.0` and the computer's LAN address.
 
+The development watcher ignores Android outputs, local toolchains and
+`.verification-build*` directories so building or verifying another edition
+does not reload a running game.
+
 ## Commands
 
 | Command | Purpose |

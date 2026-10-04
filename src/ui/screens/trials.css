@@ -59,14 +59,14 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 35%;
   aspect-ratio: 3;
   transform: translateY(-50%);
-  z-index: -1;
+  z-index: 2;
   pointer-events: none;
   background: url('../assets/ui-strokes-atlas.png') var(--stroke-x) var(--stroke-y) / 400% 200%
     no-repeat;
-  opacity: 0.28;
+  opacity: 0.6;
 }
 #trialResult {
   border-color: var(--seal);

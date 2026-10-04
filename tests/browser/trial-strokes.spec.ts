@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('completed Trials have a stable decorative stroke behind Replay, including after reload', async ({
+test('completed Trials have a stable foreground stroke across the card, including after reload', async ({
   page,
 }) => {
   await page.route('https://fonts.googleapis.com/**', (route) =>
@@ -27,9 +27,13 @@ test('completed Trials have a stable decorative stroke behind Replay, including 
     const paint = await card.evaluate((el) => ({
       image: getComputedStyle(el, '::before').backgroundImage,
       opacity: getComputedStyle(el, '::before').opacity,
+      layer: getComputedStyle(el, '::before').zIndex,
+      pointerEvents: getComputedStyle(el, '::before').pointerEvents,
     }));
     expect(paint.image).toContain('ui-strokes-atlas');
-    expect(paint.opacity).toBe('0.28');
+    expect(paint.opacity).toBe('0.6');
+    expect(paint.layer).toBe('2');
+    expect(paint.pointerEvents).toBe('none');
     if (!pass) await page.reload({ waitUntil: 'domcontentloaded' });
   }
 });

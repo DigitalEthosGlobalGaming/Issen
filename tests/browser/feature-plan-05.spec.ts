@@ -25,11 +25,14 @@ test('Temple rank copy and owned Armoury conditions stay concise', async ({ page
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   await page.locator('#armTiles').getByRole('button', { name: 'Kurogane', exact: true }).click();
+  await expect(page.locator('#armInfo .arm-unlock-condition')).toBeHidden();
+  await page.locator('#armInfo summary').click();
   await expect(page.locator('#armInfo')).toContainText('Unlocked: Win your first duel.');
   await expect(page.locator('#armInfo')).toContainText('+ Parry window 15% longer');
   await expect(page.locator('#armInfo')).toContainText('− Perfect arc 20% smaller');
   await page.getByRole('tab', { name: /^Outfits/ }).click();
   await page.locator('#armTiles').getByRole('button', { name: 'Scarecrow', exact: true }).click();
+  await expect(page.locator('#armInfo .arm-unlock-condition')).toBeVisible();
   await expect(page.locator('#armInfo')).toContainText(
     'Unlocked: Tap the title screen twenty times.',
   );

@@ -37,6 +37,8 @@ canvas#c {
   touch-action: none;
 }
 
-html[data-inactive] *, html[data-inactive] *::before, html[data-inactive] *::after {
+html[data-inactive] *,
+html[data-inactive] *::before,
+html[data-inactive] *::after {
   animation-play-state: paused !important;
 }

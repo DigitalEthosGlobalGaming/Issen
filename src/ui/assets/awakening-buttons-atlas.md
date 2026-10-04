@@ -16,11 +16,11 @@ one row, each frame 256 × 128 pixels. Nine-slice insets are 32 source pixels on
 every side. Alpha bounds include every pixel above zero alpha; maximum values
 are inclusive.
 
-| Form | Frame x | Frame y | Visible frame-local alpha bounds | Extracted image |
-| --- | ---: | ---: | --- | --- |
-| Normal | 0 | 0 | 6, 7–248, 120 | [Normal](awakening-button-normal.png) |
-| Awakened | 256 | 0 | 6, 7–248, 120 | [Awakened](awakening-button-awakened.png) |
-| Third | 512 | 0 | 6, 7–248, 120 | [Third](awakening-button-third.png) |
+| Form     | Frame x | Frame y | Visible frame-local alpha bounds | Extracted image                           |
+| -------- | ------: | ------: | -------------------------------- | ----------------------------------------- |
+| Normal   |       0 |       0 | 6, 7–248, 120                    | [Normal](awakening-button-normal.png)     |
+| Awakened |     256 |       0 | 6, 7–248, 120                    | [Awakened](awakening-button-awakened.png) |
+| Third    |     512 |       0 | 6, 7–248, 120                    | [Third](awakening-button-third.png)       |
 
 Use each extracted PNG as its form's `border-image-source`, with
 `border-image-slice: 32 fill` and `border-image-repeat: stretch`. A destination

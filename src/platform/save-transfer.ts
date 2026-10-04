@@ -190,7 +190,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     guidedLessons: merge(local.guidedLessons, incoming.guidedLessons),
     hints: merge(local.hints, incoming.hints),
     daily: merge(local.daily, incoming.daily),
-    transferArchive: merge(local.transferArchive, incoming),
+    transferArchive: archiveOverlay(local.transferArchive, incoming),
   };
   data.muted = (data.settings as { muted: boolean }).muted;
   // An old checkpoint could overwrite imported progression on startup. Transfer only an explicit compatible one,

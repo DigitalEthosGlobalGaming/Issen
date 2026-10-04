@@ -103,7 +103,8 @@ the same composition seed. Short ash-coloured grass replaces the stone floor.
 
 Completed Trial cards use one of eight left-to-right brush strokes from the
 [UI stroke atlas](../../src/ui/assets/ui-strokes-atlas.md). Catalog position
-selects a stable variation at 0.28 opacity across the whole card behind its text; completion remains
+selects a stable variation at 0.6 opacity across the front of the whole card,
+including its illustration and text; completion remains
 available to assistive technology and Replay remains usable. Unfinished Trials
 have no overlay. The atlas and its exact frame metadata are reproducible through
 `scripts/generate-ui-strokes.mjs`.

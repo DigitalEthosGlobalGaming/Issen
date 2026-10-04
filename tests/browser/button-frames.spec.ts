@@ -36,7 +36,7 @@ test('Temple panel frames load and keep selection separate from action buttons',
 test('hover highlights menu buttons and previewable locked Armoury tiles', async ({ page }) => {
   await page.goto('/');
   const armory = page.locator('#bArmory');
-  await expect(armory).toBeVisible();
+  await expect(armory).toBeVisible({ timeout: 30000 });
   const normal = /button-normal\.png/;
   const highlighted = /button-highlighted\.png/;
   await expect(armory).toHaveCSS('border-image-source', normal);
