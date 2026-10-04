@@ -142,6 +142,7 @@ export function createInkPlayerRenderer(doc: Document) {
       return false;
     }
     if (!outfits.ready(f.robeId)) return false;
+    if (env.reducedMotion && f.secondary) f = { ...f, secondary: undefined };
     const recipe = outfits.recipe(f.robeId);
     currentTone = recipe?.tone;
     const l = f.lean || 0;
@@ -150,7 +151,9 @@ export function createInkPlayerRenderer(doc: Document) {
       const sway =
         env.reducedMotion || env.reducedFlashes
           ? 0
-          : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 + env.wind * 0.003;
+          : Math.sin(env.time * 1.8 + f.d.seed) * 0.012 +
+            env.wind * 0.003 +
+            (f.secondary?.cloth ?? 0);
       g.save();
       g.translate(l * 0.5, -0.51);
       g.rotate(sway);
@@ -166,10 +169,12 @@ export function createInkPlayerRenderer(doc: Document) {
       g.closePath();
       g.fill();
       g.save();
+      g.rotate((f.secondary?.cloth ?? 0) * 0.3);
       g.transform(1, 0, -0.065, 1, 0, 0);
       stamp(g, 'leftPanel', -0.26, 0, 0.325, 0.52);
       g.restore();
       g.save();
+      g.rotate(-(f.secondary?.cloth ?? 0) * 0.25);
       g.transform(1, 0, 0.065, 1, 0, 0);
       stamp(g, 'rightPanel', -0.065, 0, 0.325, 0.52);
       g.restore();
@@ -181,7 +186,12 @@ export function createInkPlayerRenderer(doc: Document) {
       outfits.draw(g, 'head', f);
     } else {
       joints(f).forEach((j, i) => {
+        g.save();
+        g.translate(j.shoulder[0], j.shoulder[1]);
+        g.rotate((f.secondary?.cloth ?? 0) * (i ? -0.25 : 0.25));
+        g.translate(-j.shoulder[0], -j.shoulder[1]);
         bone(g, i ? 'rightSleeve' : 'leftSleeve', j.shoulder, j.elbow, 0.135);
+        g.restore();
         bone(g, i ? 'rightForearm' : 'leftForearm', j.elbow, j.hand, 0.055);
         g.save();
         g.translate(j.hand[0], j.hand[1]);

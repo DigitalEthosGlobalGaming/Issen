@@ -34,6 +34,8 @@ export interface BladeStyle {
   edgeW?: number;
 }
 export interface Figure {
+  /** Presentation-only spring angles in radians; no collision or pose changes. */
+  secondary?: SecondaryMotion;
   x: number;
   y: number;
   h: number;
@@ -69,6 +71,10 @@ export interface Figure {
   robeAura?: Aura | null;
   glint?: number;
   rf?: { tail?: number; armor?: number; patches?: number; strawy?: number };
+}
+export interface SecondaryMotion {
+  cloth: number;
+  charm: number;
 }
 export interface PlayerArtwork {
   drawPart(

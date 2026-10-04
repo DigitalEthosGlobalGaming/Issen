@@ -165,7 +165,7 @@ test('armory preview effects stay local to their renderer instance', async ({ pa
       mistSprite: null,
     };
     const first = createArmoryPreview(canvases[0], services);
-    const second = createArmoryPreview(canvases[1], services);
+    const second = createArmoryPreview(canvases[1], { ...services, now: () => 1000 });
     first.draw(frame);
     second.draw(frame);
     const before = canvases[1].toDataURL();

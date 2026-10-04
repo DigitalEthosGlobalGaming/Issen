@@ -34,6 +34,7 @@ import { createRunState, resetRun } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
+import { createSecondaryMotion } from './rendering/figures/secondary-motion.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
 import {
   appendGameOverUnlocks,
@@ -935,6 +936,7 @@ export function startGame(): () => void {
     zoomY = 0;
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
+  const apparelMotion = createSecondaryMotion();
   let fx = createEffects();
   const effectQuality = createEffectQuality();
   function powersEnabled() {
@@ -1272,6 +1274,7 @@ export function startGame(): () => void {
     G.wardUsed = false;
     P.fall = 0;
     P.swingT = 9;
+    apparelMotion.reset();
     P.pose = { ...PREST };
     timeScale = 1;
     hitStop = 0;
@@ -1955,6 +1958,7 @@ export function startGame(): () => void {
   function swingPlayer(dir: Direction | 'block') {
     if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();
     startSwing(P, dir);
+    apparelMotion.kick(dir, reducedMotion());
   }
   function onSwipe(dir: Direction) {
     if (
@@ -3708,6 +3712,7 @@ export function startGame(): () => void {
     if (G.petT > 0) G.petT -= dt;
     updateWeather(dt);
     updatePlayer(dt);
+    apparelMotion.update(raw, reducedMotion());
     updateEnemies(dt, raw);
     if (
       !activeTrial &&
@@ -3866,6 +3871,7 @@ export function startGame(): () => void {
       fog: 0,
       d: P.d,
       pose: P.pose,
+      secondary: apparelMotion.sample(),
       waiting: P.swingT > 0.6 && !P.fall,
       lean: 0,
       rot: -P.fall * 0.28,
@@ -4244,13 +4250,14 @@ export function startGame(): () => void {
     },
   );
   let artworkReady = false;
+  const resumeFrames = frameLoop.start;
   lifecycle.add(
     onActivityChange((active) => {
       audio.setInactive(!active);
       if (!active) {
         combatHaptics.stop();
         frameLoop.stop();
-      } else if (artworkReady) frameLoop.start();
+      } else if (artworkReady) resumeFrames();
     }),
   );
 

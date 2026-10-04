@@ -275,6 +275,7 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
     env.inkCompanion?.draw(type, g, x, y, size, time, petActive, env.reducedMotion);
   }
   function drawFigure(f: Figure) {
+    if (env.reducedMotion && f.secondary) f = { ...f, secondary: undefined };
     f = enemyPresence(f, time, !!env.reducedMotion);
     f = playerPresence(f, time, !!env.reducedMotion);
     const C = f.pal || cols(f.fog),
@@ -376,12 +377,20 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
       const cx = 0.1 + lx * 0.5,
         cy = -0.49;
       g.strokeStyle = '#d9d3c4';
+      g.save();
+      g.translate(cx, cy - 0.02);
+      g.rotate(
+        f.back && !env.reducedMotion
+          ? (f.secondary?.charm ?? 0) + Math.sin(time * 1.4 + f.d.seed) * 0.018
+          : 0,
+      );
       g.lineWidth = 0.004;
       g.beginPath();
-      g.moveTo(cx, cy - 0.02);
-      g.lineTo(cx, cy);
+      g.moveTo(0, 0);
+      g.lineTo(0, 0.02);
       g.stroke();
-      env.inkCharm?.draw(g, f.charmId, cx, cy, 0.05, f.charm);
+      env.inkCharm?.draw(g, f.charmId, 0, 0.02, 0.05, f.charm);
+      g.restore();
     }
     (playerArt || enemyArt)?.drawPart(g, 'head', f, env);
     if (enemyArt) {

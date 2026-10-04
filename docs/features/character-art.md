@@ -287,3 +287,13 @@ modal. Touch or Enter/Space opens inspection; Done, Escape and browser/Android
 Back restore it without changing equipment, Details or category selection.
 Effect demonstrations remain available by tapping the inspected player area or
 selecting an effect. No character artwork was added or replaced.
+
+## Attack-driven secondary motion
+
+`src/rendering/figures/secondary-motion.ts` owns two bounded, damped springs for
+cloth and the charm. Runtime cuts/parries apply directional impulses; foreground
+updates advance them independently of hit-stop. Existing robe panels, sleeves
+and cloth attachments rotate by a few degrees. The existing charm hangs from
+its belt attachment and swings with inertia. Hands, weapon poses, collision,
+attack windows and save data are unchanged. Springs reset at a new run and when
+reduced motion is enabled, and stop with manual/background suspension.

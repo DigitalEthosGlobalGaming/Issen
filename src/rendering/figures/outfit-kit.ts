@@ -257,7 +257,16 @@ export function createOutfitKit(doc: Document) {
     draw(g: CanvasRenderingContext2D, stage: 'body' | 'head', f: Figure) {
       const recipe = INK_OUTFIT_RECIPES[f.robeId!];
       if (!recipe) return;
-      for (const a of recipe[stage]) stamp(g, a, (f.lean || 0) * (stage === 'head' ? 1.05 : 0.8));
+      for (const a of recipe[stage]) {
+        g.save();
+        if (stage === 'body' && a.atlas === 'cloth') {
+          g.translate(a.x, a.y);
+          g.rotate((f.secondary?.cloth ?? 0) * (a.x < 0 ? 0.7 : 1));
+          g.translate(-a.x, -a.y);
+        }
+        stamp(g, a, (f.lean || 0) * (stage === 'head' ? 1.05 : 0.8));
+        g.restore();
+      }
       if (stage === 'body') {
         const l = f.lean || 0;
         if (f.robeId === 'aka') {
