@@ -1,0 +1,5661 @@
+{
+  "baseline": {
+    "metadata": {
+      "date": "2026-10-04T00:50:10.145Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "title": {
+        "startupMs": 840.93,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1.2,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 22,
+        "taskMs": 118.54,
+        "scriptMs": 73.19,
+        "heapEndMB": 7.62,
+        "canvasMB": 70.55,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.085999999928467,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.8226999999046267,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.837899999952313,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.29,
+          "gcCount": 12,
+          "gcMs": 4.95,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.09,
+              "inclusiveMs": 18.2
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.38,
+              "inclusiveMs": 16.74
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 16.74
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.92,
+              "inclusiveMs": 16.37
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 5.03
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 5.03
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 4.24
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 1.14,
+              "inclusiveMs": 3.1
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 3.1
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 2.97
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 1.64,
+              "inclusiveMs": 2.47
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 1.19,
+              "inclusiveMs": 1.89
+            }
+          ]
+        }
+      },
+      "stats": {
+        "startupMs": 783.89,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50.1,
+        "estimatedMissedSlots": 23,
+        "taskMs": 100.89,
+        "scriptMs": 61.43,
+        "heapEndMB": 7.75,
+        "canvasMB": 70.55,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.157900000023837,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.17189999992847,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.160499999999998,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 9.67,
+          "gcCount": 12,
+          "gcMs": 5.24,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 21.66
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 21.21
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 21.21
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0,
+              "inclusiveMs": 21.21
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.44,
+              "inclusiveMs": 10.31
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 10.31
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.78,
+              "inclusiveMs": 9.87
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 1.46,
+              "inclusiveMs": 7.22
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0.39,
+              "inclusiveMs": 5
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 2.49,
+              "inclusiveMs": 4.6
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 0.51,
+              "inclusiveMs": 2.42
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 2.02
+            }
+          ]
+        }
+      },
+      "options": {
+        "startupMs": 788.36,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 21,
+        "taskMs": 110.73,
+        "scriptMs": 63.94,
+        "heapEndMB": 7.98,
+        "canvasMB": 70.55,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.117299999928472,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.154800000071518,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.133099999999997,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.92,
+          "gcCount": 12,
+          "gcMs": 6.68,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 28.59
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.19,
+              "inclusiveMs": 26.92
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 26.92
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.51,
+              "inclusiveMs": 26.73
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.62,
+              "inclusiveMs": 12.11
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 12.11
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 12.11
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.73,
+              "inclusiveMs": 10.11
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 3.96,
+              "inclusiveMs": 7.11
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 7.11
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 1.8,
+              "inclusiveMs": 4.01
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 4.01
+            }
+          ]
+        }
+      },
+      "armoury": {
+        "startupMs": 942.09,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 13,
+        "taskMs": 125.09,
+        "scriptMs": 72.58,
+        "heapEndMB": 7.76,
+        "canvasMB": 72.67,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.1711000000238405,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.144800000071521,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.097000000071521,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.37,
+          "gcCount": 11,
+          "gcMs": 9.36,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670,
+            "prevC": 420
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 55.88
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 45.74
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 45.57
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.52,
+              "inclusiveMs": 44.46
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.78,
+              "inclusiveMs": 18.21
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 18.21
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 2.15,
+              "inclusiveMs": 16.03
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 7.8,
+              "inclusiveMs": 12.39
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 12.39
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 10.46
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3739,
+              "selfMs": 0,
+              "inclusiveMs": 10.04
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2954,
+              "selfMs": 0,
+              "inclusiveMs": 10.04
+            }
+          ]
+        }
+      },
+      "inspection": {
+        "startupMs": 800.02,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.4,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 18,
+        "taskMs": 122.62,
+        "scriptMs": 67.8,
+        "heapEndMB": 8.08,
+        "canvasMB": 80.91,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.052700000047682,
+            "particles": 2
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.115099999999998,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.107500000047685,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.53,
+          "gcCount": 8,
+          "gcMs": 4.19,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2759,
+            "prevC": 434
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.92,
+              "inclusiveMs": 30.68
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.84,
+              "inclusiveMs": 23.89
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 23.89
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 23.89
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 5.77,
+              "inclusiveMs": 8.67
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 8.67
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 6.83
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 6.83
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 5.68
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3739,
+              "selfMs": 0,
+              "inclusiveMs": 5.52
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2954,
+              "selfMs": 0,
+              "inclusiveMs": 5.52
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/armory-preview.ts",
+              "line": 80,
+              "selfMs": 0,
+              "inclusiveMs": 5.52
+            }
+          ]
+        }
+      },
+      "combat": {
+        "startupMs": 812.17,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1.2,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 227.72,
+        "scriptMs": 143.42,
+        "heapEndMB": 7.71,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9110999999761553,
+            "kills": 1,
+            "time": 3.754401999976156,
+            "particles": 23
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.945400000023837,
+            "kills": 1,
+            "time": 3.804400000023837,
+            "particles": 18
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9508000000238392,
+            "kills": 1,
+            "time": 3.8097060000238403,
+            "particles": 21
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 20.13,
+          "gcCount": 24,
+          "gcMs": 12.24,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3312,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.09,
+              "inclusiveMs": 74.76
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 2.67,
+              "inclusiveMs": 70.83
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.03,
+              "inclusiveMs": 68.15
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 68.15
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 20.08
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 12.23,
+              "inclusiveMs": 19.78
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0.93,
+              "inclusiveMs": 19.14
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.51,
+              "inclusiveMs": 14.61
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 1.48,
+              "inclusiveMs": 14.09
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.56,
+              "inclusiveMs": 8.27
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 3.93,
+              "inclusiveMs": 7.03
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 7.03
+            }
+          ]
+        }
+      },
+      "demon": {
+        "startupMs": 782.74,
+        "renderMedianMs": 0.9,
+        "renderP95Ms": 1.3,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 290.9,
+        "scriptMs": 167.6,
+        "heapEndMB": 7.2,
+        "canvasMB": 52.73,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.033199999999997,
+            "kills": 1,
+            "time": 3.8921999999999985,
+            "particles": 8
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.02500000002384,
+            "kills": 1,
+            "time": 3.8838120000238394,
+            "particles": 10
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.01240000007152,
+            "kills": 1,
+            "time": 3.855702000071521,
+            "particles": 10
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 23.56,
+          "gcCount": 26,
+          "gcMs": 9.21,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 6552
+          },
+          "reads": 0,
+          "gradients": 420,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 79.42
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 74.08
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 74.08
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0,
+              "inclusiveMs": 74.08
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 1.85,
+              "inclusiveMs": 24.56
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/rendering/glyphs.ts",
+              "line": 29,
+              "selfMs": 2.93,
+              "inclusiveMs": 19.07
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 0,
+              "inclusiveMs": 19.07
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 0,
+              "inclusiveMs": 19.07
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 1.56,
+              "inclusiveMs": 15.27
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 15.27
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 1.77,
+              "inclusiveMs": 11.02
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 10.22
+            }
+          ]
+        }
+      },
+      "film-glitch": {
+        "startupMs": 782.09,
+        "renderMedianMs": 2,
+        "renderP95Ms": 2.7,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 380.13,
+        "scriptMs": 335.81,
+        "heapEndMB": 7.19,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.903000000023837,
+            "kills": 1,
+            "time": 3.7620000000238387,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.947899999999996,
+            "kills": 1,
+            "time": 3.791295999999997,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9483000000476784,
+            "kills": 1,
+            "time": 3.8072060000476804,
+            "particles": 18
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 21.84,
+          "gcCount": 24,
+          "gcMs": 8.31,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 7729,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 218.05
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 216.39
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 1.2,
+              "inclusiveMs": 214.86
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 4.8,
+              "inclusiveMs": 213.66
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 1.59,
+              "inclusiveMs": 156.64
+            },
+            {
+              "function": "applyFilm",
+              "url": "src/rendering/effects/film.ts",
+              "line": 1,
+              "selfMs": 1.49,
+              "inclusiveMs": 151.95
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 12.68
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 11.98
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 5.13,
+              "inclusiveMs": 11.82
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.43,
+              "inclusiveMs": 10
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 10
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.45,
+              "inclusiveMs": 7.37
+            }
+          ]
+        }
+      },
+      "film-inferno": {
+        "startupMs": 780.07,
+        "renderMedianMs": 0.9,
+        "renderP95Ms": 1.2,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17,
+        "estimatedMissedSlots": 0,
+        "taskMs": 238.32,
+        "scriptMs": 152.27,
+        "heapEndMB": 8.29,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.910799999952314,
+            "kills": 1,
+            "time": 3.7541019999523146,
+            "particles": 24
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9311000000476817,
+            "kills": 1,
+            "time": 3.790100000047682,
+            "particles": 15
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.948399999999996,
+            "kills": 1,
+            "time": 3.791795999999998,
+            "particles": 23
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 21.48,
+          "gcCount": 25,
+          "gcMs": 9.22,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3289,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 1380,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 64.92
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 60.08
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.99,
+              "inclusiveMs": 59.16
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.38,
+              "inclusiveMs": 58.17
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.49,
+              "inclusiveMs": 13.73
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 13.73
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 1.39,
+              "inclusiveMs": 12.75
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 1.92,
+              "inclusiveMs": 12.12
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.66,
+              "inclusiveMs": 10.42
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 5.47,
+              "inclusiveMs": 9.64
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 9.64
+            },
+            {
+              "function": "applyFilm",
+              "url": "src/rendering/effects/film.ts",
+              "line": 1,
+              "selfMs": 3.89,
+              "inclusiveMs": 9.25
+            }
+          ]
+        }
+      },
+      "kill-effects": {
+        "startupMs": 786.18,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.6,
+        "frameP95Ms": 17,
+        "estimatedMissedSlots": 0,
+        "taskMs": 211.68,
+        "scriptMs": 130.29,
+        "heapEndMB": 7.06,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9053000000238387,
+            "kills": 1,
+            "time": 3.764300000023839,
+            "particles": 11
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.922800000047682,
+            "kills": 1,
+            "time": 3.7661960000476826,
+            "particles": 12
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9285000000715224,
+            "kills": 1,
+            "time": 3.7718960000715245,
+            "particles": 12
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 21.64,
+          "gcCount": 23,
+          "gcMs": 8.41,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3357,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 1.09,
+              "inclusiveMs": 57.26
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 51.66
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.69,
+              "inclusiveMs": 50.86
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 50.86
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 14.99
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 10.21,
+              "inclusiveMs": 12.47
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 12.47
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.98,
+              "inclusiveMs": 10.77
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 10.77
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 2.46,
+              "inclusiveMs": 6.85
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 6.85
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 1.35,
+              "inclusiveMs": 6.7
+            }
+          ]
+        }
+      },
+      "stress-100": {
+        "startupMs": 798.06,
+        "renderMedianMs": 3.6,
+        "renderP95Ms": 4,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 776.05,
+        "scriptMs": 575.16,
+        "heapEndMB": 8.69,
+        "canvasMB": 87.02,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7576000000476815,
+            "kills": 0,
+            "time": 3.7576000000476815,
+            "particles": 1
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.8017999999761543,
+            "kills": 0,
+            "time": 3.8017999999761543,
+            "particles": 2
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7757,
+            "kills": 0,
+            "time": 3.7757,
+            "particles": 2
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 150.35,
+          "gcCount": 79,
+          "gcMs": 26.29,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 74969
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.08,
+              "inclusiveMs": 550.77
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 548.99
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 548.99
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.53,
+              "inclusiveMs": 547.81
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 5.17,
+              "inclusiveMs": 413.08
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 15.99,
+              "inclusiveMs": 399.02
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 8.43,
+              "inclusiveMs": 304.92
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 8.63,
+              "inclusiveMs": 100.5
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 1.57,
+              "inclusiveMs": 91.4
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 0,
+              "inclusiveMs": 89.83
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/rendering/glyphs.ts",
+              "line": 29,
+              "selfMs": 9.4,
+              "inclusiveMs": 88.3
+            },
+            {
+              "function": "drawHeldWeapons",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 313,
+              "selfMs": 4.96,
+              "inclusiveMs": 65.92
+            }
+          ]
+        }
+      },
+      "reduced-title": {
+        "startupMs": 812.49,
+        "renderMedianMs": 0.6,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 49.9,
+        "estimatedMissedSlots": 15,
+        "taskMs": 100.73,
+        "scriptMs": 59.5,
+        "heapEndMB": 6.67,
+        "canvasMB": 63.36,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.8099999999523146,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.7888999999999964,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.857599999999995,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 9.38,
+          "gcCount": 11,
+          "gcMs": 5.24,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2759
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.04,
+              "inclusiveMs": 19.25
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 1.45,
+              "inclusiveMs": 18.93
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 18.93
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 18.93
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 6.68
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 2.87,
+              "inclusiveMs": 5.92
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.41,
+              "inclusiveMs": 5.83
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 5.83
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 5.83
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 4.39
+            },
+            {
+              "function": "drawPlayer",
+              "url": "src/game.ts",
+              "line": 3399,
+              "selfMs": 0,
+              "inclusiveMs": 3.11
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 3.11
+            }
+          ]
+        }
+      }
+    }
+  },
+  "inspection": {
+    "metadata": {
+      "date": "2026-10-04T00:54:45.942Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "inspection": {
+        "startupMs": 799.89,
+        "renderMedianMs": 0,
+        "renderP95Ms": 0,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.2,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 24,
+        "taskMs": 57.18,
+        "scriptMs": 19.99,
+        "heapEndMB": 7.63,
+        "canvasMB": 80.91,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.099099999952317,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.103299999976156,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.112199999976158,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 1.67,
+          "gcCount": 2,
+          "gcMs": 2.49,
+          "counterWindowMs": 2500,
+          "draws": {
+            "prevC": 1064
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 0.53
+            },
+            {
+              "function": "drawRoomWind",
+              "url": "src/rendering/armory-room.ts",
+              "line": 60,
+              "selfMs": 0.34,
+              "inclusiveMs": 0.34
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3732,
+              "selfMs": 0,
+              "inclusiveMs": 0.34
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2947,
+              "selfMs": 0,
+              "inclusiveMs": 0.34
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/armory-preview.ts",
+              "line": 78,
+              "selfMs": 0,
+              "inclusiveMs": 0.34
+            },
+            {
+              "function": "update",
+              "url": "src/game.ts",
+              "line": 3225,
+              "selfMs": 0.06,
+              "inclusiveMs": 0.19
+            },
+            {
+              "function": "update",
+              "url": "src/game.ts",
+              "line": 3730,
+              "selfMs": 0,
+              "inclusiveMs": 0.19
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3730,
+              "selfMs": 0,
+              "inclusiveMs": 0.19
+            },
+            {
+              "function": "updateFx",
+              "url": "src/game.ts",
+              "line": 3192,
+              "selfMs": 0.07,
+              "inclusiveMs": 0.07
+            },
+            {
+              "function": "reducedMotion",
+              "url": "src/game.ts",
+              "line": 147,
+              "selfMs": 0.05,
+              "inclusiveMs": 0.05
+            }
+          ]
+        }
+      },
+      "armoury": {
+        "startupMs": 794.8,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 18,
+        "taskMs": 135.04,
+        "scriptMs": 68.81,
+        "heapEndMB": 7.62,
+        "canvasMB": 72.67,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.151299999976154,
+            "particles": 2
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.15690000004768,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.132299999952313,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 9.51,
+          "gcCount": 12,
+          "gcMs": 5.93,
+          "counterWindowMs": 2500,
+          "draws": {
+            "c": 6853,
+            "prevC": 1078
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 25.19
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3731,
+              "selfMs": 0.77,
+              "inclusiveMs": 19.86
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3731,
+              "selfMs": 0,
+              "inclusiveMs": 19.86
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3618,
+              "selfMs": 0.43,
+              "inclusiveMs": 19.09
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3299,
+              "selfMs": 0,
+              "inclusiveMs": 6.55
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 6.55
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 6.55
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3732,
+              "selfMs": 0,
+              "inclusiveMs": 5.32
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2947,
+              "selfMs": 0,
+              "inclusiveMs": 5.32
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/armory-preview.ts",
+              "line": 78,
+              "selfMs": 0,
+              "inclusiveMs": 5.32
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.52,
+              "inclusiveMs": 5.28
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 3.7,
+              "inclusiveMs": 5.19
+            }
+          ]
+        }
+      }
+    }
+  },
+  "shared-artwork": {
+    "metadata": {
+      "date": "2026-10-04T00:56:14.969Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "title": {
+        "startupMs": 799.52,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 18,
+        "taskMs": 111.87,
+        "scriptMs": 62.31,
+        "heapEndMB": 7.49,
+        "canvasMB": 70.55,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.831999999904628,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.7926000000476807,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.8066000000238382,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.29,
+          "gcCount": 12,
+          "gcMs": 5.87,
+          "counterWindowMs": 2500,
+          "draws": {
+            "c": 6853
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 16.54
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.1,
+              "inclusiveMs": 16.49
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 16.49
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0,
+              "inclusiveMs": 16.39
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 4.28
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 4.28
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 4.28
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 4.12
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.57,
+              "inclusiveMs": 3.78
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 0.69,
+              "inclusiveMs": 2.94
+            },
+            {
+              "function": "drawPlayer",
+              "url": "src/game.ts",
+              "line": 3399,
+              "selfMs": 0,
+              "inclusiveMs": 2.86
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 2.86
+            }
+          ]
+        }
+      },
+      "armoury": {
+        "startupMs": 796.3,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 13,
+        "taskMs": 126.68,
+        "scriptMs": 71.32,
+        "heapEndMB": 7.7,
+        "canvasMB": 71.7,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.188900000071521,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.127199999976154,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.183000000000001,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.43,
+          "gcCount": 12,
+          "gcMs": 5.95,
+          "counterWindowMs": 2500,
+          "draws": {
+            "c": 6764,
+            "prevC": 1064
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.17,
+              "inclusiveMs": 16.93
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.82,
+              "inclusiveMs": 16.26
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 16.26
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0,
+              "inclusiveMs": 15.44
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 2.53,
+              "inclusiveMs": 6.27
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 6.27
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.5,
+              "inclusiveMs": 4.8
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 4.8
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 3.87
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 2.37
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 1.67
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 0,
+              "inclusiveMs": 1.67
+            }
+          ]
+        }
+      },
+      "inspection": {
+        "startupMs": 794.55,
+        "renderMedianMs": 0,
+        "renderP95Ms": 0,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.4,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 17,
+        "taskMs": 62.34,
+        "scriptMs": 19.99,
+        "heapEndMB": 7.8,
+        "canvasMB": 79.94,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.059299999999999,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.101900000000004,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.103999999952317,
+            "particles": 2
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 1.84,
+          "gcCount": 2,
+          "gcMs": 2.57,
+          "counterWindowMs": 2500,
+          "draws": {
+            "prevC": 1064
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 2.18
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3739,
+              "selfMs": 0,
+              "inclusiveMs": 1.75
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2954,
+              "selfMs": 0,
+              "inclusiveMs": 1.75
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/armory-preview.ts",
+              "line": 80,
+              "selfMs": 0,
+              "inclusiveMs": 1.75
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 1.23
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 150,
+              "selfMs": 0,
+              "inclusiveMs": 0.78
+            },
+            {
+              "function": "drawRoomWind",
+              "url": "src/rendering/armory-room.ts",
+              "line": 60,
+              "selfMs": 0.38,
+              "inclusiveMs": 0.52
+            },
+            {
+              "function": "drawHeldWeapons",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 313,
+              "selfMs": 0,
+              "inclusiveMs": 0.45
+            },
+            {
+              "function": "drawSword",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 56,
+              "selfMs": 0,
+              "inclusiveMs": 0.45
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/figures/ink-sword.ts",
+              "line": 67,
+              "selfMs": 0,
+              "inclusiveMs": 0.45
+            },
+            {
+              "function": "joints",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 125,
+              "selfMs": 0.27,
+              "inclusiveMs": 0.27
+            },
+            {
+              "function": "request",
+              "url": "src/platform/frame-loop.ts",
+              "line": 16,
+              "selfMs": 0,
+              "inclusiveMs": 0.23
+            }
+          ]
+        }
+      },
+      "combat": {
+        "startupMs": 781.91,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.2,
+        "estimatedMissedSlots": 0,
+        "taskMs": 219.94,
+        "scriptMs": 135.82,
+        "heapEndMB": 7.48,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.921500000071525,
+            "kills": 1,
+            "time": 3.780500000071525,
+            "particles": 20
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.908899999928471,
+            "kills": 1,
+            "time": 3.7522019999284724,
+            "particles": 23
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9147000000238386,
+            "kills": 1,
+            "time": 3.7584720000238385,
+            "particles": 21
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 20.66,
+          "gcCount": 25,
+          "gcMs": 9.59,
+          "counterWindowMs": 2500,
+          "draws": {
+            "c": 11422,
+            "offscreen": 8
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.07,
+              "inclusiveMs": 74.84
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 72.89
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.81,
+              "inclusiveMs": 72.62
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 72.62
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 1.59,
+              "inclusiveMs": 19.53
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 11.08,
+              "inclusiveMs": 17.94
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 16.13
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 1.59,
+              "inclusiveMs": 12.96
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.61,
+              "inclusiveMs": 10.46
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 2.18,
+              "inclusiveMs": 7.63
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 1.07,
+              "inclusiveMs": 7.55
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 2.17,
+              "inclusiveMs": 6.48
+            }
+          ]
+        }
+      }
+    }
+  },
+  "film-copy": {
+    "metadata": {
+      "date": "2026-10-04T00:58:37.335Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "film-glitch": {
+        "startupMs": 806.31,
+        "renderMedianMs": 1.2,
+        "renderP95Ms": 1.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 257.27,
+        "scriptMs": 214.24,
+        "heapEndMB": 6.8,
+        "canvasMB": 81.87,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 2,
+            "runTime": 4.0666,
+            "kills": 1,
+            "time": 3.9279999999523163,
+            "particles": 12
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9627000000476826,
+            "kills": 1,
+            "time": 3.8216060000476837,
+            "particles": 17
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.935000000047679,
+            "kills": 1,
+            "time": 3.7783020000476797,
+            "particles": 18
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 21.97,
+          "gcCount": 25,
+          "gcMs": 9.91,
+          "counterWindowMs": 2500,
+          "draws": {
+            "c": 22218,
+            "offscreen": 316
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.02,
+              "inclusiveMs": 123.47
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 120.44
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.55,
+              "inclusiveMs": 119.33
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 3.44,
+              "inclusiveMs": 117.76
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 1.05,
+              "inclusiveMs": 62.78
+            },
+            {
+              "function": "applyFilm",
+              "url": "src/rendering/effects/film.ts",
+              "line": 15,
+              "selfMs": 1.57,
+              "inclusiveMs": 59.3
+            },
+            {
+              "function": "copyFilmSource",
+              "url": "src/rendering/effects/film.ts",
+              "line": 2,
+              "selfMs": 0,
+              "inclusiveMs": 42.27
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 16.73
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 4.6,
+              "inclusiveMs": 16.67
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.6,
+              "inclusiveMs": 14.25
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 2.45,
+              "inclusiveMs": 13.21
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 5.56,
+              "inclusiveMs": 9.96
+            }
+          ]
+        }
+      }
+    }
+  },
+  "opaque": {
+    "metadata": {
+      "date": "2026-10-04T01:04:38.266Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "title": {
+        "startupMs": 860.78,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1.3,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50.1,
+        "estimatedMissedSlots": 16,
+        "taskMs": 121.04,
+        "scriptMs": 73.91,
+        "heapEndMB": 7.72,
+        "canvasMB": 70.55,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.759799999976154,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.7527999999284694,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.8079000000715224,
+            "particles": 0
+          }
+        ]
+      },
+      "combat": {
+        "startupMs": 913.04,
+        "renderMedianMs": 0.9,
+        "renderP95Ms": 1.4,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.1,
+        "estimatedMissedSlots": 0,
+        "taskMs": 263.18,
+        "scriptMs": 171.86,
+        "heapEndMB": 7.03,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.880899999999998,
+            "kills": 1,
+            "time": 3.739805999999999,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9164999999999988,
+            "kills": 1,
+            "time": 3.7598959999999995,
+            "particles": 23
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9316999999761553,
+            "kills": 1,
+            "time": 3.7906059999761568,
+            "particles": 20
+          }
+        ]
+      },
+      "demon": {
+        "startupMs": 861.14,
+        "renderMedianMs": 1,
+        "renderP95Ms": 1.7,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17,
+        "estimatedMissedSlots": 0,
+        "taskMs": 341.74,
+        "scriptMs": 201.36,
+        "heapEndMB": 8.02,
+        "canvasMB": 52.73,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.012799999952315,
+            "kills": 1,
+            "time": 3.8717999999523163,
+            "particles": 5
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.04820000004768,
+            "kills": 1,
+            "time": 3.9071060000476803,
+            "particles": 9
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.023799999999998,
+            "kills": 1,
+            "time": 3.8827999999999983,
+            "particles": 8
+          }
+        ]
+      },
+      "film-glitch": {
+        "startupMs": 825.19,
+        "renderMedianMs": 1.9,
+        "renderP95Ms": 2.7,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 367.43,
+        "scriptMs": 323.82,
+        "heapEndMB": 7.04,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.946099999976153,
+            "kills": 1,
+            "time": 3.805099999976154,
+            "particles": 13
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.913699999976155,
+            "kills": 1,
+            "time": 3.7726999999761546,
+            "particles": 20
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9384000000953625,
+            "kills": 1,
+            "time": 3.7817020000953634,
+            "particles": 25
+          }
+        ]
+      }
+    }
+  },
+  "final": {
+    "metadata": {
+      "date": "2026-10-04T01:17:01.588Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "title": {
+        "startupMs": 1232.6,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 10.5,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 16,
+        "taskMs": 324.51,
+        "scriptMs": 217.81,
+        "heapEndMB": 6.7,
+        "canvasMB": 70.55,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.123999999999999,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.750900000095364,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.121000000023838,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 9.44,
+          "gcCount": 11,
+          "gcMs": 8.62,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.19,
+              "inclusiveMs": 104.59
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 1.3,
+              "inclusiveMs": 97.48
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.32,
+              "inclusiveMs": 94.54
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 1.07,
+              "inclusiveMs": 94.21
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 30.97
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 30.97
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 23.9,
+              "inclusiveMs": 30.88
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 4.41,
+              "inclusiveMs": 30.02
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 18.25
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 0.66,
+              "inclusiveMs": 13.41
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 13.41
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 150,
+              "selfMs": 1.54,
+              "inclusiveMs": 9.73
+            }
+          ]
+        }
+      },
+      "stats": {
+        "startupMs": 1282.09,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 9.2,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.4,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 13,
+        "taskMs": 242.8,
+        "scriptMs": 146.76,
+        "heapEndMB": 7.83,
+        "canvasMB": 70.55,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.1652,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.131700000071523,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "stats",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.191299999999997,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 8.95,
+          "gcCount": 12,
+          "gcMs": 5.15,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.02,
+              "inclusiveMs": 23.78
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.31,
+              "inclusiveMs": 23.61
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 23.61
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 23.61
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0.15,
+              "inclusiveMs": 7.53
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 6.06,
+              "inclusiveMs": 7.37
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 4.49
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 4.49
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 2.38,
+              "inclusiveMs": 4.11
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 4.11
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.73,
+              "inclusiveMs": 3.73
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 3
+            }
+          ]
+        }
+      },
+      "options": {
+        "startupMs": 883.19,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50.1,
+        "estimatedMissedSlots": 33,
+        "taskMs": 113.19,
+        "scriptMs": 64.97,
+        "heapEndMB": 8.14,
+        "canvasMB": 70.55,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.148299999976156,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.136999999976153,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "options",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.158399999999996,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.36,
+          "gcCount": 12,
+          "gcMs": 5.27,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.02,
+              "inclusiveMs": 26.71
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.91,
+              "inclusiveMs": 25.47
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 1.46,
+              "inclusiveMs": 24.56
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 24.56
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 9.35
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 9.35
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0,
+              "inclusiveMs": 9.35
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0,
+              "inclusiveMs": 5.37
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 3.24,
+              "inclusiveMs": 5.15
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 5.15
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 3.17,
+              "inclusiveMs": 4.09
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 4.09
+            }
+          ]
+        }
+      },
+      "armoury": {
+        "startupMs": 1142.76,
+        "renderMedianMs": 1.2,
+        "renderP95Ms": 8.8,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50.1,
+        "estimatedMissedSlots": 15,
+        "taskMs": 301.99,
+        "scriptMs": 195.49,
+        "heapEndMB": 9.04,
+        "canvasMB": 71.7,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.15850000002384,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.126899999999996,
+            "particles": 2
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.159599999976155,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 10.36,
+          "gcCount": 12,
+          "gcMs": 19.91,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670,
+            "prevC": 420
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 112.16
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 1.68,
+              "inclusiveMs": 93.02
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 93.02
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 0.4,
+              "inclusiveMs": 91.33
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.38,
+              "inclusiveMs": 36.36
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 36.36
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.79,
+              "inclusiveMs": 35.99
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 2.37,
+              "inclusiveMs": 26.26
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 2.74,
+              "inclusiveMs": 24.46
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 9.81,
+              "inclusiveMs": 23.89
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 14.37,
+              "inclusiveMs": 23.86
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 23.86
+            }
+          ]
+        }
+      },
+      "inspection": {
+        "startupMs": 1240.7,
+        "renderMedianMs": 0,
+        "renderP95Ms": 0,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.2,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50,
+        "estimatedMissedSlots": 20,
+        "taskMs": 150.71,
+        "scriptMs": 51.34,
+        "heapEndMB": 7.94,
+        "canvasMB": 79.94,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.122700000047683,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.1203999999523155,
+            "particles": 2
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.099500000071528,
+            "particles": 1
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 1.38,
+          "gcCount": 2,
+          "gcMs": 4.46,
+          "counterWindowMs": 1000,
+          "draws": {
+            "prevC": 434
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.24,
+              "inclusiveMs": 2.37
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/armory-preview.ts",
+              "line": 80,
+              "selfMs": 0.22,
+              "inclusiveMs": 2.06
+            },
+            {
+              "function": "afterRender",
+              "url": "src/game.ts",
+              "line": 3739,
+              "selfMs": 0,
+              "inclusiveMs": 2.06
+            },
+            {
+              "function": "drawPreview",
+              "url": "src/game.ts",
+              "line": 2954,
+              "selfMs": 0,
+              "inclusiveMs": 2.06
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.18,
+              "inclusiveMs": 1.34
+            },
+            {
+              "function": "drawHeldWeapons",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 313,
+              "selfMs": 0.21,
+              "inclusiveMs": 0.6
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 150,
+              "selfMs": 0,
+              "inclusiveMs": 0.56
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 198,
+              "selfMs": 0,
+              "inclusiveMs": 0.56
+            },
+            {
+              "function": "drawRoomWind",
+              "url": "src/rendering/armory-room.ts",
+              "line": 60,
+              "selfMs": 0.5,
+              "inclusiveMs": 0.5
+            },
+            {
+              "function": "drawSword",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 56,
+              "selfMs": 0,
+              "inclusiveMs": 0.39
+            },
+            {
+              "function": "draw",
+              "url": "src/rendering/figures/ink-sword.ts",
+              "line": 67,
+              "selfMs": 0,
+              "inclusiveMs": 0.39
+            },
+            {
+              "function": "stamp",
+              "url": "src/rendering/figures/ink-player.ts",
+              "line": 119,
+              "selfMs": 0,
+              "inclusiveMs": 0.29
+            }
+          ]
+        }
+      },
+      "combat": {
+        "startupMs": 849.77,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17,
+        "estimatedMissedSlots": 0,
+        "taskMs": 214.93,
+        "scriptMs": 136.1,
+        "heapEndMB": 6.55,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.90809999990463,
+            "kills": 1,
+            "time": 3.751495999904631,
+            "particles": 25
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.907000000047682,
+            "kills": 1,
+            "time": 3.766000000047683,
+            "particles": 24
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9052999999284737,
+            "kills": 1,
+            "time": 3.7642999999284736,
+            "particles": 20
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 20.33,
+          "gcCount": 23,
+          "gcMs": 8.82,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3561,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 50.23
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 3.42,
+              "inclusiveMs": 47.89
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 47.89
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 47.89
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.47,
+              "inclusiveMs": 9.85
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 9.85
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 7.16,
+              "inclusiveMs": 9.44
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 9.44
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.48,
+              "inclusiveMs": 9.38
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0.42,
+              "inclusiveMs": 8.95
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 5.16,
+              "inclusiveMs": 8.16
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.91,
+              "inclusiveMs": 4.96
+            }
+          ]
+        }
+      },
+      "demon": {
+        "startupMs": 831.64,
+        "renderMedianMs": 1,
+        "renderP95Ms": 1.4,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 304.92,
+        "scriptMs": 175.91,
+        "heapEndMB": 6.88,
+        "canvasMB": 52.73,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9719999999523137,
+            "kills": 1,
+            "time": 3.8309999999523137,
+            "particles": 8
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.021799999999998,
+            "kills": 1,
+            "time": 3.8807999999999976,
+            "particles": 7
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 4.013300000071527,
+            "kills": 1,
+            "time": 3.8566960000715276,
+            "particles": 11
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 22.54,
+          "gcCount": 26,
+          "gcMs": 9.92,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 6002
+          },
+          "reads": 0,
+          "gradients": 427,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.04,
+              "inclusiveMs": 86.36
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.15,
+              "inclusiveMs": 78.58
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 78.58
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 1.81,
+              "inclusiveMs": 78.43
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 1.23,
+              "inclusiveMs": 26.9
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 1.1,
+              "inclusiveMs": 25.67
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/rendering/glyphs.ts",
+              "line": 29,
+              "selfMs": 2.9,
+              "inclusiveMs": 24.56
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 20.67
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.8,
+              "inclusiveMs": 15.5
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 1.16,
+              "inclusiveMs": 14.7
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 11.34
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 2.65,
+              "inclusiveMs": 10.94
+            }
+          ]
+        }
+      },
+      "film-glitch": {
+        "startupMs": 927.47,
+        "renderMedianMs": 1.5,
+        "renderP95Ms": 5.4,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.3,
+        "estimatedMissedSlots": 1,
+        "taskMs": 440.24,
+        "scriptMs": 381.2,
+        "heapEndMB": 7.29,
+        "canvasMB": 81.87,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.8245,
+            "kills": 1,
+            "time": 3.6835000000000013,
+            "particles": 25
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.935100000023841,
+            "kills": 1,
+            "time": 3.7940060000238414,
+            "particles": 18
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9423000000476813,
+            "kills": 1,
+            "time": 3.785602000047682,
+            "particles": 21
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 21.74,
+          "gcCount": 24,
+          "gcMs": 10.04,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 7807,
+            "offscreen": 129
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 115.53
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 112.01
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.21,
+              "inclusiveMs": 109.25
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 109.25
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 4.6,
+              "inclusiveMs": 51.92
+            },
+            {
+              "function": "applyFilm",
+              "url": "src/rendering/effects/film.ts",
+              "line": 15,
+              "selfMs": 1.39,
+              "inclusiveMs": 47.32
+            },
+            {
+              "function": "copyFilmSource",
+              "url": "src/rendering/effects/film.ts",
+              "line": 2,
+              "selfMs": 0,
+              "inclusiveMs": 38.92
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0.79,
+              "inclusiveMs": 15.41
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 5.91,
+              "inclusiveMs": 14.62
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0.6,
+              "inclusiveMs": 14.1
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.48,
+              "inclusiveMs": 13.51
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 2.62,
+              "inclusiveMs": 12.62
+            }
+          ]
+        }
+      },
+      "film-inferno": {
+        "startupMs": 896.21,
+        "renderMedianMs": 0.9,
+        "renderP95Ms": 1.2,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 244.17,
+        "scriptMs": 157.56,
+        "heapEndMB": 8.07,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.895100000047682,
+            "kills": 1,
+            "time": 3.7384960000476837,
+            "particles": 24
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.911599999999995,
+            "kills": 1,
+            "time": 3.770599999999997,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.893500000000001,
+            "kills": 1,
+            "time": 3.7524060000000015,
+            "particles": 20
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 22.29,
+          "gcCount": 25,
+          "gcMs": 9.59,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3360,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 1403,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 1.39,
+              "inclusiveMs": 82.74
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.29,
+              "inclusiveMs": 77.03
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 77.03
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 1.59,
+              "inclusiveMs": 76.74
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 10.34,
+              "inclusiveMs": 18.82
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 18.82
+            },
+            {
+              "function": "drawPost",
+              "url": "src/game.ts",
+              "line": 3522,
+              "selfMs": 2.83,
+              "inclusiveMs": 14.89
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 12.54
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0.52,
+              "inclusiveMs": 11.78
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 2.59,
+              "inclusiveMs": 11.26
+            },
+            {
+              "function": "applyFilm",
+              "url": "src/rendering/effects/film.ts",
+              "line": 15,
+              "selfMs": 4.11,
+              "inclusiveMs": 11.1
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 2.64,
+              "inclusiveMs": 7.88
+            }
+          ]
+        }
+      },
+      "kill-effects": {
+        "startupMs": 855.17,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.1,
+        "estimatedMissedSlots": 0,
+        "taskMs": 214.36,
+        "scriptMs": 135.7,
+        "heapEndMB": 6.68,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.919299999952315,
+            "kills": 1,
+            "time": 3.778205999952316,
+            "particles": 12
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9090999999999974,
+            "kills": 1,
+            "time": 3.768006,
+            "particles": 12
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9033000000476847,
+            "kills": 1,
+            "time": 3.7623000000476856,
+            "particles": 12
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 20.04,
+          "gcCount": 24,
+          "gcMs": 8.67,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 3305,
+            "offscreen": 7
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.03,
+              "inclusiveMs": 57.15
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.13,
+              "inclusiveMs": 54.67
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 54.67
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 54.67
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 9.17,
+              "inclusiveMs": 14.22
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 14.22
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 12.45
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 0.94,
+              "inclusiveMs": 9.74
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 9.74
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 99,
+              "selfMs": 3.44,
+              "inclusiveMs": 8.47
+            },
+            {
+              "function": "drawLeaves",
+              "url": "src/game.ts",
+              "line": 583,
+              "selfMs": 0,
+              "inclusiveMs": 8.47
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.61,
+              "inclusiveMs": 5.82
+            }
+          ]
+        }
+      },
+      "stress-100": {
+        "startupMs": 888.99,
+        "renderMedianMs": 8.9,
+        "renderP95Ms": 10.5,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.3,
+        "estimatedMissedSlots": 0,
+        "taskMs": 1581.43,
+        "scriptMs": 1246.16,
+        "heapEndMB": 7.24,
+        "canvasMB": 87.02,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.789799999976155,
+            "kills": 0,
+            "time": 3.789799999976155,
+            "particles": 1
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.686400000000001,
+            "kills": 0,
+            "time": 3.686400000000001,
+            "particles": 2
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7906000000953703,
+            "kills": 0,
+            "time": 3.7906000000953703,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 143.19,
+          "gcCount": 69,
+          "gcMs": 53.01,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 71282
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0,
+              "inclusiveMs": 1626.41
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 1608.7
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 10.68,
+              "inclusiveMs": 1606.56
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 1606.56
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 5,
+              "inclusiveMs": 1293.47
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 38.4,
+              "inclusiveMs": 1259.26
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 58.01,
+              "inclusiveMs": 915.5
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 21.13,
+              "inclusiveMs": 267.88
+            },
+            {
+              "function": "drawHeldWeapons",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 313,
+              "selfMs": 3.42,
+              "inclusiveMs": 209.35
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 1.69,
+              "inclusiveMs": 207.33
+            },
+            {
+              "function": "drawSword",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 56,
+              "selfMs": 0,
+              "inclusiveMs": 205.92
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 4.27,
+              "inclusiveMs": 204.36
+            }
+          ]
+        }
+      },
+      "reduced-title": {
+        "startupMs": 1282.63,
+        "renderMedianMs": 1.4,
+        "renderP95Ms": 1.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 33.4,
+        "frameP95Ms": 49.2,
+        "estimatedMissedSlots": 10,
+        "taskMs": 192.19,
+        "scriptMs": 117.92,
+        "heapEndMB": 6.58,
+        "canvasMB": 63.36,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.7975999999523147,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 3.7626000000715223,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": null,
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.062299999999997,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 9.28,
+          "gcCount": 11,
+          "gcMs": 5.82,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 2670
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.33,
+              "inclusiveMs": 37.62
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 34.2
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0.22,
+              "inclusiveMs": 31.64
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.3,
+              "inclusiveMs": 31.42
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 1.8,
+              "inclusiveMs": 16.29
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 0,
+              "inclusiveMs": 16.29
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/game.ts",
+              "line": 634,
+              "selfMs": 0,
+              "inclusiveMs": 16.29
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 0.42,
+              "inclusiveMs": 12.4
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 1.11,
+              "inclusiveMs": 5.75
+            },
+            {
+              "function": "blades",
+              "url": "src/rendering/scene/ambient.ts",
+              "line": 87,
+              "selfMs": 2.84,
+              "inclusiveMs": 4.32
+            },
+            {
+              "function": "blades",
+              "url": "src/game.ts",
+              "line": 553,
+              "selfMs": 0,
+              "inclusiveMs": 4.32
+            },
+            {
+              "function": "stamp",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 307,
+              "selfMs": 1.67,
+              "inclusiveMs": 2.62
+            }
+          ]
+        }
+      }
+    }
+  },
+  "paired-baseline-a": {
+    "metadata": {
+      "date": "2026-10-04T01:22:47.171Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 2
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 1983.03,
+        "renderMedianMs": 11.5,
+        "renderP95Ms": 22.5,
+        "updateMedianMs": 0.15,
+        "previewMedianMs": 0,
+        "frameMedianMs": 17.2,
+        "frameP95Ms": 29.7,
+        "estimatedMissedSlots": 38,
+        "taskMs": 2300.6,
+        "scriptMs": 1756.26,
+        "heapEndMB": 8.22,
+        "canvasMB": 86.54,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 4.067000000000003,
+            "kills": 0,
+            "time": 4.071100000047687,
+            "particles": 3
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.9996999999999985,
+            "kills": 0,
+            "time": 4.009599999976157,
+            "particles": 2
+          }
+        ]
+      },
+      "film-glitch": {
+        "startupMs": 3575.11,
+        "renderMedianMs": 9.7,
+        "renderP95Ms": 42.65,
+        "updateMedianMs": 0.15,
+        "previewMedianMs": 0,
+        "frameMedianMs": 17.65,
+        "frameP95Ms": 48.5,
+        "estimatedMissedSlots": 91,
+        "taskMs": 1860.63,
+        "scriptMs": 1695.77,
+        "heapEndMB": 6.99,
+        "canvasMB": 78.98,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.384600000000001,
+            "kills": 1,
+            "time": 3.2282780000000018,
+            "particles": 33
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.849999999999997,
+            "kills": 1,
+            "time": 3.7005079999284725,
+            "particles": 25
+          }
+        ]
+      },
+      "inspection": {
+        "startupMs": 6613.35,
+        "renderMedianMs": 1.7,
+        "renderP95Ms": 18.6,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.2,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 104.1,
+        "estimatedMissedSlots": 46,
+        "taskMs": 798.03,
+        "scriptMs": 315.33,
+        "heapEndMB": 8.89,
+        "canvasMB": 80.91,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.039399999976156,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 4.023099999952313,
+            "particles": 2
+          }
+        ]
+      },
+      "combat": {
+        "startupMs": 5699.61,
+        "renderMedianMs": 1.8,
+        "renderP95Ms": 3.15,
+        "updateMedianMs": 0.2,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 18.45,
+        "estimatedMissedSlots": 3,
+        "taskMs": 580.48,
+        "scriptMs": 372.71,
+        "heapEndMB": 7.65,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.748799999976157,
+            "kills": 1,
+            "time": 3.607799999976158,
+            "particles": 26
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.940200000047682,
+            "kills": 1,
+            "time": 3.7848180000476837,
+            "particles": 22
+          }
+        ]
+      }
+    }
+  },
+  "paired-optimized-a": {
+    "metadata": {
+      "date": "2026-10-04T01:24:06.762Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 2
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 1301.23,
+        "renderMedianMs": 5.5,
+        "renderP95Ms": 10.9,
+        "updateMedianMs": 0.15,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 18.9,
+        "estimatedMissedSlots": 2,
+        "taskMs": 1232.68,
+        "scriptMs": 920.97,
+        "heapEndMB": 9.01,
+        "canvasMB": 87.02,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.5597000000476826,
+            "kills": 0,
+            "time": 3.5597000000476826,
+            "particles": 1
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.694800000023838,
+            "kills": 0,
+            "time": 3.694800000023838,
+            "particles": 3
+          }
+        ]
+      },
+      "film-glitch": {
+        "startupMs": 821.88,
+        "renderMedianMs": 1.2,
+        "renderP95Ms": 1.85,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.95,
+        "estimatedMissedSlots": 0,
+        "taskMs": 248.07,
+        "scriptMs": 207.4,
+        "heapEndMB": 6.68,
+        "canvasMB": 84.25,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 2,
+            "runTime": 4.066499999999998,
+            "kills": 1,
+            "time": 3.9259999999523143,
+            "particles": 15
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9441999999999986,
+            "kills": 1,
+            "time": 3.8031999999999986,
+            "particles": 18
+          }
+        ]
+      },
+      "inspection": {
+        "startupMs": 793.22,
+        "renderMedianMs": 0,
+        "renderP95Ms": 0.1,
+        "updateMedianMs": 0.05,
+        "previewMedianMs": 0.2,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 50.05,
+        "estimatedMissedSlots": 17,
+        "taskMs": 59.28,
+        "scriptMs": 19.77,
+        "heapEndMB": 7.81,
+        "canvasMB": 79.94,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.053699999928473,
+            "particles": 2
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.109099999976156,
+            "particles": 0
+          }
+        ]
+      },
+      "combat": {
+        "startupMs": 836.69,
+        "renderMedianMs": 0.75,
+        "renderP95Ms": 0.95,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.15,
+        "estimatedMissedSlots": 0,
+        "taskMs": 221.07,
+        "scriptMs": 130.79,
+        "heapEndMB": 7.92,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.8893000000476814,
+            "kills": 1,
+            "time": 3.7483000000476827,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9314999999999993,
+            "kills": 1,
+            "time": 3.7904059999999995,
+            "particles": 20
+          }
+        ]
+      }
+    }
+  },
+  "paired-optimized-b": {
+    "metadata": {
+      "date": "2026-10-04T01:24:51.274Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 2
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 968.37,
+        "renderMedianMs": 3.6,
+        "renderP95Ms": 4.05,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.85,
+        "estimatedMissedSlots": 0,
+        "taskMs": 779.43,
+        "scriptMs": 577.41,
+        "heapEndMB": 7.19,
+        "canvasMB": 86.78,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 4.066599999999997,
+            "kills": 0,
+            "time": 4.068500000023838,
+            "particles": 0
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7965000000953655,
+            "kills": 0,
+            "time": 3.7965000000953655,
+            "particles": 0
+          }
+        ]
+      },
+      "film-glitch": {
+        "startupMs": 824.48,
+        "renderMedianMs": 1.25,
+        "renderP95Ms": 1.8,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.8,
+        "estimatedMissedSlots": 0,
+        "taskMs": 250.86,
+        "scriptMs": 212.28,
+        "heapEndMB": 7.31,
+        "canvasMB": 81.87,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9290999999999956,
+            "kills": 1,
+            "time": 3.7880999999999965,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9565999999761567,
+            "kills": 1,
+            "time": 3.7999019999761576,
+            "particles": 22
+          }
+        ]
+      },
+      "inspection": {
+        "startupMs": 848.64,
+        "renderMedianMs": 0,
+        "renderP95Ms": 0.05,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0.15,
+        "frameMedianMs": 33.35,
+        "frameP95Ms": 50.4,
+        "estimatedMissedSlots": 16,
+        "taskMs": 63.59,
+        "scriptMs": 19.76,
+        "heapEndMB": 7.94,
+        "canvasMB": 79.94,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.12409999997616,
+            "particles": 0
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.088500000023839,
+            "particles": 1
+          }
+        ]
+      },
+      "combat": {
+        "startupMs": 837.92,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.95,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17.05,
+        "estimatedMissedSlots": 0,
+        "taskMs": 206.36,
+        "scriptMs": 128.66,
+        "heapEndMB": 6.8,
+        "canvasMB": 76.61,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.9061999999284693,
+            "kills": 1,
+            "time": 3.7651999999284715,
+            "particles": 19
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.895300000023839,
+            "kills": 1,
+            "time": 3.754300000023841,
+            "particles": 16
+          }
+        ]
+      }
+    }
+  },
+  "paired-baseline-b": {
+    "metadata": {
+      "date": "2026-10-04T01:25:35.157Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 2
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 971.49,
+        "renderMedianMs": 3.65,
+        "renderP95Ms": 4.05,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.8,
+        "estimatedMissedSlots": 0,
+        "taskMs": 776.08,
+        "scriptMs": 576.46,
+        "heapEndMB": 9.71,
+        "canvasMB": 86.54,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 4.049899999999997,
+            "kills": 0,
+            "time": 4.057199999952314,
+            "particles": 0
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 4.033299999999995,
+            "kills": 0,
+            "time": 4.033400000047679,
+            "particles": 1
+          }
+        ]
+      },
+      "film-glitch": {
+        "startupMs": 828.49,
+        "renderMedianMs": 2.05,
+        "renderP95Ms": 2.95,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.85,
+        "estimatedMissedSlots": 0,
+        "taskMs": 392.78,
+        "scriptMs": 340.2,
+        "heapEndMB": 7.14,
+        "canvasMB": 76.61,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.932299999976156,
+            "kills": 1,
+            "time": 3.7756959999761572,
+            "particles": 21
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.938000000023839,
+            "kills": 1,
+            "time": 3.7970000000238397,
+            "particles": 16
+          }
+        ]
+      },
+      "inspection": {
+        "startupMs": 834.46,
+        "renderMedianMs": 0.7,
+        "renderP95Ms": 0.85,
+        "updateMedianMs": 0.05,
+        "previewMedianMs": 0.1,
+        "frameMedianMs": 33.3,
+        "frameP95Ms": 41.4,
+        "estimatedMissedSlots": 2,
+        "taskMs": 124.27,
+        "scriptMs": 66.34,
+        "heapEndMB": 8.66,
+        "canvasMB": 80.91,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.0942000000476835,
+            "particles": 1
+          },
+          {
+            "state": "title",
+            "panel": "armory",
+            "enemies": 5,
+            "runTime": 0,
+            "kills": 0,
+            "time": 5.066199999904632,
+            "particles": 1
+          }
+        ]
+      },
+      "combat": {
+        "startupMs": 854.72,
+        "renderMedianMs": 0.8,
+        "renderP95Ms": 1.1,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 17,
+        "estimatedMissedSlots": 0,
+        "taskMs": 225.65,
+        "scriptMs": 141.2,
+        "heapEndMB": 7.09,
+        "canvasMB": 78.98,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 3,
+            "runTime": 3.907399999952314,
+            "kills": 1,
+            "time": 3.7507959999523153,
+            "particles": 20
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 2,
+            "runTime": 4.083299999999998,
+            "kills": 1,
+            "time": 3.943800000071523,
+            "particles": 12
+          }
+        ]
+      }
+    }
+  },
+  "stress-fixed-baseline": {
+    "metadata": {
+      "date": "2026-10-04T01:31:36.504Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 845.4,
+        "renderMedianMs": 3.6,
+        "renderP95Ms": 3.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.8,
+        "estimatedMissedSlots": 0,
+        "taskMs": 764.37,
+        "scriptMs": 567.63,
+        "heapEndMB": 8.3,
+        "canvasMB": 86.53,
+        "imageObjects": 156,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.765500000095365,
+            "kills": 0,
+            "time": 3.765500000095365,
+            "particles": 0
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.794000000095366,
+            "kills": 0,
+            "time": 3.794000000095366,
+            "particles": 2
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7780999999046303,
+            "kills": 0,
+            "time": 3.7780999999046303,
+            "particles": 2
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 152.95,
+          "gcCount": 80,
+          "gcMs": 23.83,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 74969
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 0.05,
+              "inclusiveMs": 508.49
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 502.26
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 2.31,
+              "inclusiveMs": 500.75
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 500.75
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 9.4,
+              "inclusiveMs": 368.55
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 10.49,
+              "inclusiveMs": 348.16
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 1.65,
+              "inclusiveMs": 263.52
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 7.73,
+              "inclusiveMs": 89.23
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 4.62,
+              "inclusiveMs": 89.07
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/rendering/glyphs.ts",
+              "line": 29,
+              "selfMs": 7.72,
+              "inclusiveMs": 80.82
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 0,
+              "inclusiveMs": 80.82
+            },
+            {
+              "function": "brushRing",
+              "url": "src/rendering/glyphs.ts",
+              "line": 17,
+              "selfMs": 4.67,
+              "inclusiveMs": 54.24
+            }
+          ]
+        }
+      }
+    }
+  },
+  "stress-fixed-final": {
+    "metadata": {
+      "date": "2026-10-04T01:31:58.799Z",
+      "revision": "992c39d185f0c49658d05d295012f93faa405034",
+      "browser": "154.0.4258.53",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dpr": 2,
+      "build": "Vite development; route-injected instrumentation; no CPU throttling",
+      "warmupMs": 1500,
+      "sampleMs": 2500,
+      "repeats": 3
+    },
+    "scenarios": {
+      "stress-100": {
+        "startupMs": 852.37,
+        "renderMedianMs": 3.6,
+        "renderP95Ms": 3.9,
+        "updateMedianMs": 0.1,
+        "previewMedianMs": 0,
+        "frameMedianMs": 16.7,
+        "frameP95Ms": 16.9,
+        "estimatedMissedSlots": 0,
+        "taskMs": 765.09,
+        "scriptMs": 566.78,
+        "heapEndMB": 8.23,
+        "canvasMB": 86.53,
+        "imageObjects": 124,
+        "uniqueImageMB": 358.06,
+        "sampleEndStates": [
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 4.049799999999998,
+            "kills": 0,
+            "time": 4.049799999999998,
+            "particles": 2
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7902000000238374,
+            "kills": 0,
+            "time": 3.7902000000238374,
+            "particles": 1
+          },
+          {
+            "state": "playing",
+            "panel": null,
+            "enemies": 100,
+            "runTime": 3.7705000000238402,
+            "kills": 0,
+            "time": 3.7705000000238402,
+            "particles": 0
+          }
+        ],
+        "diagnostic": {
+          "sampledAllocationsMB": 149.33,
+          "gcCount": 80,
+          "gcMs": 22.76,
+          "counterWindowMs": 1000,
+          "draws": {
+            "c": 73740
+          },
+          "reads": 0,
+          "gradients": 0,
+          "cpuInclusive": [
+            {
+              "function": "frame",
+              "url": "src/platform/frame-loop.ts",
+              "line": 23,
+              "selfMs": 1.57,
+              "inclusiveMs": 495.71
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 489
+            },
+            {
+              "function": "render",
+              "url": "src/game.ts",
+              "line": 3625,
+              "selfMs": 4.91,
+              "inclusiveMs": 487.35
+            },
+            {
+              "function": "(anonymous)",
+              "url": "src/game.ts",
+              "line": 3738,
+              "selfMs": 0,
+              "inclusiveMs": 487.35
+            },
+            {
+              "function": "drawEnemy",
+              "url": "src/game.ts",
+              "line": 3306,
+              "selfMs": 2.38,
+              "inclusiveMs": 372.31
+            },
+            {
+              "function": "drawFigure",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 243,
+              "selfMs": 14.82,
+              "inclusiveMs": 359
+            },
+            {
+              "function": "drawPart",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 330,
+              "selfMs": 11.01,
+              "inclusiveMs": 261.76
+            },
+            {
+              "function": "bone",
+              "url": "src/rendering/figures/ink-enemy.ts",
+              "line": 323,
+              "selfMs": 7.94,
+              "inclusiveMs": 86.61
+            },
+            {
+              "function": "drawGlyphs",
+              "url": "src/game.ts",
+              "line": 3429,
+              "selfMs": 3.2,
+              "inclusiveMs": 68.17
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/game.ts",
+              "line": 720,
+              "selfMs": 3.06,
+              "inclusiveMs": 61.88
+            },
+            {
+              "function": "drawEnso",
+              "url": "src/rendering/glyphs.ts",
+              "line": 29,
+              "selfMs": 6.17,
+              "inclusiveMs": 58.82
+            },
+            {
+              "function": "drawHeldWeapons",
+              "url": "src/rendering/figures/figure.ts",
+              "line": 313,
+              "selfMs": 0.69,
+              "inclusiveMs": 55.59
+            }
+          ]
+        }
+      }
+    }
+  }
+}

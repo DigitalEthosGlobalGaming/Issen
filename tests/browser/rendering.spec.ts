@@ -116,71 +116,99 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('armory preview effects stay local to their renderer instance', async ({ page }) => {
-  await page.goto('/');
-  const result = await page.evaluate(async () => {
-    const previewPath = '/src/rendering/armory-preview.ts';
-    const modelPath = '/src/rendering/figures/model.ts';
-    const palettePath = '/src/rendering/palette.ts';
-    const { createArmoryPreview } = await import(previewPath);
-    const { makeFig } = await import(modelPath);
-    const { createPalette } = await import(palettePath);
-    let now = 1000,
-      slices = 0;
-    const silent = () => {};
-    const services = {
-      random: () => 0.5,
-      now: () => now,
-      sounds: {
-        zap: silent,
-        shatter: silent,
-        poof: silent,
-        crackle: silent,
-        popper: silent,
-        squeak: silent,
-        bonk: silent,
-        slice: () => slices++,
-        clink: silent,
-      },
-    };
-    const canvases = Array.from({ length: 2 }, () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 440;
-      return canvas;
-    });
-    const palette = createPalette();
-    const frame = {
-      time: 1,
-      wind: 0,
-      petActive: false,
-      palette: (fog: number) => palette.fog(fog, [146, 141, 132]),
-      background: null,
-      appearance: { d: makeFig(12) },
-      pet: 'nopet',
-      film: 'mono',
-      effectsVisible: true,
-      font: 'serif',
-      seal: '#a3271d',
-      mistSprite: null,
-    };
-    const first = createArmoryPreview(canvases[0], services);
-    const second = createArmoryPreview(canvases[1], { ...services, now: () => 1000 });
-    first.draw(frame);
-    second.draw(frame);
-    const before = canvases[1].toDataURL();
-    first.demo('petals', false);
-    now += 16;
-    first.draw(frame);
-    second.draw(frame);
-    return {
-      unaffected: canvases[1].toDataURL() === before,
-      different: canvases[0].toDataURL() !== canvases[1].toDataURL(),
-      slices,
-    };
+for (const shared of [false, true])
+  test(`armory preview effects stay local with ${shared ? 'shared' : 'owned'} artwork`, async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const result = await page.evaluate(async (shared) => {
+      const previewPath = '/src/rendering/armory-preview.ts';
+      const modelPath = '/src/rendering/figures/model.ts';
+      const palettePath = '/src/rendering/palette.ts';
+      const { createArmoryPreview } = await import(previewPath);
+      const { makeFig } = await import(modelPath);
+      const { createPalette } = await import(palettePath);
+      let now = 1000,
+        slices = 0;
+      const silent = () => {};
+      const services = {
+        random: () => 0.5,
+        now: () => now,
+        sounds: {
+          zap: silent,
+          shatter: silent,
+          poof: silent,
+          crackle: silent,
+          popper: silent,
+          squeak: silent,
+          bonk: silent,
+          slice: () => slices++,
+          clink: silent,
+        },
+      };
+      const canvases = Array.from({ length: 2 }, () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 440;
+        return canvas;
+      });
+      const palette = createPalette();
+      const frame = {
+        time: 1,
+        wind: 0,
+        petActive: false,
+        palette: (fog: number) => palette.fog(fog, [146, 141, 132]),
+        background: null,
+        appearance: { d: makeFig(12), robeId: 'hai', bladeId: 'steel', pal: palette.robe('hai') },
+        pet: 'nopet',
+        film: 'mono',
+        effectsVisible: true,
+        font: 'serif',
+        seal: '#a3271d',
+        mistSprite: null,
+      };
+      const artwork: Record<string, any> = {};
+      if (shared) {
+        for (const name of ['Charm', 'Companion', 'Enemy', 'Player', 'Sword']) {
+          const path = `/src/rendering/figures/ink-${name === 'Charm' ? 'charms' : name === 'Companion' ? 'companions' : name.toLowerCase()}.ts`;
+          const module = await import(path);
+          artwork[`ink${name}`] = module[`createInk${name}Renderer`](document);
+        }
+        await Promise.all(Object.values(artwork).map((renderer) => renderer.prepare()));
+      }
+      const first = createArmoryPreview(canvases[0], services, shared ? artwork : undefined);
+      const second = createArmoryPreview(
+        canvases[1],
+        { ...services, now: () => 1000 },
+        shared ? artwork : undefined,
+      );
+      first.draw(frame);
+      second.draw(frame);
+      const before = canvases[1].toDataURL();
+      first.demo('petals', false);
+      now += 16;
+      first.draw({
+        ...frame,
+        appearance: { ...frame.appearance, robeId: 'tanuki', pal: palette.robe('tanuki') },
+      });
+      second.draw(frame);
+      const result = {
+        unaffected: canvases[1].toDataURL() === before,
+        different: canvases[0].toDataURL() !== canvases[1].toDataURL(),
+        slices,
+      };
+      first.dispose();
+      if (shared && !artwork.inkPlayer.snapshot().ready)
+        throw new Error('Borrower disposed shared artwork');
+      second.draw(frame);
+      if (shared && canvases[1].toDataURL() !== before)
+        throw new Error('Disposal changed another preview');
+      second.dispose();
+      for (const renderer of Object.values(artwork)) renderer.dispose();
+      return result;
+    }, shared);
+    expect(result).toEqual({ unaffected: true, different: true, slices: 1 });
   });
-  expect(result).toEqual({ unaffected: true, different: true, slices: 1 });
-});
 
 test('weather layers render in both orientations without mutating simulation state', async ({
   page,

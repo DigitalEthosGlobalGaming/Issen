@@ -284,6 +284,9 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   }
   return {
     render,
+    get inspectionExpanded() {
+      return inspection.expanded;
+    },
     hasNew: () => ITEMS.some(newItem),
     get selected() {
       return armSel;

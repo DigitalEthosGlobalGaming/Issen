@@ -34,18 +34,33 @@ export interface PreviewServices {
   sounds: EffectSpawning['sounds'] & Record<'bonk' | 'slice' | 'clink', () => void>;
 }
 
+/** Prepared pixels and draw operations only; callers retain clocks, poses and effects. */
+export interface PreviewArtwork {
+  inkCharm: ReturnType<typeof createInkCharmRenderer>;
+  inkCompanion: ReturnType<typeof createInkCompanionRenderer>;
+  inkEnemy: ReturnType<typeof createInkEnemyRenderer>;
+  inkPlayer: ReturnType<typeof createInkPlayerRenderer>;
+  inkSword: ReturnType<typeof createInkSwordRenderer>;
+}
+
 /** Each preview owns its animation clock and particles, independent of the game scene. */
-export function createArmoryPreview(canvas: HTMLCanvasElement, services: PreviewServices) {
+export function createArmoryPreview(
+  canvas: HTMLCanvasElement,
+  services: PreviewServices,
+  artwork?: PreviewArtwork,
+) {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
   const room = canvas.ownerDocument.createElement('img');
   room.decoding = 'async';
   room.src = roomUrl;
-  const inkCharm = createInkCharmRenderer(canvas.ownerDocument);
-  const inkCompanion = createInkCompanionRenderer(canvas.ownerDocument);
-  const inkEnemy = createInkEnemyRenderer(canvas.ownerDocument);
-  const inkPlayer = createInkPlayerRenderer(canvas.ownerDocument);
-  const inkSword = createInkSwordRenderer(canvas.ownerDocument);
+  const { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword } = artwork ?? {
+    inkCharm: createInkCharmRenderer(canvas.ownerDocument),
+    inkCompanion: createInkCompanionRenderer(canvas.ownerDocument),
+    inkEnemy: createInkEnemyRenderer(canvas.ownerDocument),
+    inkPlayer: createInkPlayerRenderer(canvas.ownerDocument),
+    inkSword: createInkSwordRenderer(canvas.ownerDocument),
+  };
   void inkCharm.prepare();
   void inkCompanion.prepare();
   void inkEnemy.prepare();
@@ -228,11 +243,15 @@ export function createArmoryPreview(canvas: HTMLCanvasElement, services: Preview
       room.onload = null;
       room.removeAttribute('src');
       roomCache.width = roomCache.height = 0;
-      inkCharm.dispose();
-      inkCompanion.dispose();
-      inkEnemy.dispose();
-      inkPlayer.dispose();
-      inkSword.dispose();
+      // Borrowed artwork belongs to the runtime. Closing a preview must not
+      // invalidate another canvas's prepared parts or in-flight image loads.
+      if (!artwork) {
+        inkCharm.dispose();
+        inkCompanion.dispose();
+        inkEnemy.dispose();
+        inkPlayer.dispose();
+        inkSword.dispose();
+      }
     },
   };
 }

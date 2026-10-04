@@ -1,6 +1,9 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
+- [Performance testing](../tests/performance/README.md): repeatable web profiling,
+  isolated Android WebView adapter, saved reports and measurement limitations.
+
 - [Save transfer](features/save-transfer.md): portable profile backups, resilient import and recovery.
 
 - [Daily runs and world UI](features/daily-and-world-ui.md): preset daily challenges, quieter visual states, seal materials, Scattered Armour and optional scroll menus.

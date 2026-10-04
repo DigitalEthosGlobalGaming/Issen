@@ -1,5 +1,12 @@
 # Rendering and visual consistency
 
+Performance measurement lives in `tests/performance/`, outside the application.
+Its runner builds a separate instrumented bundle with source maps; only that
+bundle exposes scenario controls and callback timings. The normal Vite config
+does not import its plugin. Canvas counters, CPU/heap sampling and timing windows
+are separated to make instrumentation overhead explicit. See the
+[performance suite](../../tests/performance/README.md) for commands and limits.
+
 Issen uses two rendering surfaces. The duel scene uses Canvas 2D, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
 Ink uses layered PNG atlases for environments and modular figure artwork, alongside procedural grass, weather and effects.
@@ -68,6 +75,10 @@ backdrops and inner scrolling retain their existing owners. See the
 
 The armory has its own canvas. `src/rendering/armory-preview.ts` reuses the figure,
 effect and film renderers but owns a separate animation clock and effect state.
+The runtime lends its prepared artwork renderers and tint caches to Armoury and
+support previews. Draw inputs remain explicit; caches contain prepared pixels,
+not animation state. Borrowing previews never dispose the runtime's artwork.
+Standalone previews can still own and dispose their own artwork.
 `src/ui/share-card.ts` creates another canvas, copies the live scene into it and
 adds a paper-like score-card layout. Neither renderer swaps or mutates the live
 game canvas.
@@ -158,6 +169,17 @@ Gradients, soft radial blobs, low-saturation palettes and selective `lighter`,
 `src/rendering/effects/film.ts` supplies named color treatments to both the live
 scene and the armory preview. The final scene pass adds grain, scratches, vignette,
 ink edges and flashes, which helps procedural elements read as one image.
+
+Glitch film snapshots the source once for each of its two disjoint copying passes
+when drawing at aligned integer backing scales. Fractional or transformed rows,
+filters and shadows retain sequential self-copying to preserve edge feedback.
+Each context has at most one reusable full-resolution copy; changing film releases
+its backing storage. See the [performance report](../features/performance-profile-2026-10-04.md)
+for the measured CPU/memory tradeoff.
+
+The main scene skips drawing while the opaque fullscreen equipment inspection is
+open; the preview continues on its own canvas. Ordinary Armoury, Stats and Options
+scrolls reveal the scene around their edges and therefore retain scene rendering.
 
 ### Explicit renderer inputs and isolated state
 

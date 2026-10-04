@@ -21,6 +21,13 @@ edition does not reload a running game.
 
 ## Commands
 
+Whole-application profiling: `npm run test-performance` builds an isolated test
+copy and saves reports/traces in `tmp/performance/`. Use `-- --suite=menus` or
+`-- --scenario=combat --mode=timing` for focused runs. See the
+[performance suite guide](../../tests/performance/README.md) for requirements,
+measurement limits and the explicit Android test-app adapter. This command does
+not build or install an APK. `npm run test:performance-tools` checks the harness.
+
 | Command | Purpose |
 | --- | --- |
 | `npm run typecheck` | Strict TypeScript check for all application modules |

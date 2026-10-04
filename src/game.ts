@@ -3390,16 +3390,25 @@ export function startGame(): () => void {
       },
     ),
   );
-  const preview = createArmoryPreview($('prevC'), {
-    random: R,
-    now: activeNow,
-    sounds: sfx,
-  });
-  const supportPreview = createArmoryPreview($('supportPreview'), {
-    random: rng(4242),
-    now: activeNow,
-    sounds: sfx,
-  });
+  const previewArtwork = { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword };
+  const preview = createArmoryPreview(
+    $('prevC'),
+    {
+      random: R,
+      now: activeNow,
+      sounds: sfx,
+    },
+    previewArtwork,
+  );
+  const supportPreview = createArmoryPreview(
+    $('supportPreview'),
+    {
+      random: rng(4242),
+      now: activeNow,
+      sounds: sfx,
+    },
+    previewArtwork,
+  );
   lifecycle.add(preview.dispose);
   lifecycle.add(supportPreview.dispose);
   function demoKill() {
@@ -4114,6 +4123,9 @@ export function startGame(): () => void {
     }
   }
   function render(raw: number) {
+    // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
+    // inspection dialog covers it completely; its independent preview still draws.
+    if (G.panel === 'armory' && armory.inspectionExpanded) return;
     g.setTransform(DPR, 0, 0, DPR, 0, 0);
     const sx = reducedMotion() ? 0 : (R() - 0.5) * shake,
       sy = reducedMotion()

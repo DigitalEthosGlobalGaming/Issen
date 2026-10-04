@@ -1,5 +1,18 @@
 # Artwork performance measurements
 
+For new measurements, run `npm run test-performance`. The
+[performance suite guide](../../tests/performance/README.md) documents scenario
+selection, bundled test builds, sequential sampling, CPU/allocation profiles,
+graphics-work counters, baseline comparison and Android prerequisites. Results
+are saved under ignored `tmp/performance/`; normal builds contain no profiling
+hooks. This tooling does not change the game's rendering policy.
+
+For whole-application CPU, heap, allocation and frame measurements, see the
+[2026-10-04 performance report](performance-profile-2026-10-04.md). It includes
+startup, menus, fullscreen inspection, combat, Demon Mirror, film/kill effects,
+and a separate 100-enemy workload. `scripts/profile-runtime.mjs` complements the
+isolated renderer benchmarks below; it does not replace them.
+
 Run a Vite development server on port5183, then run
 `node scripts/benchmark-production-rendering.mjs http://127.0.0.1:5183`.
 The script opens a separate headless Edge page at `/privacy/index.html`, checks

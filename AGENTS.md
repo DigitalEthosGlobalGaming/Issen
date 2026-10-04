@@ -29,6 +29,15 @@ diagnosing timing-sensitive failures. `test:production` already builds and
 type-checks, so avoid repeating those checks immediately beforehand. Update the
 affected documentation when ownership or behavior changes.
 
+Performance testing and profiling are opt-in: develop or run performance suites,
+benchmarks, CPU/memory/graphics profiles, emulator/device performance captures,
+or performance optimization investigations only when the user specifically asks.
+Do not include them in routine verification, CI, or release checks by default.
+When requested, reuse and incrementally extend the tools in
+[tests/performance](tests/performance/README.md), record a repeatable baseline,
+and use the measurements to guide fixes. This does not replace the ordinary
+TypeScript, unit, and browser checks required for implementation changes.
+
 Keep disposable verification builds, captures, logs and test results under ignored
 `tmp/` (for example `tmp/.verification-build-<task>/` and `tmp/test-results/`).
 Use `npm run build:verification` for a checked production verification build;

@@ -1,6 +1,6 @@
 {
   "name": "issen",
-  "version": "1.50.5",
+  "version": "1.51.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -27,11 +27,14 @@
     "build:verification": "node scripts/build-verification.mjs",
     "test:production": "npm run build:verification && playwright test --config playwright.production.config.ts",
     "build:branch": "node scripts/build-pages.mjs",
-    "build:develop": "node scripts/build-pages.mjs --branch develop"
+    "build:develop": "node scripts/build-pages.mjs --branch develop",
+    "test-performance": "node tests/performance/run.mjs",
+    "test:performance-tools": "node --test tests/performance/*.test.mjs"
   },
   "devDependencies": {
     "@capacitor/cli": "8.4.3",
     "@playwright/test": "^1.63.0",
+    "magic-string": "1.4.2",
     "prettier": "3.9.9",
     "typescript": "7.0.2",
     "vite": "8.3.1"

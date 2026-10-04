@@ -1,0 +1,23 @@
+window.__profile = {
+ G, fx, frameLoop, startRun, spawnEnemy, enemyPos, killEnemy, startTrial, openPanel, closePanel, pause,
+ state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0)}),
+ configure(name) {
+  window.__scenario=name;
+  if (name==='demon') { startTrial('demon-mirror'); if(!activeTrial) throw Error('Trial did not start'); }
+  else if(['combat','paused','inactive-combat','film-glitch','film-inferno','kill-effects','stress-100'].includes(name)) startRun();
+  if(name==='paused') pause();
+  if(name==='film-glitch') EQ.film='trial-glitch';
+  if(name==='film-inferno') EQ.film='trial-inferno';
+  if(name==='kill-effects') EQ.fx='scattered-armour';
+  if(name==='stress-100') {
+   window.__resetProfileRandom(); time=0;
+   G.enemies=[]; G.pendingSpawns=[]; G.toSpawn=0; G.attacker=null; G.gapT=1e9;
+   for(let i=0;i<100;i++) { const e=spawnEnemy(i%5,true); e.state='idle'; e.fixed={x:W*(.06+(i%10)*.098),y:H*(.22+Math.floor(i/10)*.054),h:H*.14,fog:(i%5)*.08}; e.pos=enemyPos(e); }
+  }
+ },
+ beforeUpdate() {
+  if(window.__scenario==='stress-100') {G.gapT=1e9; return;}
+  const e=G.attacker;
+  if(e && e.state==='attack' && e.p>=.82) onSwipe(activeTrial?.mirrored?OPP[e.dir]:e.dir);
+ },
+};
