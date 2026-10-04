@@ -22,6 +22,7 @@ export function unlockEligibleItems(
     access: boolean | number;
     progress: AwakeningProgress;
     itemStats?(id: string): Statistics | null;
+    paidAwakenings?: boolean;
   },
 ): void {
   const byId = new Map(items.map((item) => [item.id, item]));
@@ -46,6 +47,7 @@ export function unlockEligibleItems(
       onUnlock(item.id, item);
     }
     for (const [id, definition] of Object.entries({ ...SPECIAL, ...ROBE_AWAKENINGS })) {
+      if (awakening?.paidAwakenings) continue;
       const item = byId.get(id);
       if (item?.type === 'robe' && awakening?.access !== true && Number(awakening?.access ?? 0) < 2)
         continue;
@@ -69,6 +71,7 @@ export function unlockEligibleItems(
     }
     if (
       awakening?.access &&
+      !awakening.paidAwakenings &&
       unlocked.has('steel+') &&
       !unlocked.has('steel++') &&
       (awakening.progress.blades.steel?.k ?? 0) >= STEEL_THIRD.need[1]

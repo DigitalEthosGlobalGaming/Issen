@@ -8,6 +8,7 @@ import { createSymbolArt } from '../symbol-art.ts';
 import { COLLECTIONS, type CollectionId } from '../../game/content/collections.ts';
 import { BLESS } from '../../game/content/blessings.ts';
 import { createItems } from '../../game/content/items.ts';
+import { confirmEmberSpend } from '../confirm-action.ts';
 
 export function renderTemplate(
   root: HTMLElement,
@@ -102,7 +103,9 @@ export function renderTemplate(
           : `Donate ${cost} Embers`;
     buy.hidden = cost === undefined && !premiumLocked;
     buy.disabled = blocked || cost === undefined || meta.embers < cost;
-    buy.onclick = () => {
+    buy.onclick = async () => {
+      if (cost === undefined || !(await confirmEmberSpend(root, upgrade.name, cost, meta.embers)))
+        return;
       if (purchaseUpgrade(meta, upgrade.id, premiumAccess)) {
         save();
         renderTemplate(root, meta, save, premiumAccess);

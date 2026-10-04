@@ -1,5 +1,10 @@
 import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
 import {
+  awakeningCost,
+  awakeningPurchasable,
+  purchaseAwakening,
+} from './game/progression/awakening-purchases.ts';
+import {
   parseCollectionProgress,
   initializeCollections,
   syncCollectionProgress,
@@ -1169,6 +1174,7 @@ export function startGame(): () => void {
         access: META.upgrades.awakening,
         progress: AWAKENING,
         itemStats: (id) => collectionItemStats(COLLECTION_PROGRESS, META, ST, id),
+        paidAwakenings: true,
       },
     );
     if (UNL.size !== before) refreshArmoryNew();
@@ -3280,6 +3286,19 @@ export function startGame(): () => void {
     awakeningAccess: (type) => META.upgrades.awakening >= (type === 'robe' ? 2 : 1),
     awakeningProgress: (id, type) =>
       type === 'blade' ? AWAKENING.blades[id] : AWAKENING.robes[id],
+    awakeningPurchase: (id) => ({
+      ready: accessible(id) && awakeningPurchasable(META, UNL, ITEMS, AWAKENING, id),
+      cost: awakeningCost(id),
+      balance: META.embers,
+    }),
+    buyAwakening: (id) => {
+      if (!accessible(id) || !purchaseAwakening(META, UNL, ITEMS, AWAKENING, id)) return false;
+      saveMeta();
+      store.set('issen.unlocks', [...UNL]);
+      refreshArmoryNew();
+      toast({ k: '真', msg: 'Awakening unlocked' });
+      return true;
+    },
     powersEnabled: () => SETUP.upgrades !== false,
     events: {
       equipped: (equipment) => {

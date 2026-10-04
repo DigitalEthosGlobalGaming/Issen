@@ -15,6 +15,7 @@ import { ROBE_AWAKENINGS } from '../../game/content/robe-awakenings.ts';
 import { isNewArmoryItem, markArmoryItemViewed } from '../../game/progression/armory-seen.ts';
 import { itemPresentation } from './item-presentation.ts';
 import { createArmoryInspection } from './armory-inspection.ts';
+import { confirmEmberSpend } from '../confirm-action.ts';
 
 const ARM: readonly (readonly [ItemCategory, string])[] = [
   ['blade', 'Blades'],
@@ -42,6 +43,8 @@ export interface ArmoryOptions {
   awakeningAccess?(type: ItemCategory): boolean;
   awakeningProgress?(id: string, type: 'blade' | 'robe'): BladeStats | undefined;
   powersEnabled?(): boolean;
+  awakeningPurchase?(id: string): { ready: boolean; cost: number; balance: number };
+  buyAwakening?(id: string): boolean;
   events: { equipped(equipment: Equipment): void; awaken(): void; preview(): void };
 }
 
@@ -220,9 +223,27 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       if (details.open) details.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     });
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-form]')) {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', async () => {
         const form = button.dataset.form;
         if (button.disabled || button.getAttribute('aria-pressed') === 'true') return;
+        const id = it.id + (form === 'third' ? '++' : '+');
+        if (form !== 'normal' && !owns(id)) {
+          const purchase = options.awakeningPurchase?.(id);
+          if (
+            !purchase?.ready ||
+            !(await confirmEmberSpend(
+              root,
+              `${it.n} ${form === 'third' ? 'third form' : 'Awakening'}`,
+              purchase.cost,
+              purchase.balance,
+            ))
+          )
+            return;
+          if (!options.buyAwakening?.(id)) {
+            render();
+            return;
+          }
+        }
         if (it.type === 'blade') {
           EQ.bladeSp = form === 'awakened';
           EQ.bladeThird = form === 'third';
@@ -267,8 +288,14 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
       ['normal', 'Normal', true],
       ['awakened', 'Awakened', u],
     ] as const;
-    const button = (form: string, label: string, unlocked: boolean) =>
-      `<button type="button" data-form="${form}" aria-pressed="${selected === form}"${unlocked ? '' : ' disabled aria-describedby="armFormChallenge"'}>${label}</button>`;
+    const button = (form: string, label: string, unlocked: boolean) => {
+      const purchase =
+        form === 'normal' || unlocked
+          ? undefined
+          : options.awakeningPurchase?.(it.id + (form === 'third' ? '++' : '+'));
+      const ready = purchase?.ready && purchase.balance >= purchase.cost;
+      return `<button type="button" data-form="${form}" aria-pressed="${selected === form}"${unlocked || ready ? '' : ' disabled aria-describedby="armFormChallenge"'}>${purchase?.ready ? `Buy · ${purchase.cost} Embers` : label}</button>`;
+    };
     const challenge = !u
       ? `Awakening: ${sp.need[2]} ${it.type === 'blade' ? 'with this blade' : 'while wearing this outfit'} (${cur.toLocaleString()}/${sp.need[1].toLocaleString()}).`
       : it.id === 'steel' && !thirdUnlocked

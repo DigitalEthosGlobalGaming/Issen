@@ -21,6 +21,7 @@ test('mobile Temple exposes four collections and purchase opens zero-progress ch
     'Sakura, Kodachi, Kage, Bokken, Yuki',
   );
   await page.getByRole('button', { name: 'Donate 100 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Spend 100 Embers', exact: true }).click();
   await expect(page.locator('[data-upgrade="weapons"]')).toContainText('Rank 1/3');
   await page.screenshot({ path: info.outputPath('temple-collections.png') });
   await page.locator('#template [data-back]').click();

@@ -183,6 +183,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     access: meta.upgrades.awakening,
     progress: awakening,
     itemStats: (id) => collectionItemStats(collections, meta, stats, id),
+    paidAwakenings: true,
   });
   const data: SaveData = {
     stats,

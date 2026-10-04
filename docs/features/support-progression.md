@@ -58,3 +58,18 @@ Ordinary runs capture unlocked Shrine IDs at run start. Offer eligibility and
 secondary grants share the filter; daily and Trial presets remain independent.
 The new collection emblem sheet is editable calligraphic SVG artwork at
 `src/ui/assets/collection-symbols.svg`.
+
+## 1.55.0 — Awakening purchases and Ember confirmations
+
+Awakening Access opens challenges as before. Completing a challenge now enables an
+Armoury purchase: 150 Embers for blade or outfit forms and 300 for Tamahagane's
+third form. The first form is required before buying its third. Previously owned
+forms remain owned; run-end and save-import reconciliation do not grant unpaid
+forms. Purchases validate category access, base ownership, independent challenge
+progress, prerequisite forms and affordability.
+
+Every Temple and Awakening purchase opens a confirmation with the cost and remaining
+balance. Cancel/Escape spends nothing; confirmation rechecks the owning purchase
+rules. Buying an Awakening equips it through the normal Armoury form flow.
+`progression/awakening-purchases.ts` owns the purchase rules; `ui/confirm-action.ts`
+provides the shared accessible screen-owned dialog.

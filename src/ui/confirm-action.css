@@ -1,0 +1,21 @@
+.confirm-action {
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 40px));
+  max-height: calc(100dvh - 40px);
+  padding: 24px;
+  color: #e8dfce;
+  background: #211e19;
+  border: 1px solid #75664c;
+  font-family: inherit;
+  text-align: center;
+}
+.confirm-action::backdrop {
+  background: rgb(0 0 0 / 75%);
+}
+.confirm-action p {
+  line-height: 1.65;
+}
+.confirm-action .row {
+  flex-wrap: wrap;
+  justify-content: center;
+}
