@@ -60,13 +60,16 @@ test('built assets support startup, armory, a run, and landscape layout', async 
   await expect(page.locator('#title')).toHaveClass(/on/);
   await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Armory', exact: true }).click();
-  const rendered = await page.locator('#prevC').evaluate((canvas: HTMLCanvasElement) =>
-    canvas
-      .getContext('2d')!
-      .getImageData(0, 0, canvas.width, canvas.height)
-      .data.some((value) => value !== 0),
-  );
-  expect(rendered).toBe(true);
+  await expect
+    .poll(() =>
+      page.locator('#prevC').evaluate((canvas: HTMLCanvasElement) =>
+        canvas
+          .getContext('2d')!
+          .getImageData(0, 0, canvas.width, canvas.height)
+          .data.some((value) => value !== 0),
+      ),
+    )
+    .toBe(true);
   await page.locator('#armory').getByRole('button', { name: 'Done', exact: true }).click();
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();
