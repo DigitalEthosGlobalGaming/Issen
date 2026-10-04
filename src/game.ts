@@ -2065,7 +2065,13 @@ export function startGame(): () => void {
     G.blessingTriggers.flourishWard = false;
     renderLives();
     G.bossCount++;
-    const b = createBoss(G.bossCount, G.mode, G.m, bossPos),
+    const b = createBoss(
+        G.bossCount,
+        G.mode,
+        G.m,
+        bossPos,
+        restorableRng((G.seed ^ Math.imul(G.bossCount, 0x9e3779b9)) >>> 0).next,
+      ),
       { def, lap } = b;
     G.boss = b;
     G.state = 'boss';
@@ -3962,6 +3968,7 @@ export function startGame(): () => void {
       pose: b.pose,
       lean: b.lean,
       variant: b.def.v,
+      varied: b.varied,
       glint: b.glint,
       pal: b.def.pal ? robePal(b.def.pal) : null,
       twin: b.def.twin,

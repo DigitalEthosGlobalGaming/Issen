@@ -82,6 +82,12 @@ test('landing cue is a short low impact with restrained metal and finite envelop
     assert.equal(nodes.filter((node) => node.kind === 'tone').length, 2);
     assert.ok(nodes.filter((node) => node.kind === 'tone').every((node) => node.stopAt < 1.42));
     audio.setMuted(true);
+    nodes.length = 0;
+    audio.cues.bossDie();
+    assert.ok(nodes.some((n) => n.kind === 'tone' && n.frequency.events[0][0] === 3100));
+    assert.ok(
+      nodes.filter((n) => n.kind === 'tone' || n.kind === 'noise').every((n) => n.stopAt < 1.55),
+    );
     assert.equal(master.gain.value, 0);
     await audio.dispose();
   } finally {

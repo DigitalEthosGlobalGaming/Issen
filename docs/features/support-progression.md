@@ -73,3 +73,15 @@ balance. Cancel/Escape spends nothing; confirmation rechecks the owning purchase
 rules. Buying an Awakening equips it through the normal Armoury form flow.
 `progression/awakening-purchases.ts` owns the purchase rules; `ui/confirm-action.ts`
 provides the shared accessible screen-owned dialog.
+
+## 1.56.0 — Boss variety and the final cut
+
+Each ordinary boss archetype has three themed name/palette variants. Boss figure
+seeds also vary clothing cuts and proportions through the existing Ink enemy
+artwork, retaining the archetype's headwear and combat tells. Identity uses a
+separate stream derived from run seed and boss ordinal, so revival and checkpoint
+recovery preserve it without consuming combat randomness. Trial presets continue
+to apply their curated definitions.
+
+The killing stroke uses a short synthesized cutting rush, bright metallic edge
+and ringing steel tail. The cue respects effects volume, mute and activity gates.

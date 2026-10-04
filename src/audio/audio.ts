@@ -201,8 +201,12 @@ export function createAudio(initialMuted: boolean) {
       nz({ type: 'highpass', f0: 2500, dur: 0.06, g: 0.25 });
     },
     bossDie() {
-      tn({ f0: 70, f1: 28, dur: 1.8, g: 0.9 });
-      nz({ type: 'lowpass', f0: 900, f1: 90, dur: 1.8, g: 0.5, q: 0.5 });
+      // Air parts first, followed by the bright edge and a short steel ring.
+      nz({ f0: 1200, f1: 8500, dur: 0.14, g: 0.48, q: 0.7, a: 0.002 });
+      nz({ type: 'highpass', f0: 6500, f1: 2800, dur: 0.2, g: 0.28, delay: 0.035 });
+      tn({ f0: 3100, f1: 2450, dur: 0.42, g: 0.14, type: 'triangle', delay: 0.025, a: 0.002 });
+      tn({ f0: 4700, f1: 4100, dur: 0.3, g: 0.07, delay: 0.035 });
+      tn({ f0: 110, f1: 45, dur: 0.25, g: 0.32, delay: 0.04 });
     },
     thunder() {
       const d = 0.15 + R() * 0.4;

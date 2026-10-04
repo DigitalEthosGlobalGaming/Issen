@@ -1,4 +1,5 @@
-import { BOSSES } from '../content/bosses.ts';
+import { BOSSES, BOSS_IDENTITIES } from '../content/bosses.ts';
+import type { Random } from '../../shared/random.ts';
 import { EPOSE, makeFig } from '../../rendering/figures/model.ts';
 import { bossParameters } from './configuration.ts';
 import type { Boss } from './boss.ts';
@@ -9,14 +10,21 @@ export function createBoss(
   mode: string,
   modifiers: Modifiers,
   position: (boss: Boss) => EnemyPosition,
+  appearanceRandom?: Random,
 ): Boss {
-  const def = BOSSES[(count - 1) % BOSSES.length]!,
+  const index = (count - 1) % BOSSES.length;
+  const identity = BOSS_IDENTITIES[index]!;
+  const variation = appearanceRandom ? Math.min(2, Math.floor(appearanceRandom() * 3)) : 0;
+  const def = appearanceRandom
+      ? { ...BOSSES[index]!, n: identity.names[variation]!, pal: identity.tones[variation]! }
+      : BOSSES[index]!,
     lap = Math.floor((count - 1) / BOSSES.length);
   const hp = Math.max(
     1,
     Math.min(6, 2 + Math.ceil(count * 0.6)) + (mode === 'ronin' ? 1 : 0) + modifiers.bossHp,
   );
   const b: Boss = {
+    varied: !!appearanceRandom,
     def,
     lap,
     hp,
@@ -25,7 +33,7 @@ export function createBoss(
     t: 0,
     life: 0,
     pose: { ...EPOSE.guard },
-    d: makeFig(1000 + count * 17),
+    d: makeFig(appearanceRandom ? Math.floor(appearanceRandom() * 1_000_000) : 1000 + count * 17),
     lean: 0,
     glint: 0,
     idleT: 1,

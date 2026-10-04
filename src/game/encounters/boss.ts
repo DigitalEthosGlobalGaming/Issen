@@ -12,6 +12,7 @@ export interface BossDefinition {
   pal?: string;
 }
 export interface Boss {
+  varied?: boolean;
   def: BossDefinition;
   lap: number;
   hp: number;
