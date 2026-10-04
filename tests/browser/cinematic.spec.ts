@@ -134,15 +134,15 @@ test('session preview preserves a saved run across refresh and exit', async ({ p
   await expect(page.locator('#hud')).toHaveClass(/on/);
 });
 
-test('cinematic desktop and tablet visual captures', async ({ page }) => {
+test('cinematic desktop and tablet visual captures', async ({ page }, testInfo) => {
   await page.goto('/');
   await openViewer(page);
   await expect(page.getByLabel('Preview artwork')).toHaveCount(0);
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.waitForTimeout(150);
-  await page.screenshot({ path: 'test-results/cinematic-desktop.png' });
+  await page.screenshot({ path: testInfo.outputPath('cinematic-desktop.png') });
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.waitForTimeout(150);
-  await page.screenshot({ path: 'test-results/cinematic-tablet.png' });
+  await page.screenshot({ path: testInfo.outputPath('cinematic-tablet.png') });
 });

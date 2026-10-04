@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('first play starts a run directly and the menu tutorial remains optional', async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
@@ -18,9 +18,9 @@ test('first play starts a run directly and the menu tutorial remains optional', 
   await page.locator('#bTutorial').click();
   await expect(tutorial).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: 'test-results/tutorial-portrait.png' });
+  await page.screenshot({ path: testInfo.outputPath('tutorial-portrait.png') });
   await page.setViewportSize({ width: 1000, height: 650 });
-  await page.screenshot({ path: 'test-results/tutorial-landscape.png' });
+  await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
   await page.keyboard.press('ArrowRight');
   await expect
     .poll(

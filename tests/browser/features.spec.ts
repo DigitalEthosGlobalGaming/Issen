@@ -32,7 +32,7 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
   expect(errors).toEqual([]);
 });
 
-test('Template donations persist and apply only to standard runs', async ({ page }) => {
+test('Template donations persist and apply only to standard runs', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem(
@@ -44,7 +44,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   await expect(page.locator('#template')).toHaveCSS('opacity', '1');
-  await page.screenshot({ path: '.verification-build-next-features/template-portrait.png' });
+  await page.screenshot({ path: testInfo.outputPath('template-portrait.png') });
   await page.locator('[data-upgrade="vitality"]').click();
   await page.getByRole('button', { name: 'Donate 100 Embers' }).click();
   await expect(page.locator('#templateContent')).toContainText('700 Embers');
@@ -71,7 +71,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
 
 test('testing tools isolate profile, jump encounters and repair removed equipment', async ({
   page,
-}) => {
+}, testInfo) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem('issen.meta', JSON.stringify({ tutorial: 'skipped', embers: 42 }));
@@ -93,7 +93,7 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   await page.locator('#admin').evaluate((el) => {
     el.scrollTop = 0;
   });
-  await page.screenshot({ path: '.verification-build-next-features/admin-portrait.png' });
+  await page.screenshot({ path: testInfo.outputPath('admin-portrait.png') });
   await page.getByLabel('Item or awakening').selectOption('kuro');
   await page.getByRole('button', { name: 'Equip item', exact: true }).click();
   expect(

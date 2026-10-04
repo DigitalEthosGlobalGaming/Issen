@@ -173,7 +173,7 @@ test('Live failure, retry and quitting preserve the main profile', async ({ page
 
 test('All eight encounters complete through combat and persist exclusive rewards without farming', async ({
   page,
-}) => {
+}, testInfo) => {
   await seed(page);
   await instrument(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -228,7 +228,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
     ),
   ).toBe(8);
   await expect(page.locator('#trials')).toHaveCSS('opacity', '1');
-  await page.screenshot({ path: 'test-results/trials-complete.png' });
+  await page.screenshot({ path: testInfo.outputPath('trials-complete.png') });
   await page.locator('#trials [data-back]').click();
   await page.locator('#bArmory').click();
   for (const [tab, name, category, id] of [

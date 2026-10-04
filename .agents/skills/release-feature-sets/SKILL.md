@@ -34,6 +34,19 @@ Detect supported platforms from repository evidence. Build or release the target
 
 In Issen, `npm run build:branch` detects the current branch and builds its Pages path. `npm run build:branch -- --branch <name>` selects an explicit target, including detached CI checkouts. `npm run build:develop` is a convenience command only. Pushes to source branches with the updated Pages workflow publish previews; `main` publishes production. A successful local build is not evidence of a live deployment.
 
+## Temporary verification artifacts
+
+In Issen, keep disposable builds, screenshots, logs and reports under ignored
+`tmp/`, never in repository-root `.verification*` or test-results folders.
+Use `npm run build:verification` or `npm run test:production` for the default
+`tmp/.verification-build-production/` build. For a named build, set
+`ISSEN_PREVIEW_DIR=tmp/.verification-build-<task>` for both build and preview/test
+commands. Branch preview checks use
+`npm run build:branch -- --outDir tmp/.verification-build-pages`. Playwright
+configs write results to `tmp/test-results/<suite>/`; test captures use
+`testInfo.outputPath(...)`. Put optional HTML/blob/coverage reports under `tmp/`
+as well. Keep deployment outputs in their established locations.
+
 ## Finish or promote
 
 After all sets pass, report the selected branch, changes, checks and preview status. If production release was explicitly requested, perform the repository's full release validation, builds for the requested release targets, release notes/version synchronization and promotion to the designated production branch. Otherwise stop with the feature branch ready for review/testing.

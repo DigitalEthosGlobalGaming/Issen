@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('attacker brackets remain distinct with arrows and timing rings hidden', async ({ page }) => {
+test('attacker brackets remain distinct with arrows and timing rings hidden', async ({
+  page,
+}, testInfo) => {
   await page.setViewportSize({ width: 390, height: 540 });
   await page.goto('/');
   const result = await page.evaluate(async () => {
@@ -64,5 +66,7 @@ test('attacker brackets remain distinct with arrows and timing rings hidden', as
     expect(next).toBeLessThan(80);
   }
   expect(result.restored.every(Boolean)).toBe(true);
-  await page.locator('#cue-preview').screenshot({ path: 'test-results/enemy-cues-portrait.png' });
+  await page
+    .locator('#cue-preview')
+    .screenshot({ path: testInfo.outputPath('enemy-cues-portrait.png') });
 });

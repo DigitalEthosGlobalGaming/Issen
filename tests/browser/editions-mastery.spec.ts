@@ -267,7 +267,9 @@ test('First Strike uses speed points while late slashes still count as perfect; 
   expect(result.ash.style).toBe('dissolve');
 });
 
-test('Premium locks and cosmetic previews fit both viewport orientations', async ({ page }) => {
+test('Premium locks and cosmetic previews fit both viewport orientations', async ({
+  page,
+}, testInfo) => {
   await prepare(page, 'free');
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Kill effects/ }).click();
@@ -284,7 +286,7 @@ test('Premium locks and cosmetic previews fit both viewport orientations', async
         true,
       );
       await page.screenshot({
-        path: `test-results/mastery-${effect.replaceAll(' ', '-')}-${viewport.width}.png`,
+        path: testInfo.outputPath(`mastery-${effect.replaceAll(' ', '-')}-${viewport.width}.png`),
       });
     }
     await page.evaluate(() => (window as any).__mastery.stop());

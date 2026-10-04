@@ -4,7 +4,8 @@ test-results/
 playwright-report/
 blob-report/
 coverage/
-.verification-build-*/
+.verification*/
+tmp/
 *.tsbuildinfo
 .mobile-build/
 .android-tools/

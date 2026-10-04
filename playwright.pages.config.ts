@@ -1,9 +1,13 @@
 import { defineConfig } from '@playwright/test';
 
+process.env.PLAYWRIGHT_HTML_OUTPUT_DIR ??= 'tmp/playwright-report/pages';
+process.env.PLAYWRIGHT_BLOB_OUTPUT_DIR ??= 'tmp/blob-report/pages';
+
 const base = process.env.ISSEN_PAGES_BASE ?? '/Issen/develop/';
-const outDir = process.env.ISSEN_PREVIEW_DIR ?? '.verification-build-pages';
+const outDir = process.env.ISSEN_PREVIEW_DIR ?? 'tmp/.verification-build-pages';
 
 export default defineConfig({
+  outputDir: './tmp/test-results/pages',
   testDir: './tests/pages',
   workers: 2,
   use: {

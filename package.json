@@ -1,6 +1,6 @@
 {
   "name": "issen",
-  "version": "1.50.2",
+  "version": "1.50.3",
   "private": true,
   "type": "module",
   "engines": {
@@ -24,7 +24,8 @@
     "preview": "vite preview",
     "test": "node --test tests/unit/*.test.mjs",
     "test:browser": "playwright test",
-    "test:production": "npm run build && playwright test --config playwright.production.config.ts",
+    "build:verification": "node scripts/build-verification.mjs",
+    "test:production": "npm run build:verification && playwright test --config playwright.production.config.ts",
     "build:branch": "node scripts/build-pages.mjs",
     "build:develop": "node scripts/build-pages.mjs --branch develop"
   },

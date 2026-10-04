@@ -16,8 +16,8 @@ Use Node 24 (the migration was verified with 24.16.0), then run `npm install` an
 `npm run dev -- --host 0.0.0.0` and the computer's LAN address.
 
 The development watcher ignores Android outputs, local toolchains and
-`.verification-build*` directories so building or verifying another edition
-does not reload a running game.
+`tmp/` and legacy `.verification*` directories so building or verifying another
+edition does not reload a running game.
 
 ## Commands
 
@@ -32,7 +32,8 @@ does not reload a running game.
 | `npm run preview` | Serve the production build; run build first |
 | `npm test` | Node test runner with native TypeScript stripping for rule tests |
 | `npm run test:browser` | Playwright tests using installed Microsoft Edge |
-| `npm run test:production` | Build, then test bundled assets through a dedicated Vite preview server |
+| `npm run build:verification` | Type-check, then build into `tmp/.verification-build-production/` |
+| `npm run test:production` | Build into `tmp/`, then test bundled assets through a dedicated Vite preview server |
 | `npm run android:apk` | Build/sync offline assets and assemble the Android test APK |
 | `npm run android:bundle` | Build/sync and produce a signed Play bundle with upload credentials |
 | `npm run test:android-web` | Exercise offline Android assets in a touch-enabled browser |
@@ -57,7 +58,7 @@ files; cases within a file still run in order. Use
 failures, and rerun only failures with `npm run test:browser -- --last-failed`.
 Run the full browser suite for shared runtime changes and before a release. Run
 production tests when changing bundling, startup or deployment behavior, and
-for release verification. `npm run test:production` already runs `npm run build`,
+for release verification. `npm run test:production` already runs `npm run build:verification`,
 which includes TypeScript checking; a separate build/typecheck immediately
 before it duplicates work. After a passing check, repeat it only if subsequent
 edits affect what it covered.
@@ -81,11 +82,21 @@ under load and recover gradually; gameplay rolls stay on the saved run's random
 stream. Test this with a live run on the target device rather than interpreting
 one slow startup frame as sustained performance.
 
-For production verification without writing `dist/`, run `npm run typecheck`,
-then `npx vite build --outDir .verification-build-next-features`. Set
-`ISSEN_PREVIEW_DIR=.verification-build-next-features` when running
-`npx playwright test --config playwright.production.config.ts`. The isolated
-build folder is ignored by Git.
+Keep all disposable verification artifacts under ignored `tmp/`.
+`npm run test:production` builds and serves `tmp/.verification-build-production/`
+without writing `dist/`. To build separately, run `npm run build:verification`.
+For a named build in PowerShell, set
+`$env:ISSEN_PREVIEW_DIR = 'tmp/.verification-build-next-features'` before either
+command; the build and production preview both honor it. Remove the variable with
+`Remove-Item Env:ISSEN_PREVIEW_DIR` afterward. Raw Vite commands can use
+`--outDir tmp/.verification-build-<task>`.
+
+All Playwright configs write results to `tmp/test-results/<suite>/`. Test
+screenshots use `testInfo.outputPath(...)` so captures stay with their test,
+including retries and parallel workers. Put ad hoc screenshots, logs and optional
+HTML/blob/coverage reports under `tmp/` too. Optional Playwright HTML and blob
+reporters default to `tmp/playwright-report/<suite>/` and
+`tmp/blob-report/<suite>/`; explicit reporter environment overrides are honored.
 
 TypeScript is pinned to 7.0.2; Vite is pinned to 8.3.1. `package-lock.json` records
 the dependency resolution. Test files are executed by their runners; the application
@@ -240,7 +251,7 @@ branch; production promotion requires a release request.
 `npm run build:develop` type-checks and builds `/Issen/develop/`.
 `npm run build:branch` detects the current Git branch (or `GITHUB_REF_NAME` in CI).
 Use `npm run build:branch -- --branch feature/combat` for an explicit target.
-Both support Vite options such as `--outDir .verification-build-pages`.
+Both support Vite options such as `--outDir tmp/.verification-build-pages`.
 `npm run build:pages` remains the production-only `/Issen/` build.
 
 Simple lowercase branch names such as `develop` or `combat-test` map directly to
@@ -277,7 +288,7 @@ Verify deployment changes with:
 
 ```powershell
 node --test tests/unit/pages-deployment.test.mjs
-npm run build:develop -- --outDir .verification-build-pages
+npm run build:develop -- --outDir tmp/.verification-build-pages
 npx playwright test --config playwright.pages.config.ts
 npm run test:production
 ```

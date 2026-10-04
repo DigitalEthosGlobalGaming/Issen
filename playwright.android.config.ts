@@ -1,6 +1,10 @@
 import { defineConfig } from '@playwright/test';
 
+process.env.PLAYWRIGHT_HTML_OUTPUT_DIR ??= 'tmp/playwright-report/android';
+process.env.PLAYWRIGHT_BLOB_OUTPUT_DIR ??= 'tmp/blob-report/android';
+
 export default defineConfig({
+  outputDir: './tmp/test-results/android',
   testDir: './tests/android',
   workers: 2,
   use: {

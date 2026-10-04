@@ -27,8 +27,14 @@ shared runtime behavior changes, before release, or when focused checks reveal a
 regression. Playwright uses two workers by default; use `--workers=1` only when
 diagnosing timing-sensitive failures. `test:production` already builds and
 type-checks, so avoid repeating those checks immediately beforehand. Update the
-affected documentation when ownership or behavior changes. Do not edit generated
-`dist/` files or clear real player saves for testing.
+affected documentation when ownership or behavior changes.
+
+Keep disposable verification builds, captures, logs and test results under ignored
+`tmp/` (for example `tmp/.verification-build-<task>/` and `tmp/test-results/`).
+Use `npm run build:verification` for a checked production verification build;
+Playwright configs write results into `tmp/test-results/<suite>/`, and screenshots
+should use `testInfo.outputPath(...)`. Do not edit generated `dist/` files or clear
+real player saves for testing.
 
 When implementing an approved feature plan, increase the app's SemVer version
 appropriately (minor for new features, patch for fixes, major for breaking changes).

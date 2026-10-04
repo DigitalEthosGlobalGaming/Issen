@@ -32,7 +32,8 @@ export default defineConfig(({ mode }) => {
     server: {
       watch: {
         ignored: [
-          '**/.verification-build*/**',
+          '**/tmp/**',
+          '**/.verification*/**',
           '**/.mobile-build/**',
           '**/.android-tools/**',
           '**/android/**',
