@@ -113,6 +113,8 @@ export function renderTemplate(
 
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
+    case 'presets':
+      return `${rank} ${rank === 1 ? 'preset slot' : 'preset slots'}`;
     case 'weapons':
     case 'outfits':
     case 'blessings':

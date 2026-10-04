@@ -12,6 +12,7 @@ import {
   collectionItemStats,
 } from '../game/progression/collection-progress.ts';
 import { parseTesterPremium } from './tester-premium.ts';
+import { mergePresets } from '../game/progression/presets.ts';
 import { mergeDailyLogin, SEVEN_DAWNS_CREST } from '../game/progression/daily-login.ts';
 
 export type SaveData = Record<string, unknown>;
@@ -198,6 +199,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     awakening,
     collections,
     dailyLogin,
+    presets: mergePresets(local.presets, incoming.presets),
     testerPremium: parseTesterPremium(merge(local.testerPremium, incoming.testerPremium)),
     equip: parseEquipment(preferences(local.equip, incoming.equip), unlocked, items),
     setup: parseSetup(preferences(local.setup, incoming.setup)),

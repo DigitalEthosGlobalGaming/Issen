@@ -62,6 +62,8 @@ import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
 import { createSecondaryMotion } from './rendering/figures/secondary-motion.ts';
 import { createArmoryScreen } from './ui/screens/armory.ts';
+import { createPresetScreen } from './ui/screens/presets.ts';
+import { parsePresets, presetEquipment } from './game/progression/presets.ts';
 import {
   appendGameOverUnlocks,
   renderGameOver,
@@ -3357,6 +3359,35 @@ export function startGame(): () => void {
   lifecycle.add(options.dispose);
   lifecycle.listen(systemMotion, 'change', applySettings);
   applySettings();
+  const PRESETS = parsePresets(store.get('issen.presets', null));
+  const presetScreen = createPresetScreen($('armory'), {
+    presets: PRESETS,
+    capacity: () => META.upgrades.presets,
+    current: () => EQ,
+    save: () => {
+      store.set('issen.presets', PRESETS);
+    },
+    equip: (preset) => {
+      Object.assign(
+        EQ,
+        presetEquipment(preset, accessibleUnlocks(), ITEMS, META.upgrades.awakening),
+      );
+      equipArmory(EQ);
+      renderArmory();
+    },
+    temple: () => {
+      $('templateContent').dataset.selectedUpgrade = 'presets';
+      openPanel('template');
+    },
+  });
+  lifecycle.add(presetScreen.dispose);
+  function equipArmory(equipment: typeof EQ) {
+    store.set('issen.equip', equipment);
+    computeMods();
+    applySeal();
+    G.runBlade = EQ.blade;
+    G.runRobe = EQ.robe;
+  }
   const armory = createArmoryScreen($('armory'), {
     items: ITEMS,
     equipment: EQ,
@@ -3403,13 +3434,8 @@ export function startGame(): () => void {
     },
     powersEnabled: () => SETUP.upgrades !== false,
     events: {
-      equipped: (equipment) => {
-        store.set('issen.equip', equipment);
-        computeMods();
-        applySeal();
-        G.runBlade = EQ.blade;
-        G.runRobe = EQ.robe;
-      },
+      equipped: equipArmory,
+      rendered: presetScreen.refresh,
       awaken: () => sfx.glint(),
       preview: demoKill,
     },

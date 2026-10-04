@@ -1,6 +1,7 @@
 import type { Setup } from '../../platform/saves.ts';
 
 export type UpgradeId =
+  | 'presets'
   | 'weapons'
   | 'outfits'
   | 'blessings'
@@ -16,6 +17,7 @@ export type UpgradeId =
   | 'precision'
   | 'discernment';
 export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze({
+  presets: 0,
   weapons: 0,
   outfits: 0,
   blessings: 0,
@@ -60,6 +62,13 @@ export interface TemplateUpgrade {
 /** Cost index equals owned rank. Extend the parser and modifier composition
  * alongside this catalog when introducing a new permanent upgrade. */
 export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
+  {
+    id: 'presets',
+    name: 'Preset Slots',
+    description: 'Save a loadout in the Armoury for each rank.',
+    costs: [100, 150, 200, 300, 400],
+    maxRank: 5,
+  },
   {
     id: 'weapons',
     name: 'Weapons',
@@ -229,6 +238,7 @@ export function parseMeta(
       : {}),
     upgrades: {
       weapons: integer(ranks.weapons, 3),
+      presets: integer(ranks.presets, 5),
       outfits: integer(ranks.outfits, 3),
       blessings: integer(ranks.blessings, 4),
       curses: integer(ranks.curses, 1),

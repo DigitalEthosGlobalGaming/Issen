@@ -46,7 +46,12 @@ export interface ArmoryOptions {
   powersEnabled?(): boolean;
   awakeningPurchase?(id: string): { ready: boolean; cost: number; balance: number };
   buyAwakening?(id: string): boolean;
-  events: { equipped(equipment: Equipment): void; awaken(): void; preview(): void };
+  events: {
+    equipped(equipment: Equipment): void;
+    awaken(): void;
+    preview(): void;
+    rendered?(): void;
+  };
 }
 
 /** Owns selection and DOM updates; the caller owns persistence and game effects. */
@@ -98,6 +103,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   };
   preview.addEventListener('click', onPreview);
   function render() {
+    events.rendered?.();
     const tabScroll = tabs.scrollLeft;
     tabs.innerHTML = '';
     for (const [t, label] of ARM) {

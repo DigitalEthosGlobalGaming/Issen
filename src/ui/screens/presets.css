@@ -1,0 +1,52 @@
+.preset-dialog {
+  color: var(--paper);
+  background: #25241f;
+  border: 1px solid var(--paper-dim);
+  border-radius: 6px;
+  font-family: inherit;
+  padding: 20px;
+  width: min(440px, calc(100vw - 40px));
+  max-height: calc(100dvh - 48px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  text-align: center;
+}
+.preset-dialog::backdrop {
+  background: rgb(0 0 0 / 75%);
+}
+.preset-dialog h2 {
+  margin: 0 0 16px;
+}
+.preset-dialog > .btn {
+  display: block;
+  margin: 12px auto;
+}
+.preset-entry {
+  margin: 18px 0;
+  padding-top: 14px;
+  border-top: 1px solid #766f5b;
+}
+.preset-entry input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--paper);
+  background: #171713;
+  border: 1px solid #766f5b;
+  padding: 8px;
+}
+.preset-entry .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.preset-entry .btn {
+  min-width: 0;
+  padding: 8px 16px;
+}
+#armPresets {
+  font-size: 13px;
+  padding-inline: 10px;
+}

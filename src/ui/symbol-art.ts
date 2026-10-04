@@ -3,10 +3,12 @@ import trialAtlas from './assets/trial-symbols-atlas.png';
 import tantoSymbol from './assets/tanto-symbol.svg';
 import demonSymbol from './assets/demon-mirror-symbol.png';
 import collectionAtlas from './assets/collection-symbols.svg';
+import presetSymbol from './assets/preset-symbol.svg';
 import type { UpgradeId } from '../game/progression/meta.ts';
 import './symbol-art.css';
 
 const templeCells: Record<UpgradeId, number> = {
+  presets: -3,
   blessings: -2,
   curses: -2,
   weapons: -2,
@@ -51,6 +53,12 @@ export function createSymbolArt(
   art.className = 'symbol-art';
   art.dataset.symbol = `${family}:${id}`;
   art.setAttribute('aria-hidden', 'true');
+  if (family === 'temple' && id === 'presets') {
+    art.style.backgroundImage = `url("${presetSymbol}")`;
+    art.style.backgroundSize = '80% 80%';
+    art.style.backgroundPosition = 'center';
+    return art;
+  }
   if (family === 'temple' && cell === -2) {
     const index = ['blessings', 'curses', 'weapons', 'outfits'].indexOf(id);
     art.style.backgroundImage = `url("${collectionAtlas}")`;

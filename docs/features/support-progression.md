@@ -131,3 +131,20 @@ without elapsed-hour assumptions, and merges the most recent streak while keepin
 permanent ownership. Each profile has its own record. Save transfer and run
 checkpoint recovery retain the grant. The shared calligraphic SVG at
 `ui/assets/crest-seven-dawns.svg` supplies both its Armoury image and canvas paths.
+
+## 1.58.0 — Armoury presets
+
+Preset Slots in the Temple unlock one to five stored loadouts, costing 100, 150,
+200, 300 and 400 Embers. Before the first rank, Armoury Presets links directly to
+that upgrade. Save current loadout creates an independent equipment snapshot;
+edit its name, Equip, Update or Delete from the same menu. Update and Delete
+require confirmation. Capacity and prices belong to the upgrade catalog.
+
+`issen.presets` belongs to the active profile. `progression/presets.ts` validates
+at most five unique records and preserves saved selections on import. Equipping
+revalidates every category against current ownership/edition access and Awakening
+ranks, falling back per category without changing the stored preset. Presets
+include blades, outfits, charms, crests, companions, effects, film, seals and
+Awakening forms; they exclude run modes, difficulty and run-only powers. The
+Armoury remains unavailable during unfinished runs, protecting daily/Trial
+loadouts and checkpoints. Preset names are inserted through DOM text/input values.
