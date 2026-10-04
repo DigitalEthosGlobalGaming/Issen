@@ -40,36 +40,38 @@ test('Armoury hides inaccessible and inactive powers, then independently activat
     const balancedBlade = info().includes('Balanced · no modifiers');
     click('Tamahagane');
     click('Tamahagane');
-    const gated = !equipment.bladeSp && !root.querySelector('.spx,.spb,.awakening-active');
+    const gated =
+      !equipment.bladeSp && !root.querySelector('.arm-forms,.arm-form-mark,.awakening-active');
     access = true;
     controller.render();
     const inactiveHidden = !info().includes('Score ×1.15');
-    click('Tamahagane');
+    root.querySelector<HTMLButtonElement>('[data-form="awakened"]')!.click();
     const bladeActive =
       equipment.bladeSp &&
       !!root.querySelector('.awakening-active') &&
-      info().includes('Awakened active');
+      root.querySelector('[data-form="awakened"]')!.getAttribute('aria-pressed') === 'true';
     tab('Outfits');
     const balancedOutfit = info().includes('Balanced · no modifiers');
     const beforeSelection = !info().includes('15% more time between attackers');
     click('Sumi');
     const firstSelection = !equipment.robeSp && !info().includes('15% more time between attackers');
-    click('Sumi');
+    root.querySelector<HTMLButtonElement>('[data-form="awakened"]')!.click();
     const outfitActive =
       equipment.robeSp &&
       equipment.bladeSp &&
-      info().includes('Awakened active') &&
+      root.querySelector('[data-form="awakened"]')!.getAttribute('aria-pressed') === 'true' &&
       !!root.querySelector('.awakening-active .pk') &&
       info().includes('15% more time between attackers');
     enabled = false;
     controller.render();
     const suppressed =
       !root.querySelector('.awakening-active') &&
-      info().includes('suppressed') &&
+      info().includes('Powers off') &&
+      root.querySelector('[data-form="awakened"]')!.getAttribute('aria-pressed') === 'true' &&
       !info().includes('15% more time between attackers');
     enabled = true;
     controller.render();
-    click('Sumi');
+    root.querySelector<HTMLButtonElement>('[data-form="normal"]')!.click();
     const normalAgain = !equipment.robeSp && !info().includes('15% more time between attackers');
     click('Ash');
     const challengeOnly = info().includes('(3/9)') && !info().includes('Parry window 15% shorter');

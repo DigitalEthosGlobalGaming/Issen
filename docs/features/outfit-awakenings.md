@@ -36,11 +36,13 @@ offsets are percentage points, not multipliers. Duration modifiers below one mak
 attacks faster. Shrine rare guarantees require a remaining eligible rare blessing.
 
 Before access, the Armoury hides challenges, badges and awakening details. After
-access it shows requirements; completion shows activation instructions only.
-Select/equip a tile and tap it again to activate. Active powers replace base stats
-in yellow with an explicit **Awakened active** label. Deactivation restores base
-stats and hides awakened powers. Upgrades-off setups preserve selected forms but
-suppress their powers, show base stats and explain the suppression.
+access it shows explicit **Normal / Awakened** form controls and challenge progress;
+unearned forms are disabled. Select/equip a tile, then choose its form. Repeated
+tile taps preserve the selected form. Active powers replace base stats in yellow;
+the pressed form button communicates selection. **Normal** restores base stats and
+hides awakened powers. Blade and outfit controls are independent. Upgrades-off
+setups preserve selected forms but suppress their powers, show base stats and a
+short **Powers off · normal effects apply** message.
 
 `st.c` supplies a comma-separated RGB fabric accent, and `aura` supplies the
 matching colour/effect for the isolated preview and live renderer. Adding an

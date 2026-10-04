@@ -2,6 +2,10 @@
 
 Status: implemented in v1.7.0; startup recovery, blade lightning and adaptive cosmetic density added in v1.8.0; lightning detail refined in v1.8.1.
 
+Version 1.47.0 replaces Armoury repeat-tap cycling with explicit Normal, Awakened
+and Third controls. Existing saved selections and gameplay rules are preserved;
+see [current Armoury presentation](daily-and-world-ui.md#presentation-guidance).
+
 ## Intent
 
 Give the starting Steel blade a long-term third form, make each ordinary run's gameplay randomness reproducible from its seed, and let players resume after leaving or a crash at the latest safe encounter boundary. A fatal loss must be recorded immediately.

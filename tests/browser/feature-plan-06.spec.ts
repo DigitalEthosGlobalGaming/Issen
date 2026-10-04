@@ -29,7 +29,7 @@ test('an ordinary wave resumes from its saved seed and End run closes the checkp
   await expect(page.locator('#bContinue')).toBeHidden();
 });
 
-test('Steel cycles through base, first and third forms with separate saved selection', async ({
+test('Steel explicitly selects base, first and third forms and preserves selection on reload', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -43,15 +43,28 @@ test('Steel cycles through base, first and third forms with separate saved selec
   await page.locator('#bArmory').click();
   const steel = page.locator('#armTiles').getByRole('button', { name: 'Tamahagane', exact: true });
   await steel.click();
-  await steel.click();
-  await expect(page.locator('#armInfo')).toContainText('Awakened active');
-  await steel.click();
-  await expect(page.locator('#armInfo')).toContainText('Third Awakening active');
+  await page.locator('[data-form="awakened"]').click();
+  await expect(page.locator('[data-form="awakened"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#armInfo .awakening-active')).toContainText('Score ×1.15');
+  await page.locator('[data-form="third"]').click();
+  await expect(page.locator('[data-form="third"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#armInfo .awakening-active .pk')).toHaveCount(2);
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.equip')!).bladeThird),
   ).toBe(true);
+  await page.reload();
+  await page.locator('#bArmory').click();
+  await expect(page.locator('[data-form="third"]')).toHaveAttribute('aria-pressed', 'true');
   await steel.click();
-  await expect(page.locator('#armInfo')).not.toContainText('Awakened active');
+  await expect(page.locator('[data-form="third"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('[data-form="normal"]').click();
+  await expect(page.locator('.awakening-active')).toHaveCount(0);
+  expect(
+    await page.evaluate(() => {
+      const equipment = JSON.parse(localStorage.getItem('issen.equip')!);
+      return { bladeSp: equipment.bladeSp, bladeThird: equipment.bladeThird };
+    }),
+  ).toEqual({ bladeSp: false, bladeThird: false });
 });
 
 test('a fatal loss is terminal before its animation and settles once after reload', async ({

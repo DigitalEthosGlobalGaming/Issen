@@ -4,6 +4,7 @@ Use [docs/index.md](docs/index.md) when unfamiliar with the repository.
 
 - For ownership or feature placement, read [implemented architecture](docs/architecture/overview.md).
 - For commands and verification, read [local development](docs/development/local-development.md).
+- For feature batches and branch preview releases, use [release feature sets](.agents/skills/release-feature-sets/SKILL.md).
 - For symbols, emblems and menu illustrations, follow [calligraphic symbol art](docs/features/symbol-art.md): use bold brush strokes like the main Issen logo.
 - For player-facing menus and feature copy, use [player presentation](.agents/skills/player-presentation/SKILL.md): prefer concise labels and visual states.
 - The [migration plan](docs/architecture/typescript-migration.md) includes a historical proposal; verify actual files before relying on that tree.
