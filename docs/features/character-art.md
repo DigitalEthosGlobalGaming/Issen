@@ -294,6 +294,9 @@ selecting an effect. No character artwork was added or replaced.
 cloth and the charm. Runtime cuts/parries apply directional impulses; foreground
 updates advance them independently of hit-stop. Existing robe panels, sleeves
 and cloth attachments rotate by a few degrees. The existing charm hangs from
-its belt attachment and swings with inertia. Hands, weapon poses, collision,
+its belt attachment and swings with inertia. Perfect cuts and successful standoff
+cuts apply 2.4 times the ordinary impulse; cloth is bounded to 0.085 radians and
+the charm to 0.48 radians, with the same damping so the stronger recoil settles
+naturally. Ordinary cuts and parries retain their original impulse. Hands, weapon poses, collision,
 attack windows and save data are unchanged. Springs reset at a new run and when
 reduced motion is enabled, and stop with manual/background suspension.

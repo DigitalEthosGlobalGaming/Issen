@@ -12,14 +12,21 @@ export function createSecondaryMotion() {
   };
   return {
     reset,
-    kick(direction: Direction | 'block', reduced = false) {
+    kick(direction: Direction | 'block', reduced = false, perfect = false) {
       if (reduced) {
         reset();
         return;
       }
       const force = { left: -1, right: 1, up: -0.65, down: 0.65, block: 0.35 }[direction];
-      clothVelocity = Math.max(-0.65, Math.min(0.65, clothVelocity + force * 0.4));
-      charmVelocity = Math.max(-4, Math.min(4, charmVelocity + force * 3));
+      const strength = perfect ? 2.4 : 1;
+      // A chained ordinary cut must not truncate an existing perfect-cut impulse.
+      const clothCap = Math.max(0.65 * strength, Math.abs(clothVelocity)),
+        charmCap = Math.max(4 * strength, Math.abs(charmVelocity));
+      clothVelocity = Math.max(
+        -clothCap,
+        Math.min(clothCap, clothVelocity + force * 0.4 * strength),
+      );
+      charmVelocity = Math.max(-charmCap, Math.min(charmCap, charmVelocity + force * 3 * strength));
     },
     update(delta: number, reduced = false) {
       if (reduced) {
@@ -31,8 +38,8 @@ export function createSecondaryMotion() {
         const dt = Math.min(1 / 240, remaining);
         clothVelocity += (-70 * cloth - 12 * clothVelocity) * dt;
         charmVelocity += (-110 * charm - 8 * charmVelocity) * dt;
-        cloth = Math.max(-0.045, Math.min(0.045, cloth + clothVelocity * dt));
-        charm = Math.max(-0.28, Math.min(0.28, charm + charmVelocity * dt));
+        cloth = Math.max(-0.085, Math.min(0.085, cloth + clothVelocity * dt));
+        charm = Math.max(-0.48, Math.min(0.48, charm + charmVelocity * dt));
         remaining -= dt;
       }
     },

@@ -1720,7 +1720,7 @@ export function startGame(): () => void {
       t: 0,
       life: SHADOW_DURATION,
     });
-    if (!automatic) swingPlayer(dir);
+    if (!automatic) swingPlayer(dir, perfect);
     if (G.m.bonk) sfx.bonk();
     else sfx.slice();
     combatHaptics.play('slice');
@@ -1955,10 +1955,10 @@ export function startGame(): () => void {
     weatherBurst(cx, cy, sc);
     effectSpawner().killFx(accessible(EQ.fx) ? EQ.fx : 'ink', cx, cy, ang, sc);
   }
-  function swingPlayer(dir: Direction | 'block') {
+  function swingPlayer(dir: Direction | 'block', perfect = false) {
     if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();
     startSwing(P, dir);
-    apparelMotion.kick(dir, reducedMotion());
+    apparelMotion.kick(dir, reducedMotion(), perfect);
   }
   function onSwipe(dir: Direction) {
     if (
@@ -2437,7 +2437,7 @@ export function startGame(): () => void {
       )
         e.deathType = 'dissolve';
       e.k = 0;
-      swingPlayer(dir);
+      swingPlayer(dir, true);
       addSlash(cx - v[0] * M, cy - v[1] * M, cx + v[0] * M, cy + v[1] * M, Math.max(3, 3 * S), 0.6);
       killFx(cx, cy, a + Math.PI / 2, sc);
       scraps(cx, cy, 10, sc);
