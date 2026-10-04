@@ -59,3 +59,20 @@ export function settleRunReward(meta: MetaProgress, ledger: RunRewardLedger): Re
   ledger.settled = Object.freeze({ before, gained, after: meta.embers });
   return ledger.settled;
 }
+
+/** Credit the extra copy of a settled run once; marker and balance share one save. */
+export function grantSupportEmberBonus(
+  meta: MetaProgress,
+  id: string,
+  hundredths: number,
+): RewardSettlement | null {
+  if (!id || meta.supportRewardClaim === id || !Number.isSafeInteger(hundredths) || hundredths <= 0)
+    return null;
+  const before = meta.embers;
+  const total = meta.emberRemainder + hundredths;
+  meta.embers = Math.min(MAX_CURRENCY, before + Math.floor(total / 100));
+  meta.emberRemainder = total % 100;
+  meta.earned = Math.min(MAX_CURRENCY, meta.earned + meta.embers - before);
+  meta.supportRewardClaim = id;
+  return { before, gained: meta.embers - before, after: meta.embers };
+}

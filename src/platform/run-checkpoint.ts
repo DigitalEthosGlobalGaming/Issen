@@ -147,6 +147,7 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
     return null;
   run.tanto = run.tanto ?? 0;
   run.reviveOfferResolved = run.reviveOfferResolved === true;
+  run.secondWindUsed = run.secondWindUsed === true;
   if (
     raw.ledger.supportMultiplier !== undefined &&
     ![1, 2].includes(Number(raw.ledger.supportMultiplier))

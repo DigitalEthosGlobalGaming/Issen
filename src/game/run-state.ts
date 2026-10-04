@@ -107,6 +107,7 @@ export interface RunState {
   lostLife: boolean;
   diedInBoss: boolean;
   reviveOfferResolved: boolean;
+  secondWindUsed: boolean;
   pauseN: number;
   claps: number;
 }
@@ -196,6 +197,7 @@ export function createRunState(savedHints: unknown = {}): RunState {
     lostLife: false,
     diedInBoss: false,
     reviveOfferResolved: false,
+    secondWindUsed: false,
     pauseN: 0,
     claps: 0,
   };
@@ -257,6 +259,7 @@ export function resetRun(
     phoenixUsed: false,
     tempN: 0,
     reviveOfferResolved: false,
+    secondWindUsed: false,
     foxUsed: false,
     kagamiUsed: false,
     manekiN: 0,

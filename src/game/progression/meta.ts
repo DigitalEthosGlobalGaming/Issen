@@ -42,6 +42,7 @@ export interface MetaProgress {
   earned: number;
   /** Hundredths of an Ember, carried between completed runs and reloads. */
   emberRemainder: number;
+  supportRewardClaim?: string;
   upgrades: Record<UpgradeId, number>;
   bossMilestone: number;
   revealSeen: number;
@@ -223,6 +224,9 @@ export function parseMeta(
     embers,
     earned: Math.max(embers, integer(saved.earned, MAX_CURRENCY)),
     emberRemainder: integer(saved.emberRemainder, 99),
+    ...(typeof saved.supportRewardClaim === 'string' && saved.supportRewardClaim.length <= 80
+      ? { supportRewardClaim: saved.supportRewardClaim }
+      : {}),
     upgrades: {
       weapons: integer(ranks.weapons, 3),
       outfits: integer(ranks.outfits, 3),

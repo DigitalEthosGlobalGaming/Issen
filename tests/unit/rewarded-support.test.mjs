@@ -1,8 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRewardedSupport } from '../../src/platform/rewarded-support.ts';
-import { createRunRewardLedger, settleRunReward } from '../../src/game/progression/run-rewards.ts';
+import {
+  createRunRewardLedger,
+  settleRunReward,
+  grantSupportEmberBonus,
+} from '../../src/game/progression/run-rewards.ts';
 import { parseMeta } from '../../src/game/progression/meta.ts';
+test('post-tally bonus claim is idempotent across reload', () => {
+  const meta = parseMeta({ embers: 12, emberRemainder: 50 });
+  assert.deepEqual(grantSupportEmberBonus(meta, 'bonus1', 1250), {
+    before: 12,
+    gained: 13,
+    after: 25,
+  });
+  const restored = parseMeta(JSON.parse(JSON.stringify(meta)));
+  assert.equal(grantSupportEmberBonus(restored, 'bonus1', 1250), null);
+  assert.equal(restored.embers, 25);
+});
 test('provider completion, cancellation, exceptions and concurrent claims', async () => {
   let finish;
   let calls = 0;

@@ -14,9 +14,9 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('issen.guidedLessons', JSON.stringify({ order: true, bossParry: true }));
   });
 });
-test('one revive per death restarts with half lives, then one Ember doubling settles', async ({
+test('one Second Wind per run restarts with half lives, then tally offers one Ember doubling', async ({
   page,
-}) => {
+}, info) => {
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
@@ -27,11 +27,22 @@ test('one revive per death restarts with half lives, then one Ember doubling set
     G.lives = 1;
     playerDie(null, 'wrong');
   });
+  await expect(page.locator('.support-reward-dialog')).toContainText('Second Wind');
+  await expect(page.locator('.support-reward-dialog')).toContainText(
+    'Watch an ad to revive at half health.',
+  );
+  await page.screenshot({ path: info.outputPath('second-wind-scroll.png') });
+  expect(
+    await page
+      .locator('.support-reward-dialog')
+      .evaluate((el) => el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight),
+  ).toBe(true);
   await page.getByRole('button', { name: 'Watch ad · Revive', exact: true }).click();
   await expect(page.locator('.support-reward-dialog')).toContainText('on the house');
+  await expect(page.locator('.support-reward-dialog button')).toHaveCount(1);
   await page
     .locator('.support-reward-dialog')
-    .getByRole('button', { name: 'Continue', exact: true })
+    .getByRole('button', { name: 'Thanks', exact: true })
     .click();
   const restored = await page.evaluate(
     () => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).run,
@@ -39,12 +50,18 @@ test('one revive per death restarts with half lives, then one Ember doubling set
   expect(restored.lives).toBe(3);
   expect(restored.wave).toBe(1);
   expect(restored.reviveOfferResolved).toBe(true);
-  await page.locator('#pauseBtn').click();
-  await page.locator('#bEnd').click();
-  await page.getByRole('button', { name: 'Watch ad · Double Embers', exact: true }).click();
+  expect(restored.secondWindUsed).toBe(true);
+  await page.evaluate(() => {
+    const { G, playerDie } = (window as any).__supportHarness;
+    G.lives = 1;
+    playerDie(null, 'wrong');
+  });
+  await expect(page.locator('#over')).toHaveClass(/on/);
+  await expect(page.locator('.support-reward-dialog')).not.toBeVisible();
+  await page.getByRole('button', { name: '2× Watch Ad', exact: true }).click();
   await page
     .locator('.support-reward-dialog')
-    .getByRole('button', { name: 'Continue', exact: true })
+    .getByRole('button', { name: 'Thanks', exact: true })
     .click();
   await expect(page.locator('#over')).toHaveClass(/on/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers)).toBe(
@@ -70,7 +87,12 @@ test('tester Premium doubles by default and acknowledges a revive', async ({ pag
   });
   await page.getByRole('button', { name: 'Revive', exact: true }).click();
   await expect(page.locator('.support-reward-dialog')).toContainText('complimentary');
-  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: 'Thanks', exact: true }).click();
+  await page.evaluate(() => {
+    const { G, playerDie } = (window as any).__supportHarness;
+    G.lives = 1;
+    playerDie(null, 'wrong');
+  });
   await expect(page.locator('#over')).toHaveClass(/on/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers)).toBe(
     25,

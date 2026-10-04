@@ -21,7 +21,8 @@ test('Temple cancel leaves Embers intact and completed Awakening requires confir
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="focus"]').click();
   await page.getByRole('button', { name: 'Donate 75 Embers', exact: true }).click();
-  await expect(page.locator('.confirm-action')).toContainText('925 Embers will remain');
+  await expect(page.locator('.confirm-action')).toContainText('Are you sure?');
+  await expect(page.locator('.confirm-action')).not.toContainText('will remain');
   await page
     .locator('.confirm-action')
     .getByRole('button', { name: 'Cancel', exact: true })
@@ -32,8 +33,8 @@ test('Temple cancel leaves Embers intact and completed Awakening requires confir
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   await page.locator('[data-form="awakened"]').click();
-  await expect(page.locator('.confirm-action')).toContainText('850 Embers will remain');
-  await page.getByRole('button', { name: 'Spend 150 Embers', exact: true }).click();
+  await expect(page.locator('.confirm-action')).toContainText('Confirm | -150 Embers');
+  await page.getByRole('button', { name: 'Confirm | -150 Embers', exact: true }).click();
   await expect(page.locator('[data-form="awakened"]')).toHaveAttribute('aria-pressed', 'true');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers)).toBe(
     850,

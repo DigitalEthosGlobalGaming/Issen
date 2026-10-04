@@ -2,7 +2,7 @@
 # Repository documentation
 
 - [Support and progression](features/support-progression.md): implemented support
-  screens and complimentary tester Premium; later feature sets remain in the plan.
+  screens, Second Wind, Ember rewards, Temple collections and Awakening purchases.
 
 - [Performance testing](../tests/performance/README.md): repeatable web profiling,
   isolated Android WebView adapter, saved reports and measurement limitations.

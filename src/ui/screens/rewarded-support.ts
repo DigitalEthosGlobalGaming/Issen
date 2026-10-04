@@ -33,16 +33,16 @@ export function createRewardScreen(root: HTMLElement) {
       if (resolve) return Promise.resolve(false);
       return new Promise((done) => {
         resolve = done;
-        dialog.innerHTML = `<h2 id="rewardSupportTitle">${benefit === 'revive' ? 'Another stroke?' : 'Double your Embers?'}</h2><p>${benefit === 'revive' ? `Restart this wave or duel with ${lives} ${lives === 1 ? 'life' : 'lives'}.` : 'Collect twice the Embers earned in this run.'}</p><button class="btn primary" data-claim>${premium ? 'Revive' : benefit === 'revive' ? 'Watch ad · Revive' : 'Watch ad · Double Embers'}</button><button class="btn" data-skip>${benefit === 'revive' ? 'End run' : 'Collect Embers'}</button>`;
+        dialog.innerHTML = `<h2 id="rewardSupportTitle">${benefit === 'revive' ? 'Second Wind' : 'Double your Embers?'}</h2><p>${benefit === 'revive' ? (premium ? `Revive at half health (${lives} ${lives === 1 ? 'life' : 'lives'}).` : 'Watch an ad to revive at half health.') : 'Collect twice the Embers earned in this run.'}</p><button class="btn primary" data-claim>${premium ? 'Revive' : benefit === 'revive' ? 'Watch ad · Revive' : 'Watch ad · Double Embers'}</button><button class="btn" data-skip>${benefit === 'revive' ? 'No thanks' : 'Continue'}</button>`;
         dialog.querySelector<HTMLButtonElement>('[data-skip]')!.onclick = () => close(false);
         dialog.querySelector<HTMLButtonElement>('[data-claim]')!.onclick = () => {
-          dialog.innerHTML = `<h2 id="rewardSupportTitle">${premium ? 'Thank you' : 'On the house'}</h2><p>${premium ? (tester ? 'Thank you for playing. Your complimentary tester Premium includes this revive.' : 'Thank you for purchasing Premium and supporting Issen. This revive is included.') : "We're working on ways you can support our development. While we do this, thank you for playing—this one is on the house."}</p><button class="btn primary" data-complete>Continue</button><button class="btn" data-cancel>Cancel</button>`;
+          dialog.innerHTML = `<h2 id="rewardSupportTitle">${premium ? 'Thank you' : 'On the house'}</h2><p>${premium ? (tester ? 'Thank you for playing. Your complimentary tester Premium includes this revive.' : 'Thank you for purchasing Premium and supporting Issen. This revive is included.') : "We're working on ways you can support our development. While we do this, thank you for playing—this one is on the house."}</p><button class="btn primary" data-complete>Thanks</button>`;
           dialog.querySelector<HTMLButtonElement>('[data-complete]')!.onclick = () => close(true);
-          dialog.querySelector<HTMLButtonElement>('[data-cancel]')!.onclick = () => close(false);
           dialog.querySelector<HTMLButtonElement>('[data-complete]')!.focus();
         };
         dialog.showModal();
-        dialog.querySelector<HTMLButtonElement>('[data-claim]')!.focus();
+        if (benefit === 'embers') dialog.querySelector<HTMLButtonElement>('[data-claim]')!.click();
+        else dialog.querySelector<HTMLButtonElement>('[data-claim]')!.focus();
       });
     },
     dispose() {

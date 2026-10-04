@@ -11,6 +11,7 @@ import {
   collectionItemStats,
   collectionChallengeText,
 } from './game/progression/collection-progress.ts';
+import { parsePendingSupport, type PendingSupportReward } from './platform/pending-support.ts';
 import { createRewardedSupport } from './platform/rewarded-support.ts';
 import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
@@ -73,6 +74,7 @@ import {
   createRunRewardLedger,
   accrueRunReward,
   settleRunReward,
+  grantSupportEmberBonus,
 } from './game/progression/run-rewards.ts';
 import { protectCombo, recoverAfterWave } from './game/progression/run-powers.ts';
 import { resolveDamage } from './game/combat/damage.ts';
@@ -909,8 +911,12 @@ export function startGame(): () => void {
       G.bossCount--;
       startBoss();
     } else startWave(G.wave, true);
-    if (support) banner('起', 'Another stroke');
-    else if (ph) banner('鳳凰', 'Rise from the ashes');
+    if (support) {
+      G.lives = Math.max(1, Math.ceil(G.maxLives / 2));
+      renderLives();
+      captureCheckpoint();
+      banner('起', 'Second Wind');
+    } else if (ph) banner('鳳凰', 'Rise from the ashes');
     else banner('達磨', 'Seven times down, eight times up');
     stamp(ph ? '鳳' : '起', 0, 0, Math.max(60, 86 * S), true, 1.6);
     flash(0.5, '255,240,220');
@@ -2802,7 +2808,7 @@ export function startGame(): () => void {
     updateSavedRunButtons();
   }
   const rewardSupport = createRewardedSupport();
-  const rewardScreen = createRewardScreen(document.body);
+  const rewardScreen = createRewardScreen(document.getElementById('app')!);
   lifecycle.add(rewardScreen.dispose);
   let rewardFlowBusy = false;
   // Support benefits are independent of Web collection access.
@@ -2811,10 +2817,9 @@ export function startGame(): () => void {
   function showOver() {
     if (rewardFlowBusy) return;
     const eligible = !activeDaily && !activeTrial && !G.zen;
-    const revive = eligible && !G.hard && G.state === 'dead' && !G.reviveOfferResolved;
-    const double =
-      eligible && rewardLedger.pending > 0 && rewardLedger.supportMultiplier === undefined;
-    if (revive || double) {
+    const revive =
+      eligible && !G.hard && G.state === 'dead' && !G.reviveOfferResolved && !G.secondWindUsed;
+    if (revive) {
       rewardFlowBusy = true;
       void (async () => {
         if (revive) {
@@ -2830,19 +2835,11 @@ export function startGame(): () => void {
           G.reviveOfferResolved = true;
           captureCheckpoint('lost');
           if (granted) {
+            G.secondWindUsed = true;
             rewardFlowBusy = false;
             reviveDaruma(false, true);
             return;
           }
-        }
-        if (double) {
-          const completed =
-            supportPremium() || (await rewardScreen.offer('embers', false, false, 0));
-          if (lifecycle.disposed) return;
-          const granted = completed && (await rewardSupport.claim('embers', supportPremium()));
-          if (lifecycle.disposed) return;
-          rewardLedger.supportMultiplier = granted ? 2 : 1;
-          captureCheckpoint(G.state === 'dead' ? 'lost' : 'ended');
         }
         rewardFlowBusy = false;
         showOver();
@@ -2873,7 +2870,18 @@ export function startGame(): () => void {
     saveStats();
     unlockBossMilestone(META, runBossMilestone, SETUP);
     checkUnlocks();
+    if (eligible && supportPremium()) rewardLedger.supportMultiplier = 2;
     const reward = settleRunReward(META, rewardLedger);
+    const pending: PendingSupportReward | null =
+      eligible && !supportPremium() && rewardLedger.pending > 0 && savedRun
+        ? {
+            id: crypto.randomUUID(),
+            hundredths: rewardLedger.pending,
+            reward,
+            checkpoint: structuredClone(savedRun),
+          }
+        : null;
+    if (pending) store.set('issen.supportReward', pending);
     const modeReveals: ResultReveal[] = pendingModeReveals(META).map((mode) => ({
       key: '開',
       name: mode.name,
@@ -2896,14 +2904,85 @@ export function startGame(): () => void {
     hud(false);
     G.overReady = false;
     $('bAgain').disabled = true;
-    runResults.start(reward, [...modeReveals, ...runItemReveals], () => {
-      G.overReady = true;
-      $('bAgain').disabled = false;
-    });
+    runResults.start(
+      reward,
+      [...modeReveals, ...runItemReveals],
+      () => {
+        store.remove('issen.supportReward');
+        G.overReady = true;
+        $('bAgain').disabled = false;
+      },
+      pending ? () => claimEmberBonus(pending) : undefined,
+    );
     setBestLine();
     clearRunCheckpoint();
     savedRun = null;
     updateSavedRunButtons();
+  }
+  async function claimEmberBonus(pending: PendingSupportReward) {
+    const completed = await rewardScreen.offer('embers', false, false, 0);
+    if (lifecycle.disposed || !completed || !(await rewardSupport.claim('embers', false)))
+      return null;
+    if (lifecycle.disposed) return null;
+    const before = { ...META };
+    const bonus = grantSupportEmberBonus(META, pending.id, pending.hundredths);
+    if (!bonus) return null;
+    if (!saveMeta()) {
+      Object.assign(META, before);
+      toast({ k: '!', msg: 'Reward could not be saved. Please try again.' });
+      return null;
+    }
+    store.remove('issen.supportReward');
+    const total = {
+      before: pending.reward.before,
+      gained: pending.reward.gained + bonus.gained,
+      after: bonus.after,
+    };
+    renderGameOver(
+      $('over'),
+      G,
+      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
+      false,
+      STAGES[G.stage]!.n,
+      total,
+      G.upgradesEnabled,
+    );
+    return total;
+  }
+  function recoverSupportReward() {
+    const pending = parsePendingSupport(store.get('issen.supportReward', null));
+    if (!pending || pending.id === META.supportRewardClaim) {
+      store.remove('issen.supportReward');
+      return;
+    }
+    Object.assign(G, pending.checkpoint.run, {
+      bless: new Set(pending.checkpoint.run.bless),
+      state: 'over',
+      panel: null,
+    });
+    renderGameOver(
+      $('over'),
+      G,
+      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
+      false,
+      STAGES[G.stage]!.n,
+      pending.reward,
+      G.upgradesEnabled,
+    );
+    showScreen('over');
+    hud(false);
+    G.overReady = false;
+    $('bAgain').disabled = true;
+    runResults.start(
+      pending.reward,
+      [],
+      () => {
+        store.remove('issen.supportReward');
+        G.overReady = true;
+        $('bAgain').disabled = false;
+      },
+      () => claimEmberBonus(pending),
+    );
   }
   function setBestLine() {
     $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
@@ -4465,7 +4544,10 @@ export function startGame(): () => void {
     const terminal = savedRun;
     restoreCheckpoint(terminal);
     showOver();
-  } else setupAttract();
+  } else {
+    setupAttract();
+    recoverSupportReward();
+  }
   setMuteIcon();
   refreshArmoryNew();
   setBestLine();

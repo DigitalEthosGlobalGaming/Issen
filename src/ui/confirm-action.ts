@@ -14,6 +14,7 @@ export function confirmAction(
   heading.textContent = title;
   const description = doc.createElement('p');
   description.textContent = message;
+  description.hidden = !message;
   const cancel = doc.createElement('button');
   cancel.className = 'btn';
   cancel.textContent = 'Cancel';
@@ -61,10 +62,5 @@ export function confirmAction(
   });
 }
 export function confirmEmberSpend(root: HTMLElement, name: string, cost: number, balance: number) {
-  return confirmAction(
-    root,
-    `Buy ${name}?`,
-    `Spend ${cost} Embers? ${Math.max(0, balance - cost)} Embers will remain.`,
-    `Spend ${cost} Embers`,
-  );
+  return confirmAction(root, 'Are you sure?', '', `Confirm | -${cost} Embers`);
 }

@@ -17,8 +17,7 @@ retain their existing behavior.
 `PLACEHOLDER_SUPPORT`. No checkout or SDK listener starts during the placeholder
 phase. The separate support screen activates tester access, never paid ownership.
 
-Implementation of the remaining sets follows the
-[feature plan](support-and-progression-plan.md).
+The batch also includes seven-day login progression and Armoury loadout presets.
 
 ## 1.53.0 — Support rewards
 
@@ -85,3 +84,22 @@ to apply their curated definitions.
 
 The killing stroke uses a short synthesized cutting rush, bright metallic edge
 and ringing steel tail. The cue respects effects volume, mute and activity gates.
+
+## 1.56.1 — Second Wind and simpler reward choices
+
+Second Wind replaces the earlier per-death support offer: one support revive per
+run for free and Premium players. The offer uses nine-slice scroll artwork and
+“Watch an ad to revive at half health.” **No thanks** ends the run. The support
+acknowledgement has a single **Thanks** button.
+
+Free players see **2× Watch Ad** only after the Ember tally, with **Continue**
+underneath. Base rewards settle first; the optional bonus uses a claim marker saved
+atomically with currency in metadata. `issen.supportReward` retains an unclaimed
+offer for recovery after reload without recording the run again. Premium continues
+to double automatically. The bonus doubles the current run's contribution, including
+fractional Embers. A completed bonus cannot credit again.
+
+Ember confirmations now show **Are you sure?**, **Cancel**, and
+**Confirm | -X Embers**, replacing the longer balance explanation. Reward dialogs
+live inside the app so their controls receive the shared brush frames. Their
+decoration stays inside the dialog to avoid overflow scrollbars.

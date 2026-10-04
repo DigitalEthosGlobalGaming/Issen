@@ -19,7 +19,12 @@ export interface ResultReveal {
 }
 
 export interface RunResults {
-  start(reward: RewardSettlement, reveals: readonly ResultReveal[], done: () => void): void;
+  start(
+    reward: RewardSettlement,
+    reveals: readonly ResultReveal[],
+    done: () => void,
+    doubleEmbers?: () => Promise<RewardSettlement | null>,
+  ): void;
   startUnlocks(reveals: readonly ResultReveal[], done: () => void): void;
   dispose(): void;
 }
@@ -63,6 +68,26 @@ export function createRunResults(
   let frame = 0;
   let timeout = 0;
   let onDone: (() => void) | null = null;
+  let doubleEmbers: (() => Promise<RewardSettlement | null>) | undefined;
+  let bonusBusy = false;
+  const rewardActions = root.ownerDocument.createElement('div');
+  rewardActions.className = 'result-reward-actions';
+  rewardActions.hidden = true;
+  const doubleButton = root.ownerDocument.createElement('button');
+  doubleButton.type = 'button';
+  doubleButton.className = 'btn primary';
+  doubleButton.textContent = '2× Watch Ad';
+  const continueButton = root.ownerDocument.createElement('button');
+  continueButton.type = 'button';
+  continueButton.className = 'btn';
+  continueButton.textContent = 'Continue';
+  rewardActions.append(doubleButton, continueButton);
+  sequence.append(rewardActions);
+  const updateActions = () => {
+    rewardActions.hidden = step !== 0 || animating || !doubleEmbers;
+    sequence.querySelector<HTMLElement>('.result-next')!.hidden = !rewardActions.hidden;
+    sequence.setAttribute('role', rewardActions.hidden ? 'button' : 'group');
+  };
   const clearMotion = () => {
     cancelActiveFrame(frame);
     clearActiveTimeout(timeout);
@@ -78,6 +103,7 @@ export function createRunResults(
       gain.hidden = true;
       accessible.textContent = `${reward.gained} Embers earned. ${reward.after} available.`;
     }
+    updateActions();
   };
   const showStep = () => {
     clearMotion();
@@ -93,6 +119,7 @@ export function createRunResults(
     void sequence.offsetWidth;
     animating = !reduceMotion() && (step > 0 || reward.gained > 0);
     sequence.classList.toggle('animating', animating);
+    updateActions();
     if (step === 0) {
       glyph.textContent = '火';
       benefit.hidden = tradeoff.hidden = true;
@@ -136,15 +163,41 @@ export function createRunResults(
     }
   };
   const advance = () => {
-    if (sequence.hidden || !pageActive()) return;
+    if (sequence.hidden || !pageActive() || bonusBusy) return;
     if (animating) finishAnimation();
     else {
+      if (step === 0 && doubleEmbers) return;
       step++;
       showStep();
     }
   };
+  continueButton.onclick = (e) => {
+    e.stopPropagation();
+    if (bonusBusy) return;
+    doubleEmbers = undefined;
+    step++;
+    showStep();
+  };
+  doubleButton.onclick = async (e) => {
+    e.stopPropagation();
+    if (!doubleEmbers || bonusBusy) return;
+    bonusBusy = true;
+    doubleButton.disabled = continueButton.disabled = true;
+    const next = await doubleEmbers();
+    bonusBusy = false;
+    doubleButton.disabled = continueButton.disabled = false;
+    if (next) {
+      reward = next;
+      doubleEmbers = undefined;
+      finishAnimation();
+    }
+  };
   const onClick = () => advance();
   const onKeyDown = (event: KeyboardEvent) => {
+    if ((event.target as HTMLElement).closest('button')) {
+      event.stopPropagation();
+      return;
+    }
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     event.stopPropagation();
@@ -153,7 +206,8 @@ export function createRunResults(
   sequence.addEventListener('click', onClick);
   sequence.addEventListener('keydown', onKeyDown);
   return {
-    start(nextReward, nextReveals, done) {
+    start(nextReward, nextReveals, done, nextDouble) {
+      doubleEmbers = nextDouble;
       reward = nextReward;
       reveals = nextReveals;
       onDone = done;
@@ -164,6 +218,7 @@ export function createRunResults(
       sequence.focus();
     },
     startUnlocks(nextReveals, done) {
+      doubleEmbers = undefined;
       reveals = nextReveals;
       onDone = done;
       step = 1;

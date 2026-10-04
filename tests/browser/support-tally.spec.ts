@@ -1,0 +1,40 @@
+import { expect, test } from '@playwright/test';
+test('Ember tally offers a separate Continue, and pending doubling survives reload', async ({
+  page,
+}, info) => {
+  await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      body: (await response.text()).replace(
+        'frameLoop.start();',
+        'window.__tally = {G,earn}; frameLoop.start();',
+      ),
+    });
+  });
+  await page.goto('/');
+  await page.locator('#bPlay').click();
+  await page.locator('#bBegin').click();
+  await page.evaluate(() => {
+    (window as any).__tally.earn('boss');
+  });
+  await page.locator('#pauseBtn').click();
+  await page.locator('#bEnd').click();
+  await expect(page.locator('#resultEmbers')).toHaveText('12');
+  await expect(page.getByRole('button', { name: '2× Watch Ad', exact: true })).toBeVisible();
+  await expect(
+    page.locator('.result-reward-actions').getByRole('button', { name: 'Continue', exact: true }),
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('ember-ad-choice.png') });
+  await page.reload();
+  await expect(page.getByRole('button', { name: '2× Watch Ad', exact: true })).toBeVisible();
+  await page
+    .locator('.result-reward-actions')
+    .getByRole('button', { name: 'Continue', exact: true })
+    .click();
+  await expect(page.locator('#overSummary')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers)).toBe(
+    12,
+  );
+  expect(await page.evaluate(() => localStorage.getItem('issen.supportReward'))).toBeNull();
+});
