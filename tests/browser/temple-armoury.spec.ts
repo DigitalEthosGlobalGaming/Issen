@@ -22,10 +22,24 @@ test('Temple keeps catalog order within unfinished and completed upgrades after 
       .locator('.upgrade-tile')
       .evaluateAll((tiles) => tiles.map((tile) => (tile as HTMLElement).dataset.upgrade));
   const remaining = ['focus', 'offerings', 'awakening', 'knife', 'tanto', 'composure', 'recovery'];
-  expect(await order()).toEqual(['precision', ...remaining, 'discernment', 'vitality']);
+  const collections = ['presets', 'weapons', 'outfits', 'blessings', 'curses'];
+  expect(await order()).toEqual([
+    ...collections,
+    'precision',
+    ...remaining,
+    'discernment',
+    'vitality',
+  ]);
   await page.locator('[data-upgrade="precision"]').click();
   await page.getByRole('button', { name: 'Donate 400 Embers', exact: true }).click();
-  expect(await order()).toEqual([...remaining, 'precision', 'discernment', 'vitality']);
+  await page.getByRole('button', { name: 'Yes -400 Embers', exact: true }).click();
+  expect(await order()).toEqual([
+    ...collections,
+    ...remaining,
+    'precision',
+    'discernment',
+    'vitality',
+  ]);
   await expect(page.locator('[data-upgrade="precision"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-upgrade="precision"]')).toHaveAttribute('data-state', 'max');
 });
@@ -56,6 +70,7 @@ test('Temple identifies affordable donations and refreshes the title after purch
   expect(new Set(colours).size).toBe(2);
   await page.locator('[data-upgrade="focus"]').click();
   await page.getByRole('button', { name: 'Donate 75 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -75 Embers', exact: true }).click();
   await expect(page.locator('[data-upgrade="focus"]')).toHaveAttribute(
     'data-state',
     'unaffordable',
@@ -74,6 +89,11 @@ test('fully donated Temple and room preview remain readable without selection sh
         schemaVersion: 4,
         tutorial: 'skipped',
         upgrades: {
+          presets: 5,
+          weapons: 3,
+          outfits: 3,
+          blessings: 4,
+          curses: 1,
           precision: 3,
           discernment: 1,
           vitality: 3,
@@ -94,7 +114,7 @@ test('fully donated Temple and room preview remain readable without selection sh
   await page.locator('#bTemplate').click();
   await expect(page.locator('.temple-status')).toHaveCount(0);
   await expect(page.locator('#templateContent')).not.toContainText('Fully donated');
-  await expect(page.locator('[data-state="max"].upgrade-tile')).toHaveCount(10);
+  await expect(page.locator('[data-state="max"].upgrade-tile')).toHaveCount(15);
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   const tabs = page.getByRole('tab');

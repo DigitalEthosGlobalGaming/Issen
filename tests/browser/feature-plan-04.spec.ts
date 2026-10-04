@@ -23,6 +23,7 @@ test('portrait setup gates special lives until Vitality and hides Arrows until B
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="vitality"]').click();
   await page.getByRole('button', { name: 'Donate 100 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -100 Embers', exact: true }).click();
   await page.locator('#template [data-back]').click();
   await page.locator('#bPlay').click();
   await expect(page.locator('#livesOption')).toBeVisible();

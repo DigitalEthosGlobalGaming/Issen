@@ -42,9 +42,12 @@ events are isolated from gameplay input; keyboard combat is gated while it is op
 
 Weapons and Outfits each have three five-item packs costing 100, 200 and 350 Embers.
 Blessings has four five-item packs costing 100, 200, 350 and 500; Curses has one
-five-item pack at 100. Starter and pack membership follow the feature plan.
+five-item pack at 100. Steel and Sumi are immediate starter equipment; Kurogane,
+Beni, Ash and Akabane retain their original starter challenges. Secret equipment
+keeps its discovery route. Shrine choices outside the collection packs remain
+available from the start. Pack membership is explicit in the catalog.
 `content/collections.ts` owns membership and challenge progress labels. The Temple
-shows the next pack's contents; Armoury details show its access requirement or
+shows a short category description; Armoury details show its access requirement or
 eligible counters. Existing owned equipment and secret discovery routes remain.
 
 `issen.collections` holds validated per-pack statistics. Cumulative events use
@@ -129,8 +132,8 @@ and the normal new-item cue.
 `progression/daily-login.ts` validates `issen.dailyLogin`, advances calendar dates
 without elapsed-hour assumptions, and merges the most recent streak while keeping
 permanent ownership. Each profile has its own record. Save transfer and run
-checkpoint recovery retain the grant. The shared calligraphic SVG at
-`ui/assets/crest-seven-dawns.svg` supplies both its Armoury image and canvas paths.
+checkpoint recovery retain the grant. The single calligraphic vector source at
+`rendering/crest-art.ts` supplies both its SVG Armoury image and canvas paths.
 
 ## 1.58.0 — Armoury presets
 

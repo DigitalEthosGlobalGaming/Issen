@@ -136,6 +136,7 @@ test('Tanto Temple emblem and compact scroll Armoury fit portrait and landscape'
     '1 automatic defensive strike per run',
   );
   await page.getByRole('button', { name: 'Donate 175 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -175 Embers', exact: true }).click();
   await expect(page.locator('.template-detail')).toContainText(
     '2 automatic defensive strikes per run',
   );

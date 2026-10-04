@@ -116,11 +116,11 @@ test('awakening purchases split weapons and outfits and preserve old combined ac
   );
 });
 
-test('ten upgrade catalog includes unified knives and enforces maximum ranks', () => {
-  const meta = parseMeta({ embers: 10000 });
-  assert.equal(TEMPLATE_UPGRADES.length, 10);
+test('upgrade catalog includes collections and presets and enforces maximum ranks', () => {
+  const meta = parseMeta({ embers: 20000 });
+  assert.equal(TEMPLATE_UPGRADES.length, 15);
   assert.equal(purchaseUpgrade(meta, 'pouch'), false);
-  assert.equal(meta.embers, 10000);
+  assert.equal(meta.embers, 20000);
   for (const upgrade of TEMPLATE_UPGRADES) {
     for (let rank = 0; rank < upgrade.maxRank; rank++) {
       const before = meta.embers;

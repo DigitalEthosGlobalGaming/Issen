@@ -57,7 +57,8 @@ test('leaving the window stops scene work, audio and tutorial time without chang
     .toBeGreaterThan(before.stamps);
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
-  await page.locator('#bTutorial').click();
+  await page.locator('#bOptions').click();
+  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
   await page.keyboard.press('ArrowRight');
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
   const cue = await page.locator('.tutorial-cue').textContent();

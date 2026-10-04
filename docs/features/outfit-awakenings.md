@@ -37,7 +37,9 @@ attacks faster. Shrine rare guarantees require a remaining eligible rare blessin
 
 Before access, the Armoury hides challenges, badges and awakening details. After
 access it shows explicit **Normal / Awakened** form controls and challenge progress;
-unearned forms are disabled. Select/equip a tile, then choose its form. Repeated
+incomplete challenges leave forms disabled. A completed challenge enables a
+150-Ember purchase with confirmation; the purchase unlocks and equips the form.
+Previously owned forms remain owned. Select/equip a tile, then choose its form. Repeated
 tile taps preserve the selected form. Active powers replace base stats in yellow;
 the pressed form button communicates selection. **Normal** restores base stats and
 hides awakened powers. Blade and outfit controls are independent. Upgrades-off

@@ -13,20 +13,23 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   const balance = () => page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers);
-  await expect(page.locator('.upgrade-tile')).toHaveCount(10);
+  await expect(page.locator('.upgrade-tile')).toHaveCount(15);
   await expect(page.locator('[data-upgrade="pouch"]')).toHaveCount(0);
   for (const id of ['focus', 'recovery', 'knife'])
     await page.locator(`[data-upgrade="${id}"]`).click();
   expect(await balance()).toBe(1000);
   await page.locator('[data-upgrade="knife"]').click();
   await page.getByRole('button', { name: 'Donate 125 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -125 Embers', exact: true }).click();
   expect(await balance()).toBe(875);
   await expect(page.locator('.temple-status')).toHaveCount(0);
   await expect(page.locator('.temple-header h2')).toHaveText('Temple');
   await page.getByRole('button', { name: 'Donate 150 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -150 Embers', exact: true }).click();
   expect(await balance()).toBe(725);
   await expect(page.locator('.template-detail')).toContainText('Throwing Knife · 2/3');
   await page.getByRole('button', { name: 'Donate 250 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -250 Embers', exact: true }).click();
   expect(await balance()).toBe(475);
   await expect(page.locator('.template-detail')).toContainText(
     '3 throwing knives · refill every duel',

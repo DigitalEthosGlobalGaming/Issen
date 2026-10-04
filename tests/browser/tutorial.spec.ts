@@ -15,7 +15,8 @@ test('first play starts a run directly and the menu tutorial remains optional', 
   await expect(page.locator('#paused')).toHaveClass(/on/);
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
-  await page.locator('#bTutorial').click();
+  await page.locator('#bOptions').click();
+  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
   await expect(tutorial).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: testInfo.outputPath('tutorial-portrait.png') });
@@ -61,7 +62,8 @@ test('first play starts a run directly and the menu tutorial remains optional', 
   expect(before.meta.bossMilestone).toBe(0);
   expect(before.stats.runs).toBe(1);
   await page.reload();
-  await page.locator('#bTutorial').click();
+  await page.locator('#bOptions').click();
+  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
   await expect(tutorial).toBeVisible();
   await page.getByRole('button', { name: 'Skip tutorial' }).click();
   await expect(tutorial).toBeHidden();

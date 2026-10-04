@@ -9,8 +9,10 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="offerings"]').click();
-  for (const price of [150, 250, 400])
+  for (const price of [150, 250, 400]) {
     await page.getByRole('button', { name: `Donate ${price} Embers`, exact: true }).click();
+    await page.getByRole('button', { name: `Yes -${price} Embers`, exact: true }).click();
+  }
   await expect(page.locator('.template-detail')).toContainText('1 guaranteed rare');
   await expect(page.locator('.template-detail')).toContainText('Offerings · 3/3');
   await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);

@@ -31,6 +31,10 @@
 .armHead .ph {
   margin: 0;
 }
+.armHead > .row {
+  margin: 0;
+  flex-wrap: nowrap;
+}
 .armHead .btn {
   min-width: 0;
   padding: 6px 18px;

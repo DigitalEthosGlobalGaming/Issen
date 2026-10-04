@@ -1,5 +1,21 @@
 # Premium supporter purchase
 
+## Current support phase
+
+Support Issen is visible on the title for every edition. The current screen
+explains that purchases are coming soon and offers free, temporary tester Premium.
+`issen.testerPremium` is a validated profile campaign; it does not record a paid
+entitlement. Disabling or changing the campaign retires tester access. Premium
+benefits include optional Second Wind and automatic double Embers in ordinary
+runs, with daily runs and Trials excluded. Web collection access alone does not
+enable those support benefits. See [support and progression](support-progression.md).
+
+`PLACEHOLDER_SUPPORT` currently prevents billing initialization regardless of SDK
+configuration. The RevenueCat adapter below remains available for the later store
+integration. No live ad or checkout is performed in this phase.
+
+## Earlier billing integration
+
 Version 1.11.0 implements the Android purchase UI and RevenueCat bridge. Live
 store configuration and physical sandbox transactions remain unverified. No
 advertising SDK is included. GitHub Pages billing remains unavailable.

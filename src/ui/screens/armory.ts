@@ -1,5 +1,6 @@
+import { SEVEN_DAWNS_IMAGE } from '../../rendering/crest-art.ts';
 const crestUrls: Record<string, string> = {
-  'seven-dawns': new URL('../assets/crest-seven-dawns.svg', import.meta.url).href,
+  'seven-dawns': SEVEN_DAWNS_IMAGE,
   tomoe: new URL('../assets/world-ui-crest-tomoe.png', import.meta.url).href,
   kikyo: new URL('../assets/world-ui-crest-kikyo.png', import.meta.url).href,
   juji: new URL('../assets/world-ui-crest-juji.png', import.meta.url).href,

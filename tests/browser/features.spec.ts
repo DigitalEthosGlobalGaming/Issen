@@ -8,7 +8,8 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
-  await page.locator('#bTutorial').click();
+  await page.locator('#bOptions').click();
+  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
   await expect(page.locator('.tutorial-overlay')).toBeVisible();
   await page.getByRole('button', { name: 'Skip tutorial' }).click();
   await expect(page.locator('.tutorial-overlay')).toBeHidden();
@@ -47,9 +48,12 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.screenshot({ path: testInfo.outputPath('template-portrait.png') });
   await page.locator('[data-upgrade="vitality"]').click();
   await page.getByRole('button', { name: 'Donate 100 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -100 Embers', exact: true }).click();
   await expect(page.locator('#templateContent')).toContainText('700 Embers');
   await page.getByRole('button', { name: 'Donate 200 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -200 Embers', exact: true }).click();
   await page.getByRole('button', { name: 'Donate 350 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -350 Embers', exact: true }).click();
   await expect(page.locator('#templateContent')).toContainText('150 Embers');
   await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);
   await page.reload();
@@ -83,6 +87,7 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
   const original = await page.evaluate(() => localStorage.getItem('issen.meta'));
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.keyboard.press('Control+Shift+A');
   await expect(page.locator('#admin')).toHaveClass(/on/);
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
@@ -187,8 +192,10 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
   await advance(30);
   await expect(page.locator('#resultEmbers')).toHaveText('12');
   await expect(page.locator('#resultGain')).toBeHidden();
-  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
-  await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
+  await page
+    .locator('.result-reward-actions')
+    .getByRole('button', { name: 'Continue', exact: true })
+    .evaluate((el: HTMLButtonElement) => el.click());
   await expect(page.locator('#runResultSequence')).toContainText('Boss Rush');
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());
   await page.locator('#runResultSequence').evaluate((el: HTMLElement) => el.click());

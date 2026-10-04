@@ -1,4 +1,4 @@
-import sevenDawnsSvg from '../ui/assets/crest-seven-dawns.svg?raw';
+import { SEVEN_DAWNS_PATHS } from './crest-art.ts';
 const dawnPaths: Path2D[] = [];
 const ATLAS_URL = new URL('../ui/assets/world-ui-atlas.png', import.meta.url).href;
 export type SealMaterial = 'paper' | 'wood' | 'metal' | 'silk' | 'stone';
@@ -87,9 +87,7 @@ export function drawCrestSprite(
   r: number,
 ) {
   if (id === 'seven-dawns') {
-    if (!dawnPaths.length)
-      for (const match of sevenDawnsSvg.matchAll(/<path d="([^"]+)"/g))
-        dawnPaths.push(new Path2D(match[1]));
+    if (!dawnPaths.length) for (const path of SEVEN_DAWNS_PATHS) dawnPaths.push(new Path2D(path));
     g.save();
     g.translate(x - r * 1.28, y - r * 1.28);
     g.scale((r * 2.56) / 100, (r * 2.56) / 100);

@@ -56,6 +56,9 @@ See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../featu
 | Scoring, records, statistics, unlocks                                   | `src/game/progression/`                                                |
 | Secret trigger counters and fixed-point eligibility                     | `src/game/progression/secret-events.ts`, `unlocks.ts`                  |
 | Temple upgrades, tutorial status, mode milestones                       | `src/game/progression/meta.ts`                                         |
+| Temple collection membership and eligible post-purchase counters        | `src/game/content/collections.ts`, `src/game/progression/collection-progress.ts` |
+| Awakening purchases, login streaks and loadout snapshots                 | `src/game/progression/awakening-purchases.ts`, `daily-login.ts`, `presets.ts` |
+| Tester Premium, rewarded support adapter and recoverable bonus offers   | `src/platform/tester-premium.ts`, `rewarded-support.ts`, `pending-support.ts` |
 | Trial presets, completion and cosmetic grants                           | `src/game/content/trials.ts`, `src/game/progression/trials.ts`           |
 | Pending Embers and one-time end-run settlement                          | `src/game/progression/run-rewards.ts`                                  |
 | First-encounter teaching state and overlay                              | `src/game/onboarding/`                                                 |
@@ -151,7 +154,7 @@ journal and recovery. See [save transfer](../features/save-transfer.md).
   modifiers and consumables are captured at run start and apply only to opted-in,
   arrow-guided Normal Waves runs with Normal lives. Normal starts at two lives,
   with equipment/upgrades added without a total life cap. Tutorial practice owns separate state and never
-  records gameplay rewards. It is optional from the title menu; first play starts
+  records gameplay rewards. It is optional under Options from the title; first play starts
   a normal run. The runtime persists its completion/skip callback.
 - Combat accrues half-rate Embers in a run-local ledger and writes them to
   `issen.meta` only when death or explicit End run settles the run. The runtime
@@ -173,6 +176,8 @@ journal and recovery. See [save transfer](../features/save-transfer.md).
   rank 2 outfits). Metadata schema 3 preserves old combined access as rank 2. Existing lifetime blade
   progress migrates once. Awakened sources replace their base category source;
   upgrades Off suppresses both forms without deleting ownership or progress.
+  Completed challenges enable an Ember purchase rather than automatically
+  granting a form. Previously earned forms remain owned.
 - `progression/modes.ts` preserves existing record identities and adds a `-base`
   suffix for upgrades-off runs, so new base-play scores do not overwrite upgraded
   records. Normal-life setup retains its saved `'3'` identifier despite the new

@@ -93,6 +93,7 @@ test('a fatal loss is terminal before its animation and settles once after reloa
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).status),
   ).toBe('lost');
   await page.reload();
+  await page.getByRole('button', { name: 'No thanks', exact: true }).click();
   await expect(page.locator('#over')).toHaveClass(/on/);
   await expect(page.locator('#bContinue')).toBeHidden();
   const deaths = await page.evaluate(

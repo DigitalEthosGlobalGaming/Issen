@@ -84,6 +84,7 @@ test('Temple rank one unlocks only weapons; rank two reveals outfit challenges',
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="awakening"]').click();
   await page.getByRole('button', { name: 'Donate 200 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -200 Embers', exact: true }).click();
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   await expect(page.locator('#armInfo')).toContainText('Cut down');
@@ -92,6 +93,7 @@ test('Temple rank one unlocks only weapons; rank two reveals outfit challenges',
   await page.locator('#armory [data-back]').click();
   await page.locator('#bTemplate').click();
   await page.getByRole('button', { name: 'Donate 300 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -300 Embers', exact: true }).click();
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Outfits/ }).click();

@@ -13,7 +13,8 @@ test('built assets include fresh onboarding, Template and isolated testing tools
   await page.addInitScript(() => localStorage.removeItem('issen.meta'));
   await page.goto('/');
   await expect(page.locator('#bTrials')).toBeHidden();
-  await page.locator('#bTutorial').click();
+  await page.locator('#bOptions').click();
+  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
   await expect(page.locator('.tutorial-overlay')).toBeVisible();
   await page.getByRole('button', { name: 'Skip tutorial' }).click();
   await expect(page.locator('#title')).toHaveClass(/on/);

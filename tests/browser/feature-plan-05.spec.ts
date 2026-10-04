@@ -16,10 +16,13 @@ test('Temple rank copy and owned Armoury conditions stay concise', async ({ page
   await expect(detail).not.toContainText('Current:');
   await expect(detail).not.toContainText('equipment bonuses');
   await page.getByRole('button', { name: 'Donate 100 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -100 Embers', exact: true }).click();
   await expect(detail).toContainText('Current: 3 starting lives');
   await expect(detail).toContainText('Next: 4 starting lives');
   await page.getByRole('button', { name: 'Donate 200 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -200 Embers', exact: true }).click();
   await page.getByRole('button', { name: 'Donate 350 Embers' }).click();
+  await page.getByRole('button', { name: 'Yes -350 Embers', exact: true }).click();
   await expect(detail).toContainText('Current: 5 starting lives');
   await expect(detail).not.toContainText('Next:');
   await page.locator('#template [data-back]').click();
