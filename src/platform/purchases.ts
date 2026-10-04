@@ -7,7 +7,9 @@ import {
 import { createPremium, PREMIUM_PRODUCT } from './premium.ts';
 
 export const nativePurchases = Capacitor.isNativePlatform();
-export const premiumEnabled = nativePurchases && import.meta.env.VITE_PREMIUM_ENABLED === 'true';
+export const PLACEHOLDER_SUPPORT = true;
+export const premiumEnabled =
+  !PLACEHOLDER_SUPPORT && nativePurchases && import.meta.env.VITE_PREMIUM_ENABLED === 'true';
 const key = import.meta.env.VITE_REVENUECAT_ANDROID_KEY as string | undefined;
 const enabled =
   premiumEnabled &&

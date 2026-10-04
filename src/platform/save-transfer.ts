@@ -7,6 +7,7 @@ import { unlockEligibleItems } from '../game/progression/unlocks.ts';
 import { reconcileCinematicCompanion } from '../game/progression/secret-events.ts';
 import { createItems } from '../game/content/items.ts';
 import { parseRunCheckpoint } from './run-checkpoint.ts';
+import { parseTesterPremium } from './tester-premium.ts';
 
 export type SaveData = Record<string, unknown>;
 const record = (value: unknown): value is SaveData =>
@@ -180,6 +181,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     trials,
     meta,
     awakening,
+    testerPremium: parseTesterPremium(merge(local.testerPremium, incoming.testerPremium)),
     equip: parseEquipment(preferences(local.equip, incoming.equip), unlocked, items),
     setup: parseSetup(preferences(local.setup, incoming.setup)),
     settings: parseSettings(

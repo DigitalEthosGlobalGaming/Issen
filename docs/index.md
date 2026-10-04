@@ -1,6 +1,9 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 # Repository documentation
 
+- [Support and progression](features/support-progression.md): implemented support
+  screens and complimentary tester Premium; later feature sets remain in the plan.
+
 - [Performance testing](../tests/performance/README.md): repeatable web profiling,
   isolated Android WebView adapter, saved reports and measurement limitations.
 

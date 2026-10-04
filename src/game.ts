@@ -8,7 +8,7 @@ import { createInkCompanionRenderer } from './rendering/figures/ink-companions.t
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
-import { premium, premiumEnabled, listenToPurchases } from './platform/purchases.ts';
+import { premium, listenToPurchases } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
 import {
   editionAccess,
@@ -18,6 +18,11 @@ import {
 } from './platform/editions.ts';
 import { swiftSlashPoints, precisionZone, duelMasterTimings } from './game/progression/mastery.ts';
 import { PREMIUM_FILM } from './platform/premium.ts';
+import {
+  TESTER_PREMIUM_CAMPAIGN,
+  testerPremiumActive,
+  parseTesterPremium,
+} from './platform/tester-premium.ts';
 import { renderSupport } from './ui/screens/support.ts';
 import type { Item, ItemCategory } from './game/content/items.ts';
 import type { Enemy } from './game/combat/enemy.ts';
@@ -252,7 +257,9 @@ export function startGame(): () => void {
   );
   lifecycle.add(combatHaptics.stop);
   const edition = import.meta.env.VITE_GAME_EDITION as GameEdition;
-  const premiumAccess = () => editionAccess(edition, premium.state.owned);
+  let testerPremium = parseTesterPremium(store.get('issen.testerPremium', null));
+  const premiumAccess = () =>
+    editionAccess(edition, premium.state.owned || testerPremiumActive(testerPremium));
   const accessible = (id: string) => itemAccessible(id, premiumAccess());
   const density = () => preferredDensity(settings.quality, effectQuality.density, reducedMotion());
   const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
@@ -385,7 +392,7 @@ export function startGame(): () => void {
     $('bContinue').hidden = !available;
     $('bAbandon').hidden = !available;
     $('bPlay').textContent = available ? 'Start new run' : 'Draw your blade';
-    for (const id of ['bArmory', 'bStats', 'bTemplate', 'bTutorial', 'bTrials'])
+    for (const id of ['bArmory', 'bStats', 'bTemplate', 'bSupport', 'bTrials'])
       ($(id) as HTMLButtonElement).disabled = available;
     $('tSeed').textContent = available
       ? savedRun!.dailyDay
@@ -2823,7 +2830,7 @@ export function startGame(): () => void {
     G.panel = id;
     if (id === 'support') {
       supportPreview.draw(previewFrame(PREMIUM_FILM, false));
-      renderSupport($('support'), premium.state, premium.available);
+      renderSupport($('support'), premium.state, testerPremiumActive(testerPremium));
       void premium.refresh();
     }
     if (id === 'armory') {
@@ -3140,6 +3147,9 @@ export function startGame(): () => void {
       saveSettings();
     },
     closePanel,
+    () => {
+      if (G.state === 'title' && savedRun?.status !== 'active') launchTutorial();
+    },
   );
   lifecycle.add(options.dispose);
   lifecycle.listen(systemMotion, 'change', applySettings);
@@ -3491,13 +3501,18 @@ export function startGame(): () => void {
     G.panel = null;
     startRun();
   });
-  $('bSupport').hidden = !premiumEnabled;
-  $('support').hidden = !premiumEnabled;
+  $('bSupport').hidden = false;
   lifecycle.add(
     premium.subscribe((state) => {
       if (lifecycle.disposed) return;
       $('premiumBadge').hidden = !premiumAccess();
-      $('premiumBadge').textContent = edition === 'web' ? 'Web' : 'Premium';
+      $('premiumBadge').textContent = premium.state.owned
+        ? 'Premium'
+        : testerPremiumActive(testerPremium)
+          ? 'Tester Premium'
+          : edition === 'web'
+            ? 'Web'
+            : 'Premium';
       if (premiumAccess()) {
         UNL.add(PREMIUM_FILM);
         if (initialPurchaseCheck) {
@@ -3525,7 +3540,7 @@ export function startGame(): () => void {
           computeMods();
         }
       }
-      renderSupport($('support'), state, premium.available);
+      renderSupport($('support'), state, testerPremiumActive(testerPremium));
       if (G.panel === 'armory') renderArmory();
       if (G.panel === 'template')
         renderTemplate($('templateContent'), META, saveMeta, premiumAccess());
@@ -3548,7 +3563,12 @@ export function startGame(): () => void {
     if (!lifecycle.disposed) audio.setPaused(G.state === 'paused' || guided.frozen);
   };
   lifecycle.listen($('bPurchasePremium'), 'click', () => {
-    void purchaseAction(premium.purchase);
+    testerPremium = { campaign: TESTER_PREMIUM_CAMPAIGN };
+    store.set('issen.testerPremium', testerPremium);
+    UNL.add(PREMIUM_FILM);
+    $('premiumBadge').hidden = false;
+    $('premiumBadge').textContent = 'Tester Premium';
+    renderSupport($('support'), premium.state, true);
   });
   lifecycle.listen($('bRestorePremium'), 'click', () => {
     void purchaseAction(premium.restore);
@@ -3565,7 +3585,6 @@ export function startGame(): () => void {
   lifecycle.listen($('bArmory'), 'click', () => openPanel('armory'));
   lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
   lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
-  lifecycle.listen($('bTutorial'), 'click', launchTutorial);
   lifecycle.listen($('bTrials'), 'click', () => openPanel('trials'));
   const openOptions = () => {
     if (G.panel === 'options') return;

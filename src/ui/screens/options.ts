@@ -20,6 +20,7 @@ export function createOptions(
   settings: Settings,
   changed: () => void,
   closed: () => void,
+  tutorial?: () => void,
 ) {
   const doc = root.ownerDocument,
     win = doc.defaultView!;
@@ -34,6 +35,7 @@ export function createOptions(
     message = '';
   let historyId = '',
     session = 0;
+  let afterClose: (() => void) | null = null;
   const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '', className = '') => {
     const el = doc.createElement(tag);
     el.textContent = text;
@@ -150,6 +152,9 @@ export function createOptions(
     root.hidden = true;
     closed();
     origin?.focus({ preventScroll: true });
+    const action = afterClose;
+    afterClose = null;
+    action?.();
   }
   function render(focus = false) {
     renderEvents.abort();
@@ -179,6 +184,13 @@ export function createOptions(
         el.append(node('strong', TITLES[category]), node('small', summaries[category]));
         content.append(el);
       }
+      if (tutorial)
+        content.append(
+          button('Tutorial', () => {
+            afterClose = tutorial;
+            back();
+          }),
+        );
     } else if (page === 'audio') {
       checkbox('muted', 'Master mute', 'Keep your volume choices while sound is muted.');
       volume('effectsVolume', 'Sound effects');
