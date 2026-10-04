@@ -19,3 +19,22 @@ phase. The separate support screen activates tester access, never paid ownership
 
 Implementation of the remaining sets follows the
 [feature plan](support-and-progression-plan.md).
+
+## 1.53.0 — Support rewards
+
+Every eligible fatal loss offers one optional support revive, restarting the wave
+or duel with half maximum lives rounded up. Declining ends the run. A later death
+can offer a new revive. Trials, daily runs, Zen and No Lives do not offer revives.
+Phoenix and Daruma still resolve first and are not consumed by support revives.
+
+Ordinary non-Zen results offer one Ember doubling before settlement. Trials and
+daily runs are excluded. Paid Premium, Premium builds and active tester Premium
+double automatically and acknowledge optional revives. Web collection access alone
+does not grant support benefits. The multiplier applies only to pending run rewards,
+preserving the previous fractional carry. Checkpoints retain the death-offer decision
+and reward multiplier; settlement remains idempotent.
+
+`platform/rewarded-support.ts` exposes an injectable async provider returning a
+verified completion boolean. The current placeholder grants only after completing
+the separate support acknowledgement. Cancellation/failure grants nothing. Screen
+events are isolated from gameplay input; keyboard combat is gated while it is open.

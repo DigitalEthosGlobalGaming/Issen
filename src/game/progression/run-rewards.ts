@@ -13,6 +13,8 @@ const MAX_CURRENCY = 1_000_000_000;
 const BASE_REWARD: Record<RewardEvent, number> = { kill: 1, wave: 5, boss: 25 };
 
 export interface RunRewardLedger {
+  /** Persisted choice before settlement; absent means no support choice yet. */
+  supportMultiplier?: 1 | 2;
   /** Hundredths of Embers; never stored in the account until settlement. */
   pending: number;
   settled: RewardSettlement | null;
@@ -46,7 +48,9 @@ export function accrueRunReward(
 export function settleRunReward(meta: MetaProgress, ledger: RunRewardLedger): RewardSettlement {
   if (ledger.settled) return ledger.settled;
   const before = meta.embers;
-  const hundredths = Math.max(0, Math.min(99, meta.emberRemainder)) + ledger.pending;
+  const hundredths =
+    Math.max(0, Math.min(99, meta.emberRemainder)) +
+    ledger.pending * (ledger.supportMultiplier === 2 ? 2 : 1);
   const available = Math.floor(hundredths / 100);
   meta.emberRemainder = hundredths % 100;
   meta.embers = Math.min(MAX_CURRENCY, before + available);

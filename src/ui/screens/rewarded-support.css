@@ -1,0 +1,20 @@
+.support-reward-dialog {
+  width: min(420px, calc(100vw - 40px));
+  box-sizing: border-box;
+  padding: 28px 24px;
+  color: var(--paper, #e8dfce);
+  background: #211e19;
+  border: 1px solid #75664c;
+  text-align: center;
+  font-family: inherit;
+}
+.support-reward-dialog::backdrop {
+  background: rgb(0 0 0 / 75%);
+}
+.support-reward-dialog p {
+  line-height: 1.65;
+}
+.support-reward-dialog .btn {
+  display: block;
+  margin: 16px auto 0;
+}

@@ -144,6 +144,12 @@ export function parseRunCheckpoint(raw: unknown): RunCheckpoint | null {
   )
     return null;
   run.tanto = run.tanto ?? 0;
+  run.reviveOfferResolved = run.reviveOfferResolved === true;
+  if (
+    raw.ledger.supportMultiplier !== undefined &&
+    ![1, 2].includes(Number(raw.ledger.supportMultiplier))
+  )
+    return null;
   run.shrineRerolls = run.shrineRerolls === 1 ? 1 : 0;
   const triggers = run.blessingTriggers;
   if (triggers !== undefined) {

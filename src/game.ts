@@ -1,3 +1,5 @@
+import { createRewardedSupport } from './platform/rewarded-support.ts';
+import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
 import { createScrollMenus } from './ui/scroll-menus.ts';
 import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.ts';
@@ -844,16 +846,19 @@ export function startGame(): () => void {
     flash(0.25, '150,200,255');
     sfx.glint();
   }
-  function reviveDaruma(ph = false) {
-    if (ph) G.phoenixUsed = true;
-    else G.darumaUsed = true;
+  function reviveDaruma(ph = false, support = false) {
+    if (!support) {
+      if (ph) G.phoenixUsed = true;
+      else G.darumaUsed = true;
+    }
     timeScale = 1;
     lbT = 0;
     P.fall = 0;
     P.pose = { ...PREST };
     breakCombo();
     G.pStreak = 0;
-    if (!G.zen && !G.hard) G.lives = ph ? G.maxLives : 1;
+    if (!G.zen && !G.hard)
+      G.lives = support ? Math.max(1, Math.ceil(G.maxLives / 2)) : ph ? G.maxLives : 1;
     renderLives();
     setScore();
     hud(true);
@@ -868,7 +873,8 @@ export function startGame(): () => void {
       G.bossCount--;
       startBoss();
     } else startWave(G.wave, true);
-    if (ph) banner('鳳凰', 'Rise from the ashes');
+    if (support) banner('起', 'Another stroke');
+    else if (ph) banner('鳳凰', 'Rise from the ashes');
     else banner('達磨', 'Seven times down, eight times up');
     stamp(ph ? '鳳' : '起', 0, 0, Math.max(60, 86 * S), true, 1.6);
     flash(0.5, '255,240,220');
@@ -2683,6 +2689,7 @@ export function startGame(): () => void {
     G.diedInBoss = !!(G.boss && G.boss.state !== 'dying');
     G.state = 'dead';
     G.deathT = 0;
+    G.reviveOfferResolved = false;
     G.reason = reason;
     captureCheckpoint('lost');
     timeScale = 0.3;
@@ -2739,7 +2746,54 @@ export function startGame(): () => void {
     savedRun = null;
     updateSavedRunButtons();
   }
+  const rewardSupport = createRewardedSupport();
+  const rewardScreen = createRewardScreen(document.body);
+  lifecycle.add(rewardScreen.dispose);
+  let rewardFlowBusy = false;
+  // Support benefits are independent of Web collection access.
+  const supportPremium = () =>
+    premium.state.owned || edition === 'premium' || testerPremiumActive(testerPremium);
   function showOver() {
+    if (rewardFlowBusy) return;
+    const eligible = !activeDaily && !activeTrial && !G.zen;
+    const revive = eligible && !G.hard && G.state === 'dead' && !G.reviveOfferResolved;
+    const double =
+      eligible && rewardLedger.pending > 0 && rewardLedger.supportMultiplier === undefined;
+    if (revive || double) {
+      rewardFlowBusy = true;
+      void (async () => {
+        if (revive) {
+          const completed = await rewardScreen.offer(
+            'revive',
+            supportPremium(),
+            testerPremiumActive(testerPremium),
+            Math.max(1, Math.ceil(G.maxLives / 2)),
+          );
+          if (lifecycle.disposed) return;
+          const granted = completed && (await rewardSupport.claim('revive', supportPremium()));
+          if (lifecycle.disposed) return;
+          G.reviveOfferResolved = true;
+          captureCheckpoint('lost');
+          if (granted) {
+            rewardFlowBusy = false;
+            reviveDaruma(false, true);
+            return;
+          }
+        }
+        if (double) {
+          const completed =
+            supportPremium() || (await rewardScreen.offer('embers', false, false, 0));
+          if (lifecycle.disposed) return;
+          const granted = completed && (await rewardSupport.claim('embers', supportPremium()));
+          if (lifecycle.disposed) return;
+          rewardLedger.supportMultiplier = granted ? 2 : 1;
+          captureCheckpoint(G.state === 'dead' ? 'lost' : 'ended');
+        }
+        rewardFlowBusy = false;
+        showOver();
+      })();
+      return;
+    }
     if (activeDaily) {
       finishDaily();
       return;
@@ -3622,7 +3676,7 @@ export function startGame(): () => void {
   lifecycle.listen($('bMenu'), 'click', toTitle);
   document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
   const disposeKeyboard = bindKeyboard({
-    active: pageActive,
+    active: () => pageActive() && !rewardScreen.open,
     bindings: () => settings.bindings,
     state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
     closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
@@ -3769,7 +3823,7 @@ export function startGame(): () => void {
         } else nextStep();
       }
     }
-    if (G.state === 'dead') {
+    if (G.state === 'dead' && !rewardFlowBusy) {
       G.deathT += raw;
       P.fall = clamp((G.deathT - 0.3) / 0.9);
       timeScale = lerp(0.3, 0.6, clamp(G.deathT / 1.5));
