@@ -35,7 +35,7 @@ async function observe(page: import('@playwright/test').Page) {
   await page.waitForFunction(() => !!(window as any).__performance);
 }
 
-test('only opaque inspection stops main drawing; previews, scroll backgrounds and return stay live', async ({
+test('settled Armoury holds the main scene while both preview sizes remain animated', async ({
   page,
 }) => {
   await observe(page);
@@ -45,8 +45,13 @@ test('only opaque inspection stops main drawing; previews, scroll backgrounds an
       main: (window as any).performanceProbe.main,
       preview: (window as any).performanceProbe.preview,
     }));
+  await page.waitForTimeout(600);
   let before = await count();
-  await expect.poll(async () => (await count()).main).toBeGreaterThan(before.main);
+  const scene = await page.evaluate(() => (window as any).__performance.state());
+  await page.waitForTimeout(350);
+  expect((await count()).main).toBe(before.main);
+  expect((await count()).preview).toBeGreaterThan(before.preview);
+  expect(await page.evaluate(() => (window as any).__performance.state())).toEqual(scene);
   await page.locator('#prevC').click();
   await expect(page.getByRole('dialog', { name: 'Equipment inspection' })).toBeVisible();
   before = await count();
@@ -56,9 +61,92 @@ test('only opaque inspection stops main drawing; previews, scroll backgrounds an
   expect(after.preview).toBeGreaterThan(before.preview);
   await page.setViewportSize({ width: 844, height: 390 });
   await page.waitForTimeout(150);
+  expect((await count()).main).toBe(before.main);
   await page.keyboard.press('Escape');
-  await expect.poll(async () => (await count()).main).toBeGreaterThan(before.main);
   await expect(page.locator('#prevC')).toBeFocused();
+  // Resize invalidation redraws the uncovered snapshot, then settles again.
+  await expect.poll(async () => (await count()).main).toBeGreaterThan(before.main);
+  await page.waitForTimeout(600);
+  before = await count();
+  await page.waitForTimeout(200);
+  expect((await count()).main).toBe(before.main);
+  expect((await count()).preview).toBeGreaterThan(before.preview);
+  await page.locator('#armory [data-back]').click();
+  await expect.poll(async () => (await count()).main).toBeGreaterThan(before.main);
+});
+
+for (const [button, screen] of [
+  ['bStats', 'stats'],
+  ['bOptions', 'options'],
+] as const)
+  test(`${screen} stops scene simulation and drawing after settling, then resumes on return`, async ({
+    page,
+  }) => {
+    await observe(page);
+    await page.locator(`#${button}`).click();
+    await page.waitForTimeout(600);
+    const state = () =>
+      page.evaluate(() => ({
+        scene: (window as any).__performance.state(),
+        stamps: (window as any).performanceProbe.main,
+      }));
+    const before = await state();
+    await page.waitForTimeout(350);
+    expect(await state()).toEqual(before);
+    if (screen === 'options')
+      await page.locator('#options').getByRole('button', { name: 'Done', exact: true }).click();
+    else await page.locator(`#${screen} [data-back]`).click();
+    await expect.poll(async () => (await state()).stamps).toBeGreaterThan(before.stamps);
+  });
+
+test('unchanged resizes preserve the snapshot; backing size and DPR changes prepare it again', async ({
+  page,
+}) => {
+  await observe(page);
+  await page.locator('#bStats').click();
+  await page.waitForTimeout(600);
+  await page.evaluate(() => {
+    const create = document.createElement.bind(document);
+    (window as any).resizeCanvases = 0;
+    document.createElement = ((...args: Parameters<typeof create>) => {
+      if (args[0] === 'canvas') (window as any).resizeCanvases++;
+      return Reflect.apply(create, document, args);
+    }) as typeof document.createElement;
+  });
+  const state = () =>
+    page.evaluate(() => ({
+      scene: (window as any).__performance.state(),
+      stamps: (window as any).performanceProbe.main,
+      canvases: (window as any).resizeCanvases,
+    }));
+  const before = await state();
+  for (let event = 0; event < 3; event++) {
+    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+    await page.waitForTimeout(130);
+  }
+  expect(await state()).toEqual(before);
+  await page.evaluate(() => {
+    (document.querySelector('#c') as HTMLCanvasElement).width = 1;
+    window.dispatchEvent(new Event('resize'));
+  });
+  await expect.poll(async () => (await state()).canvases).toBeGreaterThan(0);
+  const size = () =>
+    page.locator('#c').evaluate((canvas: HTMLCanvasElement) => ({
+      width: canvas.width,
+      height: canvas.height,
+      rect: canvas.getBoundingClientRect().toJSON(),
+      dpr: Math.min(2, devicePixelRatio),
+    }));
+  let resized = await size();
+  expect(resized.width).toBe(Math.round(resized.rect.width * resized.dpr));
+  expect(resized.height).toBe(Math.round(resized.rect.height * resized.dpr));
+  await page.evaluate(() => {
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 1 });
+    window.dispatchEvent(new Event('resize'));
+  });
+  await expect.poll(async () => (await size()).width).toBe(Math.round(resized.rect.width));
+  resized = await size();
+  expect(resized.height).toBe(Math.round(resized.rect.height));
 });
 
 for (const event of ['blur', 'visibilitychange'] as const)

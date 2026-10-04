@@ -1,4 +1,5 @@
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
+
 # Repository documentation
 
 - [Support and progression](features/support-progression.md): implemented support
@@ -81,3 +82,4 @@
 - [Changelog](features/changelog.md): release notes and persistent update indication.
 
 - [Artwork performance](features/rendering-performance.md): reproducible sprite stress workloads, bounded tint caches and measured results.
+- [Menu scheduling follow-up](features/performance-follow-up-2026-10-04.md): feature-release baseline, menu/preview cadence, resize preparation and validation.

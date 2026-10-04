@@ -70,11 +70,40 @@ Instrumentation adds timing calls and sample arrays. Compare only identically
 instrumented runs. CPU/heap/trace collection takes place in separate contexts
 from headline timing; allocation-heavy canvas counters run in a further separate
 one-second window. The probe does not create a requestAnimationFrame loop of its
-own. Forced GC is used only in the explicit retained-memory experiment, not in
+own. Preview callback intervals are recorded independently from main
+render intervals. Settled snapshot scenarios may have no main callbacks; animated
+scenes and visible Armoury previews must still produce callbacks. The estimated
+missed-slot calculation uses a 60 fps target for visible animated scenes.
+Forced GC is used only in the explicit retained-memory experiment, not in
 timing windows. Audio contexts and observed canvas/image objects are instrumented;
 CSS images, browser-internal surfaces and all decoded/GPU storage are not counted.
 
 ## Results and interpretation
+
+For a failed full web run, a bounded recovery can reuse its exact saved build and
+retain every completed sample:
+
+```sh
+node tests/performance/benchmarks/resume-run.mjs tmp/performance/<failed-run>
+```
+
+This writes a new folder, preserves the original failed results and records which
+missing samples/diagnostics were completed. It rejects changed host, browser,
+graphics or tooling identity. It neither rebuilds nor replaces successful samples.
+A recovered run becomes passing only when all required repetitions and diagnostics
+exist. Report the failure and recovery when using it as a baseline.
+
+For the separate unchanged-viewport resize investigation:
+
+```sh
+node tests/performance/benchmarks/measure-noop-resize.mjs tmp/performance/<saved-build> tmp/performance/<result>.json
+```
+
+This uses five fresh contexts, each with five unchanged-geometry resize events
+650 ms apart in settled Stats. It records browser task time, created canvases and
+scene state, preserving build provenance. Its server owns port 5299. Run cases
+sequentially, without overlapping the main suite. This synthetic event workload
+does not represent normal combat, real viewport changes or phone power usage.
 
 Each invocation creates `tmp/performance/<timestamp-id>/` containing:
 

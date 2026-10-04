@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { options, allScenarios } from './config.mjs';
 import { stats, comparison } from './report.mjs';
 import { instrumentRuntime } from './build-plugin.mjs';
-import { checkState } from './scenarios.mjs';
+import { checkState, checkPresentation } from './scenarios.mjs';
 import { androidPreflight } from './targets.mjs';
 
 test('Android requires explicit authorised device and verifies emulator identity', () => {
@@ -80,4 +80,17 @@ test('scenario invariants detect stress drift, dead runs and inactive simulation
   assert.throws(() => checkState('combat', {}, { state: 'dead' }), /unexpectedly/);
   assert.throws(() => checkState('inactive-combat', { time: 1 }, { time: 2 }), /advanced/);
   checkState('stress-100', { enemies: 100 }, { enemies: 100, kills: 0 });
+});
+
+test('presentation guards accept settled snapshots but require animated scenes and previews', () => {
+  const initial = { time: 1 };
+  const sample = { renders: [], updates: [], previews: [], state: initial };
+  checkPresentation('stats', initial, sample);
+  assert.throws(() => checkPresentation('title', initial, sample), /Animated/);
+  assert.throws(() => checkPresentation('armoury', initial, sample), /preview stopped/);
+  checkPresentation('inspection', initial, { ...sample, previews: [1] });
+  assert.throws(
+    () => checkPresentation('stats', initial, { ...sample, state: { time: 2 } }),
+    /continued simulation/,
+  );
 });

@@ -10,8 +10,15 @@ export interface FrameScheduler {
   cancel(handle: number): void;
 }
 
+export interface FrameDemand {
+  update: boolean;
+  render: boolean;
+  afterRender: boolean;
+}
+
 export interface FrameCallbacks {
   maxFps?(): number;
+  demand?(): FrameDemand;
   paused(): boolean;
   update(delta: number, raw: number): void;
   render(raw: number): void;
@@ -59,11 +66,14 @@ export function createFrameLoop(
     const raw = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
     const workStart = scheduler.now();
-    const delta = frameDelta(raw, timing);
-    if (!callbacks.paused()) callbacks.update(delta, raw);
-    callbacks.render(raw);
-    callbacks.afterRender();
-    callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
+    const demand = callbacks.demand?.();
+    if (!demand || demand.update) {
+      const delta = frameDelta(raw, timing);
+      if (!callbacks.paused()) callbacks.update(delta, raw);
+    }
+    if (!demand || demand.render) callbacks.render(raw);
+    if (!demand || demand.afterRender) callbacks.afterRender();
+    if (!demand || demand.render) callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
     if (running) handle = scheduler.request(frame);
   }
 

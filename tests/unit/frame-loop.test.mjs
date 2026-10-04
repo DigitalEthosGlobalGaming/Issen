@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFrameLoop, frameDelta } from '../../src/platform/frame-loop.ts';
 
-test('high refresh displays retain real-time combat at 60 fps and menus at 30 fps', () => {
+test('high refresh displays retain real time at declared 60 and 30 fps caps', () => {
   let now = 0,
     callback,
     fps = 60,
@@ -40,6 +40,46 @@ test('high refresh displays retain real-time combat at 60 fps and menus at 30 fp
   }
   assert.ok(updates.length >= 30 && updates.length <= 31);
   assert.ok(Math.abs(updates.reduce((a, b) => a + b, 0) - 1) < 0.04);
+  loop.stop();
+});
+
+test('settled surfaces suppress work without consuming combat timing or catching up', () => {
+  let now = 0,
+    callback,
+    active = false;
+  const calls = [];
+  const timing = { hitStop: 1, slowT: 1, timeScale: 1 };
+  const loop = createFrameLoop(
+    timing,
+    {
+      demand: () => ({ update: active, render: active, afterRender: true }),
+      paused: () => false,
+      update: (delta, raw) => calls.push(['update', raw]),
+      render: () => calls.push(['render']),
+      afterRender: () => calls.push(['preview']),
+    },
+    {
+      now: () => now,
+      request: (cb) => {
+        callback = cb;
+        return 1;
+      },
+      cancel() {},
+    },
+  );
+  loop.start();
+  for (let i = 1; i <= 100; i++) {
+    now = i * 16;
+    callback(now);
+  }
+  assert.equal(calls.length, 100);
+  assert.ok(calls.every((call) => call[0] === 'preview'));
+  assert.equal(timing.hitStop, 1);
+  assert.equal(timing.slowT, 1);
+  active = true;
+  now += 16;
+  callback(now);
+  assert.deepEqual(calls.slice(-3), [['update', 0.016], ['render'], ['preview']]);
   loop.stop();
 });
 

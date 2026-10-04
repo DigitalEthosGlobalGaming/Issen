@@ -27,6 +27,7 @@ test('leaving the window stops scene work, audio and tutorial time without chang
   await page.locator('#bBegin').click();
   await page.keyboard.press('p');
   await expect(page.locator('#bResume')).toBeVisible();
+  await page.waitForTimeout(550);
   await page.evaluate(async () => {
     const { activeNow } = await import('/src/platform/activity.ts');
     Object.assign(window, { activityNow: activeNow });
@@ -52,9 +53,13 @@ test('leaving the window stops scene work, audio and tutorial time without chang
     .toBe('suspended');
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(page.locator('#bResume')).toBeVisible();
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(() => (window as any).activityProbe.stamps)).toBe(before.stamps);
+  await page.locator('#bResume').click();
   await expect
     .poll(() => page.evaluate(() => (window as any).activityProbe.stamps))
     .toBeGreaterThan(before.stamps);
+  await page.keyboard.press('p');
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bOptions').click();

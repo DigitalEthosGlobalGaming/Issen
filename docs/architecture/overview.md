@@ -46,39 +46,39 @@ See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../featu
 
 ## Where changes belong
 
-| Concern                                                                 | Maintained location                                                    |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Run fields and restart initialization                                   | `src/game/run-state.ts`                                                |
-| Enemy spawn, targeting, damage, simulation                              | `src/game/combat/`                                                     |
-| Wave difficulty, boss factories/openings/updates, standoffs             | `src/game/encounters/`                                                 |
-| Items, stages, cosmetics, bosses, blessings, awakenings                 | `src/game/content/`                                                    |
-| Modifier composition and shrine rules                                   | `src/game/equipment/`, `src/game/shrine/`                              |
-| Scoring, records, statistics, unlocks                                   | `src/game/progression/`                                                |
-| Secret trigger counters and fixed-point eligibility                     | `src/game/progression/secret-events.ts`, `unlocks.ts`                  |
-| Temple upgrades, tutorial status, mode milestones                       | `src/game/progression/meta.ts`                                         |
-| Temple collection membership and eligible post-purchase counters        | `src/game/content/collections.ts`, `src/game/progression/collection-progress.ts` |
-| Awakening purchases, login streaks and loadout snapshots                 | `src/game/progression/awakening-purchases.ts`, `daily-login.ts`, `presets.ts` |
-| Tester Premium, rewarded support adapter and recoverable bonus offers   | `src/platform/tester-premium.ts`, `rewarded-support.ts`, `pending-support.ts` |
-| Trial presets, completion and cosmetic grants                           | `src/game/content/trials.ts`, `src/game/progression/trials.ts`           |
-| Pending Embers and one-time end-run settlement                          | `src/game/progression/run-rewards.ts`                                  |
-| First-encounter teaching state and overlay                              | `src/game/onboarding/`                                                 |
-| Run-end tally/reveal and viewed Armoury gear                            | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts` |
-| Independent gated blade/outfit challenges                               | `src/game/progression/awakening-progress.ts`, `unlocks.ts`             |
-| Outfit awakening catalog                                                | `src/game/content/robe-awakenings.ts`                                  |
-| Knife target selection and charge spending                              | `src/game/combat/knife.ts`                                             |
-| Tutorial practice scene and isolated canvas                             | `src/ui/screens/tutorial.ts`, `tutorial.css`                           |
-| Temple and testing menu controls                                        | `src/ui/screens/template.ts`, `admin.ts`                               |
-| Backgrounds, ambient grass/leaves, weather                              | `src/rendering/scene/`                                                 |
-| Figure geometry, poses, player animation, projection                    | `src/rendering/figures/`                                               |
-| Particle state, spawning, updates, drawing, films                       | `src/rendering/effects/`                                               |
-| Isolated armory rendering                                               | `src/rendering/armory-preview.ts`                                      |
-| Screen fragments and controllers                                        | `src/ui/screens/`                                                      |
-| HUD/navigation, hints/toasts, scroll menu presentation                    | `src/ui/`                                                              |
-| Pointer and keyboard adapters                                           | `src/input/`                                                           |
-| Validated profile settings and Options submenus                         | `src/platform/settings.ts`, `src/ui/screens/options.ts`                |
-| Death style selection, poses, durations and ground-shadow fading        | `src/rendering/figures/death.ts`, `figure.ts`                           |
-| Synthesized cues, audio context and ambience                            | `src/audio/audio.ts`                                                   |
-| Save validation, storage, haptics, lifecycle, frame scheduling | `src/platform/`                                                        |
+| Concern                                                               | Maintained location                                                              |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Run fields and restart initialization                                 | `src/game/run-state.ts`                                                          |
+| Enemy spawn, targeting, damage, simulation                            | `src/game/combat/`                                                               |
+| Wave difficulty, boss factories/openings/updates, standoffs           | `src/game/encounters/`                                                           |
+| Items, stages, cosmetics, bosses, blessings, awakenings               | `src/game/content/`                                                              |
+| Modifier composition and shrine rules                                 | `src/game/equipment/`, `src/game/shrine/`                                        |
+| Scoring, records, statistics, unlocks                                 | `src/game/progression/`                                                          |
+| Secret trigger counters and fixed-point eligibility                   | `src/game/progression/secret-events.ts`, `unlocks.ts`                            |
+| Temple upgrades, tutorial status, mode milestones                     | `src/game/progression/meta.ts`                                                   |
+| Temple collection membership and eligible post-purchase counters      | `src/game/content/collections.ts`, `src/game/progression/collection-progress.ts` |
+| Awakening purchases, login streaks and loadout snapshots              | `src/game/progression/awakening-purchases.ts`, `daily-login.ts`, `presets.ts`    |
+| Tester Premium, rewarded support adapter and recoverable bonus offers | `src/platform/tester-premium.ts`, `rewarded-support.ts`, `pending-support.ts`    |
+| Trial presets, completion and cosmetic grants                         | `src/game/content/trials.ts`, `src/game/progression/trials.ts`                   |
+| Pending Embers and one-time end-run settlement                        | `src/game/progression/run-rewards.ts`                                            |
+| First-encounter teaching state and overlay                            | `src/game/onboarding/`                                                           |
+| Run-end tally/reveal and viewed Armoury gear                          | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts`           |
+| Independent gated blade/outfit challenges                             | `src/game/progression/awakening-progress.ts`, `unlocks.ts`                       |
+| Outfit awakening catalog                                              | `src/game/content/robe-awakenings.ts`                                            |
+| Knife target selection and charge spending                            | `src/game/combat/knife.ts`                                                       |
+| Tutorial practice scene and isolated canvas                           | `src/ui/screens/tutorial.ts`, `tutorial.css`                                     |
+| Temple and testing menu controls                                      | `src/ui/screens/template.ts`, `admin.ts`                                         |
+| Backgrounds, ambient grass/leaves, weather                            | `src/rendering/scene/`                                                           |
+| Figure geometry, poses, player animation, projection                  | `src/rendering/figures/`                                                         |
+| Particle state, spawning, updates, drawing, films                     | `src/rendering/effects/`                                                         |
+| Isolated armory rendering                                             | `src/rendering/armory-preview.ts`                                                |
+| Screen fragments and controllers                                      | `src/ui/screens/`                                                                |
+| HUD/navigation, hints/toasts, scroll menu presentation                | `src/ui/`                                                                        |
+| Pointer and keyboard adapters                                         | `src/input/`                                                                     |
+| Validated profile settings and Options submenus                       | `src/platform/settings.ts`, `src/ui/screens/options.ts`                          |
+| Death style selection, poses, durations and ground-shadow fading      | `src/rendering/figures/death.ts`, `figure.ts`                                    |
+| Synthesized cues, audio context and ambience                          | `src/audio/audio.ts`                                                             |
+| Save validation, storage, haptics, lifecycle, frame scheduling        | `src/platform/`                                                                  |
 
 `platform/run-checkpoint.ts` validates the active run snapshot. `game.ts`
 captures it after each wave, duel, standoff or Shrine offer is prepared and
@@ -128,8 +128,12 @@ journal and recovery. See [save transfer](../features/save-transfer.md).
   accept a random source so tests can reproduce outcomes. State mutations and
   callbacks are synchronous; callers can observe phase changes immediately.
 - Frame scheduling separates capped raw elapsed time from slowed simulation time.
-  Pausing skips simulation but retains rendering. Hit-stop/slow timers retain
-  their existing raw-time behavior. Resume resets the scheduler's clock. Guided
+  Screen animation declarations independently gate scene simulation, scene drawing
+  and preview callbacks. Snapshot menus settle after their fade, preserving the
+  last complete scene; Armoury previews keep their own animation clock. Resize
+  invalidation survives covered inspection until the scene can draw again.
+  Pausing skips simulation; animated scenes draw at up to 60 fps. Hit-stop/slow
+  timers advance with scheduled scene work. Resume resets the scheduler's clock. Guided
   lessons go directly to safe practice using that paused-simulation boundary.
   The first boss approaches at normal speed, then holds its parry glint.
 - Main rendering and armory previews use explicit target canvases.
@@ -226,5 +230,8 @@ for asset coverage and contracts.
 Daily presets and date seeds belong to `game/progression/daily.ts`; the runtime keeps daily equipment/statistics separate from the player profile. Scroll menu presentation belongs to `ui/scroll-menus.ts`, and tintable seal/crest drawing to `rendering/ui-art.ts`. See [daily and world UI](../features/daily-and-world-ui.md).
 
 Foreground suspension and presentation timers belong to `src/platform/activity.ts`;
-combat frame pacing belongs to `src/platform/frame-loop.ts`. Audio keeps a separate
+frame pacing and callback demands belong to `src/platform/frame-loop.ts`.
+`src/ui/screen-animation.ts` declares each screen's scene and preview needs and
+owns settlement/invalidation. The runtime connects navigation and resize to that
+policy rather than embedding screen-specific frame caps. Audio keeps a separate
 inactive gate so returning never overrides player pause or mute.

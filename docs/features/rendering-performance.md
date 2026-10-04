@@ -51,16 +51,16 @@ median drawing-command milliseconds from sequential baseline/optimized runs.
 These clean runs use the standalone privacy document and supersede exploratory
 runs that used the SPA fallback URL.
 
-| Buffer | Figures | Scene | Original cache | Separate caches |
-|---|---:|---|---:|---:|
-| 1440×900 | 100 | Cached field | 52.8 | 5.0 |
-| 1440×900 | 100 | Switch each frame | 103.7 | 14.3 |
-| 1440×900 | 500 | Cached field | 383.3 | 22.0 |
-| 1440×900 | 500 | Switch each frame | 428.1 | 30.7 |
-| 1024×768 | 100 | Cached field | 67.9 | 5.2 |
-| 1024×768 | 100 | Switch each frame | 100.9 | 20.8 |
-| 1024×768 | 500 | Cached field | 378.6 | 21.3 |
-| 1024×768 | 500 | Switch each frame | 397.4 | 47.8 |
+| Buffer   | Figures | Scene             | Original cache | Separate caches |
+| -------- | ------: | ----------------- | -------------: | --------------: |
+| 1440×900 |     100 | Cached field      |           52.8 |             5.0 |
+| 1440×900 |     100 | Switch each frame |          103.7 |            14.3 |
+| 1440×900 |     500 | Cached field      |          383.3 |            22.0 |
+| 1440×900 |     500 | Switch each frame |          428.1 |            30.7 |
+| 1024×768 |     100 | Cached field      |           67.9 |             5.2 |
+| 1024×768 |     100 | Switch each frame |          100.9 |            20.8 |
+| 1024×768 |     500 | Cached field      |          378.6 |            21.3 |
+| 1024×768 |     500 | Switch each frame |          397.4 |            47.8 |
 
 For 500 figures in a cached scene, pixel reads fell from 6,860 per 28 frames to
 zero after warmup from the preceding cases. Final enemy caches retained 6,452,224
@@ -74,7 +74,7 @@ and 33.3–33.4 ms at 500. Switching scenes every frame remained more expensive
 run at 60 fps; the measured fix removes repeated tint work without freezing poses
 or caching animated figures as static images.
 
-The previous96-entry LRU keyed recolored parts by outfit *and* fog. A working set
+The previous96-entry LRU keyed recolored parts by outfit _and_ fog. A working set
 of hats, cloth palettes, and fog buckets overflowed it, repeatedly performing
 `getImageData`, pixel recoloring, canvas allocation, and eviction during drawing.
 
@@ -95,8 +95,23 @@ necessary, particularly at higher DPR and under mobile memory pressure.
 
 ## Foreground work and frame pacing
 
-From 1.48, combat and cinematics render at up to 60 fps; menus render at up to
-30 fps. Elapsed-time updates retain combat timing on high-refresh screens. Canvas
+The [1.58.2 follow-up report](performance-follow-up-2026-10-04.md) records the
+matching baseline, independent preview intervals, resize experiment and device
+testing limits. Unchanged viewport geometry and backing dimensions now skip
+resize preparation; actual geometry/DPR changes retain the existing preparation.
+
+From 1.58.2, visible animated scenes and Armoury previews render at up to 60 fps.
+Stats, Options, setup, Temple, Trials, support, admin, pause and Armoury hold the
+main scene still after the screen fade settles. Title, results and Shrine scenes
+remain animated. Fullscreen inspection keeps only its independent preview live.
+The screen policy is declared in `src/ui/screen-animation.ts`; the generic frame
+loop gates update, render and presentation callbacks independently. Its clock
+continues while callbacks are suppressed, preventing simulation catch-up when
+returning. A resize invalidates the held image, including while inspection covers
+it. Foreground suspension still stops all callbacks.
+
+Earlier releases capped menu drawing at 30 fps. Elapsed-time updates retain combat
+timing on high-refresh screens. Canvas
 resolution, scene layers, sprite detail and effect budgets are unchanged. Each
 Armoury preview caches its room crop and lighting at its current canvas size, and
 prepares its artwork once.

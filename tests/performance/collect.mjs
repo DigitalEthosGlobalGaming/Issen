@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import { stats, cpuSummary } from './report.mjs';
-import { configure, checkState, cycleMenus } from './scenarios.mjs';
+import { configure, checkState, checkPresentation, cycleMenus } from './scenarios.mjs';
 
 const metrics = (m) => Object.fromEntries(m.metrics.map((x) => [x.name, x.value]));
 export async function measure(
@@ -30,10 +30,14 @@ export async function measure(
     await page.waitForTimeout(250);
     const after = await page.evaluate(() => {
       window.__probe.measure = false;
-      return { state: window.__profile.state(), renders: window.__probe.renders.length };
+      return {
+        state: window.__profile.state(),
+        renders: window.__probe.renders.length,
+        previews: window.__probe.previews.length,
+      };
     });
     if (
-      !after.renders ||
+      !(scenario === 'inactive-inspection' ? after.previews : after.renders) ||
       after.state.state !== before.state ||
       after.state.runTime - before.runTime > 0.5
     )
@@ -101,6 +105,7 @@ export async function measure(
         updates: p.updates,
         renders: p.renders,
         previews: p.previews,
+        previewFrames: p.previewFrames,
         longTasks: p.longTasks,
         memory: p.memory(),
         state: window.__profile.state(),
@@ -117,18 +122,8 @@ export async function measure(
         sample.audio.some((s) => s === 'running'))
     )
       throw Error('Inactive application continued rendering/updating/audio');
-    if (!scenario.startsWith('inactive-') && !sample.renders.length)
-      throw Error('Active scenario produced no render callbacks');
-    const targetMs = [
-      'combat',
-      'demon',
-      'film-glitch',
-      'film-inferno',
-      'kill-effects',
-      'stress-100',
-    ].includes(scenario)
-      ? 1000 / 60
-      : 1000 / 30;
+    checkPresentation(scenario, initial, sample);
+    const targetMs = 1000 / 60;
     const row = {
       scenario,
       repetition,
@@ -140,11 +135,13 @@ export async function measure(
         updates: sample.updates,
         renders: sample.renders,
         previews: sample.previews,
+        previewFrames: sample.previewFrames,
       },
       frames: stats(sample.frames),
       updates: stats(sample.updates),
       renders: stats(sample.renders),
       previews: stats(sample.previews),
+      previewFrames: stats(sample.previewFrames),
       heapStart: a.JSHeapUsedSize,
       heapEnd: b.JSHeapUsedSize,
       taskMs: (b.TaskDuration - a.TaskDuration) * 1000,

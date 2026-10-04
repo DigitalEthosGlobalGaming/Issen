@@ -21,6 +21,10 @@ export function summarize(samples) {
       samples: rows.length,
       renderMs: render,
       frameP95Ms: stats(rows.map((s) => s.frames.p95)),
+      previewFrameP95Ms: stats(rows.map((s) => s.previewFrames?.p95)),
+      renderCalls: stats(rows.map((s) => s.renders.count)),
+      updateCalls: stats(rows.map((s) => s.updates.count)),
+      previewCalls: stats(rows.map((s) => s.previews.count)),
       taskMs: stats(rows.map((s) => s.taskMs)),
       heapEndBytes: stats(rows.map((s) => s.heapEnd)),
       startupMs: stats(rows.map((s) => s.startupMs)),
@@ -118,6 +122,13 @@ export async function writeReport(out, results) {
     ...results.summary.map(
       (s) =>
         `| ${s.scenario}${s.noisy ? ' (variable)' : ''} | ${s.samples} | ${number(s.renderMs.median)} | ${number(s.frameP95Ms.median)} | ${number(s.taskMs.median)} | ${number(s.heapEndBytes.median / 1e6)} |`,
+    ),
+    ``,
+    `| Scenario | Main updates/window | Main renders/window | Preview callbacks/window | Preview interval p95 ms |`,
+    `|---|---:|---:|---:|---:|`,
+    ...results.summary.map(
+      (s) =>
+        `| ${s.scenario} | ${number(s.updateCalls.median)} | ${number(s.renderCalls.median)} | ${number(s.previewCalls.median)} | ${number(s.previewFrameP95Ms.median)} |`,
     ),
     ``,
     `Stress-100 uses 100 animated waiting actors through real update/render systems, not 100 simultaneous fights.`,

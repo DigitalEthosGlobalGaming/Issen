@@ -55,6 +55,7 @@ import type { GrassBlade, Leaf } from './rendering/scene/ambient.ts';
 import type { WeatherParticle, Bamboo } from './rendering/scene/weather-state.ts';
 import { createLifecycle } from './platform/lifecycle.ts';
 import { createFrameLoop } from './platform/frame-loop.ts';
+import { createScreenAnimation } from './ui/screen-animation.ts';
 import { createHud } from './ui/hud.ts';
 import { createRunState, resetRun } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
@@ -1121,7 +1122,11 @@ export function startGame(): () => void {
   }
 
   const hudView = createHud($('app'));
-  const showScreen = hudView.showScreen;
+  const screenAnimation = createScreenAnimation(activeNow, hudView.activeScreen);
+  function showScreen(id: Screen | null) {
+    screenAnimation.show(id);
+    hudView.showScreen(id);
+  }
   function renderLives() {
     hudView.renderLives(G);
   }
@@ -4512,7 +4517,8 @@ export function startGame(): () => void {
       },
     },
     {
-      maxFps: () => (G.panel || ['title', 'over', 'paused'].includes(G.state) ? 30 : 60),
+      maxFps: () => 60,
+      demand: () => screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded),
       paused: () => G.state === 'paused' || guided.frozen,
       update,
       render,
@@ -4556,11 +4562,24 @@ export function startGame(): () => void {
 
   /* ---------------- boot ---------------- */
   let rt = 0;
+  let viewportPrepared = false;
   function resize() {
     const r = cvs.getBoundingClientRect();
-    W = Math.max(1, r.width);
-    H = Math.max(1, r.height);
-    DPR = Math.min(2, window.devicePixelRatio || 1);
+    const width = Math.max(1, r.width);
+    const height = Math.max(1, r.height);
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    if (
+      viewportPrepared &&
+      W === width &&
+      H === height &&
+      DPR === ratio &&
+      cvs.width === Math.round(width * ratio) &&
+      cvs.height === Math.round(height * ratio)
+    )
+      return;
+    W = width;
+    H = height;
+    DPR = ratio;
     cvs.width = Math.round(W * DPR);
     cvs.height = Math.round(H * DPR);
     layout();
@@ -4570,6 +4589,8 @@ export function startGame(): () => void {
     buildLeaves();
     buildWeather(false);
     buildPost();
+    viewportPrepared = true;
+    screenAnimation.invalidate();
     prevBg = null;
     stageFade = 0;
     for (const e of G.enemies) {

@@ -33,6 +33,8 @@ export function initProbe({
     updates: [],
     renders: [],
     previews: [],
+    previewFrames: [],
+    lastPreview: 0,
     last: 0,
     measure: false,
     canvases: [],
@@ -54,6 +56,10 @@ export function initProbe({
   }
   p.run = (name, fn) => {
     const t = performance.now();
+    if (name === 'previews' && p.measure) {
+      if (p.lastPreview) p.previewFrames.push(t - p.lastPreview);
+      p.lastPreview = t;
+    }
     const result = fn();
     if (p.measure) p[name].push(performance.now() - t);
     return result;
@@ -64,7 +70,8 @@ export function initProbe({
     p.last = t;
   };
   p.reset = () => {
-    for (const k of ['frames', 'updates', 'renders', 'previews']) p[k] = [];
+    for (const k of ['frames', 'updates', 'renders', 'previews', 'previewFrames']) p[k] = [];
+    p.lastPreview = 0;
     p.longTasks = [];
     p.draws = {};
     p.reads = 0;

@@ -56,6 +56,30 @@ export function checkState(scenario, initial, final) {
     throw Error(`Scenario ${scenario} ended unexpectedly in ${final.state}`);
 }
 
+export function checkPresentation(scenario, initial, sample) {
+  if (scenario.startsWith('inactive-')) return;
+  const snapshot = [
+    'stats',
+    'options',
+    'armoury',
+    'inspection',
+    'setup',
+    'temple',
+    'trials',
+    'paused',
+  ].includes(scenario);
+  if (!snapshot && !sample.renders.length)
+    throw Error('Animated scenario produced no render callbacks');
+  if (['armoury', 'inspection'].includes(scenario) && !sample.previews.length)
+    throw Error('Visible Armoury preview stopped');
+  if (
+    snapshot &&
+    !sample.renders.length &&
+    (sample.updates.length || JSON.stringify(initial) !== JSON.stringify(sample.state))
+  )
+    throw Error('Snapshot scene continued simulation without drawing');
+}
+
 export async function cycleMenus(page, cdp, count = 8) {
   const heaps = [];
   for (let i = 0; i <= count; i++) {
