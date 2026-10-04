@@ -1,6 +1,10 @@
 import type { Setup } from '../../platform/saves.ts';
 
 export type UpgradeId =
+  | 'weapons'
+  | 'outfits'
+  | 'blessings'
+  | 'curses'
   | 'vitality'
   | 'focus'
   | 'offerings'
@@ -12,6 +16,10 @@ export type UpgradeId =
   | 'precision'
   | 'discernment';
 export const EMPTY_UPGRADES: Readonly<Record<UpgradeId, number>> = Object.freeze({
+  weapons: 0,
+  outfits: 0,
+  blessings: 0,
+  curses: 0,
   vitality: 0,
   focus: 0,
   offerings: 0,
@@ -51,6 +59,34 @@ export interface TemplateUpgrade {
 /** Cost index equals owned rank. Extend the parser and modifier composition
  * alongside this catalog when introducing a new permanent upgrade. */
 export const TEMPLATE_UPGRADES: readonly TemplateUpgrade[] = [
+  {
+    id: 'weapons',
+    name: 'Weapons',
+    description: 'Open five new blade challenges per rank. Progress starts after purchase.',
+    costs: [100, 200, 350],
+    maxRank: 3,
+  },
+  {
+    id: 'outfits',
+    name: 'Outfits',
+    description: 'Open five new outfit challenges per rank. Progress starts after purchase.',
+    costs: [100, 200, 350],
+    maxRank: 3,
+  },
+  {
+    id: 'blessings',
+    name: 'Blessings',
+    description: 'Add five blessings to the Shrine pool per rank.',
+    costs: [100, 200, 350, 500],
+    maxRank: 4,
+  },
+  {
+    id: 'curses',
+    name: 'Curses',
+    description: 'Add five curses to the Shrine pool.',
+    costs: [100],
+    maxRank: 1,
+  },
   {
     id: 'precision',
     name: 'Precision',
@@ -188,6 +224,10 @@ export function parseMeta(
     earned: Math.max(embers, integer(saved.earned, MAX_CURRENCY)),
     emberRemainder: integer(saved.emberRemainder, 99),
     upgrades: {
+      weapons: integer(ranks.weapons, 3),
+      outfits: integer(ranks.outfits, 3),
+      blessings: integer(ranks.blessings, 4),
+      curses: integer(ranks.curses, 1),
       vitality:
         saved.schemaVersion === 2 || saved.schemaVersion === 3 || saved.schemaVersion === 4
           ? integer(ranks.vitality, 3)

@@ -5,6 +5,7 @@ import type { Random } from '../../shared/random.ts';
 
 export type Blessing = (typeof BLESS)[number];
 export interface BlessingState {
+  availableBlessings?: readonly string[];
   bless: Set<string>;
   /** Boss rush has duels only: no wave enemies, attacker gaps, or wave clears. */
   rush?: boolean;
@@ -44,6 +45,7 @@ export const BOSS_RUSH_BLESSINGS: ReadonlySet<string> = new Set([
 export function blessingEligible(state: BlessingState, blessing: Blessing): boolean {
   return (
     !state.bless.has(blessing.id) &&
+    (!state.availableBlessings || state.availableBlessings.includes(blessing.id)) &&
     (!state.rush || BOSS_RUSH_BLESSINGS.has(blessing.id)) &&
     (blessing.id !== 'knifedance' || (state.maxKnives ?? 0) > 0) &&
     (!blessing.lives || (!state.zen && !state.hard)) &&

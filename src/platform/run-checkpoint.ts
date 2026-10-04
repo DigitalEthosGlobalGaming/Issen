@@ -9,6 +9,7 @@ import type { WeatherState } from '../rendering/scene/weather-state.ts';
 import { store } from './storage.ts';
 import { STAGES } from '../game/content/stages.ts';
 import { createBlessingTriggers } from '../game/shrine/triggered.ts';
+import type { CollectionProgress } from '../game/progression/collection-progress.ts';
 
 const KEY = 'issen.runCheckpoint';
 export interface RunCheckpoint {
@@ -20,6 +21,7 @@ export interface RunCheckpoint {
   run: Omit<RunState, 'bless'> & { bless: string[] };
   stats: Statistics;
   awakening: AwakeningProgress;
+  collections?: CollectionProgress;
   meta: MetaProgress;
   unlocks: string[];
   equipment: Equipment;

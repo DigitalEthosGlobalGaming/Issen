@@ -38,3 +38,23 @@ and reward multiplier; settlement remains idempotent.
 verified completion boolean. The current placeholder grants only after completing
 the separate support acknowledgement. Cancellation/failure grants nothing. Screen
 events are isolated from gameplay input; keyboard combat is gated while it is open.
+
+## 1.54.0 — Temple collections
+
+Weapons and Outfits each have three five-item packs costing 100, 200 and 350 Embers.
+Blessings has four five-item packs costing 100, 200, 350 and 500; Curses has one
+five-item pack at 100. Starter and pack membership follow the feature plan.
+`content/collections.ts` owns membership and challenge progress labels. The Temple
+shows the next pack's contents; Armoury details show its access requirement or
+eligible counters. Existing owned equipment and secret discovery routes remain.
+
+`issen.collections` holds validated per-pack statistics. Cumulative events use
+post-purchase deltas; bests use the current run rather than lifetime records.
+Checkpoints include these records to avoid duplicate progress after recovery, and
+save import merges them by maxima. Each newly purchased pack begins at zero.
+`unlocks.ts` receives each item's eligible statistics explicitly.
+
+Ordinary runs capture unlocked Shrine IDs at run start. Offer eligibility and
+secondary grants share the filter; daily and Trial presets remain independent.
+The new collection emblem sheet is editable calligraphic SVG artwork at
+`src/ui/assets/collection-symbols.svg`.

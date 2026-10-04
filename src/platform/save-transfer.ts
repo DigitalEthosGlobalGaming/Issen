@@ -7,6 +7,10 @@ import { unlockEligibleItems } from '../game/progression/unlocks.ts';
 import { reconcileCinematicCompanion } from '../game/progression/secret-events.ts';
 import { createItems } from '../game/content/items.ts';
 import { parseRunCheckpoint } from './run-checkpoint.ts';
+import {
+  parseCollectionProgress,
+  collectionItemStats,
+} from '../game/progression/collection-progress.ts';
 import { parseTesterPremium } from './tester-premium.ts';
 
 export type SaveData = Record<string, unknown>;
@@ -168,11 +172,17 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
       parseAwakeningProgress(incoming.awakening, parseStatistics(incoming.stats).bl),
     ),
   );
+  const collections = parseCollectionProgress(
+    merge(local.collections, incoming.collections),
+    stats,
+  );
+  collections.lastStats = structuredClone(stats);
   const items = createItems(() => unlocked);
   reconcileCinematicCompanion(stats, unlocked);
   unlockEligibleItems(stats, unlocked, items, () => {}, {
     access: meta.upgrades.awakening,
     progress: awakening,
+    itemStats: (id) => collectionItemStats(collections, meta, stats, id),
   });
   const data: SaveData = {
     stats,
@@ -181,6 +191,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     trials,
     meta,
     awakening,
+    collections,
     testerPremium: parseTesterPremium(merge(local.testerPremium, incoming.testerPremium)),
     equip: parseEquipment(preferences(local.equip, incoming.equip), unlocked, items),
     setup: parseSetup(preferences(local.setup, incoming.setup)),
@@ -199,7 +210,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
   // replacing its profile snapshots with the merged permanent progress.
   const checkpoint = parseRunCheckpoint(incoming.runCheckpoint);
   data.runCheckpoint = checkpoint
-    ? { ...checkpoint, stats, meta, awakening, unlocks: [...unlocked] }
+    ? { ...checkpoint, stats, meta, awakening, collections, unlocks: [...unlocked] }
     : null;
   if (incoming.runCheckpoint && !checkpoint)
     warnings.push('The unfinished run was incompatible; permanent progress was recovered.');

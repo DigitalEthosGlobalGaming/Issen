@@ -5,6 +5,9 @@ import {
   type UpgradeId,
 } from '../../game/progression/meta.ts';
 import { createSymbolArt } from '../symbol-art.ts';
+import { COLLECTIONS, type CollectionId } from '../../game/content/collections.ts';
+import { BLESS } from '../../game/content/blessings.ts';
+import { createItems } from '../../game/content/items.ts';
 
 export function renderTemplate(
   root: HTMLElement,
@@ -75,6 +78,14 @@ export function renderTemplate(
     title.textContent = `${upgrade.name} · ${rank}/${upgrade.maxRank}`;
     const description = document.createElement('p');
     description.textContent = upgrade.description;
+    if (Object.hasOwn(COLLECTIONS, upgrade.id) && cost !== undefined) {
+      const catalog = [...BLESS, ...createItems(() => new Set())];
+      const ids = COLLECTIONS[upgrade.id as CollectionId][rank] ?? [];
+      description.textContent +=
+        ' Next: ' +
+        ids.map((id) => catalog.find((item) => item.id === id)?.n ?? id).join(', ') +
+        '.';
+    }
     const current = document.createElement('p');
     const next = document.createElement('p');
     const value = (n: number) => effectText(upgrade.id, n);
@@ -108,6 +119,13 @@ export function renderTemplate(
 
 function effectText(id: UpgradeId, rank: number): string {
   switch (id) {
+    case 'weapons':
+    case 'outfits':
+    case 'blessings':
+    case 'curses':
+      return rank
+        ? `${rank * 5} ${id === 'weapons' || id === 'outfits' ? 'challenges opened' : 'Shrine choices opened'}`
+        : 'Starter collection';
     case 'precision':
       return rank ? `Perfect-action windows ${rank * 5}% wider` : 'Standard perfect-action windows';
     case 'discernment':

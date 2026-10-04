@@ -53,6 +53,7 @@ export interface RunState {
   lives: number;
   hits: number;
   bless: Set<string>;
+  availableBlessings?: string[];
   event: 'blood' | 'fog' | null;
   wardUsed: boolean;
   runWards: number;

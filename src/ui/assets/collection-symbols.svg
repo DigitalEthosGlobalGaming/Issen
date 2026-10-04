@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="#d6cbb4">
+  <!-- Blessing: rising leaf and prayer stroke. -->
+  <path d="M47 83 43 56 32 37 17 28 35 28 47 42 49 18 58 11 60 37 77 22 85 22 72 45 59 53 57 80Z"/>
+  <path d="m26 68 8-3 39 1 5 6-47 3Z" fill="#867b68"/>
+  <!-- Curse: broken enclosing ring. -->
+  <path d="m151 13 24 7 13 23-4 28-17 17-25-2-24-17-5-23 11-25 13-5-11 16-4 23 14 19 23 3 15-16-2-22-17-14Z"/>
+  <path d="m137 28 12 5 15 39-9 6-15-30Z"/>
+  <!-- Weapons: a broad tapered blade and irregular crossguard. -->
+  <path d="m223 81 8-22 41-47 10-5-4 19-39 41-10 22Z"/>
+  <path d="m222 53 7-5 25 21-5 7-14-13Z" fill="#a99c83"/>
+  <!-- Outfit: robe shoulders, crossed lapels and hem. -->
+  <path d="m335 22 16 8 16-8 21 31-13 10-8-14 5 33-46 3 6-34-8 15-14-10Z"/>
+  <path d="m338 31 13 16 14-16-5 18-12 13-4-11Z" fill="#29241e"/>
+</svg>

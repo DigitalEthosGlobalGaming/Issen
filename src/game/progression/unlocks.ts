@@ -18,7 +18,11 @@ export function unlockEligibleItems(
   unlocked: Set<string>,
   items: readonly Item[],
   onUnlock: (id: string, notice: UnlockNotice) => void,
-  awakening?: { access: boolean | number; progress: AwakeningProgress },
+  awakening?: {
+    access: boolean | number;
+    progress: AwakeningProgress;
+    itemStats?(id: string): Statistics | null;
+  },
 ): void {
   const byId = new Map(items.map((item) => [item.id, item]));
   // A callback may remove a grant (for example, test-profile revocation).
@@ -28,7 +32,14 @@ export function unlockEligibleItems(
   do {
     changed = false;
     for (const item of items) {
-      if (granted.has(item.id) || unlocked.has(item.id) || !item.ok(stats)) continue;
+      const eligibleStats = awakening?.itemStats ? awakening.itemStats(item.id) : stats;
+      if (
+        granted.has(item.id) ||
+        unlocked.has(item.id) ||
+        !eligibleStats ||
+        !item.ok(eligibleStats)
+      )
+        continue;
       unlocked.add(item.id);
       granted.add(item.id);
       changed = true;

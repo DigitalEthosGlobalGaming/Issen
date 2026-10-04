@@ -1,3 +1,11 @@
+import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
+import {
+  parseCollectionProgress,
+  initializeCollections,
+  syncCollectionProgress,
+  collectionItemStats,
+  collectionChallengeText,
+} from './game/progression/collection-progress.ts';
 import { createRewardedSupport } from './platform/rewarded-support.ts';
 import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
@@ -349,7 +357,18 @@ export function startGame(): () => void {
   const AWAKENING = parseAwakeningProgress(store.get('issen.awakening', null), ST.bl);
   const saveAwakening = () => store.set('issen.awakening', AWAKENING);
   saveAwakening();
-  const saveMeta = () => store.set('issen.meta', META);
+  const COLLECTION_PROGRESS = parseCollectionProgress(store.get('issen.collections', null), ST);
+  initializeCollections(COLLECTION_PROGRESS, META, ST);
+  const saveCollections = () => store.set('issen.collections', COLLECTION_PROGRESS);
+  const syncCollections = () => {
+    if (!activeTrial && !activeDaily && !['title'].includes(G.state))
+      syncCollectionProgress(COLLECTION_PROGRESS, META, ST, G);
+  };
+  const saveMeta = () => {
+    initializeCollections(COLLECTION_PROGRESS, META, ST);
+    saveCollections();
+    return store.set('issen.meta', META);
+  };
   saveMeta();
   const ARMORY_SEEN = parseArmorySeen(store.get('issen.armorySeen', null), UNL);
   store.set('issen.armorySeen', [...ARMORY_SEEN]);
@@ -366,6 +385,8 @@ export function startGame(): () => void {
       !['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state)
     )
       return;
+    syncCollections();
+    saveCollections();
     const { bless, ...run } = G;
     const checkpoint: RunCheckpoint = {
       version: 1,
@@ -375,6 +396,7 @@ export function startGame(): () => void {
       run: { ...run, bless: [...bless], attacker: null, panel: null },
       stats: ST,
       awakening: AWAKENING,
+      collections: COLLECTION_PROGRESS,
       meta: META,
       unlocks: [...UNL],
       equipment: EQ,
@@ -410,6 +432,11 @@ export function startGame(): () => void {
     if (!activeDaily) {
       Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
       Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
+      Object.assign(
+        COLLECTION_PROGRESS,
+        parseCollectionProgress(checkpoint.collections ?? COLLECTION_PROGRESS, ST),
+      );
+      COLLECTION_PROGRESS.lastStats = structuredClone(ST);
       UNL.clear();
       for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
       reconcileCinematicCompanion(ST, UNL);
@@ -479,7 +506,11 @@ export function startGame(): () => void {
     });
   }
   const saveStats = () => {
-    if (!activeTrial && !activeDaily) store.set('issen.stats', ST);
+    if (!activeTrial && !activeDaily) {
+      syncCollections();
+      saveCollections();
+      store.set('issen.stats', ST);
+    }
   };
   const revokedSave = store.get('issen.revoked', []);
   const revoked = new Set<string>(
@@ -1075,6 +1106,7 @@ export function startGame(): () => void {
     hudView.render(G, on, activeDaily ? 'Daily' : undefined);
   }
   function setScore() {
+    syncCollections();
     hudView.renderScore(G);
   }
   const banner = hudView.showBanner;
@@ -1133,7 +1165,11 @@ export function startGame(): () => void {
           item: true,
         });
       },
-      { access: META.upgrades.awakening, progress: AWAKENING },
+      {
+        access: META.upgrades.awakening,
+        progress: AWAKENING,
+        itemStats: (id) => collectionItemStats(COLLECTION_PROGRESS, META, ST, id),
+      },
     );
     if (UNL.size !== before) refreshArmoryNew();
   }
@@ -1276,6 +1312,13 @@ export function startGame(): () => void {
       combatRandom = runRandom.next;
     }
     resetRun(G, setup, EQ, combatRandom);
+    G.availableBlessings =
+      activeDaily || activeTrial
+        ? undefined
+        : collectionBlessings(
+            META.upgrades,
+            BLESS.map((b) => b.id),
+          );
     stageSeed = stageVisits.enter(G.stage, true);
     Object.assign(G, templatePowers(META, setup, premiumAccess()));
     G.maxKnives = G.knives;
@@ -3215,15 +3258,17 @@ export function startGame(): () => void {
     owns: (id) => accessible(id) && (id === PREMIUM_FILM ? premiumAccess() : UNL.has(id)),
     accessible,
     progress: (id) =>
-      id === 'falling-leaves'
-        ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
-        : id === 'ember-ash'
-          ? `Duels: ${Math.min(ST.duels, 50)} / 50`
-          : id === 'ink-wash'
-            ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
-            : id === 'pilgrims-bead'
-              ? `Duels: ${Math.min(ST.duels, 10)} / 10`
-              : '',
+      equipmentPack(id)
+        ? collectionChallengeText(COLLECTION_PROGRESS, META, ST, id)
+        : id === 'falling-leaves'
+          ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
+          : id === 'ember-ash'
+            ? `Duels: ${Math.min(ST.duels, 50)} / 50`
+            : id === 'ink-wash'
+              ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
+              : id === 'pilgrims-bead'
+                ? `Duels: ${Math.min(ST.duels, 10)} / 10`
+                : '',
     statistics: ST,
     seen: ARMORY_SEEN,
     onViewed: () => {
