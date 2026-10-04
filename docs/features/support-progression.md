@@ -103,3 +103,10 @@ Ember confirmations now show **Are you sure?**, **Cancel**, and
 **Confirm | -X Embers**, replacing the longer balance explanation. Reward dialogs
 live inside the app so their controls receive the shared brush frames. Their
 decoration stays inside the dialog to avoid overflow scrollbars.
+
+## 1.56.2 — Ember ad reward amount
+
+The post-tally action reads **Watch Ad | 2x embers (+X)**, where X is the
+actual extra whole Embers, including fractional carry and the currency cap.
+The option appears only when it can credit at least one Ember. Continue remains
+below it; runs with no extra reward proceed through the usual results flow.

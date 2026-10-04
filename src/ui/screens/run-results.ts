@@ -24,6 +24,7 @@ export interface RunResults {
     reveals: readonly ResultReveal[],
     done: () => void,
     doubleEmbers?: () => Promise<RewardSettlement | null>,
+    extraEmbers?: number,
   ): void;
   startUnlocks(reveals: readonly ResultReveal[], done: () => void): void;
   dispose(): void;
@@ -76,7 +77,6 @@ export function createRunResults(
   const doubleButton = root.ownerDocument.createElement('button');
   doubleButton.type = 'button';
   doubleButton.className = 'btn primary';
-  doubleButton.textContent = '2× Watch Ad';
   const continueButton = root.ownerDocument.createElement('button');
   continueButton.type = 'button';
   continueButton.className = 'btn';
@@ -206,8 +206,9 @@ export function createRunResults(
   sequence.addEventListener('click', onClick);
   sequence.addEventListener('keydown', onKeyDown);
   return {
-    start(nextReward, nextReveals, done, nextDouble) {
-      doubleEmbers = nextDouble;
+    start(nextReward, nextReveals, done, nextDouble, extraEmbers = 0) {
+      doubleEmbers = extraEmbers > 0 ? nextDouble : undefined;
+      doubleButton.textContent = `Watch Ad | 2x embers (+${extraEmbers.toLocaleString()})`;
       reward = nextReward;
       reveals = nextReveals;
       onDone = done;

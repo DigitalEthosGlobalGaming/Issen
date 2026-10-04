@@ -75,6 +75,7 @@ import {
   accrueRunReward,
   settleRunReward,
   grantSupportEmberBonus,
+  supportEmberBonusAmount,
 } from './game/progression/run-rewards.ts';
 import { protectCombo, recoverAfterWave } from './game/progression/run-powers.ts';
 import { resolveDamage } from './game/combat/damage.ts';
@@ -2873,7 +2874,10 @@ export function startGame(): () => void {
     if (eligible && supportPremium()) rewardLedger.supportMultiplier = 2;
     const reward = settleRunReward(META, rewardLedger);
     const pending: PendingSupportReward | null =
-      eligible && !supportPremium() && rewardLedger.pending > 0 && savedRun
+      eligible &&
+      !supportPremium() &&
+      supportEmberBonusAmount(META, rewardLedger.pending) > 0 &&
+      savedRun
         ? {
             id: crypto.randomUUID(),
             hundredths: rewardLedger.pending,
@@ -2913,6 +2917,7 @@ export function startGame(): () => void {
         $('bAgain').disabled = false;
       },
       pending ? () => claimEmberBonus(pending) : undefined,
+      pending ? supportEmberBonusAmount(META, pending.hundredths) : 0,
     );
     setBestLine();
     clearRunCheckpoint();
@@ -2982,6 +2987,7 @@ export function startGame(): () => void {
         $('bAgain').disabled = false;
       },
       () => claimEmberBonus(pending),
+      supportEmberBonusAmount(META, pending.hundredths),
     );
   }
   function setBestLine() {

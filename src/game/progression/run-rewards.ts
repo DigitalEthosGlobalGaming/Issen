@@ -60,6 +60,15 @@ export function settleRunReward(meta: MetaProgress, ledger: RunRewardLedger): Re
   return ledger.settled;
 }
 
+/** Whole Embers the extra copy will credit, including fractional carry and the balance cap. */
+export function supportEmberBonusAmount(meta: MetaProgress, hundredths: number): number {
+  if (!Number.isSafeInteger(hundredths) || hundredths <= 0) return 0;
+  return Math.max(
+    0,
+    Math.min(MAX_CURRENCY - meta.embers, Math.floor((meta.emberRemainder + hundredths) / 100)),
+  );
+}
+
 /** Credit the extra copy of a settled run once; marker and balance share one save. */
 export function grantSupportEmberBonus(
   meta: MetaProgress,

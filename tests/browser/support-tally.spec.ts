@@ -1,4 +1,17 @@
 import { expect, test } from '@playwright/test';
+
+test('a run with no Ember reward has no watch-ad offer', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#bPlay').click();
+  await page.locator('#bBegin').click();
+  await page.locator('#pauseBtn').click();
+  await page.locator('#bEnd').click();
+  await expect(page.locator('#resultEmbers')).toHaveText('0');
+  await expect(page.getByRole('button', { name: /Watch Ad/ })).not.toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('issen.supportReward'))).toBeNull();
+  await page.locator('#runResultSequence').click();
+  await expect(page.locator('#overSummary')).toBeVisible();
+});
 test('Ember tally offers a separate Continue, and pending doubling survives reload', async ({
   page,
 }, info) => {
@@ -21,13 +34,17 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
   await page.locator('#pauseBtn').click();
   await page.locator('#bEnd').click();
   await expect(page.locator('#resultEmbers')).toHaveText('12');
-  await expect(page.getByRole('button', { name: '2× Watch Ad', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Watch Ad | 2x embers (+13)', exact: true }),
+  ).toBeVisible();
   await expect(
     page.locator('.result-reward-actions').getByRole('button', { name: 'Continue', exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: info.outputPath('ember-ad-choice.png') });
   await page.reload();
-  await expect(page.getByRole('button', { name: '2× Watch Ad', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Watch Ad | 2x embers (+13)', exact: true }),
+  ).toBeVisible();
   await page
     .locator('.result-reward-actions')
     .getByRole('button', { name: 'Continue', exact: true })

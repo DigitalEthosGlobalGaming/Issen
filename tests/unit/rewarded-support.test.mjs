@@ -5,8 +5,22 @@ import {
   createRunRewardLedger,
   settleRunReward,
   grantSupportEmberBonus,
+  supportEmberBonusAmount,
 } from '../../src/game/progression/run-rewards.ts';
 import { parseMeta } from '../../src/game/progression/meta.ts';
+
+test('advertised extra Embers match fractional carry and currency cap', () => {
+  const meta = parseMeta({ embers: 12, emberRemainder: 50 });
+  assert.equal(supportEmberBonusAmount(meta, 1250), 13);
+  assert.equal(supportEmberBonusAmount(meta, 0), 0);
+  assert.equal(supportEmberBonusAmount(meta, 20), 0);
+  assert.equal(supportEmberBonusAmount(meta, NaN), 0);
+  assert.equal(supportEmberBonusAmount(parseMeta({ embers: 1_000_000_000 }), 1250), 0);
+  const capped = parseMeta({ embers: 999_999_999 });
+  assert.equal(supportEmberBonusAmount(capped, 1250), 1);
+  assert.equal(grantSupportEmberBonus(capped, 'cap', 1250).gained, 1);
+  assert.equal(grantSupportEmberBonus(meta, 'fraction', 1250).gained, 13);
+});
 test('post-tally bonus claim is idempotent across reload', () => {
   const meta = parseMeta({ embers: 12, emberRemainder: 50 });
   assert.deepEqual(grantSupportEmberBonus(meta, 'bonus1', 1250), {
