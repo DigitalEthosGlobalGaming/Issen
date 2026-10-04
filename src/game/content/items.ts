@@ -805,6 +805,15 @@ export function createItems(getUnlocks: () => ReadonlySet<string>): Item[] {
     },
     { id: 'nocrest', type: 'crest', k: '無', n: 'No crest', f: 'A plain back.', ok: () => true },
     {
+      id: 'seven-dawns',
+      type: 'crest',
+      k: '暁',
+      n: 'Seven Dawns',
+      f: 'Seven mornings, one returning blade.',
+      d: 'Visit on 7 consecutive days.',
+      ok: () => false,
+    },
+    {
       id: 'tomoe',
       type: 'crest',
       k: '巴',

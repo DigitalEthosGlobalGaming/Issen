@@ -12,6 +12,7 @@ import {
   collectionItemStats,
 } from '../game/progression/collection-progress.ts';
 import { parseTesterPremium } from './tester-premium.ts';
+import { mergeDailyLogin, SEVEN_DAWNS_CREST } from '../game/progression/daily-login.ts';
 
 export type SaveData = Record<string, unknown>;
 const record = (value: unknown): value is SaveData =>
@@ -156,6 +157,9 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     ...Object.values(DEFAULT_EQUIPMENT).filter((id): id is string => typeof id === 'string'),
   ]);
   const trials = parseTrialProgress(merge(local.trials, incoming.trials));
+  const dailyLogin = mergeDailyLogin(local.dailyLogin, incoming.dailyLogin);
+  if (unlocked.has(SEVEN_DAWNS_CREST)) dailyLogin.earned = true;
+  if (dailyLogin.earned) unlocked.add(SEVEN_DAWNS_CREST);
   grantTrialRewards(trials, unlocked);
   const meta = parseMeta(
     merge(
@@ -193,6 +197,7 @@ export function prepareImport(text: string, local: SaveData): ImportPlan {
     meta,
     awakening,
     collections,
+    dailyLogin,
     testerPremium: parseTesterPremium(merge(local.testerPremium, incoming.testerPremium)),
     equip: parseEquipment(preferences(local.equip, incoming.equip), unlocked, items),
     setup: parseSetup(preferences(local.setup, incoming.setup)),

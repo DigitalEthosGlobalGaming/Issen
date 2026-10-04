@@ -117,3 +117,17 @@ Weapons, Outfits, Blessings and Curses show a short description without listing
 next-pack names, progress timing or Current/Next summaries. Purchase rules and
 challenge tracking stay the same. Spending confirmations use **Yes -X Embers**
 alongside Cancel. The reward button reads **Watch Ad · 2x embers (+X)**.
+
+## 1.57.0 — Seven Dawns
+
+Visit on seven consecutive local calendar days to earn the Seven Dawns crest.
+A profile counts once per day at startup or when returning to the foreground.
+Missing a day resets the streak; earning the crest is permanent. The Armoury
+shows the locked crest and its current streak. Day seven gives an unlock toast
+and the normal new-item cue.
+
+`progression/daily-login.ts` validates `issen.dailyLogin`, advances calendar dates
+without elapsed-hour assumptions, and merges the most recent streak while keeping
+permanent ownership. Each profile has its own record. Save transfer and run
+checkpoint recovery retain the grant. The shared calligraphic SVG at
+`ui/assets/crest-seven-dawns.svg` supplies both its Armoury image and canvas paths.

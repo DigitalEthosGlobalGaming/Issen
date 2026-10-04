@@ -1,4 +1,5 @@
 const crestUrls: Record<string, string> = {
+  'seven-dawns': new URL('../assets/crest-seven-dawns.svg', import.meta.url).href,
   tomoe: new URL('../assets/world-ui-crest-tomoe.png', import.meta.url).href,
   kikyo: new URL('../assets/world-ui-crest-kikyo.png', import.meta.url).href,
   juji: new URL('../assets/world-ui-crest-juji.png', import.meta.url).href,

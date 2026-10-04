@@ -1,5 +1,10 @@
 import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
 import {
+  parseDailyLogin,
+  recordDailyLogin,
+  SEVEN_DAWNS_CREST,
+} from './game/progression/daily-login.ts';
+import {
   awakeningCost,
   awakeningPurchasable,
   purchaseAwakening,
@@ -348,6 +353,9 @@ export function startGame(): () => void {
   let ST = loadStatistics();
   const SETUP = loadSetup();
   const UNL = loadUnlocks();
+  const DAILY_LOGIN = parseDailyLogin(store.get('issen.dailyLogin', null));
+  if (UNL.has(SEVEN_DAWNS_CREST)) DAILY_LOGIN.earned = true;
+  let loginCrestRevealed = false;
   if (reconcileCinematicCompanion(ST, UNL)) store.set('issen.unlocks', [...UNL]);
   UNL.delete(PREMIUM_FILM);
   if (premiumAccess()) UNL.add(PREMIUM_FILM);
@@ -447,6 +455,7 @@ export function startGame(): () => void {
       COLLECTION_PROGRESS.lastStats = structuredClone(ST);
       UNL.clear();
       for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
+      if (DAILY_LOGIN.earned) UNL.add(SEVEN_DAWNS_CREST);
       reconcileCinematicCompanion(ST, UNL);
       if (premiumAccess()) UNL.add(PREMIUM_FILM);
       Object.assign(SETUP, checkpoint.setup);
@@ -3355,17 +3364,19 @@ export function startGame(): () => void {
     owns: (id) => accessible(id) && (id === PREMIUM_FILM ? premiumAccess() : UNL.has(id)),
     accessible,
     progress: (id) =>
-      equipmentPack(id)
-        ? collectionChallengeText(COLLECTION_PROGRESS, META, ST, id)
-        : id === 'falling-leaves'
-          ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
-          : id === 'ember-ash'
-            ? `Duels: ${Math.min(ST.duels, 50)} / 50`
-            : id === 'ink-wash'
-              ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
-              : id === 'pilgrims-bead'
-                ? `Duels: ${Math.min(ST.duels, 10)} / 10`
-                : '',
+      id === SEVEN_DAWNS_CREST
+        ? `Consecutive days: ${DAILY_LOGIN.streak}/7`
+        : equipmentPack(id)
+          ? collectionChallengeText(COLLECTION_PROGRESS, META, ST, id)
+          : id === 'falling-leaves'
+            ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
+            : id === 'ember-ash'
+              ? `Duels: ${Math.min(ST.duels, 50)} / 50`
+              : id === 'ink-wash'
+                ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
+                : id === 'pilgrims-bead'
+                  ? `Duels: ${Math.min(ST.duels, 10)} / 10`
+                  : '',
     statistics: ST,
     seen: ARMORY_SEEN,
     onViewed: () => {
@@ -4491,9 +4502,24 @@ export function startGame(): () => void {
     },
   );
   let artworkReady = false;
+  function visitToday() {
+    const next = recordDailyLogin(DAILY_LOGIN);
+    if (!store.set('issen.dailyLogin', next)) return;
+    Object.assign(DAILY_LOGIN, next);
+    if (!next.earned) return;
+    const newlyOwned = !UNL.has(SEVEN_DAWNS_CREST);
+    UNL.add(SEVEN_DAWNS_CREST);
+    store.set('issen.unlocks', [...UNL]);
+    if (newlyOwned && !loginCrestRevealed) {
+      loginCrestRevealed = true;
+      toast({ k: '暁', msg: 'Unlocked: Seven Dawns crest' });
+      refreshArmoryNew();
+    }
+  }
   const resumeFrames = frameLoop.start;
   lifecycle.add(
     onActivityChange((active) => {
+      if (active) visitToday();
       audio.setInactive(!active);
       if (!active) {
         combatHaptics.stop();

@@ -2,7 +2,7 @@
 # Repository documentation
 
 - [Support and progression](features/support-progression.md): implemented support
-  screens, Second Wind, Ember rewards, Temple collections and Awakening purchases.
+  screens, Second Wind, Ember rewards, Temple collections, Awakening purchases and the Seven Dawns crest.
 
 - [Performance testing](../tests/performance/README.md): repeatable web profiling,
   isolated Android WebView adapter, saved reports and measurement limitations.
