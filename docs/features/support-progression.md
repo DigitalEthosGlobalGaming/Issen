@@ -110,3 +110,10 @@ The post-tally action reads **Watch Ad | 2x embers (+X)**, where X is the
 actual extra whole Embers, including fractional carry and the currency cap.
 The option appears only when it can credit at least one Ember. Continue remains
 below it; runs with no extra reward proceed through the usual results flow.
+
+## 1.56.3 — Quieter Temple and button copy
+
+Weapons, Outfits, Blessings and Curses show a short description without listing
+next-pack names, progress timing or Current/Next summaries. Purchase rules and
+challenge tracking stay the same. Spending confirmations use **Yes -X Embers**
+alongside Cancel. The reward button reads **Watch Ad · 2x embers (+X)**.

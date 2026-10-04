@@ -58,7 +58,7 @@ test('one Second Wind per run restarts with half lives, then tally offers one Em
   });
   await expect(page.locator('#over')).toHaveClass(/on/);
   await expect(page.locator('.support-reward-dialog')).not.toBeVisible();
-  await page.getByRole('button', { name: 'Watch Ad | 2x embers (+13)', exact: true }).click();
+  await page.getByRole('button', { name: 'Watch Ad · 2x embers (+13)', exact: true }).click();
   await page
     .locator('.support-reward-dialog')
     .getByRole('button', { name: 'Thanks', exact: true })

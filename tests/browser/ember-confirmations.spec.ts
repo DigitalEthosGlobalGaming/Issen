@@ -33,8 +33,8 @@ test('Temple cancel leaves Embers intact and completed Awakening requires confir
   await page.locator('#template [data-back]').click();
   await page.locator('#bArmory').click();
   await page.locator('[data-form="awakened"]').click();
-  await expect(page.locator('.confirm-action')).toContainText('Confirm | -150 Embers');
-  await page.getByRole('button', { name: 'Confirm | -150 Embers', exact: true }).click();
+  await expect(page.locator('.confirm-action')).toContainText('Yes -150 Embers');
+  await page.getByRole('button', { name: 'Yes -150 Embers', exact: true }).click();
   await expect(page.locator('[data-form="awakened"]')).toHaveAttribute('aria-pressed', 'true');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers)).toBe(
     850,

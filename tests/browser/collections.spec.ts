@@ -14,14 +14,18 @@ test('mobile Temple exposes four collections and purchase opens zero-progress ch
   });
   await page.goto('/');
   await page.locator('#bTemplate').click();
-  for (const id of ['weapons', 'outfits', 'blessings', 'curses'])
+  for (const id of ['weapons', 'outfits', 'blessings', 'curses']) {
     await expect(page.locator(`[data-upgrade="${id}"]`)).toBeVisible();
+    await page.locator(`[data-upgrade="${id}"]`).click();
+    await expect(page.locator('.template-detail')).not.toContainText('Next:');
+    await expect(page.locator('.template-detail')).not.toContainText('Progress starts');
+  }
   await page.locator('[data-upgrade="weapons"]').click();
-  await expect(page.locator('.template-detail')).toContainText(
+  await expect(page.locator('.template-detail')).not.toContainText(
     'Sakura, Kodachi, Kage, Bokken, Yuki',
   );
   await page.getByRole('button', { name: 'Donate 100 Embers', exact: true }).click();
-  await page.getByRole('button', { name: 'Confirm | -100 Embers', exact: true }).click();
+  await page.getByRole('button', { name: 'Yes -100 Embers', exact: true }).click();
   await expect(page.locator('[data-upgrade="weapons"]')).toContainText('Rank 1/3');
   await page.screenshot({ path: info.outputPath('temple-collections.png') });
   await page.locator('#template [data-back]').click();

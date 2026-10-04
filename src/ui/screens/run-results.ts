@@ -208,7 +208,7 @@ export function createRunResults(
   return {
     start(nextReward, nextReveals, done, nextDouble, extraEmbers = 0) {
       doubleEmbers = extraEmbers > 0 ? nextDouble : undefined;
-      doubleButton.textContent = `Watch Ad | 2x embers (+${extraEmbers.toLocaleString()})`;
+      doubleButton.textContent = `Watch Ad · 2x embers (+${extraEmbers.toLocaleString()})`;
       reward = nextReward;
       reveals = nextReveals;
       onDone = done;

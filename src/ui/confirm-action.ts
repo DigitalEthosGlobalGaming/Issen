@@ -62,5 +62,5 @@ export function confirmAction(
   });
 }
 export function confirmEmberSpend(root: HTMLElement, name: string, cost: number, balance: number) {
-  return confirmAction(root, 'Are you sure?', '', `Confirm | -${cost} Embers`);
+  return confirmAction(root, 'Are you sure?', '', `Yes -${cost} Embers`);
 }

@@ -35,7 +35,7 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
   await page.locator('#bEnd').click();
   await expect(page.locator('#resultEmbers')).toHaveText('12');
   await expect(
-    page.getByRole('button', { name: 'Watch Ad | 2x embers (+13)', exact: true }),
+    page.getByRole('button', { name: 'Watch Ad · 2x embers (+13)', exact: true }),
   ).toBeVisible();
   await expect(
     page.locator('.result-reward-actions').getByRole('button', { name: 'Continue', exact: true }),
@@ -43,7 +43,7 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
   await page.screenshot({ path: info.outputPath('ember-ad-choice.png') });
   await page.reload();
   await expect(
-    page.getByRole('button', { name: 'Watch Ad | 2x embers (+13)', exact: true }),
+    page.getByRole('button', { name: 'Watch Ad · 2x embers (+13)', exact: true }),
   ).toBeVisible();
   await page
     .locator('.result-reward-actions')
