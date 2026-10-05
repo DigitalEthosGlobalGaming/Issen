@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/pine-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/pine-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "0939c7edc7112ddbff87552e551f261dfe652fa6fbc548426bb13ca3c7fe55b8",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "wood": {
+      "jobHash": "5f455af6066c0a44281515fbcb65176f4fc47cee7d4a33ffdc7017995c3b84db",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

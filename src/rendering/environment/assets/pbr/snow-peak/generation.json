@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/snow-peak.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/snow-peak",
+  "generated": "2026-10-05",
+  "sourceHash": "b3a99fc85fa424fecbd6f29c71e7231f3fcfea3b789ef0ef380cbda1391be5fc",
+  "dimensions": [
+    1881,
+    836
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "4dd7b6aa345deef093ba0bba5316b92586b95e7a1f69b12a81823292be02d9b8",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

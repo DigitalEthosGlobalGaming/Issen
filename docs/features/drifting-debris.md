@@ -4,17 +4,14 @@ Implemented in 1.59.0; quieter stage mixtures and fire/spirit artwork added in 1
 
 ## Player controls
 
-Options → Display and Accessibility → Drifting leaves selects **Stage sprites**
-(default) or **Original leaves**. Backtick / tilde switches immediately, including
-in gameplay and the cinematic viewer. The choice uses the existing profile-aware
-`issen.settings` save; older settings default to sprites. The shortcut ignores
-repeat events, modifier chords other than Shift, and text-entry controls, and is
-reserved from combat key bindings.
+Stage sprites are the only debris presentation as of 1.62.0. The original curved
+leaves and reusable-shape comparison are removed from the renderer, Options and
+cinematic viewer. Legacy `issen.settings.debrisStyle` values normalize to
+`sprites` while preserving the rest of the profile. Backtick / tilde now opens the
+[lighting debug controls](sword-lighting.md) and remains reserved from combat bindings.
 
-Triple-click the title logo to open the cinematic viewer. Its Debris selector
-also exposes **Reusable shape**, which reuses one normalized Path2D leaf instead
-of reconstructing two curves per leaf per frame. Viewer-only choices are temporary;
-exiting restores the saved option. The keyboard shortcut changes the saved option.
+Triple-click the title logo to open the cinematic viewer. Scene and film choices
+remain independent of player equipment; every scene uses stage debris artwork.
 
 ## Asset families and stages
 

@@ -1,0 +1,32 @@
+{
+  "source": "src/ui/assets/trial-symbols-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/trial-symbols-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "generated": "2026-10-05",
+  "sourceHash": "972328ec700dacc8e5b5b6ced54ce0e158e68ef83a16ee5f5de2d6edc179d0f6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "default": {
+      "jobHash": "b2ed6961bc0cd9afac0bc1bdd15149a6cc3365c35323a6eaee6c50806d3f9467",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {},
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "default",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {}
+      }
+    }
+  }
+}

@@ -11,36 +11,63 @@ interface PreparedSource {
 /** Renderer-owned GPU resources. Never takes ownership of decoded source pixels. */
 export class SceneTextureStore {
   private readonly sources = new Map<SceneTexture['source'], PreparedSource>();
+  private readonly dataSources = new Map<SceneTexture['source'], PreparedSource>();
   private frame = 0;
 
   beginFrame(): void {
     this.frame++;
   }
 
-  get(input: SceneTexture): Texture {
-    let prepared = this.sources.get(input.source);
+  private prepare(source: SceneTexture['source'], revision: number, data = false): PreparedSource {
+    const store = data ? this.dataSources : this.sources;
+    let prepared = store.get(source);
     if (!prepared) {
       prepared = {
-        texture: Texture.from(input.source, true),
+        texture: Texture.from(source, true),
         frames: new Map(),
-        revision: input.revision,
+        revision,
         lastFrame: this.frame,
       };
-      this.sources.set(input.source, prepared);
+      if (data) prepared.texture.source.alphaMode = 'no-premultiply-alpha';
+      store.set(source, prepared);
     }
     prepared.lastFrame = this.frame;
-    if (prepared.revision !== input.revision) {
+    if (prepared.revision !== revision) {
       for (const texture of prepared.frames.values()) texture.destroy(false);
       prepared.frames.clear();
-      prepared.texture.source.resize(input.source.width, input.source.height);
+      prepared.texture.source.resize(source.width, source.height);
       prepared.texture.source.update();
-      prepared.revision = input.revision;
+      prepared.revision = revision;
     }
-    if (!input.frame) return prepared.texture;
-    const key = input.frame.join(':');
+    return prepared;
+  }
+  touch(source: SceneTexture['source'], revision: number): boolean {
+    const prepared = this.sources.get(source);
+    if (!prepared || prepared.revision !== revision) return false;
+    prepared.lastFrame = this.frame;
+    return true;
+  }
+  getData(input: SceneTexture): Texture {
+    return this.get(input, true);
+  }
+  get(input: SceneTexture, data = false): Texture {
+    if (input.frame) return this.getFrame(input.source, input.revision, ...input.frame, data);
+    const prepared = this.prepare(input.source, input.revision, data);
+    return prepared.texture;
+  }
+  getFrame(
+    source: SceneTexture['source'],
+    revision: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    data = false,
+  ): Texture {
+    const prepared = this.prepare(source, revision, data);
+    const key = `${x}:${y}:${width}:${height}`;
     let texture = prepared.frames.get(key);
     if (!texture) {
-      const [x, y, width, height] = input.frame;
       texture = new Texture({
         source: prepared.texture.source,
         frame: new Rectangle(x, y, width, height),
@@ -52,15 +79,16 @@ export class SceneTextureStore {
 
   /** Drop unused stage resources, keeping a short grace period for transitions. */
   collect(): void {
-    for (const [source, prepared] of this.sources) {
-      if (this.frame - prepared.lastFrame <= 120) continue;
-      this.release(prepared);
-      this.sources.delete(source);
-    }
+    for (const store of [this.sources, this.dataSources])
+      for (const [source, prepared] of store) {
+        if (this.frame - prepared.lastFrame <= 120) continue;
+        this.release(prepared);
+        store.delete(source);
+      }
   }
 
   get size(): number {
-    return this.sources.size;
+    return this.sources.size + this.dataSources.size;
   }
 
   private release(prepared: PreparedSource): void {
@@ -70,6 +98,8 @@ export class SceneTextureStore {
 
   dispose(): void {
     for (const prepared of this.sources.values()) this.release(prepared);
+    for (const prepared of this.dataSources.values()) this.release(prepared);
     this.sources.clear();
+    this.dataSources.clear();
   }
 }

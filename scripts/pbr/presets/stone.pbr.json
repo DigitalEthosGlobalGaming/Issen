@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "stone",
+  "description": "Rough nonmetal surface with moderate normal detail.",
+  "mode": "texture",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 1.2,
+    "smoothing": 1.5,
+    "roughnessBase": 0.8,
+    "roughnessVariation": 0.6,
+    "roughnessBlur": 2,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

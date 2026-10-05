@@ -1,0 +1,53 @@
+{
+  "source": "src/ui/assets/panel-normal.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/panel-normal",
+  "generated": "2026-10-05",
+  "sourceHash": "51219e8041e44b43aa92f32b9549041bf39bd4d2c2083fe65b9af3aaa231b23c",
+  "dimensions": [
+    192,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "f91e785710fcb6a111c55cd509f2d025053becde2270752e967113727444ec0c",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

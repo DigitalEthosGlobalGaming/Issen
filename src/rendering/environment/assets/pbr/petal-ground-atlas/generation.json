@@ -1,0 +1,53 @@
+{
+  "source": "src/rendering/environment/assets/petal-ground-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/petal-ground-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "293208610eb9296bd492e94b83d3dec037c0bd6479171df0e732d55fe8795e4e",
+  "dimensions": [
+    1659,
+    948
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "73f95cf2d2c72bb2cadcbac47d4fed28868c5b0fded944a6cc79bbb1f975d116",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

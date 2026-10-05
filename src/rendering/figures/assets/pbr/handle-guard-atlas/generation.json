@@ -1,0 +1,120 @@
+{
+  "source": "src/rendering/figures/assets/handle-guard-atlas.png",
+  "preset": "leather",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/handle-guard-atlas",
+  "compositions": [
+    {
+      "preset": "metal",
+      "frame": [
+        949,
+        47,
+        186,
+        406
+      ]
+    },
+    {
+      "preset": "metal",
+      "frame": [
+        912,
+        471,
+        283,
+        378
+      ]
+    },
+    {
+      "preset": "metal",
+      "frame": [
+        914,
+        869,
+        270,
+        314
+      ]
+    }
+  ],
+  "generated": "2026-10-05",
+  "sourceHash": "26bf40bf4449f8a65bd2185bc073acdf89b941640e83e44c7c01544fa656f122",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "leather": {
+      "jobHash": "56bc264b17f9943f55eb6c6d8b9aac49a3d3c0891800ac4cbd702cb23e148208",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.7,
+          "bevelHeight": 0.5,
+          "detail": 0.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.75,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "leather",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.7,
+          "roughnessBase": 0.75,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.4,
+          "smoothing": 1.5
+        }
+      }
+    },
+    "metal": {
+      "jobHash": "069c8370a7923db7349f85bbe444b4fca9d514639297d3071f064e902bc31f78",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "polished-wood",
+  "description": "Polished or lacquered wood with softened grain and smoother nonmetal highlights.",
+  "mode": "texture",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 0.6,
+    "smoothing": 1.5,
+    "roughnessBase": 0.3,
+    "roughnessVariation": 0.2,
+    "roughnessBlur": 2,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

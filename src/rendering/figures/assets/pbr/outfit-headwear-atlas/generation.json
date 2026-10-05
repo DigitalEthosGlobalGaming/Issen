@@ -1,0 +1,145 @@
+{
+  "source": "src/rendering/figures/assets/outfit-headwear-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/outfit-headwear-atlas",
+  "compositions": [
+    {
+      "preset": "metal",
+      "frame": [
+        85,
+        126,
+        488,
+        450
+      ]
+    },
+    {
+      "preset": "wood",
+      "frame": [
+        630,
+        204,
+        605,
+        322
+      ]
+    }
+  ],
+  "generated": "2026-10-05",
+  "sourceHash": "3d9454cb0384ce23075a13a1a19a6ec94fff5408bfd602b9696b76fe34d3ac61",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "2e4979c81992f797c3a96adbd48e6f3a9b278dc291b4aceb98f7ed1b68fefbba",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    },
+    "metal": {
+      "jobHash": "84f6da6530a560357b4b57d9b68b7604beba42e76c6be71b6f79ec01e10c7a1f",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    },
+    "wood": {
+      "jobHash": "9ce053529102ebc1fb892eb7d3cdfe06a9358556284f0ad856e667284cc987ff",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

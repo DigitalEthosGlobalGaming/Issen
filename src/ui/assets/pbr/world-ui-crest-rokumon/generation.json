@@ -1,0 +1,53 @@
+{
+  "source": "src/ui/assets/world-ui-crest-rokumon.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-crest-rokumon",
+  "generated": "2026-10-05",
+  "sourceHash": "c77d6e04badc82b11569a4af756d4f850036fd8eb1f5d6348f2ba3b155498857",
+  "dimensions": [
+    128,
+    128
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "fe4b6f79f34b4f7a6c021fe49ff3cd14dd299043b212365b1a732c1e394c9065",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

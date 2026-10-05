@@ -1,0 +1,53 @@
+{
+  "source": "src/ui/assets/panel-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/panel-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "af38f684d8416a2bb53a4e6667deaf49c47280088ee61aa9b769158c671a7ad5",
+  "dimensions": [
+    384,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "ec6177938902248adc7a486cdb45f844e1ffb1d315036e90dafa89728460645b",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

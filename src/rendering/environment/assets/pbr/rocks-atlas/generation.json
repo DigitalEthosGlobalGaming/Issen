@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/rocks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/rocks-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "bf7e97e20ae1d23ae98cf8e331e510fd757a554fc1f799eecedb10fe350eb0c3",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "d254506b180a0238c58fd716239d834d3adc898f349004f44278e190409babb9",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

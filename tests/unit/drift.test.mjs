@@ -49,9 +49,9 @@ test('sprite identity survives updates and is chosen from current stage on respa
   ambient.updateLeaves(leaves, 0, 0, 0);
   assert.ok(DRIFT_MIXTURES[6].some(([id]) => id === leaves[0].sprite));
 });
-test('debris preference migrates safely and reserves its instant comparison shortcut', () => {
+test('legacy debris choices migrate to sprites and the lighting shortcut remains reserved', () => {
   assert.equal(parseSettings({ version: 1 }).debrisStyle, 'sprites');
-  assert.equal(parseSettings({ version: 1, debrisStyle: 'original' }).debrisStyle, 'original');
+  assert.equal(parseSettings({ version: 1, debrisStyle: 'original' }).debrisStyle, 'sprites');
   assert.equal(parseSettings({ version: 1, debrisStyle: 'invalid' }).debrisStyle, 'sprites');
   for (const key of ['`', '~'])
     assert.match(assignBinding(parseSettings(null), 'up', key), /reserved/);

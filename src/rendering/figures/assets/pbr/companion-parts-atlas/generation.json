@@ -1,0 +1,145 @@
+{
+  "source": "src/rendering/figures/assets/companion-parts-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/companion-parts-atlas",
+  "compositions": [
+    {
+      "preset": "stone",
+      "frame": [
+        0,
+        990,
+        940,
+        264
+      ]
+    },
+    {
+      "preset": "metal",
+      "frame": [
+        940,
+        990,
+        314,
+        264
+      ]
+    }
+  ],
+  "generated": "2026-10-05",
+  "sourceHash": "665098b617662367d5649c2635d849950552b33532df8f932f1d539a943508f8",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "33abd1a27760881d4905cad6d8b12f50bc753e89e1b0c9d5627d6c9101c5d0b3",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    },
+    "stone": {
+      "jobHash": "e20f67e94baed95ac82e2452d06b7dbb878adeb40475b85306507af2b564bcbb",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    },
+    "metal": {
+      "jobHash": "cb76497f21ce7ea9df53210f066ab2c98bad285c0a942257f077560b6a383fab",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

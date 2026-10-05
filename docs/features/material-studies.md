@@ -9,8 +9,9 @@ colour brightness: dark brush strokes remain painted marks.
 The colour images remain the existing player torso, foreground boulder atlas and
 steel blade atlas. See [character art](character-art.md) and the
 [environment asset library](environment-asset-library.md) for their provenance.
-The live torso and standard steel blade use the corresponding material; rock is
-a sample for reviewing future scenery integration. Existing cached environment
+The cloth study remains on non-Sumi torso parts; steel and rock are samples
+for reviewing future integration. Live modular blades and Sumi now use
+[PBR Forge atlas maps](sword-lighting.md). Existing cached environment
 layers retain their painted atmospheric treatment.
 
 ## Conventions

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "wood",
+  "description": "Matte wood with gentle grain normals, no metallic response or emission.",
+  "mode": "texture",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 0.8,
+    "smoothing": 1,
+    "roughnessBase": 0.7,
+    "roughnessVariation": 0.4,
+    "roughnessBlur": 1.5,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

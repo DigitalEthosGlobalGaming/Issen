@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/demon-terrain-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/demon-terrain-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "c85e1d4231bee473c87588729ba19738a8d48ebeab955ba4e629979a5bf6df28",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "bcc74f159beb1b2d6f7e6cae858bd4cbeb1f1698d468df579804f66b3daba770",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

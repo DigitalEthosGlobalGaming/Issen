@@ -49,4 +49,8 @@ test('normal transforms preserve orientation across rotation, mirroring and unif
     [-1, 0, 0, 1],
   );
   assert.ok([...normalTransform({ a: 0, b: 0, c: 0, d: 0, tx: 0, ty: 0 })].every(Number.isFinite));
+  const output = new Float32Array(4);
+  const transform = { a: 0, b: 2, c: -2, d: 0, tx: 0, ty: 0 };
+  assert.equal(normalTransform(transform, output, 3, 0.5), output);
+  assert.deepEqual([...output], [...normalTransform({ ...transform, b: 6, c: -1 })]);
 });

@@ -1,5 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Figure } from './types.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
 type Frame = readonly [number, number, number, number];
@@ -180,6 +182,7 @@ const FRAMES: Record<AtlasKey, readonly Frame[]> = {
   ],
 };
 export function createOutfitKit(doc: Document) {
+  const materials = createAssetMaterials(doc, SOURCES);
   const images = new Map<AtlasKey, HTMLImageElement>();
   const loaded = new Set<AtlasKey>();
   const tinted = new Map<string, HTMLCanvasElement>();
@@ -211,14 +214,16 @@ export function createOutfitKit(doc: Document) {
             image.src = SOURCES[key];
           }),
       ),
-    ).then(() => {});
+    ).then(async () => {
+      await materials.prepare();
+    });
     return pending;
   }
   function ready(id?: string) {
     return (
       !disposed &&
       supportsInkOutfit(id) &&
-      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key))
+      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key) && materials.ready(key))
     );
   }
   function stamp(g: SceneDrawing, a: Attachment, lean: number) {
@@ -248,7 +253,17 @@ export function createOutfitKit(doc: Document) {
     const h = (a.width * sh) / sw;
     const x = a.x + lean - a.width * (a.anchorX ?? 0.5),
       y = a.y - h * (a.anchorY ?? 0);
-    if (a.tint) g.drawImage(source, x, y, a.width, h);
+    const material = materials.material(a.atlas, frame);
+    if (material)
+      drawMaterialStamp(g, {
+        texture: { source, revision: 0, frame: a.tint ? undefined : frame },
+        material,
+        x,
+        y,
+        width: a.width,
+        height: h,
+      });
+    else if (a.tint) g.drawImage(source, x, y, a.width, h);
     else g.drawImage(source, sx, sy, sw, sh, x, y, a.width, h);
   }
   return {
@@ -347,6 +362,7 @@ export function createOutfitKit(doc: Document) {
       outfits: Object.keys(INK_OUTFIT_RECIPES).filter(ready),
     }),
     dispose() {
+      materials.dispose();
       disposed = true;
       for (const im of images.values()) {
         im.onload = null;

@@ -29,6 +29,9 @@ import { createInkCompanionRenderer } from './rendering/figures/ink-companions.t
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
+import { createLightingRig } from './rendering/lighting-rig.ts';
+import { setSceneLighting } from './rendering/scene-material.ts';
+import { createLightingDebug } from './ui/lighting-debug.ts';
 import { premium, listenToPurchases } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
 import {
@@ -271,6 +274,7 @@ export function startGame(
   const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
+  const lightingRig = createLightingRig();
   lifecycle.add(inkCharm.dispose);
   lifecycle.add(inkCompanion.dispose);
   lifecycle.add(inkEnemy.dispose);
@@ -620,7 +624,6 @@ export function startGame(
   }
   const driftRenderer = createDriftRenderer();
   let previewDemon = false;
-  driftRenderer.mode = settings.debrisStyle;
   lifecycle.add(driftRenderer.dispose);
   function ambient() {
     const stage = activeTrial?.realm === 'demon' || previewDemon ? STAGES.length : G.stage;
@@ -630,10 +633,10 @@ export function startGame(
       scale: S,
       layout: L,
       random: R,
-      density: density() * (driftRenderer.mode === 'sprites' ? (DRIFT_DENSITY[stage] ?? 1) : 1),
+      density: density() * (DRIFT_DENSITY[stage] ?? 1),
       stage,
       drawLeaf: driftRenderer.draw,
-      spriteMotion: driftRenderer.mode === 'sprites',
+      spriteMotion: true,
     });
   }
   function buildGrass() {
@@ -823,7 +826,7 @@ export function startGame(
       bamboo,
       state: cinematic.active ? cinematicWeather : WX,
       smokeSprite,
-      drawEmber: driftRenderer.mode === 'sprites' ? driftRenderer.drawEmber : undefined,
+      drawEmber: driftRenderer.drawEmber,
     });
   }
   function drawWeather() {
@@ -3056,7 +3059,7 @@ export function startGame(
     G.panelFrom = hudView.activeScreen || 'title';
     G.panel = id;
     if (id === 'support') {
-      supportPreview.draw(previewFrame(PREMIUM_FILM, false));
+      supportPreview.draw(previewFrame(PREMIUM_FILM, false, $('supportPreview')));
       renderSupport($('support'), premium.state, testerPremiumActive(testerPremium));
       void premium.refresh();
     }
@@ -3343,8 +3346,7 @@ export function startGame(
   const scrollMenus = createScrollMenus($('app'));
   lifecycle.add(scrollMenus.dispose);
   function applySettings() {
-    driftRenderer.mode = settings.debrisStyle;
-    cvs.dataset.debris = driftRenderer.mode;
+    cvs.dataset.debris = 'sprites';
     screenAnimation.invalidate();
     scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
@@ -3370,28 +3372,17 @@ export function startGame(
     store.set('issen.muted', settings.muted);
     applySettings();
   }
-  const toggleDrift = (event: KeyboardEvent) => {
-    if (event.code !== 'Backquote' && event.key !== '`' && event.key !== '~') return;
-    if (event.ctrlKey || event.altKey || event.metaKey || event.repeat) return;
-    const target = event.target;
-    if (
-      target instanceof HTMLElement &&
-      target.closest('input, textarea, [contenteditable="true"]')
-    )
-      return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    settings.debrisStyle = driftRenderer.mode === 'sprites' ? 'original' : 'sprites';
-    saveSettings();
-    for (const select of document.querySelectorAll<HTMLSelectElement>(
-      '#option-debrisStyle, [aria-label="Preview debris"]',
-    ))
-      select.value = settings.debrisStyle;
-    const viewer = document.getElementById('cinematic');
-    if (viewer) viewer.dataset.debris = settings.debrisStyle;
-  };
-  window.addEventListener('keydown', toggleDrift, true);
-  lifecycle.add(() => window.removeEventListener('keydown', toggleDrift, true));
+  const lightingDebug = createLightingDebug(
+    $('app'),
+    lightingRig,
+    () => (G.panel === 'armory' ? $('prevC') : G.panel === 'support' ? $('supportPreview') : cvs),
+    () => {
+      screenAnimation.invalidate();
+      if (G.panel === 'support')
+        supportPreview.draw(previewFrame(PREMIUM_FILM, false, $('supportPreview')));
+    },
+  );
+  lifecycle.add(lightingDebug.dispose);
   const options = createOptions(
     $('options'),
     settings,
@@ -3523,12 +3514,6 @@ export function startGame(
     scenes: [...STAGES.map((stage) => stage.n), 'Demon'],
     bindings: () => settings.bindings,
     film: () => EQ.film,
-    drift: () => driftRenderer.mode,
-    setDrift: (mode) => {
-      driftRenderer.mode = mode;
-      ambient().balanceLeaves(leaves);
-      cvs.dataset.debris = mode;
-    },
     films: () =>
       ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
     enter(stage) {
@@ -3544,8 +3529,7 @@ export function startGame(
     },
     scene: previewStage,
     leave: () => {
-      driftRenderer.mode = settings.debrisStyle;
-      cvs.dataset.debris = driftRenderer.mode;
+      cvs.dataset.debris = 'sprites';
       stageSeed = cinematicStageSeed;
       previewStage(cinematicStage, false);
       setupAttract();
@@ -3729,6 +3713,7 @@ export function startGame(
     preview.demo(armory.tab === 'fx' ? (armory.selected ?? EQ.fx) : EQ.fx, !!(G.m && G.m.bonk));
   }
   function drawPreview() {
+    lightingDebug.refresh();
     preview.draw(
       previewFrame(
         EQ.film === PREMIUM_FILM && !premiumAccess() ? 'mono' : EQ.film,
@@ -3736,9 +3721,10 @@ export function startGame(
       ),
     );
   }
-  function previewFrame(film: string, effectsVisible: boolean): PreviewFrame {
+  function previewFrame(film: string, effectsVisible: boolean, target = $('prevC')): PreviewFrame {
     const rb = ROBES[EQ.robe] || {};
     return {
+      lighting: lightingRig.lighting(target.width, target.height),
       time,
       wind,
       effectDensity: density(),
@@ -4468,6 +4454,8 @@ export function startGame(
   /** Synchronous draw of the current poses; presentation updates happen once above. */
   function drawScene(frame: PresentationFrame) {
     nativeScene?.begin();
+    lightingDebug.refresh();
+    setSceneLighting(g, lightingRig.lighting(W * DPR, H * DPR));
     g.setTransform(DPR, 0, 0, DPR, 0, 0);
     g.save();
     g.translate(frame.cameraX, frame.cameraY);
@@ -4508,7 +4496,7 @@ export function startGame(
     g.globalAlpha = 1;
     blades(mid, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
     if (!cinematic.active) drawStains();
-    if (!demonRealm || driftRenderer.mode === 'sprites') drawLeaves(false);
+    drawLeaves(false);
     const b = G.boss;
     if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
       const k = b.state === 'flash' ? 1 : clamp(b.t / b.dur);
@@ -4557,7 +4545,7 @@ export function startGame(
       drawSmoke();
       drawLeaves(true);
       drawWeather();
-    } else if (driftRenderer.mode === 'sprites') drawLeaves(true);
+    } else drawLeaves(true);
     if (!cinematic.active) drawPops();
     g.restore();
     if (!cinematic.active) drawStamps();

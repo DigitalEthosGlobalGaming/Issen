@@ -1,0 +1,573 @@
+{
+  "version": 1,
+  "description": "Missing inventory packs generated as material starting points; installation does not enable renderer lighting. Mixed sheets use a dominant material unless compositions are listed.",
+  "assets": [
+    {
+      "source": "src/rendering/environment/assets/bamboo-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/bamboo-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/bamboo-landmarks-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/cherry-landmarks-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/cherry-trees-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/cherry-trees-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/demon-landmarks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/demon-landmarks-atlas",
+      "compositions": [
+        {
+          "preset": "wood",
+          "frame": [627, 627, 627, 627]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/environment/assets/demon-terrain-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/demon-terrain-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/drift-debris-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/drift-debris-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/drift-fire-atlas.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/drift-fire-atlas",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/rendering/environment/assets/drift-leaves-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/drift-leaves-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/drift-petals-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/drift-petals-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/fallen-bamboo-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/field-banks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/field-banks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/field-rocks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/field-rocks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/foam-strips-atlas.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/foam-strips-atlas",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/rendering/environment/assets/fog-wisps-atlas.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/fog-wisps-atlas",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/rendering/environment/assets/foreground-boulders-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/foreground-boulders-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/grass-edges-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/grass-edges-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/landmark-stones-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/landmark-stones-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/meadow-patches-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/meadow-patches-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/mountain-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/mountain-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/petal-ground-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/petal-ground-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/pine-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/pine-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/reeds-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/reeds-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/rocks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/rocks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/sea-stacks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/sea-stacks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/shrubs-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/shrubs-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/snow-boulders-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/snow-boulders-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/snow-peak.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/snow-peak"
+    },
+    {
+      "source": "src/rendering/environment/assets/snow-pines-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/snow-pines-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/snow-rocks-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/snow-rocks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/temple-posts-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/temple-posts-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/temple-roofs-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/temple-roofs-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/temple-steps-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/temple-steps-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/temple-walls-atlas.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/temple-walls-atlas"
+    },
+    {
+      "source": "src/rendering/environment/assets/woodland-landmarks-atlas.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas"
+    },
+    {
+      "source": "src/rendering/figures/assets/armour-plates-atlas.png",
+      "preset": "metal",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/armour-plates-atlas"
+    },
+    {
+      "source": "src/rendering/figures/assets/charm-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/charm-atlas",
+      "compositions": [
+        {
+          "preset": "metal",
+          "frame": [157, 384, 173, 245]
+        },
+        {
+          "preset": "bone",
+          "frame": [491, 369, 200, 275]
+        },
+        {
+          "preset": "wood",
+          "frame": [809, 371, 238, 283]
+        },
+        {
+          "preset": "polished-wood",
+          "frame": [147, 650, 170, 353]
+        },
+        {
+          "preset": "metal",
+          "frame": [810, 670, 238, 296]
+        }
+      ],
+      "note": "Polished wood approximates a smooth nonmetal wind chime; the flame remains a matte first-pass export."
+    },
+    {
+      "source": "src/rendering/figures/assets/companion-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/companion-atlas"
+    },
+    {
+      "source": "src/rendering/figures/assets/companion-parts-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/companion-parts-atlas",
+      "compositions": [
+        {
+          "preset": "stone",
+          "frame": [0, 990, 940, 264]
+        },
+        {
+          "preset": "metal",
+          "frame": [940, 990, 314, 264]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/figures/assets/handle-guard-atlas.png",
+      "preset": "leather",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/handle-guard-atlas",
+      "compositions": [
+        {
+          "preset": "metal",
+          "frame": [949, 47, 186, 406]
+        },
+        {
+          "preset": "metal",
+          "frame": [912, 471, 283, 378]
+        },
+        {
+          "preset": "metal",
+          "frame": [914, 869, 270, 314]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/figures/assets/katana.png",
+      "preset": "metal",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/katana"
+    },
+    {
+      "source": "src/rendering/figures/assets/mystic-rock.png",
+      "preset": "stone",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/mystic-rock"
+    },
+    {
+      "source": "src/rendering/figures/assets/outfit-cloth-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/outfit-cloth-atlas",
+      "compositions": [
+        {
+          "preset": "wood",
+          "frame": [64, 663, 746, 532]
+        },
+        {
+          "preset": "leather",
+          "frame": [927, 692, 208, 481]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/figures/assets/outfit-headwear-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/outfit-headwear-atlas",
+      "compositions": [
+        {
+          "preset": "metal",
+          "frame": [85, 126, 488, 450]
+        },
+        {
+          "preset": "wood",
+          "frame": [630, 204, 605, 322]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/figures/assets/player-mask-atlas.png",
+      "preset": "polished-wood",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/player-mask-atlas"
+    },
+    {
+      "source": "src/rendering/figures/assets/player-ronin-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/player-ronin-atlas"
+    },
+    {
+      "source": "src/rendering/figures/assets/player-special-headwear-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/player-special-headwear-atlas",
+      "compositions": [
+        {
+          "preset": "wood",
+          "frame": [147, 92, 357, 501]
+        }
+      ]
+    },
+    {
+      "source": "src/rendering/figures/assets/special-weapons-atlas.png",
+      "preset": "metal",
+      "mode": "sprite",
+      "output": "src/rendering/figures/assets/pbr/special-weapons-atlas"
+    },
+    {
+      "source": "src/ui/assets/armoury-room.png",
+      "preset": "default",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/armoury-room",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/ui/assets/awakening-button-awakened.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/awakening-button-awakened"
+    },
+    {
+      "source": "src/ui/assets/awakening-button-normal.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/awakening-button-normal"
+    },
+    {
+      "source": "src/ui/assets/awakening-button-third.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/awakening-button-third"
+    },
+    {
+      "source": "src/ui/assets/awakening-buttons-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/awakening-buttons-atlas"
+    },
+    {
+      "source": "src/ui/assets/button-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/button-atlas"
+    },
+    {
+      "source": "src/ui/assets/button-highlighted.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/button-highlighted"
+    },
+    {
+      "source": "src/ui/assets/button-normal.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/button-normal"
+    },
+    {
+      "source": "src/ui/assets/demon-mirror-symbol.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/demon-mirror-symbol",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/ui/assets/issen-logo.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/issen-logo",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/ui/assets/panel-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/panel-atlas"
+    },
+    {
+      "source": "src/ui/assets/panel-highlighted.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/panel-highlighted"
+    },
+    {
+      "source": "src/ui/assets/panel-normal.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/panel-normal"
+    },
+    {
+      "source": "src/ui/assets/temple-symbols-atlas.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/temple-symbols-atlas",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/ui/assets/trial-symbols-atlas.png",
+      "preset": "default",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/trial-symbols-atlas",
+      "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface."
+    },
+    {
+      "source": "src/ui/assets/ui-strokes-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/ui-strokes-atlas"
+    },
+    {
+      "source": "src/ui/assets/world-ui-atlas.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-atlas"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-aoi.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-aoi"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-fuji.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-fuji"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-juji.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-juji"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-kikyo.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-kikyo"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-rokumon.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-rokumon"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-tomoe.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-tomoe"
+    },
+    {
+      "source": "src/ui/assets/world-ui-crest-tsuru.png",
+      "preset": "cloth",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-crest-tsuru"
+    },
+    {
+      "source": "src/ui/assets/world-ui-material-metal.png",
+      "preset": "metal",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-material-metal"
+    },
+    {
+      "source": "src/ui/assets/world-ui-material-paper.png",
+      "preset": "cloth",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-material-paper"
+    },
+    {
+      "source": "src/ui/assets/world-ui-material-silk.png",
+      "preset": "cloth",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-material-silk"
+    },
+    {
+      "source": "src/ui/assets/world-ui-material-stone.png",
+      "preset": "stone",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-material-stone"
+    },
+    {
+      "source": "src/ui/assets/world-ui-material-wood.png",
+      "preset": "wood",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-material-wood"
+    },
+    {
+      "source": "src/ui/assets/world-ui-scroll-paper.png",
+      "preset": "cloth",
+      "mode": "texture",
+      "output": "src/ui/assets/pbr/world-ui-scroll-paper"
+    },
+    {
+      "source": "src/ui/assets/world-ui-scroll-rod.png",
+      "preset": "wood",
+      "mode": "sprite",
+      "output": "src/ui/assets/pbr/world-ui-scroll-rod"
+    }
+  ]
+}

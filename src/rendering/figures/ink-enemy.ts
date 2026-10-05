@@ -1,4 +1,6 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createPbrAtlas } from '../pbr-atlas.ts';
+import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
@@ -49,8 +51,66 @@ const URLS = {
   base: new URL('./assets/enemy-ronin-simple.png', import.meta.url).href,
   heads: new URL('./assets/enemy-headwear-atlas.png', import.meta.url).href,
 };
+const PBR_SOURCES = {
+  base: {
+    diffuse: new URL('./assets/enemy-pbr/enemy-ronin-simple_diffuse.png', import.meta.url).href,
+    normal: new URL('./assets/enemy-pbr/enemy-ronin-simple_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-ronin-simple_roughness.png', import.meta.url).href,
+    metallic: new URL('./assets/enemy-pbr/enemy-ronin-simple_metallic.png', import.meta.url).href,
+    ao: new URL('./assets/enemy-pbr/enemy-ronin-simple_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-ronin-simple_emissive.png', import.meta.url).href,
+  },
+  clothing: {
+    diffuse: new URL('./assets/enemy-pbr/enemy-clothing-variants_diffuse.png', import.meta.url)
+      .href,
+    normal: new URL('./assets/enemy-pbr/enemy-clothing-variants_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-clothing-variants_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-clothing-variants_metallic.png', import.meta.url)
+      .href,
+    ao: new URL('./assets/enemy-pbr/enemy-clothing-variants_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-clothing-variants_emissive.png', import.meta.url)
+      .href,
+  },
+  heads: {
+    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-atlas_diffuse.png', import.meta.url).href,
+    normal: new URL('./assets/enemy-pbr/enemy-headwear-atlas_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-headwear-atlas_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-headwear-atlas_metallic.png', import.meta.url).href,
+    ao: new URL('./assets/enemy-pbr/enemy-headwear-atlas_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-headwear-atlas_emissive.png', import.meta.url).href,
+  },
+  variationHeads: {
+    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-variants_diffuse.png', import.meta.url)
+      .href,
+    normal: new URL('./assets/enemy-pbr/enemy-headwear-variants_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-headwear-variants_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-headwear-variants_metallic.png', import.meta.url)
+      .href,
+    ao: new URL('./assets/enemy-pbr/enemy-headwear-variants_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-headwear-variants_emissive.png', import.meta.url)
+      .href,
+  },
+};
+function familyFor(key: string): keyof typeof PBR_SOURCES {
+  return key.startsWith('clothing:')
+    ? 'clothing'
+    : key.startsWith('variationHead:')
+      ? 'variationHeads'
+      : key.startsWith('head:')
+        ? 'heads'
+        : 'base';
+}
 /** Front-view puppet, in the caller's normalized figure transform. No gameplay state. */
 export function createInkEnemyRenderer(doc: Document) {
+  const pbr = {
+    base: createPbrAtlas(doc, PBR_SOURCES.base, 1254),
+    clothing: createPbrAtlas(doc, PBR_SOURCES.clothing, 1536, 1024),
+    heads: createPbrAtlas(doc, PBR_SOURCES.heads, 1536, 1024),
+    variationHeads: createPbrAtlas(doc, PBR_SOURCES.variationHeads, 1254),
+  };
   const images = new Map<string, HTMLImageElement>(),
     loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
@@ -82,6 +142,7 @@ export function createInkEnemyRenderer(doc: Document) {
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
+    const pbrReady = Promise.all(Object.values(pbr).map((atlas) => atlas.prepare()));
     pending = Promise.all(
       Object.entries(URLS).map(
         ([key, url]) =>
@@ -108,7 +169,10 @@ export function createInkEnemyRenderer(doc: Document) {
             image.src = url;
           }),
       ),
-    ).then(() => Object.keys(URLS).every((key) => loaded.has(key)));
+    ).then(async () => {
+      const materials = await pbrReady;
+      return Object.keys(URLS).every((key) => loaded.has(key)) && materials.every(Boolean);
+    });
     return pending;
   }
   function supports(f: Figure) {
@@ -118,6 +182,7 @@ export function createInkEnemyRenderer(doc: Document) {
       !f.back &&
       LOOKS.has(v) &&
       loaded.has('base') &&
+      Object.values(pbr).every((atlas) => atlas.ready) &&
       (!f.varied || (loaded.has('clothing') && loaded.has('variationHeads'))) &&
       (v === '' || loaded.has('heads'))
     );
@@ -131,17 +196,12 @@ export function createInkEnemyRenderer(doc: Document) {
     f: Figure,
     env: FigureEnvironment,
     cloth: boolean,
+    applyFog = true,
   ): HTMLCanvasElement | null {
-    const family = key.startsWith('clothing:')
-        ? 'clothing'
-        : key.startsWith('variationHead:')
-          ? 'variationHeads'
-          : key.startsWith('head:')
-            ? 'heads'
-            : 'base',
-      image = images.get(family);
+    const family = familyFor(key),
+      image = pbr[family].diffuse ?? images.get(family);
     if (!image) return null;
-    const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
+    const fog = applyFog ? Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4)) : 0;
     const mist = env.palette(1).robe;
     const palette = cloth ? f.pal : null,
       keyFull =
@@ -216,8 +276,47 @@ export function createInkEnemyRenderer(doc: Document) {
     f: Figure,
     env: FigureEnvironment,
   ) {
-    const im = sprite(key, BASE_FRAMES[key], f, env, key !== 'head' && key !== 'hand');
-    if (im) g.drawImage(im, x, y, w, h);
+    paint(g, key, BASE_FRAMES[key], x, y, w, h, f, env, key !== 'head' && key !== 'hand');
+  }
+  function paint(
+    g: SceneDrawing,
+    key: string,
+    frame: Frame,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    f: Figure,
+    env: FigureEnvironment,
+    cloth: boolean,
+  ) {
+    const material =
+      (cloth ||
+        key === 'head' ||
+        familyFor(key) === 'heads' ||
+        familyFor(key) === 'variationHeads') &&
+      supportsSceneMaterials(g)
+        ? pbr[familyFor(key)].material(frame)
+        : null;
+    const im = sprite(key, frame, f, env, cloth, !material);
+    if (!im) return;
+    if (material) {
+      // Keep palette recolouring in the diffuse cache, then apply fog after lighting.
+      const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
+      const mist = rgb(env.palette(1).robe);
+      drawMaterialStamp(g, {
+        texture: { source: im, revision: 0 },
+        material: {
+          ...material,
+          fog,
+          fogColor: [mist[0]! / 255, mist[1]! / 255, mist[2]! / 255],
+        },
+        x,
+        y,
+        width: w,
+        height: h,
+      });
+    } else g.drawImage(im, x, y, w, h);
   }
   function joints(f: Figure) {
     const l = f.lean || 0,
@@ -272,10 +371,9 @@ export function createInkEnemyRenderer(doc: Document) {
         g.rotate(sway);
         if (appearance) {
           const i = appearance.clothing + 3;
-          const lower = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
           const frame = CLOTHING_FRAMES[i]!,
             width = (0.52 * frame[2]) / frame[3];
-          if (lower) g.drawImage(lower, -width / 2, 0, width, 0.52);
+          paint(g, 'clothing:' + i, frame, -width / 2, 0, width, 0.52, f, env, true);
         } else {
           const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
           const dark = rgb((f.pal || env.palette(0)).robeD);
@@ -303,42 +401,57 @@ export function createInkEnemyRenderer(doc: Document) {
       if (part !== 'skirt') {
         if (appearance) {
           const i = appearance.clothing;
-          const torso = sprite('clothing:' + i, CLOTHING_FRAMES[i]!, f, env, true);
           const frame = CLOTHING_FRAMES[i]!,
             width = (0.355 * frame[2]) / frame[3];
-          if (torso) g.drawImage(torso, -width / 2 + l * 0.8, -0.835, width, 0.355);
+          paint(
+            g,
+            'clothing:' + i,
+            frame,
+            -width / 2 + l * 0.8,
+            -0.835,
+            width,
+            0.355,
+            f,
+            env,
+            true,
+          );
         } else stamp(g, 'torso', -0.175 + l * 0.8, -0.835, 0.35, 0.355, f, env);
       }
     } else if (part === 'head') {
       if (appearance && useVariantHead) {
         const i = appearance.head,
           frame = VARIANT_HEAD_FRAMES[i]!;
-        const im = sprite('variationHead:' + i, frame, f, env, false);
         const scale = HEAD_WIDTHS[i]! / frame[2];
-        if (im)
-          g.drawImage(
-            im,
-            l * 1.05 - (HEAD_NECKS[i]! - frame[0]) * scale,
-            -0.815 - (HEAD_BOTTOMS[i]! - frame[1]) * scale,
-            frame[2] * scale,
-            frame[3] * scale,
-          );
+        paint(
+          g,
+          'variationHead:' + i,
+          frame,
+          l * 1.05 - (HEAD_NECKS[i]! - frame[0]) * scale,
+          -0.815 - (HEAD_BOTTOMS[i]! - frame[1]) * scale,
+          frame[2] * scale,
+          frame[3] * scale,
+          f,
+          env,
+          false,
+        );
       } else {
         stamp(g, 'head', l * 1.05 - 0.067, -0.973, 0.134, 0.171, f, env);
         const v = f.variant || '',
           frame = HEAD_FRAMES[v];
         if (frame) {
-          const im = sprite('head:' + v, frame, f, env, false);
-          if (im) {
-            const w = v === 'kasa' || v === 'jingasa' ? 0.28 : v === 'kabuto' ? 0.23 : 0.17;
-            g.drawImage(
-              im,
-              l * 1.05 - w / 2,
-              v === 'mask' ? -0.935 : -1.0,
-              w,
-              (w * frame[3]) / frame[2],
-            );
-          }
+          const w = v === 'kasa' || v === 'jingasa' ? 0.28 : v === 'kabuto' ? 0.23 : 0.17;
+          paint(
+            g,
+            'head:' + v,
+            frame,
+            l * 1.05 - w / 2,
+            v === 'mask' ? -0.935 : -1.0,
+            w,
+            (w * frame[3]) / frame[2],
+            f,
+            env,
+            false,
+          );
         }
       }
     } else
@@ -363,7 +476,9 @@ export function createInkEnemyRenderer(doc: Document) {
     prepare,
     drawPart,
     snapshot: () => ({
-      ready: Object.keys(URLS).every((key) => loaded.has(key)),
+      ready:
+        Object.keys(URLS).every((key) => loaded.has(key)) &&
+        Object.values(pbr).every((atlas) => atlas.ready),
       loaded: [...loaded],
       cachedParts: cache.size,
       toneParts: tones.size,
@@ -374,6 +489,7 @@ export function createInkEnemyRenderer(doc: Document) {
     }),
     dispose() {
       disposed = true;
+      for (const atlas of Object.values(pbr)) atlas.dispose();
       for (const im of images.values()) {
         im.onload = null;
         im.onerror = null;

@@ -1,0 +1,32 @@
+{
+  "source": "src/rendering/environment/assets/foam-strips-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/foam-strips-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "generated": "2026-10-05",
+  "sourceHash": "7a30e9c0280571eb711345a9757c1748efc635c58920185652264e9c0d5cf6ec",
+  "dimensions": [
+    1659,
+    948
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "default": {
+      "jobHash": "88876d7cb6d1e0529d2504f66b00e064f4ef994db5602d1374199834c4ed9216",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {},
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "default",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {}
+      }
+    }
+  }
+}

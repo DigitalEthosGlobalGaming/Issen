@@ -1,0 +1,53 @@
+{
+  "source": "src/rendering/figures/assets/special-weapons-atlas.png",
+  "preset": "metal",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/special-weapons-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "45621dcc1da7e64656964b4a4d93d47186ace2cce06628e2acadf9f62b4dd4af",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "metal": {
+      "jobHash": "1f4f1913a893313e7a58f9434494ab1157f639be8a5a323237971bd17f847df0",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

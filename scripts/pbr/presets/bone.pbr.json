@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "bone",
+  "description": "Smooth bone and horn with gentle normals and subdued nonmetal highlights.",
+  "mode": "sprite",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 0.6,
+    "bevelHeight": 0.6,
+    "detail": 0.1,
+    "smoothing": 2,
+    "roughnessBase": 0.65,
+    "roughnessVariation": 0.3,
+    "roughnessBlur": 2.5,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

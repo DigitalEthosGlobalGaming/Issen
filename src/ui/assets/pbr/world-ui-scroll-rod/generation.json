@@ -1,0 +1,49 @@
+{
+  "source": "src/ui/assets/world-ui-scroll-rod.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-scroll-rod",
+  "generated": "2026-10-05",
+  "sourceHash": "96f2472cd09f5dfd2411493f781ac799dd7e3208fa64234c0f7897c44e082375",
+  "dimensions": [
+    192,
+    48
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "wood": {
+      "jobHash": "a99d64a2ecdbc7cf63aea0461c238a8596585ad3a6f736b137b4843dd3f46d3f",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

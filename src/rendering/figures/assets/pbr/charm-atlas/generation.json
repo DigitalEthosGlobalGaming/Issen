@@ -1,0 +1,245 @@
+{
+  "source": "src/rendering/figures/assets/charm-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/charm-atlas",
+  "compositions": [
+    {
+      "preset": "metal",
+      "frame": [
+        157,
+        384,
+        173,
+        245
+      ]
+    },
+    {
+      "preset": "bone",
+      "frame": [
+        491,
+        369,
+        200,
+        275
+      ]
+    },
+    {
+      "preset": "wood",
+      "frame": [
+        809,
+        371,
+        238,
+        283
+      ]
+    },
+    {
+      "preset": "polished-wood",
+      "frame": [
+        147,
+        650,
+        170,
+        353
+      ]
+    },
+    {
+      "preset": "metal",
+      "frame": [
+        810,
+        670,
+        238,
+        296
+      ]
+    }
+  ],
+  "note": "Polished wood approximates a smooth nonmetal wind chime; the flame remains a matte first-pass export.",
+  "generated": "2026-10-05",
+  "sourceHash": "12af5f9738a48b8f8c23a7eb5b22a4573424f87e18c9fec2f1794e7f38c38c93",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "e5dd87daa0f6d18652f49c232cd0a8efea6437cb4f53094d1cdf47a3caa9c942",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    },
+    "metal": {
+      "jobHash": "fe2fad45bc7d28c750ccd869812caa15530ba4fbc3d24b6e405133d3e1d0f6dc",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    },
+    "bone": {
+      "jobHash": "2666e6c0978eeba21ce06221dccdde5cb08ac610024167ffa22b14f98d8f923f",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.6,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.65,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 2.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "bone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.6,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.65,
+          "roughnessBlur": 2.5,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    },
+    "wood": {
+      "jobHash": "0ba336c656c362dbb45af1d4b4a107d6b56ddc7048556d9bdaabae98f6bf75fc",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    },
+    "polished-wood": {
+      "jobHash": "cc4680e439fd19dc6621efc61b6fe07c583000e99f4fba9bee6cf6f594e332f8",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "smoothing": 1.5,
+          "roughnessBase": 0.3,
+          "roughnessVariation": 0.2,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "polished-wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.3,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.2,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/woodland-landmarks-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "9dc9914382cfe0ff5e07317bad16729d7d71d8ebd32f64fe2ec34dd3ce0e4748",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "wood": {
+      "jobHash": "fa0a6e5ad03c746fd35944a1cce49c0fe14fc24c9938c0c984cb088d6af662d8",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

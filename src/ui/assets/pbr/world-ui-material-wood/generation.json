@@ -1,0 +1,49 @@
+{
+  "source": "src/ui/assets/world-ui-material-wood.png",
+  "preset": "wood",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-wood",
+  "generated": "2026-10-05",
+  "sourceHash": "932a5738ccc406cd0fd00d6e4755c289b0e068e59a2416b8e8a5fa90a47d4a04",
+  "dimensions": [
+    192,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "wood": {
+      "jobHash": "97e647704016fc72eb495e73eec92b64777d05f4b89ec88fb24d32872ceb8915",
+      "actual": {
+        "mode": "texture",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "texture",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

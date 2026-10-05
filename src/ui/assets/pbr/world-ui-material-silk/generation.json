@@ -1,0 +1,54 @@
+{
+  "source": "src/ui/assets/world-ui-material-silk.png",
+  "preset": "cloth",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-silk",
+  "generated": "2026-10-05",
+  "sourceHash": "27a7a61f86eac5311488752a47898582c7bb03386ec554b8c4f7dcf4cefd7856",
+  "dimensions": [
+    192,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "7efc7cf2e026366b18232ce94e31aecb488055397c7bbf629a312aaf4c0e9079",
+      "actual": {
+        "mode": "texture",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": [
+          "bevelHeight",
+          "detail"
+        ]
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "texture",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

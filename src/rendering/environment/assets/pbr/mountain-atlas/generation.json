@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/mountain-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/mountain-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "8e9de77e5a51503512527e181d597b211d096a0723c008416d43452fe9250bde",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "e14637a10e7ffb10646e56c75c93cffdec7bb5d0851211fa317d106a7d9aa29b",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

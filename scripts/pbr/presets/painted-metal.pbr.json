@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "painted-metal",
+  "description": "Coated metal with moderate normals, broad highlights and reduced metallic response.",
+  "mode": "sprite",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 1,
+    "bevelHeight": 0.8,
+    "detail": 0.2,
+    "smoothing": 1.5,
+    "roughnessBase": 0.5,
+    "roughnessVariation": 0.3,
+    "roughnessBlur": 2,
+    "metallicOffset": -0.25,
+    "metallicContrast": 0.5,
+    "emissiveIntensity": 0
+  }
+}

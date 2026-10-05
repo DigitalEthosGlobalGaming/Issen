@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/temple-posts-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/temple-posts-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "6aefeaf563e1af1fba42187dbeddd3ffc23b29e95c800ce6e2c30efe921f1547",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "wood": {
+      "jobHash": "67e68bd3ab33e56315e85a363226fcf7678ea94085bc72cd6a5bbfaa4f5ee7d4",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.8,
+          "smoothing": 1,
+          "roughnessBase": 0.7,
+          "roughnessVariation": 0.4,
+          "roughnessBlur": 1.5,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.8,
+          "roughnessBase": 0.7,
+          "roughnessBlur": 1.5,
+          "roughnessVariation": 0.4,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

@@ -18,8 +18,11 @@ import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
 import roomUrl from '../ui/assets/armoury-room.png';
 import { drawArmoryRoom, drawRoomWind, roomWindow } from './armory-room.ts';
+import { setSceneLighting } from './scene-material.ts';
+import type { SceneLighting } from './scene-frame.ts';
 
 export interface PreviewFrame extends Omit<FigureEnvironment, 'width' | 'height' | 'random'> {
+  lighting?: SceneLighting;
   background: HTMLCanvasElement | null;
   appearance: Omit<Figure, 'x' | 'y' | 'h' | 'fog' | 'pose'>;
   pet: string;
@@ -139,6 +142,7 @@ export function createArmoryPreview(
     density = frame.effectDensity ?? 1;
     const g = context!;
     surface?.native?.begin();
+    if (frame.lighting) setSceneLighting(g, frame.lighting);
     const width = canvas.width,
       height = canvas.height;
     g.setTransform(1, 0, 0, 1, 0, 0);

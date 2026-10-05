@@ -1,0 +1,53 @@
+{
+  "source": "src/rendering/environment/assets/drift-leaves-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/drift-leaves-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "ca5255457502e3673e2e054b70556b8b4f4cbf1702e82befefd2c1c9c68bf128",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "cloth": {
+      "jobHash": "90abc53e99d312e54d08988899f34147af7ec1f1db6e3612c1d738f1ddcf5ca2",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "smoothing": 2,
+          "roughnessBase": 0.85,
+          "roughnessVariation": 0.3,
+          "roughnessBlur": 3,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "cloth",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 0.5,
+          "detail": 0.1,
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.85,
+          "roughnessBlur": 3,
+          "roughnessVariation": 0.3,
+          "smoothing": 2
+        }
+      }
+    }
+  }
+}

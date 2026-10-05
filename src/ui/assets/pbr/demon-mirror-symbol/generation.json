@@ -1,0 +1,32 @@
+{
+  "source": "src/ui/assets/demon-mirror-symbol.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/demon-mirror-symbol",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "generated": "2026-10-05",
+  "sourceHash": "cb2552a3377ed544f3c14918cc1336263b39d5456915414161c1d9735998404e",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "default": {
+      "jobHash": "c48672682f91420f418ad5476e2af72c04d66c3da6e695fbbf0f162608ab99ea",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {},
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "default",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {}
+      }
+    }
+  }
+}

@@ -13,7 +13,7 @@ export interface Settings {
   textSize: 'normal' | 'large';
   menuStyle: 'scroll';
   quality: 'auto' | 'low' | 'high';
-  debrisStyle: 'sprites' | 'original';
+  debrisStyle: 'sprites';
   vibration: boolean;
   vibrationStrength: 'light' | 'full';
 }
@@ -109,7 +109,8 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
     menuStyle: 'scroll',
     quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
-    debrisStyle: choice('debrisStyle', ['sprites', 'original'], 'sprites'),
+    // Preserve the field for save compatibility; legacy choices migrate to stage sprites.
+    debrisStyle: 'sprites',
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),
   };

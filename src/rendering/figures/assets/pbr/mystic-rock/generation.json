@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/figures/assets/mystic-rock.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/mystic-rock",
+  "generated": "2026-10-05",
+  "sourceHash": "2a3629e2ecf4724b909fbbf6308c1cde9eefc6d795710b5892fa6b4df3a0e33b",
+  "dimensions": [
+    1145,
+    1373
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "7fa0066d4dc3f435a8bf00eb7a26a9cc1fcfbbc91be477296a10b3d676f2744c",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

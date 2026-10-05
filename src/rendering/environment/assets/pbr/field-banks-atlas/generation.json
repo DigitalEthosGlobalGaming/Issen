@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/field-banks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/field-banks-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "14597eff9863348440e67fccfe13d426fd5bbf9c0ad2b76838cf841920a20701",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "b9b750668ccdaab70adf6c2595e8fce1fb70c094b75dee49d47059c996bdc742",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "rusted-metal",
+  "description": "Weathered metal with stronger surface detail, high roughness and reduced metallic response.",
+  "mode": "texture",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 1.6,
+    "smoothing": 0.5,
+    "roughnessBase": 0.8,
+    "roughnessVariation": 0.7,
+    "roughnessBlur": 1,
+    "metallicOffset": -0.1,
+    "metallicContrast": 0.6,
+    "emissiveIntensity": 0
+  }
+}

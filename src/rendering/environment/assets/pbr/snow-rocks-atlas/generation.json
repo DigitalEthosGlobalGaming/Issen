@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/snow-rocks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/snow-rocks-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "61d50b3b9ab83cebeb902ef54d4ae27e8283fe1544d7caf0a7530617ef673b26",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "f9c88590ef5935e4cd2ccb1c22129e53f616f07fab8a509f021a15f69f7f489b",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

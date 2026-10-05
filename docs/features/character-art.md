@@ -37,6 +37,30 @@ Sumi supplies the common rear-view body and puppet joints. All primary outfit
 recipes combine reusable cloth, armour, headwear and accessories over that body.
 Enemy front views use a separate modular kit.
 
+Version 1.63.0 adds cloth PBR lighting to the enemy base clothing and all six
+clothing variation frames. `ink-enemy.ts` owns two `createPbrAtlas` instances:
+1254×1254 for the base kit and 1536×1024 for clothing variations. The shared
+helper accepts width and an optional height (square by default). Normal,
+roughness, metallic, AO and emissive maps use the existing frame rectangles;
+palette recolouring supplies diffuse colour. Fog blends after lighting in the
+shader, while Canvas cutouts retain their existing fog treatment. Readiness
+includes both material atlases, and disposal releases their images and packed
+surface canvases. Heads, headwear, hands and the under-robe bridge retain their
+existing artwork. The first pass uses `cloth` for all clothing, including armour
+panels. See [enemy map provenance](../../src/rendering/figures/assets/enemy-pbr/README.md)
+and [PBR tool instructions](../../scripts/pbr/README.md).
+
+Version 1.64.0 extends enemy lighting to the base face, the six authored headwear
+accessories and the four complete head variations. `ink-enemy.ts` owns two more
+PBR atlases, using the same frame-to-material mapping and fog treatment as
+clothing. Kabuto and jingasa use metal, kasa uses matte wood as a straw
+approximation, and cloth masks, hoods and hair use cloth. The complete crested
+helmet uses a source-colour mask to keep warm face and neck pixels nonmetallic;
+the exact composition is recorded in the enemy map provenance. Heads retain
+their source colours, neck anchors and transparent openings. All four atlases
+participate in readiness and disposal. Hands and the under-robe bridge retain
+flat rendering.
+
 ## Reusable source assets
 
 - [Player kit and frame/pivot contract](../../src/rendering/figures/assets/player-ronin-simple.md)
@@ -300,3 +324,12 @@ the charm to 0.48 radians, with the same damping so the stronger recoil settles
 naturally. Ordinary cuts and parries retain their original impulse. Hands, weapon poses, collision,
 attack windows and save data are unchanged. Springs reset at a new run and when
 reduced motion is enabled, and stop with manual/background suspension.
+
+## PBR lighting trial (1.62.0)
+
+Sumi's nine modular parts now use an aligned PBR Forge conversion, and all six
+blade profiles use the supplied sword PBR atlas. Existing joints, silhouette,
+weapon registration and recipe tints are retained. Tilde opens shared light
+position and comparison controls in the live scene and Armoury. Other outfits
+and their attachment artwork remain unchanged. See [sword and Sumi lighting](sword-lighting.md)
+for map ownership, shader limits and verification status.

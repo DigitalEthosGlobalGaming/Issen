@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/environment/assets/temple-walls-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/temple-walls-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "11646d9fb9b9d9e47b444c9ff41a3ba1676c98844a20f54ac7ddd026588b6d63",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "cbf9c2fa0b4eba20c02d558278699bd52702ca03fa27c5956230543ace8caf24",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

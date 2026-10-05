@@ -1,4 +1,5 @@
 import type { SceneDrawing } from './scene-drawing.ts';
+import { drawCachedBrushRing, drawCachedGlyphArrow } from './scene-brush-ring.ts';
 import { drawSeal } from './ui-art.ts';
 import { TAU, clamp } from '../shared/math.ts';
 import { DANG } from '../shared/directions.ts';
@@ -38,6 +39,19 @@ const hexA = (h: string, a: number) => {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 };
 function brushRing(g: SceneDrawing, r: number, a0: number, frac: number, w: number, col: string) {
+  // The outer direction-marker ring has fixed shape and two paint variants.
+  // Retain the original overlapping strokes; native renderers then only
+  // transform cached geometry. Progress rings keep their procedural geometry.
+  if (
+    frac === 0.93 &&
+    a0 === -2.2 &&
+    w === r * 0.1 &&
+    g.shadowBlur === 0 &&
+    g.shadowOffsetX === 0 &&
+    g.shadowOffsetY === 0 &&
+    drawCachedBrushRing(g, r, col)
+  )
+    return;
   const n = Math.max(2, Math.ceil(44 * frac));
   g.strokeStyle = col;
   g.lineCap = 'round';
@@ -129,11 +143,13 @@ export function drawEnso(
   g.lineTo(r * 0.36, 0);
   g.stroke();
   g.lineWidth = r * 0.23;
-  g.beginPath();
-  g.moveTo(r * 0.02, -r * 0.36);
-  g.lineTo(r * 0.44, 0);
-  g.lineTo(r * 0.02, r * 0.36);
-  g.stroke();
+  if (!drawCachedGlyphArrow(g, r)) {
+    g.beginPath();
+    g.moveTo(r * 0.02, -r * 0.36);
+    g.lineTo(r * 0.44, 0);
+    g.lineTo(r * 0.02, r * 0.36);
+    g.stroke();
+  }
   g.restore();
   if (o.ghost) {
     g.save();
@@ -142,11 +158,13 @@ export function drawEnso(
     g.strokeStyle = SEALARC;
     g.lineWidth = r * 0.12;
     g.lineCap = 'round';
-    g.beginPath();
-    g.moveTo(r * 0.12, -r * 0.28);
-    g.lineTo(r * 0.46, 0);
-    g.lineTo(r * 0.12, r * 0.28);
-    g.stroke();
+    if (!drawCachedGlyphArrow(g, r, true)) {
+      g.beginPath();
+      g.moveTo(r * 0.12, -r * 0.28);
+      g.lineTo(r * 0.46, 0);
+      g.lineTo(r * 0.12, r * 0.28);
+      g.stroke();
+    }
     g.restore();
   }
   if (o.rank) {

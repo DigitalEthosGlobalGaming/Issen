@@ -281,15 +281,6 @@ export function createOptions(
         'Auto adapts to performance. Attack cues remain visible at every quality.',
       );
       select(
-        'debrisStyle',
-        'Drifting leaves',
-        [
-          ['Stage sprites', 'sprites'],
-          ['Original leaves', 'original'],
-        ],
-        'Press ` / ~ to switch instantly.',
-      );
-      select(
         'vibrationStrength',
         'Vibration strength',
         [

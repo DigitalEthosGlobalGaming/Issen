@@ -37,7 +37,8 @@ the owner of its catalog, motion and settings.
 - Preserve Canvas blend definitions with owned grading shaders. Tolerant native
   comparisons cover films at DPR 1, 1.5 and 2, scene composition, equipment and
   death coverage; these establish representative parity rather than pixel identity.
-- No new performance measurements have been made and no speedup is claimed.
+- The [paired performance comparison](../features/webgl-performance-2026-10-05.md)
+  measures higher CPU rendering cost in every tested WebGL scene; no speedup is claimed.
 
 The remaining sections preserve the original design rationale and phased criteria;
 use [implemented rendering](rendering.md) for current ownership and behavior.
@@ -60,7 +61,8 @@ This is ready for feature-branch testing, not evidence of universal device suppo
 No Android device was connected during verification. The Android web bundle checks
 use Edge with touch input and do not establish actual WebView GPU compatibility.
 Retain the Canvas fallback and validate a real device before production rollout.
-There is no measured performance or battery claim.
+The desktop comparison measures a CPU rendering regression, including reduced
+callback cadence in the stress scene. Battery behavior remains unmeasured.
 
 ## Goals and scope
 
@@ -137,8 +139,9 @@ asset data where practical, not mutable animation state.
 The [existing performance report](../features/performance-follow-up-2026-10-04.md)
 records roughly 0.6–1.0 ms median rendering-command time for ordinary gameplay
 scenarios on its recorded desktop setup. This is historical CPU submission
-evidence, not current GPU timing or proof of Android performance. No new
-measurements were made for this plan.
+evidence, not current GPU timing or proof of Android performance. The subsequent
+[paired Canvas/WebGL report](../features/webgl-performance-2026-10-05.md) records
+current CPU submission measurements and their limits.
 
 ## Target ownership and frame flow
 

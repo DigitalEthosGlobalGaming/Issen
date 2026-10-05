@@ -1,0 +1,75 @@
+#lighting-debug[hidden],
+#lighting-marker[hidden] {
+  display: none;
+}
+#lighting-debug {
+  position: fixed;
+  z-index: 1000;
+  right: 12px;
+  top: 12px;
+  width: min(270px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 14px;
+  background: #211e19f5;
+  color: #e8dfce;
+  border: 1px solid #887452;
+  border-radius: 8px;
+  font: 14px/1.4 sans-serif;
+  box-sizing: border-box;
+}
+#lighting-debug header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#lighting-debug button {
+  color: inherit;
+  background: #393126;
+  border: 1px solid #887452;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+#lighting-debug label {
+  display: block;
+  margin: 10px 0;
+}
+#lighting-debug input[type='range'] {
+  display: block;
+  width: 100%;
+  accent-color: #e3b875;
+}
+#lighting-debug output {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+#lighting-debug p,
+#lighting-debug small {
+  font-size: 12px;
+  color: #c0b39d;
+}
+#lighting-debug small {
+  display: block;
+  margin-top: 10px;
+}
+#lighting-marker {
+  position: fixed;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: #211e19c0;
+  padding: 0;
+  font: 26px/1 sans-serif;
+  cursor: move;
+  touch-action: none;
+}
+@media (max-width: 600px) {
+  #lighting-debug {
+    top: auto;
+    bottom: 12px;
+    max-height: 48dvh;
+  }
+}

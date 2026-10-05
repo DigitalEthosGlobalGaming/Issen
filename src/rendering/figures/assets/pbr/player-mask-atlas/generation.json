@@ -1,0 +1,49 @@
+{
+  "source": "src/rendering/figures/assets/player-mask-atlas.png",
+  "preset": "polished-wood",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/player-mask-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "f9b085846fe38054e9b5f7194ed518515a8ee873cd4ceb5fedb45a01fffbbe61",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "polished-wood": {
+      "jobHash": "64e9be50d56e26f96b6b51dd30ffd6d2dcbda6fcf5498b300b4cd1579de10fbe",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 0.6,
+          "smoothing": 1.5,
+          "roughnessBase": 0.3,
+          "roughnessVariation": 0.2,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "polished-wood",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 0.6,
+          "roughnessBase": 0.3,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.2,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,37 @@ bundle exposes scenario controls and callback timings. The normal Vite config
 does not import its plugin. Canvas counters, CPU/heap sampling and timing windows
 are separated to make instrumentation overhead explicit. See the
 [performance suite](../../tests/performance/README.md) for commands and limits.
+The [initial Canvas/WebGL comparison](../features/webgl-performance-2026-10-05.md)
+and [rounded-stroke follow-up](../features/webgl-rounded-strokes-2026-10-05.md)
+record measured costs and the remaining Canvas/WebGL gap.
+
+The rounded-stroke follow-up retains the immutable outer enemy direction ring
+as shared Pixi `GraphicsContext` geometry per paint variant. `glyphs.ts` owns
+the original brush recipe; `scene-brush-ring.ts` offers an optional native sink.
+Canvas and changing timing rings keep their procedural drawing. Rotations,
+reflections and uniform scale reuse the ring; nonuniform transforms fall back
+to the original path commands. The painter owns and disposes its cached contexts.
+Overlapping marks retain individual alpha blending instead of flattening into
+a translucent image. Straight, solid round-ended strokes without shadows use
+retained textured meshes with one prepared cap texture; curves, gradients,
+multiple subpaths and shadows keep native Graphics paths.
+
+Version 1.61.3 also pools save/restore records and matrices, caches parsed colors
+with a 256-entry bound, and remembers sprite source/frame/transform values per
+draw slot. Texture hits touch the source's lifetime without rebuilding frame
+keys; destroyed or revision-changed frames are reacquired. Matrix operations
+compose numeric coefficients directly. Unchanged transforms are skipped and
+axis-aligned sprites use position/scale directly.
+
+Unclipped frames retain their root draw order; surplus children are detached when
+a frame uses fewer slots. Clipping and film grouping leave this fast path and
+keep the existing scoped tree lifecycle. Solid full ellipses can use the painter's
+prepared circle texture. Compound paths, strokes, gradients and clip masks
+materialize the original ellipse commands. Fixed glyph arrowheads use shared
+native geometry, with procedural fallback for unsupported stroke state or
+nonuniform transforms. These caches preserve the scene's explicit target ownership.
+See the [adapter performance report](../features/webgl-adapter-performance-2026-10-05.md)
+for the preserved-source comparison and measurement limits.
 
 Issen uses two presentation technologies. The duel scene uses PixiJS WebGL, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
@@ -58,8 +89,12 @@ and radii; it does not enable hardware depth writes or cast shadows.
 
 The initial broad cloth, rock and steel surface studies in `surface-maps.ts` are
 procedural authored forms, independent of the brightness of painted ink. The live
-player torso and standard steel blade opt into cloth/metal response. Other art
-remains unlit; Canvas draws the original colour art. GPU resources belong to each
+player torso retains its cloth response on non-Sumi outfits; Sumi uses aligned
+PBR maps on all nine parts. Modular sword blades use the supplied
+PBR atlas instead of the generated steel study. The material shader also accepts
+packed roughness/metallic/AO and an emissive texture. OpenGL normal Y is converted
+to the scene's Y-down basis before rotation and mirroring. Canvas draws the colour
+art. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
 renderer, while the small prepared maps belong to their artwork owner.
 See [material studies](../features/material-studies.md) for authoring conventions,
 the selected artwork and the visual comparison fixture.

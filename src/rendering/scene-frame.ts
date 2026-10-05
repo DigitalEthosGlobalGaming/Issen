@@ -26,6 +26,11 @@ export interface SceneTexture {
 
 export interface SceneMaterial {
   normal?: SceneTexture;
+  /** PBR data: R roughness, G metallic, B ambient occlusion, A opaque. */
+  surface?: SceneTexture;
+  emissive?: SceneTexture;
+  /** OpenGL maps use -1 to convert authored Y-up normals to scene Y-down. */
+  normalY?: 1 | -1;
   /** R: specular strength, G: gloss, B: emission. Linear data. */
   mask?: SceneTexture;
   lighting: number;
@@ -50,12 +55,17 @@ export interface SceneLight {
   x: number;
   y: number;
   z: number;
+  /** Screen-plane reach; height changes direction, not the radius footprint. */
   radius: number;
   intensity: number;
+  /** Display-space sRGB colour, decoded to linear radiance by the material backend. */
   color: readonly [number, number, number];
 }
 
 export interface SceneLighting {
+  /** Debug comparison; omitted means authored material lighting. */
+  materialLighting?: number;
+  /** Linear RGB radiance, shared by PBR and mask materials. */
   ambient: readonly [number, number, number];
   directional: readonly [number, number, number];
   direction: readonly [number, number, number];
@@ -83,10 +93,27 @@ export interface SceneBackend {
 }
 
 /** Inverse transpose of the 2D linear transform; preserves mirrored normals. */
-export function normalTransform(t: Readonly<SceneTransform>): Float32Array {
-  const det = t.a * t.d - t.b * t.c;
-  if (Math.abs(det) < 1e-8) return new Float32Array([1, 0, 0, 1]);
+export function normalTransform(
+  t: Readonly<SceneTransform>,
+  out = new Float32Array(4),
+  scaleX = 1,
+  scaleY = 1,
+): Float32Array {
+  const a = t.a * scaleX,
+    b = t.b * scaleX,
+    c = t.c * scaleY,
+    d = t.d * scaleY;
+  const det = a * d - b * c;
+  if (Math.abs(det) < 1e-8) {
+    out[0] = out[3] = 1;
+    out[1] = out[2] = 0;
+    return out;
+  }
   // Uniform world scaling changes size, not the authored slope relative to Z.
   const scale = Math.sqrt(Math.abs(det)) / det;
-  return new Float32Array([t.d * scale, -t.c * scale, -t.b * scale, t.a * scale]);
+  out[0] = d * scale;
+  out[1] = -c * scale;
+  out[2] = -b * scale;
+  out[3] = a * scale;
+  return out;
 }

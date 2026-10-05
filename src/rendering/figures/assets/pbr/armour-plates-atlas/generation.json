@@ -1,0 +1,53 @@
+{
+  "source": "src/rendering/figures/assets/armour-plates-atlas.png",
+  "preset": "metal",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/armour-plates-atlas",
+  "generated": "2026-10-05",
+  "sourceHash": "5eb5c5e9e8e27aa5336b22514c44e442343e8b8df3345724d26ecff92ca3ca92",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "metal": {
+      "jobHash": "4825e5eb889835aded02011084d07c79e6107088a9764de605372a073511deec",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}

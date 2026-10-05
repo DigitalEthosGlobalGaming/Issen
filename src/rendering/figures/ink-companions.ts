@@ -1,4 +1,6 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 const COMPANION_URL = new URL('./assets/companion-parts-atlas.png', import.meta.url).href;
 const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
 
@@ -24,6 +26,7 @@ export const INK_COMPANION_FRAMES = [
 
 /** Companion rigs share one loader; each joint animates without moving the ground anchor. */
 export function createInkCompanionRenderer(doc: Document) {
+  const materials = createAssetMaterials(doc, { parts: COMPANION_URL, rock: ROCK_URL });
   let image: HTMLImageElement | null = null;
   let pending: Promise<void> | null = null;
   let finishLoad: (() => void) | null = null;
@@ -70,7 +73,10 @@ export function createInkCompanionRenderer(doc: Document) {
       sprite.onerror = finish;
       sprite.src = COMPANION_URL;
     });
-    pending = Promise.all([pending, rockPending]).then(() => {});
+    pending = Promise.all([pending, rockPending, materials.prepare()]).then(() => {
+      ready = ready && materials.ready('parts');
+      rockReady = rockReady && materials.ready('rock');
+    });
     return pending;
   }
 
@@ -98,7 +104,24 @@ export function createInkCompanionRenderer(doc: Document) {
       const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
       g.save();
       try {
-        g.drawImage(rock, x - 580 * factor, y - 1350 * factor + bob, 1145 * factor, 1373 * factor);
+        const material = materials.material('rock', [0, 0, 1145, 1373]);
+        if (material)
+          drawMaterialStamp(g, {
+            texture: { source: rock, revision: 0 },
+            material,
+            x: x - 580 * factor,
+            y: y - 1350 * factor + bob,
+            width: 1145 * factor,
+            height: 1373 * factor,
+          });
+        else
+          g.drawImage(
+            rock,
+            x - 580 * factor,
+            y - 1350 * factor + bob,
+            1145 * factor,
+            1373 * factor,
+          );
       } finally {
         g.restore();
       }
@@ -126,7 +149,17 @@ export function createInkCompanionRenderer(doc: Document) {
         g.translate(ax, ay);
         g.rotate(angle);
         g.scale(scale, scale * stretch);
-        g.drawImage(image!, sx, sy, sw, sh, -pivotX, -pivotY, sw, sh);
+        const material = materials.material('parts', INK_COMPANION_FRAMES[index]!);
+        if (material)
+          drawMaterialStamp(g, {
+            texture: { source: image!, revision: 0, frame: INK_COMPANION_FRAMES[index]! },
+            material,
+            x: -pivotX,
+            y: -pivotY,
+            width: sw,
+            height: sh,
+          });
+        else g.drawImage(image!, sx, sy, sw, sh, -pivotX, -pivotY, sw, sh);
       } finally {
         g.restore();
       }
@@ -163,6 +196,7 @@ export function createInkCompanionRenderer(doc: Document) {
   function dispose() {
     if (disposed) return;
     disposed = true;
+    materials.dispose();
     ready = false;
     if (image) {
       image.onload = image.onerror = null;

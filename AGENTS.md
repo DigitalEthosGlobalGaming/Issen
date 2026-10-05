@@ -7,6 +7,8 @@ Use [docs/index.md](docs/index.md) when unfamiliar with the repository.
 - For feature batches and branch preview releases, use [release feature sets](.agents/skills/release-feature-sets/SKILL.md).
 - For symbols, emblems and menu illustrations, follow [calligraphic symbol art](docs/features/symbol-art.md): use bold brush strokes like the main Issen logo.
 - For player-facing menus and feature copy, use [player presentation](.agents/skills/player-presentation/SKILL.md): prefer concise labels and visual states.
+- For PBR material generation, use `scripts/pbr/cli.mjs` with the JSON material presets; follow the [PBR tool instructions](scripts/pbr/README.md). Keep trial exports under ignored `tmp/` and review the maps before integrating assets.
+- Keep the [asset and PBR inventory](docs/features/asset-pbr-inventory.md) concise and current when assets, presets or renderer coverage change.
 - The [migration plan](docs/architecture/typescript-migration.md) includes a historical proposal; verify actual files before relying on that tree.
 
 Keep gameplay rules and data in their owning modules; connect presentation and

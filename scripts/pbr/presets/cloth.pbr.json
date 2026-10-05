@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "cloth",
+  "description": "Gentle normals, matte cloth, no metallic response or emission.",
+  "mode": "sprite",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 0.6,
+    "bevelHeight": 0.5,
+    "detail": 0.1,
+    "smoothing": 2,
+    "roughnessBase": 0.85,
+    "roughnessVariation": 0.3,
+    "roughnessBlur": 3,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

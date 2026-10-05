@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "default",
+  "description": "PBR Forge's default generation settings.",
+  "mode": "auto",
+  "engine": "opengl",
+  "settings": {}
+}

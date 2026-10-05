@@ -1,4 +1,6 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 const ATLAS_URL = new URL('./assets/charm-atlas.png', import.meta.url).href;
 /** Packed source windows; the generated rows are not equal thirds. */
 const FRAMES = [
@@ -41,6 +43,7 @@ const RECIPES: Record<string, readonly [number, string?]> = {
 
 /** Caller owns position/animation; this renderer only replaces the physical charm. */
 export function createInkCharmRenderer(doc: Document) {
+  const materials = createAssetMaterials(doc, { charms: ATLAS_URL });
   let image: HTMLImageElement | undefined;
   let pending: Promise<boolean> | undefined;
   let settle: ((ready: boolean) => void) | undefined;
@@ -60,7 +63,11 @@ export function createInkCharmRenderer(doc: Document) {
         settle = undefined;
         resolve(ok && state !== 'disposed');
       };
-      img.onload = () => finish(img.naturalWidth === 1536 && img.naturalHeight === 1024);
+      img.onload = async () => {
+        const valid = img.naturalWidth === 1536 && img.naturalHeight === 1024;
+        const loaded = valid && (await materials.prepare()).every(Boolean);
+        finish(loaded);
+      };
       img.onerror = () => finish(false);
       img.src = ATLAS_URL;
     });
@@ -106,7 +113,17 @@ export function createInkCharmRenderer(doc: Document) {
       }
     }
     const width = (size * sw) / sh;
-    g.drawImage(sprite, x - width / 2, y, width, size);
+    const material = materials.material('charms', FRAMES[cell]!);
+    if (material)
+      drawMaterialStamp(g, {
+        texture: { source: sprite, revision: 0 },
+        material,
+        x: x - width / 2,
+        y,
+        width,
+        height: size,
+      });
+    else g.drawImage(sprite, x - width / 2, y, width, size);
     return true;
   }
   return {
@@ -114,6 +131,7 @@ export function createInkCharmRenderer(doc: Document) {
     draw,
     snapshot: () => ({ state, cached: cache.size, supported: Object.keys(RECIPES) }),
     dispose() {
+      materials.dispose();
       state = 'disposed';
       if (image) {
         image.onload = image.onerror = null;

@@ -1,0 +1,32 @@
+{
+  "source": "src/rendering/environment/assets/fog-wisps-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/fog-wisps-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "generated": "2026-10-05",
+  "sourceHash": "526cfc6ecb0e6d4fa4dd9e5673d6890357f149f8e5f85d7b0169bcd5b5e5ccd6",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "default": {
+      "jobHash": "f03fdab2944237fedd5b2586cf0a8d054ad76cf8528b10ad0093b175e71fd762",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {},
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "default",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {}
+      }
+    }
+  }
+}

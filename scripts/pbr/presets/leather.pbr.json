@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "leather",
+  "description": "Soft leather detail with matte highlights and no metallic response or emission.",
+  "mode": "sprite",
+  "engine": "opengl",
+  "settings": {
+    "normalIntensity": 0.7,
+    "bevelHeight": 0.5,
+    "detail": 0.2,
+    "smoothing": 1.5,
+    "roughnessBase": 0.75,
+    "roughnessVariation": 0.4,
+    "roughnessBlur": 2,
+    "metallicOffset": -0.5,
+    "metallicContrast": 0,
+    "emissiveIntensity": 0
+  }
+}

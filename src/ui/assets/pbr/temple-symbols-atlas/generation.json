@@ -1,0 +1,32 @@
+{
+  "source": "src/ui/assets/temple-symbols-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/temple-symbols-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "generated": "2026-10-05",
+  "sourceHash": "7d72bd5d2bab5ed91bf78b9b136f39edd953e1b576ffa39f23d2d316c5866ebf",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "default": {
+      "jobHash": "552a79944f7fd7af6f4b79d9472a3cf4a051c7b5e17d92592b1bc183691c1888",
+      "actual": {
+        "mode": "sprite",
+        "engine": "opengl",
+        "applied": {},
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "default",
+        "mode": "sprite",
+        "engine": "opengl",
+        "settings": {}
+      }
+    }
+  }
+}

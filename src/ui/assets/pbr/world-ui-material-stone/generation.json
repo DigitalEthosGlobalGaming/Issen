@@ -1,0 +1,49 @@
+{
+  "source": "src/ui/assets/world-ui-material-stone.png",
+  "preset": "stone",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-stone",
+  "generated": "2026-10-05",
+  "sourceHash": "324350cb2dbd5430f54d21223cf2173dbfafbd984c59f9e9979595e465846bf9",
+  "dimensions": [
+    192,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "stone": {
+      "jobHash": "6baaf6b8e572915069ca98cbf8efb7771e1f7d28448211813a08abc47b210683",
+      "actual": {
+        "mode": "texture",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.2,
+          "smoothing": 1.5,
+          "roughnessBase": 0.8,
+          "roughnessVariation": 0.6,
+          "roughnessBlur": 2,
+          "metallicOffset": -0.5,
+          "metallicContrast": 0,
+          "emissiveIntensity": 0
+        },
+        "skipped": []
+      },
+      "preset": {
+        "version": 1,
+        "name": "stone",
+        "mode": "texture",
+        "engine": "opengl",
+        "settings": {
+          "emissiveIntensity": 0,
+          "metallicContrast": 0,
+          "metallicOffset": -0.5,
+          "normalIntensity": 1.2,
+          "roughnessBase": 0.8,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.6,
+          "smoothing": 1.5
+        }
+      }
+    }
+  }
+}

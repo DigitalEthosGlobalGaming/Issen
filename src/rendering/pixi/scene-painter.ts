@@ -4,6 +4,7 @@ import {
   FillGradient,
   FillPattern,
   Graphics,
+  GraphicsContext,
   GraphicsPath,
   Matrix,
   Sprite,
@@ -13,6 +14,7 @@ import {
   BlurFilter,
   ColorMatrixFilter,
   Texture,
+  MeshSimple,
 } from 'pixi.js';
 import type { FillStyle, GradientOptions, BLEND_MODES } from 'pixi.js';
 import './canvas-blends.ts';
@@ -24,6 +26,20 @@ import { sceneTextureRevision } from '../texture-revision.ts';
 import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
+import { createRoundStroke, createRoundStrokeTexture, updateRoundStroke } from './round-stroke.ts';
+import { registerBrushRingSink, registerGlyphArrowSink } from '../scene-brush-ring.ts';
+
+function sceneColor(value: string): Color {
+  // JavaScript emits scientific notation near zero. Browser Canvas accepts it,
+  // but Pixi's CSS parser rejects it; pass those numeric RGBA components directly.
+  if (/[eE][+-]?\d/.test(value)) {
+    const match = /^rgba?\(([^)]+)\)$/.exec(value);
+    const parts = match?.[1]?.split(',').map(Number);
+    if (parts && (parts.length === 3 || parts.length === 4) && parts.every(Number.isFinite))
+      return new Color([parts[0]! / 255, parts[1]! / 255, parts[2]! / 255, parts[3] ?? 1]);
+  }
+  return new Color(value);
+}
 
 class Gradient implements CanvasGradient {
   readonly stops: { offset: number; color: string }[] = [];
@@ -32,7 +48,10 @@ class Gradient implements CanvasGradient {
     readonly matrix: Matrix,
   ) {}
   addColorStop(offset: number, color: string): void {
-    this.stops.push({ offset, color });
+    this.stops.push({
+      offset,
+      color: /[eE][+-]?\d/.test(color) ? sceneColor(color).toHexa() : color,
+    });
   }
 }
 class Pattern implements CanvasPattern {
@@ -67,11 +86,24 @@ const styleKeys = [
 type DrawStyle = Pick<SceneDrawing, (typeof styleKeys)[number]>;
 type MaterialMesh = ReturnType<typeof createMaterialMesh>['mesh'];
 type Slot = {
-  item: Graphics | Sprite | MaterialMesh;
-  kind: 'graphics' | 'sprite' | 'material';
+  item: Graphics | Sprite | MaterialMesh | MeshSimple;
+  kind:
+    'graphics' | 'sprite' | 'material' | 'round-stroke' | 'brush-ring' | 'ellipse' | 'glyph-arrow';
   material?: ReturnType<typeof createMaterialMesh>;
   filterKey?: string;
   filters?: (BlurFilter | ColorMatrixFilter)[];
+  image?: HTMLImageElement | HTMLCanvasElement;
+  revision?: number;
+  sx?: number;
+  sy?: number;
+  sw?: number;
+  sh?: number;
+  transformA?: number;
+  transformB?: number;
+  transformC?: number;
+  transformD?: number;
+  transformX?: number;
+  transformY?: number;
 };
 
 /**
@@ -98,12 +130,24 @@ export class PixiScenePainter implements SceneDrawing {
   imageSmoothingQuality: ImageSmoothingQuality = 'low';
   readonly root = new Container();
   private readonly textures = new SceneTextureStore();
+  private roundStrokeTexture?: Texture;
+  private readonly brushRings = new Map<string, GraphicsContext>();
+  private readonly glyphArrows = new Map<string, GraphicsContext>();
   private readonly slots: Slot[] = [];
   private readonly gradients = new Map<string, FillGradient>();
   private readonly patterns = new Map<Pattern, FillPattern>();
-  private readonly stack: { style: DrawStyle; matrix: Matrix; clips: Graphics[] }[] = [];
+  private readonly stack: { style: DrawStyle; matrix: Matrix; clipDepth: number }[] = [];
+  private stackDepth = 0;
   private readonly matrix = new Matrix();
+  private readonly scratch = new Matrix();
+  private readonly colours = new Map<string, Color>();
+  private retainTree = false;
   private path = new GraphicsPath();
+  private pendingEllipse = false;
+  private readonly ellipseTransform = new Matrix();
+  private ellipseStart = 0;
+  private ellipseEnd = 0;
+  private ellipseCcw = false;
   private cursor = 0;
   private disposed = false;
   contextLost = false;
@@ -143,6 +187,88 @@ export class PixiScenePainter implements SceneDrawing {
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
     this.measure = canvas.ownerDocument.createElement('canvas').getContext('2d')!;
+    registerGlyphArrowSink(this, (radius, ghost) => {
+      const { a, b, c, d } = this.matrix;
+      const scaleSquared = a * a + b * b;
+      if (
+        typeof this.strokeStyle !== 'string' ||
+        this.lineCap !== 'round' ||
+        this.lineWidth !== radius * (ghost ? 0.12 : 0.23) ||
+        this.shadowBlur !== 0 ||
+        this.shadowOffsetX !== 0 ||
+        this.shadowOffsetY !== 0 ||
+        scaleSquared === 0 ||
+        Math.abs(scaleSquared - c * c - d * d) > scaleSquared * 1e-6 ||
+        Math.abs(a * c + b * d) > scaleSquared * 1e-6
+      )
+        return false;
+      const key = `${ghost}:${this.lineJoin}`;
+      let context = this.glyphArrows.get(key);
+      if (!context) {
+        context = new GraphicsContext();
+        const x = ghost ? 0.12 : 0.02,
+          y = ghost ? 0.28 : 0.36;
+        context
+          .moveTo(32 * x, -32 * y)
+          .lineTo(32 * (ghost ? 0.46 : 0.44), 0)
+          .lineTo(32 * x, 32 * y)
+          .stroke({
+            color: 0xffffff,
+            width: 32 * (ghost ? 0.12 : 0.23),
+            cap: 'round',
+            join: this.lineJoin,
+          });
+        this.glyphArrows.set(key, context);
+      }
+      const item = this.submit('glyph-arrow');
+      const colour = this.colour(this.strokeStyle);
+      item.context = context;
+      item.tint = colour.toNumber();
+      item.alpha *= colour.alpha;
+      this.applyTransform(item, this.composed(radius / 32, 0, 0, radius / 32, 0, 0));
+      return true;
+    });
+    registerBrushRingSink(this, (radius, colour) => {
+      // Canvas-shaped strokes use determinant-scaled width. Retained local
+      // geometry matches that for rotations/reflections and uniform scale only.
+      const { a, b, c, d } = this.matrix;
+      const scaleSquared = a * a + b * b;
+      if (
+        scaleSquared === 0 ||
+        Math.abs(scaleSquared - c * c - d * d) > scaleSquared * 1e-6 ||
+        Math.abs(a * c + b * d) > scaleSquared * 1e-6
+      )
+        return false;
+      let context = this.brushRings.get(colour);
+      if (!context) {
+        context = new GraphicsContext();
+        const paint = sceneColor(colour);
+        const count = Math.ceil(44 * 0.93);
+        for (let i = 0; i < count; i++) {
+          context
+            .beginPath()
+            .arc(
+              0,
+              0,
+              128,
+              -2.2 + (0.93 * Math.PI * 2 * i) / count,
+              -2.2 + (0.93 * Math.PI * 2 * (i + 1)) / count + 0.01,
+            )
+            .stroke({
+              color: paint.toNumber(),
+              alpha: paint.alpha,
+              width: 12.8 * (1 - (0.6 * i) / count),
+              cap: 'round',
+              join: 'miter',
+            });
+        }
+        this.brushRings.set(colour, context);
+      }
+      const item = this.submit('brush-ring');
+      item.context = context;
+      this.applyTransform(item, this.composed(radius / 128, 0, 0, radius / 128, 0, 0));
+      return true;
+    });
     registerMaterialSink(this, {
       lights: (lighting) => {
         this.lighting = lighting;
@@ -150,7 +276,7 @@ export class PixiScenePainter implements SceneDrawing {
       draw: (stamp) => {
         const mesh = this.submit('material');
         const material = this.slots[this.cursor - 1]!.material!;
-        const transform = this.matrix.clone().append(new Matrix(1, 0, 0, 1, stamp.x, stamp.y));
+        const transform = this.composed(1, 0, 0, 1, stamp.x, stamp.y);
         material.update(
           {
             kind: 'sprite',
@@ -170,11 +296,13 @@ export class PixiScenePainter implements SceneDrawing {
       },
     });
     registerScenePathSink(this, (path) => {
+      this.pendingEllipse = false;
       this.path = new GraphicsPath().addPath(new GraphicsPath(path), this.matrix.clone());
       this.fill();
     });
     registerSceneFilmPass(this, (film, w, h, time, preferences) => {
       if (film !== 'noir' && film !== 'trial-glitch') return false;
+      this.stopRetainingTree();
       this.copyFilm ??= createCopyFilmPass();
       this.copyFilm.update(
         film,
@@ -202,7 +330,8 @@ export class PixiScenePainter implements SceneDrawing {
 
   begin(): void {
     if (this.disposed) return;
-    this.root.removeChildren();
+    this.retainTree = this.transientGroups.length === 0 && this.clips.length === 0;
+    if (!this.retainTree) this.root.removeChildren();
     for (const group of this.transientGroups) {
       group.mask = null;
       group.removeChildren();
@@ -211,10 +340,10 @@ export class PixiScenePainter implements SceneDrawing {
     this.transientGroups.length = 0;
     for (const clip of this.clips) clip.destroy();
     this.clips.length = 0;
-    this.activeClips = [];
+    this.activeClips.length = 0;
     this.usedGradients.clear();
     this.usedPatterns.clear();
-    this.stack.length = 0;
+    this.stackDepth = 0;
     this.cursor = 0;
     this.textures.beginFrame();
     this.matrix.identity();
@@ -223,6 +352,7 @@ export class PixiScenePainter implements SceneDrawing {
 
   flush(): void {
     if (this.disposed || this.contextLost) return;
+    this.trimRetainedTree();
     if (this.width !== this.canvas.width || this.height !== this.canvas.height) {
       this.width = this.canvas.width;
       this.height = this.canvas.height;
@@ -254,31 +384,57 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   save(): void {
-    const style = Object.fromEntries(styleKeys.map((key) => [key, this[key]])) as DrawStyle;
-    this.stack.push({ style, matrix: this.matrix.clone(), clips: [...this.activeClips] });
+    let saved = this.stack[this.stackDepth++];
+    if (!saved) {
+      saved = { style: {} as DrawStyle, matrix: new Matrix(), clipDepth: 0 };
+      this.stack[this.stackDepth - 1] = saved;
+    }
+    const style = saved.style as unknown as Record<string, unknown>;
+    for (const key of styleKeys) style[key] = this[key];
+    saved.matrix.copyFrom(this.matrix);
+    saved.clipDepth = this.activeClips.length;
   }
   restore(): void {
-    const saved = this.stack.pop();
-    if (!saved) return;
-    Object.assign(this, saved.style);
+    if (this.stackDepth === 0) return;
+    const saved = this.stack[--this.stackDepth]!;
+    const target = this as unknown as Record<string, unknown>;
+    for (const key of styleKeys) target[key] = saved.style[key];
     this.matrix.copyFrom(saved.matrix);
     // Keep mask objects alive until their submitted draws have rendered.
-    this.activeClips = saved.clips;
+    this.activeClips.length = saved.clipDepth;
+    saved.style.fillStyle = saved.style.strokeStyle = '#000000';
   }
   private activeClips: Graphics[] = [];
   translate(x: number, y: number): void {
-    this.matrix.append(new Matrix(1, 0, 0, 1, x, y));
+    const m = this.matrix;
+    m.tx += m.a * x + m.c * y;
+    m.ty += m.b * x + m.d * y;
   }
   rotate(angle: number): void {
     const c = Math.cos(angle),
       s = Math.sin(angle);
-    this.matrix.append(new Matrix(c, s, -s, c, 0, 0));
+    this.transform(c, s, -s, c, 0, 0);
   }
   scale(x: number, y: number): void {
-    this.matrix.append(new Matrix(x, 0, 0, y, 0, 0));
+    this.matrix.a *= x;
+    this.matrix.b *= x;
+    this.matrix.c *= y;
+    this.matrix.d *= y;
   }
   transform(a: number, b: number, c: number, d: number, e: number, f: number): void {
-    this.matrix.append(new Matrix(a, b, c, d, e, f));
+    const m = this.matrix;
+    const ma = m.a,
+      mb = m.b,
+      mc = m.c,
+      md = m.d;
+    m.set(
+      ma * a + mc * b,
+      mb * a + md * b,
+      ma * c + mc * d,
+      mb * c + md * d,
+      ma * e + mc * f + m.tx,
+      mb * e + md * f + m.ty,
+    );
   }
   setTransform(
     a?: number | DOMMatrix2DInit,
@@ -301,20 +457,26 @@ export class PixiScenePainter implements SceneDrawing {
   }
   beginPath(): void {
     this.path = new GraphicsPath();
+    this.pendingEllipse = false;
   }
   closePath(): void {
+    this.materializeEllipse();
     this.path.closePath();
   }
   moveTo(x: number, y: number): void {
+    this.materializeEllipse();
     this.path.moveTo(...this.point(x, y));
   }
   lineTo(x: number, y: number): void {
+    this.materializeEllipse();
     this.path.lineTo(...this.point(x, y));
   }
   quadraticCurveTo(cx: number, cy: number, x: number, y: number): void {
+    this.materializeEllipse();
     this.path.quadraticCurveTo(...this.point(cx, cy), ...this.point(x, y));
   }
   bezierCurveTo(a: number, b: number, c: number, d: number, x: number, y: number): void {
+    this.materializeEllipse();
     this.path.bezierCurveTo(...this.point(a, b), ...this.point(c, d), ...this.point(x, y));
   }
   rect(x: number, y: number, w: number, h: number): void {
@@ -327,7 +489,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.closePath();
   }
   arc(x: number, y: number, r: number, start: number, end: number, ccw = false): void {
-    this.curveArc(this.matrix.clone().append(new Matrix(r, 0, 0, r, x, y)), start, end, ccw);
+    this.addEllipse(this.composed(r, 0, 0, r, x, y), start, end, ccw);
   }
   ellipse(
     x: number,
@@ -341,8 +503,29 @@ export class PixiScenePainter implements SceneDrawing {
   ): void {
     const c = Math.cos(rotation),
       s = Math.sin(rotation);
-    const transform = this.matrix.clone().append(new Matrix(c * rx, s * rx, -s * ry, c * ry, x, y));
-    this.curveArc(transform, start, end, ccw);
+    const transform = this.composed(c * rx, s * rx, -s * ry, c * ry, x, y);
+    this.addEllipse(transform, start, end, ccw);
+  }
+  private addEllipse(matrix: Matrix, start: number, end: number, ccw: boolean): void {
+    if (
+      !this.pendingEllipse &&
+      this.path.instructions.length === 0 &&
+      ((!ccw && end - start >= Math.PI * 2) || (ccw && start - end >= Math.PI * 2))
+    ) {
+      this.pendingEllipse = true;
+      this.ellipseTransform.copyFrom(matrix);
+      this.ellipseStart = start;
+      this.ellipseEnd = end;
+      this.ellipseCcw = ccw;
+    } else {
+      this.materializeEllipse();
+      this.curveArc(matrix, start, end, ccw);
+    }
+  }
+  private materializeEllipse(): void {
+    if (!this.pendingEllipse) return;
+    this.pendingEllipse = false;
+    this.curveArc(this.ellipseTransform, this.ellipseStart, this.ellipseEnd, this.ellipseCcw);
   }
   private curveArc(m: Matrix, start: number, end: number, ccw: boolean): void {
     const tau = Math.PI * 2;
@@ -381,20 +564,95 @@ export class PixiScenePainter implements SceneDrawing {
       return this.globalCompositeOperation as BLEND_MODES;
     throw new Error(`Scene blend requires an explicit pass: ${this.globalCompositeOperation}`);
   }
+  private composed(a: number, b: number, c: number, d: number, x: number, y: number): Matrix {
+    const m = this.matrix;
+    return this.scratch.set(
+      m.a * a + m.c * b,
+      m.b * a + m.d * b,
+      m.a * c + m.c * d,
+      m.b * c + m.d * d,
+      m.a * x + m.c * y + m.tx,
+      m.b * x + m.d * y + m.ty,
+    );
+  }
+  private colour(value: string): Color {
+    let colour = this.colours.get(value);
+    if (!colour) {
+      colour = sceneColor(value);
+      if (this.colours.size >= 256) this.colours.delete(this.colours.keys().next().value!);
+      this.colours.set(value, colour);
+    }
+    return colour;
+  }
+  private applyTransform(item: Container, matrix: Matrix): void {
+    const slot = this.slots[this.cursor - 1]!;
+    const { a, b, c, d, tx, ty } = matrix;
+    if (
+      slot.transformA === a &&
+      slot.transformB === b &&
+      slot.transformC === c &&
+      slot.transformD === d &&
+      slot.transformX === tx &&
+      slot.transformY === ty
+    )
+      return;
+    if (b === 0 && c === 0) {
+      item.position.set(tx, ty);
+      item.scale.set(a, d);
+      item.rotation = 0;
+      item.skew.set(0, 0);
+    } else item.setFromMatrix(matrix);
+    slot.transformA = a;
+    slot.transformB = b;
+    slot.transformC = c;
+    slot.transformD = d;
+    slot.transformX = tx;
+    slot.transformY = ty;
+  }
+  private trimRetainedTree(): void {
+    if (this.retainTree && this.root.children.length > this.cursor)
+      this.root.removeChildren(this.cursor);
+  }
+  private stopRetainingTree(): void {
+    this.trimRetainedTree();
+    this.retainTree = false;
+  }
   private submit(kind: 'graphics'): Graphics;
   private submit(kind: 'sprite'): Sprite;
   private submit(kind: 'material'): MaterialMesh;
-  private submit(kind: 'graphics' | 'sprite' | 'material'): Graphics | Sprite | MaterialMesh {
+  private submit(kind: 'round-stroke'): MeshSimple;
+  private submit(kind: 'brush-ring'): Graphics;
+  private submit(kind: 'glyph-arrow'): Graphics;
+  private submit(kind: 'ellipse'): Sprite;
+  private submit(kind: Slot['kind']): Graphics | Sprite | MaterialMesh | MeshSimple {
     let slot = this.slots[this.cursor];
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();
       if (slot?.material) slot.material.dispose();
-      else slot?.item.destroy();
+      else {
+        if (slot?.kind === 'round-stroke') (slot.item as MeshSimple).geometry.destroy();
+        slot?.item.destroy();
+      }
       const material = kind === 'material' ? createMaterialMesh() : undefined;
       slot = {
         kind,
         material,
-        item: material?.mesh ?? (kind === 'graphics' ? new Graphics() : new Sprite()),
+        item:
+          material?.mesh ??
+          (kind === 'graphics' || kind === 'brush-ring' || kind === 'glyph-arrow'
+            ? new Graphics()
+            : kind === 'round-stroke'
+              ? createRoundStroke(
+                  (this.roundStrokeTexture ??= createRoundStrokeTexture(this.canvas.ownerDocument)),
+                )
+              : kind === 'ellipse'
+                ? new Sprite({
+                    texture: (this.roundStrokeTexture ??= createRoundStrokeTexture(
+                      this.canvas.ownerDocument,
+                    )),
+                    anchor: 0.5,
+                  })
+                : new Sprite()),
       };
       this.slots[this.cursor] = slot;
     }
@@ -416,12 +674,16 @@ export class PixiScenePainter implements SceneDrawing {
         }
       }
       slot.filterKey = this.filter;
+      item.filters = slot.filters?.length ? slot.filters : null;
     }
-    item.filters = slot.filters?.length ? slot.filters : null;
     item.alpha = this.globalAlpha;
     item.blendMode = this.blend();
-    item.setFromMatrix(new Matrix());
-    if (item instanceof Graphics) item.clear();
+    // World-space paths only need to clear a prior shadow offset. Other draw
+    // kinds supply their complete transform, so an identity decomposition is redundant.
+    if (kind === 'graphics') {
+      item.position.set(0, 0);
+      (item as Graphics).clear();
+    }
     let parent = this.root;
     for (const clip of this.activeClips) {
       const group = new Container();
@@ -430,14 +692,18 @@ export class PixiScenePainter implements SceneDrawing {
       this.transientGroups.push(group);
       parent = group;
     }
-    parent.addChild(item);
+    if (this.retainTree && parent === this.root) {
+      const index = this.cursor - 1;
+      if (parent.children[index] !== item)
+        parent.addChildAt(item, Math.min(index, parent.children.length));
+    } else parent.addChild(item);
     return item;
   }
   private paint(
     style: string | CanvasGradient | CanvasPattern,
   ): FillStyle | FillGradient | FillPattern {
     if (typeof style === 'string') {
-      const c = new Color(style);
+      const c = this.colour(style);
       return { color: c.toNumber(), alpha: c.alpha };
     }
     if (style instanceof Gradient) {
@@ -481,9 +747,23 @@ export class PixiScenePainter implements SceneDrawing {
   fill(pathOrRule?: Path2D | CanvasFillRule): void {
     if (pathOrRule && typeof pathOrRule !== 'string')
       throw new Error('Use fillScenePath for portable vector artwork');
+    if (this.pendingEllipse && typeof this.fillStyle === 'string') {
+      const item = this.submit('ellipse');
+      const colour = this.colour(this.fillStyle);
+      item.tint = colour.toNumber();
+      item.alpha *= colour.alpha;
+      const m = this.ellipseTransform;
+      this.applyTransform(
+        item,
+        this.scratch.set(m.a / 64, m.b / 64, m.c / 64, m.d / 64, m.tx, m.ty),
+      );
+      return;
+    }
+    this.materializeEllipse();
     this.submit('graphics').path(this.path).fill(this.paint(this.fillStyle));
   }
   stroke(path?: Path2D): void {
+    this.materializeEllipse();
     if (path) throw new Error('Use scene geometry for portable paths');
     const scale = Math.sqrt(
       Math.abs(this.matrix.a * this.matrix.d - this.matrix.b * this.matrix.c),
@@ -491,7 +771,30 @@ export class PixiScenePainter implements SceneDrawing {
     const paint = this.paint(this.strokeStyle);
     const style =
       paint instanceof FillGradient || paint instanceof FillPattern ? { fill: paint } : paint;
-    const shadow = new Color(this.shadowColor);
+    const shadow = this.colour(this.shadowColor);
+    const instructions = this.path.instructions;
+    // Preserve native geometry for curves, multiple subpaths, gradients and
+    // shadows. A single solid round-ended segment can reuse a batchable mesh.
+    if (
+      this.lineCap === 'round' &&
+      typeof this.strokeStyle === 'string' &&
+      shadow.alpha === 0 &&
+      instructions.length === 2 &&
+      instructions[0]!.action === 'moveTo' &&
+      instructions[1]!.action === 'lineTo'
+    ) {
+      const [x, y] = instructions[0]!.data;
+      const [endX, endY] = instructions[1]!.data;
+      const width = this.lineWidth * scale;
+      if (width > 0 && Number.isFinite(width) && Math.hypot(endX - x, endY - y) > 0) {
+        const mesh = this.submit('round-stroke');
+        updateRoundStroke(mesh, x, y, endX, endY, width);
+        const color = this.colour(this.strokeStyle);
+        mesh.tint = color.toNumber();
+        mesh.alpha *= color.alpha;
+        return;
+      }
+    }
     if (
       shadow.alpha > 0 &&
       (this.shadowBlur > 0 || this.shadowOffsetX !== 0 || this.shadowOffsetY !== 0)
@@ -504,7 +807,7 @@ export class PixiScenePainter implements SceneDrawing {
         color: shadow.toNumber(),
         alpha:
           shadow.alpha *
-          (typeof this.strokeStyle === 'string' ? new Color(this.strokeStyle).alpha : 1),
+          (typeof this.strokeStyle === 'string' ? this.colour(this.strokeStyle).alpha : 1),
         width: this.lineWidth * scale,
         cap: this.lineCap,
         join: this.lineJoin,
@@ -516,14 +819,17 @@ export class PixiScenePainter implements SceneDrawing {
       .stroke({ ...style, width: this.lineWidth * scale, cap: this.lineCap, join: this.lineJoin });
   }
   clip(pathOrRule?: Path2D | CanvasFillRule): void {
+    this.materializeEllipse();
     if (pathOrRule && typeof pathOrRule !== 'string')
       throw new Error('Use scene geometry for clip paths');
+    this.stopRetainingTree();
     const mask = new Graphics().path(this.path).fill(0xffffff);
     this.root.addChild(mask);
     this.clips.push(mask);
     this.activeClips.push(mask);
   }
   fillRect(x: number, y: number, w: number, h: number): void {
+    this.materializeEllipse();
     const path = this.path;
     this.beginPath();
     this.rect(x, y, w, h);
@@ -531,6 +837,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.path = path;
   }
   strokeRect(x: number, y: number, w: number, h: number): void {
+    this.materializeEllipse();
     const path = this.path;
     this.beginPath();
     this.rect(x, y, w, h);
@@ -548,7 +855,17 @@ export class PixiScenePainter implements SceneDrawing {
     this.fillRect(x, y, w, h);
     this.restore();
   }
-  drawImage(image: CanvasImageSource, ...args: number[]): void {
+  drawImage(
+    image: CanvasImageSource,
+    x: number,
+    y: number,
+    width?: number,
+    height?: number,
+    targetX?: number,
+    targetY?: number,
+    targetWidth?: number,
+    targetHeight?: number,
+  ): void {
     if (!(image instanceof HTMLImageElement || image instanceof HTMLCanvasElement))
       throw new Error('Scene sprites require prepared images or canvases');
     if (image === this.canvas) throw new Error('Scene feedback requires a separate render target');
@@ -559,29 +876,43 @@ export class PixiScenePainter implements SceneDrawing {
       sy = 0,
       sw = iw,
       sh = ih,
-      dx = args[0]!,
-      dy = args[1]!,
-      dw = args[2] ?? iw,
-      dh = args[3] ?? ih;
-    if (args.length === 8)
-      [sx, sy, sw, sh, dx, dy, dw, dh] = args as [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-      ];
+      dx = x,
+      dy = y,
+      dw = width ?? iw,
+      dh = height ?? ih;
+    if (targetX !== undefined) {
+      sx = x;
+      sy = y;
+      sw = width!;
+      sh = height!;
+      dx = targetX;
+      dy = targetY!;
+      dw = targetWidth!;
+      dh = targetHeight!;
+    }
     if (!sw || !sh || !dw || !dh) return;
     const sprite = this.submit('sprite');
-    sprite.texture = this.textures.get({
-      source: image,
-      revision: sceneTextureRevision(image),
-      frame: [sx, sy, sw, sh],
-    });
-    sprite.setFromMatrix(this.matrix.clone().append(new Matrix(dw / sw, 0, 0, dh / sh, dx, dy)));
+    const slot = this.slots[this.cursor - 1]!;
+    const revision = sceneTextureRevision(image);
+    if (
+      slot.image !== image ||
+      slot.revision !== revision ||
+      slot.sx !== sx ||
+      slot.sy !== sy ||
+      slot.sw !== sw ||
+      slot.sh !== sh ||
+      sprite.texture.destroyed ||
+      !this.textures.touch(image, revision)
+    ) {
+      sprite.texture = this.textures.getFrame(image, revision, sx, sy, sw, sh);
+      slot.image = image;
+      slot.revision = revision;
+      slot.sx = sx;
+      slot.sy = sy;
+      slot.sw = sw;
+      slot.sh = sh;
+    }
+    this.applyTransform(sprite, this.composed(dw / sw, 0, 0, dh / sh, dx, dy));
   }
   createLinearGradient(x0: number, y0: number, x1: number, y1: number): CanvasGradient {
     return new Gradient(
@@ -675,7 +1006,10 @@ export class PixiScenePainter implements SceneDrawing {
     }
     for (const slot of this.slots) {
       if (slot.material) slot.material.dispose();
-      else slot.item.destroy();
+      else {
+        if (slot.kind === 'round-stroke') (slot.item as MeshSimple).geometry.destroy();
+        slot.item.destroy();
+      }
       for (const filter of slot.filters ?? []) filter.destroy();
     }
     for (const clip of this.clips) clip.destroy();
@@ -688,8 +1022,15 @@ export class PixiScenePainter implements SceneDrawing {
     this.renderer.destroy({ removeView: false });
     for (const gradient of this.gradients.values()) gradient.destroy();
     this.root.destroy();
+    this.roundStrokeTexture?.destroy(true);
     this.textures.dispose();
     this.textCache.clear();
+    for (const context of this.brushRings.values()) context.destroy();
+    this.brushRings.clear();
+    for (const context of this.glyphArrows.values()) context.destroy();
+    this.glyphArrows.clear();
+    this.colours.clear();
+    this.stack.length = 0;
   }
 }
 

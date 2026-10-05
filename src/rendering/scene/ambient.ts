@@ -157,14 +157,7 @@ export function createAmbient(env: AmbientEnvironment) {
       const flutter = env.spriteMotion ? (l.flutter ?? 1) : 1;
       g.scale(1, 1 - flutter + flutter * Math.cos(l.fl));
       g.fillStyle = l.col;
-      if (env.drawLeaf) env.drawLeaf(g, l);
-      else {
-        g.beginPath();
-        g.moveTo(-l.s, 0);
-        g.quadraticCurveTo(0, -l.s * 0.48, l.s, 0);
-        g.quadraticCurveTo(0, l.s * 0.48, -l.s, 0);
-        g.fill();
-      }
+      env.drawLeaf?.(g, l);
       g.restore();
     }
   }

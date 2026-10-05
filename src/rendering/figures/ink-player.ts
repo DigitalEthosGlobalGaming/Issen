@@ -1,11 +1,20 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
+import { createPbrAtlas } from '../pbr-atlas.ts';
 import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
 const ATLAS_URL = new URL('./assets/player-ronin-simple.png', import.meta.url).href;
+const PBR_SOURCES = {
+  diffuse: new URL('./assets/player-pbr/player-ronin-simple_diffuse.png', import.meta.url).href,
+  normal: new URL('./assets/player-pbr/player-ronin-simple_normal.png', import.meta.url).href,
+  roughness: new URL('./assets/player-pbr/player-ronin-simple_roughness.png', import.meta.url).href,
+  metallic: new URL('./assets/player-pbr/player-ronin-simple_metallic.png', import.meta.url).href,
+  ao: new URL('./assets/player-pbr/player-ronin-simple_ao.png', import.meta.url).href,
+  emissive: new URL('./assets/player-pbr/player-ronin-simple_emissive.png', import.meta.url).href,
+};
 type Part = 'body' | 'head' | 'arms';
 type Frame = readonly [number, number, number, number];
 /** Tight source frames in original 1254² atlas; see adjacent provenance metadata. */
@@ -25,10 +34,12 @@ export type InkPlayerRenderer = ReturnType<typeof createInkPlayerRenderer>;
 /** Per-runtime atlas ownership. draw/drawPart inherit normalized figure transforms and alpha. */
 export function createInkPlayerRenderer(doc: Document) {
   const materials = createSurfaceMapLibrary(doc);
+  const pbr = createPbrAtlas(doc, PBR_SOURCES, 1254);
   const outfits = createOutfitKit(doc);
   const palettes = createPalette();
   const tones = new Map<string, HTMLCanvasElement>();
   let currentTone: string | undefined;
+  let currentPbr = false;
   function tonePart(key: keyof typeof PLAYER_FRAMES): HTMLCanvasElement | null {
     if (!currentTone || key === 'head' || key === 'hand' || !atlas) return null;
     const id = currentTone + ':' + key,
@@ -64,6 +75,7 @@ export function createInkPlayerRenderer(doc: Document) {
     if (pending) return pending;
     if (state === 'disposed') return Promise.resolve(false);
     void outfits.prepare();
+    void pbr.prepare();
     state = 'loading';
     const image = doc.createElement('img');
     atlas = image;
@@ -84,7 +96,9 @@ export function createInkPlayerRenderer(doc: Document) {
     image.src = ATLAS_URL;
     pending = pending.then(async (ready) => {
       await outfits.prepare();
-      return ready;
+      const pbrReady = await pbr.prepare();
+      if (!pbrReady && state !== 'disposed') state = 'unavailable';
+      return ready && pbrReady;
     });
     return pending;
   }
@@ -98,21 +112,27 @@ export function createInkPlayerRenderer(doc: Document) {
   ) {
     const [sx, sy, sw, sh] = PLAYER_FRAMES[key];
     const tinted = tonePart(key);
-    if (key === 'torso' && supportsSceneMaterials(g)) {
+    const source = currentPbr ? pbr.diffuse! : atlas!;
+    const material = currentPbr
+      ? pbr.material(PLAYER_FRAMES[key])
+      : key === 'torso'
+        ? materials.get('cloth')
+        : null;
+    if (material && supportsSceneMaterials(g)) {
       drawMaterialStamp(g, {
         texture: {
-          source: tinted ?? atlas!,
+          source: tinted ?? source,
           revision: 0,
           frame: tinted ? undefined : [sx, sy, sw, sh],
         },
-        material: materials.get('cloth'),
+        material,
         x,
         y,
         width: w,
         height: h,
       });
     } else if (tinted) g.drawImage(tinted, x, y, w, h);
-    else g.drawImage(atlas!, sx, sy, sw, sh, x, y, w, h);
+    else g.drawImage(source, sx, sy, sw, sh, x, y, w, h);
   }
   function joints(f: Figure) {
     const l = f.lean || 0,
@@ -157,6 +177,7 @@ export function createInkPlayerRenderer(doc: Document) {
     if (env.reducedMotion && f.secondary) f = { ...f, secondary: undefined };
     const recipe = outfits.recipe(f.robeId);
     currentTone = recipe?.tone;
+    currentPbr = pbr.ready;
     const l = f.lean || 0;
     g.save();
     if (part === 'body') {
@@ -235,11 +256,13 @@ export function createInkPlayerRenderer(doc: Document) {
       parts: state === 'ready' ? 9 : 0,
       outfits: outfits.snapshot(),
       toneParts: tones.size,
+      pbrReady: pbr.ready,
     }),
     dispose() {
       state = 'disposed';
       outfits.dispose();
       materials.dispose();
+      pbr.dispose();
       for (const c of tones.values()) c.width = c.height = 0;
       tones.clear();
       if (atlas) {

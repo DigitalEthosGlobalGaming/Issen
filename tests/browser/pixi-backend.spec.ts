@@ -1,5 +1,378 @@
 import { expect, test } from '@playwright/test';
 
+test('retained sprite slots refresh expired atlas frames after another slot recreates the source', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const pixels = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
+    const source = document.createElement('canvas');
+    source.width = source.height = 16;
+    const ink = source.getContext('2d')!;
+    ink.fillStyle = '#ff0000';
+    ink.fillRect(0, 0, 16, 16);
+    painter.begin();
+    painter.fillStyle = '#000000';
+    painter.fillRect(0, 0, 64, 32);
+    painter.drawImage(source, 20, 0, 16, 16);
+    painter.drawImage(source, 40, 0, 16, 16);
+    painter.flush();
+    for (let frame = 0; frame < 121; frame++) {
+      painter.begin();
+      painter.fillRect(0, 0, 64, 32);
+      painter.flush();
+    }
+    painter.begin();
+    // Slot zero recreates the expired source; slots one/two still hold its old frames.
+    painter.drawImage(source, 0, 0, 16, 16);
+    painter.drawImage(source, 20, 0, 16, 16);
+    painter.drawImage(source, 40, 0, 16, 16);
+    painter.flush();
+    const copy = document.createElement('canvas');
+    copy.width = 64;
+    copy.height = 32;
+    const read = copy.getContext('2d')!;
+    read.drawImage(canvas, 0, 0);
+    const pixels = [8, 28, 48].map((x) => [...read.getImageData(x, 8, 1, 1).data]);
+    painter.dispose();
+    return pixels;
+  });
+  expect(errors).toEqual([]);
+  expect(pixels).toEqual([
+    [255, 0, 0, 255],
+    [255, 0, 0, 255],
+    [255, 0, 0, 255],
+  ]);
+});
+
+test('pooled state and retained draws preserve clipping, path continuation and frame transitions', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const differences = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 128;
+    const painter = await createPixiScenePainter(canvas);
+    const reference = document.createElement('canvas');
+    reference.width = reference.height = 128;
+    const context = reference.getContext('2d')!;
+    const copy = document.createElement('canvas');
+    copy.width = copy.height = 128;
+    const read = copy.getContext('2d')!;
+    const differences = [];
+    for (let frame = 0; frame < 6; frame++) {
+      painter.begin();
+      context.clearRect(0, 0, 128, 128);
+      for (const target of [painter, context]) {
+        target.setTransform(1, 0, 0, 1, 0, 0);
+        target.globalAlpha = 1;
+        target.fillStyle = '#101010';
+        target.fillRect(0, 0, 128, 128);
+        target.save();
+        target.translate(12, 9);
+        target.scale(-1, 1);
+        target.rotate(0.3);
+        target.transform(1, 0.1, 0.2, 1, 0, 0);
+        target.save();
+        target.fillStyle = '#aabbcc';
+        target.globalAlpha = 0.2;
+        target.translate(5, 3);
+        target.restore();
+        target.restore();
+        if (frame % 2 === 0) {
+          target.save();
+          target.beginPath();
+          target.rect(15, 15, 95, 90);
+          target.clip();
+          target.save();
+          target.beginPath();
+          target.rect(25, 25, 55, 50);
+          target.clip();
+          target.fillStyle = '#33aadd';
+          target.fillRect(0, 0, 128, 128);
+          target.restore();
+        }
+        target.fillStyle = '#bb6644';
+        target.beginPath();
+        target.ellipse(52, 53, 25, 18, 0.4, 0, Math.PI * 2);
+        target.fill();
+        target.lineWidth = 2;
+        target.strokeStyle = '#dddddd';
+        target.stroke();
+        if (frame % 2 === 0) target.restore();
+        if (frame !== 3) {
+          target.save();
+          target.translate(94, 92);
+          target.rotate(0.7);
+          target.scale(0.9, 1.2);
+          target.fillStyle = 'rgba(30,210,50,.6)';
+          target.beginPath();
+          target.arc(0, 0, 14, 0.5, 0.5 + Math.PI * 2);
+          target.fill();
+          target.restore();
+        }
+        // A temporary rectangle draw must preserve a preceding lazy ellipse path.
+        target.fillStyle = '#eebb66';
+        target.beginPath();
+        target.arc(25, 100, 9, 0, Math.PI * 2);
+        target.fillRect(4, 4, 6, 6);
+        target.fill();
+      }
+      painter.flush();
+      read.clearRect(0, 0, 128, 128);
+      read.drawImage(canvas, 0, 0);
+      const actual = read.getImageData(0, 0, 128, 128).data;
+      const expected = context.getImageData(0, 0, 128, 128).data;
+      let difference = 0;
+      for (let i = 0; i < actual.length; i++) difference += Math.abs(actual[i]! - expected[i]!);
+      differences.push(difference / actual.length);
+    }
+    painter.dispose();
+    return differences;
+  });
+  expect(errors).toEqual([]);
+  for (const difference of differences) expect(difference).toBeLessThan(3);
+});
+
+test('prepared enemy brush rings retain Canvas appearance at different sizes and states', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const differences = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { drawEnso } = await import('/src/rendering/glyphs.ts');
+    const { registerBrushRingSink } = await import('/src/rendering/scene-brush-ring.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 256;
+    const painter = await createPixiScenePainter(canvas);
+    const oldCanvas = document.createElement('canvas');
+    oldCanvas.width = oldCanvas.height = 256;
+    const oldPainter = await createPixiScenePainter(oldCanvas);
+    registerBrushRingSink(oldPainter, (radius, colour) => {
+      oldPainter.strokeStyle = colour;
+      oldPainter.lineCap = 'round';
+      const count = Math.ceil(44 * 0.93);
+      for (let i = 0; i < count; i++) {
+        oldPainter.lineWidth = radius * 0.1 * (1 - (0.6 * i) / count);
+        oldPainter.beginPath();
+        oldPainter.arc(
+          0,
+          0,
+          radius,
+          -2.2 + (0.93 * Math.PI * 2 * i) / count,
+          -2.2 + (0.93 * Math.PI * 2 * (i + 1)) / count + 0.01,
+        );
+        oldPainter.stroke();
+      }
+      return true;
+    });
+    const reference = document.createElement('canvas');
+    reference.width = reference.height = 256;
+    const context = reference.getContext('2d')!;
+    const copy = document.createElement('canvas');
+    copy.width = copy.height = 256;
+    const read = copy.getContext('2d')!;
+    const differences = [];
+    for (const radius of [12, 32, 68])
+      for (const waiting of [true, false]) {
+        painter.begin();
+        oldPainter.begin();
+        context.clearRect(0, 0, 256, 256);
+        for (const target of [painter, oldPainter, context]) {
+          target.save();
+          target.translate(128, 128);
+          target.rotate(0.31);
+          drawEnso(
+            target,
+            {
+              time: 1,
+              seal: '#111111',
+              sealArc: '#774422',
+              font: 'sans-serif',
+              perfectZone: 0.8,
+              noArc: false,
+            },
+            0,
+            0,
+            radius,
+            'R',
+            {
+              emphasis: waiting ? 'waiting' : 'next',
+              alpha: waiting ? 0.45 : 0.75,
+              prog: waiting ? null : 0.6,
+            },
+          );
+          target.restore();
+        }
+        painter.flush();
+        oldPainter.flush();
+        read.clearRect(0, 0, 256, 256);
+        read.drawImage(canvas, 0, 0);
+        const actual = read.getImageData(0, 0, 256, 256).data;
+        const expected = context.getImageData(0, 0, 256, 256).data;
+        read.clearRect(0, 0, 256, 256);
+        read.drawImage(oldCanvas, 0, 0);
+        const previous = read.getImageData(0, 0, 256, 256).data;
+        let alphaDifference = 0,
+          alphaCoverage = 0,
+          colourDifference = 0,
+          previousDifference = 0;
+        for (let i = 0; i < actual.length; i += 4) {
+          alphaDifference += Math.abs(actual[i + 3]! - expected[i + 3]!);
+          alphaCoverage += expected[i + 3]!;
+          previousDifference += Math.abs(previous[i + 3]! - actual[i + 3]!);
+          for (let channel = 0; channel < 3; channel++)
+            colourDifference += Math.abs(
+              (actual[i + channel]! * actual[i + 3]!) / 255 -
+                (expected[i + channel]! * expected[i + 3]!) / 255,
+            );
+        }
+        differences.push({
+          radius,
+          waiting,
+          alpha: alphaDifference / alphaCoverage,
+          colour: colourDifference / (alphaCoverage * 3),
+          previous: previousDifference / alphaCoverage,
+        });
+      }
+    painter.dispose();
+    oldPainter.dispose();
+    return differences;
+  });
+  for (const difference of differences) {
+    expect(difference.alpha, JSON.stringify(difference)).toBeLessThan(0.22);
+    expect(difference.colour, JSON.stringify(difference)).toBeLessThan(0.22);
+    expect(difference.previous, JSON.stringify(difference)).toBeLessThan(0.06);
+  }
+});
+
+test('prepared round strokes preserve coverage, translucent alpha and changing transforms', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const frames = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 96;
+    const painter = await createPixiScenePainter(canvas);
+    const reference = document.createElement('canvas');
+    reference.width = canvas.width;
+    reference.height = canvas.height;
+    const context = reference.getContext('2d')!;
+    const copy = document.createElement('canvas');
+    copy.width = canvas.width;
+    copy.height = canvas.height;
+    const read = copy.getContext('2d')!;
+    const frames = [];
+    for (let frame = 0; frame < 3; frame++) {
+      painter.begin();
+      context.clearRect(0, 0, 160, 96);
+      for (const target of [painter, context]) {
+        target.save();
+        target.translate(30 + frame * 9, 30);
+        target.rotate(frame * 0.4);
+        target.scale(1.2, 1.2);
+        target.lineCap = 'round';
+        target.strokeStyle = 'rgba(255,0,0,.4)';
+        target.lineWidth = 14 - frame * 3;
+        target.beginPath();
+        target.moveTo(0, 0);
+        target.lineTo(65, 0);
+        target.stroke();
+        target.restore();
+        target.lineCap = 'round';
+        target.strokeStyle = 'rgba(0,0,255,.7)';
+        target.lineWidth = 2;
+        target.beginPath();
+        target.moveTo(20, 80);
+        target.lineTo(130, 70);
+        target.stroke();
+      }
+      painter.flush();
+      read.clearRect(0, 0, 160, 96);
+      read.drawImage(canvas, 0, 0);
+      const actual = read.getImageData(0, 0, 160, 96).data;
+      const expected = context.getImageData(0, 0, 160, 96).data;
+      let difference = 0,
+        coverage = 0,
+        maxAlpha = 0;
+      for (let i = 3; i < actual.length; i += 4) {
+        difference += Math.abs(actual[i]! - expected[i]!);
+        coverage += expected[i]!;
+        if (Math.floor(i / 4 / 160) < 60) maxAlpha = Math.max(maxAlpha, actual[i]!);
+      }
+      frames.push({ relativeAlphaDifference: difference / coverage, maxAlpha });
+    }
+    painter.dispose();
+    return frames;
+  });
+  expect(errors).toEqual([]);
+  for (const frame of frames) {
+    expect(frame.relativeAlphaDifference).toBeLessThan(0.08);
+    expect(frame.maxAlpha).toBeGreaterThanOrEqual(100);
+    expect(frame.maxAlpha).toBeLessThanOrEqual(103);
+  }
+});
+
+test('fading colours with scientific notation retain Canvas alpha without interrupting WebGL', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const samples = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
+    painter.begin();
+    painter.fillStyle = 'rgba(8,8,7,7.812472890833533e-12)';
+    painter.fillRect(0, 0, 16, 32);
+    painter.fillStyle = 'rgba(1e2,0,0,1e-1)';
+    painter.fillRect(16, 0, 16, 32);
+    const gradient = painter.createLinearGradient(32, 0, 48, 0);
+    gradient.addColorStop(0, 'rgba(8,8,7,7.812472890833533e-12)');
+    gradient.addColorStop(1, 'rgba(0,0,0,1e-1)');
+    painter.fillStyle = gradient;
+    painter.fillRect(32, 0, 16, 32);
+    painter.shadowColor = 'rgba(8,8,7,7.812472890833533e-12)';
+    painter.strokeStyle = 'rgba(0,0,0,1e-1)';
+    painter.lineWidth = 8;
+    painter.beginPath();
+    painter.moveTo(56, 0);
+    painter.lineTo(56, 32);
+    painter.stroke();
+    painter.flush();
+    const copy = document.createElement('canvas');
+    copy.width = 64;
+    copy.height = 32;
+    const read = copy.getContext('2d')!;
+    read.drawImage(canvas, 0, 0);
+    const samples = [8, 24, 56].map((x) => [...read.getImageData(x, 16, 1, 1).data]);
+    painter.dispose();
+    return samples;
+  });
+  expect(errors).toEqual([]);
+  expect(samples[0]![3]).toBe(0);
+  expect(samples[1]![3]).toBeGreaterThanOrEqual(25);
+  expect(samples[1]![3]).toBeLessThanOrEqual(26);
+  expect(samples[2]![3]).toBeGreaterThanOrEqual(25);
+  expect(samples[2]![3]).toBeLessThanOrEqual(26);
+});
+
 test('drawing the same prepared scene twice preserves poses, RNG, post state and haptics', async ({
   page,
 }) => {
@@ -557,7 +930,10 @@ test('normal materials respond to lights and mirrored normals without changing t
   });
   expect(errors).toEqual([]);
   expect(pixels.lit[0]).toBeGreaterThan(100);
-  expect(pixels.mirrored[0]).toBeLessThan(30);
+  // Linear ambient 0.1 on display-grey 128 yields about 40 after sRGB encoding.
+  expect(pixels.mirrored[0]).toBeGreaterThan(35);
+  expect(pixels.mirrored[0]).toBeLessThan(45);
+  expect(pixels.lit[0] - pixels.mirrored[0]).toBeGreaterThan(60);
   expect(pixels.lit[3]).toBeCloseTo(128, -1);
   expect(pixels.mirrored[3]).toBe(pixels.lit[3]);
   expect(pixels.fogged[0]).toBe(255);

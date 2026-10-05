@@ -1,0 +1,54 @@
+{
+  "source": "src/ui/assets/world-ui-material-metal.png",
+  "preset": "metal",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-metal",
+  "generated": "2026-10-05",
+  "sourceHash": "ec69fba0454ace59f75ba618c0c9a92a0a66ffbaf128becf85dedb966872649b",
+  "dimensions": [
+    192,
+    192
+  ],
+  "renderer": "not connected",
+  "exports": {
+    "metal": {
+      "jobHash": "525a7bb031c610af86902e94fb6fcf569ae9b548ea613b84b49a3a49a8f47ead",
+      "actual": {
+        "mode": "texture",
+        "engine": "opengl",
+        "applied": {
+          "normalIntensity": 1.5,
+          "smoothing": 1,
+          "roughnessBase": 0.25,
+          "roughnessVariation": 0.5,
+          "roughnessBlur": 2,
+          "metallicOffset": 0.25,
+          "metallicContrast": 1.5,
+          "emissiveIntensity": 0
+        },
+        "skipped": [
+          "bevelHeight",
+          "detail"
+        ]
+      },
+      "preset": {
+        "version": 1,
+        "name": "metal",
+        "mode": "texture",
+        "engine": "opengl",
+        "settings": {
+          "bevelHeight": 1,
+          "detail": 0.2,
+          "emissiveIntensity": 0,
+          "metallicContrast": 1.5,
+          "metallicOffset": 0.25,
+          "normalIntensity": 1.5,
+          "roughnessBase": 0.25,
+          "roughnessBlur": 2,
+          "roughnessVariation": 0.5,
+          "smoothing": 1
+        }
+      }
+    }
+  }
+}
