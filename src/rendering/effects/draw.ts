@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawSeal } from '../ui-art.ts';
 import { TAU, clamp, lerp, easeOut, easeInOut } from '../../shared/math.ts';
 import type { Effects } from './state.ts';
@@ -8,7 +9,7 @@ export interface EffectDrawing {
   seal: string;
   mistSprite: CanvasImageSource | null;
 }
-export function createEffectRenderer(g: CanvasRenderingContext2D, fx: Effects, env: EffectDrawing) {
+export function createEffectRenderer(g: SceneDrawing, fx: Effects, env: EffectDrawing) {
   const { scale: S, time, font: FONT, seal: SEAL, mistSprite } = env;
   function drawFx() {
     for (const knife of fx.knives) {

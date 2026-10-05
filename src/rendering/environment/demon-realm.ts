@@ -1,3 +1,5 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { invalidateSceneTexture } from '../texture-revision.ts';
 import { drawAtlasSprite, releaseSceneryCutouts } from './scene-kit.ts';
 
 const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
@@ -17,7 +19,7 @@ export function createDemonRealmRenderer(doc: Document) {
   let mountainKey = '';
   let disposed = false;
   function stamp(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     image: HTMLImageElement,
     cell: number,
     x: number,
@@ -58,7 +60,7 @@ export function createDemonRealmRenderer(doc: Document) {
   }
   return {
     draw(
-      g: CanvasRenderingContext2D,
+      g: SceneDrawing,
       width: number,
       height: number,
       time = 0,
@@ -108,6 +110,7 @@ export function createDemonRealmRenderer(doc: Document) {
                 { flip: i % 2 === 0, fadeFrom: 0.65, alpha: 0.45, hazeColor: '#584052' },
               );
             mountainKey = key;
+            invalidateSceneTexture(mountainLayer);
           }
         }
         g.save();

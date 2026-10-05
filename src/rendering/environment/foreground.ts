@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 /** Four independent boulder variants; frame geometry matches the preserved source sheet. */
 export const FOREGROUND_BOULDER_FRAMES = [
@@ -9,7 +10,7 @@ export const FOREGROUND_BOULDER_FRAMES = [
 
 /** Cached in the base layer so grounded rocks never drift independently of the grass. */
 export function drawForegroundBoulders(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   atlas: HTMLImageElement,
   width: number,
   height: number,

@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
@@ -206,7 +207,7 @@ export function createInkEnemyRenderer(doc: Document) {
     return c;
   }
   function stamp(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     key: keyof typeof BASE_FRAMES,
     x: number,
     y: number,
@@ -237,7 +238,7 @@ export function createInkEnemyRenderer(doc: Document) {
     });
   }
   function bone(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     key: keyof typeof BASE_FRAMES,
     a: Point,
     b: Point,
@@ -251,12 +252,7 @@ export function createInkEnemyRenderer(doc: Document) {
     stamp(g, key, -w / 2, -0.018, w, Math.hypot(b[0] - a[0], b[1] - a[1]) + 0.035, f, env);
     g.restore();
   }
-  function drawPart(
-    g: CanvasRenderingContext2D,
-    part: Part,
-    f: Figure,
-    env: FigureEnvironment,
-  ): boolean {
+  function drawPart(g: SceneDrawing, part: Part, f: Figure, env: FigureEnvironment): boolean {
     const appearance = f.varied ? enemyAppearance(f) : undefined;
     const useVariantHead = !!appearance && !f.variant;
     if (appearance) f = { ...f, variant: appearance.variant, pal: appearance.palette };

@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { TAU, clamp } from '../../shared/math.ts';
 import { rng } from '../../shared/random.ts';
 import type { Random } from '../../shared/random.ts';
@@ -5,7 +6,7 @@ import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { setSceneryAtmosphere } from '../environment/scene-kit.ts';
 export function blob(
-  b: CanvasRenderingContext2D,
+  b: SceneDrawing,
   x: number,
   y: number,
   rx: number,
@@ -35,7 +36,7 @@ export function createBackground(
     fieldMist?: number;
     hillHeight?: (x: number) => number;
     hillShade?: { top: string; bottom: string };
-    mountains?: (context: CanvasRenderingContext2D) => void;
+    mountains?: (context: SceneDrawing) => void;
   } = {},
 ) {
   const portrait = H >= W * 0.9,

@@ -1,6 +1,8 @@
-const filmCopies = new WeakMap<CanvasRenderingContext2D, HTMLCanvasElement>();
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { applySceneFilm } from '../scene-drawing.ts';
+const filmCopies = new WeakMap<SceneDrawing, HTMLCanvasElement>();
 
-function copyFilmSource(g: CanvasRenderingContext2D): HTMLCanvasElement {
+function copyFilmSource(g: SceneDrawing): HTMLCanvasElement {
   let copy = filmCopies.get(g);
   if (!copy) {
     copy = g.canvas.ownerDocument.createElement('canvas');
@@ -15,7 +17,7 @@ function copyFilmSource(g: CanvasRenderingContext2D): HTMLCanvasElement {
 }
 
 export function applyFilm(
-  g: CanvasRenderingContext2D,
+  g: SceneDrawing,
   W: number,
   H: number,
   source: CanvasImageSource,
@@ -23,6 +25,7 @@ export function applyFilm(
   time = 0,
   preferences: { reducedMotion?: boolean; reducedFlashes?: boolean } = {},
 ) {
+  if (applySceneFilm(g, f, W, H, time, preferences)) return;
   if (f !== 'trial-glitch') {
     const copy = filmCopies.get(g);
     if (copy) {

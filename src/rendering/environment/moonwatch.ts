@@ -1,12 +1,13 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { createBackground } from '../scene/background.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite as sprite } from './scene-kit.ts';
 
 /** One quiet landmark and isolated trees; moon and weather remain shared presentation. */
 export function drawMoonwatchClearing(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,

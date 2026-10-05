@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
     );
   }
   return {
+    optimizeDeps: { include: ['pixi.js'] },
     define: {
       'import.meta.env.VITE_GAME_EDITION': JSON.stringify(edition),
       'import.meta.env.VITE_PREMIUM_ENABLED': JSON.stringify(premiumEnabled ? 'true' : 'false'),

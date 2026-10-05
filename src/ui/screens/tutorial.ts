@@ -5,12 +5,16 @@ import {
   cancelActiveFrame,
 } from '../../platform/activity.ts';
 import './tutorial.css';
+import type { SceneDrawing } from '../../rendering/scene-drawing.ts';
+import type { SceneSurface } from '../../rendering/scene-surface.ts';
+import { createSceneSurface } from '../../rendering/scene-surface.ts';
 
 /** A practice scene with its own clock, canvas and inputs. It never touches a run or profile. */
 export function createTutorial(
   root: HTMLElement,
   onFinish: (status: 'completed' | 'skipped') => void,
   reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches,
+  pixi = false,
 ) {
   const overlay = document.createElement('section');
   overlay.className = 'tutorial-overlay';
@@ -34,10 +38,9 @@ export function createTutorial(
     <p class="tutorial-note">Swipe or use arrows / WASD to cut. Tap or Space to parry. Escape skips. Practice earns no rewards.</p>
   </div>`;
   root.append(overlay);
-  const canvas = overlay.querySelector<HTMLCanvasElement>('canvas')!;
-  const context = canvas.getContext('2d');
-  if (!context) throw new Error('Tutorial requires a 2D canvas context');
-  const g = context;
+  let canvas = overlay.querySelector<HTMLCanvasElement>('canvas')!;
+  let context: SceneDrawing | null = pixi ? null : canvas.getContext('2d');
+  let surface: SceneSurface | undefined;
   const title = overlay.querySelector<HTMLElement>('.tutorial-title')!;
   const lesson = overlay.querySelector<HTMLElement>('.tutorial-lesson')!;
   const cue = overlay.querySelector<HTMLElement>('.tutorial-cue')!;
@@ -47,8 +50,19 @@ export function createTutorial(
   const listeners = new AbortController();
   let active = false;
   let disposed = false;
+  if (pixi)
+    void createSceneSurface(canvas, true, true).then((prepared) => {
+      if (disposed) {
+        prepared.dispose();
+        return;
+      }
+      surface = prepared;
+      canvas = prepared.canvas;
+      context = prepared.drawing;
+    });
   let step = 0;
   let started = 0;
+  let contextPausedAt: number | undefined;
   let frame = 0;
   let previousFocus: HTMLElement | null = null;
   let pointer: { x: number; y: number; id: number } | null = null;
@@ -105,6 +119,12 @@ export function createTutorial(
     if (!active) return;
     if (action === 'skip') return finish('skipped');
     if (action === 'finish' && step === 4) return finish('completed');
+    if (surface?.native?.contextLost || !context) return;
+    // Input can arrive after restoration but before the next animation frame.
+    if (contextPausedAt !== undefined) {
+      started += activeNow() - contextPausedAt;
+      contextPausedAt = undefined;
+    }
     if (!pageActive()) return;
     const now = activeNow();
     if (step === 0 && action === 'right') setStep(1, 'Clean cut. Now try the timing.');
@@ -125,6 +145,25 @@ export function createTutorial(
   }
   function draw(now: number) {
     if (!active) return;
+    if (surface?.native?.contextLost) {
+      contextPausedAt ??= now;
+      frame = requestActiveFrame(draw);
+      return;
+    }
+    if (contextPausedAt !== undefined) {
+      started += now - contextPausedAt;
+      contextPausedAt = undefined;
+    }
+    if (surface) {
+      canvas = surface.canvas;
+      context = surface.drawing;
+    }
+    const g = context;
+    if (!g) {
+      frame = requestActiveFrame(draw);
+      return;
+    }
+    surface?.native?.begin();
     if (step === 3 && now - started >= 3200)
       setStep(2, 'The opening closed. Parry the next glint and try again.');
     const bounds = canvas.getBoundingClientRect();
@@ -205,6 +244,7 @@ export function createTutorial(
       x,
       y + r * 0.25,
     );
+    surface?.native?.flush();
     frame = requestActiveFrame(draw);
   }
   function keyboard(event: KeyboardEvent) {
@@ -292,6 +332,7 @@ export function createTutorial(
       if (active || disposed) return;
       previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       active = true;
+      contextPausedAt = undefined;
       overlay.hidden = false;
       setStep(0);
       overlay.querySelector<HTMLButtonElement>('button')!.focus();
@@ -302,6 +343,7 @@ export function createTutorial(
       active = false;
       cancelActiveFrame(frame);
       listeners.abort();
+      surface?.dispose();
       overlay.remove();
     },
   };

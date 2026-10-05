@@ -8,6 +8,7 @@ test('real mobile swipes find the title secret and explain its run-end reward', 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.locator('#title').waitFor({ state: 'visible', timeout: 60000 });
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const touch = await page.context().newCDPSession(page);
   for (const [dx, dy] of [
     [0, -1],
@@ -61,6 +62,7 @@ test.beforeEach(async ({ page }) => {
 test('twenty title taps record the Scarecrow secret through pointer input', async ({ page }) => {
   await page.goto('/');
   await page.locator('#title').waitFor({ state: 'visible', timeout: 60000 });
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.evaluate(() => {
     const title = document.querySelector('#title')!;
     for (let tap = 0; tap < 20; tap++) {
@@ -84,6 +86,7 @@ test('twenty title taps record the Scarecrow secret through pointer input', asyn
 test('the title swipe sequence records Kōken through pointer input', async ({ page }) => {
   await page.goto('/');
   await page.locator('#title').waitFor({ state: 'visible', timeout: 60000 });
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.evaluate(() => {
     const title = document.querySelector('#title')!;
     for (const direction of ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right']) {
@@ -117,6 +120,7 @@ test('repeating a found secret reports pending ownership until the reward is cla
   );
   await page.goto('/');
   await page.locator('#title').waitFor({ state: 'visible', timeout: 60000 });
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   for (const key of [
     'ArrowUp',
     'ArrowUp',

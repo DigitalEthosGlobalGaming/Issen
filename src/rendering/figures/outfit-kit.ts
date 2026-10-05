@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Figure } from './types.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
@@ -220,7 +221,7 @@ export function createOutfitKit(doc: Document) {
       INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key))
     );
   }
-  function stamp(g: CanvasRenderingContext2D, a: Attachment, lean: number) {
+  function stamp(g: SceneDrawing, a: Attachment, lean: number) {
     const image = images.get(a.atlas),
       frame = FRAMES[a.atlas][a.frame];
     if (!image || !frame) return;
@@ -254,7 +255,7 @@ export function createOutfitKit(doc: Document) {
     prepare,
     ready,
     recipe: (id?: string) => (id ? INK_OUTFIT_RECIPES[id] : undefined),
-    draw(g: CanvasRenderingContext2D, stage: 'body' | 'head', f: Figure) {
+    draw(g: SceneDrawing, stage: 'body' | 'head', f: Figure) {
       const recipe = INK_OUTFIT_RECIPES[f.robeId!];
       if (!recipe) return;
       for (const a of recipe[stage]) {
@@ -310,7 +311,7 @@ export function createOutfitKit(doc: Document) {
       }
     },
     drawArm(
-      g: CanvasRenderingContext2D,
+      g: SceneDrawing,
       f: Figure,
       index: number,
       shoulder: [number, number],

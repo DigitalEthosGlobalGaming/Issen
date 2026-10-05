@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -29,9 +30,9 @@ export const TEMPLE_ATLAS_FRAMES = {
 } as const;
 /** Ember Courtyard: offset ruined gateway, fractured roofline and an open central floor. */
 export function drawEmberCourtyard(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
@@ -39,7 +40,7 @@ export function drawEmberCourtyard(
   lowQuality: boolean,
 ) {
   function piece(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     image: HTMLImageElement,
     cell: number,
     x: number,

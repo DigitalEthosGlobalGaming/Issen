@@ -48,6 +48,7 @@ for (const testing of [false, true]) {
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#app')).toHaveCount(1);
+    await expect(page.locator('.startup-loading')).toHaveCount(0);
     const snapshot = () => page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
     const before = await snapshot();
     await page.locator('#bOptions').click();
@@ -70,6 +71,7 @@ for (const testing of [false, true]) {
     await dialog.getByRole('button', { name: 'Delete all progress', exact: true }).click();
     await expect(page.locator('#title')).toHaveClass(/on/);
     await expect(dialog).not.toBeVisible();
+    await expect(page.locator('.startup-loading')).toHaveCount(0);
     const after = await snapshot();
     const prefix = testing ? 'issen.testing.' : 'issen.';
     const meta = JSON.parse(after[prefix + 'meta']!);

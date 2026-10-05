@@ -9,12 +9,12 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
       response,
       body: (await response.text()).replace(
         'frameLoop.start();',
-        'window.__deathHarness = { G, fx, frameLoop, startRun, killEnemy, drawEnemy, drawStains, updateEnemies, updateFx }; frameLoop.start();',
+        'window.__deathHarness = { G, g, fx, frameLoop, startRun, killEnemy, drawEnemy, drawStains, updateEnemies, updateFx }; frameLoop.start();',
       ),
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#app')).toHaveCount(1);
+  await page.waitForFunction(() => !!(window as any).__deathHarness);
   const result = await page.evaluate(() => {
     const {
       G,
@@ -32,12 +32,12 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
     startRun();
     G.enemies = [e];
     killEnemy(e, e.dir, true);
-    const ctx = document.querySelector<HTMLCanvasElement>('#c')!.getContext('2d')!,
+    const ctx = (window as any).__deathHarness.g,
       fill = ctx.fill;
     let groundFills = 0;
     ctx.fill = function (...args: any[]) {
       if (
-        /^rgba\(0,\s*0,\s*0,\s*0\.25\)$/.test(this.fillStyle as string) ||
+        /^rgba\(0,\s*0,\s*0,\s*0?\.25\)$/.test(this.fillStyle as string) ||
         /^rgba\(8,\s*8,\s*7,/.test(this.fillStyle as string)
       )
         groundFills++;
@@ -79,18 +79,17 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
       response,
       body: (await response.text()).replace(
         'frameLoop.start();',
-        'window.__deathHarness = { G, frameLoop, drawEnemy, updateEnemies }; frameLoop.start();',
+        'window.__deathHarness = { G, g, frameLoop, drawEnemy, updateEnemies }; frameLoop.start();',
       ),
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#app')).toHaveCount(1);
+  await page.waitForFunction(() => !!(window as any).__deathHarness);
   const results = await page.evaluate(() => {
     const { G, frameLoop, drawEnemy, updateEnemies } = (window as any).__deathHarness;
     frameLoop.stop();
-    const source = G.enemies[0],
-      canvas = document.querySelector<HTMLCanvasElement>('#c')!;
-    const ctx = canvas.getContext('2d')!,
+    const source = G.enemies[0];
+    const ctx = (window as any).__deathHarness.g,
       fill = ctx.fill;
     let shadows: { alpha: number; transform: number[] }[] = [],
       bodyFills = 0;

@@ -1,4 +1,5 @@
 /** Own browser resources for one application instance. Disposal is idempotent. */
+type LifecycleEvents = DocumentEventMap & { webglcontextlost: Event; webglcontextrestored: Event };
 export function createLifecycle() {
   const controller = new AbortController();
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -8,10 +9,10 @@ export function createLifecycle() {
     get disposed() {
       return disposed;
     },
-    listen<K extends keyof DocumentEventMap>(
+    listen<K extends keyof LifecycleEvents>(
       target: EventTarget,
       type: K,
-      listener: (event: DocumentEventMap[K]) => void,
+      listener: (event: LifecycleEvents[K]) => void,
     ): void {
       target.addEventListener(type, listener as EventListener, { signal: controller.signal });
     },

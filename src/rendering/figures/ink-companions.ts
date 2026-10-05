@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 const COMPANION_URL = new URL('./assets/companion-parts-atlas.png', import.meta.url).href;
 const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
 
@@ -75,7 +76,7 @@ export function createInkCompanionRenderer(doc: Document) {
 
   function draw(
     type: string,
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     x: number,
     y: number,
     size: number,

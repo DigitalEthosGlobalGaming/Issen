@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { TAU, clamp, lerp } from '../../shared/math.ts';
 import type { Weather } from '../../game/content/stages.ts';
 import type { WeatherState, WeatherParticle, Bamboo } from './weather-state.ts';
@@ -13,14 +14,9 @@ export interface WeatherDrawing {
   bamboo: readonly Bamboo[];
   state: WeatherState;
   smokeSprite: CanvasImageSource | null;
-  drawEmber?: (
-    g: CanvasRenderingContext2D,
-    p: WeatherParticle,
-    index: number,
-    scale: number,
-  ) => void;
+  drawEmber?: (g: SceneDrawing, p: WeatherParticle, index: number, scale: number) => void;
 }
-export function createWeatherRenderer(g: CanvasRenderingContext2D, env: WeatherDrawing) {
+export function createWeatherRenderer(g: SceneDrawing, env: WeatherDrawing) {
   const {
     weather,
     width: W,

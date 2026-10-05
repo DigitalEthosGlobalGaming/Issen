@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 const ATLAS_URL = new URL('./assets/charm-atlas.png', import.meta.url).href;
 /** Packed source windows; the generated rows are not equal thirds. */
 const FRAMES = [
@@ -67,7 +68,7 @@ export function createInkCharmRenderer(doc: Document) {
   }
   /** x/y is the top suspension point; size is full height in caller coordinates. */
   function draw(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     id: string | undefined,
     x: number,
     y: number,

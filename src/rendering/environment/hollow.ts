@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -19,7 +20,7 @@ const POOLS = [
   { x: 0.89, y: 0.17, w: 0.32, h: 0.067 },
   { x: 0.02, y: 0.24, w: 0.22, h: 0.055 },
 ] as const;
-function poolPath(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+function poolPath(g: SceneDrawing, x: number, y: number, w: number, h: number) {
   g.beginPath();
   // Broken margins resemble water collected between turf, not smooth oval decals.
   for (let i = 0; i <= 64; i++) {
@@ -35,9 +36,9 @@ function poolPath(g: CanvasRenderingContext2D, x: number, y: number, w: number, 
 
 /** A rain-dark basin with shallow, disconnected pools and low grass islands. */
 export function drawRainwaterHollow(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
@@ -169,7 +170,7 @@ export function drawRainwaterHollow(
 }
 
 /** Cosmetic ripples use a fixed layout and presentation time, never gameplay randomness. */
-export function drawHollowMotion(ctx: CanvasRenderingContext2D, frame: WaterFrame) {
+export function drawHollowMotion(ctx: SceneDrawing, frame: WaterFrame) {
   const { width: w, height: h } = frame,
     { groundY } = createLayout(w, h);
   const t = frame.reducedMotion || frame.reducedFlashes ? 0 : frame.time;

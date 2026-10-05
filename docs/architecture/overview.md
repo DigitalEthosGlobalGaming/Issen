@@ -1,6 +1,7 @@
 # Implemented architecture
 
-Issen is a vanilla DOM/Canvas application compiled with TypeScript 7 and served or
+Issen uses a vanilla DOM interface and PixiJS WebGL scenes with a Canvas fallback,
+compiled with TypeScript 7 and served or
 bundled by Vite. All application TypeScript under `src/` is included in strict
 type checking; Vite's transpilation alone is not the build gate.
 
@@ -40,8 +41,9 @@ main scene layer order and post-processing orchestration. These are not separate
 session/renderer services yet; do not assume the proposed migration tree describes
 implemented files.
 
-The optional Ink environment is owned by src/rendering/environment/. It supplies
-layered image scenery to the same Canvas composition and film pass.
+The Ink environment is owned by `src/rendering/environment/`. It supplies
+layered image scenery to the shared scene composition and film pass, rendered
+through Pixi by default or the Canvas fallback.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 ## Where changes belong
@@ -205,7 +207,7 @@ needs them. Add drawing to the relevant renderer with explicit inputs, not by
 reaching into run globals. For a new screen, add its fragment to `ui/mount.ts`, its
 screen identifier/navigation entry, and a controller only when it has behavior.
 
-See [rendering and visual consistency](rendering.md) for the Canvas/DOM split,
+See [rendering and visual consistency](rendering.md) for the scene/DOM split,
 scene layering and shared style patterns. See
 [development and verification](../development/local-development.md) for commands
 and the [migration record](typescript-migration.md) for completion evidence and coverage limits.

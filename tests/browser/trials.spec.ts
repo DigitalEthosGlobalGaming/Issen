@@ -69,6 +69,7 @@ test('Mirror accepts opposite displayed directions throughout a chain and reject
   );
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#bPlay')).toBeVisible({ timeout: 60000 });
+  await page.waitForFunction(() => !!(window as any).__trialHarness);
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
@@ -178,6 +179,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
   await instrument(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#bPlay')).toBeVisible({ timeout: 60000 });
+  await page.waitForFunction(() => !!(window as any).__trialHarness);
   await page.evaluate(() => (window as any).__trialHarness.stop());
   const before = await saves(page);
   await page.locator('#bTrials').click();

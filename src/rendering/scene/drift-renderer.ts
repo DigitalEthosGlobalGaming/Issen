@@ -1,3 +1,5 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { fillScenePath } from '../scene-drawing.ts';
 import type { Leaf } from './ambient.ts';
 import { DRIFT_ATLASES as urls, DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
@@ -6,14 +8,11 @@ export type DriftMode = 'original' | 'shape' | 'sprites';
 /** One retained path and decoded atlas images per runtime; no per-frame image processing. */
 export function createDriftRenderer() {
   const images = new Map<string, HTMLImageElement>();
-  const shape = new Path2D();
-  shape.moveTo(-1, 0);
-  shape.quadraticCurveTo(0, -0.48, 1, 0);
-  shape.quadraticCurveTo(0, 0.48, -1, 0);
+  const shape = 'M -1 0 Q 0 -0.48 1 0 Q 0 0.48 -1 0';
   let mode: DriftMode = 'sprites';
   let disposed = false;
   let pending: Promise<void> | undefined;
-  function paint(g: CanvasRenderingContext2D, id: string, size: number, opacity: number) {
+  function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
     const sprite = DRIFT_BY_ID.get(id)!;
     const image = images.get(sprite.atlas);
     if (!image) return;
@@ -61,12 +60,12 @@ export function createDriftRenderer() {
         }),
       ).then(() => {}));
     },
-    draw(g: CanvasRenderingContext2D, leaf: Leaf) {
+    draw(g: SceneDrawing, leaf: Leaf) {
       if (mode === 'sprites') {
         paint(g, leaf.sprite ?? 'leaves.willow', leaf.s * 3, leaf.z > 1.25 ? 0.6 : 0.9);
       } else if (mode === 'shape') {
         g.scale(leaf.s, leaf.s);
-        g.fill(shape);
+        fillScenePath(g, shape);
       } else {
         g.beginPath();
         g.moveTo(-leaf.s, 0);
@@ -75,7 +74,7 @@ export function createDriftRenderer() {
         g.fill();
       }
     },
-    drawEmber(g: CanvasRenderingContext2D, p: WeatherParticle, index: number, scale: number) {
+    drawEmber(g: SceneDrawing, p: WeatherParticle, index: number, scale: number) {
       g.save();
       g.translate(p.x, p.y);
       g.rotate(p.ph);

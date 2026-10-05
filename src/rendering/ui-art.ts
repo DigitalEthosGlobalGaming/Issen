@@ -1,5 +1,6 @@
+import type { SceneDrawing } from './scene-drawing.ts';
+import { fillScenePath } from './scene-drawing.ts';
 import { SEVEN_DAWNS_PATHS } from './crest-art.ts';
-const dawnPaths: Path2D[] = [];
 const ATLAS_URL = new URL('../ui/assets/world-ui-atlas.png', import.meta.url).href;
 export type SealMaterial = 'paper' | 'wood' | 'metal' | 'silk' | 'stone';
 const frames = {
@@ -47,7 +48,7 @@ function tinted(material: SealMaterial, color: string) {
 }
 /** Fixed corner/edge bands, with a stretched centre; all coordinates are pixels. */
 export function drawSeal(
-  g: CanvasRenderingContext2D,
+  g: SceneDrawing,
   material: SealMaterial,
   color: string,
   x: number,
@@ -79,21 +80,14 @@ export function drawSeal(
         dy[row + 1]! - dy[row]!,
       );
 }
-export function drawCrestSprite(
-  g: CanvasRenderingContext2D,
-  id: string,
-  x: number,
-  y: number,
-  r: number,
-) {
+export function drawCrestSprite(g: SceneDrawing, id: string, x: number, y: number, r: number) {
   if (id === 'seven-dawns') {
-    if (!dawnPaths.length) for (const path of SEVEN_DAWNS_PATHS) dawnPaths.push(new Path2D(path));
     g.save();
     g.translate(x - r * 1.28, y - r * 1.28);
     g.scale((r * 2.56) / 100, (r * 2.56) / 100);
     g.globalAlpha *= 0.88;
     g.fillStyle = '#d6cbb4';
-    for (const path of dawnPaths) g.fill(path);
+    for (const path of SEVEN_DAWNS_PATHS) fillScenePath(g, path);
     g.restore();
     return;
   }

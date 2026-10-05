@@ -5,6 +5,7 @@ test('Scattered Armour reuses the enemy silhouette and expires as separate sprit
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const result = await page.evaluate(async () => {
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
@@ -113,6 +114,7 @@ test('selected Scattered Armour reaches the live kill renderer without duplicate
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const result = await page.evaluate(() => {
     const { G, frameLoop, startRun, killEnemy, drawEnemy, updateEnemies } = (window as any)
       .__scatterHarness;

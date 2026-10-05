@@ -1,3 +1,5 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { invalidateSceneTexture } from '../texture-revision.ts';
 import { createBambooForegroundRenderer } from './bamboo-foreground.ts';
 import { drawRainwaterHollow, drawHollowMotion } from './hollow.ts';
 import { drawStageVariations } from './stage-variation.ts';
@@ -185,7 +187,7 @@ export function createEnvironmentRenderer(doc: Document) {
   }
 
   function stamp(
-    ctx: CanvasRenderingContext2D,
+    ctx: SceneDrawing,
     image: HTMLImageElement,
     cell: number,
     x: number,
@@ -256,6 +258,7 @@ export function createEnvironmentRenderer(doc: Document) {
       );
       variationContext.restore();
       cached = canvas;
+      for (const layer of [canvas, distant, nearby]) if (layer) invalidateSceneTexture(layer);
       builds++;
       return true;
     };
@@ -497,7 +500,7 @@ export function createEnvironmentRenderer(doc: Document) {
     return finish();
   }
 
-  function draw(ctx: CanvasRenderingContext2D, frame: EnvironmentFrame): boolean {
+  function draw(ctx: SceneDrawing, frame: EnvironmentFrame): boolean {
     ctx.save();
     try {
       const valid =
@@ -597,7 +600,7 @@ export function createEnvironmentRenderer(doc: Document) {
 
   return {
     draw,
-    drawForeground(ctx: CanvasRenderingContext2D, frame: EnvironmentFrame) {
+    drawForeground(ctx: SceneDrawing, frame: EnvironmentFrame) {
       return (
         !disposed &&
         status === 'layered' &&

@@ -8,6 +8,11 @@ for (const viewport of [
     page,
   }, info) => {
     test.setTimeout(90000);
+    const graphicsWarnings: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'warning' && message.text().includes('PixiJS'))
+        graphicsWarnings.push(message.text());
+    });
     await page.setViewportSize(viewport);
     await page.addInitScript(() => {
       if (!localStorage.getItem('issen.meta'))
@@ -80,5 +85,6 @@ for (const viewport of [
     expect(exited.stage).toBe(0);
     expect(exited.seed).toBe(before.originalSeed);
     expect(exited.checkpoint).toBe(before.checkpoint);
+    expect(graphicsWarnings).toEqual([]);
   });
 }

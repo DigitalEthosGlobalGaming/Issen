@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Palette } from '../palette.ts';
 import type { Random } from '../../shared/random.ts';
 
@@ -78,7 +79,7 @@ export interface SecondaryMotion {
 }
 export interface PlayerArtwork {
   drawPart(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     part: 'body' | 'head' | 'arms',
     f: Figure,
     env: FigureEnvironment,
@@ -98,16 +99,11 @@ export type EnemyPart =
   | 'leftHand'
   | 'rightHand';
 export interface EnemyArtwork {
-  drawPart(
-    g: CanvasRenderingContext2D,
-    part: EnemyPart,
-    f: Figure,
-    env: FigureEnvironment,
-  ): boolean;
+  drawPart(g: SceneDrawing, part: EnemyPart, f: Figure, env: FigureEnvironment): boolean;
 }
 export interface CharmArtwork {
   draw(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     id: string | undefined,
     x: number,
     y: number,
@@ -118,7 +114,7 @@ export interface CharmArtwork {
 export interface CompanionArtwork {
   draw(
     type: string,
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     x: number,
     y: number,
     size: number,
@@ -129,7 +125,7 @@ export interface CompanionArtwork {
 }
 export interface SwordArtwork {
   draw(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     gx: number,
     gy: number,
     ang: number,

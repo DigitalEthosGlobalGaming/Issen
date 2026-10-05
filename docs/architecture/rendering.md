@@ -1,5 +1,9 @@
 # Rendering and visual consistency
 
+The [PixiJS migration plan](pixijs-migration-plan.md) records the migration scope
+and the later depth/shadow extensions. The implementation below uses PixiJS
+8.22.0 with WebGL, retaining Canvas for fallback and comparison.
+
 Performance measurement lives in `tests/performance/`, outside the application.
 Its runner builds a separate instrumented bundle with source maps; only that
 bundle exposes scenario controls and callback timings. The normal Vite config
@@ -7,15 +11,69 @@ does not import its plugin. Canvas counters, CPU/heap sampling and timing window
 are separated to make instrumentation overhead explicit. See the
 [performance suite](../../tests/performance/README.md) for commands and limits.
 
-Issen uses two rendering surfaces. The duel scene uses Canvas 2D, while
+Issen uses two presentation technologies. The duel scene uses PixiJS WebGL, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
 Ink uses layered PNG atlases for environments and modular figure artwork, alongside procedural grass, weather and effects.
 
 The only SVG in the application is small inline interface artwork, such as the
 mute control in `src/ui/shell.html` and the alternate mute icons assigned by
 `src/game.ts`. Characters, layered scenery, weather, particles and combat effects are
-drawn through `CanvasRenderingContext2D` paths, rectangles, ellipses, text,
-gradients and compositing operations.
+drawn through the bounded `SceneDrawing` vocabulary. Its Canvas-shaped operations
+keep existing pose composition readable; the native backend emits Pixi sprites,
+tessellated geometry and cached text quads. Pixel preparation and readback are
+outside that contract. No live full-scene Canvas bitmap is uploaded each frame.
+
+## Native backend and materials
+
+`src/main.ts` selects WebGL before acquiring contexts for the main scene, Armoury
+and support preview. `?renderer=canvas` selects the retained Canvas path without
+changing saves. `scene-surface.ts` replaces a canvas if WebGL initialization fails,
+then acquires its 2D context. Tutorial scenes own and dispose a separate surface.
+
+`pixi/scene-painter.ts` reuses draw slots and renderer-owned texture sources. The
+runtime's existing scheduler calls `begin()` and `flush()`; there is no Pixi ticker.
+Prepared canvases use `texture-revision.ts` to signal changed pixels. Gradients,
+patterns and clipping use target coordinates, including the runtime's DPR and
+camera transforms. Noir and glitch feedback use separate filtered render targets;
+other films use ordered native geometry and blend operations.
+
+Owned `color`, `soft-light` and `overlay` shaders apply their blend functions to
+straight colours before alpha compositing. This preserves translucent Canvas
+grading. Film grouping preserves child order explicitly, and each flush clears
+both the back buffer and presentation target so transparent frames cannot accumulate.
+
+The runtime prepares camera shake and post-effect randomness once per presentation
+frame. Drawing synchronously reads the current poses and effects; it does not yet
+serialize the entire scene into an immutable snapshot. Repeated-draw tests verify
+that this path leaves gameplay, cosmetic state, RNG, haptics and saves unchanged.
+
+`scene-material.ts` provides explicit material stamps and lighting inputs. The
+material shader accepts aligned colour/normal/mask textures, ambient and directional
+lighting, at most four point lights and logical depth/fog. Transparency retains
+painter order. Normal maps and material masks are linear data; RGB normals use
+X right, Y down, Z toward the viewer. Mask channels are specular strength, gloss
+and emission. Normals follow rotation, mirroring and nonuniform draw transforms.
+Logical depth is distance away from the viewer in the same units as light positions
+and radii; it does not enable hardware depth writes or cast shadows.
+
+The initial broad cloth, rock and steel surface studies in `surface-maps.ts` are
+procedural authored forms, independent of the brightness of painted ink. The live
+player torso and standard steel blade opt into cloth/metal response. Other art
+remains unlit; Canvas draws the original colour art. GPU resources belong to each
+renderer, while the small prepared maps belong to their artwork owner.
+See [material studies](../features/material-studies.md) for authoring conventions,
+the selected artwork and the visual comparison fixture.
+
+Main-context loss stops scene updates and leaves a live run paused. Restoration
+requires explicit resume; an eight-second restoration failure replaces the canvas,
+rebinds input and resumes presentation through Canvas with the run intact.
+Auxiliary surfaces use the same eight-second fallback deadline. Preview effects
+stop updating while their context is lost; tutorial timing and practice input
+pause until restoration or fallback, without affecting the live run.
+The pinned Pixi version needs a guarded filter bind-group adapter. It detaches
+pooled targets after rendering, before resize can destroy them, and cleans up the
+shared binding group during disposal. Warning-sensitive native and stage-switch
+browser tests cover those paths.
 
 See [Ink layer renderer](../features/ink-renderer.md) for responsive image layers,
 live switching, shared film grading, and prototype limits.
@@ -46,8 +104,9 @@ figures or post-processing.
 
 ### Cached and generated canvases
 
-Static or expensive artwork is drawn once to off-screen canvases and then copied
-with `drawImage`. `src/rendering/scene/background.ts` creates a seeded stage
+Static or expensive artwork is drawn once to off-screen canvases and then submitted
+as reusable textures (or copied with `drawImage` on the Canvas backend).
+`src/rendering/scene/background.ts` creates a seeded stage
 background at the current size and device pixel ratio. `src/game.ts` similarly
 generates reusable mist, smoke, grain, vignette and ink-edge material. These are
 generated bitmaps, not checked-in image assets.
@@ -79,9 +138,10 @@ The runtime lends its prepared artwork renderers and tint caches to Armoury and
 support previews. Draw inputs remain explicit; caches contain prepared pixels,
 not animation state. Borrowing previews never dispose the runtime's artwork.
 Standalone previews can still own and dispose their own artwork.
-`src/ui/share-card.ts` creates another canvas, copies the live scene into it and
-adds a paper-like score-card layout. Neither renderer swaps or mutates the live
-game canvas.
+There is currently no live-scene screenshot/export consumer under `src/`.
+WebGL drawing-buffer preservation stays disabled. A future export must render
+and capture a completed frame on demand; reading the canvas after browser
+compositing can return a cleared buffer.
 
 ## Patterns that keep the style consistent
 
@@ -183,9 +243,9 @@ scrolls reveal the scene around their edges and therefore retain scene rendering
 
 ### Explicit renderer inputs and isolated state
 
-Renderer factories receive a specific `CanvasRenderingContext2D` and the values
+Renderer factories receive a specific `SceneDrawing` target and the values
 they need. They do not discover a global canvas. Preview effects, live effects and
-share output have separate state. This makes shared drawing code reusable without
+auxiliary scenes have separate state. This makes shared drawing code reusable without
 letting a preview change gameplay or paint into the wrong surface.
 
 Use `save()` and `restore()` around temporary transforms, alpha or composite modes.
@@ -194,19 +254,19 @@ returning. Leaked Canvas state can subtly recolor or displace every later layer.
 
 ## Where rendering changes belong
 
-| Change | Owning location |
-| --- | --- |
-| Stage palette, weather choice or background theme | `src/game/content/stages.ts` |
-| Layered image environments and sprite atlases | `src/rendering/environment/` |
-| Static stage scenery and props | `src/rendering/scene/background.ts` |
-| Moving weather, leaves, grass or smoke | `src/rendering/scene/` |
-| Figure shape, clothing, weapon or pet drawing | `src/rendering/figures/` |
-| Robe or blade appearance data | `src/game/content/cosmetics.ts` |
-| Combat particles and transient effects | `src/rendering/effects/` |
-| Main scene composition and full-frame post effects | `src/game.ts` |
-| HUD or screen layout and styling | `src/ui/` and `src/styles/` |
-| Armory-only composition | `src/rendering/armory-preview.ts` |
-| Shared result-card composition | `src/ui/share-card.ts` |
+| Change                                                 | Owning location                     |
+| ------------------------------------------------------ | ----------------------------------- |
+| Stage palette, weather choice or background theme      | `src/game/content/stages.ts`        |
+| Layered image environments and sprite atlases          | `src/rendering/environment/`        |
+| Static stage scenery and props                         | `src/rendering/scene/background.ts` |
+| Moving weather, leaves, grass or smoke                 | `src/rendering/scene/`              |
+| Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`            |
+| Robe or blade appearance data                          | `src/game/content/cosmetics.ts`     |
+| Combat particles and transient effects                 | `src/rendering/effects/`            |
+| Main scene composition and full-frame post effects     | `src/game.ts`                       |
+| HUD or screen layout and styling                       | `src/ui/` and `src/styles/`         |
+| Armory-only composition                                | `src/rendering/armory-preview.ts`   |
+| Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`               |
 
 Keep drawing functions dependent on explicit dimensions, time, state and random
 sources. Reuse the figure/effect/film renderers for alternate views instead of
@@ -221,3 +281,14 @@ and restoration of Canvas state after film effects. `tests/browser/game.spec.ts`
 and `tests/production/app.spec.ts` cover armory drawing and landscape behavior in
 the running application. These checks establish ownership and isolation; they do
 not provide pixel-perfect visual regression coverage.
+
+The native checks are `tests/browser/pixi-backend.spec.ts`, `pixi-scenes.spec.ts`,
+`pixi-catalogue.spec.ts` and `pixi-films.spec.ts`. They exercise real WebGL drawing,
+material maps, tolerant Canvas comparisons, texture invalidation, repeat-draw
+state isolation, initialization fallback and context restoration/fallback. Use
+`npx playwright test --config playwright.rendering-v2.config.ts` for the broad
+browser suite on its dedicated development server; pass the desired test files
+for focused checks. This configuration keeps verification separate from a live
+preview server. Unit post-frame tests check immutable preparation and haptic
+cadence. Android web tests establish offline bundle behavior, not physical-device
+graphics compatibility or performance.

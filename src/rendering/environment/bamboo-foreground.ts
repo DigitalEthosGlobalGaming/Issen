@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import type { EnvironmentFrame } from './index.ts';
@@ -14,11 +15,7 @@ export function createBambooForegroundRenderer(doc: Document) {
     key = '';
     source = undefined;
   }
-  function draw(
-    ctx: CanvasRenderingContext2D,
-    atlas: HTMLImageElement,
-    frame: EnvironmentFrame,
-  ): boolean {
+  function draw(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
     const { width, height } = frame;
     if (
       disposed ||

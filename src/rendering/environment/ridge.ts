@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -13,9 +14,9 @@ interface RidgeAtlases {
 
 /** Last Light Ridge: one left-hand slope above a broad, empty valley. */
 export function drawLastLightRidge(
-  base: CanvasRenderingContext2D,
-  distant: CanvasRenderingContext2D,
-  nearby: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  distant: SceneDrawing,
+  nearby: SceneDrawing,
   atlases: RidgeAtlases,
   width: number,
   height: number,
@@ -26,7 +27,7 @@ export function drawLastLightRidge(
   const { horizonY, groundY, eH, sunX } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
   function sprite(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     atlas: HTMLImageElement,
     cell: number,
     x: number,

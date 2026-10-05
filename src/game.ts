@@ -155,6 +155,8 @@ import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
 import { applyFilm } from './rendering/effects/film.ts';
+import { createPostState, preparePost } from './rendering/effects/post-frame.ts';
+import type { PostFrame } from './rendering/effects/post-frame.ts';
 import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
 import { createEnvironmentRenderer } from './rendering/environment/index.ts';
@@ -237,8 +239,12 @@ import type { RunCheckpoint } from './platform/run-checkpoint.ts';
 import { DIRS, OPP, DANG, directionMatches } from './shared/directions.ts';
 import { kanji, roman } from './shared/format.ts';
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
-export function startGame(): () => void {
+export function startGame(
+  surfaces?: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
+): () => void {
   const lifecycle = createLifecycle();
+  if (surfaces) for (const surface of surfaces.values()) lifecycle.add(surface.dispose);
+  let nativeScene = surfaces?.get('c')?.native;
   ('use strict');
   function $(id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
   function $(id: 'bAgain'): HTMLButtonElement;
@@ -253,9 +259,9 @@ export function startGame(): () => void {
     if (!context) throw new Error('Canvas 2D unavailable');
     return context;
   }
-  const cvs = $('c'),
-    mainG = context2d(cvs);
-  const g = mainG;
+  let cvs = $('c'),
+    mainG = surfaces?.get('c')?.drawing ?? context2d(cvs);
+  let g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
   const demonRealmRenderer = createDemonRealmRenderer(cvs.ownerDocument);
@@ -743,10 +749,8 @@ export function startGame(): () => void {
     }
   }
   let inkEdge: HTMLCanvasElement | null = null,
-    inkA = 0,
-    inkPulse = 0,
-    hbT = 0,
-    hbP = 0;
+    inkPulse = 0;
+  let postState = createPostState();
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
     if (anim && bg) {
@@ -1008,7 +1012,6 @@ export function startGame(): () => void {
     timeScale = 1,
     flashA = 0,
     flashCol = '255,255,255',
-    frameN = 0,
     lb = 0,
     lbT = 0,
     zoom = 1,
@@ -3120,6 +3123,7 @@ export function startGame(): () => void {
       toTitle();
     },
     reducedMotion,
+    !!nativeScene,
   );
   function launchTutorial() {
     toTitle();
@@ -3707,6 +3711,7 @@ export function startGame(): () => void {
       sounds: sfx,
     },
     previewArtwork,
+    surfaces?.get('prevC'),
   );
   const supportPreview = createArmoryPreview(
     $('supportPreview'),
@@ -3716,6 +3721,7 @@ export function startGame(): () => void {
       sounds: sfx,
     },
     previewArtwork,
+    surfaces?.get('supportPreview'),
   );
   lifecycle.add(preview.dispose);
   lifecycle.add(supportPreview.dispose);
@@ -3767,7 +3773,7 @@ export function startGame(): () => void {
   }
 
   /* ---------------- input ---------------- */
-  const disposePointer = bindPointer(cvs, {
+  const pointerActions: Parameters<typeof bindPointer>[1] = {
     active: pageActive,
     activate: audioInit,
     threshold: () => {
@@ -3779,7 +3785,8 @@ export function startGame(): () => void {
     tap: () => {
       if (!cinematic.active) onTap();
     },
-  });
+  };
+  let disposePointer = bindPointer(cvs, pointerActions);
   lifecycle.listen($('bPlay'), 'click', () => {
     audioInit();
     if (savedRun?.status === 'active') abandonSavedRun();
@@ -3960,6 +3967,7 @@ export function startGame(): () => void {
     renderTrialObjective();
   }
   function resume() {
+    if (nativeScene?.contextLost) return;
     if (G.state !== 'paused' || !G.pausedFrom) return;
     G.state = G.pausedFrom;
     audio.setPaused(guided.frozen);
@@ -4329,7 +4337,39 @@ export function startGame(): () => void {
   function drawStamps() {
     effectRenderer().drawStamps();
   }
-  function drawPost(raw: number) {
+  function advancePost(raw: number): PostFrame {
+    const prepared = preparePost(
+      postState,
+      {
+        raw,
+        width: W,
+        height: H,
+        nitrate: sceneFilm() === 'nitrate',
+        reducedMotion: reducedMotion(),
+        reducedFlashes: reducedFlashes(),
+        active: ['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state),
+        limitedLives: !G.zen && !G.hard && G.maxLives > 1,
+        dead: G.state === 'dead',
+        lives: G.lives,
+        maxLives: G.maxLives,
+        imminentAttack: !!(
+          (G.attacker && G.attacker.p >= pz()) ||
+          (G.boss && ['windup', 'flash'].includes(G.boss.state))
+        ),
+        inkPulse,
+        flash: flashA,
+        scratches: fx.scratches,
+      },
+      R,
+    );
+    postState = prepared.state;
+    inkPulse = prepared.inkPulse;
+    flashA = prepared.flash;
+    fx.scratches = prepared.scratches;
+    if (prepared.heartbeat) buzz(8);
+    return prepared.frame;
+  }
+  function drawPost(frame: PostFrame) {
     if (G.event === 'blood' && (G.state === 'playing' || G.state === 'dead')) {
       g.fillStyle = 'rgba(120,18,12,0.16)';
       g.fillRect(0, 0, W, H);
@@ -4346,34 +4386,21 @@ export function startGame(): () => void {
         reducedFlashes: reducedFlashes(),
       },
     );
-    frameN++;
-    const pat = grainPats[frameN % 3];
+    const pat = grainPats[frame.grain];
     if (pat) {
       g.save();
-      if (!reducedMotion() && !reducedFlashes())
-        g.translate(-((R() * 180) | 0), -((R() * 180) | 0));
+      g.translate(frame.grainX, frame.grainY);
       g.fillStyle = pat;
       g.fillRect(0, 0, W + 180, H + 180);
       g.restore();
     }
-    const nit = sceneFilm() === 'nitrate';
-    if (nit && !reducedFlashes() && R() < 0.03) {
+    if (frame.blot) {
       g.fillStyle = 'rgba(8,6,4,.55)';
       g.beginPath();
-      g.arc(R() * W, R() * H, 6 + R() * 30, 0, TAU);
+      g.arc(frame.blot.x, frame.blot.y, frame.blot.radius, 0, TAU);
       g.fill();
     }
-    if (!reducedMotion() && !reducedFlashes() && R() < (nit ? 0.4 : 0.07))
-      fx.scratches.push({
-        x: R() * W,
-        y0: R() < 0.5 ? 0 : R() * H * 0.5,
-        y1: R() < 0.5 ? H : H * (0.5 + R() * 0.5),
-        t: 0,
-        life: 0.06 + R() * 0.3,
-        a: 0.05 + R() * 0.12,
-      });
-    for (const s of fx.scratches) {
-      s.t += raw;
+    for (const s of frame.scratches) {
       g.strokeStyle = `rgba(225,220,210,${s.a})`;
       g.lineWidth = 1;
       g.beginPath();
@@ -4381,11 +4408,10 @@ export function startGame(): () => void {
       g.lineTo(s.x + 1.5, s.y1);
       g.stroke();
     }
-    fx.scratches = fx.scratches.filter((s) => s.t < s.life);
-    for (let i = 0; i < (reducedMotion() || reducedFlashes() ? 0 : (R() * 3) | 0); i++) {
-      g.fillStyle = R() < 0.5 ? 'rgba(10,10,9,.35)' : 'rgba(230,225,215,.3)';
+    for (const dust of frame.dust) {
+      g.fillStyle = dust.dark ? 'rgba(10,10,9,.35)' : 'rgba(230,225,215,.3)';
       g.beginPath();
-      g.arc(R() * W, R() * H, 0.6 + R() * 1.6, 0, TAU);
+      g.arc(dust.x, dust.y, dust.radius, 0, TAU);
       g.fill();
     }
     if (vig) {
@@ -4401,30 +4427,10 @@ export function startGame(): () => void {
       g.drawImage(vig, 0, 0, W, H);
       g.globalAlpha = 1;
     }
-    {
-      const act = ['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state),
-        lm = !G.zen && !G.hard && G.maxLives > 1;
-      const tgt = act && lm ? clamp((G.maxLives - G.lives) / (G.maxLives - 1)) : 0;
-      inkA += (tgt - inkA) * (1 - Math.exp(-raw * 3));
-      if (act && lm && G.lives === 1 && G.state !== 'dead') {
-        hbT -= raw;
-        if (hbT <= 0) {
-          hbT =
-            (G.attacker && G.attacker.p >= pz()) ||
-            (G.boss && ['windup', 'flash'].includes(G.boss.state))
-              ? 0.6
-              : 0.9;
-          hbP = 1;
-          buzz(8);
-        }
-      }
-      hbP = Math.max(0, hbP - raw * 3.5);
-      inkPulse = Math.max(0, inkPulse - raw * 1.4);
-      if (inkEdge && (inkA > 0.01 || inkPulse > 0.01)) {
-        g.globalAlpha = clamp(inkA * 0.8 + hbP * 0.3 * inkA + inkPulse * 0.6);
-        g.drawImage(inkEdge, 0, 0, W, H);
-        g.globalAlpha = 1;
-      }
+    if (inkEdge && frame.inkVisible) {
+      g.globalAlpha = frame.inkAlpha;
+      g.drawImage(inkEdge, 0, 0, W, H);
+      g.globalAlpha = 1;
     }
     if (lb > 0.005) {
       const bh = lb * H * 0.085;
@@ -4432,27 +4438,39 @@ export function startGame(): () => void {
       g.fillRect(0, 0, W, bh);
       g.fillRect(0, H - bh, W, bh);
     }
-    g.fillStyle = `rgba(0,0,0,${reducedFlashes() ? 0.02 : R() * (sceneFilm() === 'nitrate' ? 0.12 : 0.035)})`;
+    g.fillStyle = `rgba(0,0,0,${frame.flicker})`;
     g.fillRect(0, 0, W, H);
-    if (flashA > 0) {
-      g.fillStyle = `rgba(${flashCol},${reducedFlashes() ? Math.min(flashA, 0.035) : flashA})`;
+    if (frame.flash > 0) {
+      g.fillStyle = `rgba(${flashCol},${frame.flash})`;
       g.fillRect(0, 0, W, H);
-      flashA = Math.max(0, flashA - raw * 2.4);
     }
   }
-  function render(raw: number) {
-    // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
-    // inspection dialog covers it completely; its independent preview still draws.
-    if (G.panel === 'armory' && armory.inspectionExpanded) return;
-    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  interface PresentationFrame {
+    readonly cameraX: number;
+    readonly cameraY: number;
+    readonly post: PostFrame;
+  }
+  function preparePresentation(raw: number): PresentationFrame {
     const sx = reducedMotion() ? 0 : (R() - 0.5) * shake,
       sy = reducedMotion()
         ? 0
         : (R() - 0.5) * shake +
           (sceneFilm() === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
     shake = Math.max(0, shake - raw * 45 * S);
+    return { cameraX: sx, cameraY: sy, post: advancePost(raw) };
+  }
+  function render(raw: number) {
+    // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
+    // inspection dialog covers it completely; its independent preview still draws.
+    if (G.panel === 'armory' && armory.inspectionExpanded) return;
+    drawScene(preparePresentation(raw));
+  }
+  /** Synchronous draw of the current poses; presentation updates happen once above. */
+  function drawScene(frame: PresentationFrame) {
+    nativeScene?.begin();
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
     g.save();
-    g.translate(sx, sy);
+    g.translate(frame.cameraX, frame.cameraY);
     if (zoom > 1.001 && !reducedMotion()) {
       g.translate(zoomX, zoomY);
       g.scale(zoom, zoom);
@@ -4543,7 +4561,9 @@ export function startGame(): () => void {
     if (!cinematic.active) drawPops();
     g.restore();
     if (!cinematic.active) drawStamps();
-    drawPost(raw);
+    drawPost(frame.post);
+    nativeScene?.flush();
+    cvs.dataset.graphicsBackend = nativeScene ? 'pixi' : 'canvas';
   }
   const frameLoop = createFrameLoop(
     {
@@ -4596,6 +4616,51 @@ export function startGame(): () => void {
     }
   }
   const resumeFrames = frameLoop.start;
+  if (nativeScene) {
+    let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
+    lifecycle.listen(cvs, 'webglcontextlost', () => {
+      frameLoop.stop();
+      combatHaptics.stop();
+      audio.setInactive(true);
+      if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) {
+        G.pausedFrom = G.state;
+        G.state = 'paused';
+        showPauseScreen();
+      }
+      ($('bResume') as HTMLButtonElement).disabled = true;
+      recoveryTimer = lifecycle.timeout(() => {
+        if (!nativeScene?.contextLost) return;
+        const replacement = cvs.cloneNode(false) as HTMLCanvasElement;
+        disposePointer();
+        nativeScene.dispose();
+        nativeScene = undefined;
+        cvs.replaceWith(replacement);
+        cvs = replacement;
+        g = mainG = context2d(cvs);
+        cvs.dataset.graphicsBackend = 'canvas';
+        cvs.dataset.contextState = 'fallback';
+        grainPats.splice(
+          0,
+          grainPats.length,
+          ...grainCanv.map((canvas) => mainG.createPattern(canvas, 'repeat')),
+        );
+        disposePointer = bindPointer(cvs, pointerActions);
+        viewportPrepared = false;
+        resize();
+        ($('bResume') as HTMLButtonElement).disabled = false;
+        audio.setInactive(!pageActive());
+        if (pageActive()) resumeFrames();
+      }, 8000);
+    });
+    lifecycle.listen(cvs, 'webglcontextrestored', () => {
+      if (!nativeScene) return;
+      if (recoveryTimer !== undefined) lifecycle.clearTimeout(recoveryTimer);
+      ($('bResume') as HTMLButtonElement).disabled = false;
+      screenAnimation.invalidate();
+      audio.setInactive(!pageActive());
+      if (pageActive()) resumeFrames();
+    });
+  }
   lifecycle.add(
     onActivityChange((active) => {
       if (active) visitToday();
@@ -4603,7 +4668,7 @@ export function startGame(): () => void {
       if (!active) {
         combatHaptics.stop();
         frameLoop.stop();
-      } else if (artworkReady) resumeFrames();
+      } else if (artworkReady && !nativeScene?.contextLost) resumeFrames();
     }),
   );
 

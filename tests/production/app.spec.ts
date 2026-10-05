@@ -61,16 +61,26 @@ test('built assets support startup, armory, a run, and landscape layout', async 
   await expect(page.locator('#title')).toHaveClass(/on/);
   await expect(page.locator('#app')).toHaveCount(1);
   await page.getByRole('button', { name: 'Armory', exact: true }).click();
-  await expect
-    .poll(() =>
-      page.locator('#prevC').evaluate((canvas: HTMLCanvasElement) =>
-        canvas
-          .getContext('2d')!
-          .getImageData(0, 0, canvas.width, canvas.height)
-          .data.some((value) => value !== 0),
-      ),
-    )
-    .toBe(true);
+  await expect(page.locator('#prevC')).toHaveAttribute('data-graphics-backend', 'pixi');
+  // Capture the browser's composited surface: WebGL cannot acquire a 2D context,
+  // and its drawing buffer need not be preserved between animation frames.
+  const capture = await page.locator('#prevC').screenshot();
+  const colors = await page.evaluate(async (data) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${data}`;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    const colors = new Set<number>();
+    for (let i = 0; i < pixels.length; i += 4)
+      colors.add((pixels[i]! << 16) | (pixels[i + 1]! << 8) | pixels[i + 2]!);
+    return colors.size;
+  }, capture.toString('base64'));
+  expect(colors).toBeGreaterThan(100);
   await page.locator('#armory').getByRole('button', { name: 'Done', exact: true }).click();
   await page.getByRole('button', { name: 'Draw your blade' }).click();
   await page.getByRole('button', { name: 'Begin', exact: true }).click();

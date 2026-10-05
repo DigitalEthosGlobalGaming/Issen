@@ -4,6 +4,7 @@ import { startGame } from './game.ts';
 import { createArtworkPreloader } from './platform/artwork-preload.ts';
 import { mountStartupLoading, STARTUP_LOGO_URL } from './ui/startup-loading.ts';
 import { mountChangelogLink } from './ui/changelog-link.ts';
+import { createSceneSurface, type SceneSurface } from './rendering/scene-surface.ts';
 
 const artwork = import.meta.glob<string>(
   '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
@@ -29,10 +30,28 @@ const loading = mountStartupLoading(() => {
 const preloader = createArtworkPreloader(urls, undefined, loading.update, [STARTUP_LOGO_URL]);
 async function begin() {
   if ((await preloader.run()) && !disposed && !root) {
-    loading.remove();
     root = mount();
     stopChangelog = mountChangelogLink(root);
-    stop = startGame();
+    // Select before acquiring a context. Canvas remains an explicit comparison
+    // path, and each unsupported WebGL surface falls back during initialization.
+    if (new URLSearchParams(location.search).get('renderer') !== 'canvas') {
+      if (disposed) return;
+      const surfaces = new Map<string, SceneSurface>();
+      for (const id of ['c', 'prevC', 'supportPreview']) {
+        const surface = await createSceneSurface(
+          root.querySelector<HTMLCanvasElement>(`#${id}`)!,
+          true,
+          id !== 'c',
+        );
+        surfaces.set(id, surface);
+        if (disposed) {
+          for (const prepared of surfaces.values()) prepared.dispose();
+          return;
+        }
+      }
+      stop = startGame(surfaces);
+    } else stop = startGame();
+    loading.remove();
   }
 }
 void begin();

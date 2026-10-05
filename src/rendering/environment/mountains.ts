@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Stage } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite, setSceneryAtmosphere } from './scene-kit.ts';
@@ -10,7 +11,7 @@ const RIDGES = [
 ] as const;
 
 export function drawMountainTiles(
-  context: CanvasRenderingContext2D,
+  context: SceneDrawing,
   atlas: HTMLImageElement,
   width: number,
   height: number,

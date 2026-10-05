@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -17,7 +18,7 @@ function coastline(x: number, w: number, h: number) {
   const eH = portrait ? Math.min(h * 0.16, w * 0.3) : Math.min(h * 0.3, w * 0.12);
   return groundY - eH * 0.43 + h * (0.065 - (0.145 * x) / w) + h * 0.008 * Math.sin((x / w) * 17);
 }
-function seaClip(g: CanvasRenderingContext2D, w: number, h: number) {
+function seaClip(g: SceneDrawing, w: number, h: number) {
   const { horizonY } = createLayout(w, h);
   g.beginPath();
   g.moveTo(0, horizonY - h * 0.005);
@@ -28,9 +29,9 @@ function seaClip(g: CanvasRenderingContext2D, w: number, h: number) {
 }
 /** Exposed sea on the left, a rising coastal shelf and wind-bent pine on the right. */
 export function drawBrokenShore(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
@@ -156,7 +157,7 @@ export function drawBrokenShore(
   });
 }
 /** Subtle advancing wave lines; no simulation, image processing or random rolls. */
-export function drawShoreMotion(ctx: CanvasRenderingContext2D, frame: WaterFrame) {
+export function drawShoreMotion(ctx: SceneDrawing, frame: WaterFrame) {
   const { width: w, height: h } = frame,
     { horizonY, groundY } = createLayout(w, h);
   const t = frame.reducedMotion || frame.reducedFlashes ? 0 : frame.time;

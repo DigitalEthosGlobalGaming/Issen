@@ -24,6 +24,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#bTrials')).toBeVisible({ timeout: 60000 });
+  await page.waitForFunction(() => !!(window as any).__demon);
   await page.evaluate(() => (window as any).__demon.stop());
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="demon-mirror"]').click();

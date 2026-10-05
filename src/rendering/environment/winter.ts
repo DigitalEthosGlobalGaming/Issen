@@ -1,12 +1,13 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { createBackground } from '../scene/background.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite as sprite } from './scene-kit.ts';
 
 /** Broad snow negative space with fitted snow art, independent of gameplay weather. */
 export function drawWhiteSilencePass(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
@@ -17,7 +18,7 @@ export function drawWhiteSilencePass(
   const unit = Math.min(height, width * 1.3);
   // Explicit source windows retain complete selected objects and exclude neighbouring-cell dust.
   function snowSprite(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     image: HTMLImageElement,
     rect: readonly [number, number, number, number],
     x: number,

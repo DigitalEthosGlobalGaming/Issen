@@ -136,12 +136,22 @@ test('armory preview draws without errors in portrait and landscape', async ({ p
   await page.getByRole('button', { name: 'Armory', exact: true }).click();
   await expect(page.locator('#armory')).toHaveClass(/on/);
   await expect(page.locator('#armTiles button').first()).toBeVisible();
-  const pixels = await page.locator('#prevC').evaluate((canvas: HTMLCanvasElement) => {
-    const context = canvas.getContext('2d');
+  // Browser screenshots capture the composited WebGL surface even when the
+  // drawing buffer has already been discarded between animation frames.
+  const capture = await page.locator('#prevC').screenshot();
+  const pixels = await page.evaluate(async (data) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${data}`;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(image, 0, 0);
     return context
-      ?.getImageData(0, 0, canvas.width, canvas.height)
+      .getImageData(0, 0, canvas.width, canvas.height)
       .data.some((value) => value !== 0);
-  });
+  }, capture.toString('base64'));
   expect(pixels).toBe(true);
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(

@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { createLayout } from '../layout.ts';
 
@@ -9,7 +10,7 @@ interface FieldAtlases {
 
 /** Low scenery anchored behind the combat ground, baked into the distant plane. */
 export function drawFieldMidground(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   atlases: FieldAtlases,
   width: number,
   height: number,

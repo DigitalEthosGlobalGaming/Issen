@@ -1,4 +1,6 @@
 import { createInkCharmRenderer } from './figures/ink-charms.ts';
+import type { SceneSurface } from './scene-surface.ts';
+import { invalidateSceneTexture } from './texture-revision.ts';
 import { createInkCompanionRenderer } from './figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
@@ -48,8 +50,9 @@ export function createArmoryPreview(
   canvas: HTMLCanvasElement,
   services: PreviewServices,
   artwork?: PreviewArtwork,
+  surface?: SceneSurface,
 ) {
-  const context = canvas.getContext('2d');
+  let context = surface?.drawing ?? canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
   const room = canvas.ownerDocument.createElement('img');
   room.decoding = 'async';
@@ -117,6 +120,14 @@ export function createArmoryPreview(
 
   function draw(frame: PreviewFrame): void {
     const now = services.now();
+    if (surface?.native?.contextLost) {
+      last = now;
+      return;
+    }
+    if (surface) {
+      canvas = surface.canvas;
+      context = surface.drawing;
+    }
     dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;
     if (!frame.reducedMotion) roomTime += dt;
@@ -127,6 +138,7 @@ export function createArmoryPreview(
     };
     density = frame.effectDensity ?? 1;
     const g = context!;
+    surface?.native?.begin();
     const width = canvas.width,
       height = canvas.height;
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -143,6 +155,7 @@ export function createArmoryPreview(
       gradient.addColorStop(1, 'rgba(10,10,9,.5)');
       background.fillStyle = gradient;
       background.fillRect(0, 0, width, height);
+      invalidateSceneTexture(roomCache);
     }
     g.drawImage(roomCache, 0, 0);
     if (room.naturalWidth)
@@ -234,6 +247,7 @@ export function createArmoryPreview(
       reducedMotion: frame.reducedMotion,
       reducedFlashes: frame.reducedFlashes,
     });
+    surface?.native?.flush();
   }
 
   return {

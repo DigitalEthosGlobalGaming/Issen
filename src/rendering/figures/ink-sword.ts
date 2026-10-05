@@ -1,3 +1,6 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
 import {
@@ -16,6 +19,7 @@ const SOURCES = {
 };
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
+  const materials = createSurfaceMapLibrary(doc);
   const images = new Map<Family, HTMLImageElement>(),
     loaded = new Set<Family>(),
     cache = new Map<string, HTMLCanvasElement>(),
@@ -88,7 +92,7 @@ export function createInkSwordRenderer(doc: Document) {
     return c;
   }
   function draw(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     gx: number,
     gy: number,
     ang: number,
@@ -160,13 +164,18 @@ export function createInkSwordRenderer(doc: Document) {
         s = Math.hypot(tx, ty) / Math.hypot(dx, dy);
       g.translate(0.016, 0);
       g.rotate(Math.atan2(ty, tx) - Math.atan2(dy, dx));
-      g.drawImage(
-        blade,
-        -(profile.root[0] - profile.frame[0]) * s,
-        -(profile.root[1] - profile.frame[1]) * s,
-        profile.frame[2] * s,
-        profile.frame[3] * s,
-      );
+      const x = -(profile.root[0] - profile.frame[0]) * s,
+        y = -(profile.root[1] - profile.frame[1]) * s;
+      if (id === 'steel' && supportsSceneMaterials(g)) {
+        drawMaterialStamp(g, {
+          texture: { source: blade, revision: 0 },
+          material: materials.get('steel'),
+          x,
+          y,
+          width: profile.frame[2] * s,
+          height: profile.frame[3] * s,
+        });
+      } else g.drawImage(blade, x, y, profile.frame[2] * s, profile.frame[3] * s);
       return true;
     } finally {
       g.restore();
@@ -182,6 +191,7 @@ export function createInkSwordRenderer(doc: Document) {
     dispose() {
       if (disposed) return;
       disposed = true;
+      materials.dispose();
       for (const im of images.values()) {
         im.onload = null;
         im.onerror = null;

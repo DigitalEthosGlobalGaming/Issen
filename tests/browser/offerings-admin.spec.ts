@@ -7,6 +7,7 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.locator('#bTemplate').click();
   await page.locator('[data-upgrade="offerings"]').click();
   for (const price of [150, 250, 400]) {
@@ -18,6 +19,7 @@ test('Offerings has three cumulative ranks and persists the rare guarantee', asy
   await expect(page.getByRole('button', { name: 'Fully donated', exact: true })).toHaveCount(0);
   await page.reload();
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).upgrades.offerings),
   ).toBe(3);
@@ -122,6 +124,7 @@ test('admin unlocks Ronin only in the test profile and keeps it after reload', a
   });
   await page.reload();
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Unlock Ronin mode', exact: true }).click();
   expect(

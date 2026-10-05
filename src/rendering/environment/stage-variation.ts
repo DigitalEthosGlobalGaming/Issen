@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { rng } from '../../shared/random.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
@@ -76,7 +77,7 @@ export function stageVariationPlacement(prop: StageVariationProp, width: number,
 
 /** Midground landmarks are painted only during cached composition rebuilds. */
 export function drawStageVariations(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   atlases: Partial<Record<VariationFamily, HTMLImageElement>>,
   stage: number,
   seed: number,

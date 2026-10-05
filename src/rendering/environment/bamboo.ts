@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -5,9 +6,9 @@ import { drawAtlasSprite } from './scene-kit.ts';
 
 /** Hollow Bamboo Road: sparse depths converge on an empty, mist-lit passage. */
 export function drawHollowBambooRoad(
-  base: CanvasRenderingContext2D,
-  far: CanvasRenderingContext2D,
-  near: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  far: SceneDrawing,
+  near: SceneDrawing,
   atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,

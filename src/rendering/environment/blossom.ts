@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -52,9 +53,9 @@ export const BLOSSOM_SPRITE_LAYOUT = {
 
 /** Falling Blossom Path uses a sparse orchard and a broken track, never a scenery plate. */
 export function drawFallingBlossomPath(
-  base: CanvasRenderingContext2D,
-  distant: CanvasRenderingContext2D,
-  nearby: CanvasRenderingContext2D,
+  base: SceneDrawing,
+  distant: SceneDrawing,
+  nearby: SceneDrawing,
   atlases: BlossomAtlases,
   width: number,
   height: number,
@@ -69,7 +70,7 @@ export function drawFallingBlossomPath(
     hillBase - height * 0.012 * Math.sin((x / width) * Math.PI * 2 + 0.6);
 
   function sprite(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     atlas: HTMLImageElement,
     cell: number,
     x: number,

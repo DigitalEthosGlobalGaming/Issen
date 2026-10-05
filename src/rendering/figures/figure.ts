@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawCrestSprite } from '../ui-art.ts';
 import { bladeEffectPoint, supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
@@ -15,8 +16,8 @@ import type {
   Aura,
   EnemyPart,
 } from './types.ts';
-export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnvironment) {
-  const { time: clock, petActive, width: W, height: H, palette: cols, random: R } = env;
+export function createFigureRenderer(g: SceneDrawing, env: FigureEnvironment) {
+  const { time: clock, petActive, width: W, height: H, palette: cols } = env;
   const time = env.reducedMotion ? 0 : clock;
   function bladePath(length: number, bladeId: string) {
     g.beginPath();
@@ -166,7 +167,8 @@ export function createFigureRenderer(g: CanvasRenderingContext2D, env: FigureEnv
         g.beginPath();
         for (let i = 0; i <= 14; i++) {
           const [x, y] = bladeEffectPoint(bladeId, Lb, i / 14);
-          const offset = i === 0 || i === 14 ? 0 : (R() - 0.5) * 0.04;
+          const phase = env.reducedFlashes ? 0 : Math.floor(time * 30);
+          const offset = i === 0 || i === 14 ? 0 : Math.sin(i * 23.7 + phase * 7.13) * 0.02;
           if (i) g.lineTo(x, y + offset);
           else g.moveTo(x, y);
         }

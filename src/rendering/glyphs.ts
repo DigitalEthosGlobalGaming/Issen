@@ -1,3 +1,4 @@
+import type { SceneDrawing } from './scene-drawing.ts';
 import { drawSeal } from './ui-art.ts';
 import { TAU, clamp } from '../shared/math.ts';
 import { DANG } from '../shared/directions.ts';
@@ -36,14 +37,7 @@ const hexA = (h: string, a: number) => {
   const n = parseInt(h.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 };
-function brushRing(
-  g: CanvasRenderingContext2D,
-  r: number,
-  a0: number,
-  frac: number,
-  w: number,
-  col: string,
-) {
+function brushRing(g: SceneDrawing, r: number, a0: number, frac: number, w: number, col: string) {
   const n = Math.max(2, Math.ceil(44 * frac));
   g.strokeStyle = col;
   g.lineCap = 'round';
@@ -57,7 +51,7 @@ function brushRing(
   }
 }
 export function drawEnso(
-  g: CanvasRenderingContext2D,
+  g: SceneDrawing,
   env: GlyphEnvironment,
   x: number,
   y: number,

@@ -11,6 +11,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
   );
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.locator('#bTemplate').click();
   const balance = () => page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).embers);
   await expect(page.locator('.upgrade-tile')).toHaveCount(15);
@@ -54,6 +55,7 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.locator('#bPlay').click();
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');
@@ -114,6 +116,7 @@ test('wave taps consume a knife only with a target and boss taps never consume o
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0);
   const tap = () =>
     page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })));
   const advance = (count: number) => page.evaluate((n) => (window as any).advanceSet02(n), count);

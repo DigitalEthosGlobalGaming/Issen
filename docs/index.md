@@ -74,6 +74,8 @@
 - [Implemented architecture](architecture/overview.md): ownership, boundaries and where to add features.
 - [Rendering and visual consistency](architecture/rendering.md): Canvas and DOM surfaces,
   scene layering, procedural art and the patterns that unify the visual style.
+- [PixiJS rendering migration plan](architecture/pixijs-migration-plan.md): proposed
+  2D scene migration, normal-map lighting, depth effects and leaves/debris integration.
 - [Local development](development/local-development.md): commands, tests, saves and browser limitations.
 - [Android development and release](development/android.md): offline builds, Pixel installation, signing and Play testing.
 - [TypeScript and Vite migration plan](architecture/typescript-migration.md):

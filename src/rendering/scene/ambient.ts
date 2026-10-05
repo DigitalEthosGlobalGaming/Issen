@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import { scaledCount } from '../effects/quality.ts';
@@ -31,7 +32,7 @@ export interface Leaf {
 export interface AmbientEnvironment {
   stage?: number;
   spriteMotion?: boolean;
-  drawLeaf?: (g: CanvasRenderingContext2D, leaf: Leaf) => void;
+  drawLeaf?: (g: SceneDrawing, leaf: Leaf) => void;
   width: number;
   height: number;
   scale: number;
@@ -134,12 +135,7 @@ export function createAmbient(env: AmbientEnvironment) {
       ordinary++;
     }
   }
-  function blades(
-    g: CanvasRenderingContext2D,
-    list: readonly GrassBlade[],
-    t: number,
-    wind: number,
-  ) {
+  function blades(g: SceneDrawing, list: readonly GrassBlade[], t: number, wind: number) {
     for (const b of list) {
       const sw = wind * 0.5 + Math.sin(t * 2.3 + b.ph) * 0.25 + Math.sin(t * 5.1 + b.ph * 2) * 0.06;
       const tx = b.x + sw * b.h * 0.45,
@@ -152,7 +148,7 @@ export function createAmbient(env: AmbientEnvironment) {
       g.fill();
     }
   }
-  function drawLeaves(g: CanvasRenderingContext2D, leaves: readonly Leaf[], front: boolean) {
+  function drawLeaves(g: SceneDrawing, leaves: readonly Leaf[], front: boolean) {
     for (const l of leaves) {
       if (l.z > 1.25 !== front) continue;
       g.save();

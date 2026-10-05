@@ -1,3 +1,4 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 /** Shared cached-composition helper. Source atlases remain untouched. */
 export interface SpritePlacement {
   frame?: { x: number; y: number; width: number; height: number };
@@ -17,7 +18,7 @@ export interface SpritePlacement {
   translucent?: boolean;
 }
 
-const atmosphere = new WeakMap<CanvasRenderingContext2D, { color: string; strength: number }>();
+const atmosphere = new WeakMap<SceneDrawing, { color: string; strength: number }>();
 const cutouts = new WeakMap<HTMLImageElement, Map<string, HTMLCanvasElement>>();
 const retained = new Map<
   HTMLCanvasElement,
@@ -39,12 +40,12 @@ export function releaseSceneryCutouts(images: Iterable<HTMLImageElement>) {
     cutouts.delete(image);
   }
 }
-export function setSceneryAtmosphere(ctx: CanvasRenderingContext2D, color: string, strength = 1) {
+export function setSceneryAtmosphere(ctx: SceneDrawing, color: string, strength = 1) {
   atmosphere.set(ctx, { color, strength });
 }
 
 export function drawAtlasSprite(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   image: HTMLImageElement,
   cell: number,
   x: number,

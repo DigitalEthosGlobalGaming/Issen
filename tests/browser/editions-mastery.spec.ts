@@ -43,6 +43,7 @@ async function prepare(page: Page, edition = 'web') {
   });
   await page.goto('/');
   await expect(page.locator('#bPlay')).toBeVisible();
+  await page.waitForFunction(() => !!(window as any).__mastery);
   await page.evaluate(() => (window as any).__mastery.stop());
 }
 

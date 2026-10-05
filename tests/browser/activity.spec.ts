@@ -14,6 +14,13 @@ test('leaving the window stops scene work, audio and tutorial time without chang
       if (this.canvas.id === 'c') state.stamps++;
       return Reflect.apply(draw, this, args);
     };
+    for (const Context of [WebGLRenderingContext, WebGL2RenderingContext]) {
+      const draw = Context.prototype.drawElements;
+      Context.prototype.drawElements = function (...args: Parameters<typeof draw>) {
+        if ((this.canvas as HTMLCanvasElement).id === 'c') state.stamps++;
+        return Reflect.apply(draw, this, args);
+      };
+    }
     const Context = window.AudioContext;
     window.AudioContext = class extends Context {
       constructor(...args: ConstructorParameters<typeof Context>) {

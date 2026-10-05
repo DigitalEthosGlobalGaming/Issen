@@ -1,3 +1,6 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
+import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
@@ -21,6 +24,7 @@ export type InkPlayerRenderer = ReturnType<typeof createInkPlayerRenderer>;
 
 /** Per-runtime atlas ownership. draw/drawPart inherit normalized figure transforms and alpha. */
 export function createInkPlayerRenderer(doc: Document) {
+  const materials = createSurfaceMapLibrary(doc);
   const outfits = createOutfitKit(doc);
   const palettes = createPalette();
   const tones = new Map<string, HTMLCanvasElement>();
@@ -85,7 +89,7 @@ export function createInkPlayerRenderer(doc: Document) {
     return pending;
   }
   function stamp(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     key: keyof typeof PLAYER_FRAMES,
     x: number,
     y: number,
@@ -94,7 +98,20 @@ export function createInkPlayerRenderer(doc: Document) {
   ) {
     const [sx, sy, sw, sh] = PLAYER_FRAMES[key];
     const tinted = tonePart(key);
-    if (tinted) g.drawImage(tinted, x, y, w, h);
+    if (key === 'torso' && supportsSceneMaterials(g)) {
+      drawMaterialStamp(g, {
+        texture: {
+          source: tinted ?? atlas!,
+          revision: 0,
+          frame: tinted ? undefined : [sx, sy, sw, sh],
+        },
+        material: materials.get('cloth'),
+        x,
+        y,
+        width: w,
+        height: h,
+      });
+    } else if (tinted) g.drawImage(tinted, x, y, w, h);
     else g.drawImage(atlas!, sx, sy, sw, sh, x, y, w, h);
   }
   function joints(f: Figure) {
@@ -117,7 +134,7 @@ export function createInkPlayerRenderer(doc: Document) {
     });
   }
   function bone(
-    g: CanvasRenderingContext2D,
+    g: SceneDrawing,
     key: keyof typeof PLAYER_FRAMES,
     a: Point,
     b: Point,
@@ -130,12 +147,7 @@ export function createInkPlayerRenderer(doc: Document) {
     stamp(g, key, -width / 2, -0.018, width, Math.hypot(b[0] - a[0], b[1] - a[1]) + 0.035);
     g.restore();
   }
-  function drawPart(
-    g: CanvasRenderingContext2D,
-    part: Part,
-    f: Figure,
-    env: FigureEnvironment,
-  ): boolean {
+  function drawPart(g: SceneDrawing, part: Part, f: Figure, env: FigureEnvironment): boolean {
     if (!f.back || !supportsInkOutfit(f.robeId)) return false;
     if (state !== 'ready' || !atlas) {
       if (state === 'idle') void prepare();
@@ -207,7 +219,7 @@ export function createInkPlayerRenderer(doc: Document) {
   return {
     prepare,
     drawPart,
-    draw(g: CanvasRenderingContext2D, f: Figure, env: FigureEnvironment) {
+    draw(g: SceneDrawing, f: Figure, env: FigureEnvironment) {
       if (state !== 'ready') {
         if (state === 'idle') void prepare();
         return false;
@@ -227,6 +239,7 @@ export function createInkPlayerRenderer(doc: Document) {
     dispose() {
       state = 'disposed';
       outfits.dispose();
+      materials.dispose();
       for (const c of tones.values()) c.width = c.height = 0;
       tones.clear();
       if (atlas) {

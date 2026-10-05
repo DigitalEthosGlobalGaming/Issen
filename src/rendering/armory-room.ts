@@ -1,3 +1,4 @@
+import type { SceneDrawing } from './scene-drawing.ts';
 export function roomWindow(
   width: number,
   height: number,
@@ -17,7 +18,7 @@ export function roomWindow(
 
 /** Reuse wall, floor and window regions as independently cropped room sprites. */
 export function drawArmoryRoom(
-  g: CanvasRenderingContext2D,
+  g: SceneDrawing,
   room: HTMLImageElement,
   width: number,
   height: number,
@@ -77,7 +78,7 @@ export function drawArmoryRoom(
 
 /** Sparse airborne brush marks and a soft window light; no particles accumulate. */
 export function drawRoomWind(
-  g: CanvasRenderingContext2D,
+  g: SceneDrawing,
   window: ReturnType<typeof roomWindow>,
   time: number,
   reduced: boolean,

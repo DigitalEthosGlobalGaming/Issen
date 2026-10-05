@@ -1,8 +1,9 @@
+import type { SceneDrawing } from '../scene-drawing.ts';
 import { createLayout } from '../layout.ts';
 import type { EnvironmentFrame } from './index.ts';
 
 function tile(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   atlas: HTMLImageElement,
   cell: number,
   x: number,
@@ -34,7 +35,7 @@ function tile(
 
 /** Cached meadow texture fills the transition without replacing any live grass. */
 export function drawMeadowTransition(
-  ctx: CanvasRenderingContext2D,
+  ctx: SceneDrawing,
   edges: HTMLImageElement,
   patches: HTMLImageElement,
   width: number,
@@ -72,11 +73,7 @@ export function drawMeadowTransition(
 }
 
 /** Sparse separate fog stamps; no full-width pale band or gameplay random calls. */
-export function drawMeadowFog(
-  ctx: CanvasRenderingContext2D,
-  atlas: HTMLImageElement,
-  frame: EnvironmentFrame,
-) {
+export function drawMeadowFog(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame) {
   const { width, height } = frame;
   const { groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);

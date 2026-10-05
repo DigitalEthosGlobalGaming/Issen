@@ -23,6 +23,17 @@ async function observe(page: import('@playwright/test').Page) {
       if (this.canvas.id === 'prevC') probe.preview++;
       return Reflect.apply(draw, this, args);
     };
+    // Scheduling assertions observe either backend; these are activity counts,
+    // not frame-time or throughput measurements.
+    for (const Context of [WebGLRenderingContext, WebGL2RenderingContext]) {
+      const draw = Context.prototype.drawElements;
+      Context.prototype.drawElements = function (...args: Parameters<typeof draw>) {
+        const id = (this.canvas as HTMLCanvasElement).id;
+        if (id === 'c') probe.main++;
+        if (id === 'prevC') probe.preview++;
+        return Reflect.apply(draw, this, args);
+      };
+    }
     const Audio = window.AudioContext;
     window.AudioContext = class extends Audio {
       constructor(...args: ConstructorParameters<typeof Audio>) {
