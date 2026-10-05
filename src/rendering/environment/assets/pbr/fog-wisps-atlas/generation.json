@@ -10,7 +10,7 @@
     1774,
     887
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/environment/index.ts",
   "exports": {
     "default": {
       "jobHash": "f03fdab2944237fedd5b2586cf0a8d054ad76cf8528b10ad0093b175e71fd762",

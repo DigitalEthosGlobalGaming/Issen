@@ -286,7 +286,7 @@ test('Ink recipes cover the complete item catalog including trial and progressio
     .filter((i) => i.type === 'charm' && i.id !== 'nocharm')
     .map((i) => i.id)
     .sort();
-  const kit = createInkCharmRenderer({});
+  const kit = createInkCharmRenderer({ createElement: () => ({ width: 0, height: 0 }) });
   assert.deepEqual(kit.snapshot().supported.sort(), charms);
   kit.dispose();
   for (const item of items.filter((i) => i.type === 'blade'))

@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '../..');
 const jobs = JSON.parse(await readFile(path.join(root, 'scripts/pbr/asset-packs.json'), 'utf8'));
-const entries = Array.isArray(jobs) ? jobs : jobs.assets;
+const entries = Array.isArray(jobs) ? jobs : [...jobs.assets, ...(jobs.installed ?? [])];
 const relative = (p) =>
   './' + path.relative(path.join(root, 'src/rendering'), path.join(root, p)).replaceAll('\\', '/');
 const lines = [
@@ -10,12 +10,14 @@ const lines = [
   'export const assetMaterialCatalog = [',
 ];
 for (const job of entries) {
-  const pack = JSON.parse(await readFile(path.join(root, job.output, 'generation.json'), 'utf8'));
+  const pack = job.dimensions
+    ? job
+    : JSON.parse(await readFile(path.join(root, job.output, 'generation.json'), 'utf8'));
   const stem = path.basename(pack.source, '.png');
   lines.push(
-    `{ source: new URL(${JSON.stringify(relative(pack.source))}, import.meta.url).href, dimensions: [${pack.dimensions}] as const, maps: {`,
+    `{ sourcePath: ${JSON.stringify(pack.source)}, source: new URL(${JSON.stringify(relative(pack.source))}, import.meta.url).href, dimensions: [${pack.dimensions}] as const, maps: {`,
   );
-  for (const kind of ['diffuse', 'normal', 'roughness', 'metallic', 'ao', 'emissive'])
+  for (const kind of ['diffuse', 'normal', 'roughness', 'metallic', 'ao', 'emissive', 'surface'])
     lines.push(
       `${kind}: new URL(${JSON.stringify(relative(`${pack.output}/${stem}_${kind}.png`))}, import.meta.url).href,`,
     );

@@ -31,6 +31,8 @@ import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
 import { createLightingRig } from './rendering/lighting-rig.ts';
 import { setSceneLighting } from './rendering/scene-material.ts';
+import { createUiMaterialLighting } from './ui/material-lighting.ts';
+import { disposeUiArt } from './rendering/ui-art.ts';
 import { createLightingDebug } from './ui/lighting-debug.ts';
 import { premium, listenToPurchases } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
@@ -244,6 +246,10 @@ import { kanji, roman } from './shared/format.ts';
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(
   surfaces?: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
+  lighting?: {
+    rig: ReturnType<typeof createLightingRig>;
+    ui: ReturnType<typeof createUiMaterialLighting>;
+  },
 ): () => void {
   const lifecycle = createLifecycle();
   if (surfaces) for (const surface of surfaces.values()) lifecycle.add(surface.dispose);
@@ -274,7 +280,12 @@ export function startGame(
   const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
   const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
-  const lightingRig = createLightingRig();
+  const lightingRig = lighting?.rig ?? createLightingRig();
+  const uiMaterialLighting =
+    lighting?.ui ??
+    createUiMaterialLighting(cvs.ownerDocument, lightingRig, !!surfaces?.get('c')?.native);
+  if (!lighting) lifecycle.add(uiMaterialLighting.dispose);
+  lifecycle.add(() => disposeUiArt(cvs.ownerDocument));
   lifecycle.add(inkCharm.dispose);
   lifecycle.add(inkCompanion.dispose);
   lifecycle.add(inkEnemy.dispose);
@@ -4757,7 +4768,17 @@ export function startGame(
     inkEnemy.prepare(),
     inkPlayer.prepare(),
     inkSword.prepare(),
-    environmentRenderer.prepare(G.stage),
+    environmentRenderer.compose({
+      stageSeed,
+      width: W,
+      height: H,
+      dpr: DPR,
+      time,
+      stage: G.stage,
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
+      lowQuality: density() <= 0.3,
+    }),
     driftRenderer.prepare(),
   ]).then(() => {
     if (artworkDisposed) return;

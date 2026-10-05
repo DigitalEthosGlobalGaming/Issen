@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { cachedMaterialContext } from '../cached-materials.ts';
 import { TAU, clamp } from '../../shared/math.ts';
 import { rng } from '../../shared/random.ts';
 import type { Random } from '../../shared/random.ts';
@@ -57,8 +58,9 @@ export function createBackground(
     const bg = document.createElement('canvas');
     bg.width = Math.round(W * DPR);
     bg.height = Math.round(H * DPR);
-    const b = bg.getContext('2d');
-    if (!b) throw new Error('Canvas 2D is unavailable');
+    const nativeContext = bg.getContext('2d');
+    if (!nativeContext) throw new Error('Canvas 2D is unavailable');
+    const b = cachedMaterialContext(nativeContext);
     setSceneryAtmosphere(b, `rgb(${st.fog.join(',')})`);
     b.setTransform(DPR, 0, 0, DPR, 0, 0);
     const r = rng(20260926 + stage * 97);

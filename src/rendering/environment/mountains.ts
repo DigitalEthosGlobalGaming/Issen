@@ -1,4 +1,9 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import {
+  drawCachedImage,
+  clearCachedMaterial,
+  cachedMaterialContext,
+} from '../cached-materials.ts';
 import type { Stage } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite, setSceneryAtmosphere } from './scene-kit.ts';
@@ -21,8 +26,9 @@ export function drawMountainTiles(
   const row = context.canvas.ownerDocument.createElement('canvas');
   row.width = context.canvas.width;
   row.height = context.canvas.height;
-  const g = row.getContext('2d');
-  if (!g) return;
+  const nativeContext = row.getContext('2d');
+  if (!nativeContext) return;
+  const g = cachedMaterialContext(nativeContext);
   const fogColour = 'rgb(' + stage.mist + ')';
   setSceneryAtmosphere(g, fogColour);
   const scaleX = row.width / width,
@@ -42,6 +48,7 @@ export function drawMountainTiles(
     context.fillStyle = bank;
     context.fillRect(0, horizonY - height * 0.03, width, height - horizonY + height * 0.03);
     for (const [depth, ridge] of RIDGES.entries()) {
+      clearCachedMaterial(row);
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.clearRect(0, 0, row.width, row.height);
       g.setTransform(scaleX, 0, 0, scaleY, 0, 0);
@@ -74,10 +81,11 @@ export function drawMountainTiles(
       g.fillRect(0, 0, width, height);
       g.globalCompositeOperation = 'source-over';
       context.globalAlpha = 1;
-      context.drawImage(row, 0, 0, width, height);
+      drawCachedImage(context, row, [0, 0, row.width, row.height], 0, 0, width, height);
     }
   } finally {
     context.restore();
     row.width = row.height = 0;
+    clearCachedMaterial(row);
   }
 }

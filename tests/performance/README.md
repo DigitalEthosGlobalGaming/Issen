@@ -20,7 +20,8 @@ npm run test:performance-tools
 ```
 
 The first command is the complete standard **web** suite: five repetitions per
-scenario, 3 seconds of warmup, 5 seconds of measurement, then one separate
+scenario, 3 seconds of warmup, 5 seconds of measurement (at least 10 seconds for
+`cinematic-transitions`), then one separate
 diagnostic capture. Every repetition starts in a disposable browser context.
 These are initial defaults, not a statistical confidence guarantee. Use longer
 samples when investigating variance or infrequent events. A short integration
@@ -45,6 +46,12 @@ without stopping or reusing the other server.
   visibility changes; Android targets use the actual Home/resume lifecycle.
 - `memory`: settled-title timing plus a separate eight-cycle Armoury/Options/Stats
   retention experiment, sampling heap after forced garbage collection.
+- `transitions`: `scene-transitions` directly calls the stage-preview path every
+  650 ms; it does not activate cinematic mode and therefore does not render Demon.
+  `cinematic-transitions` opens the real viewer, waits for each requested composition
+  to appear, then advances after a 350 ms interval. Its measurement lasts at least
+  10 seconds and guards that all nine stages and Demon actually appeared. Preparation,
+  decoding and rebuilding remain included; each sample records `measurementMs`.
 
 Fixtures fix seed 424242, Free edition, High cosmetic density and synthetic saves.
 Gameplay and lifecycle fixtures initialise audio through a real button gesture;
@@ -76,7 +83,8 @@ scenes and visible Armoury previews must still produce callbacks. The estimated
 missed-slot calculation uses a 60 fps target for visible animated scenes.
 Forced GC is used only in the explicit retained-memory experiment, not in
 timing windows. Audio contexts and observed canvas/image objects are instrumented;
-CSS images, browser-internal surfaces and all decoded/GPU storage are not counted.
+CSS images, worker OffscreenCanvases/ImageBitmaps, browser-internal surfaces and all
+resident decoded/GPU storage are not counted.
 
 ## Results and interpretation
 

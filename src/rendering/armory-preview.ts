@@ -17,6 +17,13 @@ import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
 import roomUrl from '../ui/assets/armoury-room.png';
+import { createAssetMaterials } from './asset-materials.ts';
+import {
+  createCachedMaterials,
+  cachedMaterialContext,
+  drawCachedImage,
+  clearCachedMaterial,
+} from './cached-materials.ts';
 import { drawArmoryRoom, drawRoomWind, roomWindow } from './armory-room.ts';
 import { setSceneLighting } from './scene-material.ts';
 import type { SceneLighting } from './scene-frame.ts';
@@ -58,6 +65,8 @@ export function createArmoryPreview(
   let context = surface?.drawing ?? canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
   const room = canvas.ownerDocument.createElement('img');
+  const roomMaterials = createAssetMaterials(canvas.ownerDocument, { room: roomUrl });
+  const cachedMaterials = createCachedMaterials();
   room.decoding = 'async';
   room.src = roomUrl;
   const { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword } = artwork ?? {
@@ -73,6 +82,12 @@ export function createArmoryPreview(
   void inkPlayer.prepare();
   void inkSword.prepare();
   const roomCache = canvas.ownerDocument.createElement('canvas');
+  let roomDisposed = false;
+  void roomMaterials.prepare().then(() => {
+    if (roomDisposed) return;
+    cachedMaterials.bind(room, (frame) => roomMaterials.material('room', frame));
+    roomCache.width = 0;
+  });
   let roomReady = false;
   room.onload = () => {
     roomReady = true;
@@ -148,9 +163,10 @@ export function createArmoryPreview(
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, width, height);
     if (roomCache.width !== width || roomCache.height !== height) {
+      clearCachedMaterial(roomCache);
       roomCache.width = width;
       roomCache.height = height;
-      const background = roomCache.getContext('2d')!;
+      const background = cachedMaterialContext(roomCache.getContext('2d')!);
       if ((roomReady || room.complete) && room.naturalWidth) {
         drawArmoryRoom(background, room, width, height);
       }
@@ -161,7 +177,15 @@ export function createArmoryPreview(
       background.fillRect(0, 0, width, height);
       invalidateSceneTexture(roomCache);
     }
-    g.drawImage(roomCache, 0, 0);
+    drawCachedImage(
+      g,
+      roomCache,
+      [0, 0, roomCache.width, roomCache.height],
+      0,
+      0,
+      roomCache.width,
+      roomCache.height,
+    );
     if (room.naturalWidth)
       drawRoomWind(
         g,
@@ -255,9 +279,22 @@ export function createArmoryPreview(
   }
 
   return {
+    prepare: () =>
+      Promise.all([
+        room.decode().catch(() => {}),
+        roomMaterials.prepare(),
+        inkCharm.prepare(),
+        inkCompanion.prepare(),
+        inkEnemy.prepare(),
+        inkPlayer.prepare(),
+        inkSword.prepare(),
+      ]),
     demo,
     draw,
     dispose() {
+      roomDisposed = true;
+      roomMaterials.dispose();
+      cachedMaterials.dispose();
       room.onload = null;
       room.removeAttribute('src');
       roomCache.width = roomCache.height = 0;

@@ -371,6 +371,9 @@ export class PixiScenePainter implements SceneDrawing {
       filterBindings.setResource(Texture.EMPTY.source.style, 2);
       filterBindings.setResource(Texture.EMPTY.source, 3);
     }
+    // Unused pooled meshes must detach old scene sources before expiry destroys them.
+    for (let i = this.cursor; i < this.slots.length; i++)
+      this.slots[i]?.material?.releaseTextures();
     this.textures.collect();
     for (const [key, gradient] of this.gradients) {
       if (this.usedGradients.has(key)) continue;

@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
 });
 
-test('Free mobile hides billing while disabled and shows Premium catalog requirements', async ({
+test('Free mobile keeps Support available without billing and shows Premium catalog requirements', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -20,8 +20,9 @@ test('Free mobile hides billing while disabled and shows Premium catalog require
     await route.fulfill({ response, body });
   });
   await page.goto('/');
-  await expect(page.locator('#bSupport')).toBeHidden();
-  await expect(page.locator('#support')).toBeHidden();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await expect(page.locator('#bSupport')).toBeVisible();
+  await expect(page.locator('#support')).not.toHaveClass(/on/);
   await expect(page.locator('#premiumBadge')).toBeHidden();
   await page.locator('#bArmory').click();
   await page.getByRole('tab', { name: /^Film looks/ }).click();

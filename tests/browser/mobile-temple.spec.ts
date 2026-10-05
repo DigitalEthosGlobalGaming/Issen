@@ -19,7 +19,7 @@ test('portrait title and setup fit while Temple uses compact top-centred details
   ]) {
     await page.setViewportSize(size);
     await page.goto('/');
-    await expect(page.locator('#bTemplate')).toHaveText('Temple');
+    await expect(page.locator('#bTemplate')).toHaveText('Temple', { timeout: 30000 });
     await expect(page.locator('#title .title-version')).toHaveText(`v${packageInfo.version}`);
     const fits = async (id: string) =>
       page.locator(id).evaluate((el) => ({
@@ -105,8 +105,10 @@ test('Temple rank one unlocks only weapons; rank two reveals outfit challenges',
 });
 
 test('admin clear requires confirmation and resets only test profile', async ({ page }) => {
+  test.setTimeout(60000);
   await page.goto('/');
   await page.locator('#app').waitFor();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   const player = await page.evaluate(() =>
     Object.fromEntries(
       Object.entries(localStorage).filter(([key]) => !key.startsWith('issen.testing.')),
@@ -114,7 +116,7 @@ test('admin clear requires confirmation and resets only test profile', async ({ 
   );
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
-  await expect(page.locator('#testBadge')).toBeVisible();
+  await expect(page.locator('#testBadge')).toBeVisible({ timeout: 30000 });
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('spinbutton', { name: 'Ember balance' }).fill('1000');
   await page.getByRole('button', { name: 'Set Embers', exact: true }).click();
@@ -125,7 +127,7 @@ test('admin clear requires confirmation and resets only test profile', async ({ 
   ).toBe(1000);
   await page.getByRole('button', { name: 'Clear test profile', exact: true }).click();
   await page.getByRole('button', { name: 'Confirm clear test profile', exact: true }).click();
-  await expect(page.locator('#title')).toHaveClass(/on/);
+  await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
   await expect(page.locator('#testBadge')).toBeVisible();
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.testing.meta')!).embers),

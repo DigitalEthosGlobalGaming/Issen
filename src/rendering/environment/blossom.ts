@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
@@ -118,7 +119,8 @@ export function drawFallingBlossomPath(
       );
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
 
   // A widening S-curve is broken into dry, uneven patches. Grass still draws over it at runtime.

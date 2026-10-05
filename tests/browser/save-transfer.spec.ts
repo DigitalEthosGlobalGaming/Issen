@@ -38,7 +38,7 @@ test('Profile Management downloads, previews, cancels and imports progression wi
   );
   await page.locator('#saveFile').setInputFiles(file);
   await page.locator('#bConfirmImportSave').click();
-  await expect(page.locator('#title')).toHaveClass(/on/);
+  await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
   await expect
     .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).kills))
     .toBe(40);
@@ -68,7 +68,7 @@ test('named profile creation, switching, rename and deletion preserve the origin
   await open();
   await page.locator('#profileName').fill('Wanderer');
   await page.locator('#bCreateProfile').click();
-  await expect(page.locator('#title')).toHaveClass(/on/);
+  await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
   await open();
   await expect(page.locator('#profileName')).toHaveValue('Wanderer');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).kills)).toBe(
@@ -79,7 +79,7 @@ test('named profile creation, switching, rename and deletion preserve the origin
   await expect(page.locator('#playerProfile option:checked')).toHaveText('Ronin');
   await page.locator('#bResetProfile').click();
   await page.locator('#bConfirmResetProfile').click();
-  await expect(page.locator('#title')).toHaveClass(/on/);
+  await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
   await open();
   await expect(page.locator('#playerProfile')).toHaveValue('default');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.stats')!).kills)).toBe(

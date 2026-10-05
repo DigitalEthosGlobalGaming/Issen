@@ -20,7 +20,7 @@
     1254,
     1254
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/figures/outfit-kit.ts",
   "exports": {
     "cloth": {
       "jobHash": "fafe478b621ac91c156636bc510bd861e799479b573a56daf2d44acb93c12090",

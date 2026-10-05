@@ -17,6 +17,7 @@ export const suites = {
   stress: ['stress-100'],
   lifecycle: ['inactive-combat', 'inactive-inspection'],
   memory: ['menu-cycles'],
+  transitions: ['scene-transitions', 'cinematic-transitions'],
 };
 export const allScenarios = Object.values(suites).flat();
 export function options(argv) {

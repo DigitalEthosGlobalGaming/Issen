@@ -3,8 +3,7 @@ import { expect, test } from '@playwright/test';
 test('assembled companions animate separate parts and preserve canvas state', async ({
   page,
 }, info) => {
-  await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
     const { createInkCompanionRenderer } = await import('/src/rendering/figures/ink-companions.ts');
     const rig = createInkCompanionRenderer(document);

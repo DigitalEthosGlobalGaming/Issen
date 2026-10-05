@@ -34,6 +34,19 @@
   display: block;
   margin: 10px 0;
 }
+#lighting-debug select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  color: inherit;
+  background: #211e19;
+}
+#lighting-debug .lighting-material-preview {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  background: #161512;
+}
 #lighting-debug input[type='range'] {
   display: block;
   width: 100%;

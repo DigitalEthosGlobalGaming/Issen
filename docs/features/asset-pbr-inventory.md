@@ -25,30 +25,39 @@ and document illustrations are outside this inventory.
 - **Runtime/source** records direct code references or an explicit source role.
   No direct filename reference is not proof that dynamic loading is impossible.
 
-This snapshot covers **671 media files**, including **516 PBR maps**
-across **86 source families**. The six connected families use Sprite/OpenGL.
+This snapshot covers **757 media files**, including **516 exported PBR maps**
+and **86 packed runtime surface textures**
+across **86 source families**. Renderer wiring is recorded separately from export settings.
 The 80 newly generated packs contain 480 maps: 73 Sprite/OpenGL packs and seven
-Texture/OpenGL packs. Original source artwork and renderer coverage are unchanged.
+Texture/OpenGL packs. Original source artwork is unchanged.
 
 ## Newly generated packs
 
-### Lighting integration in progress
+### Lighting coverage
 
 The player base cloth pack is now selected for all supported outfit recipes.
 The five outfit attachment sheets (armour, cloth, headwear, masks and special
 headwear), charms, companion parts and mystic rock submit aligned normal,
 roughness, metallic, AO and emissive maps to the material shader. Tinted and
 cropped colour caches retain their original atlas frames for the other maps.
-Canvas fallback retains colour artwork. Strict TypeScript checks pass;
-browser and visual verification of this wiring are pending.
+Canvas fallback retains colour artwork. Focused browser checks confirm outfit
+and charm alignment, mirrored cached normals, procedural occlusion, shader
+coverage and all nine stage caches. Visual approval is pending.
 
 Shared loading belongs to [asset-materials.ts](../../src/rendering/asset-materials.ts).
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
-Only packs selected by a renderer are decoded. Remaining
-environment/debris and UI renderers are still awaiting integration. Sword handles,
-guards and special weapons now use their generated packs as well. The tables
-below retain the generation-pass snapshot until the full renderer audit finishes.
+Only packs selected by a renderer are decoded. Generated maps are excluded from
+lifetime startup retention. Scene changes retain their shared packs and release
+departed selections. Sword handles, guards and special
+weapons use their generated packs. Stage scenery, foreground bamboo, demon realm
+props and debris now submit material data. Cached layers retain transformed
+normals and material coverage; procedural paint clears covered material pixels.
+Raster UI backgrounds, borders, symbols, crests and tinted seals use the same
+shader through CSS texture replacement; original slices, crops and alpha remain
+intact. Startup and gameplay share one session-only rig. Canvas comparison keeps
+original colour art. The tilde panel's Material preview exposes all **86** packs,
+including retained sources without reintroducing them into gameplay.
 
 All 80 previously missing raster packs are installed: 36 environment/debris,
 13 figure/equipment and 31 UI/reference packs. Their rows below link to each
@@ -64,11 +73,14 @@ cloth/wood/leather outfit parts, cloth/metal/wood rear headwear, and a wood bask
 on the special-headwear sheet. Other mixed artwork uses its dominant preset as
 a starting point. Wood approximates straw; polished wood approximates the smooth
 nonmetal wind chime. Atmospheric art and raster UI symbols are reference packs,
-not automatically physical materials. Visual review and renderer wiring are pending.
+not automatically physical materials. Visual approval of the expanded lighting is pending.
 
 All installed maps passed archive integrity, source-hash, dimensions, applied
 settings, normal-convention and diffuse-alpha validation. Six focused CLI tests
-passed. This generation-only pass changes no lighting, player saves or gameplay.
+passed. Lighting integration preserves player saves and gameplay rules.
+Each family also has a `_surface.png` that packs roughness, metallic and AO into
+RGB. All 86 packed PNGs passed exact browser pixel comparison against the previous
+runtime packing path; the six source maps and preset provenance remain unchanged.
 
 ## Renderer-connected PBR families
 
@@ -76,7 +88,7 @@ passed. This generation-only pass changes no lighting, player saves or gameplay.
 | --- | --- | --- | --- | --- |
 | [blade-profile-atlas.png](../../src/rendering/figures/assets/blade-profile-atlas.png) | Yes, six maps | `metal` + `wood` | Steel profiles: metal. Bokken: wood. | [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) |
 | [player-ronin-simple.png](../../src/rendering/figures/assets/player-ronin-simple.png) | Yes, six maps | `cloth` | All supported player outfit recipes use this base cloth pack. | [ink-player.ts](../../src/rendering/figures/ink-player.ts) |
-| [enemy-ronin-simple.png](../../src/rendering/figures/assets/enemy-ronin-simple.png) | Yes, six maps | `cloth` | Base clothing and base head lighting; hands remain unlit. | [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) |
+| [enemy-ronin-simple.png](../../src/rendering/figures/assets/enemy-ronin-simple.png) | Yes, six maps | `cloth` | Base clothing, head and hands use the cloth pack. | [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) |
 | [enemy-clothing-variants.png](../../src/rendering/figures/assets/enemy-clothing-variants.png) | Yes, six maps | `cloth` | All six clothing frames, including stylised armour panels. | [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) |
 | [enemy-headwear-atlas.png](../../src/rendering/figures/assets/enemy-headwear-atlas.png) | Yes, six maps | `cloth` + `metal` + `wood` | Cloth default; metal kabuto/jingasa; wood approximation for straw kasa. | [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) |
 | [enemy-headwear-variants.png](../../src/rendering/figures/assets/enemy-headwear-variants.png) | Yes, six maps | `cloth` + `metal` | Cloth default; metal crested helmet with warm face/neck pixels kept nonmetal. | [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) |
@@ -104,7 +116,7 @@ shader lighting.
 
 Wood approximates matte straw; it does not generate straw grain. Cloth on face/hair
 regions is a gentle nonmetal starting point, not a skin or hair-specific model.
-Enemy hands and the procedural under-robe bridge remain outside the PBR path.
+Enemy hands use the base cloth pack; the procedural under-robe bridge has no source atlas.
 All supported player outfits select the exported base cloth pack. Their attachment
 sheets also submit generated materials to the shader.
 
@@ -126,110 +138,110 @@ those in the family and mixed-material tables above.
 
 | Asset | Dimensions | Runtime/source | PBR export | Preset |
 | --- | --- | --- | --- | --- |
-| [armour-plates-atlas.png](../../src/rendering/figures/assets/armour-plates-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/armour-plates-atlas/README.md) | `metal` |
+| [armour-plates-atlas.png](../../src/rendering/figures/assets/armour-plates-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/armour-plates-atlas/README.md) | `metal` |
 | [blade-profile-atlas.png](../../src/rendering/figures/assets/blade-profile-atlas.png) | 1254×1254 | PBR source; [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) | Yes | `metal` + `wood` |
-| [charm-atlas.png](../../src/rendering/figures/assets/charm-atlas.png) | 1536×1024 | [ink-charms.ts](../../src/rendering/figures/ink-charms.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/charm-atlas/README.md) | `cloth` + `metal` + `bone` + `wood` + `polished-wood` |
-| [companion-atlas.png](../../src/rendering/figures/assets/companion-atlas.png) | 1254×1254 | Retained source; active renderer uses companion-parts-atlas. | [Generated, unwired](../../src/rendering/figures/assets/pbr/companion-atlas/README.md) | `cloth` |
-| [companion-parts-atlas.png](../../src/rendering/figures/assets/companion-parts-atlas.png) | 1254×1254 | [ink-companions.ts](../../src/rendering/figures/ink-companions.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/companion-parts-atlas/README.md) | `cloth` + `stone` + `metal` |
+| [charm-atlas.png](../../src/rendering/figures/assets/charm-atlas.png) | 1536×1024 | [ink-charms.ts](../../src/rendering/figures/ink-charms.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/charm-atlas/README.md) | `cloth` + `metal` + `bone` + `wood` + `polished-wood` |
+| [companion-atlas.png](../../src/rendering/figures/assets/companion-atlas.png) | 1254×1254 | Retained source; active renderer uses companion-parts-atlas. | [Yes, preview](../../src/rendering/figures/assets/pbr/companion-atlas/README.md) | `cloth` |
+| [companion-parts-atlas.png](../../src/rendering/figures/assets/companion-parts-atlas.png) | 1254×1254 | [ink-companions.ts](../../src/rendering/figures/ink-companions.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/companion-parts-atlas/README.md) | `cloth` + `stone` + `metal` |
 | [enemy-clothing-variants.png](../../src/rendering/figures/assets/enemy-clothing-variants.png) | 1536×1024 | PBR source; [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) | Yes | `cloth` |
 | [enemy-headwear-atlas.png](../../src/rendering/figures/assets/enemy-headwear-atlas.png) | 1536×1024 | PBR source; [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) | Yes | `cloth` + `metal` + `wood` |
 | [enemy-headwear-variants.png](../../src/rendering/figures/assets/enemy-headwear-variants.png) | 1254×1254 | PBR source; [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) | Yes | `cloth` + `metal` |
 | [enemy-ronin-simple.png](../../src/rendering/figures/assets/enemy-ronin-simple.png) | 1254×1254 | PBR source; [ink-enemy.ts](../../src/rendering/figures/ink-enemy.ts) | Yes | `cloth` |
-| [handle-guard-atlas.png](../../src/rendering/figures/assets/handle-guard-atlas.png) | 1254×1254 | [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/handle-guard-atlas/README.md) | `leather` + `metal` |
-| [katana.png](../../src/rendering/figures/assets/katana.png) | 2172×724 | Retained source; active swords use modular blade profiles. | [Generated, unwired](../../src/rendering/figures/assets/pbr/katana/README.md) | `metal` |
-| [mystic-rock.png](../../src/rendering/figures/assets/mystic-rock.png) | 1145×1373 | [ink-companions.ts](../../src/rendering/figures/ink-companions.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/mystic-rock/README.md) | `stone` |
-| [outfit-cloth-atlas.png](../../src/rendering/figures/assets/outfit-cloth-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/outfit-cloth-atlas/README.md) | `cloth` + `wood` + `leather` |
-| [outfit-headwear-atlas.png](../../src/rendering/figures/assets/outfit-headwear-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/outfit-headwear-atlas/README.md) | `cloth` + `metal` + `wood` |
-| [player-mask-atlas.png](../../src/rendering/figures/assets/player-mask-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/player-mask-atlas/README.md) | `polished-wood` |
-| [player-ronin-atlas.png](../../src/rendering/figures/assets/player-ronin-atlas.png) | 1254×1254 | Retained detailed player source; active base uses player-ronin-simple. | [Generated, unwired](../../src/rendering/figures/assets/pbr/player-ronin-atlas/README.md) | `cloth` |
+| [handle-guard-atlas.png](../../src/rendering/figures/assets/handle-guard-atlas.png) | 1254×1254 | [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/handle-guard-atlas/README.md) | `leather` + `metal` |
+| [katana.png](../../src/rendering/figures/assets/katana.png) | 2172×724 | Retained source; active swords use modular blade profiles. | [Yes, preview](../../src/rendering/figures/assets/pbr/katana/README.md) | `metal` |
+| [mystic-rock.png](../../src/rendering/figures/assets/mystic-rock.png) | 1145×1373 | [ink-companions.ts](../../src/rendering/figures/ink-companions.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/mystic-rock/README.md) | `stone` |
+| [outfit-cloth-atlas.png](../../src/rendering/figures/assets/outfit-cloth-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/outfit-cloth-atlas/README.md) | `cloth` + `wood` + `leather` |
+| [outfit-headwear-atlas.png](../../src/rendering/figures/assets/outfit-headwear-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/outfit-headwear-atlas/README.md) | `cloth` + `metal` + `wood` |
+| [player-mask-atlas.png](../../src/rendering/figures/assets/player-mask-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/player-mask-atlas/README.md) | `polished-wood` |
+| [player-ronin-atlas.png](../../src/rendering/figures/assets/player-ronin-atlas.png) | 1254×1254 | Retained detailed player source; active base uses player-ronin-simple. | [Yes, preview](../../src/rendering/figures/assets/pbr/player-ronin-atlas/README.md) | `cloth` |
 | [player-ronin-simple.png](../../src/rendering/figures/assets/player-ronin-simple.png) | 1254×1254 | PBR source; [ink-player.ts](../../src/rendering/figures/ink-player.ts) | Yes | `cloth` |
-| [player-special-headwear-atlas.png](../../src/rendering/figures/assets/player-special-headwear-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/player-special-headwear-atlas/README.md) | `cloth` + `wood` |
-| [special-weapons-atlas.png](../../src/rendering/figures/assets/special-weapons-atlas.png) | 1774×887 | [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) | [Generated, unwired](../../src/rendering/figures/assets/pbr/special-weapons-atlas/README.md) | `metal` |
+| [player-special-headwear-atlas.png](../../src/rendering/figures/assets/player-special-headwear-atlas.png) | 1254×1254 | [outfit-kit.ts](../../src/rendering/figures/outfit-kit.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/player-special-headwear-atlas/README.md) | `cloth` + `wood` |
+| [special-weapons-atlas.png](../../src/rendering/figures/assets/special-weapons-atlas.png) | 1774×887 | [ink-sword.ts](../../src/rendering/figures/ink-sword.ts) | [Yes, connected](../../src/rendering/figures/assets/pbr/special-weapons-atlas/README.md) | `metal` |
 
 ## Environment and debris
 
 | Asset | Dimensions | Runtime/source | PBR export | Preset |
 | --- | --- | --- | --- | --- |
-| [bamboo-atlas.png](../../src/rendering/environment/assets/bamboo-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/bamboo-atlas/README.md) | `wood` |
-| [bamboo-landmarks-atlas.png](../../src/rendering/environment/assets/bamboo-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/README.md) | `wood` |
-| [cherry-landmarks-atlas.png](../../src/rendering/environment/assets/cherry-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/cherry-landmarks-atlas/README.md) | `wood` |
-| [cherry-trees-atlas.png](../../src/rendering/environment/assets/cherry-trees-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/cherry-trees-atlas/README.md) | `wood` |
-| [demon-landmarks-atlas.png](../../src/rendering/environment/assets/demon-landmarks-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/demon-landmarks-atlas/README.md) | `stone` + `wood` |
-| [demon-terrain-atlas.png](../../src/rendering/environment/assets/demon-terrain-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/demon-terrain-atlas/README.md) | `stone` |
-| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
-| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
-| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
-| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
-| [fallen-bamboo-atlas.png](../../src/rendering/environment/assets/fallen-bamboo-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/fallen-bamboo-atlas/README.md) | `wood` |
-| [field-banks-atlas.png](../../src/rendering/environment/assets/field-banks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/field-banks-atlas/README.md) | `stone` |
-| [field-rocks-atlas.png](../../src/rendering/environment/assets/field-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/field-rocks-atlas/README.md) | `stone` |
-| [foam-strips-atlas.png](../../src/rendering/environment/assets/foam-strips-atlas.png) | 1659×948 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/foam-strips-atlas/README.md) | `default` |
-| [fog-wisps-atlas.png](../../src/rendering/environment/assets/fog-wisps-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/fog-wisps-atlas/README.md) | `default` |
-| [foreground-boulders-atlas.png](../../src/rendering/environment/assets/foreground-boulders-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/foreground-boulders-atlas/README.md) | `stone` |
-| [grass-edges-atlas.png](../../src/rendering/environment/assets/grass-edges-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/grass-edges-atlas/README.md) | `wood` |
-| [landmark-stones-atlas.png](../../src/rendering/environment/assets/landmark-stones-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/landmark-stones-atlas/README.md) | `stone` |
-| [meadow-patches-atlas.png](../../src/rendering/environment/assets/meadow-patches-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/meadow-patches-atlas/README.md) | `wood` |
-| [mountain-atlas.png](../../src/rendering/environment/assets/mountain-atlas.png) | 1774×887 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts), [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/mountain-atlas/README.md) | `stone` |
-| [petal-ground-atlas.png](../../src/rendering/environment/assets/petal-ground-atlas.png) | 1659×948 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/petal-ground-atlas/README.md) | `cloth` |
-| [pine-atlas.png](../../src/rendering/environment/assets/pine-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/pine-atlas/README.md) | `wood` |
-| [reeds-atlas.png](../../src/rendering/environment/assets/reeds-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/reeds-atlas/README.md) | `wood` |
-| [rocks-atlas.png](../../src/rendering/environment/assets/rocks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/rocks-atlas/README.md) | `stone` |
-| [sea-stacks-atlas.png](../../src/rendering/environment/assets/sea-stacks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/sea-stacks-atlas/README.md) | `stone` |
-| [shrubs-atlas.png](../../src/rendering/environment/assets/shrubs-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/shrubs-atlas/README.md) | `wood` |
-| [snow-boulders-atlas.png](../../src/rendering/environment/assets/snow-boulders-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/snow-boulders-atlas/README.md) | `stone` |
-| [snow-peak.png](../../src/rendering/environment/assets/snow-peak.png) | 1881×836 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/snow-peak/README.md) | `stone` |
-| [snow-pines-atlas.png](../../src/rendering/environment/assets/snow-pines-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/snow-pines-atlas/README.md) | `wood` |
-| [snow-rocks-atlas.png](../../src/rendering/environment/assets/snow-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/snow-rocks-atlas/README.md) | `stone` |
-| [snow-woodland-landmarks-atlas.png](../../src/rendering/environment/assets/snow-woodland-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/README.md) | `wood` |
-| [temple-posts-atlas.png](../../src/rendering/environment/assets/temple-posts-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/temple-posts-atlas/README.md) | `wood` |
-| [temple-roofs-atlas.png](../../src/rendering/environment/assets/temple-roofs-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/temple-roofs-atlas/README.md) | `stone` |
-| [temple-steps-atlas.png](../../src/rendering/environment/assets/temple-steps-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/temple-steps-atlas/README.md) | `stone` |
-| [temple-walls-atlas.png](../../src/rendering/environment/assets/temple-walls-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/temple-walls-atlas/README.md) | `stone` |
-| [woodland-landmarks-atlas.png](../../src/rendering/environment/assets/woodland-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Generated, unwired](../../src/rendering/environment/assets/pbr/woodland-landmarks-atlas/README.md) | `wood` |
+| [bamboo-atlas.png](../../src/rendering/environment/assets/bamboo-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/bamboo-atlas/README.md) | `wood` |
+| [bamboo-landmarks-atlas.png](../../src/rendering/environment/assets/bamboo-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/README.md) | `wood` |
+| [cherry-landmarks-atlas.png](../../src/rendering/environment/assets/cherry-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/cherry-landmarks-atlas/README.md) | `wood` |
+| [cherry-trees-atlas.png](../../src/rendering/environment/assets/cherry-trees-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/cherry-trees-atlas/README.md) | `wood` |
+| [demon-landmarks-atlas.png](../../src/rendering/environment/assets/demon-landmarks-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-landmarks-atlas/README.md) | `stone` + `wood` |
+| [demon-terrain-atlas.png](../../src/rendering/environment/assets/demon-terrain-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-terrain-atlas/README.md) | `stone` |
+| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
+| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
+| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
+| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
+| [fallen-bamboo-atlas.png](../../src/rendering/environment/assets/fallen-bamboo-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/fallen-bamboo-atlas/README.md) | `wood` |
+| [field-banks-atlas.png](../../src/rendering/environment/assets/field-banks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-banks-atlas/README.md) | `stone` |
+| [field-rocks-atlas.png](../../src/rendering/environment/assets/field-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-rocks-atlas/README.md) | `stone` |
+| [foam-strips-atlas.png](../../src/rendering/environment/assets/foam-strips-atlas.png) | 1659×948 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/foam-strips-atlas/README.md) | `default` |
+| [fog-wisps-atlas.png](../../src/rendering/environment/assets/fog-wisps-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/fog-wisps-atlas/README.md) | `default` |
+| [foreground-boulders-atlas.png](../../src/rendering/environment/assets/foreground-boulders-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/foreground-boulders-atlas/README.md) | `stone` |
+| [grass-edges-atlas.png](../../src/rendering/environment/assets/grass-edges-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/grass-edges-atlas/README.md) | `wood` |
+| [landmark-stones-atlas.png](../../src/rendering/environment/assets/landmark-stones-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/landmark-stones-atlas/README.md) | `stone` |
+| [meadow-patches-atlas.png](../../src/rendering/environment/assets/meadow-patches-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/meadow-patches-atlas/README.md) | `wood` |
+| [mountain-atlas.png](../../src/rendering/environment/assets/mountain-atlas.png) | 1774×887 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts), [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/mountain-atlas/README.md) | `stone` |
+| [petal-ground-atlas.png](../../src/rendering/environment/assets/petal-ground-atlas.png) | 1659×948 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/petal-ground-atlas/README.md) | `cloth` |
+| [pine-atlas.png](../../src/rendering/environment/assets/pine-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/pine-atlas/README.md) | `wood` |
+| [reeds-atlas.png](../../src/rendering/environment/assets/reeds-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/reeds-atlas/README.md) | `wood` |
+| [rocks-atlas.png](../../src/rendering/environment/assets/rocks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, preview](../../src/rendering/environment/assets/pbr/rocks-atlas/README.md) | `stone` |
+| [sea-stacks-atlas.png](../../src/rendering/environment/assets/sea-stacks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/sea-stacks-atlas/README.md) | `stone` |
+| [shrubs-atlas.png](../../src/rendering/environment/assets/shrubs-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/shrubs-atlas/README.md) | `wood` |
+| [snow-boulders-atlas.png](../../src/rendering/environment/assets/snow-boulders-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/snow-boulders-atlas/README.md) | `stone` |
+| [snow-peak.png](../../src/rendering/environment/assets/snow-peak.png) | 1881×836 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/snow-peak/README.md) | `stone` |
+| [snow-pines-atlas.png](../../src/rendering/environment/assets/snow-pines-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/snow-pines-atlas/README.md) | `wood` |
+| [snow-rocks-atlas.png](../../src/rendering/environment/assets/snow-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/snow-rocks-atlas/README.md) | `stone` |
+| [snow-woodland-landmarks-atlas.png](../../src/rendering/environment/assets/snow-woodland-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/README.md) | `wood` |
+| [temple-posts-atlas.png](../../src/rendering/environment/assets/temple-posts-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/temple-posts-atlas/README.md) | `wood` |
+| [temple-roofs-atlas.png](../../src/rendering/environment/assets/temple-roofs-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/temple-roofs-atlas/README.md) | `stone` |
+| [temple-steps-atlas.png](../../src/rendering/environment/assets/temple-steps-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/temple-steps-atlas/README.md) | `stone` |
+| [temple-walls-atlas.png](../../src/rendering/environment/assets/temple-walls-atlas.png) | 2172×724 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/temple-walls-atlas/README.md) | `stone` |
+| [woodland-landmarks-atlas.png](../../src/rendering/environment/assets/woodland-landmarks-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/woodland-landmarks-atlas/README.md) | `wood` |
 
 ## UI, symbols and vector sources
 
 | Asset | Dimensions | Runtime/source | PBR export | Preset |
 | --- | --- | --- | --- | --- |
-| [armoury-room.png](../../src/ui/assets/armoury-room.png) | 1536×1024 | [armory-preview.ts](../../src/rendering/armory-preview.ts), [armory.css](../../src/ui/screens/armory.css) | [Generated, unwired](../../src/ui/assets/pbr/armoury-room/README.md) | `default` |
-| [awakening-button-awakened.png](../../src/ui/assets/awakening-button-awakened.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Generated, unwired](../../src/ui/assets/pbr/awakening-button-awakened/README.md) | `cloth` |
-| [awakening-button-normal.png](../../src/ui/assets/awakening-button-normal.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Generated, unwired](../../src/ui/assets/pbr/awakening-button-normal/README.md) | `cloth` |
-| [awakening-button-third.png](../../src/ui/assets/awakening-button-third.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Generated, unwired](../../src/ui/assets/pbr/awakening-button-third/README.md) | `cloth` |
-| [awakening-buttons-atlas.png](../../src/ui/assets/awakening-buttons-atlas.png) | 768×128 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/awakening-buttons-atlas/README.md) | `cloth` |
+| [armoury-room.png](../../src/ui/assets/armoury-room.png) | 1536×1024 | [armory-preview.ts](../../src/rendering/armory-preview.ts), [armory.css](../../src/ui/screens/armory.css) | [Yes, shader available](../../src/ui/assets/pbr/armoury-room/README.md) | `default` |
+| [awakening-button-awakened.png](../../src/ui/assets/awakening-button-awakened.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Yes, shader available](../../src/ui/assets/pbr/awakening-button-awakened/README.md) | `cloth` |
+| [awakening-button-normal.png](../../src/ui/assets/awakening-button-normal.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Yes, shader available](../../src/ui/assets/pbr/awakening-button-normal/README.md) | `cloth` |
+| [awakening-button-third.png](../../src/ui/assets/awakening-button-third.png) | 256×128 | [armory.css](../../src/ui/screens/armory.css) | [Yes, shader available](../../src/ui/assets/pbr/awakening-button-third/README.md) | `cloth` |
+| [awakening-buttons-atlas.png](../../src/ui/assets/awakening-buttons-atlas.png) | 768×128 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/awakening-buttons-atlas/README.md) | `cloth` |
 | [awakening-buttons-atlas.svg](../../src/ui/assets/awakening-buttons-atlas.svg) | Vector | Source/reference; no direct filename reference found. | N/A | — |
-| [button-atlas.png](../../src/ui/assets/button-atlas.png) | 256×128 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/button-atlas/README.md) | `cloth` |
+| [button-atlas.png](../../src/ui/assets/button-atlas.png) | 256×128 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/button-atlas/README.md) | `cloth` |
 | [button-atlas.svg](../../src/ui/assets/button-atlas.svg) | Vector | Source/reference; no direct filename reference found. | N/A | — |
-| [button-highlighted.png](../../src/ui/assets/button-highlighted.png) | 128×128 | [button-frames.css](../../src/styles/button-frames.css) | [Generated, unwired](../../src/ui/assets/pbr/button-highlighted/README.md) | `cloth` |
-| [button-normal.png](../../src/ui/assets/button-normal.png) | 128×128 | [button-frames.css](../../src/styles/button-frames.css), [armory.css](../../src/ui/screens/armory.css) | [Generated, unwired](../../src/ui/assets/pbr/button-normal/README.md) | `cloth` |
+| [button-highlighted.png](../../src/ui/assets/button-highlighted.png) | 128×128 | [button-frames.css](../../src/styles/button-frames.css) | [Yes, shader available](../../src/ui/assets/pbr/button-highlighted/README.md) | `cloth` |
+| [button-normal.png](../../src/ui/assets/button-normal.png) | 128×128 | [button-frames.css](../../src/styles/button-frames.css), [armory.css](../../src/ui/screens/armory.css) | [Yes, shader available](../../src/ui/assets/pbr/button-normal/README.md) | `cloth` |
 | [collection-symbols.svg](../../src/ui/assets/collection-symbols.svg) | Vector | [symbol-art.ts](../../src/ui/symbol-art.ts) | N/A | — |
-| [demon-mirror-symbol.png](../../src/ui/assets/demon-mirror-symbol.png) | 1254×1254 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Generated, unwired](../../src/ui/assets/pbr/demon-mirror-symbol/README.md) | `default` |
-| [issen-logo.png](../../src/ui/assets/issen-logo.png) | 600×400 | [startup-loading.ts](../../src/ui/startup-loading.ts) | [Generated, unwired](../../src/ui/assets/pbr/issen-logo/README.md) | `default` |
-| [panel-atlas.png](../../src/ui/assets/panel-atlas.png) | 384×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/panel-atlas/README.md) | `cloth` |
+| [demon-mirror-symbol.png](../../src/ui/assets/demon-mirror-symbol.png) | 1254×1254 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Yes, shader available](../../src/ui/assets/pbr/demon-mirror-symbol/README.md) | `default` |
+| [issen-logo.png](../../src/ui/assets/issen-logo.png) | 600×400 | [startup-loading.ts](../../src/ui/startup-loading.ts) | [Yes, shader available](../../src/ui/assets/pbr/issen-logo/README.md) | `default` |
+| [panel-atlas.png](../../src/ui/assets/panel-atlas.png) | 384×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/panel-atlas/README.md) | `cloth` |
 | [panel-atlas.svg](../../src/ui/assets/panel-atlas.svg) | Vector | Source/reference; no direct filename reference found. | N/A | — |
-| [panel-highlighted.png](../../src/ui/assets/panel-highlighted.png) | 192×192 | [panel-frames.css](../../src/styles/panel-frames.css) | [Generated, unwired](../../src/ui/assets/pbr/panel-highlighted/README.md) | `cloth` |
-| [panel-normal.png](../../src/ui/assets/panel-normal.png) | 192×192 | [panel-frames.css](../../src/styles/panel-frames.css) | [Generated, unwired](../../src/ui/assets/pbr/panel-normal/README.md) | `cloth` |
+| [panel-highlighted.png](../../src/ui/assets/panel-highlighted.png) | 192×192 | [panel-frames.css](../../src/styles/panel-frames.css) | [Yes, shader available](../../src/ui/assets/pbr/panel-highlighted/README.md) | `cloth` |
+| [panel-normal.png](../../src/ui/assets/panel-normal.png) | 192×192 | [panel-frames.css](../../src/styles/panel-frames.css) | [Yes, shader available](../../src/ui/assets/pbr/panel-normal/README.md) | `cloth` |
 | [preset-symbol.svg](../../src/ui/assets/preset-symbol.svg) | Vector | [symbol-art.ts](../../src/ui/symbol-art.ts) | N/A | — |
 | [tanto-symbol.svg](../../src/ui/assets/tanto-symbol.svg) | Vector | [symbol-art.ts](../../src/ui/symbol-art.ts) | N/A | — |
-| [temple-symbols-atlas.png](../../src/ui/assets/temple-symbols-atlas.png) | 1254×1254 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Generated, unwired](../../src/ui/assets/pbr/temple-symbols-atlas/README.md) | `default` |
-| [trial-symbols-atlas.png](../../src/ui/assets/trial-symbols-atlas.png) | 1448×1086 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Generated, unwired](../../src/ui/assets/pbr/trial-symbols-atlas/README.md) | `default` |
-| [ui-strokes-atlas.png](../../src/ui/assets/ui-strokes-atlas.png) | 1536×256 | [trials.css](../../src/ui/screens/trials.css) | [Generated, unwired](../../src/ui/assets/pbr/ui-strokes-atlas/README.md) | `cloth` |
+| [temple-symbols-atlas.png](../../src/ui/assets/temple-symbols-atlas.png) | 1254×1254 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Yes, shader available](../../src/ui/assets/pbr/temple-symbols-atlas/README.md) | `default` |
+| [trial-symbols-atlas.png](../../src/ui/assets/trial-symbols-atlas.png) | 1448×1086 | [symbol-art.ts](../../src/ui/symbol-art.ts) | [Yes, shader available](../../src/ui/assets/pbr/trial-symbols-atlas/README.md) | `default` |
+| [ui-strokes-atlas.png](../../src/ui/assets/ui-strokes-atlas.png) | 1536×256 | [trials.css](../../src/ui/screens/trials.css) | [Yes, shader available](../../src/ui/assets/pbr/ui-strokes-atlas/README.md) | `cloth` |
 | [ui-strokes-atlas.svg](../../src/ui/assets/ui-strokes-atlas.svg) | Vector | Source/reference; no direct filename reference found. | N/A | — |
-| [world-ui-atlas.png](../../src/ui/assets/world-ui-atlas.png) | 768×640 | [ui-art.ts](../../src/rendering/ui-art.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-atlas/README.md) | `cloth` |
+| [world-ui-atlas.png](../../src/ui/assets/world-ui-atlas.png) | 768×640 | [ui-art.ts](../../src/rendering/ui-art.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-atlas/README.md) | `cloth` |
 | [world-ui-atlas.svg](../../src/ui/assets/world-ui-atlas.svg) | Vector | Source/reference; no direct filename reference found. | N/A | — |
-| [world-ui-crest-aoi.png](../../src/ui/assets/world-ui-crest-aoi.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-aoi/README.md) | `cloth` |
-| [world-ui-crest-fuji.png](../../src/ui/assets/world-ui-crest-fuji.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-fuji/README.md) | `cloth` |
-| [world-ui-crest-juji.png](../../src/ui/assets/world-ui-crest-juji.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-juji/README.md) | `cloth` |
-| [world-ui-crest-kikyo.png](../../src/ui/assets/world-ui-crest-kikyo.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-kikyo/README.md) | `cloth` |
-| [world-ui-crest-rokumon.png](../../src/ui/assets/world-ui-crest-rokumon.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-rokumon/README.md) | `cloth` |
-| [world-ui-crest-tomoe.png](../../src/ui/assets/world-ui-crest-tomoe.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-tomoe/README.md) | `cloth` |
-| [world-ui-crest-tsuru.png](../../src/ui/assets/world-ui-crest-tsuru.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-crest-tsuru/README.md) | `cloth` |
-| [world-ui-material-metal.png](../../src/ui/assets/world-ui-material-metal.png) | 192×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/world-ui-material-metal/README.md) | `metal` |
-| [world-ui-material-paper.png](../../src/ui/assets/world-ui-material-paper.png) | 192×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/world-ui-material-paper/README.md) | `cloth` |
-| [world-ui-material-silk.png](../../src/ui/assets/world-ui-material-silk.png) | 192×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/world-ui-material-silk/README.md) | `cloth` |
-| [world-ui-material-stone.png](../../src/ui/assets/world-ui-material-stone.png) | 192×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/world-ui-material-stone/README.md) | `stone` |
-| [world-ui-material-wood.png](../../src/ui/assets/world-ui-material-wood.png) | 192×192 | Source/reference; no direct filename reference found. | [Generated, unwired](../../src/ui/assets/pbr/world-ui-material-wood/README.md) | `wood` |
-| [world-ui-scroll-paper.png](../../src/ui/assets/world-ui-scroll-paper.png) | 192×192 | [scroll-menus.css](../../src/ui/scroll-menus.css), [rewarded-support.css](../../src/ui/screens/rewarded-support.css) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-scroll-paper/README.md) | `cloth` |
-| [world-ui-scroll-rod.png](../../src/ui/assets/world-ui-scroll-rod.png) | 192×48 | [scroll-menus.css](../../src/ui/scroll-menus.css), [rewarded-support.css](../../src/ui/screens/rewarded-support.css) | [Generated, unwired](../../src/ui/assets/pbr/world-ui-scroll-rod/README.md) | `wood` |
+| [world-ui-crest-aoi.png](../../src/ui/assets/world-ui-crest-aoi.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-aoi/README.md) | `cloth` |
+| [world-ui-crest-fuji.png](../../src/ui/assets/world-ui-crest-fuji.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-fuji/README.md) | `cloth` |
+| [world-ui-crest-juji.png](../../src/ui/assets/world-ui-crest-juji.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-juji/README.md) | `cloth` |
+| [world-ui-crest-kikyo.png](../../src/ui/assets/world-ui-crest-kikyo.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-kikyo/README.md) | `cloth` |
+| [world-ui-crest-rokumon.png](../../src/ui/assets/world-ui-crest-rokumon.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-rokumon/README.md) | `cloth` |
+| [world-ui-crest-tomoe.png](../../src/ui/assets/world-ui-crest-tomoe.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-tomoe/README.md) | `cloth` |
+| [world-ui-crest-tsuru.png](../../src/ui/assets/world-ui-crest-tsuru.png) | 128×128 | [armory.ts](../../src/ui/screens/armory.ts) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-crest-tsuru/README.md) | `cloth` |
+| [world-ui-material-metal.png](../../src/ui/assets/world-ui-material-metal.png) | 192×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/world-ui-material-metal/README.md) | `metal` |
+| [world-ui-material-paper.png](../../src/ui/assets/world-ui-material-paper.png) | 192×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/world-ui-material-paper/README.md) | `cloth` |
+| [world-ui-material-silk.png](../../src/ui/assets/world-ui-material-silk.png) | 192×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/world-ui-material-silk/README.md) | `cloth` |
+| [world-ui-material-stone.png](../../src/ui/assets/world-ui-material-stone.png) | 192×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/world-ui-material-stone/README.md) | `stone` |
+| [world-ui-material-wood.png](../../src/ui/assets/world-ui-material-wood.png) | 192×192 | Source/reference; no direct filename reference found. | [Yes, shader available](../../src/ui/assets/pbr/world-ui-material-wood/README.md) | `wood` |
+| [world-ui-scroll-paper.png](../../src/ui/assets/world-ui-scroll-paper.png) | 192×192 | [scroll-menus.css](../../src/ui/scroll-menus.css), [rewarded-support.css](../../src/ui/screens/rewarded-support.css) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-scroll-paper/README.md) | `cloth` |
+| [world-ui-scroll-rod.png](../../src/ui/assets/world-ui-scroll-rod.png) | 192×48 | [scroll-menus.css](../../src/ui/scroll-menus.css), [rewarded-support.css](../../src/ui/screens/rewarded-support.css) | [Yes, shader available](../../src/ui/assets/pbr/world-ui-scroll-rod/README.md) | `wood` |
 
 ## Public web artwork
 
@@ -395,5 +407,7 @@ extensions, and check PBR directories, adjacent provenance and renderer sources.
 Ignored trial exports are not evidence of installed game integration.
 
 Enemy headwear provenance and wiring are documented in the enemy pack README.
-The new inventory packs remain unwired; their installation does not change the
-player outfit coverage table or imply visual approval.
+Retained source artwork is lit in Material preview rather than placed in gameplay.
+Expanded material coverage still awaits visual approval. Functional checks cover
+all 31 UI packs, nine stage caches, mirrored cached normals, procedural occlusion,
+shader colour/coverage, outfit/charm frames and the retained/original pack previews.

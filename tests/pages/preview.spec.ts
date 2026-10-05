@@ -19,6 +19,9 @@ test('branch build loads artwork, menus and standalone pages below its base path
     expect((await page.request.get(path)).ok()).toBe(true);
   }
   const base = new URL(page.url()).pathname;
+  const workers = page.workers().map((worker) => worker.url());
+  expect(workers.some((url) => /compose\.worker-.*\.js/.test(url))).toBe(true);
+  expect(workers.every((url) => new URL(url).pathname.startsWith(base))).toBe(true);
   const artwork = await page.evaluate(() =>
     performance
       .getEntriesByType('resource')

@@ -1,8 +1,13 @@
 window.__profile = {
  G, fx, frameLoop, startRun, spawnEnemy, enemyPos, killEnemy, startTrial, openPanel, closePanel, pause,
- state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0)}),
+ state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0),transitions:window.__sceneTransitions||0,renderedScenes:[...(window.__renderedScenes||[])]}),
  configure(name) {
   window.__scenario=name;
+  if(name==='scene-transitions') { window.__sceneTransitions=0; window.__nextScene=0; window.__sceneAt=performance.now()+650; }
+  if(name==='cinematic-transitions') {
+   cinematic.open(0); if(!cinematic.active) throw Error('Cinematic did not open');
+   window.__sceneTransitions=0; window.__renderedScenes=new Set(); window.__sceneAt=performance.now()+350;
+  }
   if (name==='demon') { startTrial('demon-mirror'); if(!activeTrial) throw Error('Trial did not start'); }
   else if(['combat','paused','inactive-combat','film-glitch','film-inferno','kill-effects','stress-100'].includes(name)) startRun();
   if(name==='paused') pause();
@@ -16,6 +21,21 @@ window.__profile = {
   }
  },
  beforeUpdate() {
+  if(window.__scenario==='cinematic-transitions') {
+   const scene=cvs.dataset.rendererBackend==='demon-realm'?STAGES.length:environmentRenderer.snapshot().stage;
+   const requested=Number(document.querySelector('#cinematic').dataset.scene);
+   if(window.__probe.measure) {
+    if(Number.isInteger(scene)) window.__renderedScenes.add(scene);
+   }
+   if(scene===requested && performance.now()>=window.__sceneAt) {
+    cinematic.swipe('left'); window.__sceneTransitions++; window.__sceneAt=performance.now()+350;
+   }
+  }
+  if(window.__scenario==='scene-transitions' && performance.now()>=window.__sceneAt) {
+   previewStage(window.__nextScene++%(STAGES.length+1));
+   window.__sceneTransitions++;
+   window.__sceneAt=performance.now()+650;
+  }
   if(window.__scenario==='stress-100') {G.gapT=1e9; return;}
   const e=G.attacker;
   if(e && e.state==='attack' && e.p>=.82) onSwipe(activeTrial?.mirrored?OPP[e.dir]:e.dir);

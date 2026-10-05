@@ -31,6 +31,7 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
     const loading = a.draw(ctx, frame);
     const fallbackPixel = Array.from(ctx.getImageData(0, 0, 1, 1).data);
     await Promise.all([a.prepare(), b.prepare()]);
+    await a.compose(frame);
     ctx.globalAlpha = 0.7;
     const layered = a.draw(ctx, frame);
     const alpha = ctx.globalAlpha;
@@ -40,10 +41,12 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
     a.draw(ctx, frame);
     const sameAfterSwitch = a.snapshot().builds === first.builds;
     frame = { ...frame, width: 3840, height: 2160, dpr: 3 };
+    await a.compose(frame);
     a.draw(ctx, frame);
     const desktop = a.snapshot();
     a.dispose();
     const disposed = a.snapshot();
+    await b.compose(frame);
     const other = b.draw(ctx, frame);
     b.dispose();
     return {
@@ -88,7 +91,7 @@ test('missing sprite assets report unavailable without substituted artwork', asy
     base.fillStyle = '#ff0000';
     base.fillRect(0, 0, 2, 2);
     await renderer.prepare();
-    const drawn = renderer.draw(ctx, {
+    const frame = {
       width: 10,
       height: 10,
       dpr: 1,
@@ -97,7 +100,9 @@ test('missing sprite assets report unavailable without substituted artwork', asy
       reducedMotion: false,
       reducedFlashes: false,
       lowQuality: false,
-    });
+    };
+    await renderer.compose(frame);
+    const drawn = renderer.draw(ctx, frame);
     const backend = renderer.backend;
     const pixel = Array.from(ctx.getImageData(0, 0, 1, 1).data);
     renderer.dispose();
@@ -132,6 +137,7 @@ test('ink layers retain film grading and freeze decorative motion for accessibil
       lowQuality: false,
     };
     const pixels = () => canvas.toDataURL();
+    await renderer.compose(frame);
     const render = (changes = {}) => {
       renderer.draw(ctx, { ...frame, ...changes });
       return pixels();

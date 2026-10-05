@@ -9,7 +9,7 @@
     1774,
     887
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/figures/ink-sword.ts",
   "exports": {
     "metal": {
       "jobHash": "1f4f1913a893313e7a58f9434494ab1157f639be8a5a323237971bd17f847df0",

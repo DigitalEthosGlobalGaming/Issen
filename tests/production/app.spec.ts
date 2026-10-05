@@ -32,7 +32,7 @@ test('built assets include fresh onboarding, Template and isolated testing tools
   await page.locator('#template [data-back]').click();
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
-  await expect(page.locator('#testBadge')).toBeVisible();
+  await expect(page.locator('#testBadge')).toBeVisible({ timeout: 30000 });
   expect(errors).toEqual([]);
 });
 

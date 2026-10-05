@@ -80,6 +80,20 @@ test('scenario invariants detect stress drift, dead runs and inactive simulation
   assert.throws(() => checkState('combat', {}, { state: 'dead' }), /unexpectedly/);
   assert.throws(() => checkState('inactive-combat', { time: 1 }, { time: 2 }), /advanced/);
   checkState('stress-100', { enemies: 100 }, { enemies: 100, kills: 0 });
+  assert.throws(
+    () => checkState('scene-transitions', { transitions: 2 }, { transitions: 2 }),
+    /did not change scenery/,
+  );
+  checkState('scene-transitions', { transitions: 2 }, { transitions: 3 });
+  assert.throws(
+    () => checkState('cinematic-transitions', {}, { renderedScenes: [0, 1] }),
+    /did not render/,
+  );
+  checkState(
+    'cinematic-transitions',
+    {},
+    { renderedScenes: Array.from({ length: 10 }, (_, i) => i) },
+  );
 });
 
 test('presentation guards accept settled snapshots but require animated scenes and previews', () => {

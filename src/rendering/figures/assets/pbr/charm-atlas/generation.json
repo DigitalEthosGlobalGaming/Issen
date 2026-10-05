@@ -57,7 +57,7 @@
     1536,
     1024
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/figures/ink-charms.ts",
   "exports": {
     "cloth": {
       "jobHash": "e5dd87daa0f6d18652f49c232cd0a8efea6437cb4f53094d1cdf47a3caa9c942",

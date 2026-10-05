@@ -85,6 +85,8 @@
 
 - [Artwork performance](features/rendering-performance.md): reproducible sprite stress workloads, bounded tint caches and measured results.
 - [Menu scheduling follow-up](features/performance-follow-up-2026-10-04.md): feature-release baseline, menu/preview cadence, resize preparation and validation.
+- [PBR performance follow-up](features/pbr-performance-2026-10-05.md): expanded material coverage,
+  measured loading/composition improvements and remaining cold scene stalls.
 
 - [Drifting debris](features/drifting-debris.md): stage sprite mixtures and legacy preference migration.
 - [Sword and Sumi lighting](features/sword-lighting.md): PBR atlas maps, shader response and tilde lighting controls.

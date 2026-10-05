@@ -12,15 +12,13 @@ import {
   SPECIAL_FRAMES,
 } from './blade-recipes.ts';
 type Family = 'blades' | 'hilts' | 'special';
-type MapKind = 'normal' | 'roughness' | 'metallic' | 'ao' | 'emissive';
+type MapKind = 'normal' | 'surface' | 'emissive';
 type SourceKind = Family | MapKind;
 type Frame = readonly [number, number, number, number];
 const SOURCES = {
   blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.png', import.meta.url).href,
   normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.png', import.meta.url).href,
-  roughness: new URL('./assets/blade-pbr/blade-profile-atlas_roughness.png', import.meta.url).href,
-  metallic: new URL('./assets/blade-pbr/blade-profile-atlas_metallic.png', import.meta.url).href,
-  ao: new URL('./assets/blade-pbr/blade-profile-atlas_ao.png', import.meta.url).href,
+  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.png', import.meta.url).href,
   emissive: new URL('./assets/blade-pbr/blade-profile-atlas_emissive.png', import.meta.url).href,
   hilts: new URL('./assets/handle-guard-atlas.png', import.meta.url).href,
   special: new URL('./assets/special-weapons-atlas.png', import.meta.url).href,
@@ -29,13 +27,15 @@ const SOURCES = {
 export function createInkSwordRenderer(doc: Document) {
   const fittings = createAssetMaterials(doc, { hilts: SOURCES.hilts, special: SOURCES.special });
   const materials = new Map<number, SceneMaterial>();
-  const surface = doc.createElement('canvas');
+  const surface = doc.createElement('img');
   const images = new Map<SourceKind, HTMLImageElement>(),
     loaded = new Set<SourceKind>(),
     cache = new Map<string, HTMLCanvasElement>(),
     finish = new Set<() => void>();
   let disposed = false,
     pending: Promise<void> | undefined;
+  const pbrReady = () =>
+    !disposed && ['normal', 'surface', 'emissive'].every((kind) => loaded.has(kind as MapKind));
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
@@ -43,7 +43,7 @@ export function createInkSwordRenderer(doc: Document) {
       (Object.keys(SOURCES) as SourceKind[]).map(
         (family) =>
           new Promise<void>((resolve) => {
-            const im = doc.createElement('img');
+            const im = family === 'surface' ? surface : doc.createElement('img');
             images.set(family, im);
             const done = () => {
               im.onload = null;
@@ -63,28 +63,6 @@ export function createInkSwordRenderer(doc: Document) {
       ),
     ).then(async () => {
       await fittings.prepare();
-      if (
-        disposed ||
-        !['normal', 'roughness', 'metallic', 'ao', 'emissive'].every((kind) =>
-          loaded.has(kind as MapKind),
-        )
-      )
-        return;
-      surface.width = surface.height = 1254;
-      const g = surface.getContext('2d')!;
-      const channels = (['roughness', 'metallic', 'ao'] as const).map((kind) => {
-        g.clearRect(0, 0, 1254, 1254);
-        g.drawImage(images.get(kind)!, 0, 0);
-        return g.getImageData(0, 0, 1254, 1254).data;
-      });
-      const packed = g.createImageData(1254, 1254);
-      for (let i = 0; i < packed.data.length; i += 4) {
-        packed.data[i] = channels[0]![i]!;
-        packed.data[i + 1] = channels[1]![i]!;
-        packed.data[i + 2] = channels[2]![i]!;
-        packed.data[i + 3] = 255;
-      }
-      g.putImageData(packed, 0, 0);
     });
     return pending;
   }
@@ -230,7 +208,7 @@ export function createInkSwordRenderer(doc: Document) {
       g.rotate(Math.atan2(ty, tx) - Math.atan2(dy, dx));
       const x = -(profile.root[0] - profile.frame[0]) * s,
         y = -(profile.root[1] - profile.frame[1]) * s;
-      if (surface.width === 1254 && supportsSceneMaterials(g)) {
+      if (pbrReady() && supportsSceneMaterials(g)) {
         let material = materials.get(recipe.profile);
         if (!material) {
           material = {
@@ -265,7 +243,7 @@ export function createInkSwordRenderer(doc: Document) {
     get ready() {
       return (
         loaded.size === Object.keys(SOURCES).length &&
-        surface.width === 1254 &&
+        pbrReady() &&
         fittings.ready('hilts') &&
         fittings.ready('special')
       );
@@ -273,7 +251,7 @@ export function createInkSwordRenderer(doc: Document) {
     snapshot: () => ({
       loaded: [...loaded],
       cachedParts: cache.size,
-      pbrReady: surface.width === 1254,
+      pbrReady: pbrReady(),
       disposed,
     }),
     dispose() {

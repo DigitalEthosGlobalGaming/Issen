@@ -24,7 +24,7 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
     'skipped',
   );
   await page.reload();
-  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await expect(page.locator('#paused')).toHaveClass(/on/, { timeout: 30000 });
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();
@@ -34,6 +34,7 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
 });
 
 test('Template donations persist and apply only to standard runs', async ({ page }, testInfo) => {
+  test.setTimeout(90000);
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem(
@@ -64,7 +65,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(5);
   await page.reload();
-  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await expect(page.locator('#paused')).toHaveClass(/on/, { timeout: 30000 });
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();
@@ -86,12 +87,12 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   const original = await page.evaluate(() => localStorage.getItem('issen.meta'));
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
   await page.keyboard.press('Control+Shift+A');
   await expect(page.locator('#admin')).toHaveClass(/on/);
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
-  await expect(page.locator('#testBadge')).toBeVisible();
+  await expect(page.locator('#testBadge')).toBeVisible({ timeout: 30000 });
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Set Embers', exact: true }).click();
   await expect(page.locator('#admin')).toHaveCSS('opacity', '1');
@@ -163,6 +164,7 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })

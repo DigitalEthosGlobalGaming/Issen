@@ -2,9 +2,12 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Leaf } from './ambient.ts';
 import { DRIFT_ATLASES as urls, DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 
 /** One retained path and decoded atlas images per runtime; no per-frame image processing. */
-export function createDriftRenderer() {
+export function createDriftRenderer(doc: Document = document) {
+  const materials = createAssetMaterials(doc, urls);
   const images = new Map<string, HTMLImageElement>();
   let disposed = false;
   let pending: Promise<void> | undefined;
@@ -20,26 +23,29 @@ export function createDriftRenderer() {
     const width = size * sprite.size,
       height = (width * sh) / sw;
     g.globalAlpha *= opacity * sprite.opacity;
-    g.drawImage(
-      image,
-      sx,
-      sy,
-      sw,
-      sh,
-      -width * sprite.pivot[0],
-      -height * sprite.pivot[1],
-      width,
-      height,
-    );
+    const frame = [sx, sy, sw, sh] as const;
+    const material = materials.material(sprite.atlas, frame);
+    const dx = -width * sprite.pivot[0],
+      dy = -height * sprite.pivot[1];
+    if (material)
+      drawMaterialStamp(g, {
+        texture: { source: image, revision: 0, frame },
+        material,
+        x: dx,
+        y: dy,
+        width,
+        height,
+      });
+    else g.drawImage(image, ...frame, dx, dy, width, height);
   }
   return {
     get ready() {
-      return images.size === Object.keys(urls).length;
+      return images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
     },
     prepare() {
       return (pending ??= Promise.all(
         Object.entries(urls).map(async ([id, url]) => {
-          const image = new Image();
+          const image = doc.createElement('img');
           image.src = url;
           try {
             await image.decode();
@@ -48,7 +54,9 @@ export function createDriftRenderer() {
             /* Runtime startup reports missing artwork and offers retry. */
           }
         }),
-      ).then(() => {}));
+      ).then(async () => {
+        await materials.prepare();
+      }));
     },
     draw(g: SceneDrawing, leaf: Leaf) {
       paint(g, leaf.sprite ?? 'leaves.willow', leaf.s * 3, leaf.z > 1.25 ? 0.6 : 0.9);
@@ -67,6 +75,8 @@ export function createDriftRenderer() {
     },
     dispose() {
       disposed = true;
+      materials.dispose();
+      for (const image of images.values()) image.removeAttribute('src');
       images.clear();
     },
   };

@@ -27,9 +27,13 @@ checks are independent of earned unlocks/ranks. See
 ## Startup and ownership
 
 Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
-shell and screen fragments after every bundled image loads and decodes, then calls
+shell and screen fragments after source artwork loads and decodes, then calls
 `startGame()` in `src/game.ts`. Startup loading/progress and retry are owned by
 `platform/artwork-preload.ts` and `ui/startup-loading.ts`.
+Generated PBR maps are excluded from this lifetime preloader. Material owners
+decode selected packs, release departed packs, and retain shared scenery packs
+across scene changes. UI textures use a separate owned shader surface and share
+the session lighting rig with startup and gameplay.
 The returned disposer stops the runtime. `main.ts` removes the mounted root and
 registers disposal with Vite HMR before a replacement instance starts.
 
@@ -216,6 +220,15 @@ Environment composition modules cover all nine stages. The router loads only
 the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
 handles native-aspect frames, ground anchors and contact fades. Runtime weather
 and final film grading remain separate from image assets.
+
+Since 1.66.0, `environment/index.ts` selects a renderer-owned module worker when
+Worker and OffscreenCanvas are available. `local-renderer.ts` composes colour and
+material depth planes; `compose.worker.ts` transfers owned ImageBitmaps back to
+`worker-renderer.ts`. One completed composition remains drawable while the latest
+queued stage/size is prepared. Superseded requests coalesce, inactive owners defer
+new work, and disposal closes bitmaps and terminates the worker. The explicit local
+renderer remains the unsupported/failed-worker fallback. Cosmetic motion stays on
+the presentation clock; the worker does not own gameplay or animation loops.
 
 Ink is the rendering path for all nine environments and migrated figures,
 weapons, charms, and companions. Runtime and armoury canvases own separate

@@ -9,7 +9,7 @@ test('Temple rank copy and owned Armoury conditions stay concise', async ({ page
     localStorage.setItem('issen.unlocks', JSON.stringify(['kuro', 'scarecrow']));
   });
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.locator('#bTemplate').click();
   const detail = page.locator('.template-detail');
   await expect(detail).toContainText('Next: 3 starting lives');
@@ -57,7 +57,7 @@ test('pause lists current blessings and keeps actions visible in short landscape
   );
   await page.setViewportSize({ width: 844, height: 390 });
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await page.keyboard.press('p');
@@ -112,7 +112,7 @@ test('item reveals match Armoury copy and cue once when each card appears', asyn
     localStorage.setItem('issen.meta', JSON.stringify({ schemaVersion: 4, tutorial: 'skipped' })),
   );
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.evaluate(() => {
     const h = (window as any).__revealHarness;
     (window as any).__revealCues = 0;

@@ -1,4 +1,5 @@
 import type { SceneDrawing } from './scene-drawing.ts';
+import { drawCachedImage } from './cached-materials.ts';
 export function roomWindow(
   width: number,
   height: number,
@@ -27,7 +28,15 @@ export function drawArmoryRoom(
     const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
     const dw = room.naturalWidth * zoom,
       dh = room.naturalHeight * zoom;
-    g.drawImage(room, (width - dw) / 2, (height - dh) / 2, dw, dh);
+    drawCachedImage(
+      g,
+      room,
+      [0, 0, room.naturalWidth, room.naturalHeight],
+      (width - dw) / 2,
+      (height - dh) / 2,
+      dw,
+      dh,
+    );
     return;
   }
   const strips = [
@@ -42,12 +51,10 @@ export function drawArmoryRoom(
       scale = Math.max(dw / sw, height / sh);
     const cropW = dw / scale,
       cropH = height / scale;
-    g.drawImage(
+    drawCachedImage(
+      g,
       room,
-      room.naturalWidth * sourceX + (sw - cropW) / 2,
-      (sh - cropH) / 2,
-      cropW,
-      cropH,
+      [room.naturalWidth * sourceX + (sw - cropW) / 2, (sh - cropH) / 2, cropW, cropH],
       width * targetX,
       0,
       dw,

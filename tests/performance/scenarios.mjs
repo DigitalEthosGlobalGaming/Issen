@@ -43,6 +43,15 @@ export async function configure(page, scenario) {
 
 export function checkState(scenario, initial, final) {
   if (
+    scenario === 'cinematic-transitions' &&
+    (final.renderedScenes?.length !== 10 || !final.renderedScenes.includes(9))
+  )
+    throw Error(
+      `Cinematic fixture did not render all nine stages and Demon during measurement: ${JSON.stringify(final)}`,
+    );
+  if (scenario === 'scene-transitions' && final.transitions - initial.transitions < 1)
+    throw Error('Scene-transition fixture did not change scenery');
+  if (
     scenario === 'stress-100' &&
     (initial.enemies !== 100 || final.enemies !== 100 || final.kills !== 0)
   )

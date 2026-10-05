@@ -135,7 +135,8 @@ void main() {
     result += toLinear(clamp(emission.rgb / max(emission.a, 0.0001) * tint, 0.0, 1.0));
   } else if (!usePBR) result += albedo * mask.b;
   vec3 display = toDisplay(highlightRolloff(result));
-  vec3 lit = mix(original, display, clamp(uMaterial.x, 0.0, 1.0));
+  float coverage = uHasSurface > 1.5 ? texture(uSurface, uSurfaceRect.xy + vUV * uSurfaceRect.zw).a : 1.0;
+  vec3 lit = mix(original, display, clamp(uMaterial.x * coverage, 0.0, 1.0));
   // Tint belongs to the surface, not the mist. Coverage remains premultiplied.
   lit = mix(lit, uFog.rgb, clamp(uFog.a, 0.0, 1.0));
   finalColor = vec4(lit * alpha, alpha);
@@ -194,8 +195,15 @@ export function createMaterialMesh() {
   const matrix = new Matrix();
   const selected: (SceneLighting['points'][number] | undefined)[] = new Array(4);
   const scores = new Float64Array(4);
+  let texturesBound = false;
   return {
     mesh,
+    releaseTextures(): void {
+      if (!texturesBound) return;
+      for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'])
+        shader.resources[name] = Texture.WHITE.source;
+      texturesBound = false;
+    },
     update(sprite: SceneSprite, lights: SceneLighting, textures: SceneTextureStore): void {
       const material = sprite.material!;
       const diffuse = textures.get(sprite.texture);
@@ -208,6 +216,7 @@ export function createMaterialMesh() {
       shader.resources.uMask = mask.source;
       shader.resources.uSurface = surface.source;
       shader.resources.uEmissive = emissive.source;
+      texturesBound = true;
       const u = uniforms.uniforms;
       setUvRect(u.uDiffuseRect, diffuse);
       setUvRect(u.uNormalRect, normal);
@@ -278,7 +287,7 @@ export function createMaterialMesh() {
       for (let j = 0; j < 3; j++) u.uFog[j] = material.fogColor[j]!;
       u.uFog[3] = material.fog;
       u.uHasMask = material.mask ? 1 : 0;
-      u.uHasSurface = material.surface ? 1 : 0;
+      u.uHasSurface = material.surface ? (material.surfaceCoverage ? 2 : 1) : 0;
       u.uHasEmissive = material.emissive ? 1 : 0;
       uniforms.update();
       const t = sprite.transform;

@@ -9,7 +9,7 @@
     1254,
     1254
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/figures/outfit-kit.ts",
   "exports": {
     "polished-wood": {
       "jobHash": "64e9be50d56e26f96b6b51dd30ffd6d2dcbda6fcf5498b300b4cd1579de10fbe",

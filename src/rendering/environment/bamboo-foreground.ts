@@ -1,4 +1,9 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import {
+  drawCachedImage,
+  clearCachedMaterial,
+  cachedMaterialContext,
+} from '../cached-materials.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import type { EnvironmentFrame } from './index.ts';
@@ -10,12 +15,15 @@ export function createBambooForegroundRenderer(doc: Document) {
   let source: HTMLImageElement | undefined;
   let disposed = false;
   function release() {
-    for (const layer of layers) layer.width = layer.height = 0;
+    for (const layer of layers) {
+      clearCachedMaterial(layer);
+      layer.width = layer.height = 0;
+    }
     layers = [];
     key = '';
     source = undefined;
   }
-  function draw(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
+  function prepare(atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
     const { width, height } = frame;
     if (
       disposed ||
@@ -41,12 +49,13 @@ export function createBambooForegroundRenderer(doc: Document) {
         const canvas = doc.createElement('canvas');
         canvas.width = Math.max(1, Math.floor(edge * density));
         canvas.height = Math.max(1, Math.floor(height * density));
-        const g = canvas.getContext('2d');
-        if (!g) {
+        const nativeContext = canvas.getContext('2d');
+        if (!nativeContext) {
           canvas.width = canvas.height = 0;
           release();
           return false;
         }
+        const g = cachedMaterialContext(nativeContext);
         layers.push(canvas);
         g.scale(canvas.width / edge, canvas.height / height);
         // Draw one whole clump per side. Its root is below the viewport; no ground plate.
@@ -79,18 +88,37 @@ export function createBambooForegroundRenderer(doc: Document) {
       key = next;
       source = atlas;
     }
+    return true;
+  }
+  function draw(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
+    if (!prepare(atlas, frame)) return false;
+    const { width, height } = frame;
+    const edge = width * (height >= width * 0.9 ? 0.2 : 0.24);
     const time = frame.reducedMotion || frame.reducedFlashes ? 0 : frame.time;
     ctx.save();
     // Tiny outer-edge breathing; no RNG, gameplay clock or weather state changes.
     for (let side = 0; side < 2; side++) {
       const outward = Math.sin(time * 0.48 + side * 1.4) * Math.min(width * 0.002, 2);
-      ctx.drawImage(layers[side]!, side ? width - edge + outward : -outward, 0, edge, height);
+      const layer = layers[side]!;
+      drawCachedImage(
+        ctx,
+        layer,
+        [0, 0, layer.width, layer.height],
+        side ? width - edge + outward : -outward,
+        0,
+        edge,
+        height,
+      );
     }
     ctx.restore();
     return true;
   }
   return {
     draw,
+    prepare,
+    get layers() {
+      return layers;
+    },
     snapshot: () => ({
       layers: layers.length,
       pixels: layers.reduce((n, c) => n + c.width * c.height, 0),

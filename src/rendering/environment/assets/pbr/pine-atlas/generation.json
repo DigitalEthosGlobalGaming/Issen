@@ -9,7 +9,7 @@
     1254,
     1254
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/environment/index.ts",
   "exports": {
     "wood": {
       "jobHash": "5f455af6066c0a44281515fbcb65176f4fc47cee7d4a33ffdc7017995c3b84db",

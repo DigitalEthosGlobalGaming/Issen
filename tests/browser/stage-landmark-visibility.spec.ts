@@ -24,20 +24,19 @@ for (const viewport of [
           const pixels: Uint8ClampedArray[] = [];
           for (const stageSeed of [0, 1]) {
             context.clearRect(0, 0, width, height);
-            if (
-              !renderer.draw(context, {
-                width,
-                height,
-                dpr: 1,
-                time: 0,
-                stage,
-                stageSeed,
-                reducedMotion: true,
-                reducedFlashes: true,
-                lowQuality: false,
-              })
-            )
-              throw new Error(`Scene ${stage} did not load`);
+            const frame = {
+              width,
+              height,
+              dpr: 1,
+              time: 0,
+              stage,
+              stageSeed,
+              reducedMotion: true,
+              reducedFlashes: true,
+              lowQuality: false,
+            };
+            await renderer.compose(frame);
+            if (!renderer.draw(context, frame)) throw new Error(`Scene ${stage} did not load`);
             pixels.push(context.getImageData(0, 0, width, height).data);
           }
           let changed = 0;

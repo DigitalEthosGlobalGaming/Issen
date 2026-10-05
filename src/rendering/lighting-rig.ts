@@ -12,9 +12,26 @@ export function createLightingRig() {
     enabled: true,
     color: '#fff0d8',
   };
-  const state = { ...defaults };
+  const listeners = new Set<() => void>();
+  const state = new Proxy(
+    { ...defaults },
+    {
+      set(target, property, value) {
+        const previous = Reflect.get(target, property);
+        const changed = Reflect.set(target, property, value);
+        if (changed && previous !== value) for (const listener of listeners) listener();
+        return changed;
+      },
+    },
+  );
   return {
     state,
+    subscribe(listener: () => void) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
     reset() {
       Object.assign(state, defaults);
     },

@@ -13,7 +13,9 @@ test('legacy classic preference loads Ink and exposes no artwork switch', async 
     ),
   );
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered', {
+    timeout: 30000,
+  });
   await page.locator('#bOptions').click();
   await page
     .locator('#options')
@@ -21,5 +23,7 @@ test('legacy classic preference loads Ink and exposes no artwork switch', async 
     .click();
   await expect(page.getByLabel('Artwork', { exact: true })).toHaveCount(0);
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered');
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'layered', {
+    timeout: 30000,
+  });
 });

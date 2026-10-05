@@ -9,7 +9,7 @@
     1254,
     1254
   ],
-  "renderer": "not connected",
+  "renderer": "src/ui/material-lighting.ts",
   "exports": {
     "cloth": {
       "jobHash": "b5fe76201d3b9a0e3ba900e3697bdd160e54068377eb681729d3355ed4dd4d20",
@@ -49,5 +49,6 @@
         }
       }
     }
-  }
+  },
+  "coverage": "Material preview only; retained artwork is not placed in gameplay."
 }

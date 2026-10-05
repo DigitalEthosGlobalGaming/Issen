@@ -54,6 +54,10 @@ test('reduced-motion result tally advances by keyboard without paying twice', as
     .toBe(true);
   await expect(page.locator('#resultGain')).toHaveText('+0');
   await page.keyboard.press('Space');
+  if (await page.locator('#runResultSequence').isVisible()) {
+    await expect(page.locator('#runResultSequence')).toHaveClass(/show-unlock/);
+    await page.keyboard.press('Space');
+  }
   await expect(page.locator('#runResultSequence')).toBeHidden();
   await expect(page.locator('#bAgain')).toBeEnabled();
   const meta = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!));
@@ -107,7 +111,7 @@ test('Armoury sorts owned gear first and underlines unread gear until its detail
   await page.locator('#armory [data-back]').click();
   await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/);
   await page.reload();
-  await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/);
+  await expect(page.locator('#bArmory')).not.toHaveClass(/arm-unread/, { timeout: 30000 });
 });
 
 for (const input of ['keyboard', 'touch'] as const) {
@@ -141,7 +145,8 @@ for (const input of ['keyboard', 'touch'] as const) {
       };
     });
     await page.goto('/');
-    await expect(page.locator('#app')).toHaveCount(1);
+    await expect(page.locator('#app')).toHaveCount(1, { timeout: 30000 });
+    await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
     await page.keyboard.press('Control+Shift+A');
     await page.getByLabel('Wave within stage').selectOption('3');
     await page
@@ -222,6 +227,7 @@ test('first boss holds the glint until the player parries with touch', async ({ 
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })

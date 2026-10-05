@@ -97,20 +97,19 @@ for (const viewport of [
         const g = canvas.getContext('2d');
         if (stage < 9) {
           await renderer.prepare(stage);
-          if (
-            !renderer.draw(g, {
-              width: canvas.width,
-              height: canvas.height,
-              dpr: 1,
-              time: 0,
-              stage,
-              stageSeed: 3,
-              reducedMotion: true,
-              reducedFlashes: true,
-              lowQuality: false,
-            })
-          )
-            throw new Error(`Stage ${stage} unavailable`);
+          const frame = {
+            width: canvas.width,
+            height: canvas.height,
+            dpr: 1,
+            time: 0,
+            stage,
+            stageSeed: 3,
+            reducedMotion: true,
+            reducedFlashes: true,
+            lowQuality: false,
+          };
+          await renderer.compose(frame);
+          if (!renderer.draw(g, frame)) throw new Error(`Stage ${stage} unavailable`);
         } else {
           for (let i = 0; !demon.draw(g, canvas.width, canvas.height, 0, true, 131304); i++) {
             if (i > 40) throw new Error('Demon assets unavailable');

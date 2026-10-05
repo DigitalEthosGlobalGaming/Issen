@@ -9,7 +9,7 @@
     1254,
     1254
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/environment/demon-realm.ts",
   "exports": {
     "stone": {
       "jobHash": "bcc74f159beb1b2d6f7e6cae858bd4cbeb1f1698d468df579804f66b3daba770",

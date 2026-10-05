@@ -53,6 +53,7 @@ const URLS = {
 };
 const PBR_SOURCES = {
   base: {
+    surface: new URL('./assets/enemy-pbr/enemy-ronin-simple_surface.png', import.meta.url).href,
     diffuse: new URL('./assets/enemy-pbr/enemy-ronin-simple_diffuse.png', import.meta.url).href,
     normal: new URL('./assets/enemy-pbr/enemy-ronin-simple_normal.png', import.meta.url).href,
     roughness: new URL('./assets/enemy-pbr/enemy-ronin-simple_roughness.png', import.meta.url).href,
@@ -61,6 +62,8 @@ const PBR_SOURCES = {
     emissive: new URL('./assets/enemy-pbr/enemy-ronin-simple_emissive.png', import.meta.url).href,
   },
   clothing: {
+    surface: new URL('./assets/enemy-pbr/enemy-clothing-variants_surface.png', import.meta.url)
+      .href,
     diffuse: new URL('./assets/enemy-pbr/enemy-clothing-variants_diffuse.png', import.meta.url)
       .href,
     normal: new URL('./assets/enemy-pbr/enemy-clothing-variants_normal.png', import.meta.url).href,
@@ -73,6 +76,7 @@ const PBR_SOURCES = {
       .href,
   },
   heads: {
+    surface: new URL('./assets/enemy-pbr/enemy-headwear-atlas_surface.png', import.meta.url).href,
     diffuse: new URL('./assets/enemy-pbr/enemy-headwear-atlas_diffuse.png', import.meta.url).href,
     normal: new URL('./assets/enemy-pbr/enemy-headwear-atlas_normal.png', import.meta.url).href,
     roughness: new URL('./assets/enemy-pbr/enemy-headwear-atlas_roughness.png', import.meta.url)
@@ -82,6 +86,8 @@ const PBR_SOURCES = {
     emissive: new URL('./assets/enemy-pbr/enemy-headwear-atlas_emissive.png', import.meta.url).href,
   },
   variationHeads: {
+    surface: new URL('./assets/enemy-pbr/enemy-headwear-variants_surface.png', import.meta.url)
+      .href,
     diffuse: new URL('./assets/enemy-pbr/enemy-headwear-variants_diffuse.png', import.meta.url)
       .href,
     normal: new URL('./assets/enemy-pbr/enemy-headwear-variants_normal.png', import.meta.url).href,
@@ -293,6 +299,7 @@ export function createInkEnemyRenderer(doc: Document) {
     const material =
       (cloth ||
         key === 'head' ||
+        key === 'hand' ||
         familyFor(key) === 'heads' ||
         familyFor(key) === 'variationHeads') &&
       supportsSceneMaterials(g)

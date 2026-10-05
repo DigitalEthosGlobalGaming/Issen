@@ -85,7 +85,8 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!(window as any).__deathHarness);
-  const results = await page.evaluate(() => {
+  const results = await page.evaluate(async () => {
+    const { registerMaterialSink } = await import('/src/rendering/scene-material.ts');
     const { G, frameLoop, drawEnemy, updateEnemies } = (window as any).__deathHarness;
     frameLoop.stop();
     const source = G.enemies[0];
@@ -93,6 +94,12 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
       fill = ctx.fill;
     let shadows: { alpha: number; transform: number[] }[] = [],
       bodyFills = 0;
+    registerMaterialSink(ctx, {
+      draw: () => {
+        bodyFills++;
+      },
+      lights: () => {},
+    });
     ctx.fill = function (...args: any[]) {
       if (this.fillStyle === 'rgba(0, 0, 0, 0.25)' || this.fillStyle === 'rgba(0,0,0,.25)') {
         const m = this.getTransform();

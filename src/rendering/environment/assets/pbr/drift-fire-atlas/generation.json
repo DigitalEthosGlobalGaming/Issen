@@ -10,7 +10,7 @@
     1774,
     887
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/scene/drift-renderer.ts",
   "exports": {
     "default": {
       "jobHash": "01feacad59e166aa715e678539627704c415a5293a1fa3f9879a95b0ac39accb",

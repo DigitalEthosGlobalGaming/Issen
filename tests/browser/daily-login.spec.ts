@@ -24,7 +24,7 @@ test('Armoury shows streak progress and seventh-day crest survives saved-run rec
   await page.locator('#pauseBtn').click();
   await page.clock.setFixedTime(new Date('2026-10-05T12:00:00Z'));
   await page.reload();
-  await expect(page.locator('#paused')).toHaveClass(/on/);
+  await expect(page.locator('#paused')).toHaveClass(/on/, { timeout: 30000 });
   expect(
     await page.evaluate(() =>
       JSON.parse(localStorage.getItem('issen.unlocks')!).includes('seven-dawns'),

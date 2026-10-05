@@ -104,6 +104,7 @@ test('Tanto intercepts attacks, exhausts charges and preserves the boss victory 
     boss: { hp: 0, state: 'dying' },
   });
   await page.reload();
+  await page.waitForFunction(() => !!window.__tanto);
   await expect(page.locator('#paused')).toHaveClass(/on/);
   expect(
     await page.evaluate(() => {

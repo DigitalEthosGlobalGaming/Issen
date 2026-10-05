@@ -9,7 +9,7 @@
     128,
     128
   ],
-  "renderer": "not connected",
+  "renderer": "src/ui/material-lighting.ts",
   "exports": {
     "cloth": {
       "jobHash": "82e20168b68d3139ec33ffde84918f5b0f5a3c4ca39bd100ca80cebc0a81a55a",
@@ -49,5 +49,6 @@
         }
       }
     }
-  }
+  },
+  "coverage": "CSS/IMG textures and material preview; atlas seal/crest draws also use ui-art.ts."
 }

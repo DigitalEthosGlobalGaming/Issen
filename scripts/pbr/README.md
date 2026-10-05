@@ -105,6 +105,20 @@ Install the validated six-map packs with Python 3 and Pillow available:
 python scripts/pbr/install-packs.py
 ```
 
+Installation also runs `pack-surfaces.mjs` using the installed Playwright browser
+(Edge by default; `PBR_BROWSER_CHANNEL` can override it). Each `_surface.png`
+packs roughness, metallic and AO into RGB with opaque alpha. The tool verifies
+every pixel against the former browser packing path. The six exported maps remain
+available for editing; runtime owners load the packed surface instead of decoding
+and combining three scalar maps during scene changes.
+
+To refresh packed textures after manually editing any scalar map:
+
+```powershell
+node scripts/pbr/pack-surfaces.mjs
+node scripts/pbr/update-runtime-catalog.mjs
+```
+
 The installer checks source hashes, ZIP checksums, dimensions, diffuse alpha,
 applied settings, processing mode and normal convention before installing each
 pack. Catalog frame compositions are applied to all six maps. Each destination
@@ -190,6 +204,18 @@ defaults may change; a preset records selected values rather than pinning the
 whole application version.
 
 ## Tests
+
+After installing or adding packs, refresh the shader catalog:
+
+```powershell
+node scripts/pbr/update-runtime-catalog.mjs
+```
+
+The catalog includes the 80 generated inventory packs and six previously installed
+packs listed under `installed` in `asset-packs.json`. Those six are catalog
+records, not new generation jobs. Open the tilde Lighting panel and choose
+Material preview to inspect any pack under the shared light, including retained
+source art that is not placed in gameplay.
 
 ```powershell
 node --test scripts/pbr/tests/cli.test.mjs

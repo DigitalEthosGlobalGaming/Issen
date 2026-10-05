@@ -41,6 +41,7 @@ for (const [width, height] of [
             reducedFlashes: true,
             lowQuality: false,
           };
+          await environment.compose(frame);
           painter.begin();
           canvas.clearRect(0, 0, width, height);
           if (!environment.draw(painter, frame) || !environment.draw(canvas, frame))

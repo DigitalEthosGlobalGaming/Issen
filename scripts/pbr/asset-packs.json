@@ -569,5 +569,37 @@
       "mode": "sprite",
       "output": "src/ui/assets/pbr/world-ui-scroll-rod"
     }
+  ],
+  "installed": [
+    {
+      "source": "src/rendering/figures/assets/blade-profile-atlas.png",
+      "output": "src/rendering/figures/assets/blade-pbr",
+      "dimensions": [1254, 1254]
+    },
+    {
+      "source": "src/rendering/figures/assets/player-ronin-simple.png",
+      "output": "src/rendering/figures/assets/player-pbr",
+      "dimensions": [1254, 1254]
+    },
+    {
+      "source": "src/rendering/figures/assets/enemy-ronin-simple.png",
+      "output": "src/rendering/figures/assets/enemy-pbr",
+      "dimensions": [1254, 1254]
+    },
+    {
+      "source": "src/rendering/figures/assets/enemy-clothing-variants.png",
+      "output": "src/rendering/figures/assets/enemy-pbr",
+      "dimensions": [1536, 1024]
+    },
+    {
+      "source": "src/rendering/figures/assets/enemy-headwear-atlas.png",
+      "output": "src/rendering/figures/assets/enemy-pbr",
+      "dimensions": [1536, 1024]
+    },
+    {
+      "source": "src/rendering/figures/assets/enemy-headwear-variants.png",
+      "output": "src/rendering/figures/assets/enemy-pbr",
+      "dimensions": [1254, 1254]
+    }
   ]
 }

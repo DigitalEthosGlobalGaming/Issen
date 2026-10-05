@@ -9,7 +9,7 @@
     2172,
     724
   ],
-  "renderer": "not connected",
+  "renderer": "src/ui/material-lighting.ts",
   "exports": {
     "metal": {
       "jobHash": "e3a8373c4eefb122cb2dc4be3fd9f94cb77f7ff07e47b90a30449cf5843fffa8",
@@ -49,5 +49,6 @@
         }
       }
     }
-  }
+  },
+  "coverage": "Material preview only; retained artwork is not placed in gameplay."
 }

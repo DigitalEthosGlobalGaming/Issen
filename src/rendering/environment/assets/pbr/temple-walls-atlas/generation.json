@@ -9,7 +9,7 @@
     2172,
     724
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/environment/index.ts",
   "exports": {
     "stone": {
       "jobHash": "cbf9c2fa0b4eba20c02d558278699bd52702ca03fa27c5956230543ace8caf24",

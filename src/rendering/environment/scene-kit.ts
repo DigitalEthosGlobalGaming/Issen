@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { drawCachedImage } from '../cached-materials.ts';
 /** Shared cached-composition helper. Source atlases remain untouched. */
 export interface SpritePlacement {
   frame?: { x: number; y: number; width: number; height: number };
@@ -139,7 +140,15 @@ export function drawAtlasSprite(
   ctx.translate(x, foot);
   ctx.rotate(placement.angle ?? 0);
   ctx.scale(placement.flip ? -1 : 1, 1);
-  if (cutout) ctx.drawImage(cutout, -width * ax, -height * ay, width, height);
-  else ctx.drawImage(image, sx, sy, sw, sh, -width * ax, -height * ay, width, height);
+  drawCachedImage(
+    ctx,
+    image,
+    [sx, sy, sw, sh],
+    -width * ax,
+    -height * ay,
+    width,
+    height,
+    cutout ?? undefined,
+  );
   ctx.restore();
 }

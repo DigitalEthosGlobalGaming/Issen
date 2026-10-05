@@ -4,12 +4,29 @@ import {
   createInkCompanionRenderer,
   INK_COMPANION_FRAMES,
 } from '../../src/rendering/figures/ink-companions.ts';
+import { assetMaterialCatalog } from '../../src/rendering/asset-material-catalog.ts';
 
 function fixture() {
   const images = [];
   const renderer = createInkCompanionRenderer({
-    createElement() {
-      const image = { naturalWidth: 0, naturalHeight: 0, removeAttribute() {} };
+    createElement(tag) {
+      if (tag === 'canvas') return { width: 0, height: 0 };
+      const image = {
+        naturalWidth: 0,
+        naturalHeight: 0,
+        onload: null,
+        onerror: null,
+        removeAttribute() {
+          delete this.src;
+        },
+        async decode() {
+          const pack = assetMaterialCatalog.find((pack) =>
+            Object.values(pack.maps).includes(this.src),
+          );
+          assert.ok(pack, `Unexpected material URL: ${this.src}`);
+          [this.naturalWidth, this.naturalHeight] = pack.dimensions;
+        },
+      };
       images.push(image);
       return image;
     },
@@ -45,15 +62,14 @@ function context() {
 test('each rig composes four native-aspect parts, animates joints and freezes accessibility poses', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
-  assert.equal(images.length, 2);
+  assert.equal(images.filter((i) => !i.src.includes('/pbr/')).length, 2);
   const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
   rock.naturalWidth = 1145;
   rock.naturalHeight = 1373;
   rock.onload();
-  images.reverse();
-  assert.match(images[0].src, /companion-parts-atlas.png$/);
-  images[0].naturalWidth = images[0].naturalHeight = 1254;
-  images[0].onload();
+  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.png'));
+  parts.naturalWidth = parts.naturalHeight = 1254;
+  parts.onload();
   await pending;
   for (const type of ['shiba', 'cat', 'crow']) {
     const a = context(),
@@ -88,16 +104,17 @@ test('disposing during companion loading settles preparation and releases callba
   for (const image of images) {
     assert.equal(image.onload, null);
     assert.equal(image.onerror, null);
+    assert.equal(image.src, undefined);
   }
 });
 test('incorrect atlas geometry never renders incomplete parts', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
   images.find((i) => i.src.endsWith('mystic-rock.png')).onerror();
-  images.reverse();
-  images[0].naturalWidth = 100;
-  images[0].naturalHeight = 200;
-  images[0].onload();
+  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.png'));
+  parts.naturalWidth = 100;
+  parts.naturalHeight = 200;
+  parts.onload();
   await pending;
   assert.equal(renderer.ready, false);
   assert.equal(renderer.draw('shiba', context().ctx, 0, 0, 100), false);
@@ -110,7 +127,7 @@ test('Mystic Rock retains the original floating sprite and freezes with reduced 
   rock.naturalWidth = 1145;
   rock.naturalHeight = 1373;
   rock.onload();
-  images.find((i) => i !== rock).onerror();
+  images.find((i) => i.src.endsWith('companion-parts-atlas.png')).onerror();
   await pending;
   const a = context(),
     b = context();

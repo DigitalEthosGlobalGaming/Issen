@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createBackground } from '../scene/background.ts';
 import { createLayout } from '../layout.ts';
@@ -69,7 +70,8 @@ export function drawWhiteSilencePass(
       g.restore();
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
   // Opaque broad snow covers meadow texture; a low contrast wind-carved saddle remains.
   const snowTop = groundY - eH * 0.16;

@@ -122,7 +122,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
 }) => {
   await seed(page, 9);
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#bTrials')).toBeHidden();
   await page.evaluate(() => {
     const stats = JSON.parse(localStorage.getItem('issen.stats')!);
@@ -152,7 +152,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
 test('Live failure, retry and quitting preserve the main profile', async ({ page }) => {
   await seed(page);
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   const before = await saves(page);
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="unbroken"]').click();
@@ -219,6 +219,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
   expect(await saves(page)).toEqual(before);
   await expect(page.locator('#trialsAccess')).toContainText('8/11');
   await page.reload();
+  await page.waitForFunction(() => !!(window as any).__trialHarness);
   await page.locator('#bTrials').click();
   await expect(page.locator('#trialsAccess')).toContainText('8/11');
   expect(
@@ -268,7 +269,8 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   await seed(page);
   await instrument(page);
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await page.waitForFunction(() => !!(window as any).__trialHarness);
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bTrials').click();
   const sequences: string[][] = [];

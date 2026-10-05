@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -75,7 +76,8 @@ export function drawBrokenShore(
       }
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
   // Stacks sit offshore; their footing is dissolved into independent foam, never stretched.
   const contacts = [0.923, 0.916, 0.805, 0.812];

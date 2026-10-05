@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
@@ -124,7 +125,8 @@ export function drawLastLightRidge(
       g.fillRect(0, horizonY + height * 0.025, width, hillBase - horizonY);
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
 
   // Native bank silhouette slopes down towards the valley. Its base stays behind combat feet.

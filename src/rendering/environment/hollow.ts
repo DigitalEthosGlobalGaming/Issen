@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -71,7 +72,8 @@ export function drawRainwaterHollow(
       g.fillRect(0, horizonY - height * 0.08, width, bankY - horizonY + height * 0.1);
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
   // Repeated treeline stays remote and below the empty rainy sky.
   const count = Math.ceil(width / (unit * 0.18));

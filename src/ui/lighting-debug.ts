@@ -1,4 +1,5 @@
 import type { createLightingRig } from '../rendering/lighting-rig.ts';
+import { assetMaterialCatalog } from '../rendering/asset-material-catalog.ts';
 
 /** Non-modal, session-only lighting controls; does not mutate profile or gameplay state. */
 export function createLightingDebug(
@@ -28,6 +29,35 @@ export function createLightingDebug(
   marker.setAttribute('aria-label', 'Drag light position');
   app.append(root, marker);
   const controls = root.querySelector('.lighting-controls')!;
+  const previewLabel = doc.createElement('label');
+  previewLabel.textContent = 'Material preview';
+  const previewSelect = doc.createElement('select');
+  previewSelect.setAttribute('aria-label', 'Material preview');
+  const empty = doc.createElement('option');
+  empty.value = '';
+  empty.textContent = 'None';
+  previewSelect.append(empty);
+  for (const pack of assetMaterialCatalog) {
+    const option = doc.createElement('option');
+    option.value = pack.source;
+    option.textContent = pack.sourcePath.split('/').pop()!.replace('.png', '').replaceAll('-', ' ');
+    previewSelect.append(option);
+  }
+  const previewImage = doc.createElement('img');
+  previewImage.className = 'lighting-material-preview';
+  previewImage.hidden = true;
+  previewImage.alt = 'Selected PBR material';
+  previewLabel.append(previewSelect);
+  root.append(previewLabel, previewImage);
+  previewSelect.addEventListener(
+    'change',
+    () => {
+      previewImage.hidden = !previewSelect.value;
+      if (previewSelect.value) previewImage.src = previewSelect.value;
+      else previewImage.removeAttribute('src');
+    },
+    { signal: events.signal },
+  );
   type Numeric = 'x' | 'y' | 'height' | 'radius' | 'intensity' | 'ambient';
   const fields: [Numeric, string, number, number][] = [
     ['x', 'Light X', 0, 1],

@@ -182,7 +182,11 @@ for (const shared of [false, true])
         { ...services, now: () => 1000 },
         shared ? artwork : undefined,
       );
+      await Promise.all([first.prepare(), second.prepare(), document.fonts.ready]);
       first.draw(frame);
+      second.draw(frame);
+      // A first readback can change the browser's atlas sampling cache.
+      canvases[1].toDataURL();
       second.draw(frame);
       const before = canvases[1].toDataURL();
       first.demo('petals', false);

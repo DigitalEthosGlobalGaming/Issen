@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { drawCachedImage } from '../cached-materials.ts';
 import { createLayout } from '../layout.ts';
 import type { EnvironmentFrame } from './index.ts';
 
@@ -19,12 +20,10 @@ function tile(
   ctx.globalAlpha = alpha;
   ctx.translate(x, foot);
   ctx.scale(flip ? -1 : 1, 1);
-  ctx.drawImage(
+  drawCachedImage(
+    ctx,
     atlas,
-    (cell % 2) * sw,
-    Math.floor(cell / 2) * sh,
-    sw,
-    sh,
+    [(cell % 2) * sw, Math.floor(cell / 2) * sh, sw, sh],
     -width / 2,
     -height * 0.9,
     width,

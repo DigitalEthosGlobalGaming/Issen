@@ -9,7 +9,7 @@
     1145,
     1373
   ],
-  "renderer": "not connected",
+  "renderer": "src/rendering/figures/ink-companions.ts",
   "exports": {
     "stone": {
       "jobHash": "7fa0066d4dc3f435a8bf00eb7a26a9cc1fcfbbc91be477296a10b3d676f2744c",

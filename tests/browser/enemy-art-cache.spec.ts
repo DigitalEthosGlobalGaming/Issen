@@ -91,10 +91,13 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
   expect(result.ready).toBe(true);
   expect(result.repeatedReads).toBe(0);
   expect(result.snapshot.loaded.sort()).toEqual(['base', 'clothing', 'heads', 'variationHeads']);
-  expect(result.bossSources.sort()).toEqual(['enemy-headwear-atlas.png', 'enemy-ronin-simple.png']);
-  expect(result.variedSources).toContain('enemy-clothing-variants.png');
-  expect(result.variedSources).toContain('enemy-headwear-variants.png');
-  expect(result.variedSources).not.toContain('enemy-headwear-atlas.png');
+  expect(result.bossSources.sort()).toEqual([
+    'enemy-headwear-atlas_diffuse.png',
+    'enemy-ronin-simple_diffuse.png',
+  ]);
+  expect(result.variedSources).toContain('enemy-clothing-variants_diffuse.png');
+  expect(result.variedSources).toContain('enemy-headwear-variants_diffuse.png');
+  expect(result.variedSources).not.toContain('enemy-headwear-atlas_diffuse.png');
   expect(result.snapshot.variantPixels + result.snapshot.tonePixels).toBeLessThanOrEqual(8_000_000);
   expect(result.snapshot.cachedParts).toBeLessThanOrEqual(192);
   expect(result.snapshot.toneParts).toBeLessThanOrEqual(48);

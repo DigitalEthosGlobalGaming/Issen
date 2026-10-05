@@ -1,10 +1,10 @@
-# Sword and Sumi lighting
+# Asset lighting
 
 Implemented in 1.62.0. The six blade profiles in `figures/assets/blade-pbr/`
 provide aligned 1254×1254 diffuse, OpenGL normal, roughness, metallic, ambient
 occlusion and emissive maps. `ink-sword.ts` keeps the existing recipe frames,
-grips, tips, tints and animation transforms. Hilts, guards, beam and pan retain
-their existing colour artwork because this pack contains only blade profiles.
+grips, tips, tints and animation transforms. Since 1.66.0, handles, guards, beam
+and pan also use their generated PBR packs while retaining their colour artwork.
 
 Each sword renderer owns decoded images, cropped diffuse parts and one packed
 surface atlas (R roughness, G metallic, B AO, opaque alpha). PBR images participate
@@ -23,9 +23,17 @@ values, replacing 1.64.1's global Reinhard tone mapping. Unlit comparison keeps
 the diffuse artwork. Tint applies to surfaces before lighting; fog blends after
 display conversion without inheriting surface tint. Coverage stays premultiplied.
 
+Since 1.66.0, nine-stage colour and material composition runs in an owned worker
+where supported. Transferred colour ImageBitmaps preserve premultiplied coverage;
+normal, surface and emissive planes preserve raw channel data. The last completed
+scene keeps drawing until the latest requested scene is ready. Cached material
+revisions increase across rebuilds so reused colour canvases cannot leave stale
+GPU textures after a scene change. See [performance follow-up](pbr-performance-2026-10-05.md).
+
 Normal, mask and surface textures use separate raw-data uploads without alpha
 premultiplication; diffuse and emission retain colour-texture uploads. Surface
-atlases remain opaque. Material UVs require untrimmed, unrotated frames, enforced
+atlases remain opaque. Cached scenery layers opt into surface-alpha lighting
+coverage so procedural pixels retain their original colour. Material UVs require untrimmed, unrotated frames, enforced
 by the backend. The compositor supplies full scene transforms to meshes in an
 identity root (temporary film/clip containers do not change that coordinate
 space); normal transforms and screen-space light positions use that same space.
@@ -57,8 +65,9 @@ The first outfit, Sumi, uses a Sprite/OpenGL PBR Forge conversion of
 `ink-player.ts` applies aligned frame materials to all nine Sumi parts: torso,
 head, two robe panels, two sleeves, two forearms and the hand stamp. Existing
 joint transforms and animation remain in place. The small procedural under-robe
-bridge retains its existing flat colour. Other outfits keep their original
-atlas/tints, overlays and procedural torso material.
+bridge retains its existing flat colour. Since 1.65.0 all supported outfits use
+this base cloth pack, with aligned packs on armour, hats, masks and overlays.
+Charms, companions, enemy hands, scenery and debris also use generated materials.
 
 The runtime and Armoury use the same explicit light inputs as the swords. Canvas
 fallback shows the exported diffuse parts. These maps participate in artwork
@@ -76,7 +85,7 @@ compares against the diffuse artwork; Reset light restores defaults. Escape, the
 close button or tilde closes the panel. Modifier chords and external text fields
 do not trigger it; Shift+tilde is accepted. It does not pause or resume gameplay.
 
-The runtime owns a session-only `lighting-rig.ts` instance and supplies lighting
+Startup owns a session-only `lighting-rig.ts` instance and supplies lighting
 explicitly to the main scene and preview frames. X/Y are fractions of each
 target's dimensions; height/radius use its longest dimension, including DPR.
 This keeps the marker and rendered light aligned on resized canvases. Control
@@ -84,12 +93,32 @@ changes redraw settled scenes and previews without writing player saves. Other
 opt-in material surfaces also receive this rig; unlit artwork is unaffected.
 Canvas views report that lighting requires WebGL.
 
+Raster UI textures are rendered through the same shader on lighting changes.
+CSS border slices, atlas positions and tinted seal colours remain in place;
+the explicit Canvas comparison retains original artwork. The material catalog
+contains all 86 packs. The panel's Material preview can inspect retained source
+art without adding it to gameplay. Scene, preview and UI resources have explicit
+owners and are released on disposal.
+
 The 1.64.1 defaults place the light at X 0.5, Y 0.4, height 0.5 and radius 1.6,
 with intensity 2 and ambient 0.55. The higher, centred light provides more even
 foreground/background illumination. Reset light applies these defaults; the
 rig remains session-only.
 
 ## Verification
+
+The 1.66.0 material-loading pass excludes generated maps from lifetime startup
+retention. Environment selection keeps packs shared by consecutive scenes and
+releases the rest. Cached material baking uses destination backing resolution;
+aligned OpenGL normals copy directly, while rotations, mirrors and nonuniform
+scales retain inverse-transpose conversion. Readback canvases request CPU backing.
+Roughness, metallic and AO are prepacked by the PBR tool into an opaque RGB
+`_surface.png`. Runtime owners decode that texture instead of combining scalar
+maps on the main thread. All 86 textures passed exact browser pixel comparison;
+six-map exports remain available, and unconverted callers retain the old fallback.
+Focused browser checks cover original-art startup gating, disposal and retry,
+shared-pack reuse and release, mirrored normals, procedural occlusion, unchanged
+alpha, all nine environments and CSS material slices. TypeScript passed.
 
 For 1.64.2, strict TypeScript, three focused unit checks and two focused browser
 checks passed. The new material-colour check exercises unit-ambient midtone

@@ -8,6 +8,7 @@ import type { Figure, FigureEnvironment, Point } from './types.ts';
 
 const ATLAS_URL = new URL('./assets/player-ronin-simple.png', import.meta.url).href;
 const PBR_SOURCES = {
+  surface: new URL('./assets/player-pbr/player-ronin-simple_surface.png', import.meta.url).href,
   diffuse: new URL('./assets/player-pbr/player-ronin-simple_diffuse.png', import.meta.url).href,
   normal: new URL('./assets/player-pbr/player-ronin-simple_normal.png', import.meta.url).href,
   roughness: new URL('./assets/player-pbr/player-ronin-simple_roughness.png', import.meta.url).href,

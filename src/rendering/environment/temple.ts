@@ -1,3 +1,4 @@
+import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -99,7 +100,8 @@ export function drawEmberCourtyard(
       );
     },
   }).canvas;
-  base.drawImage(terrain, 0, 0, width, height);
+  drawCachedImage(base, terrain, [0, 0, terrain.width, terrain.height], 0, 0, width, height);
+  clearCachedMaterial(terrain);
   terrain.width = terrain.height = 0;
   for (const [i, x] of [0.1, 0.81, 1.04].entries()) {
     drawAtlasSprite(far, atlases.pines!, i % 4, width * x, foot - height * 0.07, unit * 0.18, {

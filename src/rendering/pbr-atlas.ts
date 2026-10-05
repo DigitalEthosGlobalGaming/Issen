@@ -1,12 +1,12 @@
 import type { SceneMaterial } from './scene-frame.ts';
 
-type MapKind = 'diffuse' | 'normal' | 'roughness' | 'metallic' | 'ao' | 'emissive';
+type MapKind = 'diffuse' | 'normal' | 'roughness' | 'metallic' | 'ao' | 'emissive' | 'surface';
 type Frame = readonly [number, number, number, number];
 
 /** Instance-owned decoded PBR maps. Every part shares aligned atlas UVs. */
 export function createPbrAtlas(
   doc: Document,
-  sources: Record<MapKind, string>,
+  sources: Record<Exclude<MapKind, 'surface'>, string> & { surface?: string },
   width: number,
   height = width,
 ) {
@@ -20,10 +20,13 @@ export function createPbrAtlas(
   function prepare(): Promise<boolean> {
     if (disposed) return Promise.resolve(false);
     return (pending ??= Promise.all(
-      (Object.keys(sources) as MapKind[]).map(async (kind) => {
+      (sources.surface
+        ? (['diffuse', 'normal', 'emissive', 'surface'] as const)
+        : (['diffuse', 'normal', 'roughness', 'metallic', 'ao', 'emissive'] as const)
+      ).map(async (kind) => {
         const image = doc.createElement('img');
         images.set(kind, image);
-        image.src = sources[kind];
+        image.src = sources[kind]!;
         try {
           await image.decode();
           return !disposed && image.naturalWidth === width && image.naturalHeight === height;
@@ -33,9 +36,13 @@ export function createPbrAtlas(
       }),
     ).then((loaded) => {
       if (disposed || loaded.some((value) => !value)) return false;
+      if (sources.surface) {
+        ready = true;
+        return true;
+      }
       surface.width = width;
       surface.height = height;
-      const g = surface.getContext('2d')!;
+      const g = surface.getContext('2d', { willReadFrequently: true })!;
       const channels = (['roughness', 'metallic', 'ao'] as const).map((kind) => {
         g.clearRect(0, 0, width, height);
         g.drawImage(images.get(kind)!, 0, 0);
@@ -68,7 +75,7 @@ export function createPbrAtlas(
       if (!material) {
         material = {
           normal: { source: images.get('normal')!, revision: 0, frame },
-          surface: { source: surface, revision: 0, frame },
+          surface: { source: images.get('surface') ?? surface, revision: 0, frame },
           emissive: { source: images.get('emissive')!, revision: 0, frame },
           normalY: -1,
           lighting: 1,
@@ -83,7 +90,10 @@ export function createPbrAtlas(
     dispose() {
       disposed = true;
       ready = false;
-      for (const image of images.values()) image.removeAttribute('src');
+      for (const image of images.values()) {
+        image.removeAttribute('src');
+        image.width = image.height = 0;
+      }
       images.clear();
       materials.clear();
       surface.width = surface.height = 0;

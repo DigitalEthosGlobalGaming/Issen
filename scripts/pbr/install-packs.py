@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
@@ -80,4 +81,6 @@ REPORT.parent.mkdir(parents=True, exist_ok=True)
 REPORT.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
 failed = sum(job["status"] == "failed" for job in results)
 print(f"{len(results) - failed}/{len(results)} packs installed; {failed} failed.")
+if not failed:
+    subprocess.run(["node", "scripts/pbr/pack-surfaces.mjs"], cwd=ROOT, check=True)
 sys.exit(1 if failed else 0)

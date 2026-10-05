@@ -101,11 +101,11 @@ test('tilde opens lighting controls and edits remain session-only', async ({ pag
   await page.keyboard.press('Shift+Backquote');
   await expect(panel).toBeVisible();
   await page.getByRole('button', { name: 'Reset light', exact: true }).click();
-  await expect(page.getByLabel('Light X', { exact: true })).toHaveValue('0.65');
+  await expect(page.getByLabel('Light X', { exact: true })).toHaveValue('0.5');
   await page.keyboard.press('Backquote');
   await expect(panel).toBeHidden();
   await page.reload();
   await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.press('Backquote');
-  await expect(page.getByLabel('Light intensity', { exact: true })).toHaveValue('2.5');
+  await expect(page.getByLabel('Light intensity', { exact: true })).toHaveValue('2');
 });

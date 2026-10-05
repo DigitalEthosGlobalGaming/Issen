@@ -18,7 +18,7 @@ export const IDENTITY: Readonly<SceneTransform> = Object.freeze({
 });
 
 export interface SceneTexture {
-  source: HTMLImageElement | HTMLCanvasElement;
+  source: HTMLImageElement | HTMLCanvasElement | ImageBitmap;
   /** Increment only when a prepared canvas's pixels change. */
   revision: number;
   frame?: readonly [x: number, y: number, width: number, height: number];
@@ -26,8 +26,10 @@ export interface SceneTexture {
 
 export interface SceneMaterial {
   normal?: SceneTexture;
-  /** PBR data: R roughness, G metallic, B ambient occlusion, A opaque. */
+  /** PBR data: R roughness, G metallic, B ambient occlusion, A opaque by default. */
   surface?: SceneTexture;
+  /** Cached mixed layers use surface alpha to preserve unlit procedural pixels. */
+  surfaceCoverage?: boolean;
   emissive?: SceneTexture;
   /** OpenGL maps use -1 to convert authored Y-up normals to scene Y-down. */
   normalY?: 1 | -1;
