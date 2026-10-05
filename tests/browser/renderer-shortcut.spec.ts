@@ -46,6 +46,7 @@ test('backtick leaves Ink artwork and paused encounter unchanged', async ({ page
   await expect(canvas).toHaveAttribute('data-renderer-backend', 'layered', { timeout: 30000 });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.keyboard.press('p');
   const snapshot = () =>
     page.evaluate(() => {

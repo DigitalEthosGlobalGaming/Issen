@@ -4,6 +4,7 @@ import { defeatCurrentBoss } from './drive-boss.ts';
 test('fresh journey offers an optional tutorial, persists skip and hides locked modes', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
@@ -20,10 +21,12 @@ test('fresh journey offers an optional tutorial, persists skip and hides locked 
   await page.locator('#bBegin').click();
   await expect(page.locator('.tutorial-overlay')).toBeHidden();
   await expect(page.locator('#hud')).toHaveClass(/on/);
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).tutorial)).toBe(
     'skipped',
   );
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#paused')).toHaveClass(/on/, { timeout: 30000 });
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
@@ -64,6 +67,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(5);
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.reload();
   await expect(page.locator('#paused')).toHaveClass(/on/, { timeout: 30000 });
   await page.locator('#bEnd').click();

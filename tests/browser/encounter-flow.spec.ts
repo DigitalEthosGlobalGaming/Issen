@@ -37,7 +37,8 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
     );
     Math.random = () => 0.5;
     let next = 0,
-      time = 0;
+      time = performance.now();
+    Object.defineProperty(performance, 'now', { value: () => time });
     const pending = new Map<number, FrameRequestCallback>();
     window.requestAnimationFrame = (callback) => {
       pending.set(++next, callback);
@@ -80,6 +81,15 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
     .first()
     .evaluate((button: HTMLButtonElement) => button.click());
   await expect(page.locator('#shrine')).not.toHaveClass(/on/);
+  await expect
+    .poll(
+      async () => {
+        await advance(1);
+        return page.locator('#c').getAttribute('data-scene-state');
+      },
+      { timeout: 15000 },
+    )
+    .toBe('ready');
   await expect(page.locator('#bossbar')).toHaveClass(/on/);
   await expect(page.locator('#waveLbl')).toHaveText('決闘 二');
   await expect(page.locator('#badges .chip')).toHaveCount(1);

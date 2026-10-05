@@ -32,6 +32,7 @@ test('daily presets survive reload and keep player gear and progression unchange
     meta: localStorage.getItem('issen.meta'),
   }));
   await page.locator('#bDaily').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const checkpoint = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('issen.runCheckpoint')!),
   );
@@ -46,6 +47,7 @@ test('daily presets survive reload and keep player gear and progression unchange
   await expect(page.locator('#overSeed')).toHaveText('Daily · 2026-10-03');
   await expect(page.locator('#bShare,#share')).toHaveCount(0);
   await page.locator('#bAgain').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const retry = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!));
   expect(retry.seed).toBe(checkpoint.seed);
   expect(retry.equipment).toEqual(checkpoint.equipment);
@@ -62,6 +64,7 @@ test('daily presets survive reload and keep player gear and progression unchange
   await page.locator('#bPlay').click();
   await expect(page.locator('#dailyDate')).toHaveText('2026-10-04');
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const ordinary = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('issen.runCheckpoint')!),
   );

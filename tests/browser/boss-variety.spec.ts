@@ -22,6 +22,7 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
   await page.evaluate(() => {
     (window as any).__bossVariety.testJump(0, 3, true);
   });
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const before = await page.evaluate(
     () => JSON.parse(localStorage.getItem('issen.testing.runCheckpoint')!).run.boss,
   );

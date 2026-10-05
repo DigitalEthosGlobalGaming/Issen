@@ -21,6 +21,7 @@ test('Armoury shows streak progress and seventh-day crest survives saved-run rec
   await page.locator('#armory [data-back]').click();
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.locator('#pauseBtn').click();
   await page.clock.setFixedTime(new Date('2026-10-05T12:00:00Z'));
   await page.reload();

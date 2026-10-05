@@ -24,6 +24,7 @@ test('player cuts move existing cloth and charm sprites without changing the sim
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const result = await page.evaluate(() => {
     const h = (window as any).__cloth;
     h.frameLoop.stop();

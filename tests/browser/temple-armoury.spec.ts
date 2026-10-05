@@ -15,7 +15,7 @@ test('Temple keeps catalog order within unfinished and completed upgrades after 
     ),
   );
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.locator('#bTemplate').click();
   const order = () =>
     page
@@ -54,7 +54,7 @@ test('Temple identifies affordable donations and refreshes the title after purch
     ),
   );
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#bTemplate')).toHaveText('Temple');
   await page.locator('#bTemplate').click();
   await expect(page.locator('.temple-status')).toHaveCount(0);
@@ -109,7 +109,7 @@ test('fully donated Temple and room preview remain readable without selection sh
     ),
   );
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#bTemplate')).toHaveText('Temple');
   await page.locator('#bTemplate').click();
   await expect(page.locator('.temple-status')).toHaveCount(0);

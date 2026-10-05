@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 test('a run with no Ember reward has no watch-ad offer', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-06T12:00:00+10:00'));
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.locator('#pauseBtn').click();
   await page.locator('#bEnd').click();
   await expect(page.locator('#resultEmbers')).toHaveText('0');
@@ -28,6 +30,7 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     (window as any).__tally.earn('boss');
   });

@@ -9,6 +9,7 @@ test('an ordinary wave resumes from its saved seed and End run closes the checkp
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const first = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!));
   expect(first.status).toBe('active');
   expect(first.run.state).toBe('playing');
@@ -84,6 +85,7 @@ test('a fatal loss is terminal before its animation and settles once after reloa
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     const { G, playerDie } = (window as any).__runHarness;
     G.lives = 1;
@@ -121,6 +123,7 @@ test('Shrine offers survive reload without a new roll', async ({ page }) => {
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => (window as any).__runHarness.openShrine());
   const before = await page.evaluate(
     () => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).offers,
@@ -151,6 +154,7 @@ test('boss and standoff checkpoints restore their encounter phases', async ({ pa
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => (window as any).__runHarness.startBoss());
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).run.state),

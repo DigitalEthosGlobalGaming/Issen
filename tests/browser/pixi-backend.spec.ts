@@ -462,6 +462,7 @@ test('unavailable WebGL initializes a playable Canvas surface with the same save
   await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'canvas');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.keyboard.press('p');
   await expect(page.locator('#bResume')).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).tutorial)).toBe(
@@ -675,6 +676,9 @@ for (const restore of [true, false]) {
       await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink');
       await page.locator('#bPlay').click();
       await page.locator('#bBegin').click();
+      await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+        timeout: 15000,
+      });
       const seed = await page.evaluate(
         () => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).seed,
       );

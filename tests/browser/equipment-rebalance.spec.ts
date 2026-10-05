@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test('Jinbaori starts above five lives and retains its gear bonus with Temple upgrades off', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   await page.addInitScript(() => {
     localStorage.setItem(
       'issen.meta',
@@ -16,7 +17,9 @@ test('Jinbaori starts above five lives and retains its gear bonus with Temple up
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await page.locator('#bBegin').click();
   await expect(page.locator('#lives i')).toHaveCount(7);
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.locator('#bEnd').click();
   await page.locator('#bMenu').evaluate((button: HTMLButtonElement) => button.click());
   await page.locator('#bPlay').click();

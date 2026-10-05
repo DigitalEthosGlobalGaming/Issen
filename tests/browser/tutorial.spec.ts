@@ -6,6 +6,7 @@ test('first play starts a run directly and the menu tutorial remains optional', 
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const tutorial = page.locator('.tutorial-overlay');
   await expect(tutorial).toBeHidden();
   await page.keyboard.press('p');

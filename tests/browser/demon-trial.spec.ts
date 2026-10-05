@@ -18,7 +18,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
       response,
       body: (await response.text()).replace(
         'frameLoop.start();',
-        'window.__demon = { G, sceneSeeds: [], step: update, swipe: onSwipe, render, stop: () => frameLoop.stop() }; const drawRealm = demonRealmRenderer.draw; demonRealmRenderer.draw = (...args) => { window.__demon.sceneSeeds.push(args[5]); return drawRealm(...args); }; frameLoop.start();',
+        'window.__demon = { G, sceneSeeds: [], step: update, swipe: onSwipe, render, settleScene: async () => { while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } }, stop: () => frameLoop.stop() }; const drawRealm = demonRealmRenderer.draw; demonRealmRenderer.draw = (...args) => { window.__demon.sceneSeeds.push(args[5]); return drawRealm(...args); }; frameLoop.start();',
       ),
     });
   });
@@ -28,6 +28,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
   await page.evaluate(() => (window as any).__demon.stop());
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="demon-mirror"]').click();
+  await page.evaluate(() => (window as any).__demon.settleScene());
   await expect(page.locator('#title')).toHaveCSS('opacity', '0');
   await expect(page.locator('#trials')).toHaveCSS('opacity', '0');
   await page.evaluate(() => {
@@ -55,6 +56,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
       page.locator('#c').evaluate((canvas: HTMLCanvasElement) => canvas.width / canvas.height),
     )
     .toBeGreaterThan(2);
+  await page.evaluate(() => (window as any).__demon.settleScene());
   await page.evaluate(() => (window as any).__demon.render(0.016));
   await page.screenshot({ path: info.outputPath('demon-realm-landscape.png') });
   const result = await page.evaluate(() => {
@@ -89,6 +91,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
   expect(result.unlocks).toContain('trial-inferno');
   await expect(page.locator('#trialResult')).toContainText('Complete');
   await page.locator('[data-trial="demon-mirror"]').click();
+  await page.evaluate(() => (window as any).__demon.settleScene());
   await page.evaluate(() => {
     const h = (window as any).__demon;
     for (let i = 0; i < 300 && !h.G.attacker; i++) h.step(0.02, 0.02);

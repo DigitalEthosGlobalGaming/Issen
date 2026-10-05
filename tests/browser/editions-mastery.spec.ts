@@ -36,6 +36,7 @@ async function prepare(page: Page, edition = 'web') {
       'frameLoop.start();',
       `window.__mastery = { G, step: update, swipe: onSwipe, tap: onTap,
       stop: () => frameLoop.stop(), runFrames: () => frameLoop.start(), shrine: openShrine, checkpoint: captureCheckpoint,
+      settleScene: async () => { while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },
       equipment: () => EQ, stats: () => ST, modifiers: computeMods, parry, pause, startRun, killEnemy,
       access: premiumAccess, premium, title: () => showScreen('title') }; frameLoop.start();`,
     );
@@ -117,6 +118,7 @@ test('Discernment rerolls once, checkpoints the new offer, and remains spent aft
   await prepare(page);
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await page.evaluate(() => (window as any).__mastery.settleScene());
   await page.evaluate(() => {
     const h = (window as any).__mastery;
     h.G.bossesSlain = 1;
@@ -145,6 +147,7 @@ test('Duel Master completes exactly 20 accelerating exchanges and awards First S
   const statsBefore = await page.evaluate(() => localStorage.getItem('issen.stats'));
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="duel-master"]').click();
+  await page.evaluate(() => (window as any).__mastery.settleScene());
   const result = await page.evaluate(() => {
     const h = (window as any).__mastery;
     const flashes: number[] = [];
@@ -186,6 +189,7 @@ test('Duel Master pauses without advancing and a wrong counter ends the attempt'
   await prepare(page);
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="duel-master"]').click();
+  await page.evaluate(() => (window as any).__mastery.settleScene());
   const unchanged = await page.evaluate(async () => {
     const h = (window as any).__mastery;
     h.pause();
@@ -221,6 +225,7 @@ test('Quiet Blade has its own perfect-cut objective and grants Quiet jade', asyn
   await prepare(page);
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="quiet-blade"]').click();
+  await page.evaluate(() => (window as any).__mastery.settleScene());
   expect(await page.evaluate(() => (window as any).__mastery.G.blade)).toBe(true);
   await page.evaluate(() => {
     const h = (window as any).__mastery;
@@ -236,10 +241,11 @@ test('First Strike uses speed points while late slashes still count as perfect; 
   page,
 }) => {
   await prepare(page);
-  const result = await page.evaluate(() => {
+  const result = await page.evaluate(async () => {
     const h = (window as any).__mastery;
     const source = structuredClone(h.G.enemies[0]);
     h.startRun();
+    await h.settleScene();
     h.equipment().charm = 'first-strike';
     h.modifiers();
     const cut = (elapsed: number, perfect: boolean) => {

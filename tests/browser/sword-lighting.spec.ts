@@ -71,7 +71,7 @@ test('PBR sword atlas responds to a moving light and keeps transparent coverage'
 
 test('tilde opens lighting controls and edits remain session-only', async ({ page }, testInfo) => {
   await page.goto('/');
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink');
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink', { timeout: 30000 });
   const saved = await page.evaluate(() => localStorage.getItem('issen.settings'));
   await page.keyboard.press('Backquote');
   const panel = page.getByRole('complementary', { name: 'Lighting debug' });

@@ -77,6 +77,7 @@ test('settled Armoury holds the main scene while both preview sizes remain anima
   await expect(page.locator('#prevC')).toBeFocused();
   // Resize invalidation redraws the uncovered snapshot, then settles again.
   await expect.poll(async () => (await count()).main).toBeGreaterThan(before.main);
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.waitForTimeout(600);
   before = await count();
   await page.waitForTimeout(200);

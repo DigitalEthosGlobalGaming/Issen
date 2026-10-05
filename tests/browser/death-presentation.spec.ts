@@ -15,6 +15,11 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!(window as any).__deathHarness);
+  await page.evaluate(() => (window as any).__deathHarness.startRun());
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__deathHarness.G.enemies.length))
+    .toBeGreaterThan(0);
   const result = await page.evaluate(() => {
     const {
       G,
@@ -29,7 +34,6 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
     } = (window as any).__deathHarness;
     frameLoop.stop();
     const e = G.enemies[0];
-    startRun();
     G.enemies = [e];
     killEnemy(e, e.dir, true);
     const ctx = (window as any).__deathHarness.g,

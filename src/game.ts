@@ -1660,7 +1660,6 @@ export function startGame(
     G.toSpawn = 0;
     G.attacker = null;
     startBoss();
-    $('waveLbl').textContent = `決闘 ${kanji(n)}`;
   }
   function startWave(n: number, skipEvent = false) {
     G.wave = n;
@@ -2203,7 +2202,7 @@ export function startGame(
     G.event = null;
     const nm = def.n + (lap ? ' ' + roman(lap + 1) : '');
     banner(def.k, nm);
-    $('waveLbl').textContent = '決闘';
+    $('waveLbl').textContent = G.rush ? `決闘 ${kanji(G.wave)}` : '決闘';
     $('bossK').textContent = def.k;
     $('bossN').textContent = nm;
     renderHp();

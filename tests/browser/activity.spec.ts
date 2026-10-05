@@ -32,6 +32,7 @@ test('leaving the window stops scene work, audio and tutorial time without chang
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.keyboard.press('p');
   await expect(page.locator('#bResume')).toBeVisible();
   await page.waitForTimeout(550);

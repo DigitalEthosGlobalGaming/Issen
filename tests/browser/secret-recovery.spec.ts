@@ -76,6 +76,7 @@ test('every actual duel entry refills the run capacity before writing its checkp
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   const result = await page.evaluate(() => {
     const { G, startBoss } = (window as any).__duelAudit;
     G.maxKnives = 3;

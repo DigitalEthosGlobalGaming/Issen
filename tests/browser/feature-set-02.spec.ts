@@ -94,8 +94,9 @@ test('wave taps consume a knife only with a target and boss taps never consume o
       JSON.stringify({ schemaVersion: 2, tutorial: 'skipped', upgrades: { knife: 1, pouch: 2 } }),
     );
     Math.random = () => 0.5;
-    let clock = 0,
+    let clock = performance.now(),
       id = 0;
+    Object.defineProperty(performance, 'now', { value: () => clock });
     const frames = new Map<number, FrameRequestCallback>();
     window.requestAnimationFrame = (callback) => {
       frames.set(++id, callback);
@@ -124,6 +125,15 @@ test('wave taps consume a knife only with a target and boss taps never consume o
   await page
     .getByRole('button', { name: 'Jump to wave', exact: true })
     .evaluate((el: HTMLElement) => el.click());
+  await expect
+    .poll(
+      async () => {
+        await advance(1);
+        return page.locator('#c').getAttribute('data-scene-state');
+      },
+      { timeout: 15000 },
+    )
+    .toBe('ready');
   await tap();
   await expect(page.locator('.badge.knives')).toHaveText('Knife ×3');
   // Initial spawn delay (0.3s) plus the 0.9s entry animation must finish first.
@@ -139,6 +149,15 @@ test('wave taps consume a knife only with a target and boss taps never consume o
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })
     .evaluate((el: HTMLElement) => el.click());
+  await expect
+    .poll(
+      async () => {
+        await advance(1);
+        return page.locator('#c').getAttribute('data-scene-state');
+      },
+      { timeout: 15000 },
+    )
+    .toBe('ready');
   await expect(page.locator('#bossbar')).toHaveClass(/on/);
   await tap();
   await expect(page.locator('.badge.knives')).toHaveText('Knife ×3');

@@ -30,6 +30,7 @@ test('Unlock all grants Armoury and Endless access while preserving other ranks,
 }) => {
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   const player = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
   await page.keyboard.press('Control+Shift+A');
   await page.getByRole('button', { name: 'Enter test profile', exact: true }).click();
@@ -91,6 +92,7 @@ test('admin unlocks Ronin only in the test profile and keeps it after reload', a
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   const playerMeta = await page.evaluate(() => localStorage.getItem('issen.meta'));
   await page.keyboard.press('Control+Shift+A');
   await expect(page.getByRole('button', { name: 'Unlock Ronin mode' })).toHaveCount(0);

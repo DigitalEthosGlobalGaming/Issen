@@ -18,6 +18,7 @@ test('an Oath ward outlines lives, survives reload and is spent before life', as
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     const { G, captureCheckpoint, renderLives } = (window as any).__blessingHarness;
     G.bless.add('oath');
@@ -40,6 +41,7 @@ test('Crossroads immediately adds a curse and expands the next Shrine', async ({
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     const { G, BLESS_BY, showShrineOffers, frameLoop } = (window as any).__blessingHarness;
     frameLoop.stop();
@@ -68,6 +70,7 @@ test('Stormcall kills the next attacker with lightning and cannot charge itself'
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await expect
     .poll(() => page.evaluate(() => (window as any).__blessingHarness.G.enemies.length))
     .toBeGreaterThan(0);

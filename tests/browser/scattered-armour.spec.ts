@@ -115,12 +115,16 @@ test('selected Scattered Armour reaches the live kill renderer without duplicate
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await page.evaluate(() => (window as any).__scatterHarness.startRun());
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__scatterHarness.G.enemies.length))
+    .toBeGreaterThan(0);
   const result = await page.evaluate(() => {
     const { G, frameLoop, startRun, killEnemy, drawEnemy, updateEnemies } = (window as any)
       .__scatterHarness;
     frameLoop.stop();
     const enemy = G.enemies[0];
-    startRun();
     G.enemies = [enemy];
     killEnemy(enemy, enemy.dir, true);
     const style = enemy.deathType;

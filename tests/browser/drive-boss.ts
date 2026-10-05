@@ -1,7 +1,18 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 /** Drive the live duel by its glint and blade, independent of the run seed. */
 export async function defeatCurrentBoss(page: Page): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const game = window as any;
+          (game.advanceGameFrames ?? game.advance)(1);
+          return document.querySelector<HTMLCanvasElement>('#c')?.dataset.sceneState;
+        }),
+      { timeout: 15000 },
+    )
+    .toBe('ready');
   await page.evaluate(() => {
     const game = window as any;
     const advance = game.advanceGameFrames ?? game.advance;

@@ -20,6 +20,7 @@ test('one Second Wind per run restarts with half lives, then tally offers one Em
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     const { G, playerDie, earn } = (window as any).__supportHarness;
     earn('boss');
@@ -79,6 +80,7 @@ test('tester Premium doubles by default and acknowledges a revive', async ({ pag
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.evaluate(() => {
     const { G, playerDie, earn } = (window as any).__supportHarness;
     earn('boss');
