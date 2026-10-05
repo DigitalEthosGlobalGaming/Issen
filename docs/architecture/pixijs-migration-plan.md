@@ -1,9 +1,10 @@
 # PixiJS rendering and 2D lighting migration plan
 
-Status: implemented for local testing on `feature/rendering-v2`, 5 October 2026.
+Status: implemented and integrated into `develop`, 5 October 2026.
 The sections below retain the design and acceptance criteria. See
 [implemented rendering](rendering.md) for current code and ownership. WebGL is
-now the default in this worktree. Focused parity, unit, production and offline
+now the default. The implementation was merged from `feature/rendering-v2` into
+the main `develop` checkout. Focused parity, unit, production and offline
 Android web checks have passed. Broad browser validation and corrected-fixture
 reruns leave one existing short-screen UI overflow, detailed below.
 The branch was reconciled with freshly fetched `develop` after implementation.
