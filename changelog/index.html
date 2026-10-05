@@ -61,6 +61,185 @@
         <p class="date">Issen · What changed</p>
       </header>
       <section>
+        <h2>1.66.2</h2>
+        <p class="date">6 October 2026</p>
+        <ul>
+          <li>Boss Rush keeps the correct duel number after loading a new scene.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.66.1</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>Cinematic navigation prepares and displays the selected scene.</li>
+          <li>Encounters wait for their scenery before enemies appear and combat begins.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.66.0</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>Scenery, drifting debris, menus and the armoury room now react to lighting.</li>
+          <li>Inspect every generated material from the lighting debug panel.</li>
+          <li>Scenery prepares in the background while the current scene keeps drawing.</li>
+          <li>Lighting loads material maps as needed and reuses shared materials.</li>
+          <li>Fixed stale scenery textures and kept setup within smaller portrait screens.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.65.0</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>Lighting now follows player outfit armour, masks, hats, charms and companions.</li>
+          <li>
+            All player robes share the cloth material response while keeping their outfit colours.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.64.2</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Cloth stays matte under lighting, with clearer outfit colours and softer bright
+            highlights.
+          </li>
+          <li>
+            Light height changes its direction without shrinking its coverage, and fog keeps its own
+            colour on tinted materials.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.64.1</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Balanced character lighting so dark player cloth retains detail and pale enemy surfaces
+            have softer highlights.
+          </li>
+          <li>The default light is higher and more centred, with stronger ambient fill.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.64.0</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Enemy helmets, hats, masks and hoods now respond to lighting with metal and matte
+            material finishes.
+          </li>
+          <li>Enemy faces follow scene lighting while keeping a nonmetallic finish.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.63.0</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Enemy robes, sleeves and outfit variations now respond to scene lighting with soft,
+            matte cloth surfaces.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.62.1</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Steel blades have brighter metal highlights, while the wooden bokken has a matte finish.
+          </li>
+          <li>
+            Sumi's outfit has softer surface detail and rough cloth lighting without metallic shine.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.62.0</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>
+            Sword blades and the Sumi outfit now respond to lighting with detailed surface normals
+            and material maps.
+          </li>
+          <li>
+            Press ~ to open lighting controls, drag the light, and compare lighting on or off.
+          </li>
+          <li>
+            Drifting debris now always uses the new stage artwork; old leaf styles and their
+            selectors have been removed.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.61.3</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>Reduced repeated drawing work and temporary memory allocations during combat.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.61.2</h2>
+        <p class="date">5 October 2026</p>
+        <ul>
+          <li>Reduced rendering work for enemy direction rings and rounded combat strokes.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.61.1</h2>
+        <ul>
+          <li>Fixed a rare rendering interruption as combat effects fade away.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.61.0</h2>
+        <ul>
+          <li>
+            Scenes, drifting leaves and combat effects now use WebGL rendering, with the familiar
+            menus and controls.
+          </li>
+          <li>Subtle lighting adds surface detail to the swordsman's robe and steel blade.</li>
+          <li>
+            Devices without WebGL retain Canvas rendering. Graphics interruptions pause combat
+            safely.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.60.0</h2>
+        <ul>
+          <li>
+            Quieter drifting leaves and debris across the stages, while Blossom keeps its full petal
+            drift.
+          </li>
+          <li>
+            New ember and fire sprites in the Courtyard, with violet spirit flames in the Demon
+            realm.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.59.0</h2>
+        <ul>
+          <li>Each stage now has its own mixture of drifting leaves, petals, seeds and debris.</li>
+          <li>
+            Switch between stage sprites and original leaves in Display options, or press the
+            backtick / tilde key.
+          </li>
+          <li>The scene viewer includes original, reusable-shape and sprite comparisons.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>1.58.2</h2>
+        <ul>
+          <li>
+            Menus hold the background still once settled, while the title scene and Armoury previews
+            animate at up to 60 fps.
+          </li>
+          <li>Avoided rebuilding scenery when a resize event leaves the view unchanged.</li>
+        </ul>
+      </section>
+      <section>
         <h2>1.58.1</h2>
         <ul>
           <li>Kept Armoury equipment tiles visible in landscape while adding preset controls.</li>
