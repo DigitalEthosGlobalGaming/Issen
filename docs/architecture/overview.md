@@ -230,6 +230,13 @@ new work, and disposal closes bitmaps and terminates the worker. The explicit lo
 renderer remains the unsupported/failed-worker fallback. Cosmetic motion stays on
 the presentation clock; the worker does not own gameplay or animation loops.
 
+Since 1.66.1, the runtime explicitly prepares a selected scene and presents its
+background before releasing pending encounters. Combat and input stay frozen
+during preparation; resize preserves the pending encounter and newer scene
+choices supersede earlier requests. Cinematic mode requests its own animated
+frame demand, independently of a settled menu. Pending scenes do not write
+partially initialized run checkpoints.
+
 Ink is the rendering path for all nine environments and migrated figures,
 weapons, charms, and companions. Runtime and armoury canvases own separate
 loaders. Startup waits for artwork decoding and module validation; failures

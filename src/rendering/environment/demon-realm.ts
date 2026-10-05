@@ -79,6 +79,20 @@ export function createDemonRealmRenderer(doc: Document) {
     g.restore();
   }
   return {
+    async prepare() {
+      await Promise.all([
+        landmarks.decode(),
+        terrain.decode(),
+        mountains.decode(),
+        materials.prepare(),
+      ]);
+      return (
+        !disposed &&
+        materials.ready('landmarks') &&
+        materials.ready('terrain') &&
+        materials.ready('mountains')
+      );
+    },
     draw(
       g: SceneDrawing,
       width: number,

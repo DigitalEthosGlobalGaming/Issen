@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 async function openViewer(page: import('@playwright/test').Page) {
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink', { timeout: 30000 });
   await page.locator('#title .t-k').click({ clickCount: 3 });
   await expect(page.locator('#cinematic')).toBeVisible();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
 }
 
 test('cinematic scenes isolate gameplay, support remapped keys and swipes, and exit at top right', async ({
@@ -97,6 +99,7 @@ test('viewer remains usable with unavailable session storage and keyboard logo a
     });
   });
   await page.goto('/');
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink', { timeout: 30000 });
   await page.locator('#title .t-k').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#cinematic')).toBeVisible();
@@ -114,6 +117,7 @@ test('session preview preserves a saved run across refresh and exit', async ({ p
   await page.goto('/');
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await page.keyboard.press('p');
   const checkpoint = await page.evaluate(() => localStorage.getItem('issen.runCheckpoint'));
   expect(checkpoint).toBeTruthy();

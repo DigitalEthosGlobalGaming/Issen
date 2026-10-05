@@ -43,8 +43,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     preparedStage = -1;
   let preparePending: Promise<void> | undefined;
   let desired: EnvironmentFrame | undefined, completed: EnvironmentFrame | undefined;
-  let currentKey = '',
-    failedKey = '';
+  let currentKey = '';
   let layers: ComposedLayer[] = [],
     foreground: ComposedLayer[] = [];
   let snapshot = emptySnapshot();
@@ -125,7 +124,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     if (running || disposed || fallback || doc.hidden || !desired) return;
     const frame = { ...desired },
       key = compositionKey(frame);
-    if (key === currentKey || key === failedKey) return;
+    if (key === currentKey) return;
     running = true;
     snapshot.backend = 'loading';
     try {
@@ -139,9 +138,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
       }
       if (!response.ok) {
         closeLayers([...response.layers, ...response.foreground]);
-        failedKey = key;
-        snapshot.backend = 'unavailable';
-        settle(key, false);
+        failWorker(response.error || 'Scenery worker could not compose the selected scene');
         return;
       }
       release();
@@ -190,7 +187,6 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     if (fallback) return fallback.compose(frame);
     const key = compositionKey(frame);
     if (key === currentKey) return true;
-    if (key === failedKey) return false;
     const result = new Promise<boolean>((resolve) => {
       const group = waiters.get(key) ?? new Set();
       group.add(resolve);

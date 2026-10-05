@@ -24,6 +24,7 @@ import { createScrollMenus } from './ui/scroll-menus.ts';
 import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.ts';
 import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
+import { compositionKey } from './rendering/environment/worker-types.ts';
 import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
 import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
@@ -422,6 +423,13 @@ export function startGame(
   let savedRun = readRunCheckpoint();
   let shrineOfferIds: string[] | null = null;
   function captureCheckpoint(status: RunCheckpoint['status'] = 'active') {
+    if (sceneLoading) {
+      if (status === 'ended') {
+        clearRunCheckpoint();
+        savedRun = null;
+      }
+      return;
+    }
     if (
       activeTrial ||
       !['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state)
@@ -779,6 +787,7 @@ export function startGame(
     buildMist();
     buildGrass();
     buildWeather();
+    prepareScene();
   }
   const snowGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
   const demonGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
@@ -1152,6 +1161,57 @@ export function startGame(
 
   const hudView = createHud($('app'));
   const screenAnimation = createScreenAnimation(activeNow, hudView.activeScreen);
+  let artworkReady = false;
+  let sceneLoading = false;
+  let sceneReadyToPresent = false;
+  let sceneRequest = 0;
+  let requestedSceneKey = '';
+  let requestedSceneIdentity = '';
+  let sceneContinuation: (() => void) | undefined;
+  function prepareScene() {
+    const frame = {
+      stageSeed,
+      width: W,
+      height: H,
+      dpr: DPR,
+      time,
+      stage: G.stage,
+      reducedMotion: reducedMotion(),
+      reducedFlashes: reducedFlashes(),
+      lowQuality: density() <= 0.3,
+    };
+    const demon = activeTrial?.realm === 'demon' || previewDemon;
+    const key = `${demon}:${compositionKey(frame)}`;
+    if (key === requestedSceneKey) return;
+    requestedSceneKey = key;
+    const request = ++sceneRequest;
+    const identity = `${demon}:${G.stage}:${stageSeed}`;
+    if (identity !== requestedSceneIdentity) sceneContinuation = undefined;
+    requestedSceneIdentity = identity;
+    sceneLoading = true;
+    sceneReadyToPresent = false;
+    cvs.dataset.sceneState = 'loading';
+    screenAnimation.invalidate();
+    const pending = demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame);
+    void pending
+      .then((ready) => {
+        if (lifecycle.disposed || request !== sceneRequest) return;
+        if (!ready) {
+          cvs.dataset.sceneState = 'unavailable';
+          return;
+        }
+        sceneReadyToPresent = true;
+        screenAnimation.invalidate();
+      })
+      .catch(() => {
+        if (!lifecycle.disposed && request === sceneRequest) cvs.dataset.sceneState = 'unavailable';
+      });
+  }
+  function deferUntilSceneReady(action: () => void) {
+    if (!sceneLoading) return false;
+    sceneContinuation = action;
+    return true;
+  }
   function showScreen(id: Screen | null) {
     screenAnimation.show(id);
     hudView.showScreen(id);
@@ -1316,6 +1376,7 @@ export function startGame(
     return createEnemy(G, slot, attract, enemyPos, attract ? R : combatRandom);
   }
   function setupAttract() {
+    if (deferUntilSceneReady(setupAttract)) return;
     G.enemies = [];
     G.cfg = null;
     G.boss = null;
@@ -1404,6 +1465,8 @@ export function startGame(
     hud(true);
     $('bossbar').classList.remove('on');
     G.pauseN = 0;
+    G.state = 'playing';
+    prepareScene();
     if (activeTrial) {
       startTrialEncounter();
       setScore();
@@ -1478,6 +1541,7 @@ export function startGame(
     startRun();
   }
   function startTrialEncounter() {
+    if (deferUntilSceneReady(startTrialEncounter)) return;
     const trial = activeTrial;
     if (!trial) return;
     G.afterBoss = false;
@@ -1626,83 +1690,87 @@ export function startGame(
       changed = si !== G.stage || lap !== G.lap;
     G.lap = lap;
     if (si !== G.stage) setStage(si, true);
-    const st = STAGES[si]!;
-    if (!G.zen) {
-      if (G.blade) ST.bladeWave = Math.max(ST.bladeWave || 0, n);
-      if (!G.lostLife) ST.flawlessWave = Math.max(ST.flawlessWave || 0, n);
-      {
-        const q = bst();
-        if (q) {
-          q.w = Math.max(q.w, n);
-          if (G.mode === 'ronin') q.rw = Math.max(q.rw, n);
+    const begin = () => {
+      const st = STAGES[si]!;
+      if (!G.zen) {
+        if (G.blade) ST.bladeWave = Math.max(ST.bladeWave || 0, n);
+        if (!G.lostLife) ST.flawlessWave = Math.max(ST.flawlessWave || 0, n);
+        {
+          const q = bst();
+          if (q) {
+            q.w = Math.max(q.w, n);
+            if (G.mode === 'ronin') q.rw = Math.max(q.rw, n);
+          }
+          challenge('w', n);
+          if (G.mode === 'ronin') challenge('rw', n);
         }
-        challenge('w', n);
-        if (G.mode === 'ronin') challenge('rw', n);
+        ST.bestWave = Math.max(ST.bestWave, n);
+        if (G.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
+        ST.furthestStage = Math.max(ST.furthestStage, Math.floor((n - 1) / 3));
       }
-      ST.bestWave = Math.max(ST.bestWave, n);
-      if (G.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
-      ST.furthestStage = Math.max(ST.furthestStage, Math.floor((n - 1) / 3));
-    }
-    saveStats();
-    checkUnlocks();
-    let ev: 'standoff' | 'blood' | 'fog' | null = null;
-    if (
-      !skipEvent &&
-      n >= 4 &&
-      n - G.lastEv >= 2 &&
-      combatRandom() < 0.3 * (G.m.standoff > 1 ? 1.4 : 1)
-    ) {
-      const q = combatRandom();
-      ev = q < (G.m.standoff > 1 ? 0.7 : 0.4) ? 'standoff' : q < 0.7 ? 'blood' : 'fog';
-      G.lastEv = n;
-    }
-    if (ev === 'standoff') {
-      if (st.hint) hint('stage' + si, st.hint, 5000);
-      startStandoff(n, changed);
-      return;
-    }
-    G.event = ev;
-    G.cfg = waveCfg(n);
-    if (ev === 'blood') waveConfiguration().atk *= 0.82;
-    G.state = 'playing';
-    G.enemies = G.enemies.filter((e) => e.state === 'dying');
-    G.attacker = null;
-    G.toSpawn = waveConfiguration().total;
-    G.gapT = 1.2;
-    G.pendingSpawns = [];
-    G.pendingSpawns = initialSpawns(
-      waveConfiguration().pack,
-      !!((changed && n > 1) || ev),
-      combatRandom,
-    );
-    if (changed && n > 1) {
-      banner(st.k, `${st.n}${lap ? ' ' + roman(lap + 1) : ''}, wave ${n}`);
-      G.gapT = 1.9;
-    } else if (ev === 'blood') {
-      banner('赤月', 'Blood moon. Faster blades, double score.');
-      G.gapT = 1.9;
-    } else if (ev === 'fog') {
-      banner('霧', 'Fog. Only the attacker shows himself.');
-      G.gapT = 1.9;
-    } else banner(`第${kanji(n)}陣`, `Wave ${n}`);
-    $('waveLbl').textContent = ev === 'blood' ? '赤月' : ev === 'fog' ? '霧' : `第${kanji(n)}陣`;
-    sfx.drum();
-    if (n === 1) hint('swipe', 'Swipe the way his blade points.', 7000);
-    if (n === 2 || G.mode === 'ronin')
-      hint(
-        'perfect',
-        'Wait until his ring reaches the red arc, then cut, for a perfect cut.',
-        5000,
+      saveStats();
+      checkUnlocks();
+      let ev: 'standoff' | 'blood' | 'fog' | null = null;
+      if (
+        !skipEvent &&
+        n >= 4 &&
+        n - G.lastEv >= 2 &&
+        combatRandom() < 0.3 * (G.m.standoff > 1 ? 1.4 : 1)
+      ) {
+        const q = combatRandom();
+        ev = q < (G.m.standoff > 1 ? 0.7 : 0.4) ? 'standoff' : q < 0.7 ? 'blood' : 'fog';
+        G.lastEv = n;
+      }
+      if (ev === 'standoff') {
+        if (st.hint) hint('stage' + si, st.hint, 5000);
+        startStandoff(n, changed);
+        return;
+      }
+      G.event = ev;
+      G.cfg = waveCfg(n);
+      if (ev === 'blood') waveConfiguration().atk *= 0.82;
+      G.state = 'playing';
+      G.enemies = G.enemies.filter((e) => e.state === 'dying');
+      G.attacker = null;
+      G.toSpawn = waveConfiguration().total;
+      G.gapT = 1.2;
+      G.pendingSpawns = [];
+      G.pendingSpawns = initialSpawns(
+        waveConfiguration().pack,
+        !!((changed && n > 1) || ev),
+        combatRandom,
       );
-    if (waveConfiguration().refill) hint('refill', 'The pack no longer thins. Keep cutting.', 4000);
-    if (waveConfiguration().feint)
-      hint('feint', 'A trembling seal may feint. Watch the blade turn.', 5000);
-    if (st.hint) hint('stage' + si, st.hint, 5000);
-    if (ev === 'blood')
-      hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
-    if (ev === 'fog')
-      hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
-    captureCheckpoint();
+      if (changed && n > 1) {
+        banner(st.k, `${st.n}${lap ? ' ' + roman(lap + 1) : ''}, wave ${n}`);
+        G.gapT = 1.9;
+      } else if (ev === 'blood') {
+        banner('赤月', 'Blood moon. Faster blades, double score.');
+        G.gapT = 1.9;
+      } else if (ev === 'fog') {
+        banner('霧', 'Fog. Only the attacker shows himself.');
+        G.gapT = 1.9;
+      } else banner(`第${kanji(n)}陣`, `Wave ${n}`);
+      $('waveLbl').textContent = ev === 'blood' ? '赤月' : ev === 'fog' ? '霧' : `第${kanji(n)}陣`;
+      sfx.drum();
+      if (n === 1) hint('swipe', 'Swipe the way his blade points.', 7000);
+      if (n === 2 || G.mode === 'ronin')
+        hint(
+          'perfect',
+          'Wait until his ring reaches the red arc, then cut, for a perfect cut.',
+          5000,
+        );
+      if (waveConfiguration().refill)
+        hint('refill', 'The pack no longer thins. Keep cutting.', 4000);
+      if (waveConfiguration().feint)
+        hint('feint', 'A trembling seal may feint. Watch the blade turn.', 5000);
+      if (st.hint) hint('stage' + si, st.hint, 5000);
+      if (ev === 'blood')
+        hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
+      if (ev === 'fog')
+        hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
+      captureCheckpoint();
+    };
+    if (!deferUntilSceneReady(begin)) begin();
   }
   function updateWave(dt: number) {
     simulateWave(
@@ -2077,6 +2145,7 @@ export function startGame(
     apparelMotion.kick(dir, reducedMotion(), perfect);
   }
   function onSwipe(dir: Direction) {
+    if (sceneLoading) return;
     if (
       guided.swipe(
         dir,
@@ -2115,6 +2184,7 @@ export function startGame(
 
   /* ---------------- boss ---------------- */
   function startBoss() {
+    if (deferUntilSceneReady(startBoss)) return;
     refillDuelKnives(G);
     G.blessingTriggers.flourishWard = false;
     renderLives();
@@ -2220,6 +2290,7 @@ export function startGame(
       );
   }
   function onTapDown() {
+    if (sceneLoading) return false;
     // Finger-down begins a possible swipe. Consume taps on release during cut
     // practice so the pointer adapter can still recognize the teaching gesture.
     if (guided.phase === 'order-practice') return false;
@@ -2231,6 +2302,7 @@ export function startGame(
     return false;
   }
   function onTap() {
+    if (sceneLoading) return;
     if (guided.tap()) return;
     if (G.state === 'playing') {
       const target = throwKnife(G, combatRandom);
@@ -2466,6 +2538,7 @@ export function startGame(
 
   /* ---------------- standoff & shrine ---------------- */
   function startStandoff(n: number, changed: boolean) {
+    if (deferUntilSceneReady(() => startStandoff(n, changed))) return;
     const st = STAGES[G.stage]!;
     G.state = 'standoff';
     G.cfg = waveCfg(n);
@@ -2863,6 +2936,7 @@ export function startGame(
   const supportPremium = () =>
     premium.state.owned || edition === 'premium' || testerPremiumActive(testerPremium);
   function showOver() {
+    sceneContinuation = undefined;
     if (rewardFlowBusy) return;
     const eligible = !activeDaily && !activeTrial && !G.zen;
     const revive =
@@ -3359,6 +3433,7 @@ export function startGame(
   function applySettings() {
     cvs.dataset.debris = 'sprites';
     screenAnimation.invalidate();
+    if (artworkReady) prepareScene();
     scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
     audio.setMuted(settings.muted);
@@ -3505,7 +3580,6 @@ export function startGame(
     previewDemon = stage === STAGES.length;
     G.stage = previewDemon ? 0 : stage;
     buildLeaves();
-    if (newVisit) setupAttract();
     MIST = previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
     palette.clearFog();
     prevBg = null;
@@ -3518,6 +3592,8 @@ export function startGame(
       cinematicWeather,
       createWeatherState(() => 0.5),
     );
+    prepareScene();
+    if (newVisit) setupAttract();
   }
   const cinematic = createCinematic($('app'), {
     canOpen: () => G.state === 'title' && !G.panel,
@@ -4017,6 +4093,7 @@ export function startGame(
     });
   }
   function update(dt: number, raw: number) {
+    if (sceneLoading) return;
     if (activeTrial && trialFailure) {
       finishTrial(trialFailure);
       return;
@@ -4497,6 +4574,9 @@ export function startGame(
           lowQuality: density() <= 0.3,
         });
     cvs.dataset.renderer = 'ink';
+    cvs.dataset.scene = String(
+      demonRealm ? STAGES.length : (environmentRenderer.snapshot().stage ?? G.stage),
+    );
     cvs.dataset.rendererBackend = demonRealm ? 'demon-realm' : environmentRenderer.backend;
     cvs.dataset.artwork = 'ink';
     if (mistSprite)
@@ -4508,13 +4588,13 @@ export function startGame(
     blades(mid, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
     if (!cinematic.active) drawStains();
     drawLeaves(false);
-    const b = G.boss;
+    const b = sceneLoading ? null : G.boss;
     if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
       const k = b.state === 'flash' ? 1 : clamp(b.t / b.dur);
       g.fillStyle = `rgba(0,0,0,${0.2 * k})`;
       g.fillRect(-30, -30, W + 60, H + 60);
     }
-    const back = G.enemies
+    const back = (sceneLoading ? [] : G.enemies)
       .filter((e) => e !== G.attacker && e.state !== 'strike')
       .sort((a, c) => a.pos.y - c.pos.y);
     for (const e of back) drawEnemy(e);
@@ -4531,8 +4611,9 @@ export function startGame(
       g.fillRect(-30, y0, W + 60, y1 - y0);
     }
     if (b) drawBoss();
-    for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
-    if (!cinematic.active) {
+    if (!sceneLoading)
+      for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
+    if (!cinematic.active && !sceneLoading) {
       drawPlayer();
       drawPet();
       drawFoxfire();
@@ -4563,6 +4644,20 @@ export function startGame(
     drawPost(frame.post);
     nativeScene?.flush();
     cvs.dataset.graphicsBackend = nativeScene ? 'pixi' : 'canvas';
+    if (sceneLoading && sceneReadyToPresent) {
+      sceneLoading = false;
+      sceneReadyToPresent = false;
+      cvs.dataset.sceneState = 'ready';
+      const continuation = sceneContinuation;
+      sceneContinuation = undefined;
+      const paused = G.state === 'paused';
+      continuation?.();
+      if (paused && G.state !== 'paused') {
+        G.pausedFrom = G.state;
+        G.state = 'paused';
+      }
+      frameLoop.resetClock();
+    }
   }
   const frameLoop = createFrameLoop(
     {
@@ -4584,7 +4679,10 @@ export function startGame(
     },
     {
       maxFps: () => 60,
-      demand: () => screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded),
+      demand: () =>
+        cinematic.active
+          ? { update: true, render: true, afterRender: false }
+          : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded),
       paused: () => G.state === 'paused' || guided.frozen,
       update,
       render,
@@ -4592,6 +4690,7 @@ export function startGame(
         if (G.panel === 'armory') drawPreview();
       },
       sampleFrame: (interval, work) => {
+        if (sceneLoading) return;
         if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
         if (!effectQuality.sample(interval, work)) return;
         ambient().balanceLeaves(leaves);
@@ -4599,7 +4698,6 @@ export function startGame(
       },
     },
   );
-  let artworkReady = false;
   function visitToday() {
     const next = recordDailyLogin(DAILY_LOGIN);
     if (!store.set('issen.dailyLogin', next)) return;
@@ -4702,6 +4800,7 @@ export function startGame(
     buildPost();
     viewportPrepared = true;
     screenAnimation.invalidate();
+    if (artworkReady) prepareScene();
     prevBg = null;
     stageFade = 0;
     for (const e of G.enemies) {

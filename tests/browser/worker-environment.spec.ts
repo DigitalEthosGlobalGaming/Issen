@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('worker construction and runtime errors settle through the owned local fallback', async ({
+test('worker construction, runtime and composition errors settle through the owned local fallback', async ({
   page,
 }) => {
   await page.goto('/privacy/index.html');
@@ -20,14 +20,29 @@ test('worker construction and runtime errors settle through the owned local fall
     };
     const results = [];
     try {
-      for (const constructionFailure of [true, false]) {
+      for (const failure of ['construction', 'runtime', 'composition']) {
         let terminated = 0;
         (window as any).Worker = class extends EventTarget {
           constructor() {
             super();
-            if (constructionFailure) throw Error('fixture constructor failure');
+            if (failure === 'construction') throw Error('fixture constructor failure');
           }
-          postMessage() {
+          postMessage(request: { id: number }) {
+            if (failure === 'composition') {
+              this.dispatchEvent(
+                new MessageEvent('message', {
+                  data: {
+                    id: request.id,
+                    ok: false,
+                    error: 'fixture composition failure',
+                    layers: [],
+                    foreground: [],
+                    snapshot: {},
+                  },
+                }),
+              );
+              return;
+            }
             this.dispatchEvent(new ErrorEvent('error', { message: 'fixture runtime failure' }));
           }
           terminate() {
@@ -64,6 +79,8 @@ test('worker construction and runtime errors settle through the owned local fall
   }
   expect(result[1]!.failure).toContain('fixture runtime failure');
   expect(result[1]!.terminated).toBeGreaterThan(0);
+  expect(result[2]!.failure).toContain('fixture composition failure');
+  expect(result[2]!.terminated).toBeGreaterThan(0);
 });
 
 test('worker scenery preserves all nine lit compositions and foreground materials', async ({

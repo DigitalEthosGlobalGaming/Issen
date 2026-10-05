@@ -152,6 +152,15 @@ for (const input of ['keyboard', 'touch'] as const) {
     await page
       .getByRole('button', { name: 'Jump to wave', exact: true })
       .evaluate((button: HTMLButtonElement) => button.click());
+    await expect
+      .poll(
+        async () => {
+          await page.evaluate(() => (window as any).advance(1));
+          return page.locator('#c').getAttribute('data-scene-state');
+        },
+        { timeout: 15000 },
+      )
+      .toBe('ready');
     for (
       let i = 0;
       i < 20 && !(await page.getByRole('heading', { name: 'Cut the front enemy' }).isVisible());
@@ -232,6 +241,15 @@ test('first boss holds the glint until the player parries with touch', async ({ 
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })
     .evaluate((button: HTMLButtonElement) => button.click());
+  await expect
+    .poll(
+      async () => {
+        await page.evaluate(() => (window as any).advance(1));
+        return page.locator('#c').getAttribute('data-scene-state');
+      },
+      { timeout: 15000 },
+    )
+    .toBe('ready');
   await expect(page.getByRole('heading', { name: 'Watch for the glint' })).toBeVisible();
   await expect(page.locator('.guided-overlay button')).toHaveCount(0);
   await expect(page.locator('#hint')).not.toContainText('A duel. Wait for the glint');

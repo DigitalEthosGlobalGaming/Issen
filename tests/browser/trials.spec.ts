@@ -52,7 +52,10 @@ async function instrument(page: Page) {
       `
       window.__trialHarness = { G, step: update, swipe: onSwipe, tap: onTap,
         startBoss, shownDirection: bossShownDirection,
-        stop: () => frameLoop.stop(), getEquipment: () => EQ };
+        stop: () => frameLoop.stop(), getEquipment: () => EQ,
+        settleScene: async () => {
+          while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); }
+        } };
       frameLoop.start();`,
     );
     await route.fulfill({ response, body });
@@ -73,6 +76,7 @@ test('Mirror accepts opposite displayed directions throughout a chain and reject
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  await page.evaluate(() => (window as any).__trialHarness.settleScene());
   const result = await page.evaluate(() => {
     const h = (window as any).__trialHarness;
     h.G.bossCount = 5;
@@ -175,6 +179,7 @@ test('Live failure, retry and quitting preserve the main profile', async ({ page
 test('All eight encounters complete through combat and persist exclusive rewards without farming', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(90000);
   await seed(page);
   await instrument(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -194,6 +199,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
     'broken-reality',
   ]) {
     await page.locator(`[data-trial="${id}"]`).click();
+    await page.evaluate(() => (window as any).__trialHarness.settleScene());
     const completed = await page.evaluate(() => {
       const h = (window as any).__trialHarness;
       if (
@@ -277,6 +283,7 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   for (let attempt = 0; attempt < 2; attempt++) {
     if (attempt === 0) await page.locator('[data-trial="true-edge"]').click();
     else await page.getByRole('button', { name: 'Retry', exact: true }).click();
+    await page.evaluate(() => (window as any).__trialHarness.settleScene());
     sequences.push(
       await page.evaluate(() => {
         const h = (window as any).__trialHarness;
@@ -308,6 +315,7 @@ test('Broken Reality ends on the first ordinary cut', async ({ page }) => {
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="broken-reality"]').click();
+  await page.evaluate(() => (window as any).__trialHarness.settleScene());
   const cuts = await page.evaluate(() => {
     const h = (window as any).__trialHarness;
     let cuts = 0;
