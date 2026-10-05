@@ -19,20 +19,20 @@ test('drift options, shortcut and all stage mixtures render and persist', async 
   await expect(page.locator('#cinematic')).toBeVisible();
   await page.keyboard.press('Backquote');
   await expect(page.getByLabel('Preview debris')).toHaveValue('sprites');
-  for (let stage = 0; stage < 9; stage++) {
+  for (let stage = 0; stage < 10; stage++) {
     await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', String(stage));
     for (const mode of ['original', 'shape', 'sprites']) {
       await page.getByLabel('Preview debris').selectOption(mode);
       await expect(page.locator('#c')).toHaveAttribute('data-debris', mode);
     }
-    if (stage < 8) await page.getByRole('button', { name: 'Next scene' }).click();
+    if (stage < 9) await page.getByRole('button', { name: 'Next scene' }).click();
   }
   await page.getByRole('button', { name: 'Exit', exact: true }).click();
   await expect(page.locator('#c')).toHaveAttribute('data-debris', 'sprites');
   expect(errors).toEqual([]);
 });
 
-test('all 24 atlas frames paint and reusable geometry matches the original', async ({ page }) => {
+test('all 32 atlas frames paint and reusable geometry matches the original', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#c')).toHaveAttribute('data-debris', 'sprites');
   const result = await page.evaluate(async () => {
@@ -54,7 +54,7 @@ test('all 24 atlas frames paint and reusable geometry matches the original', asy
       vf: 1,
       vy: 1,
       ph: 1,
-      col: '#242321',
+      col: '#322321',
     };
     function paint(mode: 'original' | 'shape' | 'sprites', sprite?: string) {
       g.clearRect(0, 0, 96, 96);
@@ -82,7 +82,7 @@ test('all 24 atlas frames paint and reusable geometry matches the original', asy
     renderer.dispose();
     return { coverage, relativeError: alphaError / totalAlpha };
   });
-  expect(result.coverage).toHaveLength(24);
+  expect(result.coverage).toHaveLength(32);
   expect(Math.min(...result.coverage)).toBeGreaterThan(50);
   expect(result.relativeError).toBeLessThan(0.03);
 });

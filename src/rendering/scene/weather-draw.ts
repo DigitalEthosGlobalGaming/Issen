@@ -13,6 +13,12 @@ export interface WeatherDrawing {
   bamboo: readonly Bamboo[];
   state: WeatherState;
   smokeSprite: CanvasImageSource | null;
+  drawEmber?: (
+    g: CanvasRenderingContext2D,
+    p: WeatherParticle,
+    index: number,
+    scale: number,
+  ) => void;
 }
 export function createWeatherRenderer(g: CanvasRenderingContext2D, env: WeatherDrawing) {
   const {
@@ -78,9 +84,13 @@ export function createWeatherRenderer(g: CanvasRenderingContext2D, env: WeatherD
     if (w === 'smoke') {
       g.save();
       g.globalCompositeOperation = 'lighter';
-      for (const p of wx) {
-        g.fillStyle = `rgba(255,226,196,${0.35 + 0.35 * Math.sin(time * 6 + p.ph)})`;
-        g.fillRect(p.x, p.y, p.z * 2 * S, p.z * 2 * S);
+      for (let index = 0; index < wx.length; index++) {
+        const p = wx[index]!;
+        if (env.drawEmber) env.drawEmber(g, p, index, S);
+        else {
+          g.fillStyle = `rgba(255,226,196,${0.35 + 0.35 * Math.sin(time * 6 + p.ph)})`;
+          g.fillRect(p.x, p.y, p.z * 2 * S, p.z * 2 * S);
+        }
       }
       g.restore();
     }

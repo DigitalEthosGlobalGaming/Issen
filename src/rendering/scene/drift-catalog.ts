@@ -4,6 +4,7 @@ export const DRIFT_ATLASES: Readonly<Record<string, string>> = {
   leaves: new URL('../environment/assets/drift-leaves-atlas.png', import.meta.url).href,
   petals: new URL('../environment/assets/drift-petals-atlas.png', import.meta.url).href,
   debris: new URL('../environment/assets/drift-debris-atlas.png', import.meta.url).href,
+  fire: new URL('../environment/assets/drift-fire-atlas.png', import.meta.url).href,
 };
 
 /** Frame rectangles and pivots are normalized to the atlas and frame respectively. */
@@ -15,6 +16,8 @@ export interface DriftSprite {
   size: number;
   spin: number;
   opacity: number;
+  rise: number;
+  flutter: number;
 }
 const families = {
   leaves: [
@@ -29,6 +32,16 @@ const families = {
   ],
   petals: ['round', 'notched', 'narrow', 'folded', 'paired', 'winged-seed', 'husk', 'fluff'],
   debris: ['torn', 'skeletal', 'needles', 'bark-strip', 'bark-chip', 'splinter', 'ash', 'charred'],
+  fire: [
+    'ember',
+    'coal',
+    'streak',
+    'forked',
+    'wisp',
+    'spectral-flame',
+    'spirit-shard',
+    'spectral-cinder',
+  ],
 } as const;
 export const DRIFT_SPRITES: readonly DriftSprite[] = Object.entries(families).flatMap(
   ([atlas, names]) =>
@@ -38,8 +51,10 @@ export const DRIFT_SPRITES: readonly DriftSprite[] = Object.entries(families).fl
       frame: [(index % 4) / 4, Math.floor(index / 4) / 2, 1 / 4, 1 / 2] as const,
       pivot: [0.5, 0.5] as const,
       size: atlas === 'petals' ? 0.85 : 1,
-      spin: atlas === 'debris' ? 0.7 : 1,
+      spin: atlas === 'fire' ? 0.2 : atlas === 'debris' ? 0.7 : 1,
       opacity: name === 'fluff' || name === 'ash' ? 0.65 : 1,
+      rise: atlas === 'fire' ? 32 : 0,
+      flutter: atlas === 'fire' ? 0.2 : 1,
     })),
 );
 export const DRIFT_BY_ID = new Map(DRIFT_SPRITES.map((sprite) => [sprite.id, sprite]));
@@ -85,9 +100,13 @@ export const DRIFT_MIXTURES: readonly Mixture[] = [
     ['debris.bark-chip', 1],
   ],
   [
-    ['debris.ash', 6],
-    ['debris.charred', 4],
-    ['debris.torn', 1],
+    ['fire.ember', 4],
+    ['fire.coal', 3],
+    ['fire.streak', 2],
+    ['fire.forked', 1],
+    ['fire.wisp', 1],
+    ['debris.ash', 2],
+    ['debris.charred', 1],
   ],
   [
     ['debris.torn', 3],
@@ -102,7 +121,14 @@ export const DRIFT_MIXTURES: readonly Mixture[] = [
     ['petals.winged-seed', 2],
     ['petals.round', 1],
   ],
+  [
+    ['fire.spectral-flame', 3],
+    ['fire.spirit-shard', 2],
+    ['fire.spectral-cinder', 5],
+  ],
 ];
+/** Blossom keeps its original abundance; other scenes leave more open space. Index 9 is Demon. */
+export const DRIFT_DENSITY = [0.4, 0.3, 1, 0.3, 0.4, 0.15, 0.35, 0.25, 0.25, 0.3] as const;
 export function chooseDriftSprite(stage: number, random: Random): DriftSprite {
   const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
   let roll = random() * mixture.reduce((total, entry) => total + entry[1], 0);

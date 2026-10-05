@@ -4,23 +4,24 @@ import {
   DRIFT_ATLASES,
   DRIFT_SPRITES,
   DRIFT_MIXTURES,
+  DRIFT_DENSITY,
   chooseDriftSprite,
 } from '../../src/rendering/scene/drift-catalog.ts';
 import { createAmbient } from '../../src/rendering/scene/ambient.ts';
 import { rng } from '../../src/shared/random.ts';
 import { parseSettings, assignBinding } from '../../src/platform/settings.ts';
-test('all nine stage mixtures resolve to valid independent atlas frames', () => {
-  assert.equal(DRIFT_MIXTURES.length, 9);
-  assert.equal(DRIFT_SPRITES.length, 24);
+test('all ten stage mixtures resolve to valid independent atlas frames', () => {
+  assert.equal(DRIFT_MIXTURES.length, 10);
+  assert.equal(DRIFT_SPRITES.length, 32);
   const used = new Set(DRIFT_MIXTURES.flatMap((m) => m.map(([id]) => id)));
-  assert.equal(used.size, 24);
+  assert.equal(used.size, 32);
   for (const sprite of DRIFT_SPRITES) {
     assert.ok(DRIFT_ATLASES[sprite.atlas]);
     assert.ok(used.has(sprite.id));
     const [x, y, w, h] = sprite.frame;
     assert.ok(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1 && y + h <= 1);
   }
-  for (let stage = 0; stage < 9; stage++) {
+  for (let stage = 0; stage < 10; stage++) {
     const allowed = new Set(DRIFT_MIXTURES[stage].map(([id]) => id));
     const random = rng(42);
     for (let i = 0; i < 100; i++) assert.ok(allowed.has(chooseDriftSprite(stage, random).id));
@@ -54,4 +55,11 @@ test('debris preference migrates safely and reserves its instant comparison shor
   assert.equal(parseSettings({ version: 1, debrisStyle: 'invalid' }).debrisStyle, 'sprites');
   for (const key of ['`', '~'])
     assert.match(assignBinding(parseSettings(null), 'up', key), /reserved/);
+});
+
+test('Blossom retains density and other scenes are substantially quieter', () => {
+  assert.equal(DRIFT_DENSITY[2], 1);
+  DRIFT_DENSITY.forEach((density, index) => {
+    if (index !== 2) assert.ok(density > 0 && density <= 0.4);
+  });
 });

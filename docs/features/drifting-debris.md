@@ -1,6 +1,6 @@
 # Drifting leaves, petals and debris
 
-Implemented in 1.59.0 on develop. Full regression and performance comparison are deferred to the later release pass.
+Implemented in 1.59.0; quieter stage mixtures and fire/spirit artwork added in 1.60.0 on develop. Full regression and performance comparison are deferred to the later release pass.
 
 ## Player controls
 
@@ -18,9 +18,9 @@ exiting restores the saved option. The keyboard shortcut changes the saved optio
 
 ## Asset families and stages
 
-Three transparent 4×2 sheets provide 24 independent variations. They are not
+Four transparent 4×2 sheets provide 32 independent variations. They are not
 animation frames. Actual generated dimensions are 1774×887 per sheet (about
-18 MiB of nominal combined RGBA pixels); the requested 1024×512 size was not
+24 MiB of nominal combined RGBA pixels); the requested 1024×512 size was not
 returned by generation. Original sheets remain intact. Each adjacent asset note
 records provenance, generation prompts, alpha observations and frame geometry.
 
@@ -32,18 +32,26 @@ records provenance, generation prompts, alpha observations and frame geometry.
 | Rainwater Hollow | Oval and heart-shaped leaves | Torn leaves, seed husks |
 | Hollow Bamboo Road | Pointed and curved bamboo leaves | Bamboo splinters |
 | White Silence Pass | Pine needles, skeletal and curled leaves | Bark chips |
-| Ember Courtyard | Ash and charred fragments | Torn leaves |
+| Ember Courtyard | Ember flecks, coal, streaks | Forked flame, fire wisp, ash and charred fragments |
 | Broken Shore | Torn and curled leaves, bark strips | Bark chips, seed husks |
 | Moonwatch Clearing | Ginkgo and maple leaves | Winged seeds, pale petals |
+| Demon | Violet spectral cinders and flames | Angular ink-spirit shards |
 
-Snow, rain, weather petals, sparks and other existing weather continue through
-their existing renderer. Demon retains its separate scene and suppresses leaves.
+Snow, rain and weather petals continue through their existing renderer. In sprite
+mode the Courtyard weather sparks also use ember/coal/streak frames; original mode
+retains square sparks. Demon uses only spectral sprites and keeps its separate
+scene renderer; original/retained-shape modes suppress ambient leaves there.
+
+Sprite density by scene is Field 40%, Ridge 30%, Blossom 100%, Hollow 30%,
+Bamboo 40%, Snow 15%, Courtyard 35%, Shore 25%, Moonwatch 25%, Demon 30% of
+the prior leaf count, multiplied by existing quality/reduced-motion density.
+Blossom remains unchanged. Density applies to gusts as well as ordinary drift.
 
 ## Ownership and extension
 
 - `src/rendering/scene/drift-catalog.ts`: atlas URLs, stable sprite IDs, normalized
   source rectangles, normalized frame-local pivots, size/spin/opacity presets and
-  weighted stage mixtures. Entries follow `STAGES` order.
+  weighted stage mixtures and density. Entries follow `STAGES` order, then Demon.
 - `src/rendering/scene/drift-renderer.ts`: decoded image ownership, original curve,
   retained Path2D and sprite drawing. Images prepare before frame startup and
   release with the runtime. No per-frame image decoding, tinting or offscreen
@@ -63,15 +71,16 @@ Broad silhouettes remain distinguishable at 16–32 pixels; at 4–8 pixels they
 as flecks. Very faint alpha noise in original gutters is documented in asset notes.
 
 Original and retained-shape modes preserve the original rotation rate; sprite
-mode applies the family spin preset. All modes share particle positions and count
-when switching, so comparisons do not restart the scene or reroll particles.
+mode applies family spin, rise and flutter presets. Fire rises gently and avoids
+flattening completely. Switching modes balances particle counts for the selected
+style while retaining surviving particles; it does not restart the scene.
 Existing density/reduced-motion controls still bound the particle population.
 
 ## Focused verification
 
 Strict TypeScript and develop-path build; focused ambient/settings/catalog unit
-checks; browser checks for Options, shortcut persistence, all nine scenes, all
-24 frames painting, retained-shape/original alpha parity, and existing cinematic
+checks; browser checks for Options, shortcut persistence, all ten scenes, all
+32 frames painting, retained-shape/original alpha parity, and existing cinematic
 isolation. Atlas sheets and tiny light/dark previews were visually inspected.
 Portrait/desktop scene previews and the nested develop-path smoke check also passed.
 Full regression, allocation/frame-time A/B measurements and physical-device

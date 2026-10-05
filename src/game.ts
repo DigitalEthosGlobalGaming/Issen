@@ -108,6 +108,7 @@ import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
 import { createAmbient } from './rendering/scene/ambient.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
+import { DRIFT_DENSITY } from './rendering/scene/drift-catalog.ts';
 import { createWeatherRenderer } from './rendering/scene/weather-draw.ts';
 import { createWeatherParticles } from './rendering/scene/weather-particles.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
@@ -612,17 +613,19 @@ export function startGame(): () => void {
       });
   }
   const driftRenderer = createDriftRenderer();
+  let previewDemon = false;
   driftRenderer.mode = settings.debrisStyle;
   lifecycle.add(driftRenderer.dispose);
   function ambient() {
+    const stage = activeTrial?.realm === 'demon' || previewDemon ? STAGES.length : G.stage;
     return createAmbient({
       width: W,
       height: H,
       scale: S,
       layout: L,
       random: R,
-      density: density(),
-      stage: G.stage,
+      density: density() * (driftRenderer.mode === 'sprites' ? (DRIFT_DENSITY[stage] ?? 1) : 1),
+      stage,
       drawLeaf: driftRenderer.draw,
       spriteMotion: driftRenderer.mode === 'sprites',
     });
@@ -816,6 +819,7 @@ export function startGame(): () => void {
       bamboo,
       state: cinematic.active ? cinematicWeather : WX,
       smokeSprite,
+      drawEmber: driftRenderer.mode === 'sprites' ? driftRenderer.drawEmber : undefined,
     });
   }
   function drawWeather() {
@@ -1439,6 +1443,7 @@ export function startGame(): () => void {
     )
       return;
     activeTrial = trial;
+    buildLeaves();
     trialFailure = '';
     trialResult = null;
     combatRandom = rng(trial.seed);
@@ -1536,6 +1541,7 @@ export function startGame(): () => void {
           : `You landed ${G.perfects} perfect cuts; ${trial.wave?.perfects ?? 0} were required.`),
     };
     activeTrial = null;
+    buildLeaves();
     combatRandom = R;
     ST = playerStats;
     EQ = playerEquipment;
@@ -3485,7 +3491,6 @@ export function startGame(): () => void {
     if (unread) $('bArmory').setAttribute('aria-description', 'Unviewed equipment');
     else $('bArmory').removeAttribute('aria-description');
   }
-  let previewDemon = false;
   let cinematicStage = 0;
   let cinematicStageSeed = stageSeed;
   let cinematicFilm = EQ.film;
@@ -3517,6 +3522,7 @@ export function startGame(): () => void {
     drift: () => driftRenderer.mode,
     setDrift: (mode) => {
       driftRenderer.mode = mode;
+      ambient().balanceLeaves(leaves);
       cvs.dataset.debris = mode;
     },
     films: () =>
@@ -4484,7 +4490,7 @@ export function startGame(): () => void {
     g.globalAlpha = 1;
     blades(mid, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
     if (!cinematic.active) drawStains();
-    if (!demonRealm) drawLeaves(false);
+    if (!demonRealm || driftRenderer.mode === 'sprites') drawLeaves(false);
     const b = G.boss;
     if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
       const k = b.state === 'flash' ? 1 : clamp(b.t / b.dur);
@@ -4533,7 +4539,7 @@ export function startGame(): () => void {
       drawSmoke();
       drawLeaves(true);
       drawWeather();
-    }
+    } else if (driftRenderer.mode === 'sprites') drawLeaves(true);
     if (!cinematic.active) drawPops();
     g.restore();
     if (!cinematic.active) drawStamps();

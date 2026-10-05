@@ -13,6 +13,8 @@ export interface GrassBlade {
 export interface Leaf {
   sprite?: string;
   spin?: number;
+  rise?: number;
+  flutter?: number;
   x: number;
   y: number;
   z: number;
@@ -86,6 +88,8 @@ export function createAmbient(env: AmbientEnvironment) {
     return {
       sprite: sprite.id,
       spin: sprite.spin,
+      rise: sprite.rise,
+      flutter: sprite.flutter,
       x: anywhere ? R() * W : -30 - R() * 120,
       y: anywhere ? R() * H : R() * H * 0.95,
       z,
@@ -154,7 +158,8 @@ export function createAmbient(env: AmbientEnvironment) {
       g.save();
       g.translate(l.x, l.y);
       g.rotate(l.rot);
-      g.scale(1, Math.cos(l.fl));
+      const flutter = env.spriteMotion ? (l.flutter ?? 1) : 1;
+      g.scale(1, 1 - flutter + flutter * Math.cos(l.fl));
       g.fillStyle = l.col;
       if (env.drawLeaf) env.drawLeaf(g, l);
       else {
@@ -173,6 +178,7 @@ export function createAmbient(env: AmbientEnvironment) {
         sp = l.gust ? 3.2 : 1;
       l.x += (40 + 95 * wind) * l.z * dt * S * sp;
       l.y += (l.vy + Math.sin(time * 1.7 + l.ph) * 26) * l.z * dt * 0.6 * S;
+      if (env.spriteMotion) l.y -= (l.rise ?? 0) * dt * S;
       l.rot += l.vr * dt * (env.spriteMotion ? (l.spin ?? 1) : 1);
       l.fl += l.vf * dt;
       if (l.x > W + 40 || l.y > H + 40 || l.y < -60) {
