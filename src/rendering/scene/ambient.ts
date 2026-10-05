@@ -1,6 +1,7 @@
 import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import { scaledCount } from '../effects/quality.ts';
+import { chooseDriftSprite } from './drift-catalog.ts';
 export interface GrassBlade {
   x: number;
   y: number;
@@ -10,6 +11,8 @@ export interface GrassBlade {
   col: string;
 }
 export interface Leaf {
+  sprite?: string;
+  spin?: number;
   x: number;
   y: number;
   z: number;
@@ -24,6 +27,9 @@ export interface Leaf {
   gust?: number;
 }
 export interface AmbientEnvironment {
+  stage?: number;
+  spriteMotion?: boolean;
+  drawLeaf?: (g: CanvasRenderingContext2D, leaf: Leaf) => void;
   width: number;
   height: number;
   scale: number;
@@ -76,7 +82,10 @@ export function createAmbient(env: AmbientEnvironment) {
   function newLeaf(anywhere: boolean): Leaf {
     const z = 0.35 + Math.pow(R(), 1.8) * 1.7,
       c = Math.round(20 + (1 - Math.min(z, 1)) * 95);
+    const sprite = chooseDriftSprite(env.stage ?? 0, R);
     return {
+      sprite: sprite.id,
+      spin: sprite.spin,
       x: anywhere ? R() * W : -30 - R() * 120,
       y: anywhere ? R() * H : R() * H * 0.95,
       z,
@@ -147,11 +156,14 @@ export function createAmbient(env: AmbientEnvironment) {
       g.rotate(l.rot);
       g.scale(1, Math.cos(l.fl));
       g.fillStyle = l.col;
-      g.beginPath();
-      g.moveTo(-l.s, 0);
-      g.quadraticCurveTo(0, -l.s * 0.48, l.s, 0);
-      g.quadraticCurveTo(0, l.s * 0.48, -l.s, 0);
-      g.fill();
+      if (env.drawLeaf) env.drawLeaf(g, l);
+      else {
+        g.beginPath();
+        g.moveTo(-l.s, 0);
+        g.quadraticCurveTo(0, -l.s * 0.48, l.s, 0);
+        g.quadraticCurveTo(0, l.s * 0.48, -l.s, 0);
+        g.fill();
+      }
       g.restore();
     }
   }
@@ -161,7 +173,7 @@ export function createAmbient(env: AmbientEnvironment) {
         sp = l.gust ? 3.2 : 1;
       l.x += (40 + 95 * wind) * l.z * dt * S * sp;
       l.y += (l.vy + Math.sin(time * 1.7 + l.ph) * 26) * l.z * dt * 0.6 * S;
-      l.rot += l.vr * dt;
+      l.rot += l.vr * dt * (env.spriteMotion ? (l.spin ?? 1) : 1);
       l.fl += l.vf * dt;
       if (l.x > W + 40 || l.y > H + 40 || l.y < -60) {
         if (l.gust) leaves.splice(i, 1);

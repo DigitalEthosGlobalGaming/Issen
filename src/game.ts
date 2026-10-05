@@ -107,6 +107,7 @@ import {
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
 import { createAmbient } from './rendering/scene/ambient.ts';
+import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
 import { createWeatherRenderer } from './rendering/scene/weather-draw.ts';
 import { createWeatherParticles } from './rendering/scene/weather-particles.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
@@ -610,6 +611,9 @@ export function startGame(): () => void {
         v: (5 + R() * 12) * S,
       });
   }
+  const driftRenderer = createDriftRenderer();
+  driftRenderer.mode = settings.debrisStyle;
+  lifecycle.add(driftRenderer.dispose);
   function ambient() {
     return createAmbient({
       width: W,
@@ -618,6 +622,9 @@ export function startGame(): () => void {
       layout: L,
       random: R,
       density: density(),
+      stage: G.stage,
+      drawLeaf: driftRenderer.draw,
+      spriteMotion: driftRenderer.mode === 'sprites',
     });
   }
   function buildGrass() {
@@ -744,6 +751,7 @@ export function startGame(): () => void {
       stageFade = 1;
     }
     G.stage = si;
+    buildLeaves();
     MIST = STAGES[si]!.fog;
     palette.clearFog();
     buildBG();
@@ -3325,6 +3333,9 @@ export function startGame(): () => void {
   const scrollMenus = createScrollMenus($('app'));
   lifecycle.add(scrollMenus.dispose);
   function applySettings() {
+    driftRenderer.mode = settings.debrisStyle;
+    cvs.dataset.debris = driftRenderer.mode;
+    screenAnimation.invalidate();
     scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
     audio.setMuted(settings.muted);
@@ -3349,6 +3360,28 @@ export function startGame(): () => void {
     store.set('issen.muted', settings.muted);
     applySettings();
   }
+  const toggleDrift = (event: KeyboardEvent) => {
+    if (event.code !== 'Backquote' && event.key !== '`' && event.key !== '~') return;
+    if (event.ctrlKey || event.altKey || event.metaKey || event.repeat) return;
+    const target = event.target;
+    if (
+      target instanceof HTMLElement &&
+      target.closest('input, textarea, [contenteditable="true"]')
+    )
+      return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    settings.debrisStyle = driftRenderer.mode === 'sprites' ? 'original' : 'sprites';
+    saveSettings();
+    for (const select of document.querySelectorAll<HTMLSelectElement>(
+      '#option-debrisStyle, [aria-label="Preview debris"]',
+    ))
+      select.value = settings.debrisStyle;
+    const viewer = document.getElementById('cinematic');
+    if (viewer) viewer.dataset.debris = settings.debrisStyle;
+  };
+  window.addEventListener('keydown', toggleDrift, true);
+  lifecycle.add(() => window.removeEventListener('keydown', toggleDrift, true));
   const options = createOptions(
     $('options'),
     settings,
@@ -3460,6 +3493,7 @@ export function startGame(): () => void {
     if (newVisit) stageSeed = previewVisits.enter(stage, true);
     previewDemon = stage === STAGES.length;
     G.stage = previewDemon ? 0 : stage;
+    buildLeaves();
     if (newVisit) setupAttract();
     MIST = previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
     palette.clearFog();
@@ -3480,6 +3514,11 @@ export function startGame(): () => void {
     scenes: [...STAGES.map((stage) => stage.n), 'Demon'],
     bindings: () => settings.bindings,
     film: () => EQ.film,
+    drift: () => driftRenderer.mode,
+    setDrift: (mode) => {
+      driftRenderer.mode = mode;
+      cvs.dataset.debris = mode;
+    },
     films: () =>
       ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
     enter(stage) {
@@ -3495,6 +3534,8 @@ export function startGame(): () => void {
     },
     scene: previewStage,
     leave: () => {
+      driftRenderer.mode = settings.debrisStyle;
+      cvs.dataset.debris = driftRenderer.mode;
       stageSeed = cinematicStageSeed;
       previewStage(cinematicStage, false);
       setupAttract();
@@ -4658,6 +4699,7 @@ export function startGame(): () => void {
     inkPlayer.prepare(),
     inkSword.prepare(),
     environmentRenderer.prepare(G.stage),
+    driftRenderer.prepare(),
   ]).then(() => {
     if (artworkDisposed) return;
     const failed = [
@@ -4669,9 +4711,10 @@ export function startGame(): () => void {
         : null,
       !inkSword.ready ? 'weapons' : null,
       environmentRenderer.backend !== 'layered' ? 'scene' : null,
+      !driftRenderer.ready ? 'drifting debris' : null,
     ].filter((name): name is string => !!name);
     if (failed.length) {
-      artworkLoading.update({ loaded: 6 - failed.length, total: 6, pending: 0, failed });
+      artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
       return;
     }
     artworkLoading.remove();

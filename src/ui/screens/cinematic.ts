@@ -1,6 +1,7 @@
 import { activeNow } from '../../platform/activity.ts';
 import { controlKey, keyLabel } from '../../platform/settings.ts';
 import type { Bindings } from '../../platform/settings.ts';
+import type { DriftMode } from '../../rendering/scene/drift-renderer.ts';
 
 interface CinematicActions {
   canOpen(): boolean;
@@ -8,6 +9,8 @@ interface CinematicActions {
   scenes: string[];
   bindings(): Bindings;
   film(): string;
+  drift(): DriftMode;
+  setDrift(mode: DriftMode): void;
   films(): { id: string; n: string }[];
   enter(stage: number): void;
   scene(stage: number): void;
@@ -26,7 +29,8 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   root.setAttribute('aria-label', 'Cinematic scene viewer');
   root.innerHTML = `<button type="button" class="cinematic-exit">Exit</button>
     <div class="cinematic-toolbar"><div class="cinematic-scenes"><button type="button" aria-label="Previous scene">←</button><span role="status"></span><button type="button" aria-label="Next scene">→</button></div>
-    <div class="cinematic-looks"><label>Film <select aria-label="Preview film"></select></label></div><small></small></div>`;
+    <div class="cinematic-looks"><label>Film <select aria-label="Preview film"></select></label>
+    <label>Debris <select aria-label="Preview debris"><option value="sprites">Sprites</option><option value="shape">Reusable shape</option><option value="original">Original curves</option></select></label></div><small></small></div>`;
   app.append(root);
   const buttons = root.querySelectorAll('button');
   const exit = buttons[0]!,
@@ -35,6 +39,15 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
   const label = root.querySelector('[role="status"]')!;
   const help = root.querySelector('small')!;
   const film = root.querySelector<HTMLSelectElement>('[aria-label="Preview film"]')!;
+  const drift = root.querySelector<HTMLSelectElement>('[aria-label="Preview debris"]')!;
+  drift.addEventListener(
+    'change',
+    () => {
+      actions.setDrift(drift.value as DriftMode);
+      root.dataset.debris = drift.value;
+    },
+    { signal: events.signal },
+  );
   function refreshFilms() {
     film.replaceChildren();
     for (const item of actions.films()) {
@@ -87,6 +100,8 @@ export function createCinematic(app: HTMLElement, actions: CinematicActions) {
     clicks = 0;
     refreshFilms();
     film.value = actions.film();
+    drift.value = actions.drift();
+    root.dataset.debris = drift.value;
     actions.enter(scene);
     root.hidden = false;
     app.classList.add('cinematic-active');

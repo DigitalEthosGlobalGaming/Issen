@@ -83,3 +83,5 @@
 
 - [Artwork performance](features/rendering-performance.md): reproducible sprite stress workloads, bounded tint caches and measured results.
 - [Menu scheduling follow-up](features/performance-follow-up-2026-10-04.md): feature-release baseline, menu/preview cadence, resize preparation and validation.
+
+- [Drifting debris](features/drifting-debris.md): stage sprite mixtures, original/retained-shape comparison and instant toggle.

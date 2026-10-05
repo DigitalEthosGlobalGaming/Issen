@@ -13,6 +13,7 @@ export interface Settings {
   textSize: 'normal' | 'large';
   menuStyle: 'scroll';
   quality: 'auto' | 'low' | 'high';
+  debrisStyle: 'sprites' | 'original';
   vibration: boolean;
   vibrationStrength: 'light' | 'full';
 }
@@ -45,12 +46,14 @@ export function defaultSettings(muted = false): Settings {
     textSize: 'normal',
     menuStyle: 'scroll',
     quality: 'auto',
+    debrisStyle: 'sprites',
     vibration: true,
     vibrationStrength: 'full',
   };
 }
 /** Menu keys, modifier chords and the testing shortcut remain reserved. */
 export function controlKey(key: string): string | null {
+  if (key === '`' || key === '~') return null;
   if (/^Arrow(Up|Down|Left|Right)$/.test(key) || key === ' ') return key;
   const lower = key.toLowerCase();
   return /^[a-z0-9\-=[\]\\;',./`]$/.test(lower) ? lower : null;
@@ -106,6 +109,7 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
     menuStyle: 'scroll',
     quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
+    debrisStyle: choice('debrisStyle', ['sprites', 'original'], 'sprites'),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),
   };

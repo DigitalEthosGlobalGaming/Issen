@@ -1,0 +1,57 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  DRIFT_ATLASES,
+  DRIFT_SPRITES,
+  DRIFT_MIXTURES,
+  chooseDriftSprite,
+} from '../../src/rendering/scene/drift-catalog.ts';
+import { createAmbient } from '../../src/rendering/scene/ambient.ts';
+import { rng } from '../../src/shared/random.ts';
+import { parseSettings, assignBinding } from '../../src/platform/settings.ts';
+test('all nine stage mixtures resolve to valid independent atlas frames', () => {
+  assert.equal(DRIFT_MIXTURES.length, 9);
+  assert.equal(DRIFT_SPRITES.length, 24);
+  const used = new Set(DRIFT_MIXTURES.flatMap((m) => m.map(([id]) => id)));
+  assert.equal(used.size, 24);
+  for (const sprite of DRIFT_SPRITES) {
+    assert.ok(DRIFT_ATLASES[sprite.atlas]);
+    assert.ok(used.has(sprite.id));
+    const [x, y, w, h] = sprite.frame;
+    assert.ok(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1 && y + h <= 1);
+  }
+  for (let stage = 0; stage < 9; stage++) {
+    const allowed = new Set(DRIFT_MIXTURES[stage].map(([id]) => id));
+    const random = rng(42);
+    for (let i = 0; i < 100; i++) assert.ok(allowed.has(chooseDriftSprite(stage, random).id));
+  }
+});
+test('sprite identity survives updates and is chosen from current stage on respawn', () => {
+  const environment = {
+    width: 390,
+    height: 844,
+    scale: 1,
+    layout: { groundY: 650, eH: 160 },
+    random: rng(42),
+    stage: 4,
+  };
+  const ambient = createAmbient(environment);
+  const leaves = ambient.buildLeaves();
+  const ids = leaves.map((l) => l.sprite);
+  ambient.updateLeaves(leaves, 0, 0, 0);
+  assert.deepEqual(
+    leaves.map((l) => l.sprite),
+    ids,
+  );
+  environment.stage = 6;
+  leaves[0].x = 1000;
+  ambient.updateLeaves(leaves, 0, 0, 0);
+  assert.ok(DRIFT_MIXTURES[6].some(([id]) => id === leaves[0].sprite));
+});
+test('debris preference migrates safely and reserves its instant comparison shortcut', () => {
+  assert.equal(parseSettings({ version: 1 }).debrisStyle, 'sprites');
+  assert.equal(parseSettings({ version: 1, debrisStyle: 'original' }).debrisStyle, 'original');
+  assert.equal(parseSettings({ version: 1, debrisStyle: 'invalid' }).debrisStyle, 'sprites');
+  for (const key of ['`', '~'])
+    assert.match(assignBinding(parseSettings(null), 'up', key), /reserved/);
+});

@@ -235,3 +235,7 @@ frame pacing and callback demands belong to `src/platform/frame-loop.ts`.
 owns settlement/invalidation. The runtime connects navigation and resize to that
 policy rather than embedding screen-specific frame caps. Audio keeps a separate
 inactive gate so returning never overrides player pause or mute.
+
+Drifting particle catalogs and drawing belong to `rendering/scene/drift-catalog.ts`
+and `drift-renderer.ts`; ambient simulation owns particle identity and motion.
+See [drifting debris](../features/drifting-debris.md) for atlas extension and controls.
