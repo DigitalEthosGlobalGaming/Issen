@@ -1,3 +1,4 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import {
   drawCachedImage,
@@ -12,7 +13,7 @@ import type { EnvironmentFrame } from './index.ts';
 export function createBambooForegroundRenderer(doc: Document) {
   let layers: HTMLCanvasElement[] = [];
   let key = '';
-  let source: HTMLImageElement | undefined;
+  let source: SceneryAtlas | undefined;
   let disposed = false;
   function release() {
     for (const layer of layers) {
@@ -23,7 +24,7 @@ export function createBambooForegroundRenderer(doc: Document) {
     key = '';
     source = undefined;
   }
-  function prepare(atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
+  function prepare(atlas: SceneryAtlas, frame: EnvironmentFrame): boolean {
     const { width, height } = frame;
     if (
       disposed ||
@@ -90,7 +91,7 @@ export function createBambooForegroundRenderer(doc: Document) {
     }
     return true;
   }
-  function draw(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame): boolean {
+  function draw(ctx: SceneDrawing, atlas: SceneryAtlas, frame: EnvironmentFrame): boolean {
     if (!prepare(atlas, frame)) return false;
     const { width, height } = frame;
     const edge = width * (height >= width * 0.9 ? 0.2 : 0.24);

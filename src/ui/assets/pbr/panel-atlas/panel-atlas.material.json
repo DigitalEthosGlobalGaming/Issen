@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/panel-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/panel-atlas",
+  "dimensions": [
+    384,
+    192
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "af38f684d8416a2bb53a4e6667deaf49c47280088ee61aa9b769158c671a7ad5"
+}

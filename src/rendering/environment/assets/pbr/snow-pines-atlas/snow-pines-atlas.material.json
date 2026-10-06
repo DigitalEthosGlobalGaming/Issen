@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/snow-pines-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/snow-pines-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "28dccf8555c58fe18f2bb5ddffa11e2bf49c5558eac0e2d15c84ffbcef0311ed"
+}

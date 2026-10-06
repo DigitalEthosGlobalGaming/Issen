@@ -4,7 +4,7 @@ Generated from [world-ui-crest-aoi.png](../../world-ui-crest-aoi.png) with `clot
 
 Six aligned 128Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](world-ui-crest-aoi_diffuse.png), [normal](world-ui-crest-aoi_normal.png), [roughness](world-ui-crest-aoi_roughness.png), [metallic](world-ui-crest-aoi_metallic.png), [ao](world-ui-crest-aoi_ao.png), [emissive](world-ui-crest-aoi_emissive.png).
+Maps: [diffuse](world-ui-crest-aoi_diffuse.png), [normal](world-ui-crest-aoi_normal.png), [roughness](world-ui-crest-aoi_roughness.png), metallic constant (see `world-ui-crest-aoi.material.json`), [ao](world-ui-crest-aoi_ao.png), emissive constant (see `world-ui-crest-aoi.material.json`).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -13,3 +13,5 @@ Renderer lighting is available through [material-lighting.ts](../../../material-
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../scripts/pbr/README.md).
+
+Redundant generated maps and exact replacements: [world-ui-crest-aoi.material.json](world-ui-crest-aoi.material.json).

@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/demon-terrain-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/demon-terrain-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "c85e1d4231bee473c87588729ba19738a8d48ebeab955ba4e629979a5bf6df28"
+}

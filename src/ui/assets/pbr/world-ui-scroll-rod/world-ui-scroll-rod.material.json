@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-scroll-rod.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-scroll-rod",
+  "dimensions": [
+    192,
+    48
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "96f2472cd09f5dfd2411493f781ac799dd7e3208fa64234c0f7897c44e082375"
+}

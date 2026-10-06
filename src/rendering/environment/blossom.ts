@@ -1,3 +1,4 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
@@ -6,12 +7,12 @@ import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
 
 interface BlossomAtlases {
-  cherries: HTMLImageElement;
-  petals: HTMLImageElement;
-  mountains: HTMLImageElement;
-  banks: HTMLImageElement;
-  shrubs: HTMLImageElement;
-  rocks: HTMLImageElement;
+  cherries: SceneryAtlas;
+  petals: SceneryAtlas;
+  mountains: SceneryAtlas;
+  banks: SceneryAtlas;
+  shrubs: SceneryAtlas;
+  rocks: SceneryAtlas;
 }
 
 /** Cells retain full transparent padding. Cherry anchors use frame-local pixels; petal anchors are normalized. */
@@ -72,7 +73,7 @@ export function drawFallingBlossomPath(
 
   function sprite(
     g: SceneDrawing,
-    atlas: HTMLImageElement,
+    atlas: SceneryAtlas,
     cell: number,
     x: number,
     foot: number,

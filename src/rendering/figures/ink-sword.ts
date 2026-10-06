@@ -1,7 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { createAssetMaterials } from '../asset-materials.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
-import type { SceneMaterial } from '../scene-frame.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
+import { packedSpritePlacement } from '../packed-assets.ts';
+import type { FigureLease } from './packed-figures.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
 import {
@@ -10,65 +10,43 @@ import {
   HILT_FRAMES,
   GUARD_PARTS,
   SPECIAL_FRAMES,
+  weaponSpriteId,
 } from './blade-recipes.ts';
 type Family = 'blades' | 'hilts' | 'special';
-type MapKind = 'normal' | 'surface' | 'emissive';
-type SourceKind = Family | MapKind;
 type Frame = readonly [number, number, number, number];
-const SOURCES = {
-  blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.png', import.meta.url).href,
-  normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.png', import.meta.url).href,
-  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.png', import.meta.url).href,
-  emissive: new URL('./assets/blade-pbr/blade-profile-atlas_emissive.png', import.meta.url).href,
-  hilts: new URL('./assets/handle-guard-atlas.png', import.meta.url).href,
-  special: new URL('./assets/special-weapons-atlas.png', import.meta.url).href,
-};
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
-  const fittings = createAssetMaterials(doc, { hilts: SOURCES.hilts, special: SOURCES.special });
-  const materials = new Map<number, SceneMaterial>();
-  const surface = doc.createElement('img');
-  const images = new Map<SourceKind, HTMLImageElement>(),
-    loaded = new Set<SourceKind>(),
-    cache = new Map<string, HTMLCanvasElement>(),
-    finish = new Set<() => void>();
+  let lease: FigureLease | undefined;
+  const cache = new Map<string, HTMLCanvasElement>();
   let disposed = false,
+    prepared = false,
     pending: Promise<void> | undefined;
-  const pbrReady = () =>
-    !disposed && ['normal', 'surface', 'emissive'].every((kind) => loaded.has(kind as MapKind));
+  const pbrReady = () => prepared && !disposed;
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
-    pending = Promise.all(
-      (Object.keys(SOURCES) as SourceKind[]).map(
-        (family) =>
-          new Promise<void>((resolve) => {
-            const im = family === 'surface' ? surface : doc.createElement('img');
-            images.set(family, im);
-            const done = () => {
-              im.onload = null;
-              im.onerror = null;
-              finish.delete(done);
-              resolve();
-            };
-            finish.add(done);
-            im.onload = () => {
-              const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
-              if (!disposed && im.naturalWidth === w && im.naturalHeight === h) loaded.add(family);
-              done();
-            };
-            im.onerror = done;
-            im.src = SOURCES[family];
-          }),
-      ),
-    ).then(async () => {
-      await fittings.prepare();
-    });
+    pending = (async () => {
+      try {
+        const { packedFigures } = await import('./packed-figures.ts');
+        if (disposed) return;
+        const acquired = packedFigures(doc).acquireGroup('weapons');
+        lease = acquired;
+        await acquired.ready;
+        prepared = !disposed;
+      } catch {
+        lease?.release();
+        lease = undefined;
+      }
+    })();
     return pending;
+  }
+  function resolve(family: Family, frame: Frame) {
+    const id = weaponSpriteId(family, frame);
+    return id ? lease?.sprite(id) : null;
   }
   function fittingStamp(
     g: SceneDrawing,
-    family: 'hilts' | 'special',
+    family: Family,
     frame: Frame,
     source: HTMLCanvasElement,
     x: number,
@@ -76,10 +54,25 @@ export function createInkSwordRenderer(doc: Document) {
     width: number,
     height: number,
   ) {
-    const material = fittings.material(family, frame);
-    if (material)
-      drawMaterialStamp(g, { texture: { source, revision: 0 }, material, x, y, width, height });
-    else g.drawImage(source, x, y, width, height);
+    const packed = resolve(family, frame);
+    if (!packed || packed.metadata.empty) return;
+    const [sw, sh] = packed.metadata.logicalSize;
+    const [tx, ty] = packed.metadata.trim;
+    const [, , pw, ph] = packed.metadata.frame;
+    const crop = [
+      (tx * source.width) / sw,
+      (ty * source.height) / sh,
+      (pw * source.width) / sw,
+      (ph * source.height) / sh,
+    ] as const;
+    const placed = packedSpritePlacement(packed.metadata, x, y, width, height);
+    if (packed.material)
+      drawMaterialStamp(g, {
+        texture: { source, revision: 0, frame: crop },
+        material: packed.material,
+        ...placed,
+      });
+    else g.drawImage(source, ...crop, placed.x, placed.y, placed.width, placed.height);
   }
   function part(family: Family, frame: Frame, tint?: string): HTMLCanvasElement | null {
     const key = family + ':' + frame.join(',') + ':' + (tint || ''),
@@ -89,8 +82,8 @@ export function createInkSwordRenderer(doc: Document) {
       cache.set(key, prior);
       return prior;
     }
-    const im = images.get(family);
-    if (!im) return null;
+    const packed = resolve(family, frame);
+    if (!packed) return null;
     const [sx, sy, sw, sh] = frame,
       c = doc.createElement('canvas'),
       s = Math.min(1, (family === 'blades' ? 1024 : 512) / Math.max(sw, sh));
@@ -98,7 +91,19 @@ export function createInkSwordRenderer(doc: Document) {
     c.height = Math.max(1, Math.round(sh * s));
     const g = c.getContext('2d');
     if (!g) return null;
-    g.drawImage(im, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    const [px, py, pw, ph] = packed.metadata.frame;
+    const [tx, ty] = packed.metadata.trim;
+    g.drawImage(
+      packed.colour,
+      px,
+      py,
+      pw,
+      ph,
+      (tx * c.width) / sw,
+      (ty * c.height) / sh,
+      (pw * c.width) / sw,
+      (ph * c.height) / sh,
+    );
     const data = g.getImageData(0, 0, c.width, c.height);
     // The originals retain near-transparent generator fringe. Clean only bounded cached cutouts.
     for (let i = 3; i < data.data.length; i += 4) if (data.data[i]! <= 16) data.data[i] = 0;
@@ -132,8 +137,7 @@ export function createInkSwordRenderer(doc: Document) {
     if (disposed || !recipe || ![gx, gy, ang, length].every(Number.isFinite) || length <= 0)
       return false;
     void prepare();
-    if (recipe.special ? !loaded.has('special') : !loaded.has('blades') || !loaded.has('hilts'))
-      return false;
+    if (!prepared) return false;
     // Resolve all required stamps before touching the caller's context.
     if (recipe.special) {
       const frame = SPECIAL_FRAMES[recipe.special],
@@ -208,30 +212,16 @@ export function createInkSwordRenderer(doc: Document) {
       g.rotate(Math.atan2(ty, tx) - Math.atan2(dy, dx));
       const x = -(profile.root[0] - profile.frame[0]) * s,
         y = -(profile.root[1] - profile.frame[1]) * s;
-      if (pbrReady() && supportsSceneMaterials(g)) {
-        let material = materials.get(recipe.profile);
-        if (!material) {
-          material = {
-            normal: { source: images.get('normal')!, revision: 0, frame: profile.frame },
-            surface: { source: surface, revision: 0, frame: profile.frame },
-            emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame },
-            normalY: -1,
-            lighting: 1,
-            depth: 0,
-            fog: 0,
-            fogColor: [0.53, 0.51, 0.47],
-          };
-          materials.set(recipe.profile, material);
-        }
-        drawMaterialStamp(g, {
-          texture: { source: blade, revision: 0 },
-          material,
-          x,
-          y,
-          width: profile.frame[2] * s,
-          height: profile.frame[3] * s,
-        });
-      } else g.drawImage(blade, x, y, profile.frame[2] * s, profile.frame[3] * s);
+      fittingStamp(
+        g,
+        'blades',
+        profile.frame,
+        blade,
+        x,
+        y,
+        profile.frame[2] * s,
+        profile.frame[3] * s,
+      );
       return true;
     } finally {
       g.restore();
@@ -241,15 +231,10 @@ export function createInkSwordRenderer(doc: Document) {
     prepare,
     draw,
     get ready() {
-      return (
-        loaded.size === Object.keys(SOURCES).length &&
-        pbrReady() &&
-        fittings.ready('hilts') &&
-        fittings.ready('special')
-      );
+      return pbrReady();
     },
     snapshot: () => ({
-      loaded: [...loaded],
+      loaded: prepared ? ['blades', 'hilts', 'special', 'normal', 'surface'] : [],
       cachedParts: cache.size,
       pbrReady: pbrReady(),
       disposed,
@@ -257,19 +242,11 @@ export function createInkSwordRenderer(doc: Document) {
     dispose() {
       if (disposed) return;
       disposed = true;
-      fittings.dispose();
-      materials.clear();
-      surface.width = surface.height = 0;
-      for (const im of images.values()) {
-        im.onload = null;
-        im.onerror = null;
-        im.removeAttribute('src');
-      }
-      for (const f of [...finish]) f();
+      prepared = false;
+      lease?.release();
+      lease = undefined;
       for (const c of cache.values()) c.width = c.height = 0;
       cache.clear();
-      images.clear();
-      loaded.clear();
     },
   };
 }

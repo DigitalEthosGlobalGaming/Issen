@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/figures/assets/mystic-rock.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/mystic-rock",
+  "dimensions": [
+    1145,
+    1373
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "2a3629e2ecf4724b909fbbf6308c1cde9eefc6d795710b5892fa6b4df3a0e33b"
+}

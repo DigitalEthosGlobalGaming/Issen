@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/button-highlighted.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/button-highlighted",
+  "dimensions": [
+    128,
+    128
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "4d88dc1e764dcbee5b1228b486a24a6a4580d19e14e64c49e3e0550c284f46d2"
+}

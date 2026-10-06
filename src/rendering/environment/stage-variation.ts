@@ -2,8 +2,11 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { rng } from '../../shared/random.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
+import { packedMaterialFrame } from '../packed-assets.ts';
 
 import { LANDMARK_LAYOUT, type LandmarkFamily } from './landmark-layout.ts';
+import type { LandmarkLease } from './packed-landmarks.ts';
+import type { createCachedMaterials } from '../cached-materials.ts';
 
 export type VariationFamily = LandmarkFamily;
 export interface StageVariationProp {
@@ -78,23 +81,44 @@ export function stageVariationPlacement(prop: StageVariationProp, width: number,
 /** Midground landmarks are painted only during cached composition rebuilds. */
 export function drawStageVariations(
   ctx: SceneDrawing,
-  atlases: Partial<Record<VariationFamily, HTMLImageElement>>,
+  lease: LandmarkLease,
   stage: number,
   seed: number,
   width: number,
   height: number,
   _lowQuality: boolean,
+  materials: ReturnType<typeof createCachedMaterials>,
 ) {
   // Both silhouettes remain visible at low quality; they add no per-frame allocation.
   for (const prop of stageVariationPlan(stage, seed)) {
-    const image = atlases[prop.family];
-    if (!image?.naturalWidth || !image.naturalHeight) continue;
+    const sprite = lease.sprite(`landmark.${prop.family}.${prop.cell}`);
+    if (!sprite || sprite.metadata.empty) continue;
+    const image = sprite.colour;
     const placement = stageVariationPlacement(prop, width, height);
     drawAtlasSprite(ctx, image, prop.cell, placement.x, placement.foot, placement.width, {
       alpha: prop.alpha,
       angle: prop.angle,
       flip: prop.flip,
-      frame: placement.frame,
+      frame: {
+        x: sprite.metadata.frame[0],
+        y: sprite.metadata.frame[1],
+        width: sprite.metadata.frame[2],
+        height: sprite.metadata.frame[3],
+      },
+      logicalSize: sprite.metadata.logicalSize,
+      trim: sprite.metadata.trim,
+      draw: (ctx, source, frame, x, y, width, height, colour) =>
+        materials.draw(
+          ctx,
+          source as HTMLImageElement | ImageBitmap,
+          frame,
+          x,
+          y,
+          width,
+          height,
+          colour,
+          packedMaterialFrame(sprite.material, frame),
+        ),
       anchorX: placement.anchorX,
       anchorY: placement.anchorY,
       fadeFrom: placement.anchorY - 0.1,

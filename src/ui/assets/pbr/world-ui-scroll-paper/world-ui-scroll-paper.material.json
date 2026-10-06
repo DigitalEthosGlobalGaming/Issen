@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-scroll-paper.png",
+  "preset": "cloth",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-scroll-paper",
+  "dimensions": [
+    192,
+    192
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "283cb7087624a36ef71857b9a20bf5538ea4cd461ec2f71fbc501875a368109b"
+}

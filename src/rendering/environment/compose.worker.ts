@@ -18,18 +18,27 @@ scope.onmessage = ({ data }) => {
       else if (await renderer.compose(data.frame)) {
         const completed = renderer.exportLayers();
         const transfer = async (entry: (typeof completed.layers)[number]) => {
-          const copy = (
+          const copy = async (
             source: HTMLCanvasElement | HTMLImageElement | ImageBitmap,
             colour = false,
-          ) =>
-            createImageBitmap(source, {
-              premultiplyAlpha: colour ? 'premultiply' : 'none',
-              colorSpaceConversion: 'none',
-            });
+            plane = 'colour',
+          ) => {
+            try {
+              return await createImageBitmap(source, {
+                premultiplyAlpha: colour ? 'premultiply' : 'none',
+                colorSpaceConversion: 'none',
+              });
+            } catch (error) {
+              throw Error(
+                `Cannot transfer ${plane} plane ${source.width}x${source.height}: ${String(error)}`,
+              );
+            }
+          };
           const layer: ComposedLayer = { colour: await copy(entry.colour, true) };
           try {
             for (const kind of ['normal', 'surface', 'emissive'] as const)
-              if (entry.material?.[kind]) layer[kind] = await copy(entry.material[kind]!.source);
+              if (entry.material?.[kind])
+                layer[kind] = await copy(entry.material[kind]!.source, false, kind);
           } catch (error) {
             closeLayers([layer]);
             throw error;

@@ -1,0 +1,18 @@
+{
+  "source": "src/rendering/figures/assets/player-ronin-simple.png",
+  "output": "src/rendering/figures/assets/player-pbr",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "fe9f81eac34b074baccea8e738a666712be2b96fd531c5fe78922bd47abbc193"
+}

@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/reeds-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/reeds-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "d69f72a9307e01b1a48b5bdd94d5a0125ecfb8c0a59d90f34f97c010f771bde3"
+}

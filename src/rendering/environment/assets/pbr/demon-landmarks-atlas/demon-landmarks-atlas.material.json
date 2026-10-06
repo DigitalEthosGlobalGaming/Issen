@@ -1,0 +1,31 @@
+{
+  "source": "src/rendering/environment/assets/demon-landmarks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/demon-landmarks-atlas",
+  "compositions": [
+    {
+      "preset": "wood",
+      "frame": [
+        627,
+        627,
+        627,
+        627
+      ]
+    }
+  ],
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "90a7992c1dec4d4ba50b94542b137e887286604807ce8266101416db55ad0ead"
+}

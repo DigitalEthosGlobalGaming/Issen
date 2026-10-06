@@ -10,3 +10,5 @@ normal, roughness, metallic, AO and emissive. Other exported maps are unused.
 See [sword and Sumi lighting](../../../../../docs/features/sword-lighting.md)
 for renderer ownership and lighting controls, and the
 [PBR tool instructions](../../../../../scripts/pbr/README.md) for regeneration.
+
+Redundant generated maps and exact replacements: [player-ronin-simple.material.json](player-ronin-simple.material.json).

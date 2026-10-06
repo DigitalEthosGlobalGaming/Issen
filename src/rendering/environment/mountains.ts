@@ -1,3 +1,4 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import {
   drawCachedImage,
@@ -17,7 +18,7 @@ const RIDGES = [
 
 export function drawMountainTiles(
   context: SceneDrawing,
-  atlas: HTMLImageElement,
+  atlas: SceneryAtlas,
   width: number,
   height: number,
   stage: Stage,

@@ -5,7 +5,7 @@ import path from 'node:path';
 import { main, convertBatch, inputFiles } from '../cli.mjs';
 import { loadPreset, listPresets, validatePreset } from '../preset.mjs';
 
-const silent = { log() {}, error() {} };
+const silent = { log() {}, error() {}, async cleanupArchive() {} };
 async function fixture(t) {
   const dir = await mkdtemp(path.resolve('tmp/pbr-cli-test-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
@@ -152,5 +152,40 @@ test('CLI applies mode/engine overrides and reports conversion failure with exit
       createConverter: fakeConverter([], () => true),
     }),
     1,
+  );
+});
+
+test('cleanup runs on new and cached exports and a failed cleanup preserves the published pack', async (t) => {
+  const { input, output } = await fixture(t),
+    calls = [],
+    cleaned = [];
+  const options = { input, output, preset: await loadPreset('cloth') };
+  const dependencies = {
+    ...silent,
+    createConverter: fakeConverter(calls),
+    async cleanupArchive(file) {
+      cleaned.push(file);
+    },
+  };
+  assert.equal((await convertBatch(options, dependencies)).converted, 1);
+  assert.match(cleaned[0], /\.partial$/);
+  const destination = path.join(output, 'one.png_cloth_pbr_pack.zip');
+  const prior = await readFile(destination);
+  assert.equal((await convertBatch(options, dependencies)).skipped, 1);
+  assert.equal(cleaned[1], destination);
+  const result = await convertBatch(
+    { ...options, force: true },
+    {
+      ...dependencies,
+      async cleanupArchive() {
+        throw Error('invalid material archive');
+      },
+    },
+  );
+  assert.equal(result.failed, 1);
+  assert.deepEqual(await readFile(destination), prior);
+  assert.equal(
+    (await readdir(output)).some((name) => name.endsWith('.partial')),
+    false,
   );
 });

@@ -1,0 +1,39 @@
+{
+  "source": "src/rendering/figures/assets/companion-parts-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/companion-parts-atlas",
+  "compositions": [
+    {
+      "preset": "stone",
+      "frame": [
+        0,
+        990,
+        940,
+        264
+      ]
+    },
+    {
+      "preset": "metal",
+      "frame": [
+        940,
+        990,
+        314,
+        264
+      ]
+    }
+  ],
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ]
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "665098b617662367d5649c2635d849950552b33532df8f932f1d539a943508f8"
+}

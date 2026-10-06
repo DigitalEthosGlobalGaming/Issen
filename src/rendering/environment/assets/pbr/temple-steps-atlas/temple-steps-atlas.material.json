@@ -1,0 +1,21 @@
+{
+  "source": "src/rendering/environment/assets/temple-steps-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/temple-steps-atlas",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "roughness": 0,
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "289de7bbe88098b6f8c6aac478cfe30174d486e7ef4481d1263c4343bcf4b060"
+}

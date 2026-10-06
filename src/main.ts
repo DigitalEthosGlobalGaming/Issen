@@ -7,25 +7,10 @@ import { mountChangelogLink } from './ui/changelog-link.ts';
 import { createSceneSurface, type SceneSurface } from './rendering/scene-surface.ts';
 import { createLightingRig } from './rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from './ui/material-lighting.ts';
-import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
 
-const artwork = import.meta.glob<string>(
-  '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
-  { eager: true, query: '?url', import: 'default' },
-);
-const publicArtwork = import.meta.glob<string>(
-  '/public/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
-  { query: '?url', import: 'default' },
-);
-// Material owners decode their selected packs. Retaining every exported map here
-// would also keep reference artwork and inactive scene maps alive for the session.
-const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
-const urls = [
-  ...Object.values(artwork),
-  ...Object.keys(publicArtwork).map(
-    (path) => `${import.meta.env.BASE_URL}${path.slice('/public/'.length)}`,
-  ),
-].filter((url) => !materialMaps.has(url));
+// Bootstrap owns only the loading logo. Runtime and UI owners prepare their
+// selected dependencies; authoring/reference artwork is never preloaded globally.
+const urls = [STARTUP_LOGO_URL];
 let root: HTMLElement | null = null;
 let stop: (() => void) | null = null;
 let stopChangelog: (() => void) | null = null;

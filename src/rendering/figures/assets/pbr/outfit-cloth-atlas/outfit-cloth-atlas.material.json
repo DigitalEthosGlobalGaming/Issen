@@ -1,0 +1,40 @@
+{
+  "source": "src/rendering/figures/assets/outfit-cloth-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/outfit-cloth-atlas",
+  "compositions": [
+    {
+      "preset": "wood",
+      "frame": [
+        64,
+        663,
+        746,
+        532
+      ]
+    },
+    {
+      "preset": "leather",
+      "frame": [
+        927,
+        692,
+        208,
+        481
+      ]
+    }
+  ],
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "eb28de90516aecd0ebca235059004679be8130db4234ef85abeefe46fc741348"
+}

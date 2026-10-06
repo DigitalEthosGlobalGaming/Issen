@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/awakening-button-third.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/awakening-button-third",
+  "dimensions": [
+    256,
+    128
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "7ce82b26709cd975430de53ac1359a059eda31c2f1cd82c54dcb3d689f9f5a2a"
+}

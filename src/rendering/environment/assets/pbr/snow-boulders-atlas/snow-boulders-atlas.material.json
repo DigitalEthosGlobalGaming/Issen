@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/snow-boulders-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/snow-boulders-atlas",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "c3a3f2401f46adcb130163bca410db2791cc780db17b19fdc4ddd11d57e6fb8d"
+}

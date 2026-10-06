@@ -4,7 +4,7 @@ Generated from [player-ronin-atlas.png](../../player-ronin-atlas.png) with `clot
 
 Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](player-ronin-atlas_diffuse.png), [normal](player-ronin-atlas_normal.png), [roughness](player-ronin-atlas_roughness.png), [metallic](player-ronin-atlas_metallic.png), [ao](player-ronin-atlas_ao.png), [emissive](player-ronin-atlas_emissive.png).
+Maps: [diffuse](player-ronin-atlas_diffuse.png), [normal](player-ronin-atlas_normal.png), [roughness](player-ronin-atlas_roughness.png), metallic constant (see `player-ronin-atlas.material.json`), [ao](player-ronin-atlas_ao.png), emissive constant (see `player-ronin-atlas.material.json`).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -15,3 +15,5 @@ This is a material starting point. Mixed artwork uses the dominant preset; indiv
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
 
 Retained source: inspect its lighting with Material preview in the tilde panel; it is not placed in gameplay.
+
+Redundant generated maps and exact replacements: [player-ronin-atlas.material.json](player-ronin-atlas.material.json).

@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { options, help } from './config.mjs';
 import { performancePlugin } from './build-plugin.mjs';
 import { openTarget, localDoctor } from './targets.mjs';
-import { measure } from './collect.mjs';
+import { measure, captureTextureCounters } from './collect.mjs';
 import { comparison, writeReport } from './report.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -77,6 +77,7 @@ const manifest = {
   viewport: config.viewport,
   dpr: config.dpr,
   headed: config.headed,
+  httpCache: config.httpCache,
   platform: `${platform()} ${release()}`,
   cpu: cpus()[0]?.model,
   logicalCpus: cpus().length,
@@ -113,6 +114,7 @@ try {
     logLevel: 'warn',
     mode: 'android',
     plugins: [performancePlugin(config.buildId)],
+    worker: { plugins: () => [performancePlugin(config.buildId)] },
     define: {
       'import.meta.env.VITE_GAME_EDITION': JSON.stringify('free'),
       'import.meta.env.VITE_PREMIUM_ENABLED': JSON.stringify('false'),
@@ -161,7 +163,10 @@ try {
         }
       if (config.mode !== 'timing') {
         console.log(`${scenario}: separate diagnostic capture`);
-        results.diagnostics.push(await measure(target, origin, config, scenario, 0, out, true));
+        const diagnostic = await measure(target, origin, config, scenario, 0, out, true);
+        console.log(`${scenario}: separate texture-counter context`);
+        diagnostic.textures = await captureTextureCounters(target, origin, config, scenario, out);
+        results.diagnostics.push(diagnostic);
         await writeReport(out, results);
       }
     }

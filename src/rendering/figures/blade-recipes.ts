@@ -55,6 +55,22 @@ export const GUARD_PARTS = [
   { frame: [914, 869, 270, 314], pivot: [1051, 1028] },
 ] as const;
 export const SPECIAL_FRAMES = { beam: [329, 96, 1102, 195], pan: [95, 336, 1589, 498] } as const;
+export const WEAPON_FRAMES = {
+  blades: BLADE_PROFILE_FRAMES.map((profile) => profile.frame),
+  hilts: [...HILT_FRAMES, ...GUARD_PARTS.map((guard) => guard.frame)],
+  special: SPECIAL_FRAMES,
+} as const;
+const weaponIds = new Map(
+  Object.entries(WEAPON_FRAMES).flatMap(([family, frames]) =>
+    Object.entries(frames).map(([key, frame]) => [
+      `${family}:${frame.join()}`,
+      `weapon.${family}.${key}`,
+    ]),
+  ),
+);
+export function weaponSpriteId(family: keyof typeof WEAPON_FRAMES, frame: readonly number[]) {
+  return weaponIds.get(`${family}:${frame.join()}`);
+}
 export function supportsInkBlade(id?: string): boolean {
   return !!id && Object.hasOwn(BLADE_RECIPES, id);
 }

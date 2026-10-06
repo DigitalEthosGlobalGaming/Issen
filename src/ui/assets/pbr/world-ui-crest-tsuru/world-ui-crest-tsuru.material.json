@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-crest-tsuru.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-crest-tsuru",
+  "dimensions": [
+    128,
+    128
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "cf12119022f38ac7b37ac83217f9b2c56caac029257f6eacc6ce8bcbefc7a23a"
+}

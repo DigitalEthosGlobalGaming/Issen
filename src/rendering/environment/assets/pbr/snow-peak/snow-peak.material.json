@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/snow-peak.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/snow-peak",
+  "dimensions": [
+    1881,
+    836
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "b3a99fc85fa424fecbd6f29c71e7231f3fcfea3b789ef0ef380cbda1391be5fc"
+}

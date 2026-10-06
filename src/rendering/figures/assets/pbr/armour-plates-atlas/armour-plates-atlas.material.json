@@ -1,0 +1,19 @@
+{
+  "source": "src/rendering/figures/assets/armour-plates-atlas.png",
+  "preset": "metal",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/armour-plates-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ]
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "5eb5c5e9e8e27aa5336b22514c44e442343e8b8df3345724d26ecff92ca3ca92"
+}

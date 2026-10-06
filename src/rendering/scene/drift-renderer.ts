@@ -1,62 +1,87 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Leaf } from './ambient.ts';
-import { DRIFT_ATLASES as urls, DRIFT_BY_ID } from './drift-catalog.ts';
+import { DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
-import { createAssetMaterials } from '../asset-materials.ts';
+import { packedDrift } from './packed-drift.ts';
+import { packedSpritePlacement } from '../packed-assets.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 
-/** One retained path and decoded atlas images per runtime; no per-frame image processing. */
+/** Canonical packed pages are shared by overlapping runtimes and previews. */
 export function createDriftRenderer(doc: Document = document) {
-  const materials = createAssetMaterials(doc, urls);
-  const images = new Map<string, HTMLImageElement>();
+  const store = packedDrift(doc);
+  let lease: ReturnType<typeof store.acquire> | undefined;
+  let selected: readonly string[] = [];
+  let selectedKey = '';
+  let generation = 0;
+  let preparing: ReturnType<typeof store.acquire> | undefined;
+  let pendingKey = '';
   let disposed = false;
-  let pending: Promise<void> | undefined;
+  let pending: Promise<boolean> | undefined;
   function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
     const sprite = DRIFT_BY_ID.get(id)!;
-    const image = images.get(sprite.atlas);
-    if (!image) return;
-    const [x, y, w, h] = sprite.frame;
-    const sx = Math.round(x * image.naturalWidth),
-      sy = Math.round(y * image.naturalHeight);
-    const sw = Math.round((x + w) * image.naturalWidth) - sx;
-    const sh = Math.round((y + h) * image.naturalHeight) - sy;
+    const packed = lease?.sprite(id);
+    if (!packed || packed.metadata.empty) return;
+    const [sw, sh] = packed.metadata.logicalSize;
     const width = size * sprite.size,
       height = (width * sh) / sw;
     g.globalAlpha *= opacity * sprite.opacity;
-    const frame = [sx, sy, sw, sh] as const;
-    const material = materials.material(sprite.atlas, frame);
+    const frame = packed.metadata.frame;
+    const material = packed.material;
     const dx = -width * sprite.pivot[0],
       dy = -height * sprite.pivot[1];
+    const placed = packedSpritePlacement(packed.metadata, dx, dy, width, height);
     if (material)
       drawMaterialStamp(g, {
-        texture: { source: image, revision: 0, frame },
+        texture: { source: packed.colour, revision: 0, frame },
         material,
-        x: dx,
-        y: dy,
-        width,
-        height,
+        ...placed,
       });
-    else g.drawImage(image, ...frame, dx, dy, width, height);
+    else g.drawImage(packed.colour, ...frame, placed.x, placed.y, placed.width, placed.height);
   }
   return {
     get ready() {
-      return images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
+      return !!lease && !disposed;
     },
-    prepare() {
-      return (pending ??= Promise.all(
-        Object.entries(urls).map(async ([id, url]) => {
-          const image = doc.createElement('img');
-          image.src = url;
-          try {
-            await image.decode();
-            if (!disposed && image.naturalWidth > 0) images.set(id, image);
-          } catch {
-            /* Runtime startup reports missing artwork and offers retry. */
+    snapshot: () => ({ selected: [...selected], pending: pendingKey, ...store.snapshot() }),
+    prepare(ids: readonly string[] = [...DRIFT_BY_ID.keys()]) {
+      if (disposed) return Promise.reject(Error('Drift renderer disposed'));
+      const unique = [...new Set(ids)].sort();
+      const key = JSON.stringify(unique);
+      if (pending && key === pendingKey) return pending;
+      const request = ++generation;
+      preparing?.release();
+      preparing = undefined;
+      pending = undefined;
+      pendingKey = '';
+      if (key === selectedKey) return Promise.resolve(true);
+      const acquired = store.acquire(unique);
+      preparing = acquired;
+      pendingKey = key;
+      pending = acquired.ready
+        .then(() => {
+          if (disposed || request !== generation) {
+            acquired.release();
+            return false;
           }
-        }),
-      ).then(async () => {
-        await materials.prepare();
-      }));
+          const previous = lease;
+          lease = acquired;
+          selected = unique;
+          selectedKey = key;
+          previous?.release();
+          preparing = undefined;
+          pendingKey = '';
+          pending = undefined;
+          return true;
+        })
+        .catch((error: unknown) => {
+          acquired.release();
+          if (disposed || request !== generation) return false;
+          preparing = undefined;
+          pendingKey = '';
+          pending = undefined;
+          throw error;
+        });
+      return pending;
     },
     draw(g: SceneDrawing, leaf: Leaf) {
       paint(g, leaf.sprite ?? 'leaves.willow', leaf.s * 3, leaf.z > 1.25 ? 0.6 : 0.9);
@@ -75,9 +100,13 @@ export function createDriftRenderer(doc: Document = document) {
     },
     dispose() {
       disposed = true;
-      materials.dispose();
-      for (const image of images.values()) image.removeAttribute('src');
-      images.clear();
+      generation++;
+      preparing?.release();
+      preparing = undefined;
+      selected = [];
+      selectedKey = pendingKey = '';
+      lease?.release();
+      lease = undefined;
     },
   };
 }

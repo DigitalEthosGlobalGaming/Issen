@@ -1,3 +1,4 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
@@ -10,7 +11,7 @@ export function drawHollowBambooRoad(
   base: SceneDrawing,
   far: SceneDrawing,
   near: SceneDrawing,
-  atlases: Record<string, HTMLImageElement>,
+  atlases: Record<string, SceneryAtlas>,
   width: number,
   height: number,
   scale: number,

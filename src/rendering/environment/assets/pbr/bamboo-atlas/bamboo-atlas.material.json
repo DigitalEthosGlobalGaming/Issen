@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/bamboo-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/bamboo-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "b4e6af00bfb28fa34070ebcf70f2df510200342ad4b37a522cc53262e584971e"
+}

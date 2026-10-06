@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/grass-edges-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/grass-edges-atlas",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "7b5bcb1e7e36161d6a1b2cc42542b38ced1b673b4140c10d308d3b503ea69f7b"
+}

@@ -1,83 +1,52 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { createAssetMaterials } from '../asset-materials.ts';
+import { INK_COMPANION_FRAMES } from './companion-catalog.ts';
+import { packedSpritePlacement } from '../packed-assets.ts';
+import type { FigureLease } from './packed-figures.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-const COMPANION_URL = new URL('./assets/companion-parts-atlas.png', import.meta.url).href;
-const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
-
-/** Verified packed windows, with source-pixel joints and native aspect ratios. */
-export const INK_COMPANION_FRAMES = [
-  [0, 0, 313, 440],
-  [313, 0, 314, 440],
-  [627, 0, 313, 440],
-  [940, 0, 314, 440],
-  [0, 440, 313, 300],
-  [313, 440, 314, 300],
-  [627, 440, 313, 300],
-  [940, 440, 314, 300],
-  [0, 740, 313, 250],
-  [313, 740, 314, 250],
-  [627, 740, 313, 250],
-  [940, 740, 314, 250],
-  [0, 990, 313, 264],
-  [313, 990, 314, 264],
-  [627, 990, 313, 264],
-  [940, 990, 314, 264],
-] as const;
-
+export { INK_COMPANION_FRAMES } from './companion-catalog.ts';
 /** Companion rigs share one loader; each joint animates without moving the ground anchor. */
 export function createInkCompanionRenderer(doc: Document) {
-  const materials = createAssetMaterials(doc, { parts: COMPANION_URL, rock: ROCK_URL });
-  let image: HTMLImageElement | null = null;
+  let lease: FigureLease | undefined;
   let pending: Promise<void> | null = null;
-  let finishLoad: (() => void) | null = null;
-  let ready = false;
-  let disposed = false;
-  let rock: HTMLImageElement | null = null;
-  let rockReady = false;
-  let finishRock: (() => void) | null = null;
-
+  let ready = false,
+    disposed = false;
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
-    const rockPending = new Promise<void>((resolve) => {
-      rock = doc.createElement('img');
-      const sprite = rock;
-      sprite.decoding = 'async';
-      const finish = () => {
-        sprite.onload = sprite.onerror = null;
-        finishRock = null;
-        resolve();
-      };
-      finishRock = finish;
-      sprite.onload = () => {
-        rockReady = !disposed && sprite.naturalWidth === 1145 && sprite.naturalHeight === 1373;
-        finish();
-      };
-      sprite.onerror = finish;
-      sprite.src = ROCK_URL;
-    });
-    pending = new Promise<void>((resolve) => {
-      const sprite = doc.createElement('img');
-      image = sprite;
-      sprite.decoding = 'async';
-      const finish = () => {
-        sprite.onload = sprite.onerror = null;
-        finishLoad = null;
-        resolve();
-      };
-      finishLoad = finish;
-      sprite.onload = () => {
-        ready = !disposed && sprite.naturalWidth === 1254 && sprite.naturalHeight === 1254;
-        finish();
-      };
-      sprite.onerror = finish;
-      sprite.src = COMPANION_URL;
-    });
-    pending = Promise.all([pending, rockPending, materials.prepare()]).then(() => {
-      ready = ready && materials.ready('parts');
-      rockReady = rockReady && materials.ready('rock');
-    });
+    pending = (async () => {
+      try {
+        const { packedFigures } = await import('./packed-figures.ts');
+        if (disposed) return;
+        const acquired = packedFigures(doc).acquireGroup('companions');
+        lease = acquired;
+        await acquired.ready;
+        ready = !disposed;
+      } catch {
+        lease?.release();
+        lease = undefined;
+      }
+    })();
     return pending;
+  }
+  function stamp(g: SceneDrawing, id: string, x: number, y: number, width: number, height: number) {
+    const packed = lease?.sprite(id);
+    if (!packed || packed.metadata.empty) return;
+    const placed = packedSpritePlacement(packed.metadata, x, y, width, height);
+    if (packed.material)
+      drawMaterialStamp(g, {
+        texture: { source: packed.colour, revision: 0, frame: packed.metadata.frame },
+        material: packed.material,
+        ...placed,
+      });
+    else
+      g.drawImage(
+        packed.colour,
+        ...packed.metadata.frame,
+        placed.x,
+        placed.y,
+        placed.width,
+        placed.height,
+      );
   }
 
   function draw(
@@ -99,35 +68,25 @@ export function createInkCompanionRenderer(doc: Document) {
       return false;
     void prepare();
     if (type === 'mystic-rock') {
-      if (!rockReady || !rock) return false;
+      if (!ready) return false;
       const factor = size / 1157;
       const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
       g.save();
       try {
-        const material = materials.material('rock', [0, 0, 1145, 1373]);
-        if (material)
-          drawMaterialStamp(g, {
-            texture: { source: rock, revision: 0 },
-            material,
-            x: x - 580 * factor,
-            y: y - 1350 * factor + bob,
-            width: 1145 * factor,
-            height: 1373 * factor,
-          });
-        else
-          g.drawImage(
-            rock,
-            x - 580 * factor,
-            y - 1350 * factor + bob,
-            1145 * factor,
-            1373 * factor,
-          );
+        stamp(
+          g,
+          'companion.rock',
+          x - 580 * factor,
+          y - 1350 * factor + bob,
+          1145 * factor,
+          1373 * factor,
+        );
       } finally {
         g.restore();
       }
       return true;
     }
-    if (!ready || !image) return false;
+    if (!ready) return false;
     const t = reducedMotion ? 0 : time;
     const reaction = active && !reducedMotion;
     const sine = (speed: number, phase = 0) => (reducedMotion ? 0 : Math.sin(t * speed + phase));
@@ -149,17 +108,7 @@ export function createInkCompanionRenderer(doc: Document) {
         g.translate(ax, ay);
         g.rotate(angle);
         g.scale(scale, scale * stretch);
-        const material = materials.material('parts', INK_COMPANION_FRAMES[index]!);
-        if (material)
-          drawMaterialStamp(g, {
-            texture: { source: image!, revision: 0, frame: INK_COMPANION_FRAMES[index]! },
-            material,
-            x: -pivotX,
-            y: -pivotY,
-            width: sw,
-            height: sh,
-          });
-        else g.drawImage(image!, sx, sy, sw, sh, -pivotX, -pivotY, sw, sh);
+        stamp(g, `companion.parts.${index}`, -pivotX, -pivotY, sw, sh);
       } finally {
         g.restore();
       }
@@ -196,28 +145,16 @@ export function createInkCompanionRenderer(doc: Document) {
   function dispose() {
     if (disposed) return;
     disposed = true;
-    materials.dispose();
     ready = false;
-    if (image) {
-      image.onload = image.onerror = null;
-      image.removeAttribute('src');
-    }
-    finishLoad?.();
-    rockReady = false;
-    if (rock) {
-      rock.onload = rock.onerror = null;
-      rock.removeAttribute('src');
-    }
-    finishRock?.();
-    rock = null;
-    image = null;
+    lease?.release();
+    lease = undefined;
   }
   return {
     prepare,
     draw,
     dispose,
     get ready() {
-      return ready && rockReady;
+      return ready && !disposed;
     },
   };
 }

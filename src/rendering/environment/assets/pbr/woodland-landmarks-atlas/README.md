@@ -4,7 +4,7 @@ Generated from [woodland-landmarks-atlas.png](../../woodland-landmarks-atlas.png
 
 Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](woodland-landmarks-atlas_diffuse.png), [normal](woodland-landmarks-atlas_normal.png), [roughness](woodland-landmarks-atlas_roughness.png), [metallic](woodland-landmarks-atlas_metallic.png), [ao](woodland-landmarks-atlas_ao.png), [emissive](woodland-landmarks-atlas_emissive.png).
+Maps: [diffuse](woodland-landmarks-atlas_diffuse.png), [normal](woodland-landmarks-atlas_normal.png), [roughness](woodland-landmarks-atlas_roughness.png), metallic constant (see `woodland-landmarks-atlas.material.json`), [ao](woodland-landmarks-atlas_ao.png), emissive constant (see `woodland-landmarks-atlas.material.json`).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -13,3 +13,5 @@ Renderer lighting is connected through [index.ts](../../../index.ts). Visual rev
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
+
+Redundant generated maps and exact replacements: [woodland-landmarks-atlas.material.json](woodland-landmarks-atlas.material.json).

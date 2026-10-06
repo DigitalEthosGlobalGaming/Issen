@@ -1,0 +1,18 @@
+{
+  "source": "src/rendering/figures/assets/enemy-ronin-simple.png",
+  "output": "src/rendering/figures/assets/enemy-pbr",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "7ac619d767db16eb73ec60ac483082cab21577bbabf8d2d7eb983bb3bc772d91"
+}

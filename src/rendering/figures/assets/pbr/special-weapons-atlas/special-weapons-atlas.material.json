@@ -1,0 +1,19 @@
+{
+  "source": "src/rendering/figures/assets/special-weapons-atlas.png",
+  "preset": "metal",
+  "mode": "sprite",
+  "output": "src/rendering/figures/assets/pbr/special-weapons-atlas",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ]
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "45621dcc1da7e64656964b4a4d93d47186ace2cce06628e2acadf9f62b4dd4af"
+}

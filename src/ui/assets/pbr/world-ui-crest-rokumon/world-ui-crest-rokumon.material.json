@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-crest-rokumon.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-crest-rokumon",
+  "dimensions": [
+    128,
+    128
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "c77d6e04badc82b11569a4af756d4f850036fd8eb1f5d6348f2ba3b155498857"
+}

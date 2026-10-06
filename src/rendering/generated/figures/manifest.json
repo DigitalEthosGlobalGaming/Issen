@@ -1,0 +1,4487 @@
+{
+  "collections": {},
+  "dependencies": {
+    "charms": [
+      "charm.0",
+      "charm.1",
+      "charm.10",
+      "charm.11",
+      "charm.2",
+      "charm.3",
+      "charm.4",
+      "charm.5",
+      "charm.6",
+      "charm.7",
+      "charm.8",
+      "charm.9"
+    ],
+    "companion-preview": [
+      "companion.parts.0",
+      "companion.parts.1",
+      "companion.parts.10",
+      "companion.parts.11",
+      "companion.parts.12",
+      "companion.parts.13",
+      "companion.parts.14",
+      "companion.parts.15",
+      "companion.parts.2",
+      "companion.parts.3",
+      "companion.parts.4",
+      "companion.parts.5",
+      "companion.parts.6",
+      "companion.parts.7",
+      "companion.parts.8",
+      "companion.parts.9",
+      "companion.rock"
+    ],
+    "companions": [
+      "companion.parts.0",
+      "companion.parts.1",
+      "companion.parts.10",
+      "companion.parts.11",
+      "companion.parts.2",
+      "companion.parts.3",
+      "companion.parts.4",
+      "companion.parts.5",
+      "companion.parts.6",
+      "companion.parts.7",
+      "companion.parts.8",
+      "companion.parts.9",
+      "companion.rock"
+    ],
+    "enemies": [
+      "enemy.base.hand",
+      "enemy.base.head",
+      "enemy.base.leftForearm",
+      "enemy.base.leftPanel",
+      "enemy.base.leftSleeve",
+      "enemy.base.rightForearm",
+      "enemy.base.rightPanel",
+      "enemy.base.rightSleeve",
+      "enemy.base.torso",
+      "enemy.clothing.0",
+      "enemy.clothing.1",
+      "enemy.clothing.2",
+      "enemy.clothing.3",
+      "enemy.clothing.4",
+      "enemy.clothing.5",
+      "enemy.heads.hair",
+      "enemy.heads.jingasa",
+      "enemy.heads.kabuto",
+      "enemy.heads.kasa",
+      "enemy.heads.mask",
+      "enemy.heads.monk",
+      "enemy.variationHeads.0",
+      "enemy.variationHeads.1",
+      "enemy.variationHeads.2",
+      "enemy.variationHeads.3"
+    ],
+    "outfit-armour": [
+      "outfit.armour.0",
+      "outfit.armour.1",
+      "outfit.armour.2",
+      "outfit.armour.3"
+    ],
+    "outfit-cloth": [
+      "outfit.cloth.0",
+      "outfit.cloth.1",
+      "outfit.cloth.2",
+      "outfit.cloth.3"
+    ],
+    "outfit-headwear": [
+      "outfit.headwear.0",
+      "outfit.headwear.1",
+      "outfit.headwear.2",
+      "outfit.headwear.3"
+    ],
+    "outfit-masks": [
+      "outfit.masks.0",
+      "outfit.masks.1",
+      "outfit.masks.2",
+      "outfit.masks.3"
+    ],
+    "outfit-special": [
+      "outfit.special.0",
+      "outfit.special.1",
+      "outfit.special.2",
+      "outfit.special.3"
+    ],
+    "outfits": [
+      "outfit.armour.0",
+      "outfit.armour.1",
+      "outfit.armour.2",
+      "outfit.armour.3",
+      "outfit.cloth.0",
+      "outfit.cloth.1",
+      "outfit.cloth.2",
+      "outfit.cloth.3",
+      "outfit.headwear.0",
+      "outfit.headwear.1",
+      "outfit.headwear.2",
+      "outfit.headwear.3",
+      "outfit.masks.0",
+      "outfit.masks.1",
+      "outfit.masks.2",
+      "outfit.masks.3",
+      "outfit.special.0",
+      "outfit.special.1",
+      "outfit.special.2",
+      "outfit.special.3"
+    ],
+    "player": [
+      "player.hand",
+      "player.head",
+      "player.leftForearm",
+      "player.leftPanel",
+      "player.leftSleeve",
+      "player.rightForearm",
+      "player.rightPanel",
+      "player.rightSleeve",
+      "player.torso"
+    ],
+    "weapons": [
+      "weapon.blades.0",
+      "weapon.blades.1",
+      "weapon.blades.2",
+      "weapon.blades.3",
+      "weapon.blades.4",
+      "weapon.blades.5",
+      "weapon.hilts.0",
+      "weapon.hilts.1",
+      "weapon.hilts.2",
+      "weapon.hilts.3",
+      "weapon.hilts.4",
+      "weapon.hilts.5",
+      "weapon.special.beam",
+      "weapon.special.pan"
+    ]
+  },
+  "fingerprint": "e6444638d613a9760385d6b4633bf98e181491a253bc2cfadfc4b65761c67553",
+  "loadingReport": {
+    "charms": {
+      "encodedBytes": 1741054,
+      "imageCount": 3,
+      "loadedPlanePixels": 2848992,
+      "pages": [
+        1
+      ],
+      "requiredSpritePlanePixels": 2324307
+    },
+    "companion-preview": {
+      "encodedBytes": 2297477,
+      "imageCount": 9,
+      "loadedPlanePixels": 8994267,
+      "pages": [
+        0,
+        2,
+        3
+      ],
+      "requiredSpritePlanePixels": 8270298
+    },
+    "companions": {
+      "encodedBytes": 2072910,
+      "imageCount": 6,
+      "loadedPlanePixels": 8083353,
+      "pages": [
+        2,
+        3
+      ],
+      "requiredSpritePlanePixels": 7425024
+    },
+    "enemies": {
+      "encodedBytes": 5215811,
+      "imageCount": 9,
+      "loadedPlanePixels": 13128492,
+      "pages": [
+        4,
+        5,
+        6
+      ],
+      "requiredSpritePlanePixels": 11606865
+    },
+    "outfit-armour": {
+      "encodedBytes": 1526660,
+      "imageCount": 3,
+      "loadedPlanePixels": 2834304,
+      "pages": [
+        7
+      ],
+      "requiredSpritePlanePixels": 2720988
+    },
+    "outfit-cloth": {
+      "encodedBytes": 1100662,
+      "imageCount": 3,
+      "loadedPlanePixels": 3348072,
+      "pages": [
+        8
+      ],
+      "requiredSpritePlanePixels": 2817648
+    },
+    "outfit-headwear": {
+      "encodedBytes": 960127,
+      "imageCount": 3,
+      "loadedPlanePixels": 2368080,
+      "pages": [
+        9
+      ],
+      "requiredSpritePlanePixels": 2131404
+    },
+    "outfit-masks": {
+      "encodedBytes": 1347532,
+      "imageCount": 6,
+      "loadedPlanePixels": 3116268,
+      "pages": [
+        10,
+        11
+      ],
+      "requiredSpritePlanePixels": 2813196
+    },
+    "outfit-special": {
+      "encodedBytes": 1081637,
+      "imageCount": 3,
+      "loadedPlanePixels": 2649600,
+      "pages": [
+        12
+      ],
+      "requiredSpritePlanePixels": 2434941
+    },
+    "outfits": {
+      "encodedBytes": 6016618,
+      "imageCount": 18,
+      "loadedPlanePixels": 14316324,
+      "pages": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "requiredSpritePlanePixels": 12918177
+    },
+    "player": {
+      "encodedBytes": 999776,
+      "imageCount": 6,
+      "loadedPlanePixels": 3027966,
+      "pages": [
+        13,
+        14
+      ],
+      "requiredSpritePlanePixels": 2440734
+    },
+    "weapons": {
+      "encodedBytes": 3643451,
+      "imageCount": 3,
+      "loadedPlanePixels": 8296344,
+      "pages": [
+        15
+      ],
+      "requiredSpritePlanePixels": 7083876
+    }
+  },
+  "mipmaps": false,
+  "padding": 2,
+  "pageHashes": {
+    "page-0-colour.png": "ab51559ad7b77d1e1affd5c74a4489bbe002d2425368cfb8e4b3f54ab2223404",
+    "page-0-normal.png": "64e960e604b83b1a28b74678c806c1de216e48b75240d3c62a00c6a07d863cac",
+    "page-0-surface.png": "189262095f7b15ea667a646c909ab101786e41a9fa894becc5dd4ac27900be14",
+    "page-1-colour.png": "085bff5397a5ee4fe7b2ef6f2896d3e10ebd5e58e624df29c12cf40815a22c04",
+    "page-1-normal.png": "09734dbdbd0b30208073d98350f72aa584aaf95cd5f3b5eb11c4d586d9db6164",
+    "page-1-surface.png": "8380164b2c1690a5012c030e3349afee3daca070c8f8eef7678777415b505630",
+    "page-10-colour.png": "42ec50e3c14ed07e442f711c94f05ca7914002accc9ff439f656a41217fafcce",
+    "page-10-normal.png": "1bef0fee68d503606ef696207ec93475ec9bcbefea2bf21a1b1321eb93d716d2",
+    "page-10-surface.png": "a89189d3783e5da1dec43ac9722193f1d8267c387711485e37b25e0c5c6e735b",
+    "page-11-colour.png": "e9c5acf8d7f572d5a9bf54b00ae1b2a10b03630b3fd93a8981ed7cb1bb57fee5",
+    "page-11-normal.png": "ab8c03616d58b1805f129de537881a7b0811e8e792f6151e637a1c6aa456eca3",
+    "page-11-surface.png": "9ed66371aa9ab7b1614e2f8ad19a2188432d17d9e018d2197a8c2a6b5a57e09f",
+    "page-12-colour.png": "beee59a1cf503badc9345d419c4e40caf155425eed18a2ebd8856fb822fe4228",
+    "page-12-normal.png": "17a4203e9ebb18b210814a33122fa9065f88fc65369fd1b0449a477d800accfc",
+    "page-12-surface.png": "f4c70f2acbcbae2ff4dc694dc808880f43e37772b31772fc1ed3979d9bca7d25",
+    "page-13-colour.png": "69386b28878462e1381f8a646d9b1cd9d494496811617424290506e2b79e26b2",
+    "page-13-normal.png": "02d3f96f0aade7028f4d18102499b3664c0c3f09792cb1b0afa765a9c79c4a09",
+    "page-13-surface.png": "de50d9dcdfff6b46259618a67c707dd483f3937075f2568ea3e01682293372ad",
+    "page-14-colour.png": "c5fbafbe27e33b3e772e9370fa3596853f14bc5807e7851d961c5aa44b42f411",
+    "page-14-normal.png": "3ee5e0bd63f061ce67e0bcb6381a2de0d20a30a290292f14075a5b90e41fd57b",
+    "page-14-surface.png": "d0f5a81c93922561c73039f3a5d5460ce30eeaf7710a7b06920b0c2ea73bdf19",
+    "page-15-colour.png": "c36bcce079d2ae7443a75ccd2070f1d2d6671dcfe472cf10f26739c213d6ae20",
+    "page-15-normal.png": "696050a48fe067de1bb67b2b48035ae37ffe3356747af8f454c3d2b0eccbb3f3",
+    "page-15-surface.png": "34ca0cee633a83bbf5d88df079e6588b4613877e2fd7e3ae744ee6cae71ff88d",
+    "page-2-colour.png": "f9a21e0ea8803a0f9c0848b856e0d0a1f60282b92cc915350ff5fba57a91f086",
+    "page-2-normal.png": "a301e1d3e440635b916512e347247a33d3245b9f85fd431088be78bf95de4e01",
+    "page-2-surface.png": "9d8ad4abf3ee766e6162cfbfc97e7c7d9704c54876fbdee6d5f09d0839095c04",
+    "page-3-colour.png": "b6ba092f35915f38233059b63b75b311ef14a5f89eb11b8fa14d911f3477debb",
+    "page-3-normal.png": "df48cde35361bcb3f59ef0592e37ab8c072b2c0436d68f36f3cffa32819c40e9",
+    "page-3-surface.png": "1da6771ae93a0c54bf7c57002ecdbb4880cc1bb3a83188a2c892d12e6bc982d2",
+    "page-4-colour.png": "e03ea53a2db489d88fd98192358501593a7cfe2c67eef86d73f38defa15e2535",
+    "page-4-normal.png": "e5c9dfc4651c96ee29136104c205189c3ba46f9fc1c1c752b7c1eb1d9b70b139",
+    "page-4-surface.png": "266849f8d73f41af3136f3976c7200f08ddb0b5817b994a31f7ac0b7043b3925",
+    "page-5-colour.png": "50b7030fb25d47108535e0ca8cc29e37df03f0bb1bc344c57b5baf76c7306f4b",
+    "page-5-normal.png": "a12dccb424ff68b9f4c0b8872b19d00902aaacb27d8ef30e66617b743b0d6633",
+    "page-5-surface.png": "52b3c0deda78195de6c6a53039e15e117085b38f8ae172ba8287345cba4a7f5c",
+    "page-6-colour.png": "34a809c559c26d65ab8e23cf6746e155f0a4de61d81b7416dfd3e6b22170e4b1",
+    "page-6-normal.png": "215c83639baed79dd4aaff34a8ce74f6f3183e2b140c8d1e1dfe40e710506969",
+    "page-6-surface.png": "4a4f37a094e962b222750d72976c37f0396e0a013d3d0bd40f5843a3303d0b00",
+    "page-7-colour.png": "3a1cc749979fc782661ecdf473a5ccd5345d4b1c93ae2823345b7cfae10da705",
+    "page-7-normal.png": "191af4b201d2de1406676fa7e2211c754ec5ac55aa1b617a520431d322b0861b",
+    "page-7-surface.png": "2c5e93338133648705d4c47068c6df1e49872ea5a7b9ed409700061dfea8cb5e",
+    "page-8-colour.png": "8faf78af5573d4d4d683c3fc15c7db8e9633863c885fbc7940126314cc910870",
+    "page-8-normal.png": "355a786dcc34fedf1b3385519e8aa0b98cf95e4897018d52a1df460740d94a63",
+    "page-8-surface.png": "f8e9821c8bc3cb9ca127c2e41371f6cf51b360f141c306c444aaf380400ccc0e",
+    "page-9-colour.png": "fdbefdc639738237ed959130f8cc66d8748b979ddec9f6e8f101335ee0819fd1",
+    "page-9-normal.png": "c6631c932acad4e5ae93aa89d3bdf921720b805ac5a86f4c05d8409ccfb87d92",
+    "page-9-surface.png": "dd57d66272dbd6d4f129af1cfa73601f17dcb2c09ca1dac54a47b8d7cadaea94"
+  },
+  "pages": [
+    {
+      "maps": {
+        "colour": "page-0-colour.png",
+        "normal": "page-0-normal.png",
+        "surface": "page-0-surface.png"
+      },
+      "nonzeroColourPixels": 40699,
+      "size": [
+        314,
+        967
+      ],
+      "storedSpritePixels": 281758
+    },
+    {
+      "maps": {
+        "colour": "page-1-colour.png",
+        "normal": "page-1-normal.png",
+        "surface": "page-1-surface.png"
+      },
+      "nonzeroColourPixels": 498913,
+      "size": [
+        503,
+        1888
+      ],
+      "storedSpritePixels": 774769
+    },
+    {
+      "maps": {
+        "colour": "page-2-colour.png",
+        "normal": "page-2-normal.png",
+        "surface": "page-2-surface.png"
+      },
+      "nonzeroColourPixels": 511271,
+      "size": [
+        1036,
+        2041
+      ],
+      "storedSpritePixels": 2007942
+    },
+    {
+      "maps": {
+        "colour": "page-3-colour.png",
+        "normal": "page-3-normal.png",
+        "surface": "page-3-surface.png"
+      },
+      "nonzeroColourPixels": 76832,
+      "size": [
+        925,
+        627
+      ],
+      "storedSpritePixels": 467066
+    },
+    {
+      "maps": {
+        "colour": "page-4-colour.png",
+        "normal": "page-4-normal.png",
+        "surface": "page-4-surface.png"
+      },
+      "nonzeroColourPixels": 1116970,
+      "size": [
+        1008,
+        2036
+      ],
+      "storedSpritePixels": 1869286
+    },
+    {
+      "maps": {
+        "colour": "page-5-colour.png",
+        "normal": "page-5-normal.png",
+        "surface": "page-5-surface.png"
+      },
+      "nonzeroColourPixels": 1131217,
+      "size": [
+        1005,
+        2028
+      ],
+      "storedSpritePixels": 1743927
+    },
+    {
+      "maps": {
+        "colour": "page-6-colour.png",
+        "normal": "page-6-normal.png",
+        "surface": "page-6-surface.png"
+      },
+      "nonzeroColourPixels": 175355,
+      "size": [
+        748,
+        382
+      ],
+      "storedSpritePixels": 255742
+    },
+    {
+      "maps": {
+        "colour": "page-7-colour.png",
+        "normal": "page-7-normal.png",
+        "surface": "page-7-surface.png"
+      },
+      "nonzeroColourPixels": 619027,
+      "size": [
+        976,
+        968
+      ],
+      "storedSpritePixels": 906996
+    },
+    {
+      "maps": {
+        "colour": "page-8-colour.png",
+        "normal": "page-8-normal.png",
+        "surface": "page-8-surface.png"
+      },
+      "nonzeroColourPixels": 570364,
+      "size": [
+        1022,
+        1092
+      ],
+      "storedSpritePixels": 939216
+    },
+    {
+      "maps": {
+        "colour": "page-9-colour.png",
+        "normal": "page-9-normal.png",
+        "surface": "page-9-surface.png"
+      },
+      "nonzeroColourPixels": 433933,
+      "size": [
+        1012,
+        780
+      ],
+      "storedSpritePixels": 710468
+    },
+    {
+      "maps": {
+        "colour": "page-10-colour.png",
+        "normal": "page-10-normal.png",
+        "surface": "page-10-surface.png"
+      },
+      "nonzeroColourPixels": 467949,
+      "size": [
+        529,
+        1599
+      ],
+      "storedSpritePixels": 748375
+    },
+    {
+      "maps": {
+        "colour": "page-11-colour.png",
+        "normal": "page-11-normal.png",
+        "surface": "page-11-surface.png"
+      },
+      "nonzeroColourPixels": 137647,
+      "size": [
+        385,
+        501
+      ],
+      "storedSpritePixels": 189357
+    },
+    {
+      "maps": {
+        "colour": "page-12-colour.png",
+        "normal": "page-12-normal.png",
+        "surface": "page-12-surface.png"
+      },
+      "nonzeroColourPixels": 585612,
+      "size": [
+        960,
+        920
+      ],
+      "storedSpritePixels": 811647
+    },
+    {
+      "maps": {
+        "colour": "page-13-colour.png",
+        "normal": "page-13-normal.png",
+        "surface": "page-13-surface.png"
+      },
+      "nonzeroColourPixels": 367795,
+      "size": [
+        386,
+        1873
+      ],
+      "storedSpritePixels": 600145
+    },
+    {
+      "maps": {
+        "colour": "page-14-colour.png",
+        "normal": "page-14-normal.png",
+        "surface": "page-14-surface.png"
+      },
+      "nonzeroColourPixels": 147232,
+      "size": [
+        328,
+        873
+      ],
+      "storedSpritePixels": 213433
+    },
+    {
+      "maps": {
+        "colour": "page-15-colour.png",
+        "normal": "page-15-normal.png",
+        "surface": "page-15-surface.png"
+      },
+      "nonzeroColourPixels": 1620742,
+      "size": [
+        1593,
+        1736
+      ],
+      "storedSpritePixels": 2361292
+    }
+  ],
+  "rotation": false,
+  "sources": {
+    "scripts/assets/figures-spec.mjs": "45e8cd42a9abf93941cb1857afba65a5deb141997d0c885f0cc616e2ddb2c727",
+    "scripts/assets/pack.py": "c0a696900c20d5e30085f8c305de928d54c1502fa5f01988ad8254095d5f0ecb",
+    "src/rendering/asset-material-catalog.ts": "3889be5d1d8f24afd332b7a345f0edfa94f9ea6e5af120a6418d40845e7e07ef",
+    "src/rendering/figures/assets/armour-plates-atlas.png": "5eb5c5e9e8e27aa5336b22514c44e442343e8b8df3345724d26ecff92ca3ca92",
+    "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_diffuse.png": "e3d956cdd0e734c4b1a32a5c6fdfc60f8299d256eb14327a2f45271c2fbb5b9f",
+    "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_normal.png": "2b7768c613ceea4f723277eb4daeb2c7c4ea566916d609eb8a55006d15262dc4",
+    "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_surface.png": "3fecc9abce6ad0eebedd804020b7140601a58a20911f2262bd090b0019cdb0fb",
+    "src/rendering/figures/assets/charm-atlas.png": "12af5f9738a48b8f8c23a7eb5b22a4573424f87e18c9fec2f1794e7f38c38c93",
+    "src/rendering/figures/assets/companion-parts-atlas.png": "665098b617662367d5649c2635d849950552b33532df8f932f1d539a943508f8",
+    "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_diffuse.png": "d2587a7ac488e99facd81a0cef75282147b9599b82454832e8cb053eb8c94333",
+    "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_normal.png": "e457d236d8484c3e98a68e81b382a1969b73440010cdeeeb30ab91d5711ea864",
+    "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_surface.png": "8964cd466f56a9828551e3be6c4f8978d28723397ad66cf763e2797a1fb31e5d",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_diffuse.png": "9c0b3ed34d1784c1d85042484f3d15286ada575e0dc2efeaff8c6e82b89e4a6a",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_normal.png": "c50db908a2482004d18ed07ec28cd582fd0695a9bc7a0d60a2bec1474e9cd543",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_surface.png": "cc7de1f9c255143bdaf712640e5547fc8b3da5fc132685c1bf9354869094f60c",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_diffuse.png": "552943593d3dab02ff4ee5796528a6ece64d0bfc078940f58b9895b6e8c95aa8",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_normal.png": "80d94354f410a0c1bc71934834b29221c6ce1e2159ca0b62dea45ba32a7bb170",
+    "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_surface.png": "30b933669b9b034e23876f5ba780baaec27d89cab4e86da39393bb8bdac160f3",
+    "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_diffuse.png": "0a2e9638ded19e48a09e5a7b441840c13ddfb5742640a3273c6795db19e565ad",
+    "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_normal.png": "e5070812e6128de4ed5f9469e4db931b615002ceb0980585fc799d1422fa935e",
+    "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_surface.png": "083bdd31653b2048a08f1b9344dea04bf2bdd141e3be0affbcfe8e2c23498e86",
+    "src/rendering/figures/assets/handle-guard-atlas.png": "26bf40bf4449f8a65bd2185bc073acdf89b941640e83e44c7c01544fa656f122",
+    "src/rendering/figures/assets/mystic-rock.png": "2a3629e2ecf4724b909fbbf6308c1cde9eefc6d795710b5892fa6b4df3a0e33b",
+    "src/rendering/figures/assets/outfit-cloth-atlas.png": "eb28de90516aecd0ebca235059004679be8130db4234ef85abeefe46fc741348",
+    "src/rendering/figures/assets/outfit-headwear-atlas.png": "3d9454cb0384ce23075a13a1a19a6ec94fff5408bfd602b9696b76fe34d3ac61",
+    "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_normal.png": "004220d5a319dfe09c2bfe4a51c8231d854ebd425de3be969ff240a3cc34e0a0",
+    "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_surface.png": "3a2961152893079bea1b391afdd01960d8595b6b8635ffd60f463a1d2075f60c",
+    "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_normal.png": "4ab3c2b8dce6aec36fc79c7e7099d0906e33c261b8a9ffb2c4eef8b2f5b9cf24",
+    "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_surface.png": "6f3f90e4e9809ba4349a5bdfc6797199553a7306a31a2b4deb2466954385b475",
+    "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_normal.png": "2fd6b591335483feeb90b08cb0d00fe2aadf2d0fea2123a5bde5f0a999a44303",
+    "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_surface.png": "35d01203ef8537eb77274beac4d4e48941bb4fb5bb94d13e4e920626d9ab7bd8",
+    "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_normal.png": "5be4938b96ca66b75ebfefaceb4add5126dc421bc16005d7f75c795899fffc57",
+    "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_surface.png": "fd3a036218c0434268956fd740a42ea6ee6b56c00fa16cf53497d2d67d823c68",
+    "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_normal.png": "89af357f7b47d6808628ffb3bbaa9a186d15767642a1096721ce771a021710c8",
+    "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_surface.png": "534d7c26cd7e139c17868d3514d8e93a8f37030139fb539a903fd59f635d69bb",
+    "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_normal.png": "60f7174117db78d1de1eb38f97e7169a92e3e8459deb864d2a976f7c5cad1eec",
+    "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_surface.png": "e3b1d4c7f2d79ef7641bc4a9a30c93befb0d1338b3b6af02c74e3a12f4860d6c",
+    "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_normal.png": "f02b5579ab294c28fcc6ba76dc31ff5cbc25d39b0ee775d713cd2b25842892a9",
+    "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_surface.png": "c6f981f5637a73283bd1a1437f9693e21bbd49fa0543e026124d8e2563409d6e",
+    "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_normal.png": "f451b043b869a94c6a1a832f1d5222d5b4d4cd09d276e7fadc3ec965e6c0f961",
+    "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_surface.png": "20145702ddd69e6eaee1a611c39dcc8055cb4588f6076dbb80027c01c0e855dd",
+    "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_normal.png": "44500804c5566d3c73aa9780903d01eb1aac3057132df8ede39342d844739c54",
+    "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_surface.png": "889734f2d06daf25edd775f84acdefdcd7e50ebebba6d0754891a2e05eceb65f",
+    "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_normal.png": "324c4c7acbedfec676b1d9c94492fe13438c5e6180f967cc49c1069acd60a084",
+    "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_surface.png": "378d60a75edf1a35d4f4d1dbaa61dccddf79f83f4e67ca055656cc574f95d920",
+    "src/rendering/figures/assets/player-mask-atlas.png": "f9b085846fe38054e9b5f7194ed518515a8ee873cd4ceb5fedb45a01fffbbe61",
+    "src/rendering/figures/assets/player-pbr/player-ronin-simple_diffuse.png": "78d9236c5dfd977d4f3415f409e60a97cb27dcb74b900e5fb64da754d6b5d8cd",
+    "src/rendering/figures/assets/player-pbr/player-ronin-simple_normal.png": "8423ece1a03419aa82283d202b49944efc5207322548fee4eb170e5b665b5a8e",
+    "src/rendering/figures/assets/player-pbr/player-ronin-simple_surface.png": "b2ee6b1e269f3facc35c6ec57c213d7b7b3b48b028522b306619d300bd5ca92b",
+    "src/rendering/figures/assets/player-special-headwear-atlas.png": "80a97573b462c2018f26421848006f4867dfe818ceea2fce27d3bdb653ea8739",
+    "src/rendering/figures/assets/special-weapons-atlas.png": "45621dcc1da7e64656964b4a4d93d47186ace2cce06628e2acadf9f62b4dd4af",
+    "src/rendering/figures/blade-recipes.ts": "60451a63bb3802fcc99b1f63fbb7f4fdfb8fa331a72e837b46caf18b0d1d5bc8",
+    "src/rendering/figures/charm-catalog.ts": "adce6bae9565c08165d63cfd295451ac30e5fae7ca5216602b9fb43e36e48aab",
+    "src/rendering/figures/companion-catalog.ts": "3a6549b1917840d6ce9bf772a89c30a6cbfe8a44d2b3e9ec2fa4cacbeeb64cf7",
+    "src/rendering/figures/enemy-catalog.ts": "f3f089607ce44785796ecabdd755904e9a92a68787b5ee6d953b4b112d81cebd",
+    "src/rendering/figures/outfit-catalog.ts": "a1c02dede45fb0b1be820719e8637ede4d8626a3043559ae25db1469f9209c38",
+    "src/rendering/figures/player-catalog.ts": "63ab2f510d23d1e0ecef63c9927db3a8f95d457fafdef2bfa7be42c4b442f88e"
+  },
+  "sprites": {
+    "charm.0": {
+      "empty": false,
+      "frame": [
+        176,
+        2,
+        265,
+        336
+      ],
+      "id": "charm.0",
+      "logicalSize": [
+        265,
+        336
+      ],
+      "page": 1,
+      "pivot": [
+        132.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        110,
+        22,
+        265,
+        336
+      ],
+      "storageFrame": [
+        176,
+        2,
+        265,
+        336
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.1": {
+      "empty": false,
+      "frame": [
+        176,
+        342,
+        166,
+        336
+      ],
+      "id": "charm.1",
+      "logicalSize": [
+        166,
+        336
+      ],
+      "page": 1,
+      "pivot": [
+        83,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        501,
+        21,
+        166,
+        336
+      ],
+      "storageFrame": [
+        176,
+        342,
+        166,
+        336
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.10": {
+      "empty": false,
+      "frame": [
+        253,
+        1020,
+        238,
+        296
+      ],
+      "id": "charm.10",
+      "logicalSize": [
+        238,
+        296
+      ],
+      "page": 1,
+      "pivot": [
+        119,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        810,
+        670,
+        238,
+        296
+      ],
+      "storageFrame": [
+        253,
+        1020,
+        238,
+        296
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.11": {
+      "empty": false,
+      "frame": [
+        274,
+        682,
+        227,
+        293
+      ],
+      "id": "charm.11",
+      "logicalSize": [
+        227,
+        293
+      ],
+      "page": 1,
+      "pivot": [
+        113.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1179,
+        681,
+        227,
+        293
+      ],
+      "storageFrame": [
+        274,
+        682,
+        227,
+        293
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.2": {
+      "empty": false,
+      "frame": [
+        2,
+        1020,
+        247,
+        311
+      ],
+      "id": "charm.2",
+      "logicalSize": [
+        247,
+        311
+      ],
+      "page": 1,
+      "pivot": [
+        123.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        802,
+        42,
+        247,
+        311
+      ],
+      "storageFrame": [
+        2,
+        1020,
+        247,
+        311
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.3": {
+      "empty": false,
+      "frame": [
+        2,
+        682,
+        268,
+        334
+      ],
+      "id": "charm.3",
+      "logicalSize": [
+        268,
+        334
+      ],
+      "page": 1,
+      "pivot": [
+        134,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1159,
+        25,
+        268,
+        334
+      ],
+      "storageFrame": [
+        2,
+        682,
+        268,
+        334
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.4": {
+      "empty": false,
+      "frame": [
+        2,
+        1622,
+        173,
+        245
+      ],
+      "id": "charm.4",
+      "logicalSize": [
+        173,
+        245
+      ],
+      "page": 1,
+      "pivot": [
+        86.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        157,
+        384,
+        173,
+        245
+      ],
+      "storageFrame": [
+        2,
+        1622,
+        173,
+        245
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.5": {
+      "empty": false,
+      "frame": [
+        244,
+        1611,
+        200,
+        275
+      ],
+      "id": "charm.5",
+      "logicalSize": [
+        200,
+        275
+      ],
+      "page": 1,
+      "pivot": [
+        100,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        491,
+        369,
+        200,
+        275
+      ],
+      "storageFrame": [
+        244,
+        1611,
+        200,
+        275
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.6": {
+      "empty": false,
+      "frame": [
+        2,
+        1335,
+        238,
+        283
+      ],
+      "id": "charm.6",
+      "logicalSize": [
+        238,
+        283
+      ],
+      "page": 1,
+      "pivot": [
+        119,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        809,
+        371,
+        238,
+        283
+      ],
+      "storageFrame": [
+        2,
+        1335,
+        238,
+        283
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.7": {
+      "empty": false,
+      "frame": [
+        253,
+        1320,
+        192,
+        287
+      ],
+      "id": "charm.7",
+      "logicalSize": [
+        192,
+        287
+      ],
+      "page": 1,
+      "pivot": [
+        96,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1199,
+        374,
+        192,
+        287
+      ],
+      "storageFrame": [
+        253,
+        1320,
+        192,
+        287
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.8": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        170,
+        353
+      ],
+      "id": "charm.8",
+      "logicalSize": [
+        170,
+        353
+      ],
+      "page": 1,
+      "pivot": [
+        85,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        147,
+        650,
+        170,
+        353
+      ],
+      "storageFrame": [
+        2,
+        2,
+        170,
+        353
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "charm.9": {
+      "empty": false,
+      "frame": [
+        346,
+        342,
+        141,
+        332
+      ],
+      "id": "charm.9",
+      "logicalSize": [
+        141,
+        332
+      ],
+      "page": 1,
+      "pivot": [
+        70.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        509,
+        650,
+        141,
+        332
+      ],
+      "storageFrame": [
+        346,
+        342,
+        141,
+        332
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1318,
+        313,
+        419
+      ],
+      "id": "companion.parts.0",
+      "logicalSize": [
+        313,
+        440
+      ],
+      "page": 2,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        313,
+        440
+      ],
+      "storageFrame": [
+        2,
+        1318,
+        313,
+        419
+      ],
+      "trim": [
+        0,
+        21
+      ]
+    },
+    "companion.parts.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        314,
+        371
+      ],
+      "id": "companion.parts.1",
+      "logicalSize": [
+        314,
+        440
+      ],
+      "page": 3,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        313,
+        0,
+        314,
+        440
+      ],
+      "storageFrame": [
+        2,
+        2,
+        314,
+        371
+      ],
+      "trim": [
+        0,
+        69
+      ]
+    },
+    "companion.parts.10": {
+      "empty": false,
+      "frame": [
+        320,
+        2,
+        303,
+        210
+      ],
+      "id": "companion.parts.10",
+      "logicalSize": [
+        313,
+        250
+      ],
+      "page": 3,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        740,
+        313,
+        250
+      ],
+      "storageFrame": [
+        320,
+        2,
+        303,
+        210
+      ],
+      "trim": [
+        7,
+        4
+      ]
+    },
+    "companion.parts.11": {
+      "empty": false,
+      "frame": [
+        2,
+        377,
+        285,
+        248
+      ],
+      "id": "companion.parts.11",
+      "logicalSize": [
+        314,
+        250
+      ],
+      "page": 3,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        940,
+        740,
+        314,
+        250
+      ],
+      "storageFrame": [
+        2,
+        377,
+        285,
+        248
+      ],
+      "trim": [
+        7,
+        2
+      ]
+    },
+    "companion.parts.12": {
+      "empty": false,
+      "frame": [
+        2,
+        729,
+        272,
+        236
+      ],
+      "id": "companion.parts.12",
+      "logicalSize": [
+        313,
+        264
+      ],
+      "page": 0,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        990,
+        313,
+        264
+      ],
+      "storageFrame": [
+        2,
+        729,
+        272,
+        236
+      ],
+      "trim": [
+        41,
+        8
+      ]
+    },
+    "companion.parts.13": {
+      "empty": false,
+      "frame": [
+        2,
+        261,
+        308,
+        234
+      ],
+      "id": "companion.parts.13",
+      "logicalSize": [
+        314,
+        264
+      ],
+      "page": 0,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        313,
+        990,
+        314,
+        264
+      ],
+      "storageFrame": [
+        2,
+        261,
+        308,
+        234
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.14": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        310,
+        255
+      ],
+      "id": "companion.parts.14",
+      "logicalSize": [
+        313,
+        264
+      ],
+      "page": 0,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        990,
+        313,
+        264
+      ],
+      "storageFrame": [
+        2,
+        2,
+        310,
+        255
+      ],
+      "trim": [
+        3,
+        9
+      ]
+    },
+    "companion.parts.15": {
+      "empty": false,
+      "frame": [
+        2,
+        499,
+        294,
+        226
+      ],
+      "id": "companion.parts.15",
+      "logicalSize": [
+        314,
+        264
+      ],
+      "page": 0,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        940,
+        990,
+        314,
+        264
+      ],
+      "storageFrame": [
+        2,
+        499,
+        294,
+        226
+      ],
+      "trim": [
+        0,
+        2
+      ]
+    },
+    "companion.parts.2": {
+      "empty": false,
+      "frame": [
+        621,
+        1318,
+        313,
+        407
+      ],
+      "id": "companion.parts.2",
+      "logicalSize": [
+        313,
+        440
+      ],
+      "page": 2,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        313,
+        440
+      ],
+      "storageFrame": [
+        621,
+        1318,
+        313,
+        407
+      ],
+      "trim": [
+        0,
+        33
+      ]
+    },
+    "companion.parts.3": {
+      "empty": false,
+      "frame": [
+        319,
+        1318,
+        298,
+        417
+      ],
+      "id": "companion.parts.3",
+      "logicalSize": [
+        314,
+        440
+      ],
+      "page": 2,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        940,
+        0,
+        314,
+        440
+      ],
+      "storageFrame": [
+        319,
+        1318,
+        298,
+        417
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "companion.parts.4": {
+      "empty": false,
+      "frame": [
+        633,
+        1729,
+        310,
+        294
+      ],
+      "id": "companion.parts.4",
+      "logicalSize": [
+        313,
+        300
+      ],
+      "page": 2,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        440,
+        313,
+        300
+      ],
+      "storageFrame": [
+        633,
+        1729,
+        310,
+        294
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.5": {
+      "empty": false,
+      "frame": [
+        319,
+        1739,
+        310,
+        300
+      ],
+      "id": "companion.parts.5",
+      "logicalSize": [
+        314,
+        300
+      ],
+      "page": 2,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        313,
+        440,
+        314,
+        300
+      ],
+      "storageFrame": [
+        319,
+        1739,
+        310,
+        300
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.6": {
+      "empty": false,
+      "frame": [
+        2,
+        1741,
+        313,
+        278
+      ],
+      "id": "companion.parts.6",
+      "logicalSize": [
+        313,
+        300
+      ],
+      "page": 2,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        440,
+        313,
+        300
+      ],
+      "storageFrame": [
+        2,
+        1741,
+        313,
+        278
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.7": {
+      "empty": false,
+      "frame": [
+        627,
+        2,
+        296,
+        300
+      ],
+      "id": "companion.parts.7",
+      "logicalSize": [
+        314,
+        300
+      ],
+      "page": 3,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        940,
+        440,
+        314,
+        300
+      ],
+      "storageFrame": [
+        627,
+        2,
+        296,
+        300
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "companion.parts.8": {
+      "empty": false,
+      "frame": [
+        613,
+        306,
+        258,
+        214
+      ],
+      "id": "companion.parts.8",
+      "logicalSize": [
+        313,
+        250
+      ],
+      "page": 3,
+      "pivot": [
+        156.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        740,
+        313,
+        250
+      ],
+      "storageFrame": [
+        613,
+        306,
+        258,
+        214
+      ],
+      "trim": [
+        29,
+        21
+      ]
+    },
+    "companion.parts.9": {
+      "empty": false,
+      "frame": [
+        320,
+        216,
+        289,
+        250
+      ],
+      "id": "companion.parts.9",
+      "logicalSize": [
+        314,
+        250
+      ],
+      "page": 3,
+      "pivot": [
+        157,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        313,
+        740,
+        314,
+        250
+      ],
+      "storageFrame": [
+        320,
+        216,
+        289,
+        250
+      ],
+      "trim": [
+        13,
+        0
+      ]
+    },
+    "companion.rock": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        1032,
+        1312
+      ],
+      "id": "companion.rock",
+      "logicalSize": [
+        1145,
+        1373
+      ],
+      "page": 2,
+      "pivot": [
+        572.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        1145,
+        1373
+      ],
+      "storageFrame": [
+        2,
+        2,
+        1032,
+        1312
+      ],
+      "trim": [
+        47,
+        21
+      ]
+    },
+    "enemy.base.hand": {
+      "empty": false,
+      "frame": [
+        2,
+        1744,
+        166,
+        228
+      ],
+      "id": "enemy.base.hand",
+      "logicalSize": [
+        166,
+        228
+      ],
+      "page": 5,
+      "pivot": [
+        83,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        971,
+        944,
+        166,
+        228
+      ],
+      "storageFrame": [
+        2,
+        1744,
+        166,
+        228
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.head": {
+      "empty": false,
+      "frame": [
+        373,
+        2,
+        230,
+        319
+      ],
+      "id": "enemy.base.head",
+      "logicalSize": [
+        230,
+        319
+      ],
+      "page": 6,
+      "pivot": [
+        115,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        510,
+        101,
+        230,
+        319
+      ],
+      "storageFrame": [
+        373,
+        2,
+        230,
+        319
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.leftForearm": {
+      "empty": false,
+      "frame": [
+        607,
+        2,
+        139,
+        314
+      ],
+      "id": "enemy.base.leftForearm",
+      "logicalSize": [
+        139,
+        314
+      ],
+      "page": 6,
+      "pivot": [
+        69.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        157,
+        875,
+        139,
+        314
+      ],
+      "storageFrame": [
+        607,
+        2,
+        139,
+        314
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.leftPanel": {
+      "empty": false,
+      "frame": [
+        2,
+        964,
+        365,
+        395
+      ],
+      "id": "enemy.base.leftPanel",
+      "logicalSize": [
+        365,
+        395
+      ],
+      "page": 5,
+      "pivot": [
+        182.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        865,
+        63,
+        365,
+        395
+      ],
+      "storageFrame": [
+        2,
+        964,
+        365,
+        395
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.leftSleeve": {
+      "empty": false,
+      "frame": [
+        639,
+        1690,
+        242,
+        336
+      ],
+      "id": "enemy.base.leftSleeve",
+      "logicalSize": [
+        242,
+        336
+      ],
+      "page": 5,
+      "pivot": [
+        121,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        508,
+        502,
+        242,
+        336
+      ],
+      "storageFrame": [
+        639,
+        1690,
+        242,
+        336
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.rightForearm": {
+      "empty": false,
+      "frame": [
+        810,
+        930,
+        139,
+        320
+      ],
+      "id": "enemy.base.rightForearm",
+      "logicalSize": [
+        139,
+        320
+      ],
+      "page": 5,
+      "pivot": [
+        69.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        550,
+        875,
+        139,
+        320
+      ],
+      "storageFrame": [
+        810,
+        930,
+        139,
+        320
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.rightPanel": {
+      "empty": false,
+      "frame": [
+        2,
+        1663,
+        385,
+        371
+      ],
+      "id": "enemy.base.rightPanel",
+      "logicalSize": [
+        385,
+        371
+      ],
+      "page": 4,
+      "pivot": [
+        192.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        38,
+        470,
+        385,
+        371
+      ],
+      "storageFrame": [
+        2,
+        1663,
+        385,
+        371
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.rightSleeve": {
+      "empty": false,
+      "frame": [
+        757,
+        1347,
+        246,
+        339
+      ],
+      "id": "enemy.base.rightSleeve",
+      "logicalSize": [
+        246,
+        339
+      ],
+      "page": 5,
+      "pivot": [
+        123,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        911,
+        502,
+        246,
+        339
+      ],
+      "storageFrame": [
+        757,
+        1347,
+        246,
+        339
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.base.torso": {
+      "empty": false,
+      "frame": [
+        292,
+        1682,
+        343,
+        334
+      ],
+      "id": "enemy.base.torso",
+      "logicalSize": [
+        343,
+        334
+      ],
+      "page": 5,
+      "pivot": [
+        171.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        63,
+        92,
+        343,
+        334
+      ],
+      "storageFrame": [
+        292,
+        1682,
+        343,
+        334
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        367,
+        378
+      ],
+      "id": "enemy.clothing.0",
+      "logicalSize": [
+        367,
+        378
+      ],
+      "page": 6,
+      "pivot": [
+        183.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        85,
+        34,
+        367,
+        378
+      ],
+      "storageFrame": [
+        2,
+        2,
+        367,
+        378
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.1": {
+      "empty": false,
+      "frame": [
+        406,
+        930,
+        400,
+        413
+      ],
+      "id": "enemy.clothing.1",
+      "logicalSize": [
+        400,
+        413
+      ],
+      "page": 5,
+      "pivot": [
+        200,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        562,
+        22,
+        400,
+        413
+      ],
+      "storageFrame": [
+        406,
+        930,
+        400,
+        413
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.2": {
+      "empty": false,
+      "frame": [
+        2,
+        1363,
+        286,
+        377
+      ],
+      "id": "enemy.clothing.2",
+      "logicalSize": [
+        286,
+        377
+      ],
+      "page": 5,
+      "pivot": [
+        143,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1117,
+        42,
+        286,
+        377
+      ],
+      "storageFrame": [
+        2,
+        1363,
+        286,
+        377
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.3": {
+      "empty": false,
+      "frame": [
+        563,
+        1072,
+        427,
+        509
+      ],
+      "id": "enemy.clothing.3",
+      "logicalSize": [
+        427,
+        509
+      ],
+      "page": 4,
+      "pivot": [
+        213.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        53,
+        459,
+        427,
+        509
+      ],
+      "storageFrame": [
+        563,
+        1072,
+        427,
+        509
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.4": {
+      "empty": false,
+      "frame": [
+        2,
+        1127,
+        481,
+        532
+      ],
+      "id": "enemy.clothing.4",
+      "logicalSize": [
+        481,
+        532
+      ],
+      "page": 4,
+      "pivot": [
+        240.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        538,
+        460,
+        481,
+        532
+      ],
+      "storageFrame": [
+        2,
+        1127,
+        481,
+        532
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.clothing.5": {
+      "empty": false,
+      "frame": [
+        582,
+        546,
+        377,
+        522
+      ],
+      "id": "enemy.clothing.5",
+      "logicalSize": [
+        377,
+        522
+      ],
+      "page": 4,
+      "pivot": [
+        188.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1102,
+        459,
+        377,
+        522
+      ],
+      "storageFrame": [
+        582,
+        546,
+        377,
+        522
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.hair": {
+      "empty": false,
+      "frame": [
+        2,
+        510,
+        400,
+        450
+      ],
+      "id": "enemy.heads.hair",
+      "logicalSize": [
+        400,
+        450
+      ],
+      "page": 5,
+      "pivot": [
+        200,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1105,
+        54,
+        400,
+        450
+      ],
+      "storageFrame": [
+        2,
+        510,
+        400,
+        450
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.jingasa": {
+      "empty": false,
+      "frame": [
+        2,
+        528,
+        576,
+        301
+      ],
+      "id": "enemy.heads.jingasa",
+      "logicalSize": [
+        576,
+        301
+      ],
+      "page": 4,
+      "pivot": [
+        288,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        490,
+        588,
+        576,
+        301
+      ],
+      "storageFrame": [
+        2,
+        528,
+        576,
+        301
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.kabuto": {
+      "empty": false,
+      "frame": [
+        487,
+        1585,
+        458,
+        419
+      ],
+      "id": "enemy.heads.kabuto",
+      "logicalSize": [
+        458,
+        419
+      ],
+      "page": 4,
+      "pivot": [
+        229,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        582,
+        64,
+        458,
+        419
+      ],
+      "storageFrame": [
+        487,
+        1585,
+        458,
+        419
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.kasa": {
+      "empty": false,
+      "frame": [
+        2,
+        833,
+        557,
+        290
+      ],
+      "id": "enemy.heads.kasa",
+      "logicalSize": [
+        557,
+        290
+      ],
+      "page": 4,
+      "pivot": [
+        278.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        8,
+        137,
+        557,
+        290
+      ],
+      "storageFrame": [
+        2,
+        833,
+        557,
+        290
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.mask": {
+      "empty": false,
+      "frame": [
+        371,
+        1347,
+        382,
+        331
+      ],
+      "id": "enemy.heads.mask",
+      "logicalSize": [
+        382,
+        331
+      ],
+      "page": 5,
+      "pivot": [
+        191,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        63,
+        600,
+        382,
+        331
+      ],
+      "storageFrame": [
+        371,
+        1347,
+        382,
+        331
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.heads.monk": {
+      "empty": false,
+      "frame": [
+        500,
+        474,
+        396,
+        452
+      ],
+      "id": "enemy.heads.monk",
+      "logicalSize": [
+        396,
+        452
+      ],
+      "page": 5,
+      "pivot": [
+        198,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1110,
+        527,
+        396,
+        452
+      ],
+      "storageFrame": [
+        500,
+        474,
+        396,
+        452
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.variationHeads.0": {
+      "empty": false,
+      "frame": [
+        500,
+        2,
+        493,
+        468
+      ],
+      "id": "enemy.variationHeads.0",
+      "logicalSize": [
+        493,
+        468
+      ],
+      "page": 5,
+      "pivot": [
+        246.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        54,
+        110,
+        493,
+        468
+      ],
+      "storageFrame": [
+        500,
+        2,
+        493,
+        468
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.variationHeads.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        577,
+        522
+      ],
+      "id": "enemy.variationHeads.1",
+      "logicalSize": [
+        577,
+        522
+      ],
+      "page": 4,
+      "pivot": [
+        288.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        653,
+        79,
+        577,
+        522
+      ],
+      "storageFrame": [
+        2,
+        2,
+        577,
+        522
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.variationHeads.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        494,
+        504
+      ],
+      "id": "enemy.variationHeads.2",
+      "logicalSize": [
+        494,
+        504
+      ],
+      "page": 5,
+      "pivot": [
+        247,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        82,
+        660,
+        494,
+        504
+      ],
+      "storageFrame": [
+        2,
+        2,
+        494,
+        504
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "enemy.variationHeads.3": {
+      "empty": false,
+      "frame": [
+        583,
+        2,
+        423,
+        540
+      ],
+      "id": "enemy.variationHeads.3",
+      "logicalSize": [
+        423,
+        540
+      ],
+      "page": 4,
+      "pivot": [
+        211.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        724,
+        632,
+        423,
+        540
+      ],
+      "storageFrame": [
+        583,
+        2,
+        423,
+        540
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.armour.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        588,
+        538
+      ],
+      "id": "outfit.armour.0",
+      "logicalSize": [
+        588,
+        538
+      ],
+      "page": 7,
+      "pivot": [
+        294,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        77,
+        72,
+        588,
+        538
+      ],
+      "storageFrame": [
+        2,
+        2,
+        588,
+        538
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.armour.1": {
+      "empty": false,
+      "frame": [
+        594,
+        490,
+        349,
+        476
+      ],
+      "id": "outfit.armour.1",
+      "logicalSize": [
+        349,
+        476
+      ],
+      "page": 7,
+      "pivot": [
+        174.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        847,
+        114,
+        349,
+        476
+      ],
+      "storageFrame": [
+        594,
+        490,
+        349,
+        476
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.armour.2": {
+      "empty": false,
+      "frame": [
+        594,
+        2,
+        380,
+        484
+      ],
+      "id": "outfit.armour.2",
+      "logicalSize": [
+        380,
+        484
+      ],
+      "page": 7,
+      "pivot": [
+        190,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        62,
+        693,
+        380,
+        484
+      ],
+      "storageFrame": [
+        594,
+        2,
+        380,
+        484
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.armour.3": {
+      "empty": false,
+      "frame": [
+        2,
+        544,
+        584,
+        412
+      ],
+      "id": "outfit.armour.3",
+      "logicalSize": [
+        584,
+        412
+      ],
+      "page": 7,
+      "pivot": [
+        292,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        620,
+        729,
+        584,
+        412
+      ],
+      "storageFrame": [
+        2,
+        544,
+        584,
+        412
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.cloth.0": {
+      "empty": false,
+      "frame": [
+        400,
+        538,
+        408,
+        551
+      ],
+      "id": "outfit.cloth.0",
+      "logicalSize": [
+        408,
+        551
+      ],
+      "page": 8,
+      "pivot": [
+        204,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        146,
+        53,
+        408,
+        551
+      ],
+      "storageFrame": [
+        400,
+        538,
+        408,
+        551
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.cloth.1": {
+      "empty": false,
+      "frame": [
+        2,
+        538,
+        394,
+        552
+      ],
+      "id": "outfit.cloth.1",
+      "logicalSize": [
+        394,
+        552
+      ],
+      "page": 8,
+      "pivot": [
+        197,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        718,
+        53,
+        394,
+        552
+      ],
+      "storageFrame": [
+        2,
+        538,
+        394,
+        552
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.cloth.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        746,
+        532
+      ],
+      "id": "outfit.cloth.2",
+      "logicalSize": [
+        746,
+        532
+      ],
+      "page": 8,
+      "pivot": [
+        373,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        64,
+        663,
+        746,
+        532
+      ],
+      "storageFrame": [
+        2,
+        2,
+        746,
+        532
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.cloth.3": {
+      "empty": false,
+      "frame": [
+        812,
+        2,
+        208,
+        481
+      ],
+      "id": "outfit.cloth.3",
+      "logicalSize": [
+        208,
+        481
+      ],
+      "page": 8,
+      "pivot": [
+        104,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        927,
+        692,
+        208,
+        481
+      ],
+      "storageFrame": [
+        812,
+        2,
+        208,
+        481
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.headwear.0": {
+      "empty": false,
+      "frame": [
+        2,
+        328,
+        488,
+        450
+      ],
+      "id": "outfit.headwear.0",
+      "logicalSize": [
+        488,
+        450
+      ],
+      "page": 9,
+      "pivot": [
+        244,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        85,
+        126,
+        488,
+        450
+      ],
+      "storageFrame": [
+        2,
+        328,
+        488,
+        450
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.headwear.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        605,
+        322
+      ],
+      "id": "outfit.headwear.1",
+      "logicalSize": [
+        605,
+        322
+      ],
+      "page": 9,
+      "pivot": [
+        302.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        630,
+        204,
+        605,
+        322
+      ],
+      "storageFrame": [
+        2,
+        2,
+        605,
+        322
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.headwear.2": {
+      "empty": false,
+      "frame": [
+        611,
+        2,
+        399,
+        522
+      ],
+      "id": "outfit.headwear.2",
+      "logicalSize": [
+        399,
+        522
+      ],
+      "page": 9,
+      "pivot": [
+        199.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        141,
+        653,
+        399,
+        522
+      ],
+      "storageFrame": [
+        611,
+        2,
+        399,
+        522
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.headwear.3": {
+      "empty": false,
+      "frame": [
+        494,
+        528,
+        399,
+        220
+      ],
+      "id": "outfit.headwear.3",
+      "logicalSize": [
+        399,
+        220
+      ],
+      "page": 9,
+      "pivot": [
+        199.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        747,
+        872,
+        399,
+        220
+      ],
+      "storageFrame": [
+        494,
+        528,
+        399,
+        220
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.masks.0": {
+      "empty": false,
+      "frame": [
+        2,
+        561,
+        436,
+        535
+      ],
+      "id": "outfit.masks.0",
+      "logicalSize": [
+        436,
+        535
+      ],
+      "page": 10,
+      "pivot": [
+        218,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        150,
+        40,
+        436,
+        535
+      ],
+      "storageFrame": [
+        2,
+        561,
+        436,
+        535
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.masks.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1100,
+        525,
+        497
+      ],
+      "id": "outfit.masks.1",
+      "logicalSize": [
+        525,
+        497
+      ],
+      "page": 10,
+      "pivot": [
+        262.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        692,
+        79,
+        525,
+        497
+      ],
+      "storageFrame": [
+        2,
+        1100,
+        525,
+        497
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.masks.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        458,
+        555
+      ],
+      "id": "outfit.masks.2",
+      "logicalSize": [
+        458,
+        555
+      ],
+      "page": 10,
+      "pivot": [
+        229,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        144,
+        589,
+        458,
+        555
+      ],
+      "storageFrame": [
+        2,
+        2,
+        458,
+        555
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.masks.3": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        381,
+        497
+      ],
+      "id": "outfit.masks.3",
+      "logicalSize": [
+        381,
+        497
+      ],
+      "page": 11,
+      "pivot": [
+        190.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        733,
+        654,
+        381,
+        497
+      ],
+      "storageFrame": [
+        2,
+        2,
+        381,
+        497
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.special.0": {
+      "empty": false,
+      "frame": [
+        532,
+        2,
+        357,
+        501
+      ],
+      "id": "outfit.special.0",
+      "logicalSize": [
+        357,
+        501
+      ],
+      "page": 12,
+      "pivot": [
+        178.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        147,
+        92,
+        357,
+        501
+      ],
+      "storageFrame": [
+        532,
+        2,
+        357,
+        501
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.special.1": {
+      "empty": false,
+      "frame": [
+        2,
+        375,
+        494,
+        507
+      ],
+      "id": "outfit.special.1",
+      "logicalSize": [
+        494,
+        507
+      ],
+      "page": 12,
+      "pivot": [
+        247,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        703,
+        85,
+        494,
+        507
+      ],
+      "storageFrame": [
+        2,
+        375,
+        494,
+        507
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.special.2": {
+      "empty": false,
+      "frame": [
+        500,
+        507,
+        458,
+        411
+      ],
+      "id": "outfit.special.2",
+      "logicalSize": [
+        458,
+        411
+      ],
+      "page": 12,
+      "pivot": [
+        229,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        101,
+        702,
+        458,
+        411
+      ],
+      "storageFrame": [
+        500,
+        507,
+        458,
+        411
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "outfit.special.3": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        526,
+        369
+      ],
+      "id": "outfit.special.3",
+      "logicalSize": [
+        526,
+        369
+      ],
+      "page": 12,
+      "pivot": [
+        263,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        690,
+        783,
+        526,
+        369
+      ],
+      "storageFrame": [
+        2,
+        2,
+        526,
+        369
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.hand": {
+      "empty": false,
+      "frame": [
+        2,
+        636,
+        165,
+        235
+      ],
+      "id": "player.hand",
+      "logicalSize": [
+        165,
+        236
+      ],
+      "page": 14,
+      "pivot": [
+        82.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        959,
+        926,
+        165,
+        236
+      ],
+      "storageFrame": [
+        2,
+        636,
+        165,
+        235
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.head": {
+      "empty": false,
+      "frame": [
+        2,
+        350,
+        229,
+        282
+      ],
+      "id": "player.head",
+      "logicalSize": [
+        229,
+        282
+      ],
+      "page": 14,
+      "pivot": [
+        114.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        523,
+        110,
+        229,
+        282
+      ],
+      "storageFrame": [
+        2,
+        350,
+        229,
+        282
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.leftForearm": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        165,
+        344
+      ],
+      "id": "player.leftForearm",
+      "logicalSize": [
+        165,
+        344
+      ],
+      "page": 14,
+      "pivot": [
+        82.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        134,
+        861,
+        165,
+        344
+      ],
+      "storageFrame": [
+        2,
+        2,
+        165,
+        344
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.leftPanel": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        366,
+        391
+      ],
+      "id": "player.leftPanel",
+      "logicalSize": [
+        366,
+        392
+      ],
+      "page": 13,
+      "pivot": [
+        183,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        864,
+        45,
+        366,
+        392
+      ],
+      "storageFrame": [
+        2,
+        2,
+        366,
+        391
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.leftSleeve": {
+      "empty": false,
+      "frame": [
+        2,
+        1132,
+        233,
+        368
+      ],
+      "id": "player.leftSleeve",
+      "logicalSize": [
+        233,
+        368
+      ],
+      "page": 13,
+      "pivot": [
+        116.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        503,
+        464,
+        233,
+        368
+      ],
+      "storageFrame": [
+        2,
+        1132,
+        233,
+        368
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.rightForearm": {
+      "empty": false,
+      "frame": [
+        171,
+        2,
+        155,
+        344
+      ],
+      "id": "player.rightForearm",
+      "logicalSize": [
+        155,
+        344
+      ],
+      "page": 14,
+      "pivot": [
+        77.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        554,
+        861,
+        155,
+        344
+      ],
+      "storageFrame": [
+        171,
+        2,
+        155,
+        344
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.rightPanel": {
+      "empty": false,
+      "frame": [
+        2,
+        759,
+        380,
+        369
+      ],
+      "id": "player.rightPanel",
+      "logicalSize": [
+        380,
+        369
+      ],
+      "page": 13,
+      "pivot": [
+        190,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        37,
+        452,
+        380,
+        369
+      ],
+      "storageFrame": [
+        2,
+        759,
+        380,
+        369
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "player.rightSleeve": {
+      "empty": false,
+      "frame": [
+        2,
+        1504,
+        257,
+        367
+      ],
+      "id": "player.rightSleeve",
+      "logicalSize": [
+        257,
+        368
+      ],
+      "page": 13,
+      "pivot": [
+        128.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        924,
+        465,
+        257,
+        368
+      ],
+      "storageFrame": [
+        2,
+        1504,
+        257,
+        367
+      ],
+      "trim": [
+        0,
+        1
+      ]
+    },
+    "player.torso": {
+      "empty": false,
+      "frame": [
+        2,
+        397,
+        382,
+        358
+      ],
+      "id": "player.torso",
+      "logicalSize": [
+        382,
+        358
+      ],
+      "page": 13,
+      "pivot": [
+        191,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        45,
+        54,
+        382,
+        358
+      ],
+      "storageFrame": [
+        2,
+        397,
+        382,
+        358
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1069,
+        955,
+        92
+      ],
+      "id": "weapon.blades.0",
+      "logicalSize": [
+        955,
+        92
+      ],
+      "page": 15,
+      "pivot": [
+        477.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        152,
+        111,
+        955,
+        92
+      ],
+      "storageFrame": [
+        2,
+        1069,
+        955,
+        92
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.1": {
+      "empty": false,
+      "frame": [
+        2,
+        504,
+        1179,
+        88
+      ],
+      "id": "weapon.blades.1",
+      "logicalSize": [
+        1179,
+        88
+      ],
+      "page": 15,
+      "pivot": [
+        589.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        50,
+        300,
+        1179,
+        88
+      ],
+      "storageFrame": [
+        2,
+        504,
+        1179,
+        88
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.2": {
+      "empty": false,
+      "frame": [
+        2,
+        1165,
+        947,
+        116
+      ],
+      "id": "weapon.blades.2",
+      "logicalSize": [
+        947,
+        116
+      ],
+      "page": 15,
+      "pivot": [
+        473.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        159,
+        486,
+        947,
+        116
+      ],
+      "storageFrame": [
+        2,
+        1165,
+        947,
+        116
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.3": {
+      "empty": false,
+      "frame": [
+        2,
+        888,
+        1045,
+        95
+      ],
+      "id": "weapon.blades.3",
+      "logicalSize": [
+        1045,
+        95
+      ],
+      "page": 15,
+      "pivot": [
+        522.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        110,
+        696,
+        1045,
+        95
+      ],
+      "storageFrame": [
+        2,
+        888,
+        1045,
+        95
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.4": {
+      "empty": false,
+      "frame": [
+        2,
+        795,
+        1091,
+        89
+      ],
+      "id": "weapon.blades.4",
+      "logicalSize": [
+        1091,
+        89
+      ],
+      "page": 15,
+      "pivot": [
+        545.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        94,
+        892,
+        1091,
+        89
+      ],
+      "storageFrame": [
+        2,
+        795,
+        1091,
+        89
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.blades.5": {
+      "empty": false,
+      "frame": [
+        2,
+        987,
+        1043,
+        78
+      ],
+      "id": "weapon.blades.5",
+      "logicalSize": [
+        1043,
+        78
+      ],
+      "page": 15,
+      "pivot": [
+        521.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        107,
+        1080,
+        1043,
+        78
+      ],
+      "storageFrame": [
+        2,
+        987,
+        1043,
+        78
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1285,
+        758,
+        226
+      ],
+      "id": "weapon.hilts.0",
+      "logicalSize": [
+        758,
+        226
+      ],
+      "page": 15,
+      "pivot": [
+        379,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        53,
+        145,
+        758,
+        226
+      ],
+      "storageFrame": [
+        2,
+        1285,
+        758,
+        226
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.1": {
+      "empty": false,
+      "frame": [
+        764,
+        1513,
+        758,
+        221
+      ],
+      "id": "weapon.hilts.1",
+      "logicalSize": [
+        758,
+        221
+      ],
+      "page": 15,
+      "pivot": [
+        379,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        53,
+        551,
+        758,
+        221
+      ],
+      "storageFrame": [
+        764,
+        1513,
+        758,
+        221
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.2": {
+      "empty": false,
+      "frame": [
+        764,
+        1285,
+        758,
+        224
+      ],
+      "id": "weapon.hilts.2",
+      "logicalSize": [
+        758,
+        224
+      ],
+      "page": 15,
+      "pivot": [
+        379,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        53,
+        915,
+        758,
+        224
+      ],
+      "storageFrame": [
+        764,
+        1285,
+        758,
+        224
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.3": {
+      "empty": false,
+      "frame": [
+        1097,
+        795,
+        186,
+        406
+      ],
+      "id": "weapon.hilts.3",
+      "logicalSize": [
+        186,
+        406
+      ],
+      "page": 15,
+      "pivot": [
+        93,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        949,
+        47,
+        186,
+        406
+      ],
+      "storageFrame": [
+        1097,
+        795,
+        186,
+        406
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.4": {
+      "empty": false,
+      "frame": [
+        1287,
+        504,
+        283,
+        378
+      ],
+      "id": "weapon.hilts.4",
+      "logicalSize": [
+        283,
+        378
+      ],
+      "page": 15,
+      "pivot": [
+        141.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        912,
+        471,
+        283,
+        378
+      ],
+      "storageFrame": [
+        1287,
+        504,
+        283,
+        378
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.hilts.5": {
+      "empty": false,
+      "frame": [
+        1287,
+        886,
+        270,
+        314
+      ],
+      "id": "weapon.hilts.5",
+      "logicalSize": [
+        270,
+        314
+      ],
+      "page": 15,
+      "pivot": [
+        135,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        914,
+        869,
+        270,
+        314
+      ],
+      "storageFrame": [
+        1287,
+        886,
+        270,
+        314
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.special.beam": {
+      "empty": false,
+      "frame": [
+        2,
+        596,
+        1102,
+        195
+      ],
+      "id": "weapon.special.beam",
+      "logicalSize": [
+        1102,
+        195
+      ],
+      "page": 15,
+      "pivot": [
+        551,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        329,
+        96,
+        1102,
+        195
+      ],
+      "storageFrame": [
+        2,
+        596,
+        1102,
+        195
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "weapon.special.pan": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        1589,
+        498
+      ],
+      "id": "weapon.special.pan",
+      "logicalSize": [
+        1589,
+        498
+      ],
+      "page": 15,
+      "pivot": [
+        794.5,
+        0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        95,
+        336,
+        1589,
+        498
+      ],
+      "storageFrame": [
+        2,
+        2,
+        1589,
+        498
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    }
+  },
+  "version": 1
+}

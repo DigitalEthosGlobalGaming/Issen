@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/ui-strokes-atlas.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/ui-strokes-atlas",
+  "dimensions": [
+    1536,
+    256
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "a93c1ecf892bbd7855e88f93b8412bbe97e3fe655fb05e7ed1241e78fe885185"
+}

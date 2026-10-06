@@ -63,3 +63,16 @@ test('Blossom retains density and other scenes are substantially quieter', () =>
     if (index !== 2) assert.ok(density > 0 && density <= 0.4);
   });
 });
+
+test('drift dependencies include future mixture choices and optional weather embers', async () => {
+  const { driftDependencies } = await import('../../src/rendering/scene/drift-catalog.ts');
+  for (let stage = 0; stage < DRIFT_MIXTURES.length; stage++) {
+    assert.deepEqual(
+      driftDependencies(stage),
+      [...new Set(DRIFT_MIXTURES[stage].map(([id]) => id))].sort(),
+    );
+    for (const id of ['fire.coal', 'fire.ember', 'fire.streak'])
+      assert.ok(driftDependencies(stage, true).includes(id));
+  }
+  assert.deepEqual(driftDependencies(-1), driftDependencies(0));
+});

@@ -1,0 +1,17 @@
+{
+  "source": "src/rendering/figures/assets/enemy-headwear-variants.png",
+  "output": "src/rendering/figures/assets/enemy-pbr",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ]
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "038b79729574c50f41eb88d8889d702416dede068703a9d22d95e82a9b149d14"
+}

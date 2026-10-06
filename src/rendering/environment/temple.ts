@@ -1,3 +1,4 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { STAGES } from '../../game/content/stages.ts';
@@ -34,7 +35,7 @@ export function drawEmberCourtyard(
   base: SceneDrawing,
   far: SceneDrawing,
   near: SceneDrawing,
-  atlases: Record<string, HTMLImageElement>,
+  atlases: Record<string, SceneryAtlas>,
   width: number,
   height: number,
   scale: number,
@@ -42,7 +43,7 @@ export function drawEmberCourtyard(
 ) {
   function piece(
     g: SceneDrawing,
-    image: HTMLImageElement,
+    image: SceneryAtlas,
     cell: number,
     x: number,
     foot: number,

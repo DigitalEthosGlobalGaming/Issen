@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/mountain-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/mountain-atlas",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "8e9de77e5a51503512527e181d597b211d096a0723c008416d43452fe9250bde"
+}

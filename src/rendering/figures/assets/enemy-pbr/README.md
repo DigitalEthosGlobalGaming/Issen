@@ -59,3 +59,11 @@ node scripts/pbr/cli.mjs --input src/rendering/figures/assets/enemy-headwear-var
 All five exports passed archive, settings, dimensions and diffuse-alpha checks.
 The composed helmet's warm face and neck pixels were checked against the cloth
 metallic map. Strict TypeScript checks passed; gameplay tests were not run.
+
+Redundant generated maps and exact replacements: [enemy-ronin-simple.material.json](enemy-ronin-simple.material.json).
+
+Redundant generated maps and exact replacements: [enemy-clothing-variants.material.json](enemy-clothing-variants.material.json).
+
+Redundant generated maps and exact replacements: [enemy-headwear-atlas.material.json](enemy-headwear-atlas.material.json).
+
+Redundant generated maps and exact replacements: [enemy-headwear-variants.material.json](enemy-headwear-variants.material.json).

@@ -16,57 +16,85 @@ try {
     if (!directory.startsWith(root + path.sep))
       throw Error('Pack output must stay in the repository');
     const stem = path.basename(job.source, '.png');
+    let metadata = job.dimensions
+      ? job
+      : JSON.parse(await readFile(path.join(directory, 'generation.json'), 'utf8'));
+    try {
+      metadata = JSON.parse(await readFile(path.join(directory, `${stem}.material.json`), 'utf8'));
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
     const channels = await Promise.all(
-      ['roughness', 'metallic', 'ao'].map(
-        async (kind) =>
+      ['roughness', 'metallic', 'ao'].map(async (kind) => {
+        if (metadata.omittedMaps?.[kind] !== undefined) return metadata.omittedMaps[kind];
+        return (
           'data:image/png;base64,' +
-          (await readFile(path.join(directory, `${stem}_${kind}.png`))).toString('base64'),
-      ),
+          (await readFile(path.join(directory, `${stem}_${kind}.png`))).toString('base64')
+        );
+      }),
     );
     // Match the existing Canvas readback semantics, including transparent data
     // pixels. This work runs once in the asset tool rather than on scene changes.
-    const png = await page.evaluate(async (urls) => {
-      const images = await Promise.all(
-        urls.map(async (url) => {
-          const image = new Image();
-          image.src = url;
-          await image.decode();
-          return image;
-        }),
-      );
-      const [width, height] = [images[0].naturalWidth, images[0].naturalHeight];
-      if (images.some((image) => image.naturalWidth !== width || image.naturalHeight !== height))
-        throw Error('Surface channel dimensions differ');
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const g = canvas.getContext('2d', { willReadFrequently: true });
-      const channels = images.map((image) => {
+    const png = await page.evaluate(
+      async ({ urls, dimensions }) => {
+        const images = await Promise.all(
+          urls.map(async (url) => {
+            if (typeof url === 'number') return url;
+            const image = new Image();
+            image.src = url;
+            await image.decode();
+            return image;
+          }),
+        );
+        const [width, height] = dimensions;
+        if (
+          images.some(
+            (image) =>
+              typeof image !== 'number' &&
+              (image.naturalWidth !== width || image.naturalHeight !== height),
+          )
+        )
+          throw Error('Surface channel dimensions differ');
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const g = canvas.getContext('2d', { willReadFrequently: true });
+        const channels = images.map((image) => {
+          if (typeof image === 'number') {
+            if (!Number.isInteger(image) || image < 0 || image > 255)
+              throw Error('Invalid scalar map constant');
+            const channel = new Uint8ClampedArray(width * height * 4);
+            for (let i = 0; i < channel.length; i += 4) channel[i] = image;
+            return channel;
+          }
+          g.clearRect(0, 0, width, height);
+          g.drawImage(image, 0, 0);
+          return g.getImageData(0, 0, width, height).data;
+        });
+        const packed = g.createImageData(width, height);
+        for (let i = 0; i < packed.data.length; i += 4) {
+          packed.data[i] = channels[0][i];
+          packed.data[i + 1] = channels[1][i];
+          packed.data[i + 2] = channels[2][i];
+          packed.data[i + 3] = 255;
+        }
+        g.putImageData(packed, 0, 0);
+        const png = canvas.toDataURL();
+        const decoded = new Image();
+        decoded.src = png;
+        await decoded.decode();
         g.clearRect(0, 0, width, height);
-        g.drawImage(image, 0, 0);
-        return g.getImageData(0, 0, width, height).data;
-      });
-      const packed = g.createImageData(width, height);
-      for (let i = 0; i < packed.data.length; i += 4) {
-        packed.data[i] = channels[0][i];
-        packed.data[i + 1] = channels[1][i];
-        packed.data[i + 2] = channels[2][i];
-        packed.data[i + 3] = 255;
-      }
-      g.putImageData(packed, 0, 0);
-      const png = canvas.toDataURL();
-      const decoded = new Image();
-      decoded.src = png;
-      await decoded.decode();
-      g.clearRect(0, 0, width, height);
-      g.drawImage(decoded, 0, 0);
-      const actual = g.getImageData(0, 0, width, height).data;
-      if (actual.some((value, index) => value !== packed.data[index]))
-        throw Error('Packed PNG differs from runtime surface data');
-      canvas.width = canvas.height = 0;
-      for (const image of [...images, decoded]) image.removeAttribute('src');
-      return png.slice(png.indexOf(',') + 1);
-    }, channels);
+        g.drawImage(decoded, 0, 0);
+        const actual = g.getImageData(0, 0, width, height).data;
+        if (actual.some((value, index) => value !== packed.data[index]))
+          throw Error('Packed PNG differs from runtime surface data');
+        canvas.width = canvas.height = 0;
+        for (const image of [...images, decoded])
+          if (typeof image !== 'number') image.removeAttribute('src');
+        return png.slice(png.indexOf(',') + 1);
+      },
+      { urls: channels, dimensions: metadata.dimensions },
+    );
     await writeFile(path.join(directory, `${stem}_surface.png`), Buffer.from(png, 'base64'));
   }
   console.log(`Packed and verified ${jobs.length} runtime surface textures.`);

@@ -1,0 +1,17 @@
+{
+  "source": "src/rendering/figures/assets/enemy-headwear-atlas.png",
+  "output": "src/rendering/figures/assets/enemy-pbr",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ]
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "a48972e2ccfa9fb51ef027a824de933ff0f4457d853f79355f8a64c4db460147"
+}

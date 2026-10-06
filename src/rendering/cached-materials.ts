@@ -8,7 +8,7 @@ type Layer = {
   owner: Owner;
   normal: HTMLCanvasElement;
   surface: HTMLCanvasElement;
-  emissive: HTMLCanvasElement;
+  emissive?: HTMLCanvasElement;
   revision: number;
 };
 type Owner = { layers: Set<HTMLCanvasElement>; images: Set<HTMLImageElement> };
@@ -78,6 +78,7 @@ export function cachedMaterialContext(native: CanvasRenderingContext2D): SceneDr
             operation === 'destination-in'
           ) {
             for (const map of [layer.normal, layer.surface, layer.emissive]) {
+              if (!map) continue;
               const g = map.getContext('2d')!;
               mapContext(proxy, g, () => {
                 g.globalCompositeOperation =
@@ -112,6 +113,22 @@ export function cachedMaterialContext(native: CanvasRenderingContext2D): SceneDr
 export function createCachedMaterials() {
   const owner: Owner = { layers: new Set(), images: new Set() };
   return {
+    draw(
+      ctx: SceneDrawing,
+      source: HTMLImageElement | ImageBitmap,
+      frame: Frame,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      colour: HTMLCanvasElement | undefined,
+      material: SceneMaterial | null,
+    ) {
+      drawCachedImage(ctx, source, frame, x, y, width, height, colour, {
+        owner,
+        material: () => material,
+      });
+    },
     bind(image: HTMLImageElement, material: (frame: Frame) => SceneMaterial | null) {
       owner.images.add(image);
       sources.set(image, { owner, material });
@@ -127,7 +144,8 @@ export function createCachedMaterials() {
 export function clearCachedMaterial(canvas: HTMLCanvasElement) {
   const layer = layers.get(canvas);
   if (!layer) return;
-  for (const map of [layer.normal, layer.surface, layer.emissive]) map.width = map.height = 0;
+  for (const map of [layer.normal, layer.surface, layer.emissive])
+    if (map) map.width = map.height = 0;
   layer.owner.layers.delete(canvas);
   layers.delete(canvas);
 }
@@ -142,9 +160,10 @@ function materialLayer(canvas: HTMLCanvasElement, owner: Owner): Layer {
       const c = canvas.ownerDocument.createElement('canvas');
       c.width = canvas.width;
       c.height = canvas.height;
+      c.getContext('2d');
       return c;
     };
-    layer = { owner, normal: map(), surface: map(), emissive: map(), revision: ++revisionSequence };
+    layer = { owner, normal: map(), surface: map(), revision: ++revisionSequence };
     layers.set(canvas, layer);
     owner.layers.add(canvas);
   }
@@ -154,7 +173,7 @@ function layerMaterial(layer: Layer): SceneMaterial {
   return {
     normal: { source: layer.normal, revision: layer.revision },
     surface: { source: layer.surface, revision: layer.revision },
-    emissive: { source: layer.emissive, revision: layer.revision },
+    emissive: layer.emissive ? { source: layer.emissive, revision: layer.revision } : undefined,
     surfaceCoverage: true,
     normalY: -1,
     lighting: 1,
@@ -173,15 +192,16 @@ export function getCachedMaterial(canvas: HTMLCanvasElement): SceneMaterial | nu
 /** Draw a source crop or an already composed layer, retaining aligned PBR channels. */
 export function drawCachedImage(
   ctx: SceneDrawing,
-  source: HTMLImageElement | HTMLCanvasElement,
+  source: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
   frame: Frame,
   x: number,
   y: number,
   width: number,
   height: number,
   colour?: HTMLCanvasElement,
+  binding?: { owner: Owner; material: (frame: Frame) => SceneMaterial | null },
 ) {
-  const entry = source instanceof HTMLImageElement ? sources.get(source) : undefined;
+  const entry = binding ?? (source instanceof HTMLImageElement ? sources.get(source) : undefined);
   const cached = source instanceof HTMLCanvasElement ? layers.get(source) : undefined;
   const material = entry?.material(frame) ?? (cached ? layerMaterial(cached) : null);
   const texture: SceneTexture = {
@@ -236,7 +256,23 @@ export function drawCachedImage(
       Math.abs(normalMatrix[3]! - 1) < 1e-6;
     for (const kind of ['normal', 'surface', 'emissive'] as const) {
       const map = material[kind];
-      if (!map) continue;
+      if (!map) {
+        // A nonemitting sprite still occludes emission already behind it.
+        if (kind === 'emissive' && destination.emissive) {
+          g.clearRect(0, 0, scratch.width, scratch.height);
+          if (colour) g.drawImage(colour, 0, 0, scratch.width, scratch.height);
+          else g.drawImage(source, ...frame, 0, 0, scratch.width, scratch.height);
+          const output = destination.emissive.getContext('2d')!;
+          mapContext(ctx, output, () => {
+            output.globalCompositeOperation =
+              ctx.globalCompositeOperation === 'destination-in'
+                ? 'destination-in'
+                : 'destination-out';
+            output.drawImage(scratch, x, y, width, height);
+          });
+        }
+        continue;
+      }
       g.clearRect(0, 0, scratch.width, scratch.height);
       const crop = map.frame ?? frame;
       g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);
@@ -259,7 +295,13 @@ export function drawCachedImage(
       if (colour) g.drawImage(colour, 0, 0, scratch.width, scratch.height);
       else g.drawImage(source, ...frame, 0, 0, scratch.width, scratch.height);
       g.globalCompositeOperation = 'source-over';
-      const output = destination[kind].getContext('2d')!;
+      if (kind === 'emissive' && !destination.emissive) {
+        const plane = ctx.canvas.ownerDocument.createElement('canvas');
+        plane.width = ctx.canvas.width;
+        plane.height = ctx.canvas.height;
+        destination.emissive = plane;
+      }
+      const output = destination[kind]!.getContext('2d')!;
       mapContext(ctx, output, () => {
         output.globalCompositeOperation = ctx.globalCompositeOperation;
         output.drawImage(scratch, x, y, width, height);

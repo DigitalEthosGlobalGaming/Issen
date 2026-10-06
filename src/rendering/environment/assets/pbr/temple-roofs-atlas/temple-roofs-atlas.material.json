@@ -1,0 +1,21 @@
+{
+  "source": "src/rendering/environment/assets/temple-roofs-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/temple-roofs-atlas",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "roughness": 0,
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "5cc7c89b133382f428e2c5c23e9dbad9e53c6adae42ccb978916ea9f2c84183f"
+}

@@ -1,11 +1,12 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { createLayout } from '../layout.ts';
 
 interface FieldAtlases {
-  banks: HTMLImageElement;
-  shrubs: HTMLImageElement;
-  rocks: HTMLImageElement;
+  banks: SceneryAtlas;
+  shrubs: SceneryAtlas;
+  rocks: SceneryAtlas;
 }
 
 /** Low scenery anchored behind the combat ground, baked into the distant plane. */
@@ -21,7 +22,7 @@ export function drawFieldMidground(
   const baseline = groundY - eH * 0.33;
   const count = Math.ceil(width / (unit * (lowQuality ? 0.58 : 0.42))) + 1;
   function sprite(
-    image: HTMLImageElement,
+    image: SceneryAtlas,
     cell: number,
     x: number,
     foot: number,

@@ -1,0 +1,14 @@
+{
+  "source": "src/ui/assets/temple-symbols-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/temple-symbols-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {},
+  "mapCleanupVersion": 1,
+  "sourceHash": "7d72bd5d2bab5ed91bf78b9b136f39edd953e1b576ffa39f23d2d316c5866ebf"
+}

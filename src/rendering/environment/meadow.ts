@@ -1,11 +1,12 @@
+import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { drawCachedImage } from '../cached-materials.ts';
+import { drawSceneryImage } from './scene-kit.ts';
 import { createLayout } from '../layout.ts';
 import type { EnvironmentFrame } from './index.ts';
 
 function tile(
   ctx: SceneDrawing,
-  atlas: HTMLImageElement,
+  atlas: SceneryAtlas,
   cell: number,
   x: number,
   foot: number,
@@ -20,7 +21,7 @@ function tile(
   ctx.globalAlpha = alpha;
   ctx.translate(x, foot);
   ctx.scale(flip ? -1 : 1, 1);
-  drawCachedImage(
+  drawSceneryImage(
     ctx,
     atlas,
     [(cell % 2) * sw, Math.floor(cell / 2) * sh, sw, sh],
@@ -35,8 +36,8 @@ function tile(
 /** Cached meadow texture fills the transition without replacing any live grass. */
 export function drawMeadowTransition(
   ctx: SceneDrawing,
-  edges: HTMLImageElement,
-  patches: HTMLImageElement,
+  edges: SceneryAtlas,
+  patches: SceneryAtlas,
   width: number,
   height: number,
   lowQuality: boolean,
@@ -72,7 +73,7 @@ export function drawMeadowTransition(
 }
 
 /** Sparse separate fog stamps; no full-width pale band or gameplay random calls. */
-export function drawMeadowFog(ctx: SceneDrawing, atlas: HTMLImageElement, frame: EnvironmentFrame) {
+export function drawMeadowFog(ctx: SceneDrawing, atlas: SceneryAtlas, frame: EnvironmentFrame) {
   const { width, height } = frame;
   const { groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);

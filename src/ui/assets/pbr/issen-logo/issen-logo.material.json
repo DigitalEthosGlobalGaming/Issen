@@ -1,0 +1,14 @@
+{
+  "source": "src/ui/assets/issen-logo.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/issen-logo",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "dimensions": [
+    600,
+    400
+  ],
+  "omittedMaps": {},
+  "mapCleanupVersion": 1,
+  "sourceHash": "46ece50c1a811ad7c640383a8e652c7da090fe4bff5a62624504fe8ebcd25d6c"
+}

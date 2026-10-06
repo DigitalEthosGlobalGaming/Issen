@@ -59,14 +59,17 @@ test('Temple and Trials show isolated atlas emblems in portrait and landscape', 
     await expect(trials).toHaveCount(11);
     expect(
       await trials.evaluateAll(
-        (nodes) =>
-          new Set(nodes.map((node) => (node as HTMLElement).style.backgroundPosition)).size,
+        (nodes) => new Set(nodes.map((node) => (node as HTMLElement).style.backgroundImage)).size,
       ),
     ).toBe(11);
     const fits = await page
       .locator('.trial-card')
       .evaluateAll((nodes) => nodes.every((node) => node.scrollWidth <= node.clientWidth + 1));
     expect(fits).toBe(true);
+    await expect(page.locator('[data-symbol="trial:quiet-blade"]')).toHaveCSS(
+      'background-image',
+      /blob:/,
+    );
     const atlasDimensions = await page
       .locator('[data-symbol="trial:quiet-blade"]')
       .evaluate(async (node) => {
@@ -76,7 +79,7 @@ test('Temple and Trials show isolated atlas emblems in portrait and landscape', 
         await img.decode();
         return { width: img.naturalWidth, height: img.naturalHeight };
       });
-    expect(atlasDimensions.width / atlasDimensions.height).toBeCloseTo(4 / 3, 2);
+    expect(atlasDimensions.width / atlasDimensions.height).toBeCloseTo(1, 2);
     await page.screenshot({ path: info.outputPath(`trial-symbols-${viewport.width}.png`) });
     await page.locator('#trials [data-back]').click();
   }

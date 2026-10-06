@@ -1,5 +1,41 @@
 import type { SceneDrawing } from './scene-drawing.ts';
 import { drawCachedImage } from './cached-materials.ts';
+import { packedSourceRegion } from './packed-source.ts';
+import { drawMaterialStamp } from './scene-material.ts';
+import type { UiLease } from '../ui/packed-ui.ts';
+export type PackedRoom = {
+  naturalWidth: number;
+  naturalHeight: number;
+  sprite: NonNullable<ReturnType<UiLease['sprite']>>;
+};
+type Room = HTMLImageElement | PackedRoom;
+function drawRoomImage(
+  g: SceneDrawing,
+  room: Room,
+  frame: readonly [number, number, number, number],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  if (!('sprite' in room)) {
+    drawCachedImage(g, room, frame, x, y, width, height);
+    return;
+  }
+  const region = packedSourceRegion(room.sprite, frame);
+  if (!region?.material) return;
+  const sx = width / frame[2],
+    sy = height / frame[3];
+  drawMaterialStamp(g, {
+    ...region,
+    material: region.material,
+    x: x + region.x * sx,
+    y: y + region.y * sy,
+    width: region.width * sx,
+    height: region.height * sy,
+  });
+}
+
 export function roomWindow(
   width: number,
   height: number,
@@ -18,17 +54,12 @@ export function roomWindow(
 }
 
 /** Reuse wall, floor and window regions as independently cropped room sprites. */
-export function drawArmoryRoom(
-  g: SceneDrawing,
-  room: HTMLImageElement,
-  width: number,
-  height: number,
-) {
+export function drawArmoryRoom(g: SceneDrawing, room: Room, width: number, height: number) {
   if (width / height >= 1.35) {
     const zoom = Math.max(width / room.naturalWidth, height / room.naturalHeight);
     const dw = room.naturalWidth * zoom,
       dh = room.naturalHeight * zoom;
-    drawCachedImage(
+    drawRoomImage(
       g,
       room,
       [0, 0, room.naturalWidth, room.naturalHeight],
@@ -51,7 +82,7 @@ export function drawArmoryRoom(
       scale = Math.max(dw / sw, height / sh);
     const cropW = dw / scale,
       cropH = height / scale;
-    drawCachedImage(
+    drawRoomImage(
       g,
       room,
       [room.naturalWidth * sourceX + (sw - cropW) / 2, (sh - cropH) / 2, cropW, cropH],
@@ -70,12 +101,10 @@ export function drawArmoryRoom(
     floorH = room.naturalHeight - floorY;
   const scale = Math.max(width / room.naturalWidth, (height * 0.39) / floorH);
   const cropW = width / scale;
-  g.drawImage(
+  drawRoomImage(
+    g,
     room,
-    (room.naturalWidth - cropW) / 2,
-    floorY,
-    cropW,
-    floorH,
+    [(room.naturalWidth - cropW) / 2, floorY, cropW, floorH],
     0,
     height * 0.61,
     width,

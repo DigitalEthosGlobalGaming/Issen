@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-crest-fuji.png",
+  "preset": "cloth",
+  "mode": "sprite",
+  "output": "src/ui/assets/pbr/world-ui-crest-fuji",
+  "dimensions": [
+    128,
+    128
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "9e63c6d6df6c0a7511ec6f0ea2302810fc0b1ea8df387dd04d5dfc4d0e33fd83"
+}

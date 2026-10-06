@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-material-silk.png",
+  "preset": "cloth",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-silk",
+  "dimensions": [
+    192,
+    192
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "27a7a61f86eac5311488752a47898582c7bb03386ec554b8c4f7dcf4cefd7856"
+}

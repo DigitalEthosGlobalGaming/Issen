@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/rocks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/rocks-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "bf7e97e20ae1d23ae98cf8e331e510fd757a554fc1f799eecedb10fe350eb0c3"
+}

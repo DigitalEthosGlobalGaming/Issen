@@ -1,0 +1,5627 @@
+{
+  "collections": {
+    "bamboo-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.bamboo-atlas.0",
+        "scenery.bamboo-atlas.1",
+        "scenery.bamboo-atlas.2",
+        "scenery.bamboo-atlas.3"
+      ]
+    },
+    "cherry-trees-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.cherry-trees-atlas.0",
+        "scenery.cherry-trees-atlas.1",
+        "scenery.cherry-trees-atlas.2",
+        "scenery.cherry-trees-atlas.3"
+      ]
+    },
+    "demon-landmarks-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.demon-landmarks-atlas.0",
+        "scenery.demon-landmarks-atlas.1",
+        "scenery.demon-landmarks-atlas.2",
+        "scenery.demon-landmarks-atlas.3"
+      ]
+    },
+    "demon-terrain-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.demon-terrain-atlas.0",
+        "scenery.demon-terrain-atlas.1",
+        "scenery.demon-terrain-atlas.2",
+        "scenery.demon-terrain-atlas.3"
+      ]
+    },
+    "fallen-bamboo-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.fallen-bamboo-atlas.0",
+        "scenery.fallen-bamboo-atlas.1",
+        "scenery.fallen-bamboo-atlas.2",
+        "scenery.fallen-bamboo-atlas.3"
+      ]
+    },
+    "field-banks-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.field-banks-atlas.0",
+        "scenery.field-banks-atlas.1",
+        "scenery.field-banks-atlas.2",
+        "scenery.field-banks-atlas.3"
+      ]
+    },
+    "field-rocks-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.field-rocks-atlas.0",
+        "scenery.field-rocks-atlas.1",
+        "scenery.field-rocks-atlas.2",
+        "scenery.field-rocks-atlas.3"
+      ]
+    },
+    "foam-strips-atlas": {
+      "size": [
+        1659,
+        948
+      ],
+      "sprites": [
+        "scenery.foam-strips-atlas.0",
+        "scenery.foam-strips-atlas.1",
+        "scenery.foam-strips-atlas.2",
+        "scenery.foam-strips-atlas.3"
+      ]
+    },
+    "fog-wisps-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.fog-wisps-atlas.0",
+        "scenery.fog-wisps-atlas.1",
+        "scenery.fog-wisps-atlas.2",
+        "scenery.fog-wisps-atlas.3"
+      ]
+    },
+    "foreground-boulders-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.foreground-boulders-atlas.0",
+        "scenery.foreground-boulders-atlas.1",
+        "scenery.foreground-boulders-atlas.2",
+        "scenery.foreground-boulders-atlas.3"
+      ]
+    },
+    "grass-edges-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.grass-edges-atlas.0",
+        "scenery.grass-edges-atlas.1",
+        "scenery.grass-edges-atlas.2",
+        "scenery.grass-edges-atlas.3"
+      ]
+    },
+    "meadow-patches-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.meadow-patches-atlas.0",
+        "scenery.meadow-patches-atlas.1",
+        "scenery.meadow-patches-atlas.2",
+        "scenery.meadow-patches-atlas.3"
+      ]
+    },
+    "mountain-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.mountain-atlas.0",
+        "scenery.mountain-atlas.1",
+        "scenery.mountain-atlas.2",
+        "scenery.mountain-atlas.3"
+      ]
+    },
+    "petal-ground-atlas": {
+      "size": [
+        1659,
+        948
+      ],
+      "sprites": [
+        "scenery.petal-ground-atlas.0",
+        "scenery.petal-ground-atlas.1",
+        "scenery.petal-ground-atlas.2",
+        "scenery.petal-ground-atlas.3"
+      ]
+    },
+    "pine-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.pine-atlas.0",
+        "scenery.pine-atlas.1",
+        "scenery.pine-atlas.2",
+        "scenery.pine-atlas.3"
+      ]
+    },
+    "reeds-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.reeds-atlas.0",
+        "scenery.reeds-atlas.1",
+        "scenery.reeds-atlas.2",
+        "scenery.reeds-atlas.3"
+      ]
+    },
+    "rocks-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.rocks-atlas.0",
+        "scenery.rocks-atlas.1",
+        "scenery.rocks-atlas.2",
+        "scenery.rocks-atlas.3"
+      ]
+    },
+    "sea-stacks-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.sea-stacks-atlas.0",
+        "scenery.sea-stacks-atlas.1",
+        "scenery.sea-stacks-atlas.2",
+        "scenery.sea-stacks-atlas.3"
+      ]
+    },
+    "shrubs-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.shrubs-atlas.0",
+        "scenery.shrubs-atlas.1",
+        "scenery.shrubs-atlas.2",
+        "scenery.shrubs-atlas.3"
+      ]
+    },
+    "snow-boulders-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.snow-boulders-atlas.0",
+        "scenery.snow-boulders-atlas.1",
+        "scenery.snow-boulders-atlas.2",
+        "scenery.snow-boulders-atlas.3"
+      ]
+    },
+    "snow-peak": {
+      "size": [
+        1881,
+        836
+      ],
+      "sprites": [
+        "scenery.snow-peak.0"
+      ]
+    },
+    "snow-pines-atlas": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sprites": [
+        "scenery.snow-pines-atlas.0",
+        "scenery.snow-pines-atlas.1",
+        "scenery.snow-pines-atlas.2",
+        "scenery.snow-pines-atlas.3",
+        "scenery.snow-pines-atlas.4",
+        "scenery.snow-pines-atlas.5"
+      ]
+    },
+    "snow-rocks-atlas": {
+      "size": [
+        1774,
+        887
+      ],
+      "sprites": [
+        "scenery.snow-rocks-atlas.0",
+        "scenery.snow-rocks-atlas.1",
+        "scenery.snow-rocks-atlas.2",
+        "scenery.snow-rocks-atlas.3",
+        "scenery.snow-rocks-atlas.4"
+      ]
+    },
+    "temple-posts-atlas": {
+      "size": [
+        2172,
+        724
+      ],
+      "sprites": [
+        "scenery.temple-posts-atlas.0",
+        "scenery.temple-posts-atlas.1",
+        "scenery.temple-posts-atlas.2"
+      ]
+    },
+    "temple-roofs-atlas": {
+      "size": [
+        2172,
+        724
+      ],
+      "sprites": [
+        "scenery.temple-roofs-atlas.0",
+        "scenery.temple-roofs-atlas.1",
+        "scenery.temple-roofs-atlas.2"
+      ]
+    },
+    "temple-steps-atlas": {
+      "size": [
+        2172,
+        724
+      ],
+      "sprites": [
+        "scenery.temple-steps-atlas.0",
+        "scenery.temple-steps-atlas.1",
+        "scenery.temple-steps-atlas.2"
+      ]
+    },
+    "temple-walls-atlas": {
+      "size": [
+        2172,
+        724
+      ],
+      "sprites": [
+        "scenery.temple-walls-atlas.0",
+        "scenery.temple-walls-atlas.1",
+        "scenery.temple-walls-atlas.2"
+      ]
+    }
+  },
+  "dependencies": {
+    "demon": [
+      "scenery.demon-landmarks-atlas.0",
+      "scenery.demon-landmarks-atlas.1",
+      "scenery.demon-landmarks-atlas.2",
+      "scenery.demon-landmarks-atlas.3",
+      "scenery.demon-terrain-atlas.0",
+      "scenery.demon-terrain-atlas.1",
+      "scenery.demon-terrain-atlas.2",
+      "scenery.demon-terrain-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3"
+    ],
+    "fog": [
+      "scenery.fog-wisps-atlas.0",
+      "scenery.fog-wisps-atlas.1",
+      "scenery.fog-wisps-atlas.2",
+      "scenery.fog-wisps-atlas.3"
+    ],
+    "material-preview": [
+      "scenery.bamboo-atlas.0",
+      "scenery.bamboo-atlas.1",
+      "scenery.bamboo-atlas.2",
+      "scenery.bamboo-atlas.3",
+      "scenery.cherry-trees-atlas.0",
+      "scenery.cherry-trees-atlas.1",
+      "scenery.cherry-trees-atlas.2",
+      "scenery.cherry-trees-atlas.3",
+      "scenery.demon-landmarks-atlas.0",
+      "scenery.demon-landmarks-atlas.1",
+      "scenery.demon-landmarks-atlas.2",
+      "scenery.demon-landmarks-atlas.3",
+      "scenery.demon-terrain-atlas.0",
+      "scenery.demon-terrain-atlas.1",
+      "scenery.demon-terrain-atlas.2",
+      "scenery.demon-terrain-atlas.3",
+      "scenery.fallen-bamboo-atlas.0",
+      "scenery.fallen-bamboo-atlas.1",
+      "scenery.fallen-bamboo-atlas.2",
+      "scenery.fallen-bamboo-atlas.3",
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.foam-strips-atlas.0",
+      "scenery.foam-strips-atlas.1",
+      "scenery.foam-strips-atlas.2",
+      "scenery.foam-strips-atlas.3",
+      "scenery.fog-wisps-atlas.0",
+      "scenery.fog-wisps-atlas.1",
+      "scenery.fog-wisps-atlas.2",
+      "scenery.fog-wisps-atlas.3",
+      "scenery.foreground-boulders-atlas.0",
+      "scenery.foreground-boulders-atlas.1",
+      "scenery.foreground-boulders-atlas.2",
+      "scenery.foreground-boulders-atlas.3",
+      "scenery.grass-edges-atlas.0",
+      "scenery.grass-edges-atlas.1",
+      "scenery.grass-edges-atlas.2",
+      "scenery.grass-edges-atlas.3",
+      "scenery.meadow-patches-atlas.0",
+      "scenery.meadow-patches-atlas.1",
+      "scenery.meadow-patches-atlas.2",
+      "scenery.meadow-patches-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.petal-ground-atlas.0",
+      "scenery.petal-ground-atlas.1",
+      "scenery.petal-ground-atlas.2",
+      "scenery.petal-ground-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.reeds-atlas.0",
+      "scenery.reeds-atlas.1",
+      "scenery.reeds-atlas.2",
+      "scenery.reeds-atlas.3",
+      "scenery.rocks-atlas.0",
+      "scenery.rocks-atlas.1",
+      "scenery.rocks-atlas.2",
+      "scenery.rocks-atlas.3",
+      "scenery.sea-stacks-atlas.0",
+      "scenery.sea-stacks-atlas.1",
+      "scenery.sea-stacks-atlas.2",
+      "scenery.sea-stacks-atlas.3",
+      "scenery.shrubs-atlas.0",
+      "scenery.shrubs-atlas.1",
+      "scenery.shrubs-atlas.2",
+      "scenery.shrubs-atlas.3",
+      "scenery.snow-boulders-atlas.0",
+      "scenery.snow-boulders-atlas.1",
+      "scenery.snow-boulders-atlas.2",
+      "scenery.snow-boulders-atlas.3",
+      "scenery.snow-peak.0",
+      "scenery.snow-pines-atlas.0",
+      "scenery.snow-pines-atlas.1",
+      "scenery.snow-pines-atlas.2",
+      "scenery.snow-pines-atlas.3",
+      "scenery.snow-pines-atlas.4",
+      "scenery.snow-pines-atlas.5",
+      "scenery.snow-rocks-atlas.0",
+      "scenery.snow-rocks-atlas.1",
+      "scenery.snow-rocks-atlas.2",
+      "scenery.snow-rocks-atlas.3",
+      "scenery.snow-rocks-atlas.4",
+      "scenery.temple-posts-atlas.0",
+      "scenery.temple-posts-atlas.1",
+      "scenery.temple-posts-atlas.2",
+      "scenery.temple-roofs-atlas.0",
+      "scenery.temple-roofs-atlas.1",
+      "scenery.temple-roofs-atlas.2",
+      "scenery.temple-steps-atlas.0",
+      "scenery.temple-steps-atlas.1",
+      "scenery.temple-steps-atlas.2",
+      "scenery.temple-walls-atlas.0",
+      "scenery.temple-walls-atlas.1",
+      "scenery.temple-walls-atlas.2"
+    ],
+    "stage-0": [
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.fog-wisps-atlas.0",
+      "scenery.fog-wisps-atlas.1",
+      "scenery.fog-wisps-atlas.2",
+      "scenery.fog-wisps-atlas.3",
+      "scenery.foreground-boulders-atlas.0",
+      "scenery.foreground-boulders-atlas.1",
+      "scenery.foreground-boulders-atlas.2",
+      "scenery.foreground-boulders-atlas.3",
+      "scenery.grass-edges-atlas.0",
+      "scenery.grass-edges-atlas.1",
+      "scenery.grass-edges-atlas.2",
+      "scenery.grass-edges-atlas.3",
+      "scenery.meadow-patches-atlas.0",
+      "scenery.meadow-patches-atlas.1",
+      "scenery.meadow-patches-atlas.2",
+      "scenery.meadow-patches-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.shrubs-atlas.0",
+      "scenery.shrubs-atlas.1",
+      "scenery.shrubs-atlas.2",
+      "scenery.shrubs-atlas.3"
+    ],
+    "stage-1": [
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.shrubs-atlas.0",
+      "scenery.shrubs-atlas.1",
+      "scenery.shrubs-atlas.2",
+      "scenery.shrubs-atlas.3"
+    ],
+    "stage-2": [
+      "scenery.cherry-trees-atlas.0",
+      "scenery.cherry-trees-atlas.1",
+      "scenery.cherry-trees-atlas.2",
+      "scenery.cherry-trees-atlas.3",
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.petal-ground-atlas.0",
+      "scenery.petal-ground-atlas.1",
+      "scenery.petal-ground-atlas.2",
+      "scenery.petal-ground-atlas.3",
+      "scenery.shrubs-atlas.0",
+      "scenery.shrubs-atlas.1",
+      "scenery.shrubs-atlas.2",
+      "scenery.shrubs-atlas.3"
+    ],
+    "stage-3": [
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.grass-edges-atlas.0",
+      "scenery.grass-edges-atlas.1",
+      "scenery.grass-edges-atlas.2",
+      "scenery.grass-edges-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.reeds-atlas.0",
+      "scenery.reeds-atlas.1",
+      "scenery.reeds-atlas.2",
+      "scenery.reeds-atlas.3",
+      "scenery.shrubs-atlas.0",
+      "scenery.shrubs-atlas.1",
+      "scenery.shrubs-atlas.2",
+      "scenery.shrubs-atlas.3"
+    ],
+    "stage-4": [
+      "scenery.bamboo-atlas.0",
+      "scenery.bamboo-atlas.1",
+      "scenery.bamboo-atlas.2",
+      "scenery.bamboo-atlas.3",
+      "scenery.fallen-bamboo-atlas.0",
+      "scenery.fallen-bamboo-atlas.1",
+      "scenery.fallen-bamboo-atlas.2",
+      "scenery.fallen-bamboo-atlas.3",
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3"
+    ],
+    "stage-5": [
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.snow-boulders-atlas.0",
+      "scenery.snow-boulders-atlas.1",
+      "scenery.snow-boulders-atlas.2",
+      "scenery.snow-boulders-atlas.3",
+      "scenery.snow-peak.0",
+      "scenery.snow-pines-atlas.0",
+      "scenery.snow-pines-atlas.1",
+      "scenery.snow-pines-atlas.2",
+      "scenery.snow-pines-atlas.3",
+      "scenery.snow-pines-atlas.4",
+      "scenery.snow-pines-atlas.5",
+      "scenery.snow-rocks-atlas.0",
+      "scenery.snow-rocks-atlas.1",
+      "scenery.snow-rocks-atlas.2",
+      "scenery.snow-rocks-atlas.3",
+      "scenery.snow-rocks-atlas.4"
+    ],
+    "stage-6": [
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.temple-posts-atlas.0",
+      "scenery.temple-posts-atlas.1",
+      "scenery.temple-posts-atlas.2",
+      "scenery.temple-roofs-atlas.0",
+      "scenery.temple-roofs-atlas.1",
+      "scenery.temple-roofs-atlas.2",
+      "scenery.temple-steps-atlas.0",
+      "scenery.temple-steps-atlas.1",
+      "scenery.temple-steps-atlas.2",
+      "scenery.temple-walls-atlas.0",
+      "scenery.temple-walls-atlas.1",
+      "scenery.temple-walls-atlas.2"
+    ],
+    "stage-7": [
+      "scenery.field-banks-atlas.0",
+      "scenery.field-banks-atlas.1",
+      "scenery.field-banks-atlas.2",
+      "scenery.field-banks-atlas.3",
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.foam-strips-atlas.0",
+      "scenery.foam-strips-atlas.1",
+      "scenery.foam-strips-atlas.2",
+      "scenery.foam-strips-atlas.3",
+      "scenery.foreground-boulders-atlas.0",
+      "scenery.foreground-boulders-atlas.1",
+      "scenery.foreground-boulders-atlas.2",
+      "scenery.foreground-boulders-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.sea-stacks-atlas.0",
+      "scenery.sea-stacks-atlas.1",
+      "scenery.sea-stacks-atlas.2",
+      "scenery.sea-stacks-atlas.3"
+    ],
+    "stage-8": [
+      "scenery.field-rocks-atlas.0",
+      "scenery.field-rocks-atlas.1",
+      "scenery.field-rocks-atlas.2",
+      "scenery.field-rocks-atlas.3",
+      "scenery.fog-wisps-atlas.0",
+      "scenery.fog-wisps-atlas.1",
+      "scenery.fog-wisps-atlas.2",
+      "scenery.fog-wisps-atlas.3",
+      "scenery.mountain-atlas.0",
+      "scenery.mountain-atlas.1",
+      "scenery.mountain-atlas.2",
+      "scenery.mountain-atlas.3",
+      "scenery.pine-atlas.0",
+      "scenery.pine-atlas.1",
+      "scenery.pine-atlas.2",
+      "scenery.pine-atlas.3",
+      "scenery.temple-posts-atlas.0",
+      "scenery.temple-posts-atlas.1",
+      "scenery.temple-posts-atlas.2",
+      "scenery.temple-steps-atlas.0",
+      "scenery.temple-steps-atlas.1",
+      "scenery.temple-steps-atlas.2"
+    ]
+  },
+  "fingerprint": "45c4d81fe4b45e63f179e5eba1753944bc6526cefbd9397ecc870e555873d510",
+  "loadingReport": {
+    "demon": {
+      "encodedBytes": 6079414,
+      "imageCount": 9,
+      "loadedPlanePixels": 10942020,
+      "pages": [
+        3,
+        4,
+        5
+      ],
+      "requiredSpritePlanePixels": 10550316.0
+    },
+    "fog": {
+      "encodedBytes": 2561378,
+      "imageCount": 4,
+      "loadedPlanePixels": 6215616,
+      "pages": [
+        8
+      ],
+      "requiredSpritePlanePixels": 6085286.0
+    },
+    "material-preview": {
+      "encodedBytes": 64219117,
+      "imageCount": 89,
+      "loadedPlanePixels": 124485932,
+      "pages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "requiredSpritePlanePixels": 117319397.0
+    },
+    "stage-0": {
+      "encodedBytes": 21554177,
+      "imageCount": 34,
+      "loadedPlanePixels": 42221967,
+      "pages": [
+        0,
+        5,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "requiredSpritePlanePixels": 41254737.5
+    },
+    "stage-1": {
+      "encodedBytes": 11400882,
+      "imageCount": 21,
+      "loadedPlanePixels": 22640943,
+      "pages": [
+        5,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "requiredSpritePlanePixels": 22117533.0
+    },
+    "stage-2": {
+      "encodedBytes": 12017119,
+      "imageCount": 24,
+      "loadedPlanePixels": 26876508,
+      "pages": [
+        5,
+        11,
+        12,
+        13,
+        14,
+        17,
+        18,
+        19
+      ],
+      "requiredSpritePlanePixels": 26099010.0
+    },
+    "stage-3": {
+      "encodedBytes": 16305551,
+      "imageCount": 27,
+      "loadedPlanePixels": 31866390,
+      "pages": [
+        5,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        20
+      ],
+      "requiredSpritePlanePixels": 31130362.5
+    },
+    "stage-4": {
+      "encodedBytes": 12130461,
+      "imageCount": 15,
+      "loadedPlanePixels": 23058129,
+      "pages": [
+        5,
+        13,
+        14,
+        21,
+        22
+      ],
+      "requiredSpritePlanePixels": 22443138.0
+    },
+    "stage-5": {
+      "encodedBytes": 13158270,
+      "imageCount": 12,
+      "loadedPlanePixels": 25767324,
+      "pages": [
+        5,
+        23,
+        24,
+        25
+      ],
+      "requiredSpritePlanePixels": 23265757.5
+    },
+    "stage-6": {
+      "encodedBytes": 15000958,
+      "imageCount": 21,
+      "loadedPlanePixels": 31851621,
+      "pages": [
+        5,
+        9,
+        10,
+        13,
+        26,
+        27,
+        28
+      ],
+      "requiredSpritePlanePixels": 29479848.0
+    },
+    "stage-7": {
+      "encodedBytes": 16138914,
+      "imageCount": 25,
+      "loadedPlanePixels": 31430705,
+      "pages": [
+        5,
+        6,
+        7,
+        9,
+        10,
+        13,
+        14,
+        16
+      ],
+      "requiredSpritePlanePixels": 30418737.0
+    },
+    "stage-8": {
+      "encodedBytes": 13656515,
+      "imageCount": 19,
+      "loadedPlanePixels": 28334382,
+      "pages": [
+        5,
+        8,
+        9,
+        10,
+        13,
+        28
+      ],
+      "requiredSpritePlanePixels": 27089867.0
+    }
+  },
+  "mipmaps": false,
+  "padding": 2,
+  "pageHashes": {
+    "page-0-colour.png": "d95e8275f4374758f4bb913e868bae74f7014b9e6ccb40970a89b1123cafea25",
+    "page-0-normal.png": "3e09b184871e7ba5e867e372624ace41dfeea28e130110ee106f0f7041ed1c09",
+    "page-0-surface.png": "2161dfb2a99d29b06ed0eefb57cd00ff22f63c27937a7347132440c005938f8f",
+    "page-1-colour.png": "e6ec96ca0d98883ad097120f470ee157aa08bf49d5ec77fc88298412217355ee",
+    "page-1-normal.png": "f4c2ff1c6e7cb725fae86e050c13adf3c594a3497aae1b150dd8d5d7821952ad",
+    "page-1-surface.png": "bb044d32933db195e422358fe0527418ecf747ede3b569722b8bc2f392589d4e",
+    "page-10-colour.png": "3e333ecbd57965d67a76779587eb44aec4c229c08309bd827831ce0f2cdd49a0",
+    "page-10-normal.png": "f53a51c3ff0a4d07612b13d1222b9686c2555c8efe99c972010fedda2477a29d",
+    "page-10-surface.png": "632ce11fc5604a16481576001c2af4339c3cfa7a83af8e8edaefb8b29f348212",
+    "page-11-colour.png": "2da991a7b05fa1b413cfde2ad0f00f283e45ef0fc620e78b04cea8681531e7f0",
+    "page-11-normal.png": "81f59b664477f7475614c23a5ccd8bc62a7e8d8964d2f465bf074488b7d0fb10",
+    "page-11-surface.png": "100af9f7be137ae126f2a0b3c2bd10ca499cc8354b25479f609940f4ab0f6e0e",
+    "page-12-colour.png": "d0e3e100c9ea4855c2adb52ab9b5bcc73684419441475f11052c8dc99ad6dafb",
+    "page-12-normal.png": "983addf6f317395856a257952c5fabf5f56d7a101c9e29a22ef13691f5108eca",
+    "page-12-surface.png": "b112c8d40366fc0c72cf9b485b35aa69e49aa567f2f58cff6285244deb73d6be",
+    "page-13-colour.png": "4669e78a65154877620486c3913d1699860ed6c591d752eeb982c3f69978901c",
+    "page-13-normal.png": "f455ba015f77168886d86f331e52d408774af8fdbd1a6ee41450629aef6e0003",
+    "page-13-surface.png": "0c8ff03ec0e35ee56adbcf1c60a7d7c07b9a69026b13074f614abba4a7811331",
+    "page-14-colour.png": "7df0a1cb9b017d10c3260c05300cffd47c39f8344c29942ded7fa421f0f0ebaa",
+    "page-14-normal.png": "e4caa815230544e7d9302e3bae5518df5d65b90c488e06c2cffaf39bbd7d6695",
+    "page-14-surface.png": "09887e7a92a5bd2cc5785b2cf9e5727eb16613f056f99d8fb5093b40b651b10a",
+    "page-15-colour.png": "7fa34c74597497c7b6ce43f21d4aa4787be56907637c7e5c4bf234bb42a8885b",
+    "page-15-normal.png": "12c7782de4ba432a71424a971bfa530dc0cb378393e65c9522422feab27282b3",
+    "page-15-surface.png": "4abcd70d0a9c0a76940460ab504d72a5e60008288a51a2beb6809742f25d8cd9",
+    "page-16-colour.png": "b9a4e5fcfdcb508fdf946c23e13e78ac965950dbf2f5384342999ae63819464b",
+    "page-16-normal.png": "bc633aae73331b511b975604b0023bb51b0e5d86a87f1d9b8778c40a93e2cb3b",
+    "page-16-surface.png": "14f9c47955365d8a5974646dd392cbcf060fe9c71940acaaeaeb5fa939b06275",
+    "page-17-colour.png": "0beded262cf817d0fe44ed1edf27a0d89956a5dafca3ca3ed5c786d436efd723",
+    "page-17-normal.png": "1c52d1a54ba3c2fe046ca99a83b3a735105b6269853fc34ed98a8fe9ef42da10",
+    "page-17-surface.png": "678557612b2f782eb21baf2c84c98642b5bcdde0a9b222e3edb4e14f73236b1b",
+    "page-18-colour.png": "58d8232580cda0569d8e9dabead27a03cca800760a751f6dce882be61f6e8629",
+    "page-18-normal.png": "721ca42f27f49767415cbf1b0efc7e0f23de781cfac527f3e214a334e8280bdb",
+    "page-18-surface.png": "c153421ae64ef95a93d733780e6740d32c1fcbeb5e4ce3c98eed31dd1320a327",
+    "page-19-colour.png": "e12b8c11f67c6b47497cb844cb29c16d1ed6f24ca1ae4c5e01197c1c1fcd19ad",
+    "page-19-normal.png": "53296095e6e88266ed167a49edd879cd1b18ed68ae963c17c909918b53b349ad",
+    "page-19-surface.png": "0fde5ea039c38d1967e666237c383e82100ed24b3a1526c33a8f8cea17b8c630",
+    "page-2-colour.png": "81d58015403ef9fa0059f896f16184d3f6a9c71848b4294070488fee4da8ebc8",
+    "page-2-normal.png": "61769442762e03fe441a9970a0269006219ceb3281841563d9f034bb7ea066f8",
+    "page-2-surface.png": "acda89114fe14bbe3af786067b992f05af107e8e8625f8845f9bba9e6d180d65",
+    "page-20-colour.png": "5ac0cc01fc3dcabb4c0c9159c596bfa781a0ce5881c5e0e21b7ad33faf056376",
+    "page-20-normal.png": "22f31b3150d6414d588e0aec04298aa4c6ea63dbadf9fc39104134477f2ae601",
+    "page-20-surface.png": "6697497485e18c115a7e4ab2cb67d56e4372cd60480ec0b74d4df535df001aaf",
+    "page-21-colour.png": "5738e0edb20af110d4a440895b71ce2d4fe296de1f188d133dd1599e75d4695a",
+    "page-21-normal.png": "3dba041756fc6b83719e9d56dae82a34820af1d3eb53f02d1fad8580d6dccf37",
+    "page-21-surface.png": "7aa5c8f28abbbfbbd2e10b094a9ddb20828603b09152b561573c68a9772cc30e",
+    "page-22-colour.png": "dd887de683c4df9f08758dff56dc3da95ddd25f3496151f3e5fea48d50dd5d5f",
+    "page-22-normal.png": "6f46a6c020da38101ee0ea32e9251fa266c59623cfd9125fa3a7d9adaaaf1e5f",
+    "page-22-surface.png": "513f4bf0790060898c2b1ca6a06359ef3255c7108dc3580a6b6d7357d58a09be",
+    "page-23-colour.png": "76b5af21c28e402962bf3059de828530a65f79e55c6f15d402b2135f177faad1",
+    "page-23-normal.png": "a14746d938de3d73ff11b7f658d2e0077aacfaa2bcd9c67c5c9f93b050c541c1",
+    "page-23-surface.png": "1c7c2cb2e19f4352e2bdca08c5694293f673a195a952a9e1388af8f35a9dcceb",
+    "page-24-colour.png": "9d9c3aa9d89c91193e703b924bca0ef926460938f0c5596afb90115a40998fad",
+    "page-24-normal.png": "2d0ad22ece4a5e64c6dd495d1cab06749634f88005662a0f644fc8988bf8e3a5",
+    "page-24-surface.png": "17c1cd4bb19da17eeea2a0e0eb6dfce0f4f068ad81a07b97a642ff8fa9f3cbe2",
+    "page-25-colour.png": "792966b98eff5874b506610ac67f5830f5736192320437321c1fd0874ba2cd60",
+    "page-25-normal.png": "7b1221af82a32334d2cc997518d66617afac4def12d466c7acc0a6f753afda6d",
+    "page-25-surface.png": "a3929ac9e514b7bba8e186d056446d359646c3fb065272dea6effc67493653fc",
+    "page-26-colour.png": "5b1700114bf3f739f9526e252129c263a50e087c95fa6eeecde93866b83a33df",
+    "page-26-normal.png": "8b6dc3a45a2e6c8c7aeb175abffc0d4adf9506b75d4b257fc9fe98a751324892",
+    "page-26-surface.png": "e04a24b9446e33ecaee3fb27dd5498e2eb77061fd7ddf1cd1314c055f8002134",
+    "page-27-colour.png": "c12d4ef7b11dd60ce721124884cf437e3a81b2a04ac8f870d41760c91d46c2e9",
+    "page-27-normal.png": "039a012c2c3c0fa0a32c318d2aa91b16895667f5f6e4fd365617124eb47cc83c",
+    "page-27-surface.png": "81f78c9548302b8a4f4977f425a05201c0019f01ac7f349f70ad15db6b34a8a3",
+    "page-28-colour.png": "c9268bb00ad4a3280ab0291987f2b2af0b2530ac1d0e757ef96dfa24533d847e",
+    "page-28-normal.png": "00b148a2fe8cdd04558090fa2b1046ab197b0af840b004d084da42c5f605c363",
+    "page-28-surface.png": "102fad3d14ce9c3b18f1c01a7b09cfb0d247fe4714f62fe0d5212131e1ff498b",
+    "page-3-colour.png": "14b27977b6a85affa4152a9756c71315d5a76a19c244ac8e903c9c148a6769fe",
+    "page-3-normal.png": "1aa400e8cfb862d8e468392dfbdeccc3743075fde4fee25b997e63e4affdb327",
+    "page-3-surface.png": "158f47c58f4b9a14c21a059c16fa802073e044b6ba9e12a55c65dc5bebcd7b17",
+    "page-4-colour.png": "680df1cc26d88a7ded792f33e41fa101e19420eb91a61f00f7616e010ce17be0",
+    "page-4-normal.png": "f791cb4e413846c112ef02b8597b94a570a76eb5ae127bed0915e7b533311d29",
+    "page-4-surface.png": "3efac84893423f3fe3427b30c39ed26b10a3e8bc7e0844ff4b304cea82d9b336",
+    "page-5-colour.png": "255e9be5a4c86d87a8693857d8781ca9e6d77334165abe65d1da2e438515cd87",
+    "page-5-normal.png": "0c10010fe0afc6f31077641dd14dbd21f4a06532837d86d711de85f9d9f58cd5",
+    "page-5-surface.png": "59c31cd578e5b1c8ed68cbce874fd9ae33de1235349eaa8784fc936743327444",
+    "page-6-colour.png": "1b18110379b11a1a7d60d77e6c2d8ff67654015fcfa3057d20b1898eed4011a9",
+    "page-6-emissive.png": "ddc84f47115428fc8707be3aa5be9199a1bb7c8bd761ed8bd4af8d8aef3a7d32",
+    "page-6-normal.png": "3da25b5f8d3ac631cae1a455598eb52f2dcdd17173329341cc08ed26cd33b8f3",
+    "page-6-surface.png": "8f3c885dbdcfb04a54076b5ef9b6b8979613374b5996668f932500b70ad64340",
+    "page-7-colour.png": "d13990854ba7e400c709dbb52e9af4ee8f7fa188ec44bff0dc822e54d1c3a9b4",
+    "page-7-normal.png": "5f90581060ab931c6087a2552215de4446a879885e2ec7e49c1320e47db944aa",
+    "page-7-surface.png": "05ede8c2b6678bed1ef293324ac8aa686fa775cfb6e2fc6153ddd067cfaffeed",
+    "page-8-colour.png": "7db978f348150322f9dbf5df7923643a87563e5b95452301c3c2b32d0736e82b",
+    "page-8-emissive.png": "15797901370fd9e5a32e714ea4a069426c318f01b7d078fd9bd7c34891b0bccf",
+    "page-8-normal.png": "155d9e3cf239ab45dc17c91c74651cf70d6fb75c6aa4a0b0d83979f8e6e3137b",
+    "page-8-surface.png": "d77383b8cf55a385a4a6a26893aaefc07db78a05714a1e54aa60af0cf6b3aab0",
+    "page-9-colour.png": "a67aaced99071021069e30b365ab6c085ba6e3514e6c2d8697ec87e8a1680153",
+    "page-9-normal.png": "f17f99ee44a60b5acaf20403c6e623dbcfd2e99288ab25571d2dcfbe2e066eff",
+    "page-9-surface.png": "0e1605061b0eb119ca07313bff51926450eb2719d38c02a93a34e27b3e310ea3"
+  },
+  "pages": [
+    {
+      "maps": {
+        "colour": "page-0-colour.png",
+        "normal": "page-0-normal.png",
+        "surface": "page-0-surface.png"
+      },
+      "nonzeroColourPixels": 675322,
+      "size": [
+        891,
+        1760
+      ],
+      "storedSpritePixels": 1546928
+    },
+    {
+      "maps": {
+        "colour": "page-1-colour.png",
+        "normal": "page-1-normal.png",
+        "surface": "page-1-surface.png"
+      },
+      "nonzeroColourPixels": 255866,
+      "size": [
+        631,
+        1797
+      ],
+      "storedSpritePixels": 1099513
+    },
+    {
+      "maps": {
+        "colour": "page-2-colour.png",
+        "normal": "page-2-normal.png",
+        "surface": "page-2-surface.png"
+      },
+      "nonzeroColourPixels": 82417,
+      "size": [
+        592,
+        596
+      ],
+      "storedSpritePixels": 348096
+    },
+    {
+      "maps": {
+        "colour": "page-3-colour.png",
+        "normal": "page-3-normal.png",
+        "surface": "page-3-surface.png"
+      },
+      "nonzeroColourPixels": 312032,
+      "size": [
+        631,
+        1776
+      ],
+      "storedSpritePixels": 1066218
+    },
+    {
+      "maps": {
+        "colour": "page-4-colour.png",
+        "normal": "page-4-normal.png",
+        "surface": "page-4-surface.png"
+      },
+      "nonzeroColourPixels": 493391,
+      "size": [
+        588,
+        1715
+      ],
+      "storedSpritePixels": 957469
+    },
+    {
+      "maps": {
+        "colour": "page-5-colour.png",
+        "normal": "page-5-normal.png",
+        "surface": "page-5-surface.png"
+      },
+      "nonzeroColourPixels": 476699,
+      "size": [
+        891,
+        1704
+      ],
+      "storedSpritePixels": 1493968
+    },
+    {
+      "maps": {
+        "colour": "page-6-colour.png",
+        "emissive": "page-6-emissive.png",
+        "normal": "page-6-normal.png",
+        "surface": "page-6-surface.png"
+      },
+      "nonzeroColourPixels": 446879,
+      "size": [
+        830,
+        1744
+      ],
+      "storedSpritePixels": 1409784
+    },
+    {
+      "maps": {
+        "colour": "page-7-colour.png",
+        "normal": "page-7-normal.png",
+        "surface": "page-7-surface.png"
+      },
+      "nonzeroColourPixels": 370790,
+      "size": [
+        572,
+        1973
+      ],
+      "storedSpritePixels": 1018632
+    },
+    {
+      "maps": {
+        "colour": "page-8-colour.png",
+        "emissive": "page-8-emissive.png",
+        "normal": "page-8-normal.png",
+        "surface": "page-8-surface.png"
+      },
+      "nonzeroColourPixels": 427074,
+      "size": [
+        891,
+        1744
+      ],
+      "storedSpritePixels": 1523084
+    },
+    {
+      "maps": {
+        "colour": "page-9-colour.png",
+        "normal": "page-9-normal.png",
+        "surface": "page-9-surface.png"
+      },
+      "nonzeroColourPixels": 425199,
+      "size": [
+        631,
+        1824
+      ],
+      "storedSpritePixels": 1127346
+    },
+    {
+      "maps": {
+        "colour": "page-10-colour.png",
+        "normal": "page-10-normal.png",
+        "surface": "page-10-surface.png"
+      },
+      "nonzeroColourPixels": 122962,
+      "size": [
+        611,
+        613
+      ],
+      "storedSpritePixels": 369663
+    },
+    {
+      "maps": {
+        "colour": "page-11-colour.png",
+        "normal": "page-11-normal.png",
+        "surface": "page-11-surface.png"
+      },
+      "nonzeroColourPixels": 327326,
+      "size": [
+        631,
+        1773
+      ],
+      "storedSpritePixels": 1073526
+    },
+    {
+      "maps": {
+        "colour": "page-12-colour.png",
+        "normal": "page-12-normal.png",
+        "surface": "page-12-surface.png"
+      },
+      "nonzeroColourPixels": 103855,
+      "size": [
+        598,
+        578
+      ],
+      "storedSpritePixels": 340956
+    },
+    {
+      "maps": {
+        "colour": "page-13-colour.png",
+        "normal": "page-13-normal.png",
+        "surface": "page-13-surface.png"
+      },
+      "nonzeroColourPixels": 395035,
+      "size": [
+        873,
+        1704
+      ],
+      "storedSpritePixels": 1441342
+    },
+    {
+      "maps": {
+        "colour": "page-14-colour.png",
+        "normal": "page-14-normal.png",
+        "surface": "page-14-surface.png"
+      },
+      "nonzeroColourPixels": 502266,
+      "size": [
+        891,
+        1741
+      ],
+      "storedSpritePixels": 1530075
+    },
+    {
+      "maps": {
+        "colour": "page-15-colour.png",
+        "normal": "page-15-normal.png",
+        "surface": "page-15-surface.png"
+      },
+      "nonzeroColourPixels": 368238,
+      "size": [
+        891,
+        1741
+      ],
+      "storedSpritePixels": 1523788
+    },
+    {
+      "maps": {
+        "colour": "page-16-colour.png",
+        "normal": "page-16-normal.png",
+        "surface": "page-16-surface.png"
+      },
+      "nonzeroColourPixels": 504694,
+      "size": [
+        859,
+        1555
+      ],
+      "storedSpritePixels": 1283464
+    },
+    {
+      "maps": {
+        "colour": "page-17-colour.png",
+        "normal": "page-17-normal.png",
+        "surface": "page-17-surface.png"
+      },
+      "nonzeroColourPixels": 334518,
+      "size": [
+        815,
+        1834
+      ],
+      "storedSpritePixels": 1413749
+    },
+    {
+      "maps": {
+        "colour": "page-18-colour.png",
+        "normal": "page-18-normal.png",
+        "surface": "page-18-surface.png"
+      },
+      "nonzeroColourPixels": 327280,
+      "size": [
+        609,
+        1805
+      ],
+      "storedSpritePixels": 1071941
+    },
+    {
+      "maps": {
+        "colour": "page-19-colour.png",
+        "normal": "page-19-normal.png",
+        "surface": "page-19-surface.png"
+      },
+      "nonzeroColourPixels": 101160,
+      "size": [
+        589,
+        583
+      ],
+      "storedSpritePixels": 338715
+    },
+    {
+      "maps": {
+        "colour": "page-20-colour.png",
+        "normal": "page-20-normal.png",
+        "surface": "page-20-surface.png"
+      },
+      "nonzeroColourPixels": 535743,
+      "size": [
+        1243,
+        1226
+      ],
+      "storedSpritePixels": 1482255
+    },
+    {
+      "maps": {
+        "colour": "page-21-colour.png",
+        "normal": "page-21-normal.png",
+        "surface": "page-21-surface.png"
+      },
+      "nonzeroColourPixels": 443705,
+      "size": [
+        891,
+        1754
+      ],
+      "storedSpritePixels": 1518176
+    },
+    {
+      "maps": {
+        "colour": "page-22-colour.png",
+        "normal": "page-22-normal.png",
+        "surface": "page-22-surface.png"
+      },
+      "nonzeroColourPixels": 700076,
+      "size": [
+        1241,
+        1262
+      ],
+      "storedSpritePixels": 1503597
+    },
+    {
+      "maps": {
+        "colour": "page-23-colour.png",
+        "normal": "page-23-normal.png",
+        "surface": "page-23-surface.png"
+      },
+      "nonzeroColourPixels": 1339128,
+      "size": [
+        1885,
+        2000
+      ],
+      "storedSpritePixels": 3477246
+    },
+    {
+      "maps": {
+        "colour": "page-24-colour.png",
+        "normal": "page-24-normal.png",
+        "surface": "page-24-surface.png"
+      },
+      "nonzeroColourPixels": 941977,
+      "size": [
+        1666,
+        1788
+      ],
+      "storedSpritePixels": 2469083
+    },
+    {
+      "maps": {
+        "colour": "page-25-colour.png",
+        "normal": "page-25-normal.png",
+        "surface": "page-25-surface.png"
+      },
+      "nonzeroColourPixels": 105106,
+      "size": [
+        563,
+        572
+      ],
+      "storedSpritePixels": 317512
+    },
+    {
+      "maps": {
+        "colour": "page-26-colour.png",
+        "normal": "page-26-normal.png",
+        "surface": "page-26-surface.png"
+      },
+      "nonzeroColourPixels": 837175,
+      "size": [
+        1336,
+        2035
+      ],
+      "storedSpritePixels": 2305348
+    },
+    {
+      "maps": {
+        "colour": "page-27-colour.png",
+        "normal": "page-27-normal.png",
+        "surface": "page-27-surface.png"
+      },
+      "nonzeroColourPixels": 171202,
+      "size": [
+        735,
+        715
+      ],
+      "storedSpritePixels": 519741
+    },
+    {
+      "maps": {
+        "colour": "page-28-colour.png",
+        "normal": "page-28-normal.png",
+        "surface": "page-28-surface.png"
+      },
+      "nonzeroColourPixels": 1109442,
+      "size": [
+        1467,
+        1937
+      ],
+      "storedSpritePixels": 2571799
+    }
+  ],
+  "rotation": false,
+  "sources": {
+    "scripts/assets/pack.py": "c0a696900c20d5e30085f8c305de928d54c1502fa5f01988ad8254095d5f0ecb",
+    "scripts/assets/scenery-spec.mjs": "98f4d24adf9b3ea562b9b86acf9925cfc3752cc2cedff0268c52124ae46bcbb2",
+    "src/rendering/environment/assets/bamboo-atlas.png": "b4e6af00bfb28fa34070ebcf70f2df510200342ad4b37a522cc53262e584971e",
+    "src/rendering/environment/assets/cherry-trees-atlas.png": "fc1253286be2af8cc8b5f6796052806583958b60d0420c462430ca43de1b1ca7",
+    "src/rendering/environment/assets/demon-landmarks-atlas.png": "90a7992c1dec4d4ba50b94542b137e887286604807ce8266101416db55ad0ead",
+    "src/rendering/environment/assets/demon-terrain-atlas.png": "c85e1d4231bee473c87588729ba19738a8d48ebeab955ba4e629979a5bf6df28",
+    "src/rendering/environment/assets/fallen-bamboo-atlas.png": "1e5f56cbe7210b70e3dd3cb52f6d18fdf48363ca1c95717cede71aa360442805",
+    "src/rendering/environment/assets/field-banks-atlas.png": "14597eff9863348440e67fccfe13d426fd5bbf9c0ad2b76838cf841920a20701",
+    "src/rendering/environment/assets/field-rocks-atlas.png": "3b3e04aa1113d3dc23f2778b1289143e21650de66f62e0901ef19eba7718ebf0",
+    "src/rendering/environment/assets/foam-strips-atlas.png": "7a30e9c0280571eb711345a9757c1748efc635c58920185652264e9c0d5cf6ec",
+    "src/rendering/environment/assets/fog-wisps-atlas.png": "526cfc6ecb0e6d4fa4dd9e5673d6890357f149f8e5f85d7b0169bcd5b5e5ccd6",
+    "src/rendering/environment/assets/foreground-boulders-atlas.png": "9c27f49cebcb89b43afb372a213b2965b8b781348baf0dc3a1b355536d621cd3",
+    "src/rendering/environment/assets/grass-edges-atlas.png": "7b5bcb1e7e36161d6a1b2cc42542b38ced1b673b4140c10d308d3b503ea69f7b",
+    "src/rendering/environment/assets/meadow-patches-atlas.png": "ebe6daea6ea07012db08d96643a0c4ea09ca0767a57088e5af7de94f8e917732",
+    "src/rendering/environment/assets/mountain-atlas.png": "8e9de77e5a51503512527e181d597b211d096a0723c008416d43452fe9250bde",
+    "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_normal.png": "03b7cab06a1f31a83aee2f3eb19ccc42da39fe920bbf49ad21104d904e866b8b",
+    "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_surface.png": "68f2ce93ff29b10fcf81d4936653039f65ce99bd2f5d719c83d7de84351adedd",
+    "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_normal.png": "ad28e71c829c1253542c24224b9a7e9c1c2b56b9a38faeeb7cbd4c8964e9bb44",
+    "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_surface.png": "9927ae2081c98123e32bde70e9a834d8f1d8c46ef4f57921a060e2d765722a12",
+    "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_normal.png": "1ab8316c16c3ec1630a21e945708199fbaa85bad2255bb720828293e2e38da7d",
+    "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_surface.png": "69de99d59d2b679fff15e12ddef65c98a25bcc142915e5e41bac5be3bc2513b2",
+    "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_normal.png": "079a33c1e0bdd5d6a9d96528258a6338e2e024126f64f3ed98ec29885d5f9ecb",
+    "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_surface.png": "c88d4c6e71449f1556768b3ab586a4f67fff8d099a0041ac03e45de16367f0e5",
+    "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_normal.png": "92f33e1b36b9a4c7f995f0ccd4916a0c68541bb1d3f64c1457eb5316341a426a",
+    "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_surface.png": "6da56653d8d54fd7384b6900025234d3f6ae55b36d8ba65d33c1823becb52de3",
+    "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_normal.png": "af6643057f15fbe8366b2c50b0627d5e1323a5d6d2b602d1cb64332552623176",
+    "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_surface.png": "8fa8542f0c7a83d91471f9e6e3c685d2efe83cfb585e1f0f50c4e6b0d37694eb",
+    "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_normal.png": "117e8a202282865455e16c953936540e6c9ef25c5b5da3e3984d07077924d5f4",
+    "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_surface.png": "de0cded1d1e58bd46afd599535b5fd207a875071b8a55fd86a0439d5c47bdf87",
+    "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_emissive.png": "70fc795fbad93f1d08b18a6faec22175028bb0b09ae8d948457114241e5f1734",
+    "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_normal.png": "6be4c25d96150b7961dd8989762b7a41ed17f0dcff4fdcb48565c46e8a3f74a8",
+    "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_surface.png": "69aa443530379c0ed086d6b396759d30cf2c4d1238b7b62a61e72cda9d25f03e",
+    "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_emissive.png": "0e770ff0e66c0f6ae97bf2e7f618fae2b5049237d0e9eae8712c1f52bd036099",
+    "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_normal.png": "f7f392d26475fa126d811fb2f8ebb1844b0ab6513848c1069be48f7c0ce87a25",
+    "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_surface.png": "5c045c2ef527eb33ea1a4bae2e30493bba2c1b3f15e2863e04b6b3f5017a6f54",
+    "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_normal.png": "cda7e42636cdff4909f1e6f396be2867db72f9f60178349e4f6d271581ba32a7",
+    "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_surface.png": "9ef0706e968056a1464de2636006e6fd28f43b8b5f2be5a6680994796e56477c",
+    "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_normal.png": "aa3ac772a043b460c0f9313b0029c41b17ec4babfd98490b75b1facff57b6e69",
+    "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_surface.png": "f5623af1a00765192d34ecb577ed0d30bd8675de792662c298506338b524fe23",
+    "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_normal.png": "6c238fba40c70f8ded883c66aafbd082f7ffd1d2629f8c499df136439387fc13",
+    "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_surface.png": "bb9681767871e6e9b701798a059945bfcab1925962179f932994f3529505dafc",
+    "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_normal.png": "b3e270217a1a8ee939468e545872e03556936ccde7e14791b97bb1c274252291",
+    "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_surface.png": "49b8fbf7e7fa630767aa273e82d9c2f70b62c5b33b13c4e032eb86048c1517b3",
+    "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_normal.png": "c154ccd4257eee3a6af5bd5061cbf36fcac5b601d802758cc2f4d0166fe3e77b",
+    "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_surface.png": "6dba2a1b15d874cf8e8265c9899b42cc1c29753a0b487cca98d4a081b1065d64",
+    "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_normal.png": "3450bf2bd2bf1705c11c00fa0840af5b4dc63100d585ba8cd73f06e197e1031d",
+    "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_surface.png": "a79f4b9f04363bfb1ab81a09ef7d267797fd4e1c5de216a8ed4c5c76a63044af",
+    "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_normal.png": "fec3f0bb326f9292d4fa25526bc2412ec8ef6b49270ef20e6fcbf3fbebb8cf05",
+    "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_surface.png": "0efad7bf54a6346c4175adca32288cc51138f58a59cd5ce38aaed130dbf48701",
+    "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_normal.png": "e79a2dbac29b7784a8805ae784461eb8a3b0d62c13ddb498bbe387769644057f",
+    "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_surface.png": "96e2eac67157ad2cd2dbeef1ef5f6bc7261ec0c5f3a50f477edd2e7b7b40f795",
+    "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_normal.png": "3c4c32f8b267fd70c59d469e2f3fa5af7eaab265888d559bd5d854264473379c",
+    "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_surface.png": "292f171cb77baf34f27b5625e8de32ba4b2749ee23eec07c92a3881430cc8e12",
+    "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_normal.png": "a956e283a4a3d130c561aadc2ac286bdd71c70071d055419397cadde8f8b2561",
+    "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_surface.png": "a7d116aa86dd6144412b7c4715c55e5af6696cfc480affe7a98f8db749b99594",
+    "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_normal.png": "7ba0eadc54a4114199d19d48819bfb8cf7f8f3ebdc94e769768f75b3daa8acae",
+    "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_surface.png": "80c5500f8dce195d08ec77003025de5d0e82bf67227d8a09aca614e49eb1dc4f",
+    "src/rendering/environment/assets/pbr/snow-peak/snow-peak_normal.png": "24766ca9f4ca66b82d42a24876a90ec5ee8b1990a54c14f299de084e9506cfd9",
+    "src/rendering/environment/assets/pbr/snow-peak/snow-peak_surface.png": "a7c227b5b913be565cb494689d407b1b53e2a970ea11d167ff16beefb9714a18",
+    "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_normal.png": "40661a840e8aabe5255488ce38af5c9477bd6e58a3aa8e36338eebc3d47b2b48",
+    "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_surface.png": "0cb902bcd82d309c241329fbbd80e63bd79351c2c85ec9d91ecd919d260819a7",
+    "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_normal.png": "55643ac3c922024559a2ecb654c144444798eb559c7a836e540a42ea9443df29",
+    "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_surface.png": "241df98ab1c83e597ffe4bf2f865e43639dd9b2512fcbe814351dae980a2e194",
+    "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_normal.png": "918064edfc6767f9e19cabcaef030c788292128cad9773906be8705e6b4932b6",
+    "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_surface.png": "c97fda5bce10026118fc7aa56f9c52a6936168312e2e7dd702896831f145caf3",
+    "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_normal.png": "dbbadfd2bf86fc6b8fed619871de1c873221d20c0f6f8ee21b66801707f8aded",
+    "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_surface.png": "c4e62fc1a5841e6ae6e19905c4fd4f385363c521e80da98a00c1857bf9b49977",
+    "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_normal.png": "81afb8ce5f4c20c246666564ea78f1701cbb8716dc564437e0f79191d0af660b",
+    "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_surface.png": "9ce120f1c06de71095047f51173bf1ed8e229eed1df6fa3832fe41985b9a101a",
+    "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_normal.png": "742052628df51e8057b1100a6d0ea94e89d3d7339c61ef62c7211aaf899e7acd",
+    "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_surface.png": "6ebde2a87b46b1161aa2ebabe1adfa62098ebc6aa26060bdcd374be9accd860c",
+    "src/rendering/environment/assets/petal-ground-atlas.png": "293208610eb9296bd492e94b83d3dec037c0bd6479171df0e732d55fe8795e4e",
+    "src/rendering/environment/assets/pine-atlas.png": "0939c7edc7112ddbff87552e551f261dfe652fa6fbc548426bb13ca3c7fe55b8",
+    "src/rendering/environment/assets/reeds-atlas.png": "d69f72a9307e01b1a48b5bdd94d5a0125ecfb8c0a59d90f34f97c010f771bde3",
+    "src/rendering/environment/assets/rocks-atlas.png": "bf7e97e20ae1d23ae98cf8e331e510fd757a554fc1f799eecedb10fe350eb0c3",
+    "src/rendering/environment/assets/sea-stacks-atlas.png": "731c23d6eebdd5e64295fd0c89ab235fca996b14f017b16aab5b7378f8efd8e6",
+    "src/rendering/environment/assets/shrubs-atlas.png": "e191e11251abacbfeda8dd50c494921ff8d7b209c18692dcb0fde01e21427819",
+    "src/rendering/environment/assets/snow-boulders-atlas.png": "c3a3f2401f46adcb130163bca410db2791cc780db17b19fdc4ddd11d57e6fb8d",
+    "src/rendering/environment/assets/snow-peak.png": "b3a99fc85fa424fecbd6f29c71e7231f3fcfea3b789ef0ef380cbda1391be5fc",
+    "src/rendering/environment/assets/snow-pines-atlas.png": "28dccf8555c58fe18f2bb5ddffa11e2bf49c5558eac0e2d15c84ffbcef0311ed",
+    "src/rendering/environment/assets/snow-rocks-atlas.png": "61d50b3b9ab83cebeb902ef54d4ae27e8283fe1544d7caf0a7530617ef673b26",
+    "src/rendering/environment/assets/temple-posts-atlas.png": "6aefeaf563e1af1fba42187dbeddd3ffc23b29e95c800ce6e2c30efe921f1547",
+    "src/rendering/environment/assets/temple-roofs-atlas.png": "5cc7c89b133382f428e2c5c23e9dbad9e53c6adae42ccb978916ea9f2c84183f",
+    "src/rendering/environment/assets/temple-steps-atlas.png": "289de7bbe88098b6f8c6aac478cfe30174d486e7ef4481d1263c4343bcf4b060",
+    "src/rendering/environment/assets/temple-walls-atlas.png": "11646d9fb9b9d9e47b444c9ff41a3ba1676c98844a20f54ac7ddd026588b6d63",
+    "src/rendering/environment/demon-realm.ts": "72c5043a72544b61883fa9552cd637f737273481991f02472be40d74f4c6354b",
+    "src/rendering/environment/foreground.ts": "9220dca26df6db7d323bdbadee80215f3919ed603ee11f728b2fc1f8d9aef8a5",
+    "src/rendering/environment/scenery-sources.ts": "8b07b36503fab021a5dc1601e0d9ee1061ca2af6c26f7f407f167c5d796a8dc5",
+    "src/rendering/environment/temple.ts": "b4356d437e9642b529e782e35930017d214660aef1b10cef9c1c674ac66906b8",
+    "src/rendering/environment/winter.ts": "b09b8ae1c8231f5e1f18b095e15ef3e36b8936347a83c7ad64b2bde933147bf4"
+  },
+  "sprites": {
+    "scenery.bamboo-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        633,
+        558,
+        627
+      ],
+      "id": "scenery.bamboo-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 22,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        633,
+        558,
+        627
+      ],
+      "trim": [
+        69,
+        0
+      ]
+    },
+    "scenery.bamboo-atlas.1": {
+      "empty": false,
+      "frame": [
+        564,
+        633,
+        610,
+        624
+      ],
+      "id": "scenery.bamboo-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 22,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        564,
+        633,
+        610,
+        624
+      ],
+      "trim": [
+        0,
+        3
+      ]
+    },
+    "scenery.bamboo-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "id": "scenery.bamboo-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 22,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.bamboo-atlas.3": {
+      "empty": false,
+      "frame": [
+        633,
+        2,
+        606,
+        627
+      ],
+      "id": "scenery.bamboo-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 22,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        633,
+        2,
+        606,
+        627
+      ],
+      "trim": [
+        7,
+        0
+      ]
+    },
+    "scenery.cherry-trees-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1211,
+        598,
+        592
+      ],
+      "id": "scenery.cherry-trees-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 18,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1211,
+        598,
+        592
+      ],
+      "trim": [
+        29,
+        21
+      ]
+    },
+    "scenery.cherry-trees-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        626,
+        605,
+        581
+      ],
+      "id": "scenery.cherry-trees-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 18,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        626,
+        605,
+        581
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "scenery.cherry-trees-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        585,
+        579
+      ],
+      "id": "scenery.cherry-trees-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 19,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        585,
+        579
+      ],
+      "trim": [
+        39,
+        0
+      ]
+    },
+    "scenery.cherry-trees-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        591,
+        620
+      ],
+      "id": "scenery.cherry-trees-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 18,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        591,
+        620
+      ],
+      "trim": [
+        3,
+        7
+      ]
+    },
+    "scenery.demon-landmarks-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1227,
+        548,
+        486
+      ],
+      "id": "scenery.demon-landmarks-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 4,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1227,
+        548,
+        486
+      ],
+      "trim": [
+        61,
+        111
+      ]
+    },
+    "scenery.demon-landmarks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1204,
+        590,
+        570
+      ],
+      "id": "scenery.demon-landmarks-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 3,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1204,
+        590,
+        570
+      ],
+      "trim": [
+        9,
+        17
+      ]
+    },
+    "scenery.demon-landmarks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        627,
+        570
+      ],
+      "id": "scenery.demon-landmarks-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 3,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        627,
+        570
+      ],
+      "trim": [
+        0,
+        57
+      ]
+    },
+    "scenery.demon-landmarks-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        576,
+        597,
+        624
+      ],
+      "id": "scenery.demon-landmarks-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 3,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        576,
+        597,
+        624
+      ],
+      "trim": [
+        0,
+        3
+      ]
+    },
+    "scenery.demon-terrain-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        938,
+        551,
+        285
+      ],
+      "id": "scenery.demon-terrain-atlas.0",
+      "logicalSize": [
+        580,
+        285
+      ],
+      "page": 4,
+      "pivot": [
+        290.0,
+        142.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        21,
+        231,
+        580,
+        285
+      ],
+      "storageFrame": [
+        2,
+        938,
+        551,
+        285
+      ],
+      "trim": [
+        13,
+        0
+      ]
+    },
+    "scenery.demon-terrain-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        661,
+        566,
+        273
+      ],
+      "id": "scenery.demon-terrain-atlas.1",
+      "logicalSize": [
+        586,
+        285
+      ],
+      "page": 4,
+      "pivot": [
+        293.0,
+        142.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        650,
+        240,
+        586,
+        285
+      ],
+      "storageFrame": [
+        2,
+        661,
+        566,
+        273
+      ],
+      "trim": [
+        8,
+        0
+      ]
+    },
+    "scenery.demon-terrain-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        584,
+        353
+      ],
+      "id": "scenery.demon-terrain-atlas.2",
+      "logicalSize": [
+        594,
+        353
+      ],
+      "page": 4,
+      "pivot": [
+        297.0,
+        176.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        17,
+        716,
+        594,
+        353
+      ],
+      "storageFrame": [
+        2,
+        2,
+        584,
+        353
+      ],
+      "trim": [
+        8,
+        0
+      ]
+    },
+    "scenery.demon-terrain-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        359,
+        582,
+        298
+      ],
+      "id": "scenery.demon-terrain-atlas.3",
+      "logicalSize": [
+        593,
+        298
+      ],
+      "page": 4,
+      "pivot": [
+        296.5,
+        149.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        645,
+        782,
+        593,
+        298
+      ],
+      "storageFrame": [
+        2,
+        359,
+        582,
+        298
+      ],
+      "trim": [
+        5,
+        0
+      ]
+    },
+    "scenery.fallen-bamboo-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        450,
+        887,
+        426.5
+      ],
+      "id": "scenery.fallen-bamboo-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 21,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        427
+      ],
+      "trim": [
+        0,
+        17
+      ]
+    },
+    "scenery.fallen-bamboo-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        881,
+        861,
+        422.5
+      ],
+      "id": "scenery.fallen-bamboo-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 21,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        881,
+        861,
+        423
+      ],
+      "trim": [
+        0,
+        21
+      ]
+    },
+    "scenery.fallen-bamboo-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.fallen-bamboo-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 21,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.fallen-bamboo-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        1308.5,
+        859,
+        443.5
+      ],
+      "id": "scenery.fallen-bamboo-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 21,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1308,
+        859,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.field-banks-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        898,
+        887,
+        426.5
+      ],
+      "id": "scenery.field-banks-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 14,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        898,
+        887,
+        427
+      ],
+      "trim": [
+        0,
+        17
+      ]
+    },
+    "scenery.field-banks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1329,
+        887,
+        409.5
+      ],
+      "id": "scenery.field-banks-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 14,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1329,
+        887,
+        410
+      ],
+      "trim": [
+        0,
+        34
+      ]
+    },
+    "scenery.field-banks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.field-banks-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 14,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.field-banks-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        450.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.field-banks-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 14,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.field-rocks-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1276,
+        824,
+        425.5
+      ],
+      "id": "scenery.field-rocks-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 13,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1276,
+        824,
+        426
+      ],
+      "trim": [
+        63,
+        18
+      ]
+    },
+    "scenery.field-rocks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        847,
+        859,
+        424.5
+      ],
+      "id": "scenery.field-rocks-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 13,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        847,
+        859,
+        425
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "scenery.field-rocks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        421.5,
+        864,
+        421.5
+      ],
+      "id": "scenery.field-rocks-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 13,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        421,
+        864,
+        422
+      ],
+      "trim": [
+        23,
+        0.0
+      ]
+    },
+    "scenery.field-rocks-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        869,
+        414.5
+      ],
+      "id": "scenery.field-rocks-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 13,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        869,
+        415
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.foam-strips-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        847,
+        810,
+        456
+      ],
+      "id": "scenery.foam-strips-atlas.0",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 6,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        847,
+        810,
+        456
+      ],
+      "trim": [
+        0,
+        18
+      ]
+    },
+    "scenery.foam-strips-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1307,
+        806,
+        435
+      ],
+      "id": "scenery.foam-strips-atlas.1",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 6,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        829.5,
+        0,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        1307,
+        806,
+        435
+      ],
+      "trim": [
+        13.5,
+        33
+      ]
+    },
+    "scenery.foam-strips-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        826,
+        450
+      ],
+      "id": "scenery.foam-strips-atlas.2",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 6,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        474,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        2,
+        826,
+        450
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.foam-strips-atlas.3": {
+      "empty": false,
+      "frame": [
+        2.5,
+        456,
+        821.5,
+        387
+      ],
+      "id": "scenery.foam-strips-atlas.3",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 6,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        829.5,
+        474,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        456,
+        822,
+        387
+      ],
+      "trim": [
+        0.0,
+        9
+      ]
+    },
+    "scenery.fog-wisps-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        898,
+        876,
+        427.5
+      ],
+      "id": "scenery.fog-wisps-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 8,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        898,
+        876,
+        428
+      ],
+      "trim": [
+        11,
+        16
+      ]
+    },
+    "scenery.fog-wisps-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1330,
+        875,
+        411.5
+      ],
+      "id": "scenery.fog-wisps-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 8,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1330,
+        875,
+        412
+      ],
+      "trim": [
+        0,
+        32
+      ]
+    },
+    "scenery.fog-wisps-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.fog-wisps-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 8,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.fog-wisps-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        450.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.fog-wisps-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 8,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "emissive",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.foreground-boulders-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        855,
+        410
+      ],
+      "id": "scenery.foreground-boulders-atlas.0",
+      "logicalSize": [
+        887,
+        443
+      ],
+      "page": 16,
+      "pivot": [
+        443.5,
+        221.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443
+      ],
+      "storageFrame": [
+        2,
+        2,
+        855,
+        410
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "scenery.foreground-boulders-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        416,
+        838,
+        429
+      ],
+      "id": "scenery.foreground-boulders-atlas.1",
+      "logicalSize": [
+        887,
+        443
+      ],
+      "page": 16,
+      "pivot": [
+        443.5,
+        221.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443
+      ],
+      "storageFrame": [
+        2,
+        416,
+        838,
+        429
+      ],
+      "trim": [
+        5,
+        7
+      ]
+    },
+    "scenery.foreground-boulders-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        849,
+        823,
+        316
+      ],
+      "id": "scenery.foreground-boulders-atlas.2",
+      "logicalSize": [
+        887,
+        444
+      ],
+      "page": 16,
+      "pivot": [
+        443.5,
+        222.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443,
+        887,
+        444
+      ],
+      "storageFrame": [
+        2,
+        849,
+        823,
+        316
+      ],
+      "trim": [
+        64,
+        54
+      ]
+    },
+    "scenery.foreground-boulders-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        1169,
+        816,
+        384
+      ],
+      "id": "scenery.foreground-boulders-atlas.3",
+      "logicalSize": [
+        887,
+        444
+      ],
+      "page": 16,
+      "pivot": [
+        443.5,
+        222.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443,
+        887,
+        444
+      ],
+      "storageFrame": [
+        2,
+        1169,
+        816,
+        384
+      ],
+      "trim": [
+        0,
+        38
+      ]
+    },
+    "scenery.grass-edges-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1311,
+        879,
+        427.5
+      ],
+      "id": "scenery.grass-edges-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 15,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1311,
+        879,
+        428
+      ],
+      "trim": [
+        8,
+        16
+      ]
+    },
+    "scenery.grass-edges-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        898,
+        880,
+        408.5
+      ],
+      "id": "scenery.grass-edges-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 15,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        898,
+        880,
+        409
+      ],
+      "trim": [
+        7,
+        35
+      ]
+    },
+    "scenery.grass-edges-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.grass-edges-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 15,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.grass-edges-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        450.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.grass-edges-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 15,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.meadow-patches-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        898,
+        887,
+        428.5
+      ],
+      "id": "scenery.meadow-patches-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 0,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        898,
+        887,
+        429
+      ],
+      "trim": [
+        0,
+        15
+      ]
+    },
+    "scenery.meadow-patches-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1331,
+        887,
+        426.5
+      ],
+      "id": "scenery.meadow-patches-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 0,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1331,
+        887,
+        427
+      ],
+      "trim": [
+        0,
+        17
+      ]
+    },
+    "scenery.meadow-patches-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.meadow-patches-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 0,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.meadow-patches-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        450.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.meadow-patches-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 0,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.mountain-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        871,
+        887,
+        416
+      ],
+      "id": "scenery.mountain-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 5,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        871,
+        887,
+        416
+      ],
+      "trim": [
+        0,
+        15
+      ]
+    },
+    "scenery.mountain-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1291,
+        879,
+        410.5
+      ],
+      "id": "scenery.mountain-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 5,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1291,
+        879,
+        411
+      ],
+      "trim": [
+        0,
+        33
+      ]
+    },
+    "scenery.mountain-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        450,
+        887,
+        417
+      ],
+      "id": "scenery.mountain-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 5,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        450,
+        887,
+        417
+      ],
+      "trim": [
+        0,
+        4.5
+      ]
+    },
+    "scenery.mountain-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        2.5,
+        887,
+        443.5
+      ],
+      "id": "scenery.mountain-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 5,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        887,
+        444
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.petal-ground-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        936,
+        766,
+        455
+      ],
+      "id": "scenery.petal-ground-atlas.0",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 17,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        936,
+        766,
+        455
+      ],
+      "trim": [
+        39,
+        19
+      ]
+    },
+    "scenery.petal-ground-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1395,
+        731,
+        437
+      ],
+      "id": "scenery.petal-ground-atlas.1",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 17,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        829.5,
+        0,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        1395,
+        731,
+        437
+      ],
+      "trim": [
+        39.5,
+        37
+      ]
+    },
+    "scenery.petal-ground-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        811,
+        452
+      ],
+      "id": "scenery.petal-ground-atlas.2",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 17,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        474,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        2,
+        811,
+        452
+      ],
+      "trim": [
+        15,
+        0
+      ]
+    },
+    "scenery.petal-ground-atlas.3": {
+      "empty": false,
+      "frame": [
+        2.5,
+        458,
+        799.5,
+        474
+      ],
+      "id": "scenery.petal-ground-atlas.3",
+      "logicalSize": [
+        829.5,
+        474
+      ],
+      "page": 17,
+      "pivot": [
+        414.75,
+        237.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        829.5,
+        474,
+        829.5,
+        474
+      ],
+      "storageFrame": [
+        2,
+        458,
+        800,
+        474
+      ],
+      "trim": [
+        0.0,
+        0
+      ]
+    },
+    "scenery.pine-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1264,
+        627,
+        558
+      ],
+      "id": "scenery.pine-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 9,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1264,
+        627,
+        558
+      ],
+      "trim": [
+        0,
+        69
+      ]
+    },
+    "scenery.pine-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        607,
+        609
+      ],
+      "id": "scenery.pine-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 10,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        607,
+        609
+      ],
+      "trim": [
+        0,
+        18
+      ]
+    },
+    "scenery.pine-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "id": "scenery.pine-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 9,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.pine-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        633,
+        613,
+        627
+      ],
+      "id": "scenery.pine-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 9,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        633,
+        613,
+        627
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.reeds-atlas.0": {
+      "empty": false,
+      "frame": [
+        633,
+        2,
+        608,
+        610
+      ],
+      "id": "scenery.reeds-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 20,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        633,
+        2,
+        608,
+        610
+      ],
+      "trim": [
+        19,
+        17
+      ]
+    },
+    "scenery.reeds-atlas.1": {
+      "empty": false,
+      "frame": [
+        633,
+        616,
+        602,
+        608
+      ],
+      "id": "scenery.reeds-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 20,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        633,
+        616,
+        602,
+        608
+      ],
+      "trim": [
+        5,
+        19
+      ]
+    },
+    "scenery.reeds-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "id": "scenery.reeds-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 20,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        627,
+        627
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.reeds-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        633,
+        597,
+        590
+      ],
+      "id": "scenery.reeds-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 20,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        633,
+        597,
+        590
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.rocks-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1232,
+        605,
+        563
+      ],
+      "id": "scenery.rocks-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 1,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1232,
+        605,
+        563
+      ],
+      "trim": [
+        22,
+        21
+      ]
+    },
+    "scenery.rocks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        588,
+        592
+      ],
+      "id": "scenery.rocks-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 2,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        588,
+        592
+      ],
+      "trim": [
+        23,
+        19
+      ]
+    },
+    "scenery.rocks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        627,
+        614
+      ],
+      "id": "scenery.rocks-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 1,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        627,
+        614
+      ],
+      "trim": [
+        0,
+        13
+      ]
+    },
+    "scenery.rocks-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        620,
+        615,
+        608
+      ],
+      "id": "scenery.rocks-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 1,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        620,
+        615,
+        608
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "scenery.sea-stacks-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        1493,
+        469,
+        478
+      ],
+      "id": "scenery.sea-stacks-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 7,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1493,
+        469,
+        478
+      ],
+      "trim": [
+        156,
+        125
+      ]
+    },
+    "scenery.sea-stacks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        568,
+        565
+      ],
+      "id": "scenery.sea-stacks-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 7,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        568,
+        565
+      ],
+      "trim": [
+        37,
+        19
+      ]
+    },
+    "scenery.sea-stacks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        571,
+        548,
+        473
+      ],
+      "id": "scenery.sea-stacks-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 7,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        571,
+        548,
+        473
+      ],
+      "trim": [
+        39,
+        67
+      ]
+    },
+    "scenery.sea-stacks-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        1048,
+        486,
+        441
+      ],
+      "id": "scenery.sea-stacks-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 7,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1048,
+        486,
+        441
+      ],
+      "trim": [
+        63,
+        76
+      ]
+    },
+    "scenery.shrubs-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        633,
+        627,
+        510
+      ],
+      "id": "scenery.shrubs-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 11,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        633,
+        627,
+        510
+      ],
+      "trim": [
+        0,
+        117
+      ]
+    },
+    "scenery.shrubs-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        594,
+        574
+      ],
+      "id": "scenery.shrubs-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 12,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        594,
+        574
+      ],
+      "trim": [
+        15,
+        19
+      ]
+    },
+    "scenery.shrubs-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        612,
+        627
+      ],
+      "id": "scenery.shrubs-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 11,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        612,
+        627
+      ],
+      "trim": [
+        15,
+        0
+      ]
+    },
+    "scenery.shrubs-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        1147,
+        593,
+        624
+      ],
+      "id": "scenery.shrubs-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 11,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1147,
+        593,
+        624
+      ],
+      "trim": [
+        0,
+        3
+      ]
+    },
+    "scenery.snow-boulders-atlas.0": {
+      "empty": false,
+      "frame": [
+        812,
+        330,
+        802,
+        402
+      ],
+      "id": "scenery.snow-boulders-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 24,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        812,
+        330,
+        802,
+        402
+      ],
+      "trim": [
+        55,
+        35
+      ]
+    },
+    "scenery.snow-boulders-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        806,
+        399
+      ],
+      "id": "scenery.snow-boulders-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 24,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        2,
+        806,
+        399
+      ],
+      "trim": [
+        49,
+        39
+      ]
+    },
+    "scenery.snow-boulders-atlas.2": {
+      "empty": false,
+      "frame": [
+        812,
+        2,
+        804,
+        324
+      ],
+      "id": "scenery.snow-boulders-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 24,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        812,
+        2,
+        804,
+        324
+      ],
+      "trim": [
+        61,
+        57.5
+      ]
+    },
+    "scenery.snow-boulders-atlas.3": {
+      "empty": false,
+      "frame": [
+        2,
+        1626,
+        819,
+        372
+      ],
+      "id": "scenery.snow-boulders-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1626,
+        819,
+        372
+      ],
+      "trim": [
+        0,
+        11.5
+      ]
+    },
+    "scenery.snow-peak.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        1881,
+        809
+      ],
+      "id": "scenery.snow-peak.0",
+      "logicalSize": [
+        1881,
+        836
+      ],
+      "page": 23,
+      "pivot": [
+        940.5,
+        418.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        1881,
+        836
+      ],
+      "storageFrame": [
+        2,
+        2,
+        1881,
+        809
+      ],
+      "trim": [
+        0,
+        19
+      ]
+    },
+    "scenery.snow-pines-atlas.0": {
+      "empty": false,
+      "frame": [
+        1086,
+        1264,
+        574,
+        522
+      ],
+      "id": "scenery.snow-pines-atlas.0",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 24,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        1086,
+        1264,
+        574,
+        522
+      ],
+      "trim": [
+        53,
+        105
+      ]
+    },
+    "scenery.snow-pines-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        405,
+        573,
+        611
+      ],
+      "id": "scenery.snow-pines-atlas.1",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 24,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        405,
+        573,
+        611
+      ],
+      "trim": [
+        0,
+        15
+      ]
+    },
+    "scenery.snow-pines-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        559,
+        568
+      ],
+      "id": "scenery.snow-pines-atlas.2",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 25,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        2,
+        2,
+        559,
+        568
+      ],
+      "trim": [
+        39,
+        19
+      ]
+    },
+    "scenery.snow-pines-atlas.3": {
+      "empty": false,
+      "frame": [
+        476,
+        1020,
+        606,
+        536
+      ],
+      "id": "scenery.snow-pines-atlas.3",
+      "logicalSize": [
+        627,
+        627
+      ],
+      "page": 24,
+      "pivot": [
+        313.5,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "storageFrame": [
+        476,
+        1020,
+        606,
+        536
+      ],
+      "trim": [
+        5,
+        21
+      ]
+    },
+    "scenery.snow-pines-atlas.4": {
+      "empty": false,
+      "frame": [
+        2,
+        1020,
+        470,
+        611
+      ],
+      "id": "scenery.snow-pines-atlas.4",
+      "logicalSize": [
+        554,
+        627
+      ],
+      "page": 24,
+      "pivot": [
+        277.0,
+        313.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        700,
+        0,
+        554,
+        627
+      ],
+      "storageFrame": [
+        2,
+        1020,
+        470,
+        611
+      ],
+      "trim": [
+        30,
+        15
+      ]
+    },
+    "scenery.snow-pines-atlas.5": {
+      "empty": false,
+      "frame": [
+        1086,
+        736,
+        578,
+        524
+      ],
+      "id": "scenery.snow-pines-atlas.5",
+      "logicalSize": [
+        594,
+        594
+      ],
+      "page": 24,
+      "pivot": [
+        297.0,
+        297.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        660,
+        660,
+        594,
+        594
+      ],
+      "storageFrame": [
+        1086,
+        736,
+        578,
+        524
+      ],
+      "trim": [
+        0,
+        0
+      ]
+    },
+    "scenery.snow-rocks-atlas.0": {
+      "empty": false,
+      "frame": [
+        842,
+        1564,
+        820,
+        424.5
+      ],
+      "id": "scenery.snow-rocks-atlas.0",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        842,
+        1564,
+        820,
+        425
+      ],
+      "trim": [
+        65,
+        19
+      ]
+    },
+    "scenery.snow-rocks-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        1213,
+        836,
+        408.5
+      ],
+      "id": "scenery.snow-rocks-atlas.1",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        0,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        1213,
+        836,
+        409
+      ],
+      "trim": [
+        7,
+        35
+      ]
+    },
+    "scenery.snow-rocks-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        815.5,
+        848,
+        393.5
+      ],
+      "id": "scenery.snow-rocks-atlas.2",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        2,
+        815,
+        848,
+        394
+      ],
+      "trim": [
+        39,
+        0.0
+      ]
+    },
+    "scenery.snow-rocks-atlas.3": {
+      "empty": false,
+      "frame": [
+        854,
+        1149.5,
+        843,
+        410.5
+      ],
+      "id": "scenery.snow-rocks-atlas.3",
+      "logicalSize": [
+        887,
+        443.5
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        221.75
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        887,
+        443.5,
+        887,
+        443.5
+      ],
+      "storageFrame": [
+        854,
+        1149,
+        843,
+        411
+      ],
+      "trim": [
+        0,
+        0.0
+      ]
+    },
+    "scenery.snow-rocks-atlas.4": {
+      "empty": false,
+      "frame": [
+        854,
+        815,
+        848,
+        330
+      ],
+      "id": "scenery.snow-rocks-atlas.4",
+      "logicalSize": [
+        887,
+        387
+      ],
+      "page": 23,
+      "pivot": [
+        443.5,
+        193.5
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        500,
+        887,
+        387
+      ],
+      "storageFrame": [
+        854,
+        815,
+        848,
+        330
+      ],
+      "trim": [
+        39,
+        7
+      ]
+    },
+    "scenery.temple-posts-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        898,
+        693
+      ],
+      "id": "scenery.temple-posts-atlas.0",
+      "logicalSize": [
+        950,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        475.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        950,
+        724
+      ],
+      "storageFrame": [
+        2,
+        2,
+        898,
+        693
+      ],
+      "trim": [
+        52,
+        9
+      ]
+    },
+    "scenery.temple-posts-atlas.1": {
+      "empty": false,
+      "frame": [
+        904,
+        2,
+        500,
+        669
+      ],
+      "id": "scenery.temple-posts-atlas.1",
+      "logicalSize": [
+        500,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        250.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        950,
+        0,
+        500,
+        724
+      ],
+      "storageFrame": [
+        904,
+        2,
+        500,
+        669
+      ],
+      "trim": [
+        0,
+        11
+      ]
+    },
+    "scenery.temple-posts-atlas.2": {
+      "empty": false,
+      "frame": [
+        792,
+        699,
+        673,
+        574
+      ],
+      "id": "scenery.temple-posts-atlas.2",
+      "logicalSize": [
+        722,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        361.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1450,
+        0,
+        722,
+        724
+      ],
+      "storageFrame": [
+        792,
+        699,
+        673,
+        574
+      ],
+      "trim": [
+        5,
+        106
+      ]
+    },
+    "scenery.temple-roofs-atlas.0": {
+      "empty": false,
+      "frame": [
+        811,
+        717,
+        523,
+        608
+      ],
+      "id": "scenery.temple-roofs-atlas.0",
+      "logicalSize": [
+        568,
+        724
+      ],
+      "page": 26,
+      "pivot": [
+        284.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        568,
+        724
+      ],
+      "storageFrame": [
+        811,
+        717,
+        523,
+        608
+      ],
+      "trim": [
+        41,
+        116
+      ]
+    },
+    "scenery.temple-roofs-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        973,
+        711
+      ],
+      "id": "scenery.temple-roofs-atlas.1",
+      "logicalSize": [
+        980,
+        724
+      ],
+      "page": 26,
+      "pivot": [
+        490.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        568,
+        0,
+        980,
+        724
+      ],
+      "storageFrame": [
+        2,
+        2,
+        973,
+        711
+      ],
+      "trim": [
+        7,
+        13
+      ]
+    },
+    "scenery.temple-roofs-atlas.2": {
+      "empty": false,
+      "frame": [
+        594,
+        1336,
+        601,
+        650
+      ],
+      "id": "scenery.temple-roofs-atlas.2",
+      "logicalSize": [
+        624,
+        724
+      ],
+      "page": 26,
+      "pivot": [
+        312.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1548,
+        0,
+        624,
+        724
+      ],
+      "storageFrame": [
+        594,
+        1336,
+        601,
+        650
+      ],
+      "trim": [
+        0,
+        74
+      ]
+    },
+    "scenery.temple-steps-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        699,
+        786,
+        614
+      ],
+      "id": "scenery.temple-steps-atlas.0",
+      "logicalSize": [
+        808,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        404.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        808,
+        724
+      ],
+      "storageFrame": [
+        2,
+        699,
+        786,
+        614
+      ],
+      "trim": [
+        22,
+        73
+      ]
+    },
+    "scenery.temple-steps-atlas.1": {
+      "empty": false,
+      "frame": [
+        753,
+        1317,
+        592,
+        618
+      ],
+      "id": "scenery.temple-steps-atlas.1",
+      "logicalSize": [
+        602,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        301.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        808,
+        0,
+        602,
+        724
+      ],
+      "storageFrame": [
+        753,
+        1317,
+        592,
+        618
+      ],
+      "trim": [
+        0,
+        106
+      ]
+    },
+    "scenery.temple-steps-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        1317,
+        747,
+        509
+      ],
+      "id": "scenery.temple-steps-atlas.2",
+      "logicalSize": [
+        762,
+        724
+      ],
+      "page": 28,
+      "pivot": [
+        381.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1410,
+        0,
+        762,
+        724
+      ],
+      "storageFrame": [
+        2,
+        1317,
+        747,
+        509
+      ],
+      "trim": [
+        11,
+        104
+      ]
+    },
+    "scenery.temple-walls-atlas.0": {
+      "empty": false,
+      "frame": [
+        2,
+        2,
+        731,
+        711
+      ],
+      "id": "scenery.temple-walls-atlas.0",
+      "logicalSize": [
+        731,
+        724
+      ],
+      "page": 27,
+      "pivot": [
+        365.5,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        0,
+        0,
+        731,
+        724
+      ],
+      "storageFrame": [
+        2,
+        2,
+        731,
+        711
+      ],
+      "trim": [
+        0,
+        13
+      ]
+    },
+    "scenery.temple-walls-atlas.1": {
+      "empty": false,
+      "frame": [
+        2,
+        717,
+        805,
+        615
+      ],
+      "id": "scenery.temple-walls-atlas.1",
+      "logicalSize": [
+        822,
+        724
+      ],
+      "page": 26,
+      "pivot": [
+        411.0,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        731,
+        0,
+        822,
+        724
+      ],
+      "storageFrame": [
+        2,
+        717,
+        805,
+        615
+      ],
+      "trim": [
+        0,
+        109
+      ]
+    },
+    "scenery.temple-walls-atlas.2": {
+      "empty": false,
+      "frame": [
+        2,
+        1336,
+        588,
+        697
+      ],
+      "id": "scenery.temple-walls-atlas.2",
+      "logicalSize": [
+        619,
+        724
+      ],
+      "page": 26,
+      "pivot": [
+        309.5,
+        362.0
+      ],
+      "planes": [
+        "colour",
+        "normal",
+        "surface"
+      ],
+      "sourceFrame": [
+        1553,
+        0,
+        619,
+        724
+      ],
+      "storageFrame": [
+        2,
+        1336,
+        588,
+        697
+      ],
+      "trim": [
+        11,
+        27
+      ]
+    }
+  },
+  "version": 1
+}

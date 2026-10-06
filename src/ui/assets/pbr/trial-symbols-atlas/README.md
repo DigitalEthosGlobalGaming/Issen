@@ -15,3 +15,5 @@ This is a material starting point. Mixed artwork uses the dominant preset; indiv
 Generated reference maps; this artwork is not automatically a physical material or a lit surface.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../scripts/pbr/README.md).
+
+Redundant generated maps and exact replacements: [trial-symbols-atlas.material.json](trial-symbols-atlas.material.json).

@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/field-rocks-atlas.png",
+  "preset": "stone",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/field-rocks-atlas",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "3b3e04aa1113d3dc23f2778b1289143e21650de66f62e0901ef19eba7718ebf0"
+}

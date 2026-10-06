@@ -1,0 +1,14 @@
+{
+  "source": "src/rendering/environment/assets/drift-fire-atlas.png",
+  "preset": "default",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/drift-fire-atlas",
+  "note": "Generated reference maps; this artwork is not automatically a physical material or a lit surface.",
+  "dimensions": [
+    1774,
+    887
+  ],
+  "omittedMaps": {},
+  "mapCleanupVersion": 1,
+  "sourceHash": "e319b96c67b51994c2a4d43d29eb5a03a729a34f1572da0d377422e3e072aeca"
+}

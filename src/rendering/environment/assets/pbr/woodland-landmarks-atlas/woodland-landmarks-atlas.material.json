@@ -1,0 +1,20 @@
+{
+  "source": "src/rendering/environment/assets/woodland-landmarks-atlas.png",
+  "preset": "wood",
+  "mode": "sprite",
+  "output": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "9dc9914382cfe0ff5e07317bad16729d7d71d8ebd32f64fe2ec34dd3ce0e4748"
+}

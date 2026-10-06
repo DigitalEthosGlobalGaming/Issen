@@ -1,0 +1,20 @@
+{
+  "source": "src/ui/assets/world-ui-material-paper.png",
+  "preset": "cloth",
+  "mode": "texture",
+  "output": "src/ui/assets/pbr/world-ui-material-paper",
+  "dimensions": [
+    192,
+    192
+  ],
+  "omittedMaps": {
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "metallic": 0
+  },
+  "mapCleanupVersion": 1,
+  "sourceHash": "489c54bb28bbadc260df9e2018d32651f46bae2ee9bcb5710553b0872c331623"
+}
