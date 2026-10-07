@@ -1,3 +1,4 @@
+import { createStandoffPhase } from './game/phases/standoff.ts';
 import { createWavesPhase, createWaveLifecycle } from './game/phases/waves.ts';
 import { createRunStart } from './game/session/run-start.ts';
 import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
@@ -1928,12 +1929,7 @@ export function startGame(
       return;
     }
     if (G.state === 'standoff') {
-      const so = G.so;
-      if (so && !so.done && !so.fired) {
-        so.done = true;
-        swingPlayer('block');
-        playerDie(so.e, 'early');
-      }
+      standoffPhase.onTap(context);
       return;
     }
     if (G.state !== 'boss' || !G.boss) return;
@@ -2118,133 +2114,69 @@ export function startGame(
   }
 
   /* ---------------- standoff & shrine ---------------- */
+  const standoffPhase = createStandoffPhase<GameContext<PresentationContext>>(
+    () => ({
+      deferUntilSceneReady,
+      G,
+      waveCfg,
+      L,
+      combatRandom,
+      pickLook,
+      enemyPos,
+      banner,
+      letterbox,
+      sfx,
+      hint,
+      captureCheckpoint,
+      startWave,
+      flash,
+      playerDie,
+      W,
+      H,
+      accessible,
+      EQ,
+      swingPlayer,
+      addSlash,
+      S,
+      killFx,
+      scraps,
+      ring,
+      stamp,
+      punch,
+      get hitStop() {
+        return hitStop;
+      },
+      set hitStop(value) {
+        hitStop = value;
+      },
+      combatHaptics,
+      bumpCombo,
+      ST,
+      challenge,
+      earn,
+      addScore,
+      comboMult,
+      saveStats,
+      checkUnlocks,
+      makeFigure: makeFig,
+      guardPose: EPOSE.guard,
+      setWaveLabel: (label) => {
+        $('waveLbl').textContent = label;
+      },
+      clearLetterbox: () => {
+        presentationState.lbT = 0;
+      },
+    }),
+    context,
+  );
   function startStandoff(n: number, changed: boolean) {
-    if (deferUntilSceneReady(() => startStandoff(n, changed))) return;
-    const st = STAGES[G.stage]!;
-    G.state = 'standoff';
-    G.cfg = waveCfg(n);
-    G.enemies = G.enemies.filter((e) => e.state === 'dying');
-    G.attacker = null;
-    G.pendingSpawns = [];
-    G.toSpawn = 0;
-    const B = L.boss;
-    const e: Enemy = {
-      feintAt: 0,
-      pos: { x: 0, y: 0, h: 0, fog: 0, alpha: 1 },
-      slot: 2,
-      fixed: { x: B.x, y: B.y, h: B.h * 0.82, fog: 0.05 },
-      dir: DIRS[(combatRandom() * 4) | 0]!,
-      fake: null,
-      switched: false,
-      order: 0,
-      state: 'idle',
-      t: 0,
-      life: 0,
-      p: 0,
-      T: 1,
-      k: 0,
-      d: makeFig((combatRandom() * 1e9) | 0),
-      pose: { ...EPOSE.guard },
-      snap: 0,
-      lean: 0,
-      look: pickLook(9),
-      glint: 0,
-      challenger: true,
-    };
-    e.pos = enemyPos(e);
-    G.enemies.push(e);
-    G.so = createStandoff(e, n, G.mode, G.m.parry, G.m.soWin, combatRandom);
-    banner(
-      '挑',
-      changed ? `A challenger in the ${st.n.toLowerCase()}` : 'A challenger blocks the road',
-    );
-    $('waveLbl').textContent = '挑';
-    letterbox(99);
-    sfx.drum();
-    hint(
-      'standoff',
-      'A standoff. Stay still. The instant he draws, cut the way his blade points. Moving early is death.',
-      6500,
-    );
-    captureCheckpoint();
+    standoffPhase.startStandoff(n, changed);
   }
   function updateStandoff(dt: number) {
-    simulateStandoff(
-      G,
-      dt,
-      {
-        nextWave: (n) => {
-          presentationState.lbT = 0;
-          startWave(n, true);
-        },
-        step: () => sfx.step(),
-        draw: () => {
-          sfx.glint();
-          flash(0.2);
-        },
-        late: (e) => playerDie(e, 'late'),
-      },
-      combatRandom,
-    );
+    standoffPhase.update(context, dt);
   }
   function standoffSwipe(dir: Direction) {
-    const so = G.so,
-      outcome = resolveStandoffSwipe(so, dir, !!G.m.axisCut);
-    if (outcome === 'ignore' || !so) return;
-    const e = so.e;
-    if (outcome === 'cut') {
-      const p = e.pos,
-        cx = p.x,
-        cy = p.y - p.h * 0.55,
-        a = DANG[dir],
-        v: [number, number] = [Math.cos(a), Math.sin(a)],
-        M = Math.max(W, H) * 1.3,
-        sc = p.h / 160;
-      e.state = 'dying';
-      e.t = 0;
-      e.cutAng = a;
-      e.shadowTime = 0;
-      e.deathGround = { ...p };
-      if (!G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour') e.deathType = 'scatter';
-      else if (
-        !G.m.bonk &&
-        accessible(EQ.fx) &&
-        ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
-      )
-        e.deathType = 'dissolve';
-      e.k = 0;
-      swingPlayer(dir, true);
-      addSlash(cx - v[0] * M, cy - v[1] * M, cx + v[0] * M, cy + v[1] * M, Math.max(3, 3 * S), 0.6);
-      killFx(cx, cy, a + Math.PI / 2, sc);
-      scraps(cx, cy, 10, sc);
-      ring(cx, cy, p.h * 0.1, p.h * 1.3, 0.5, Math.max(2, 3 * S));
-      stamp('一閃', W / 2, H * 0.3, Math.max(56, 80 * S), true, 1.4);
-      punch(1.08, cx, cy);
-      hitStop = 0.22;
-      flash(0.4);
-      sfx.perfect();
-      combatHaptics.play('slice');
-      G.combo++;
-      bumpCombo();
-      G.kills++;
-      ST.kills++;
-      ST.standoffs++;
-      challenge('k');
-      earn('kill');
-      addScore(
-        Math.round(1000 * comboMult() * G.m.standoff),
-        cx,
-        p.y - p.h * 1.1,
-        '挑',
-        Math.max(22, 28 * S),
-      );
-      saveStats();
-      checkUnlocks();
-    } else {
-      swingPlayer(dir);
-      sfx.whoosh();
-      playerDie(e, outcome);
-    }
+    standoffPhase.onSwipe(context, dir);
   }
   let knocks = 0;
   lifecycle.listen($('shrineK'), 'click', () => {

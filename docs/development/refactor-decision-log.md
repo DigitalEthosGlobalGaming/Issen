@@ -116,6 +116,8 @@
 
 - 2026-10-08 — W2 wave lifecycle move — move deferred wave entry and simulation callbacks into the wave owner with fresh readiness-time views — snapshot feedback ports before asynchronous preparation or rewrite entry timing — all 297 units, three new real API cases and thirteen live trial/save/setup cases pass; seeded scenario entry/update use the production API — revert the wave lifecycle move and driver migration.
 
+- 2026-10-08 — W2 standoff move — retain plain challenger records and existing early/draw/wrong/late windows through explicit construction and feedback ports — import rendering models into gameplay or rewrite standoff timing — all 300 units, three actual controller cases and five real input/save cases pass; seeded standoff driver now calls the phase API — revert the standoff move and scenario migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -325,3 +325,6 @@ inactive gate so returning never overrides player pause or mute.
 Drifting particle catalogs and drawing belong to `rendering/scene/drift-catalog.ts`
 and `drift-renderer.ts`; ambient simulation owns particle identity and motion.
 See [drifting debris](../features/drifting-debris.md) for atlas extension and controls.
+
+`game/phases/standoff.ts` owns challenger setup, draw-window updates and swipe/tap
+resolution, with explicit figure/feedback ports and plain checkpoint records.

@@ -1,3 +1,4 @@
+import { standoffPhaseFixture } from './helpers/runtime-standoff-phase.mjs';
 import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
 import { parseStatistics } from '../../src/platform/saves.ts';
@@ -311,44 +312,21 @@ for (const [type, count] of [
   });
 
 test('standoff, shrine, death and result settlement complete without double rewards', () => {
-  const { run, random } = session();
-  run.cfg = waveConfig(1, run.mode, run.m);
-  run.toSpawn = 1;
-  const enemy = spawnEnemy(run, 2, false, position, random.next);
-  run.state = 'standoff';
-  run.so = createStandoff(enemy, 2, run.mode, 1, 1, random.next);
+  const runtime = session(),
+    { run, random } = runtime;
+  const standoff = standoffPhaseFixture(runtime);
+  standoff.phase.startStandoff(2, false);
+  const enemy = run.so.e;
   let nextWave = 0;
+  standoff.views.startWave = () => {
+    nextWave++;
+  };
   for (let tick = 0; tick < 1000 && run.so && !run.so.fired; tick++)
-    updateStandoff(
-      run,
-      0.01,
-      {
-        nextWave() {
-          nextWave++;
-        },
-        step() {},
-        draw() {},
-        late() {
-          assert.fail('draw window must be observable');
-        },
-      },
-      random.next,
-    );
+    standoff.phase.update(standoff.views, 0.01);
   assert.ok(run.so.fired);
-  assert.equal(resolveStandoffSwipe(run.so, enemy.dir), 'cut');
-  updateStandoff(
-    run,
-    1.5,
-    {
-      nextWave() {
-        nextWave++;
-      },
-      step() {},
-      draw() {},
-      late() {},
-    },
-    random.next,
-  );
+  standoff.phase.onSwipe(standoff.views, enemy.dir);
+  assert.equal(enemy.state, 'dying');
+  standoff.phase.update(standoff.views, 1.5);
   assert.equal(nextWave, 1);
   assert.equal(run.so, null);
   run.state = 'shrine';

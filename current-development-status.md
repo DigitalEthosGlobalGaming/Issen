@@ -40,20 +40,21 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: wave entry and update now also belong to
-`src/game/phases/waves.ts` through createWaveLifecycle. Deferred scene entry reads
-current ports when ready; regeneration, stage/lap, events, profile rewards, initial
-spawns and attacker blessing feedback retain existing order. Three added actual
-API cases cover deferred readiness/current ports, paused update/one clear reward,
-and the charged storm automatic kill boundary. Seeded scenario wave entry/update
-now use this API; kill rules remain a temporary port until their own move.
-Strict types passed; all 297 units passed (wave-lifecycle-final-unit.log).
-`npx playwright test tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/setup-progression.spec.ts --config playwright.rendering-v2.config.ts`:
-all 13 passed (wave-lifecycle-browser.log; terminal confirmed).
-Wave inputs checkpoint 2b6dfe5 had 294 units and twenty real browser cases green.
-Next move standoff/boss/shrine/death controllers and trial encounter start/finish,
-then live router dispatch. No intentional gameplay changes. Full W2/W3/Part 4
-remain pending; do not push develop.
+Latest checkpoint: standoff setup, update, swipe and early tap now belong to
+`src/game/phases/standoff.ts`. Challenger records remain plain; figure construction,
+guard pose, layout and feedback are explicit ports without rendering imports.
+Three actual controller cases cover one successful cut/next wave, early swipe/tap,
+wrong/late failures and scene readiness. Seeded standoff scenarios now call this
+controller. Strict types passed; all 300 units passed (standoff-final-unit.log).
+`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/input.spec.ts --config playwright.rendering-v2.config.ts`:
+all five passed (standoff-browser.log; terminal confirmed). No gameplay change.
+Next move boss/shrine/death controllers and trial encounter start/finish, then
+wire the live router preserving same-frame between/dead cascades. Full W2/W3/
+Part 4 remain pending; develop stays unpushed.
+
+Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
+passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave
+input checkpoint 2b6dfe5: strict, 294 units and twenty real browser cases passed.
 
 Previous run-start checkpoint: 5aee8dd; four actual initialization cases and seeded
 scenario initialization use run-start.ts. Strict, all 290 units and 15 real browser
