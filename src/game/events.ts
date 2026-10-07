@@ -87,6 +87,8 @@ export interface GameEvents {
     alpha: number;
     crow: boolean;
   }>;
+  standoffStarted: Readonly<{ stage: number; changed: boolean }> ;
+  standoffCue: Readonly<{ kind: 'step' | 'draw' | 'exit' }> ;
   standoffResolved: Readonly<
     | { won: false; perfect: false }
     | { won: true; perfect: true; direction: Direction; x: number; y: number; height: number }

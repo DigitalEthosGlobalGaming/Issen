@@ -1,3 +1,4 @@
+import { bindStandoffCues } from '../presentation/standoff-cues.ts';
 import { bindWaveFeedback } from '../presentation/wave-feedback.ts';
 import { createRuntimeUIBase } from '../runtime/ui-base.ts';
 
@@ -186,6 +187,13 @@ export function bindRuntimeReactions(
     setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
     lightningFx: event => presentation.effectSpawner().killFx('bolt', event.x, event.y - event.height * 0.55, -Math.PI / 2, event.height / 160),
     dust: presentation.dust,
+  })));
+
+  foundation.lifecycle.add(bindStandoffCues(events, () => ({
+    banner: ui.banner, hint: ui.hint, letterbox: presentation.letterbox,
+    clearLetterbox: () => { foundation.view.presentationState.lbT = 0; },
+    setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
+    flash: presentation.flash, sfx: foundation.browser.sfx,
   })));
 
   foundation.lifecycle.add(bindWaveProgression(events, () => ({

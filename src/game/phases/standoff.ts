@@ -176,18 +176,7 @@ export function createStandoffPhase<Context>(
     e.pos = enemyPos(e);
     G.enemies.push(e);
     G.so = createStandoff(e, n, G.mode, G.m.parry, G.m.soWin, combatRandom);
-    banner(
-      '挑',
-      changed ? `A challenger in the ${st.n.toLowerCase()}` : 'A challenger blocks the road',
-    );
-    setWaveLabel('挑');
-    letterbox(99);
-    sfx.drum();
-    hint(
-      'standoff',
-      'A standoff. Stay still. The instant he draws, cut the way his blade points. Moving early is death.',
-      6500,
-    );
+    views.events.emit('standoffStarted', { stage: G.stage, changed });
     captureCheckpoint();
   }
   function updateStandoff(dt: number) {
@@ -239,14 +228,11 @@ export function createStandoffPhase<Context>(
       dt,
       {
         nextWave: (n) => {
-          clearLetterbox();
+          views.events.emit('standoffCue', { kind: 'exit' });
           startWave(n, true);
         },
-        step: () => sfx.step(),
-        draw: () => {
-          sfx.glint();
-          flash(0.2);
-        },
+        step: () => views.events.emit('standoffCue', { kind: 'step' }),
+        draw: () => views.events.emit('standoffCue', { kind: 'draw' }),
         late: (e) => {
           playerDie(e, 'late');
           views.events.emit('standoffResolved', { won: false, perfect: false });

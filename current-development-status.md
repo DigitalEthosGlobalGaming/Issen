@@ -61,19 +61,27 @@ Knife persistence now precedes cosmetics within the same call; wave preparation
 and deferred profile settlement keep their original boundaries. Behavior changes
 are recorded in tmp/runtime-refactor/behaviour-changes.md and architecture docs.
 
-Next: apply the isolated challenger entry/transition cue draft from wave-cues-
-preview. Only its events.ts, standoff.ts, runtime/reactions.ts, new presentation/
-standoff-cues.ts and tests/unit/standoff-cues.test.mjs changed beyond this wave
-checkpoint. Its root is stale: never copy all source. Strict and all 375 isolated
-units pass (standoff-cues-draft-typecheck.log / standoff-cues-draft-unit.log).
-Actual deferred entry/twitch/draw/cut/exit test proves frozen snapshots, disposal,
-and identical run/profile/combat RNG with cosmetic cues disabled.
+Wave event checkpoint is committed at f53dc44. Challenger entry/twitch/draw/exit
+cues are now applied through presentation/standoff-cues.ts. Strict and all 375
+actual units pass (standoff-cues-typecheck.log / standoff-cues-unit.log). The exact
+browser command with feature-plan-06, runtime-checkpoint-fixtures and tanto,
+rendering-v2 configuration and retained traces passes all 11 cases
+(standoff-cues-browser.log). No source was changed during either browser run.
+Actual deferred entry/cut/exit isolation proves frozen snapshots, disposal and
+identical run/profile/combat RNG when cosmetic cues are absent. Entry checkpoint,
+transition/wave continuation and cosmetic values retain their original order.
 
-Remaining: boss entry/update/return/heal/deflect/hints and low-level grunt/boss
-audio/flash callbacks, final ownership/adapter audit, all W2 final gates/version/
-docs/checklist. All W3 and Part 4 remain required. Develop is unpushed; push once
-only after full completion. No profiling/benchmarks, store builds, real-save edits
-or lit-only changes.
+Next: boss entry/update/return/heal/deflect/hints and low-level grunt/boss audio/
+flash callbacks. Then finish the ownership/adapter audit, including direct shrine/
+trial unlock sound and their remaining display/progression ports. Current scan
+finds no presentation/rendering imports in src/game (only an items.ts comment).
+Remove obsolete cosmetic phase capabilities/imports separately after event moves.
+The isolated wave-cues-preview root remains stale: never copy all its source.
+Original generation scripts are non-idempotent and already executed.
+
+All W2 final gates/version/docs/checklist remain; all W3 and Part 4 remain
+required. Develop is unpushed; push once only after full completion. No profiling/
+benchmarks, store builds, real-save edits or lit-only changes.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

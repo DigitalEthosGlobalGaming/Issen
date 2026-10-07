@@ -548,3 +548,9 @@ game/progression/encounter-listeners.ts. Deferred wave settlement saves once at
 the original entry boundary. Knife profile persistence now precedes cosmetics
 within the same input call. Rules retain charges, score, lives, combat RNG,
 initial spawns, gap timing, scene adoption and checkpoint boundaries.
+
+Challenger entry and twitch/draw/exit feedback belong in presentation/standoff-
+cues.ts. The phase emits frozen stage/change and transition-kind snapshots before
+its existing checkpoint or wave continuation. Letterbox, banner, label, tutorial,
+step/glint/drum and draw flash remain synchronous cosmetic reactions. The listener
+has no combat/profile/RNG capability; lifecycle disposal removes both subscriptions.
