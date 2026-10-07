@@ -96,6 +96,9 @@ explicit progression sync port before score display.
 `ui/wiring/secrets.ts` owns title tap/sequence counters and pointer gesture binding;
 it reads current statistics through explicit views and invokes progression ports.
 
+`ui/wiring/admin.ts` owns testing-menu wiring and guards, with current profile/run
+views and explicit runtime action ports.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
