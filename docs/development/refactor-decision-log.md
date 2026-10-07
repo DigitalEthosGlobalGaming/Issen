@@ -52,6 +52,8 @@
 
 - 2026-10-08 — W2 composer — name the seven actual runtime layers and preserve foreground bamboo after combat particles — rearranging drawing to match the historical prose — source order is the output contract; explicit-neighbour hooks are validated, and mid-frame insert/removal applies on the next frame — revert the named-composer commit.
 
+- 2026-10-08 — W2 post move — move the unchanged prepared-frame drawing into presentation/post.ts, leaving clock/RNG advancement separate — combining state ownership changes with the move — repeated draws must remain isolated; native/trial films and saved encounters pass — revert the post-drawing move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

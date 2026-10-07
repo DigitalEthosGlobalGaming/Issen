@@ -52,7 +52,8 @@ keeps retry available after a failed start. A disposed instance cannot remount.
 scene inputs and drawing ports. Its seven named passes use scene-composer.ts
 with explicit before/after neighbours. Runtime orchestration settles scene readiness
 after drawing; presentation cannot commit pending gameplay continuations.
-`game.ts` remains the composition and orchestration layer. Its private closure
+`presentation/post.ts` owns prepared full-frame drawing; effects advancement
+remains separate from replay. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service
 instances. It connects feature callbacks to audio, persistence, effects and UI.
 It still contains encounter transitions, kill/damage presentation, title secrets,
