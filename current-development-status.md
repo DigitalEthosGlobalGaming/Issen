@@ -10,7 +10,26 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint correction: rush-flow fixture now chooses a single blessing
+Latest checkpoint: boss successful-cut and victory feedback react through
+presentation/boss-feedback.ts. bossCut carries direction/automatic/position;
+bossDefeated adds flat effect/ground position and crow projection. Rules retain
+HP, animation, death records, hit stop, combo/score/rewards, life recovery and phase.
+Listeners reproduce original slash lengths, effects, stamp, camera, audio/haptics,
+bar visibility and grounded stain. Current profile reactions remain registered
+before cosmetic reactions; persistence follows synchronous delivery.
+Strict types and all 363 units pass (boss-feedback-typecheck.log,
+boss-feedback-unit.log). Actual parry/block/cut/defeat outcomes, profiles and
+gameplay RNG match with cosmetic listeners enabled/disabled; geometry/disposal
+coverage includes automatic cut length and grounded victory stain.
+`npx playwright test tests/browser/boss-variety.spec.ts tests/browser/encounter-flow.spec.ts tests/browser/trials.spec.ts tests/browser/tanto.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 11 pass on the full retry in 1.6m (boss-feedback-browser-retry.log;
+terminal confirmed). Original run was ten pass/one proven pre-existing wrong
+fixture; its correction was committed separately as 01f0b53 with baseline proof.
+Next: full browser suite for combined changes, then remaining standoff/damage/wave
+feedback reactions and major phase/session/UI binding reduction. Root is still
+about 2,560 lines. W2/W3/Part 4 remain unfinished; no develop push before final gates.
+
+Previous checkpoint correction:  rush-flow fixture now chooses a single blessing
 before asserting one badge. The first random offer could be Twin blessing,
 which intentionally grants two extra blessings and three badges.
 The original one-badge assertion fails on unchanged pre-refactor ad353b3 with

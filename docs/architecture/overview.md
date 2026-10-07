@@ -449,3 +449,5 @@ presentation/environment-host.ts owns per-game environment state and the artwork
 Profile foundation (statistics/setup/unlocks/daily/trial reconciliation), progression records/initial persistence and equipment loading are owned by game/progression/profile-state.ts. Its phased calls preserve original ordering and profile identity; metadata saves resolve current statistics through an explicit provider. Session variables and run-only sync eligibility remain in the runtime.
 
 presentation/figures-host.ts binds figure rendering, player/companion drawing and encounter cues through current read-only views. It shares the internal figure/pet capabilities while retaining each owner's existing API and composer order.
+
+Successful boss cuts emit bossCut with flat direction/automatic/position values. bossDefeated projects grounded position and crow selection as values. presentation/boss-feedback.ts owns their cut/victory effects, audio/haptics, camera and boss-bar reaction; rules retain HP/death records, hit stop, rewards and phases. Synchronous progression listeners precede presentation and subsequent profile persistence.

@@ -1,3 +1,4 @@
+import { bindBossFeedback } from './presentation/boss-feedback.ts';
 import { createFiguresHost } from './presentation/figures-host.ts';
 import { bossShownDirection } from './game/encounters/boss-openings.ts';
 import { createProfileFoundation, createProfileProgress, createProfileEquipment } from './game/progression/profile-state.ts';
@@ -1246,6 +1247,13 @@ export function startGame(
     bindCombatProgression(context.events, () => ({ ST, bst, challenge, checkUnlocks })),
   );
   lifecycle.add(bindEncounterProgression(context.events, () => ({ ST, bst, challenge })));
+  lifecycle.add(bindBossFeedback(context.events, () => ({
+    W, H, S, addSlash, killFx, scraps, ring, flash, sfx, combatHaptics,
+    stamp, letterbox, punch, inkBurst,
+    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
+    showBossBar: shown => { $('bossbar').classList.toggle('on', shown); },
+    bossStain: p => { presentationState.fx.stains.push({ x:p.x, y:p.y+p.h*0.01, rx:p.h*0.3, t:0, life:BOSS_SHADOW_DURATION }); },
+  })));
   lifecycle.add(bindDuelFeedback(context.events, () => ({
     S, sparks, ring, flash, sfx, combatHaptics, letterbox, buzz,
     shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },

@@ -365,26 +365,9 @@ export function createBossPhase<Context>(
       if (activeTrial?.duelMaster) b.bp = duelMasterTimings(20 - b.hp);
       renderHp();
       if (!automatic) swingPlayer(dir);
-      const a = DANG[dir],
-        v: [number, number] = [Math.cos(a), Math.sin(a)],
-        len = p.h * (automatic ? 0.55 : 0.9),
-        sc = p.h / 170;
-      addSlash(
-        cx - (v[0] * len) / 2,
-        cy - (v[1] * len) / 2,
-        cx + (v[0] * len) / 2,
-        cy + (v[1] * len) / 2,
-        Math.max(4, p.h * 0.03),
-        0.35,
-      );
-      killFx(cx, cy, a + Math.PI / 2, sc);
-      scraps(cx, cy, 8, sc);
-      ring(cx, cy, p.h * 0.1, p.h * 0.7, 0.35, Math.max(2, 2.5 * S));
-      shake(12 * S);
+      const a = DANG[dir];
+      const cutEvent = { boss: b.def.v, direction: dir, automatic, x: cx, y: cy, height: p.h };
       views.hitStop = 0.08;
-      flash(0.15);
-      sfx.slice();
-      combatHaptics.play('slice');
       G.combo++;
       bumpCombo();
       if (notifications.activeHint === 'parry') hideHint();
@@ -401,22 +384,8 @@ export function createBossPhase<Context>(
           '討取',
           Math.max(22, 28 * S),
         );
-        stamp('討取', W / 2, H * 0.3, Math.max(56, 80 * S), true, 1.6);
-        letterbox(1.3);
-        punch(1.08, cx, cy);
         views.hitStop = 0.25;
-        flash(0.45);
-        addSlash(
-          cx - v[0] * Math.max(W, H) * 1.3,
-          cy - v[1] * Math.max(W, H) * 1.3,
-          cx + v[0] * Math.max(W, H) * 1.3,
-          cy + v[1] * Math.max(W, H) * 1.3,
-          Math.max(3, 3 * S),
-          0.7,
-        );
-        sfx.bossDie();
         G.petT = 1;
-        if (EQ.pet === 'crow') sfx.caw();
         G.bossesSlain++;
         earn('boss');
         views.runBossMilestone = Math.max(views.runBossMilestone, G.bossCount);
@@ -428,9 +397,7 @@ export function createBossPhase<Context>(
         G.state = 'between';
         G.afterBoss = true;
         G.nextT = 2.2;
-        showBossBar(false);
-        inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
-        bossStain(p);
+        views.events.emit('bossCut', cutEvent);
         views.events.emit('bossDefeated', {
           boss: b.def.v,
           count: G.bossCount,
@@ -440,6 +407,14 @@ export function createBossPhase<Context>(
           rush: G.rush,
           blade: G.blade,
           bossesSlain: G.bossesSlain,
+          direction: dir,
+          x: cx,
+          y: cy,
+          groundY: p.y,
+          height: p.h,
+          fog: p.fog,
+          alpha: p.alpha,
+          crow: EQ.pet === 'crow',
         });
         saveStats();
         checkUnlocks();
@@ -451,6 +426,7 @@ export function createBossPhase<Context>(
           cx,
           p.y - p.h * 1.05,
         );
+        views.events.emit('bossCut', cutEvent);
       }
     } else {
       if (G.m.kage && (b.kageUsed || 0) < G.m.kage) {

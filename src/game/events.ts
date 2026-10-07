@@ -49,6 +49,7 @@ export interface GameEvents {
   block: Readonly<{ boss: string; perfect: boolean; x: number; y: number; height: number }>;
   waveStarted: Readonly<{ wave: number; stage: number }>;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
+  bossCut: Readonly<{ boss: string; direction: Direction; automatic: boolean; x: number; y: number; height: number }>;
   bossStarted: Readonly<{ boss: string; count: number }>;
   bossDefeated: Readonly<{
     boss: string;
@@ -59,6 +60,14 @@ export interface GameEvents {
     rush: boolean;
     blade: boolean;
     bossesSlain: number;
+    direction: Direction;
+    x: number;
+    y: number;
+    groundY: number;
+    height: number;
+    fog: number;
+    alpha: number;
+    crow: boolean;
   }>;
   standoffResolved: Readonly<{ won: boolean; perfect: boolean }>;
   comboChanged: Readonly<{ combo: number; maximum: number; zen?: boolean }>;

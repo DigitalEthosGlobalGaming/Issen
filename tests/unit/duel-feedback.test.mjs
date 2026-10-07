@@ -1,3 +1,4 @@
+import { bindBossFeedback } from '../../src/presentation/boss-feedback.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bindDuelFeedback } from '../../src/presentation/duel-feedback.ts';
@@ -14,11 +15,27 @@ function feedback(calls, visual) {
     };
   return {
     S: 1,
+    W: 390,
+    H: 844,
+    addSlash: call('slash'),
+    killFx: call('killFx'),
+    scraps: call('scraps'),
+    stamp: call('stamp'),
+    punch: call('punch'),
+    inkBurst: call('inkBurst'),
+    bossStain: call('stain'),
+    showBossBar: call('bossbar'),
     sparks: call('sparks'),
     ring: call('ring'),
     shake: call('shake'),
     flash: call('flash'),
-    sfx: { clang: call('clang'), block: call('block') },
+    sfx: {
+      clang: call('clang'),
+      block: call('block'),
+      slice: call('slice'),
+      bossDie: call('bossDie'),
+      caw: call('caw'),
+    },
     combatHaptics: { play: call('haptic') },
     letterbox: call('letterbox'),
     buzz: call('buzz'),
@@ -42,7 +59,7 @@ test('duel reactions preserve the original sword-tip effects and dispose both su
   events.emit('block', {});
   assert.deepEqual(calls, []);
 });
-test('actual parry/block/defeat outcomes and gameplay RNG match with cosmetic listeners enabled or disabled', () => {
+test('actual parry/block/cut/defeat outcomes and gameplay RNG match with cosmetic listeners enabled or disabled', () => {
   function drive(enabled) {
     const runtime = runStartSession(5477, {
       mode: 'waves',
@@ -54,7 +71,10 @@ test('actual parry/block/defeat outcomes and gameplay RNG match with cosmetic li
     const f = bossPhaseFixture(runtime),
       calls = [],
       visual = restorableRng(765);
-    if (enabled) bindDuelFeedback(runtime.views.events, () => feedback(calls, visual));
+    if (enabled) {
+      bindDuelFeedback(runtime.views.events, () => feedback(calls, visual));
+      bindBossFeedback(runtime.views.events, () => feedback(calls, visual));
+    }
     f.phase.startBoss();
     const b = runtime.run.boss;
     b.state = 'flash';
@@ -80,4 +100,42 @@ test('actual parry/block/defeat outcomes and gameplay RNG match with cosmetic li
   assert.notEqual(enabled.visual, disabled.visual);
   assert.ok(enabled.calls.length > 0);
   assert.equal(disabled.calls.length, 0);
+});
+
+test('boss cut/victory listeners retain automatic cut geometry, grounded stain and disposal', () => {
+  const events = createEventBus(),
+    calls = [],
+    visual = restorableRng(45);
+  const off = bindBossFeedback(events, () => feedback(calls, visual));
+  events.emit('bossCut', { direction: 'right', automatic: true, x: 10, y: 20, height: 100 });
+  const slash = calls.find((c) => c[0] === 'slash');
+  assert.ok(Math.abs(slash[1] - -17.5) < 1e-10);
+  assert.ok(Math.abs(slash[3] - 37.5) < 1e-10);
+  assert.equal(slash[2], 20);
+  assert.equal(slash[4], 20);
+  calls.length = 0;
+  events.emit('bossDefeated', {
+    direction: 'right',
+    x: 10,
+    y: 20,
+    groundY: 75,
+    height: 100,
+    fog: 0.2,
+    alpha: 0.8,
+    crow: true,
+  });
+  assert.deepEqual(
+    calls.find((c) => c[0] === 'stain'),
+    ['stain', { x: 10, y: 75, h: 100, fog: 0.2, alpha: 0.8 }],
+  );
+  assert.ok(calls.some((c) => c[0] === 'caw'));
+  assert.deepEqual(
+    calls.find((c) => c[0] === 'bossbar'),
+    ['bossbar', false],
+  );
+  off();
+  calls.length = 0;
+  events.emit('bossCut', {});
+  events.emit('bossDefeated', {});
+  assert.deepEqual(calls, []);
 });
