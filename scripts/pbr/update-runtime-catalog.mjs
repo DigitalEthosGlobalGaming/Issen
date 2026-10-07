@@ -47,14 +47,14 @@ export async function generateRuntimeCatalog(root = path.resolve(import.meta.dir
       ? job
       : JSON.parse(await readFile(path.join(root, job.output, 'generation.json'), 'utf8'));
     const stem = path.basename(pack.source, '.png');
-    const source = await existing(root, [pack.source.replace(/\.png$/, '.webp'), pack.source]);
+    const source = await existing(root, [pack.source.replace(/\.png$/, '.compact.png'), pack.source.replace(/\.png$/, '.webp'), pack.source]);
     lines.push(
       `{ sourcePath: ${JSON.stringify(pack.source)}, source: new URL(${JSON.stringify(relative(source))}, import.meta.url).href, dimensions: [${pack.dimensions}] as const, maps: {`,
     );
     for (const kind of ['diffuse', 'normal', 'surface', 'emissive']) {
       const plane = await existing(
         root,
-        ['webp', 'png'].map((ext) => `${pack.output}/${stem}_${kind}.${ext}`),
+        ['compact.png', 'webp', 'png'].map((ext) => `${pack.output}/${stem}_${kind}.${ext}`),
         kind !== 'emissive',
       );
       if (kind === 'emissive' && plane?.endsWith('.png') && zeroEmission.has(plane)) {

@@ -37,6 +37,41 @@ class CompactionTests(unittest.TestCase):
         from io import BytesIO
         self.assertEqual(Image.open(BytesIO(encoded)).convert('RGBA').tobytes(), image.tobytes())
 
+    def test_png_exception_preserves_pixels_metadata_and_idempotence(self):
+        from PIL.PngImagePlugin import PngInfo
+        from io import BytesIO
+        with tempfile.TemporaryDirectory(dir=TEST_TMP) as temp:
+            root = Path(temp)
+            source = root/'src/tiny.png'
+            source.parent.mkdir()
+            image = Image.new('RGBA', (1,1), (20,60,120,127))
+            metadata = PngInfo()
+            metadata.add_text('provenance', 'temporary test metadata')
+            metadata.add(b'gAMA', bytes.fromhex('0000b18f'))
+            image.save(source, pnginfo=metadata)
+            original = source.read_bytes()
+            optimized = compact.optimized_png(original, Image.open(BytesIO(original)))
+            self.assertEqual(Image.open(BytesIO(optimized)).convert('RGBA').tobytes(), image.tobytes())
+            self.assertNotIn(b'provenance', optimized)
+            self.assertIn(b'gAMA', optimized)
+            # Force a valid but larger WebP to exercise the size-fallback path.
+            from unittest.mock import patch
+            real_encode = compact.encode
+            def padded_encode(image, data):
+                encoded, settings = real_encode(image, data)
+                return encoded + bytes(1000), settings
+            with patch.object(compact, 'encode', padded_encode):
+                manifest = compact.run(root, True, retain_generated_png=True)
+                record = manifest['files'][0]
+                self.assertEqual(record['encoding']['format'], 'png')
+                self.assertTrue(record['newPath'].endswith('.compact.png'))
+                self.assertEqual(source.read_bytes(), original)
+                self.assertLess(record['sizeAfter'], record['sizeBefore'])
+                path = root/'scripts/assets/compaction-manifest.json'
+                first = path.read_bytes()
+                compact.run(root, True, retain_generated_png=True)
+                self.assertEqual(path.read_bytes(), first)
+
     def test_apply_preserves_authoring_and_is_idempotent(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP) as temp:
             root = Path(temp)

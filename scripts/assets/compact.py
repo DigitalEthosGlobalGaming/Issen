@@ -10,6 +10,9 @@ import json
 from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageChops
+from PIL.PngImagePlugin import PngInfo
+import struct
+import zlib
 
 
 def digest(data):
@@ -61,10 +64,56 @@ def encode(image, data):
     raise ValueError('No WebP encoding preserves the required decoded values')
 
 
+def optimized_png(original, image):
+    # Preserve critical chunks and colour interpretation, remove metadata only.
+    chunks, offset = [], 8
+    while offset < len(original):
+        length = struct.unpack('>I', original[offset:offset+4])[0]
+        kind = original[offset+4:offset+8]
+        payload = original[offset+8:offset+8+length]
+        chunks.append((kind, payload))
+        offset += length + 12
+    keep = {b'IHDR', b'PLTE', b'tRNS', b'IDAT', b'IEND', b'iCCP', b'sRGB', b'gAMA', b'cHRM', b'sBIT'}
+    if any(kind in {b'acTL', b'fcTL', b'fdAT'} for kind, _ in chunks):
+        raise ValueError('Animated PNG compaction is unsupported')
+    def chunk(kind, payload):
+        return struct.pack('>I', len(payload))+kind+payload+struct.pack('>I', zlib.crc32(kind+payload))
+    compressed = zlib.compress(zlib.decompress(b''.join(payload for kind, payload in chunks if kind == b'IDAT')), 9)
+    parts, emitted = [], False
+    for kind, payload in chunks:
+        if kind not in keep: continue
+        if kind == b'IDAT':
+            if emitted: continue
+            payload, emitted = compressed, True
+        parts.append(chunk(kind, payload))
+    candidates = [b'\x89PNG\r\n\x1a\n'+b''.join(parts)]
+    metadata = PngInfo()
+    for kind, payload in chunks:
+        if kind in {b'iCCP', b'sRGB', b'gAMA', b'cHRM', b'sBIT'}:
+            metadata.add(kind, payload)
+    buffer = BytesIO()
+    options = {'pnginfo': metadata, 'optimize': True, 'compress_level': 9}
+    if 'transparency' in image.info: options['transparency'] = image.info['transparency']
+    image.save(buffer, 'PNG', **options)
+    candidates.append(buffer.getvalue())
+    valid = [candidate for candidate in candidates if errors(image, Image.open(BytesIO(candidate)), True)]
+    if not valid: raise ValueError('PNG recompression changed decoded values')
+    return min(valid, key=len)
+
+
+def reusable(record):
+    return record.get('encoding', {}).get('format') == 'png' or record['sizeAfter'] < record['sizeBefore']
+
+
 def encode_file(source, data):
     original = source.read_bytes()
     with Image.open(BytesIO(original)) as image:
         encoded, encoding = encode(image, data)
+        if len(encoded) >= len(original):
+            png = optimized_png(original, image)
+            if len(png) <= len(encoded):
+                encoded = png
+                encoding = {'format': 'png', 'lossless': True, 'meanError': [0,0,0], 'maxError': [0,0,0]}
         return encoded, encoding, list(image.size), digest(original)
 
 
@@ -74,7 +123,7 @@ def pending_encodings(root, files, records, generated, removals, untouched):
         if source in removals or source in untouched:
             continue
         old = records.get(source.relative_to(root).as_posix())
-        if old and old['originalHash'] == digest(source.read_bytes()) and old.get('newPath'):
+        if old and old['originalHash'] == digest(source.read_bytes()) and old.get('newPath') and reusable(old):
             target = root/old['newPath']
             target.resolve().relative_to(root.resolve())
             if target.exists() and digest(target.read_bytes()) == old['newHash']:
@@ -114,7 +163,7 @@ def run(root, apply, retain_generated_png=False, workers=4):
         if files['emissive'].exists():
             with Image.open(files['emissive']) as image:
                 if zero_emission(image): removals[files['emissive']] = 'zero-emission'
-    files = sorted({p for folder in ['src', 'public'] for p in (root/folder).rglob('*.png')})
+    files = sorted({p for folder in ['src', 'public'] for p in (root/folder).rglob('*.png') if not p.name.endswith('.compact.png')})
     changed = 0
     # Workers only encode and validate independent images. The parent commits
     # outputs and manifest entries in deterministic filename order. Prefetch is
@@ -140,7 +189,7 @@ def run(root, apply, retain_generated_png=False, workers=4):
                 if retain_generated_png and source in removals and old['action'] == removals[source]:
                     continue
                 target = root/old['newPath'] if old.get('newPath') else None
-                if target and target.exists() and digest(target.read_bytes()) == old['newHash']:
+                if target and reusable(old) and target.exists() and digest(target.read_bytes()) == old['newHash']:
                     if source in generated and apply and not retain_generated_png:
                         source.unlink()
                         changed += 1
@@ -156,9 +205,9 @@ def run(root, apply, retain_generated_png=False, workers=4):
                 if encoded_hash != original_hash:
                     raise ValueError(f'Source changed during encoding: {rel}')
                 schedule()
-                target = source.with_suffix('.webp')
+                target = source.with_suffix('.webp' if encoding['format'] == 'webp' else '.compact.png')
                 if target.exists() and digest(target.read_bytes()) != digest(encoded) and (not old or digest(target.read_bytes()) != old.get('newHash')):
-                    raise ValueError(f'Refusing to overwrite an unrelated WebP: {rel}')
+                    raise ValueError(f'Refusing to overwrite an unrelated compact output: {rel}')
                 record = {'originalPath':rel, 'originalHash':original_hash, 'sizeBefore':len(original),
                           'sizeAfter':len(encoded), 'action':'replace-generated' if source in generated else 'retain-authoring',
                           'newPath':target.relative_to(root).as_posix(), 'newHash':digest(encoded),
@@ -173,7 +222,15 @@ def run(root, apply, retain_generated_png=False, workers=4):
                 if backup.exists() and digest(backup.read_bytes()) != original_hash:
                     raise ValueError(f'Hash-addressed backup differs: {rel}')
                 if not backup.exists(): backup.write_bytes(original)
-                if encoded is not None: target.write_bytes(encoded)
+                if encoded is not None:
+                    if old and old.get('newPath') and old['newPath'] != record['newPath']:
+                        superseded = root/old['newPath']
+                        superseded.resolve().relative_to(root.resolve())
+                        if superseded.exists():
+                            if digest(superseded.read_bytes()) != old['newHash']:
+                                raise ValueError(f'Superseded output changed: {rel}')
+                            superseded.unlink()
+                    target.write_bytes(encoded)
                 if source in generated and not retain_generated_png: source.unlink()
             records[rel] = record
             if apply:

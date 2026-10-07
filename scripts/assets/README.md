@@ -14,7 +14,9 @@ node --test tests/unit/asset-compaction.test.mjs
 ```
 
 The tool never resizes, crops, repacks or deletes authoring colour artwork.
-Runtime consumers use aligned WebP siblings. Generated scalar maps are removable
+Runtime consumers use aligned WebP siblings, or `.compact.png` siblings when
+WebP would increase size. PNG exceptions strip non-pixel ancillary metadata and
+recompress losslessly, preserving colour interpretation and exact decoded RGBA. Generated scalar maps are removable
 only when decoded surface channels match exactly. Missing emissive means zero;
 only maps with zero RGB everywhere alpha is positive are omitted. Transparent
 hidden colour does not count as emission.

@@ -32,7 +32,7 @@ export async function refreshPackDocs(root = path.resolve(import.meta.dirname, '
       const maps = [];
       for (const kind of ['diffuse', 'normal', 'surface', 'emissive']) {
         let plane;
-        for (const ext of ['webp', 'png']) {
+        for (const ext of ['compact.png', 'webp', 'png']) {
           const file = `${stem}_${kind}.${ext}`;
           try {
             await access(path.join(directory, file));

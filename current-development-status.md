@@ -9,7 +9,7 @@ Restore point: `pre-refactor` at `ad353b3`, pushed successfully from clean devel
 after confirming it matched origin. Never modify that branch. Develop has not
 been pushed; runtime version is still 1.66.7.
 
-## Current work: W1 staged conversion is live
+## Current work: W1 staged conversion complete; pixel verification next
 
 - W1.0 audit: `tmp/asset-compaction/audit.md` and `audit.json`. All 86 families
   have exact scalar-to-surface channel equality; 78 emissive maps are zero.
@@ -26,24 +26,27 @@ been pushed; runtime version is still 1.66.7.
   retained. Bounded encoding workers are committed in `73562da`; workers only
   encode/read while the parent writes outputs and manifest entries in filename
   order. Default worker count is four, configurable with `ISSEN_ASSET_WORKERS`.
-- The resumed converter is running:
-  `node scripts/assets/compact.mjs --apply --retain-generated-png`.
-  It uses a Pillow-enabled `ISSEN_PYTHON`. Log:
-  `tmp/asset-compaction/conversion-workers.log`. Durable conversion records:
-  `scripts/assets/compaction-manifest.json`. Original backups:
-  `tmp/asset-compaction/originals/`. Original authoring PNGs remain checked in.
-- The active execution handle is recorded in ignored
-  `tmp/asset-compaction/conversion-process.json`. Poll that actual handle to prove
-  whether it is live. A log/manifest/process record alone is not proof. Never start
-  a duplicate converter. Only rerun its idempotent command after terminal status
-  has been established. The previous serial execution is terminal.
+- The four-worker staged converter completed successfully (terminal exit 0).
+  A second refinement converted eleven size-regressing WebPs to exact lossless
+  `.compact.png` siblings; all eleven now shrink. Original generated PNGs remain
+  in place and original authoring PNGs are preserved. No converter is live.
+  Logs: `tmp/asset-compaction/conversion-workers.log`, `png-exceptions.log`.
+  Staged repeat-run: zero changes. Every-plane raw browser check passed for
+  all 352 conversions (180 exact data planes), with alpha/dimensions unchanged.
+  Strict TypeScript also passed. Next:
+  commit validated added outputs separately, then migrate URLs and remove generated
+  PNGs in distinct commits. All W2/W3 and final verification remain required.
+  New focused utility checks: six Python and four Node tests pass, including
+  exact PNG metadata/pixels and idempotence. No tolerances were relaxed.
+  Matched restore-point web/Android byte baselines are recorded in
+  `tmp/asset-compaction/restore-baseline-build-bytes.json`; both builds passed.
 - Early colour atlases required lossless WebP to satisfy the unchanged tolerances.
   No dimensions, alpha or data channels are relaxed. Early byte counts are partial;
   final source/bundle/APK projections must wait for conversion and verification.
 - Missing emissive now follows the same coverage and blend mode as an explicit
   opaque zero map. This preserves additive emission and source-over occlusion.
   The new exact parity test covers seven blend modes. No gameplay changes.
-- Generator maintenance now hash-checks staged zero-emission omissions, so regenerated PNGs and emitting WebPs remain in the catalog. Changed future exports preserve the initial original backup and receive a separate hash-addressed backup. Installation refreshes compact-plane README links while preserving recipes and shared-folder families. All five Python compaction tests and four focused Node loader/catalog/documentation tests passed. Node syntax checks passed. These changes affect future utility invocations; the current one-off conversion remains live and its original inputs have not changed.
+- Generator maintenance now hash-checks staged zero-emission omissions, so regenerated PNGs and emitting WebPs remain in the catalog. Changed future exports preserve the initial original backup and receive a separate hash-addressed backup. Installation refreshes compact-plane README links while preserving recipes and shared-folder families. All five Python compaction tests and four focused Node loader/catalog/documentation tests passed. Node syntax checks passed. These changes affect future utility invocations; the initial conversion is complete and its original inputs have not changed.
 
 ## Verification already completed
 

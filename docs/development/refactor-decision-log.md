@@ -16,6 +16,9 @@
 - 2026-10-07 — W1 regeneration — preserve initial backups and store changed later inputs under hash-addressed regenerated-originals — overwriting restore inputs or rejecting all changed exports — future material generation must remain usable without destroying the original restore evidence — revert the backup-maintenance commit; both original versions stay under ignored tmp.
 - 2026-10-07 — W1 documentation — refresh installed plane links after compaction with shared-directory grouping — leaving six-map links after removal — future installs must document only the runtime planes while keeping recipes, source links and provenance — revert the documentation utility commit.
 
+- 2026-10-07 — W1 encoding — use lossless `.compact.png` runtime siblings for eleven small colour assets whose tolerance-valid WebP increased bytes — larger WebP or relaxed colour tolerances — lossless recompression makes all eleven smaller, preserves authoring originals, colour chunks and pixel placement — restore manifest targets and remove compact siblings.
+- 2026-10-07 — W1 byte baseline — build `pre-refactor` in an isolated ignored detached checkout with linked dependencies — stale dist/APK inventories or the post-loader baseline — matched original web and Android web builds establish 261,053,490 and 284,964,042 total bytes, each with 258,901,059 image bytes — discard ignored verification outputs.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
