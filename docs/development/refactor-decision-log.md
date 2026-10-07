@@ -142,6 +142,8 @@
 
 - 2026-10-08 — W2 state foundation — retain state/t on plain records, validate states always and let owners advance specialized clocks before table dispatch; derive registry types from existing data in stable first-match order — add serialized discriminants or increment a universal timer twice — strict and all 330 units pass, with four actual dispatcher/registry cases; character wiring is the next step — revert the unwired foundation modules/tests.
 
+- 2026-10-08 — W2 grunt tables — derive feint/Zen/Still/base behaviours from existing fields and dispatch six states through tables, preserving clocks and shared pose finishing — add serialized type fields or change feint/foxfire frame ordering — strict, all 337 units and twenty-one live browser cases pass, with seven state/API cases; the old update export is temporarily a thin adapter — revert the grunt table integration while retaining the independent foundation/models.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

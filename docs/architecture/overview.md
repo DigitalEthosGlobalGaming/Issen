@@ -131,7 +131,20 @@ game/state-machine.ts supplies typed plain-record table dispatch, transition
 validation and entry/exit/next hooks. Each character owner advances its own clock
 before dispatch to preserve freeze/hazards and raw shadow timing. The ordered
 game/behaviour-registry.ts matches existing record data, retaining checkpoint
-shapes. Character tables are not wired yet.
+shapes. game/combat/grunt.ts now dispatches enter/idle/attack/strike/dying/fade through
+the registry's feint/Zen/Still/base tables. Shared finishing preserves pose/timer
+ordering when rule callbacks change state in the same frame. updateEnemies is a
+temporary adapter while callers migrate; boss/player tables remain next.
+
+### Adding an enemy behaviour
+
+Keep checkpoint-compatible plain records. Register a named behaviour in the
+ordered registry, using a predicate over existing record data and a state machine
+whose table covers every saved state. Put specific matches before the final base
+match. Override only the relevant state handlers (the feint table overrides attack
+and composes its Zen strike handling); shared clocks and finishing remain in the
+owner. New types need a registry entry, without a type branch in the update loop.
+Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects.
 
 ## Where changes belong
 

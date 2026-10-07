@@ -92,19 +92,26 @@ owners advance freeze/hazard/raw clocks before dispatch. behaviour-registry.ts
 provides stable ordered matching by existing record data with duplicate/unknown
 type validation. Four real API cases cover timer/hook ordering, invalid restored
 states, single dispatch and registry extension without serialized type fields.
-Strict types and all 330 units passed (state-foundation-*.log). Foundation is not
-wired to characters yet; model browser coverage remains seventeen cases green.
-Next: actual grunt/boss tables, migrating old
-update/spawn/idle adapters before removing them separately. Player/companions,
-results ownership, remaining phase/run events and root reduction still follow.
+State foundation checkpoint 6161d28: strict and all 330 units passed.
+Live grunt tables now own enter/idle/attack/strike/dying/fade in game/combat/grunt.ts.
+The registry derives feint/Zen/Still/base variants from existing flags, with no
+serialized type field. Owner clocks retain attack freeze/surge, life and raw shadows;
+shared pose finishing retains the old feint-switch frame and same-frame foxfire
+non-split death pose. Existing updateEnemies remains a thin compatibility adapter.
+Seven actual API cases cover every state, variants, deadlines, damage and foxfire.
+Strict types and all 337 units passed (grunt-table-*.log), including seeded scenarios
+and legacy checkpoint unit fixtures.
+`npx playwright test tests/browser/new-blessings.spec.ts tests/browser/death-presentation.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/trials.spec.ts tests/browser/feature-plan-04.spec.ts --config playwright.rendering-v2.config.ts`:
+all 21 passed (1.6m, grunt-table-browser.log, terminal confirmed).
+Next: migrate old update/spawn callers and retain thin adapters until migration;
+remove unused adapters separately. Then boss tables/registry and player animation
+states/companions. Results/reward orchestration, remaining phase/run events and
+composition-root reduction remain required. No timing/balance/save changes.
 W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.
-Prepared drafts under tmp/runtime-refactor/drafts: model move already RUN (do not
-repeat); state-machine-draft and state-machine-tests-draft are already RUN; grunt-table-draft
-and grunt-tests-draft remain NOT applied to develop. In isolated table-preview-e1c67d8d,
-these passed strict types and all 31 targeted cases, including seven grunt cases
-and same-frame foxfire dying pose (table-preview-*.log). Repeat checks after live
-application; isolated preview is preparation, not a develop checkpoint.
+Prepared drafts under tmp/runtime-refactor/drafts: model move, state foundation,
+grunt table and grunt tests are all RUN (do not repeat physical scripts).
 move-results-draft is NOT applied; refresh its capture audit before the later move.
+Ignored isolated previews were preparation only; actual develop checks above pass.
 Earlier checkpoint b360675: between controller, strict/all 316 units and
 ten actual trial/save browser cases passed (between-*.log).
 Then state tables/registry, player/companions, results/reward ownership and root
