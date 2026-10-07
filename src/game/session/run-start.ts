@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { resetRun, type RunState, type Screen } from '../run-state.ts';
 import { normalLives } from '../equipment/lives.ts';
 import { recordSecretEvent } from '../progression/secret-events.ts';
@@ -28,6 +29,7 @@ import type { Statistics } from '../progression/statistics.ts';
 import type { ItemCategory } from '../content/items.ts';
 
 export interface RunStartViews<Pose extends object, Reveal> {
+  readonly events: RuleEvents;
   readonly $: (id: string) => HTMLElement;
   readonly G: RunState;
   readonly META: MetaProgress;
@@ -188,6 +190,10 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
     G.pauseN = 0;
     G.state = 'playing';
     prepareScene();
+    views.events.emit('runStarted', {
+      seed: G.seed,
+      mode: views.activeTrial ? 'trial' : views.activeDaily ? 'daily' : G.rush ? 'rush' : G.mode,
+    });
     if (views.activeTrial) {
       startTrialEncounter();
       setScore();

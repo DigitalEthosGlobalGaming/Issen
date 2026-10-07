@@ -7,6 +7,7 @@ export function waveLifecycleFixture(session) {
     trace = [],
     pending = [];
   const views = {
+    events: session.views.events,
     G,
     ST: session.views.ST,
     W: 200,

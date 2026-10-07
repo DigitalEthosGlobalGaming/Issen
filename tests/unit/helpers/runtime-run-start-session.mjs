@@ -1,3 +1,4 @@
+import { createEventBus } from '../../../src/game/events.ts';
 import { createRunStart } from '../../../src/game/session/run-start.ts';
 import { createRunState } from '../../../src/game/run-state.ts';
 import { parseMeta, templateModifiers } from '../../../src/game/progression/meta.ts';
@@ -22,6 +23,7 @@ export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, star
   const trace = [],
     weather = createWeatherState(() => 0.5);
   const views = {
+    events: createEventBus(),
     $: () => ({ classList: { remove() {} } }),
     G,
     META,

@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { STAGES } from '../content/stages.ts';
 import { startBlessingWave, nextBlessingAttacker } from '../shrine/triggered.ts';
 import { recoverAfterWave } from '../progression/run-powers.ts';
@@ -16,6 +17,7 @@ import type { Statistics } from '../progression/statistics.ts';
 import type { TrialDefinition } from '../content/trials.ts';
 
 export interface WavesViews {
+  readonly events: RuleEvents;
   readonly G: RunState;
   readonly W: number;
   readonly ST: Statistics;
@@ -149,6 +151,7 @@ export function createWavesPhase<Context>(
 
 export interface WaveLifecycleViews extends Pick<
   WavesViews,
+  | 'events'
   | 'G'
   | 'ST'
   | 'W'
@@ -348,6 +351,7 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
         hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
       if (ev === 'fog')
         hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
+      readViews().events.emit('waveStarted', { wave: G.wave, stage: G.stage });
       captureCheckpoint();
     };
     if (!deferUntilSceneReady(begin)) begin();
@@ -411,6 +415,7 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
             pop(W / 2, H * 0.4, 'Recovery +1 life');
           }
           addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
+          readViews().events.emit('waveCleared', { wave: G.wave, stage: G.stage, score: G.score });
         },
       },
       combatRandom,

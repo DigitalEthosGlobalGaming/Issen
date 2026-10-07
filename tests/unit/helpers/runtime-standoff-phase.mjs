@@ -7,6 +7,7 @@ export function standoffPhaseFixture(session) {
   const G = session.run,
     trace = [];
   const views = {
+    events: session.views.events,
     G,
     ST: session.views.ST,
     EQ: session.views.EQ,

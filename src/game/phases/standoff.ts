@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { definePhase } from '../session/phase-router.ts';
 import { STAGES } from '../content/stages.ts';
 import { DIRS, DANG, type Direction } from '../../shared/directions.ts';
@@ -13,6 +14,7 @@ import type { Equipment } from '../../platform/saves.ts';
 import type { Statistics, BladeStats } from '../progression/statistics.ts';
 
 export interface StandoffViews {
+  readonly events: RuleEvents;
   readonly deferUntilSceneReady: (action: () => void) => boolean;
   readonly G: RunState;
   readonly waveCfg: (w: number) => {
@@ -245,7 +247,10 @@ export function createStandoffPhase<Context>(
           sfx.glint();
           flash(0.2);
         },
-        late: (e) => playerDie(e, 'late'),
+        late: (e) => {
+          playerDie(e, 'late');
+          views.events.emit('standoffResolved', { won: false, perfect: false });
+        },
       },
       combatRandom,
     );
@@ -346,10 +351,12 @@ export function createStandoffPhase<Context>(
       );
       saveStats();
       checkUnlocks();
+      views.events.emit('standoffResolved', { won: true, perfect: true });
     } else {
       swingPlayer(dir);
       sfx.whoosh();
       playerDie(e, outcome);
+      views.events.emit('standoffResolved', { won: false, perfect: false });
     }
   }
   return Object.assign(

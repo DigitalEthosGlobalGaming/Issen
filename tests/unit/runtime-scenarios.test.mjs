@@ -61,7 +61,7 @@ function driveWave(seed, options = setup, trial) {
   const lifecycleFixture = waveLifecycleFixture({
     run,
     random,
-    views: { ST: parseStatistics({}) },
+    views: { ST: parseStatistics({}), events: runtime.views.events },
   });
   if (trial)
     lifecycleFixture.views.waveCfg = (wave) => ({
@@ -76,6 +76,7 @@ function driveWave(seed, options = setup, trial) {
     attacked = 0;
   let cut = null;
   const inputViews = {
+    events: runtime.views.events,
     G: run,
     W: 200,
     ST: parseStatistics({}),

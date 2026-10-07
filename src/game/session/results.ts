@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { STAGES } from '../content/stages.ts';
 import { dailyResult, type DailyRun } from '../progression/daily.ts';
 import { recordRun } from '../progression/run-records.ts';
@@ -27,6 +28,7 @@ import type { ResultReveal, RunResults } from '../../ui/screens/run-results.ts';
 import type { renderGameOver } from '../../ui/screens/game-over.ts';
 
 export interface ResultsViews {
+  readonly events: RuleEvents;
   readonly activeDaily: DailyRun | null;
   readonly G: RunState;
   readonly guided: { reset(): void };
@@ -116,6 +118,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
     G.state = 'over';
     const result = dailyResult(store.get('issen.daily', null), activeDaily.day, G);
     store.set('issen.daily', result.records);
+    views.events.emit('runEnded', { seed: G.seed, score: G.score, reason: G.reason });
     guided.reset();
     audio.setPaused(false);
     views.timeScale = 1;
@@ -234,6 +237,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
     checkUnlocks();
     if (eligible && supportPremium()) rewardLedger.supportMultiplier = 2;
     const reward = settleRunReward(META, rewardLedger);
+    views.events.emit('runEnded', { seed: G.seed, score: G.score, reason: G.reason });
     const pending: PendingSupportReward | null =
       eligible &&
       !supportPremium() &&

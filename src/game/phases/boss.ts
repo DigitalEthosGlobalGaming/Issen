@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { definePhase } from '../session/phase-router.ts';
 import { createBoss } from '../encounters/boss-create.ts';
 import { advanceBoss as simulateBoss } from '../encounters/boss-simulation.ts';
@@ -17,6 +18,7 @@ import type { TrialDefinition } from '../content/trials.ts';
 import type { DailyRun } from '../progression/daily.ts';
 
 export interface BossViews {
+  readonly events: RuleEvents;
   readonly deferUntilSceneReady: (action: () => void) => boolean;
   readonly G: RunState;
   readonly renderLives: () => void;
@@ -157,6 +159,7 @@ export function createBossPhase<Context>(
     if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
     if (def.mirror)
       hint('mirror', 'The Mirror never feints. Cut opposite to his arrow and blade.', 5000);
+    views.events.emit('bossStarted', { boss: def.v, count: G.bossCount });
     captureCheckpoint();
   }
   function updateBoss(dt: number, raw = dt) {
@@ -237,6 +240,14 @@ export function createBossPhase<Context>(
     guided.bossParried();
     bumpCombo();
     addScore(Math.round(60 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05);
+    views.events.emit('parry', {
+      boss: b.def.v,
+      perfect: true,
+      second,
+      x: tw[0],
+      y: tw[1],
+      height: b.pos.h,
+    });
     if (!second)
       hint(
         'parry',
@@ -290,6 +301,13 @@ export function createBossPhase<Context>(
     G.combo++;
     bumpCombo();
     addScore(Math.round(40 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05, 'Blocked');
+    views.events.emit('block', {
+      boss: b.def.v,
+      perfect: false,
+      x: tw[0],
+      y: tw[1],
+      height: b.pos.h,
+    });
     if (notifications.activeHint === 'parry') hideHint();
     hint(
       'chain',
@@ -441,6 +459,7 @@ export function createBossPhase<Context>(
         showBossBar(false);
         inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
         bossStain(p);
+        views.events.emit('bossDefeated', { boss: b.def.v, count: G.bossCount });
         saveStats();
         checkUnlocks();
       } else {

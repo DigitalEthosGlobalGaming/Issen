@@ -120,8 +120,10 @@ restoration and result-display ports.
 and feedback ports. Its createWaveLifecycle owns deferred entry, preparation
 and update/clear boundaries. Boss, standoff, shrine, death and between controllers
 own their encounter rules and dispatch through the live router. Gameplay events
-include phaseChanged, kill/cutChain and score/combo events; remaining phase/run
-emissions are the next step.
+include phaseChanged, kill/cutChain, score/combo, struck, parry/block, wave and
+boss entry/clear, standoff outcome and run entry/terminal settlement. Rule owners
+receive emission-only capabilities; flat frozen parry/block positions are ready
+for presentation light listeners. Checkpoint restore remains silent.
 
 Plain character records use shared/character.ts, seed/pose helpers use
 shared/figure-model.ts, and death style/timing values use shared/character-death.ts.
@@ -137,7 +139,7 @@ ordering when rule callbacks change state in the same frame. Runtime and tests n
 has been removed separately. game/combat/grunt-spawn.ts owns plain construction
 and look selection; all construction consumers call createGrunt directly. The
 unused spawn adapter has been removed; enemy-spawn.ts retains ordering/selection.
-Boss/player tables remain next.
+Boss tables/registry and derived player animation tables are also live (see below).
 
 ### Adding an enemy behaviour
 

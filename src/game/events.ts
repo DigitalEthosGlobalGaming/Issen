@@ -38,8 +38,15 @@ export interface GameEvents {
     height: number;
   }>;
   struck: Readonly<{ reason: string; lives: number; fatal: boolean }>;
-  parry: Readonly<{ boss: string; perfect: boolean }>;
-  block: Readonly<{ boss: string; perfect: boolean }>;
+  parry: Readonly<{
+    boss: string;
+    perfect: boolean;
+    second: boolean;
+    x: number;
+    y: number;
+    height: number;
+  }>;
+  block: Readonly<{ boss: string; perfect: boolean; x: number; y: number; height: number }>;
   waveStarted: Readonly<{ wave: number; stage: number }>;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
   bossStarted: Readonly<{ boss: string; count: number }>;
@@ -97,3 +104,6 @@ export function createEventBus<Events extends object>(): EventBus<Events> {
     },
   };
 }
+
+/** Rule owners receive emission only, without listener management capabilities. */
+export type RuleEvents = Pick<EventBus<GameEvents>, 'emit'>;

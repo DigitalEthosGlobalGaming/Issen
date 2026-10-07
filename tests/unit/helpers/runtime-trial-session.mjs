@@ -11,6 +11,7 @@ export function trialSessionFixture() {
     trace = [],
     records = new Map();
   const views = {
+    events: source.events,
     G: runtime.run,
     TRIAL_PROGRESS: { completed: [] },
     UNL: new Set(),

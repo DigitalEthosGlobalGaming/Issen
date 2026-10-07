@@ -1173,6 +1173,7 @@ export function startGame(
     });
   }
   const { startRun, startDaily, startTrial, nextStep, startRushDuel } = createRunStart({
+    events: context.events,
     $,
     G,
     META,
@@ -1321,6 +1322,7 @@ export function startGame(
     },
   });
   const trialSession = createTrialSession(() => ({
+    events: context.events,
     G,
     TRIAL_PROGRESS,
     UNL,
@@ -1414,6 +1416,7 @@ export function startGame(
           : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
   }
   const waveLifecycle = createWaveLifecycle(() => ({
+    events: context.events,
     G,
     ST,
     W,
@@ -1574,6 +1577,7 @@ export function startGame(
   }
   const wavesPhase = createWavesPhase<GameContext<PresentationContext>>(
     () => ({
+      events: context.events,
       G,
       W,
       ST,
@@ -1624,6 +1628,7 @@ export function startGame(
   /* ---------------- boss ---------------- */
   const bossPhase = createBossPhase<GameContext<PresentationContext>>(
     () => ({
+      events: context.events,
       deferUntilSceneReady,
       G,
       renderLives,
@@ -1738,6 +1743,7 @@ export function startGame(
   /* ---------------- standoff & shrine ---------------- */
   const standoffPhase = createStandoffPhase<GameContext<PresentationContext>>(
     () => ({
+      events: context.events,
       deferUntilSceneReady,
       G,
       waveCfg,
@@ -1880,6 +1886,7 @@ export function startGame(
 
   /* ---------------- death & menus ---------------- */
   const deathPhase = createDeathPhase<GameContext<PresentationContext>>(() => ({
+    events: context.events,
     G,
     get timeScale() {
       return timeScale;
@@ -1962,6 +1969,7 @@ export function startGame(
   lifecycle.add(rewardScreen.dispose);
   let rewardFlowBusy = false;
   const resultsSession = createResultsSession(() => ({
+    events: context.events,
     activeDaily,
     G,
     guided,

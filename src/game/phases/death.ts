@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { createCompanionRevival } from '../player/companions.ts';
 import { definePhase } from '../session/phase-router.ts';
 import { resolveDamage } from '../combat/damage.ts';
@@ -12,6 +13,7 @@ import type { Statistics } from '../progression/statistics.ts';
 import type { TrialDefinition } from '../content/trials.ts';
 
 export interface DeathViews {
+  readonly events: RuleEvents;
   readonly G: RunState;
   timeScale: number;
   readonly breakCombo: () => void;
@@ -88,7 +90,12 @@ export interface DeathViews {
 /** Damage, death timing and revival retain checkpoint-compatible plain records. */
 export function createDeathPhase<Context>(readViews: () => DeathViews) {
   const reviveDaruma = createCompanionRevival(readViews);
-  function struck(killer: Enemy | Boss | null, keep: boolean, label?: string | null) {
+  function struck(
+    killer: Enemy | Boss | null,
+    keep: boolean,
+    label?: string | null,
+    reason = 'struck',
+  ) {
     const views = readViews();
     const {
       G,
@@ -166,6 +173,7 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       if (waveConfiguration().refill && G.toSpawn > 0)
         G.pendingSpawns.push({ slot: killer.slot, t: 1.0 });
     }
+    views.events.emit('struck', { reason, lives: G.lives, fatal: false });
   }
   function playerDie(killer: Enemy | Boss | null, reason: string) {
     const views = readViews();
@@ -229,7 +237,7 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
     renderLives();
     if (outcome.kind === 'hurt') {
       if (outcome.lifeLost) inkPulse(1);
-      struck(killer, outcome.keepCombo, outcome.label);
+      struck(killer, outcome.keepCombo, outcome.label, reason);
       return;
     }
     G.diedInBoss = !!(G.boss && G.boss.state !== 'dying');
@@ -247,6 +255,7 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       killer.state = 'strike';
       killer.t = 0;
     }
+    views.events.emit('struck', { reason, lives: G.lives, fatal: true });
     const p = L.player;
     addSlash(
       p.x + p.h * 0.4,

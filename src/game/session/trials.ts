@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { initialSpawns } from '../encounters/waves.ts';
 import { duelMasterTimings } from '../progression/mastery.ts';
 import {
@@ -20,6 +21,7 @@ export interface TrialOutcome {
   message: string;
 }
 export interface TrialSessionViews {
+  readonly events: RuleEvents;
   readonly G: RunState;
   readonly TRIAL_PROGRESS: TrialProgress;
   readonly UNL: Set<string>;
@@ -175,6 +177,11 @@ export function createTrialSession(readViews: () => TrialSessionViews) {
           ? ''
           : `You landed ${G.perfects} perfect cuts; ${trial.wave?.perfects ?? 0} were required.`),
     };
+    views.events.emit('runEnded', {
+      seed: G.seed,
+      score: G.score,
+      reason: passed ? 'completed' : message || views.trialFailure || 'failed',
+    });
     views.activeTrial = null;
     buildLeaves();
     views.combatRandom = R;
