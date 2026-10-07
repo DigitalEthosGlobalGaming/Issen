@@ -1,3 +1,4 @@
+import { createResultsSession } from './game/session/results.ts';
 import { visiblePet, saveWithFoxfire } from './game/player/companions.ts';
 import { createCombatScore } from './game/progression/combat-score.ts';
 import { bindCombatScoreFeedback } from './presentation/combat-score.ts';
@@ -1955,215 +1956,60 @@ export function startGame(
   function playerDie(killer: Enemy | Boss | null, reason: string) {
     deathPhase.playerDie(killer, reason);
   }
-  function finishDaily() {
-    if (!activeDaily || G.state === 'over') return;
-    G.state = 'over';
-    const result = dailyResult(store.get('issen.daily', null), activeDaily.day, G);
-    store.set('issen.daily', result.records);
-    guided.reset();
-    audio.setPaused(false);
-    timeScale = 1;
-    presentationState.lbT = 0;
-    clearHints();
-    $('bossbar').classList.remove('on');
-    const reward = { before: META.embers, after: META.embers, gained: 0 };
-    renderGameOver($('over'), G, result.record, result.newBest, STAGES[G.stage]!.n, reward, true);
-    $('overSeed').textContent = `Daily · ${activeDaily.day}`;
-    $('oModifier').hidden = true;
-    $('runResultSequence').hidden = true;
-    $('overSummary').hidden = false;
-    $('over').dataset.daily = 'true';
-    showScreen('over');
-    hud(false);
-    G.overReady = true;
-    $('bAgain').disabled = false;
-    clearRunCheckpoint();
-    savedRun = null;
-    updateSavedRunButtons();
-  }
+  function finishDaily() { resultsSession.finishDaily(); }
   const rewardSupport = createRewardedSupport();
   const rewardScreen = createRewardScreen(document.getElementById('app')!);
   lifecycle.add(rewardScreen.dispose);
   let rewardFlowBusy = false;
+  const resultsSession = createResultsSession(() => ({
+    activeDaily,
+    G,
+    guided,
+    audio,
+    get timeScale() { return timeScale; }, set timeScale(value) { timeScale = value; },
+    presentationState,
+    clearHints,
+    $,
+    META,
+    showScreen,
+    hud,
+    get savedRun() { return savedRun; }, set savedRun(value) { savedRun = value; },
+    updateSavedRunButtons,
+    get sceneContinuation() { return sceneContinuation; }, set sceneContinuation(value) { sceneContinuation = value; },
+    get rewardFlowBusy() { return rewardFlowBusy; }, set rewardFlowBusy(value) { rewardFlowBusy = value; },
+    activeTrial,
+    rewardScreen,
+    supportPremium,
+    testerPremium,
+    lifecycle,
+    rewardSupport,
+    captureCheckpoint,
+    reviveDaruma,
+    finishTrial,
+    ST,
+    challenge,
+    saveStats,
+    runBossMilestone,
+    SETUP,
+    checkUnlocks,
+    rewardLedger,
+    runTrialsWasUnlocked,
+    saveMeta,
+    runResults,
+    runItemReveals,
+    setBestLine,
+    toast,
+    modeKey,
+    store,
+    clearRunCheckpoint,
+    renderGameOver,
+  }));
   // Support benefits are independent of Web collection access.
   const supportPremium = () =>
     premium.state.owned || edition === 'premium' || testerPremiumActive(testerPremium);
-  function showOver() {
-    sceneContinuation = undefined;
-    if (rewardFlowBusy) return;
-    const eligible = !activeDaily && !activeTrial && !G.zen;
-    const revive =
-      eligible && !G.hard && G.state === 'dead' && !G.reviveOfferResolved && !G.secondWindUsed;
-    if (revive) {
-      rewardFlowBusy = true;
-      void (async () => {
-        if (revive) {
-          const completed = await rewardScreen.offer(
-            'revive',
-            supportPremium(),
-            testerPremiumActive(testerPremium),
-            Math.max(1, Math.ceil(G.maxLives / 2)),
-          );
-          if (lifecycle.disposed) return;
-          const granted = completed && (await rewardSupport.claim('revive', supportPremium()));
-          if (lifecycle.disposed) return;
-          G.reviveOfferResolved = true;
-          captureCheckpoint('lost');
-          if (granted) {
-            G.secondWindUsed = true;
-            rewardFlowBusy = false;
-            reviveDaruma(false, true);
-            return;
-          }
-        }
-        rewardFlowBusy = false;
-        showOver();
-      })();
-      return;
-    }
-    if (activeDaily) {
-      finishDaily();
-      return;
-    }
-    delete $('over').dataset.daily;
-    if (activeTrial) {
-      finishTrial(G.reason === 'quit' ? 'You ended the attempt.' : 'A mistake ended the trial.');
-      return;
-    }
-    if (G.state === 'over') return;
-    if (G.state !== 'dead') captureCheckpoint('ended');
-    G.state = 'over';
-    guided.reset();
-    audio.setPaused(false);
-    timeScale = 1;
-    presentationState.lbT = 0;
-    clearHints();
-    $('bossbar').classList.remove('on');
-    const { record: rec, newBest: nb } = recordRun(ST, G);
-    challenge('sc', G.score);
-    if (!G.zen) store.set('issen.best', ST.bestScore);
-    saveStats();
-    unlockBossMilestone(META, runBossMilestone, SETUP);
-    checkUnlocks();
-    if (eligible && supportPremium()) rewardLedger.supportMultiplier = 2;
-    const reward = settleRunReward(META, rewardLedger);
-    const pending: PendingSupportReward | null =
-      eligible &&
-      !supportPremium() &&
-      supportEmberBonusAmount(META, rewardLedger.pending) > 0 &&
-      savedRun
-        ? {
-            id: crypto.randomUUID(),
-            hundredths: rewardLedger.pending,
-            reward,
-            checkpoint: structuredClone(savedRun),
-          }
-        : null;
-    if (pending) store.set('issen.supportReward', pending);
-    const modeReveals: ResultReveal[] = pendingModeReveals(META).map((mode) => ({
-      key: '開',
-      name: mode.name,
-      kind: 'mode',
-      description: mode.description,
-    }));
-    if (!runTrialsWasUnlocked && trialsUnlocked(ST.roninWave))
-      modeReveals.push({
-        key: '試',
-        name: 'Trials',
-        kind: 'mode',
-        description: 'Preset challenges are now on the title screen.',
-      });
-    markModeRevealsSeen(META);
-    saveMeta();
-    G.claps = 0;
-    renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled);
-    $('overSeed').textContent = `Seed ${G.seed}`;
-    showScreen('over');
-    hud(false);
-    G.overReady = false;
-    $('bAgain').disabled = true;
-    runResults.start(
-      reward,
-      [...modeReveals, ...runItemReveals],
-      () => {
-        store.remove('issen.supportReward');
-        G.overReady = true;
-        $('bAgain').disabled = false;
-      },
-      pending ? () => claimEmberBonus(pending) : undefined,
-      pending ? supportEmberBonusAmount(META, pending.hundredths) : 0,
-    );
-    setBestLine();
-    clearRunCheckpoint();
-    savedRun = null;
-    updateSavedRunButtons();
-  }
-  async function claimEmberBonus(pending: PendingSupportReward) {
-    const completed = await rewardScreen.offer('embers', false, false, 0);
-    if (lifecycle.disposed || !completed || !(await rewardSupport.claim('embers', false)))
-      return null;
-    if (lifecycle.disposed) return null;
-    const before = { ...META };
-    const bonus = grantSupportEmberBonus(META, pending.id, pending.hundredths);
-    if (!bonus) return null;
-    if (!saveMeta()) {
-      Object.assign(META, before);
-      toast({ k: '!', msg: 'Reward could not be saved. Please try again.' });
-      return null;
-    }
-    store.remove('issen.supportReward');
-    const total = {
-      before: pending.reward.before,
-      gained: pending.reward.gained + bonus.gained,
-      after: bonus.after,
-    };
-    renderGameOver(
-      $('over'),
-      G,
-      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
-      false,
-      STAGES[G.stage]!.n,
-      total,
-      G.upgradesEnabled,
-    );
-    return total;
-  }
-  function recoverSupportReward() {
-    const pending = parsePendingSupport(store.get('issen.supportReward', null));
-    if (!pending || pending.id === META.supportRewardClaim) {
-      store.remove('issen.supportReward');
-      return;
-    }
-    Object.assign(G, pending.checkpoint.run, {
-      bless: new Set(pending.checkpoint.run.bless),
-      state: 'over',
-      panel: null,
-    });
-    renderGameOver(
-      $('over'),
-      G,
-      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
-      false,
-      STAGES[G.stage]!.n,
-      pending.reward,
-      G.upgradesEnabled,
-    );
-    showScreen('over');
-    hud(false);
-    G.overReady = false;
-    $('bAgain').disabled = true;
-    runResults.start(
-      pending.reward,
-      [],
-      () => {
-        store.remove('issen.supportReward');
-        G.overReady = true;
-        $('bAgain').disabled = false;
-      },
-      () => claimEmberBonus(pending),
-      supportEmberBonusAmount(META, pending.hundredths),
-    );
-  }
+  function showOver() { resultsSession.showOver(); }
+  async function claimEmberBonus(pending: PendingSupportReward) { return resultsSession.claimEmberBonus(pending); }
+  function recoverSupportReward() { resultsSession.recoverSupportReward(); }
   const { toTitle, pause, resume, endRun } = createRunFlow({
     $,
     G,

@@ -401,3 +401,9 @@ Companion selection, foxfire rescue and Daruma/Phoenix/support revival are owned
 by game/player/companions.ts with narrow capabilities. Death dispatch retains its
 existing revival priority and timer. Drawing remains presentation work; this
 physical move preserves checkpoint fields and reaction order.
+
+Terminal daily/main-run results, revive offers, support bonus claims and pending
+support recovery are owned by game/session/results.ts through explicit display,
+persistence and reward capabilities. Its actual API drives seeded death/results
+scenarios and settlement/recovery/disposal tests. Trial settlement remains with
+the trial session owner.

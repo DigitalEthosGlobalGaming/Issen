@@ -1,3 +1,4 @@
+import { resultsSessionFixture } from './helpers/runtime-results-session.mjs';
 import { enemyKillFixture } from './helpers/runtime-enemy-kill.mjs';
 import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';
 import { shrinePhaseFixture } from './helpers/runtime-shrine-phase.mjs';
@@ -286,7 +287,7 @@ for (const [type, count] of [
     assert.equal(recovered, 1);
   });
 
-test('standoff, shrine, death and result settlement complete without double rewards', () => {
+test('standoff, shrine, death and result settlement complete without double rewards', async () => {
   const runtime = session(),
     { run, random } = runtime;
   const standoff = standoffPhaseFixture(runtime);
@@ -316,20 +317,19 @@ test('standoff, shrine, death and result settlement complete without double rewa
   run.lives = 1;
   run.runWards = 0;
   const death = deathPhaseFixture(runtime);
+  const results = resultsSessionFixture(runtime);
+  run.reviveOfferResolved = true;
+  death.views.showOver = results.flow.showOver;
   run.state = 'playing';
   death.phase.playerDie(null, 'wrong');
   assert.equal(run.state, 'dead');
   assert.equal(run.lives, 0);
   death.phase.updateDeath(2);
+  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(run.state, 'over');
-  const ledger = createRunRewardLedger(),
-    meta = parseMeta(null);
-  accrueRunReward(ledger, 'kill');
-  accrueRunReward(ledger, 'wave');
-  accrueRunReward(ledger, 'boss');
-  const result = settleRunReward(meta, ledger),
-    balance = meta.embers;
-  assert.ok(result.gained > 0);
-  assert.deepEqual(settleRunReward(meta, ledger), result);
-  assert.equal(meta.embers, balance);
+  const balance = runtime.views.META.embers;
+  assert.ok(runtime.views.rewardLedger.settled);
+  results.flow.showOver();
+  assert.equal(runtime.views.META.embers, balance);
+  assert.equal(results.sequences.length, 1);
 });
