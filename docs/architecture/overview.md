@@ -101,6 +101,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/panels.ts` owns panel navigation and current-profile statistics/title display.
 
+`ui/wiring/settings.ts` owns preference application, options and lighting-debug wiring.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

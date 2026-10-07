@@ -1,3 +1,4 @@
+import { createSettingsWiring } from './ui/wiring/settings.ts';
 import { createPanelWiring } from './ui/wiring/panels.ts';
 import { createTitleSecrets } from './ui/wiring/secrets.ts';
 import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
@@ -2822,62 +2823,12 @@ export function startGame(
     get EQ() { return EQ; },
     setTrialsWasUnlocked(value) { runTrialsWasUnlocked = value; },
   });
-  const scrollMenus = createScrollMenus($('app'));
-  lifecycle.add(scrollMenus.dispose);
-  function applySettings() {
-    cvs.dataset.debris = 'sprites';
-    screenAnimation.invalidate();
-    if (artworkReady) prepareScene();
-    scrollMenus.update(settings.menuStyle, reducedMotion());
-    if (!settings.vibration) combatHaptics.stop();
-    audio.setMuted(settings.muted);
-    audio.setVolumes(settings.effectsVolume, settings.ambienceVolume);
-    setMuteIcon();
-    $('app').classList.toggle('large-text', settings.textSize === 'large');
-    $('app').classList.toggle('reduced-motion', reducedMotion());
-    document.documentElement.dataset.motion = settings.reducedMotion;
-    $('app').dataset.reducedFlashes = String(reducedFlashes());
-    if (reducedMotion()) {
-      presentationState.shake = 0;
-      presentationState.zoom = 1;
-    }
-    if (reducedFlashes()) presentationState.flashA = Math.min(presentationState.flashA, 0.035);
-    if (environmentState.bg) {
-      ambient().balanceLeaves(environmentState.leaves);
-      rebalanceWeather();
-    }
-  }
-  function saveSettings() {
-    store.set('issen.settings', settings);
-    store.set('issen.muted', settings.muted);
-    applySettings();
-  }
-  const lightingDebug = createLightingDebug(
-    $('app'),
-    lightingRig,
-    () => (G.panel === 'armory' ? $('prevC') : G.panel === 'support' ? $('supportPreview') : cvs),
-    () => {
-      screenAnimation.invalidate();
-      if (G.panel === 'support')
-        supportPreview.draw(previewFrame(PREMIUM_FILM, false, $('supportPreview')));
-    },
-  );
-  lifecycle.add(lightingDebug.dispose);
-  const options = createOptions(
-    $('options'),
-    settings,
-    () => {
-      audioInit();
-      saveSettings();
-    },
-    closePanel,
-    () => {
-      if (G.state === 'title' && savedRun?.status !== 'active') launchTutorial();
-    },
-  );
-  lifecycle.add(options.dispose);
-  lifecycle.listen(systemMotion, 'change', applySettings);
-  applySettings();
+  const { scrollMenus, applySettings, saveSettings, lightingDebug, options } = createSettingsWiring({
+    $, G, cvs, screenAnimation, lifecycle, settings, reducedMotion, reducedFlashes, prepareScene, combatHaptics, audio, setMuteIcon, presentationState, environmentState, ambient, rebalanceWeather, lightingRig, previewFrame, audioInit, closePanel, launchTutorial, systemMotion,
+    get artworkReady() { return artworkReady; },
+    get savedRun() { return savedRun; },
+    get supportPreview() { return supportPreview; },
+  });
   const PRESETS = parsePresets(store.get('issen.presets', null));
   const presetScreen = createPresetScreen($('armory'), {
     presets: PRESETS,

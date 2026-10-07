@@ -40,10 +40,10 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has about 4,141 lines; composition-root reduction is NOT complete.
 
-Latest checkpoint: UI panels ownership moved without intentional behavior changes.
-Strict types passed; all 274 units passed (ui-panels-unit.log).
-`npx playwright test tests/browser/ui.spec.ts tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all 16 passed (ui-panels-browser.log; terminal completion confirmed).
+Latest checkpoint: UI settings ownership moved without intentional behavior changes.
+Strict types passed; all 274 units passed (ui-settings-unit.log).
+`npx playwright test tests/browser/options.spec.ts tests/browser/ui.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
+all 21 passed (ui-settings-browser.log; terminal completion confirmed).
 Continue the ordered UI cluster, then run-flow/router/phases. Full W2/W3 and
 Part 4 remain pending; do not push develop yet.
 
