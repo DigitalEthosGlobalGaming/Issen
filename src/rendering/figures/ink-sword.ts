@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
@@ -15,11 +16,14 @@ type Family = 'blades' | 'hilts' | 'special';
 type MapKind = 'normal' | 'surface' | 'emissive';
 type SourceKind = Family | MapKind;
 type Frame = readonly [number, number, number, number];
-const SOURCES = {
+const bladePack = assetMaterialCatalog.find(
+  (pack) => pack.sourcePath === 'src/rendering/figures/assets/blade-profile-atlas.png',
+)!;
+const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: string } = {
   blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.png', import.meta.url).href,
   normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.png', import.meta.url).href,
   surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.png', import.meta.url).href,
-  emissive: new URL('./assets/blade-pbr/blade-profile-atlas_emissive.png', import.meta.url).href,
+  emissive: bladePack.maps.emissive,
   hilts: new URL('./assets/handle-guard-atlas.png', import.meta.url).href,
   special: new URL('./assets/special-weapons-atlas.png', import.meta.url).href,
 };
@@ -35,32 +39,37 @@ export function createInkSwordRenderer(doc: Document) {
   let disposed = false,
     pending: Promise<void> | undefined;
   const pbrReady = () =>
-    !disposed && ['normal', 'surface', 'emissive'].every((kind) => loaded.has(kind as MapKind));
+    !disposed &&
+    ['normal', 'surface'].every((kind) => loaded.has(kind as MapKind)) &&
+    (!SOURCES.emissive || loaded.has('emissive'));
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
     pending = Promise.all(
-      (Object.keys(SOURCES) as SourceKind[]).map(
-        (family) =>
-          new Promise<void>((resolve) => {
-            const im = family === 'surface' ? surface : doc.createElement('img');
-            images.set(family, im);
-            const done = () => {
-              im.onload = null;
-              im.onerror = null;
-              finish.delete(done);
-              resolve();
-            };
-            finish.add(done);
-            im.onload = () => {
-              const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
-              if (!disposed && im.naturalWidth === w && im.naturalHeight === h) loaded.add(family);
-              done();
-            };
-            im.onerror = done;
-            im.src = SOURCES[family];
-          }),
-      ),
+      (Object.keys(SOURCES) as SourceKind[])
+        .filter((kind) => SOURCES[kind])
+        .map(
+          (family) =>
+            new Promise<void>((resolve) => {
+              const im = family === 'surface' ? surface : doc.createElement('img');
+              images.set(family, im);
+              const done = () => {
+                im.onload = null;
+                im.onerror = null;
+                finish.delete(done);
+                resolve();
+              };
+              finish.add(done);
+              im.onload = () => {
+                const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
+                if (!disposed && im.naturalWidth === w && im.naturalHeight === h)
+                  loaded.add(family);
+                done();
+              };
+              im.onerror = done;
+              im.src = SOURCES[family]!;
+            }),
+        ),
     ).then(async () => {
       await fittings.prepare();
     });
@@ -214,7 +223,9 @@ export function createInkSwordRenderer(doc: Document) {
           material = {
             normal: { source: images.get('normal')!, revision: 0, frame: profile.frame },
             surface: { source: surface, revision: 0, frame: profile.frame },
-            emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame },
+            ...(images.has('emissive')
+              ? { emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame } }
+              : {}),
             normalY: -1,
             lighting: 1,
             depth: 0,

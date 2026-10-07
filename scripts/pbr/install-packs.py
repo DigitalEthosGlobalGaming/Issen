@@ -83,4 +83,6 @@ failed = sum(job["status"] == "failed" for job in results)
 print(f"{len(results) - failed}/{len(results)} packs installed; {failed} failed.")
 if not failed:
     subprocess.run(["node", "scripts/pbr/pack-surfaces.mjs"], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, "scripts/assets/compact.py", "--root", str(ROOT), "--apply"], cwd=ROOT, check=True)
+    subprocess.run(["node", "scripts/pbr/update-runtime-catalog.mjs"], cwd=ROOT, check=True)
 sys.exit(1 if failed else 0)

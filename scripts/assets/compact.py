@@ -60,7 +60,7 @@ def encode(image, data):
     raise ValueError('No WebP encoding preserves the required decoded values')
 
 
-def run(root, apply):
+def run(root, apply, retain_generated_png=False):
     catalog_path = root/'scripts/pbr/asset-packs.json'
     catalog = json.loads(catalog_path.read_text()) if catalog_path.exists() else {'assets': []}
     jobs = catalog['assets'] + catalog.get('installed', [])
@@ -99,8 +99,13 @@ def run(root, apply):
         original_hash = digest(original)
         old = records.get(rel)
         if old and old['originalHash'] == original_hash:
+            if retain_generated_png and source in removals and old['action'] == removals[source]:
+                continue
             target = root/old['newPath'] if old.get('newPath') else None
             if target and target.exists() and digest(target.read_bytes()) == old['newHash']:
+                if source in generated and apply and not retain_generated_png:
+                    source.unlink()
+                    changed += 1
                 continue
         backup = root/'tmp/asset-compaction/originals'/rel
         if source in removals:
@@ -124,7 +129,7 @@ def run(root, apply):
                 raise ValueError(f'Original backup already differs: {rel}')
             if not backup.exists(): backup.write_bytes(original)
             if encoded is not None: target.write_bytes(encoded)
-            if source in generated: source.unlink()
+            if source in generated and not retain_generated_png: source.unlink()
         records[rel] = record
         if apply:
             manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -143,5 +148,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--retain-generated-png', action='store_true', help='Stage conversions before URL migration; final apply removes generated PNGs')
     args = parser.parse_args()
-    run(args.root.resolve(), args.apply)
+    run(args.root.resolve(), args.apply, args.retain_generated_png)

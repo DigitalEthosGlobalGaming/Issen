@@ -9,7 +9,11 @@ import { createUiMaterialLighting } from './ui/material-lighting.ts';
 import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
 
 const artwork = import.meta.glob<string>(
-  '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
+  [
+    '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
+    '!/src/**/pbr/**',
+    '!/src/**/*-pbr/**',
+  ],
   { eager: true, query: '?url', import: 'default' },
 );
 const publicArtwork = import.meta.glob<string>(

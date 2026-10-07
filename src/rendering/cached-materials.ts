@@ -236,7 +236,17 @@ export function drawCachedImage(
       Math.abs(normalMatrix[3]! - 1) < 1e-6;
     for (const kind of ['normal', 'surface', 'emissive'] as const) {
       const map = material[kind];
-      if (!map) continue;
+      if (!map) {
+        if (kind === 'emissive') {
+          const output = destination.emissive.getContext('2d')!;
+          mapContext(ctx, output, () => {
+            output.globalCompositeOperation = 'destination-out';
+            if (colour) output.drawImage(colour, x, y, width, height);
+            else output.drawImage(source, ...frame, x, y, width, height);
+          });
+        }
+        continue;
+      }
       g.clearRect(0, 0, scratch.width, scratch.height);
       const crop = map.frame ?? frame;
       g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);

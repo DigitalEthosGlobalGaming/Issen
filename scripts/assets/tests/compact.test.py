@@ -8,6 +8,8 @@ from pathlib import Path
 from PIL import Image
 
 spec = importlib.util.spec_from_file_location('compact', Path(__file__).resolve().parents[1]/'compact.py')
+TEST_TMP = Path(__file__).resolve().parents[3]/'tmp/asset-compaction/tests'
+TEST_TMP.mkdir(parents=True, exist_ok=True)
 compact = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(compact)
 
@@ -33,10 +35,10 @@ class CompactionTests(unittest.TestCase):
         encoded, metadata = compact.encode(image, True)
         self.assertTrue(metadata['lossless'])
         from io import BytesIO
-        self.assertEqual(list(Image.open(BytesIO(encoded)).convert('RGBA').getdata()), list(image.getdata()))
+        self.assertEqual(Image.open(BytesIO(encoded)).convert('RGBA').tobytes(), image.tobytes())
 
     def test_apply_preserves_authoring_and_is_idempotent(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP) as temp:
             root = Path(temp)
             pack = root/'src/pbr/sample'
             pack.mkdir(parents=True)
@@ -61,7 +63,7 @@ class CompactionTests(unittest.TestCase):
             self.assertEqual(manifest.stat().st_mtime_ns,timestamp)
 
     def test_mismatching_family_remains_untouched(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP) as temp:
             root=Path(temp)
             pack=root/'src/pbr/sample'
             pack.mkdir(parents=True)
