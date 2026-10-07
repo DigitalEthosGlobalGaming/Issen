@@ -1,3 +1,4 @@
+import { createRunStart } from './game/session/run-start.ts';
 import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
 import { createRunFlow } from './game/session/run-flow.ts';
 import { bindProfileWiring } from './ui/wiring/profile.ts';
@@ -1200,144 +1201,154 @@ export function startGame(
       position: enemyPos,
     });
   }
-  function startRun() {
-    if (!activeTrial) {
-      clearRunCheckpoint();
-      savedRun = null;
-      shrineOfferIds = null;
-    }
-    runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
-    if (!activeTrial) Object.assign(SETUP, sanitizeSetup(SETUP, META));
-    const setup = activeTrial
-      ? {
-          mode: 'waves' as const,
-          diff: 'ronin' as const,
-          arrows: activeTrial.arrows,
-          lives: '0' as const,
-          upgrades: false,
-        }
-      : (activeDaily?.setup ?? SETUP);
-    runTemplate = templateModifiers(META, setup, premiumAccess());
-    rewardLedger = createRunRewardLedger();
-    runBossMilestone = 0;
-    runItemReveals = [];
-    guided.reset();
-    audio.setPaused(false);
-    if (!activeTrial) {
-      G.seed = activeDaily?.seed ?? newRunSeed();
-      runRandom = restorableRng(G.seed);
-      combatRandom = runRandom.next;
-    }
-    resetRun(G, setup, EQ, combatRandom);
-    G.availableBlessings =
-      activeDaily || activeTrial
-        ? undefined
-        : collectionBlessings(
-            META.upgrades,
-            BLESS.map((b) => b.id),
-          );
-    stageSeed = stageVisits.enter(G.stage, true);
-    Object.assign(G, templatePowers(META, setup, premiumAccess()));
-    G.maxKnives = G.knives;
-    computeMods();
-    G.runWards = G.m.runWard;
-    G.maxLives = normalLives(G.m.lives);
-    if (!G.zen && !G.hard) G.lives = G.maxLives;
-    G.freezeT = 0;
-    G.wardUsed = false;
-    P.fall = 0;
-    P.swingT = 9;
-    apparelMotion.reset();
-    P.pose = { ...PREST };
-    timeScale = 1;
-    hitStop = 0;
-    presentationState.lbT = 0;
-    for (const [key, particles] of Object.entries(presentationState.fx))
-      if (key !== 'scratches') particles.length = 0;
-    ST.runs++;
-    saveStats();
-    clearHints();
-    if (G.stage !== 0) setStage(0, true);
-    else Object.assign(WX, createWeatherState(combatRandom));
-    showScreen(null);
-    hud(true);
-    $('bossbar').classList.remove('on');
-    G.pauseN = 0;
-    G.state = 'playing';
-    prepareScene();
-    if (activeTrial) {
-      startTrialEncounter();
-      setScore();
-      return;
-    }
-    {
-      const hr = new Date().getHours();
-      if (recordSecretEvent(ST, { kind: 'midnight', hour: hr })) {
-        saveStats();
-        checkUnlocks();
-      }
-    }
-    setScore();
-    if (G.rush) {
-      ST.rushRuns = (ST.rushRuns || 0) + 1;
-      startRushDuel();
-      hint(
-        'rush',
-        'Boss rush. Only duels, one after another, with a shrine after every victory.',
-        5500,
-      );
-    } else startWave(1);
-    if (G.fortune) toast({ k: G.fortune.k, msg: `Omikuji: ${G.fortune.n}. ${G.fortune.d}` });
-    if (G.blade)
-      hint(
-        'blade',
-        'No arrows. Raised high is up, held low is down, held out to a side is that side.',
-        6500,
-      );
-    if (G.zen)
-      hint(
-        'zen',
-        'Endless combo. You cannot die, but every mistake breaks your chain. End the run from pause.',
-        6500,
-      );
-  }
-  function startDaily() {
-    activeDaily = dailyRun();
-    ST = structuredClone(playerStats);
-    EQ = { ...activeDaily.equipment };
-    applySeal();
-    G.panel = null;
-    audioInit();
-    startRun();
-  }
-  function startTrial(id: string) {
-    const trial = TRIALS.find((entry) => entry.id === id);
-    if (
-      !trial ||
-      !trialAccessible(id, premiumAccess()) ||
-      activeTrial ||
-      !trialsUnlocked(playerStats.roninWave) ||
-      G.state !== 'title'
-    )
-      return;
-    activeTrial = trial;
-    buildLeaves();
-    trialFailure = '';
-    trialResult = null;
-    combatRandom = rng(trial.seed);
-    // Legacy combat counters write into a disposable statistics object during trials.
-    // Armoury and normal runs retain the original profile objects.
-    ST = structuredClone(playerStats);
-    EQ = {
-      ...DEFAULT_EQUIPMENT,
-      fx: playerEquipment.fx,
-      film: playerEquipment.film,
-      seal: playerEquipment.seal,
-    };
-    G.panel = null;
-    audioInit();
-    startRun();
-  }
+  const { startRun, startDaily, startTrial, nextStep, startRushDuel } = createRunStart({
+    $,
+    G,
+    META,
+    P,
+    PREST,
+    SETUP,
+    apparelMotion,
+    audio,
+    checkUnlocks,
+    clearHints,
+    computeMods,
+    guided,
+    hint,
+    hud,
+    playerStats,
+    playerEquipment,
+    premiumAccess,
+    prepareScene,
+    presentationState,
+    saveStats,
+    setScore,
+    setStage,
+    showScreen,
+    stageVisits,
+    startTrialEncounter,
+    startWave,
+    startBoss,
+    toast,
+    applySeal,
+    audioInit,
+    buildLeaves,
+    waveCfg,
+    clearTrialResult() {
+      trialResult = null;
+    },
+    clearCheckpoint: clearRunCheckpoint,
+    newRunSeed,
+    resetWeather(random) {
+      Object.assign(WX, createWeatherState(random));
+    },
+    clearEffects() {
+      for (const [key, particles] of Object.entries(presentationState.fx))
+        if (key !== 'scratches') particles.length = 0;
+    },
+    get EQ() {
+      return EQ;
+    },
+    set EQ(value) {
+      EQ = value;
+    },
+    get ST() {
+      return ST;
+    },
+    set ST(value) {
+      ST = value;
+    },
+    get activeDaily() {
+      return activeDaily;
+    },
+    set activeDaily(value) {
+      activeDaily = value;
+    },
+    get activeTrial() {
+      return activeTrial;
+    },
+    set activeTrial(value) {
+      activeTrial = value;
+    },
+    get rewardLedger() {
+      return rewardLedger;
+    },
+    set rewardLedger(value) {
+      rewardLedger = value;
+    },
+    get runBossMilestone() {
+      return runBossMilestone;
+    },
+    set runBossMilestone(value) {
+      runBossMilestone = value;
+    },
+    get runItemReveals() {
+      return runItemReveals;
+    },
+    set runItemReveals(value) {
+      runItemReveals = value;
+    },
+    get runRandom() {
+      return runRandom;
+    },
+    set runRandom(value) {
+      runRandom = value;
+    },
+    get runTemplate() {
+      return runTemplate;
+    },
+    set runTemplate(value) {
+      runTemplate = value;
+    },
+    get combatRandom() {
+      return combatRandom;
+    },
+    set combatRandom(value) {
+      combatRandom = value;
+    },
+    get savedRun() {
+      return savedRun;
+    },
+    set savedRun(value) {
+      savedRun = value;
+    },
+    get shrineOfferIds() {
+      return shrineOfferIds;
+    },
+    set shrineOfferIds(value) {
+      shrineOfferIds = value;
+    },
+    get runTrialsWasUnlocked() {
+      return runTrialsWasUnlocked;
+    },
+    set runTrialsWasUnlocked(value) {
+      runTrialsWasUnlocked = value;
+    },
+    get stageSeed() {
+      return stageSeed;
+    },
+    set stageSeed(value) {
+      stageSeed = value;
+    },
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(value) {
+      timeScale = value;
+    },
+    get hitStop() {
+      return hitStop;
+    },
+    set hitStop(value) {
+      hitStop = value;
+    },
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+  });
   function startTrialEncounter() {
     if (deferUntilSceneReady(startTrialEncounter)) return;
     const trial = activeTrial;
@@ -1434,30 +1445,6 @@ export function startGame(
     $('trials')
       .querySelector<HTMLButtonElement>('#trialResult button')
       ?.focus({ preventScroll: true });
-  }
-  function nextStep() {
-    if (G.rush) startRushDuel();
-    else startWave(G.wave + 1);
-  }
-  function startRushDuel() {
-    const n = G.bossCount + 1;
-    G.wave = n;
-    G.event = null;
-    G.wardUsed = false;
-    G.blessingTriggers.flourishWard = false;
-    G.kikuUsed = 0;
-    G.foxUsed = false;
-    G.kagamiUsed = false;
-    G.so = null;
-    const si = (n - 1) % STAGES.length;
-    G.lap = Math.floor((n - 1) / STAGES.length);
-    if (si !== G.stage) setStage(si, true);
-    G.cfg = waveCfg(Math.min(30, n * 3));
-    G.enemies = G.enemies.filter((e) => e.state === 'dying');
-    G.pendingSpawns = [];
-    G.toSpawn = 0;
-    G.attacker = null;
-    startBoss();
   }
   function startWave(n: number, skipEvent = false) {
     G.wave = n;

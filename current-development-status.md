@@ -40,31 +40,36 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: capture/restore/continue/abandon moved to
-`src/game/session/checkpoint-flow.ts`, using explicit persistence, storage and
-current-state ports. Original v1 record fields, profile merge order and rule RNG
-restoration after stage setup remain unchanged. Old playing/boss/standoff/shrine
-unit fixtures now call the real extracted restore/capture APIs, rather than inline
-drivers. Two extra actual-API cases cover continuation preserving later secrets
-and RNG, plus one-time abandonment. All six checkpoint unit cases passed; strict
-types passed and all 286 `npm test` cases passed (checkpoint-flow-final-unit.log).
-`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/run-checkpoint.spec.ts tests/browser/secret-recovery.spec.ts --config playwright.rendering-v2.config.ts`:
-all six passed (checkpoint-flow-browser.log; terminal confirmed). run-checkpoint.spec
-does not exist/matched no cases; the real four runtime fixtures and two secret
-recovery cases supplied the six passing cases. Continue/abandon APIs also have the
-new headless coverage. No tolerance or assertion was weakened.
+Latest checkpoint: normal/daily/trial/rush entry and next-step bodies moved to
+`src/game/session/run-start.ts`, retaining record initialization, scene/weather
+reset and rule/cosmetic RNG order. The existing fresh-seed function is an explicit
+port; production still uses newRunSeed, while headless tests provide fixed seeds.
+Cosmetic reset callbacks stay at composition ports; gameplay has no rendering
+imports. Four actual run-start API cases cover seeded normal entry, daily profile
+isolation, disposable trial state/retries and rush/next-step dispatch. Existing
+runtime-scenarios initialization now uses this API; encounter/kill drivers remain
+temporary until their APIs move. All thirteen focused run-start/scenario cases
+passed, strict types passed and all 290 `npm test` cases passed
+(run-start-final-unit.log).
+`npx playwright test tests/browser/trials.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/setup-progression.spec.ts --config playwright.rendering-v2.config.ts`:
+all fifteen passed (run-start-browser.log; terminal confirmed), including all eight
+actual trial encounters, saved records and setup modes. No tolerance was changed.
 
-Previous run-flow controls checkpoint: 5842908; title/pause/resume/quit APIs passed
-five headless cases, all 284 units, 17 menu/save and ten real graphics/context cases.
-Logs run-flow-{final-unit,browser,graphics-browser}.log. Its player/letterbox data
-slices are transitional until player/event ownership moves; no rendering imports.
+Previous session checkpoints: run-flow controls 5842908 (284 units, 17 menu/save
+and ten graphics/context cases), checkpoint recovery 05a52ee (286 units, six actual
+API fixture/action cases and six real browser fixtures/recovery cases). Legacy
+records now use the extracted restore/capture APIs and still have identical keys.
+Logs run-flow-*.log and checkpoint-flow-*.log retain exact commands/results;
+nonexistent context-loss.spec/run-checkpoint.spec patterns matched no cases, and
+real graphics/context files were explicitly verified.
 
 Router foundation (556acb9) remains alongside the closure, NOT yet wired into
 game.ts. It provides synchronous validated controller dispatch and checkpoint
 adoption without replaying enter effects; five tests passed plus all 279 units at
 that checkpoint. No live gameplay events emitted yet.
-Next move remaining run start/daily/trial/rush controls into session owners,
-then actual phase-controller dispatch.
+Next move waves input/update and phase entry bodies, followed by standoff/boss/
+shrine/death, and replace input/update branching with the phase router. Trial
+encounter start/finish remain in the closure for those phase owners.
 Remaining rule capture/type audit: tmp/runtime-refactor/rule-port-audit.json.
 Preserve same-frame phase cascades and game/cosmetic RNG consumption order.
 Full W2, W3 and Part 4 remain pending; do not push develop.

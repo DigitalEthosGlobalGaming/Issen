@@ -1,3 +1,4 @@
+import { runStartSession } from './helpers/runtime-run-start-session.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRunState, resetRun } from '../../src/game/run-state.ts';
@@ -34,16 +35,11 @@ const position = () => ({ x: 100, y: 200, h: 150, fog: 0, alpha: 1 });
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };
 const noSound = { bell() {}, feint() {}, bark() {} };
 function session(seed = 123456, options = setup, equipment = DEFAULT_EQUIPMENT) {
-  const random = restorableRng(seed),
-    run = createRunState();
-  resetRun(run, options, equipment, random.next);
-  run.state = 'playing';
-  run.seed = seed;
-  run.wave = 1;
-  return { run, random };
+  return runStartSession(seed, options, equipment);
 }
 
-// Before extraction, these scenario drivers use current exported simulations.
+// Run entry now uses the production session API. Encounter drivers still use
+// current exported simulations until phase and kill APIs replace their adapters.
 // Their event handlers represent external inputs/state boundaries still inline in
 // game.ts. Replace those handlers with extracted phase/kill APIs as they appear;
 // assertions concern outcomes and invariants, never a per-tick snapshot.

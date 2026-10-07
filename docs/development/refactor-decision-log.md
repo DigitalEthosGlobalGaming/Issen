@@ -110,6 +110,8 @@
 
 - 2026-10-08 — W2 checkpoint move — move record capture/recovery through explicit persistence and current-state ports, and migrate old fixture drivers to the real APIs — rewrite records or retain inline test restore/capture — all old records play and round-trip with unchanged keys; seeded RNG resumes after stage setup, later secrets survive, and abandonment enters results once; all units and six real browser fixtures/recovery cases pass — revert the checkpoint-flow move and its fixture-driver migration together.
 
+- 2026-10-08 — W2 run-start move — move normal/daily/trial/rush entry through current-state ports and expose the existing fresh-seed generator as a port — seed test-only copies of resetRun or move cosmetic RNG into rules — production initialization/RNG order is retained; scenario initialization now uses the real API, with four added entry/isolation/retry cases, all units and fifteen browser cases green — revert the run-start move and its scenario-driver migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

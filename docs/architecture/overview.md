@@ -105,8 +105,10 @@ runtime already uses it.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
 profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
-capture/restore/continue/abandon through explicit persistence ports. Run starts
-still remain in the composition closure pending the next session-owner move.
+capture/restore/continue/abandon through explicit persistence ports.
+`game/session/run-start.ts` owns normal/daily/trial/rush entry and next-step
+dispatch; fresh-seed and cosmetic-reset ports preserve existing ordering. Trial
+encounter start/finish and phase input/update still await their phase-owner moves.
 
 ## Where changes belong
 
