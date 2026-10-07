@@ -10,7 +10,25 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+Latest checkpoint: isolated restore fix discards the prior scene continuation
+before adopting checkpoint state. This prevents a pending title/cinematic callback
+from clearing a restored wave when both adopt the same scene key.
+Baseline proof is scene-continuation-baseline.log: unchanged pre-refactor ad353b3
+with a held real renderer completion logs the same missing-wave exception and
+fails the valid-wave invariant with null (terminal exit 1).
+Strict types and all 364 units pass (scene-continuation-typecheck.log,
+scene-continuation-unit.log), including saved wave/enemy/RNG retention after stale
+callback cancellation. `npx playwright test tests/browser/scene-continuation.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all six pass in 29.9s (scene-continuation-browser.log; terminal confirmed).
+The new actual-renderer browser regression raises the broad manifest to 254.
+Save keys/record shapes and combat timing/RNG are unchanged. Same-scene continue
+now retains the encounter rather than accidentally returning title enemies.
+Next: regenerate/apply the strict phase-binding preview from current fixed source,
+verify its actual live flows, then run the combined broad suite. The menu preview
+must likewise be regenerated after that source change and independently verified.
+W2 composition/reactions, W3 and Part 4 remain required and unpushed.
+
+Previous combined verification:  `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
 passes all 253 in 13.4m (boss-feedback-broad.log; terminal exit 0 confirmed),
 covering committed native/equipment/frame/environment/profile/figure ownership,
 boss cut/victory feedback and the separately corrected rush fixture.

@@ -130,3 +130,17 @@ test('actual saved-run abandonment checkpoints quit and enters results once', ()
   assert.equal(session.read().run.reason, 'quit');
   assert.deepEqual(session.trace, ['over']);
 });
+
+test('checkpoint adoption supersedes pending title setup while retaining the saved wave and RNG', () => {
+  const checkpoint = savedWave(),
+    session = checkpointSession(checkpoint, position);
+  session.views.sceneContinuation = () => {
+    session.views.G.cfg = null;
+    session.views.G.enemies = [];
+  };
+  session.flow.restoreCheckpoint(structuredClone(checkpoint));
+  session.views.sceneContinuation?.();
+  assert.deepEqual(session.views.G.cfg, checkpoint.run.cfg);
+  assert.equal(session.views.G.enemies.length, checkpoint.run.enemies.length);
+  assert.equal(session.views.runRandom.state(), checkpoint.randomState);
+});

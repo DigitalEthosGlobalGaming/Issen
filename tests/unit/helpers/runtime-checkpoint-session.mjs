@@ -34,6 +34,7 @@ export function checkpointSession(checkpoint, position) {
     ITEMS: createItems(() => UNL),
     activeTrial: null,
     sceneLoading: false,
+    sceneContinuation: undefined,
     EQ: playerEquipment,
     ST: playerStats,
     activeDaily: null,
@@ -96,6 +97,9 @@ export function checkpointSession(checkpoint, position) {
       G.state = 'over';
     },
     adoptPhase() {},
+    discardSceneContinuation() {
+      views.sceneContinuation = undefined;
+    },
     resetClock() {
       trace.push('clock');
     },

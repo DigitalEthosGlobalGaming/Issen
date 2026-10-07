@@ -87,6 +87,7 @@ export interface CheckpointFlowViews {
   readonly showOver: () => void;
   readonly resetClock: () => void;
   readonly adoptPhase: () => void;
+  readonly discardSceneContinuation: () => void;
 }
 
 /** Version-one records and rule RNG restore through explicit persistence/scene ports. */
@@ -167,6 +168,9 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
     updateSavedRunButtons();
   }
   function restoreCheckpoint(checkpoint: RunCheckpoint) {
+    // A restored encounter supersedes pending title/cinematic scene work, even
+    // when it adopts the same scene key and needs no new composition request.
+    views.discardSceneContinuation();
     views.activeDaily = checkpoint.dailyDay ? dailyRun(checkpoint.dailyDay) : null;
     views.ST = views.activeDaily ? structuredClone(playerStats) : playerStats;
     views.EQ = views.activeDaily ? { ...views.activeDaily.equipment } : playerEquipment;

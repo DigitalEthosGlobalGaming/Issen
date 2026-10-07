@@ -714,6 +714,7 @@ export function startGame(
   const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } =
     createCheckpointFlow({
       adoptPhase: () => phaseRouter.adoptCheckpoint(),
+      discardSceneContinuation: () => { sceneContinuation = undefined; },
       $,
       AWAKENING,
       COLLECTION_PROGRESS,

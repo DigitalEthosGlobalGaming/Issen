@@ -451,3 +451,5 @@ Profile foundation (statistics/setup/unlocks/daily/trial reconciliation), progre
 presentation/figures-host.ts binds figure rendering, player/companion drawing and encounter cues through current read-only views. It shares the internal figure/pet capabilities while retaining each owner's existing API and composer order.
 
 Successful boss cuts emit bossCut with flat direction/automatic/position values. bossDefeated projects grounded position and crow selection as values. presentation/boss-feedback.ts owns their cut/victory effects, audio/haptics, camera and boss-bar reaction; rules retain HP/death records, hit stop, rewards and phases. Synchronous progression listeners precede presentation and subsequent profile persistence.
+
+Checkpoint restore explicitly discards superseded scene continuations before adopting saved run state. This keeps a pending title/cinematic setup callback from clearing a restored encounter when the scene key is unchanged; save records and RNG restoration retain their original shape/order.
