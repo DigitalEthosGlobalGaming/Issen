@@ -1,3 +1,4 @@
+import { bindDuelFeedback } from './presentation/duel-feedback.ts';
 import { bindEncounterProgression } from './game/progression/encounter-listeners.ts';
 import { createSceneFlow } from './game/session/scene-flow.ts';
 import { createProfileRules } from './game/progression/profile-rules.ts';
@@ -1458,6 +1459,10 @@ export function startGame(
     bindCombatProgression(context.events, () => ({ ST, bst, challenge, checkUnlocks })),
   );
   lifecycle.add(bindEncounterProgression(context.events, () => ({ ST, bst, challenge })));
+  lifecycle.add(bindDuelFeedback(context.events, () => ({
+    S, sparks, ring, flash, sfx, combatHaptics, letterbox, buzz,
+    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
+  })));
   lifecycle.add(bindKillFeedback(context.events, readKillViews));
   lifecycle.add(bindCombatScoreFeedback(context.events, () => ({ setScore, pop, W, H })));
   function killEnemy(

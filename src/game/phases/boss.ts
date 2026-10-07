@@ -226,14 +226,7 @@ export function createBossPhase<Context>(
       pop(b.pos.x, b.pos.y - b.pos.h * 1.25, '返し', Math.max(20, 26 * S));
     }
     swingPlayer('block');
-    sparks(tw[0], tw[1], 24);
-    ring(tw[0], tw[1], 4 * S, 90 * S, 0.35, Math.max(2, 2.5 * S));
-    shake(11 * S);
     views.hitStop = 0.09;
-    flash(0.3);
-    sfx.clang();
-    combatHaptics.play('parry');
-    letterbox(0.3);
     G.combo++;
     G.parries++;
     guided.bossParried();
@@ -290,13 +283,7 @@ export function createBossPhase<Context>(
     b.window = Math.max(0.5, b.bp.stag * 0.72);
     b.blockT = 0.12;
     swingPlayer(dir);
-    sparks(tw[0], tw[1], 16);
-    ring(tw[0], tw[1], 3 * S, 70 * S, 0.28, Math.max(1.5, 2 * S));
-    shake(7 * S);
     views.hitStop = 0.05;
-    flash(0.12);
-    sfx.block();
-    buzz(12);
     G.combo++;
     bumpCombo();
     addScore(Math.round(40 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05, 'Blocked');
