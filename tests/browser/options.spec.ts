@@ -52,8 +52,8 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__optionsHarness = { G, randomState: () => runRandom.state() }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__optionsHarness = { G, randomState: () => runRandom.state() }; artworkReady = true;',
       ),
     });
   });
@@ -279,8 +279,8 @@ test('explicit motion overrides control result tallies and setup reveal animatio
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__motionHarness = { runResults }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__motionHarness = { runResults }; artworkReady = true;',
       ),
     });
   });

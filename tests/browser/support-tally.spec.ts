@@ -23,8 +23,8 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__tally = {G,earn}; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__tally = {G,earn}; artworkReady = true;',
       ),
     });
   });

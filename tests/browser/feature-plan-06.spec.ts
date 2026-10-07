@@ -74,8 +74,8 @@ test('a fatal loss is terminal before its animation and settles once after reloa
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__runHarness = { G, playerDie, openShrine }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__runHarness = { G, playerDie, openShrine }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
@@ -112,8 +112,8 @@ test('Shrine offers survive reload without a new roll', async ({ page }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__runHarness = { G, openShrine }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__runHarness = { G, openShrine }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
@@ -143,8 +143,8 @@ test('boss and standoff checkpoints restore their encounter phases', async ({ pa
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__runHarness = { G, startBoss, startStandoff }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__runHarness = { G, startBoss, startStandoff }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

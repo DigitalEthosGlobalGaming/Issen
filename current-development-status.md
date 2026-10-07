@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.0 baseline complete; W2.1 WebGL2 lifecycle complete; fallback cleanup next
+## W1 complete; W2.0 baseline complete; W2.1 surfaces/materials native-only; film cleanup next
 
 W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
 `tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
@@ -93,7 +93,24 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
    tmp/runtime-refactor. No process remains. Next remove the remaining material
    Canvas branch/checks and standalone Armoury fallback, migrate scene tests to
    prepared native surfaces, remove fallback-only comparisons in separate commits,
-   then run the shared-runtime broad suite before extraction. Native blend filters
+   then run the shared-runtime broad suite before extraction.
+   Material/Armoury cleanup now implemented and focused checks green. Explicit
+   cachedMaterialContext distinguishes texture preparation from native scene
+   stamps; all supportsSceneMaterials fallback checks removed. Scene fixtures
+   now use native painters with separate Canvas readback. Runtime test injections
+   use artworkReady assignment to preserve original fully-loaded timing (a return
+   hook exposed partially loaded frames and failed the unchanged maximum-2 pixel
+   tolerance; corrected hook passes). Strict types passed, all 265 unit tests
+   passed (material-native-unit.log). Material/environment/save suite all 15 passed
+   (material-native-browser.log). Scene suite 24/25 passed; only old harness hook
+   failed (native-scene-browser.log). Backend suite 20/22 passed; old harness and
+   removed fallback assertion failed (native-material-backend.log). Corrected
+   `npx playwright test tests/browser/pixi-backend.spec.ts -g 'same prepared scene|unavailable WebGL' tests/browser/scattered-armour.spec.ts -g 'selected Scattered|same prepared scene|unavailable WebGL' --config playwright.rendering-v2.config.ts`
+   all three passed (native-harness-ready-recheck.log). These focused/recheck runs
+   are not an uninterrupted broad-suite pass. No process remains. Remaining
+   W2.1: remove Canvas-only film self-copy and path fallback code, migrate film
+   tests to native targets, delete fallback-only film reference/tooling separately,
+   refresh related docs, run broad browser tests. Then ordered W2 extraction. Native blend filters
    remain because film output depends on them. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
    Require WebGL2, use one graphics error screen, retain eight-second context-loss
    recovery with explicit resume and Reload on failure. Then follow the eight

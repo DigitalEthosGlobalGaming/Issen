@@ -6,6 +6,7 @@ test('attacker brackets remain distinct with arrows and timing rings hidden', as
   await page.setViewportSize({ width: 390, height: 540 });
   await page.goto('/');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const mainPath = document.querySelector<HTMLScriptElement>('script[src*="/src/main.ts"]')!.src;
     (await import(mainPath)).dispose();
     const { drawEnso, enemyGlyphCue } = await import('/src/rendering/glyphs.ts');
@@ -14,7 +15,7 @@ test('attacker brackets remain distinct with arrows and timing rings hidden', as
     canvas.height = 540;
     canvas.id = 'cue-preview';
     document.body.replaceChildren(canvas);
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     g.fillStyle = '#292823';
     g.fillRect(0, 0, canvas.width, canvas.height);
     const env = {

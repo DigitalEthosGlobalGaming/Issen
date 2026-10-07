@@ -6,12 +6,13 @@ test('nine-slice seals preserve texture, tint and transparent corners at multipl
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const path = '/src/rendering/ui-art.ts';
     const { setSealTextures, drawSeal, drawCrestSprite } = await import(path);
     await setSealTextures(document.querySelector('#app')!, '#a3271d');
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 100;
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     const frames = [];
     for (const material of ['paper', 'wood', 'metal', 'silk', 'stone']) {
       g.clearRect(0, 0, 100, 100);

@@ -1,7 +1,7 @@
 import type { SceneDrawing } from './scene-drawing.ts';
 import type { SceneMaterial, SceneTexture } from './scene-frame.ts';
 import { normalTransform } from './scene-frame.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from './scene-material.ts';
+import { drawMaterialStamp } from './scene-material.ts';
 
 type Frame = readonly [number, number, number, number];
 type Layer = {
@@ -189,7 +189,7 @@ export function drawCachedImage(
     revision: cached?.revision ?? 0,
     frame: colour ? undefined : frame,
   };
-  if (material && supportsSceneMaterials(ctx)) {
+  if (material && !contextState.has(ctx)) {
     drawMaterialStamp(ctx, { texture, material, x, y, width, height });
     return;
   }

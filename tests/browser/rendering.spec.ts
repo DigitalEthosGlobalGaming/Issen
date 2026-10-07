@@ -176,11 +176,20 @@ for (const shared of [false, true])
         }
         await Promise.all(Object.values(artwork).map((renderer) => renderer.prepare()));
       }
-      const first = createArmoryPreview(canvases[0], services, shared ? artwork : undefined);
+      const { SceneSurface } = await import('/src/rendering/scene-surface.ts');
+      const surfaces = canvases.map((canvas) => new SceneSurface(canvas, true));
+      await Promise.all(surfaces.map((surface) => surface.initialize()));
+      const first = createArmoryPreview(
+        canvases[0],
+        services,
+        shared ? artwork : undefined,
+        surfaces[0],
+      );
       const second = createArmoryPreview(
         canvases[1],
         { ...services, now: () => 1000 },
         shared ? artwork : undefined,
+        surfaces[1],
       );
       await Promise.all([first.prepare(), second.prepare(), document.fonts.ready]);
       first.draw(frame);
@@ -208,6 +217,7 @@ for (const shared of [false, true])
       if (shared && canvases[1].toDataURL() !== before)
         throw new Error('Disposal changed another preview');
       second.dispose();
+      for (const surface of surfaces) surface.dispose();
       for (const renderer of Object.values(artwork)) renderer.dispose();
       return result;
     }, shared);
@@ -375,7 +385,8 @@ test('figure renderer draws every blade and robe without touching another canvas
     const preview = document.createElement('canvas');
     preview.width = 390;
     preview.height = 844;
-    const g = preview.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const g = await createTestDrawing(preview);
     const renderer = createFigureRenderer(g, {
       time: 1,
       wind: 0.5,

@@ -26,8 +26,8 @@ for (const viewport of [
       await route.fulfill({
         response,
         body: (await response.text()).replace(
-          'frameLoop.start();',
-          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: runRandom.state(), cache: environmentRenderer.snapshot() }); frameLoop.start();',
+          'artworkReady = true;',
+          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: runRandom.state(), cache: environmentRenderer.snapshot() }); artworkReady = true;',
         ),
       });
     });

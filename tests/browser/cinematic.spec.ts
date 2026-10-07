@@ -24,8 +24,8 @@ test('cinematic scenes isolate gameplay, support remapped keys and swipes, and e
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__cinematicHarness = { G, WX, random: () => runRandom.state() }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__cinematicHarness = { G, WX, random: () => runRandom.state() }; artworkReady = true;',
       ),
     });
   });

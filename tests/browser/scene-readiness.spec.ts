@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
+        'artworkReady = true;',
         `
       { let releaseScene;
       const composeScene = environmentRenderer.compose.bind(environmentRenderer);
@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
         release() { releaseScene(); },
         freezeMenu() { screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }
       };
-      frameLoop.start();
+      artworkReady = true;
       }
     `,
       ),

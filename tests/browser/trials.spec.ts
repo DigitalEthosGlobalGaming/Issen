@@ -48,7 +48,7 @@ async function instrument(page: Page) {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
+      'artworkReady = true;',
       `
       window.__trialHarness = { G, step: update, swipe: onSwipe, tap: onTap,
         startBoss, shownDirection: bossShownDirection,

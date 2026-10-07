@@ -62,8 +62,8 @@ export function createArmoryPreview(
   artwork?: PreviewArtwork,
   surface?: SceneSurface,
 ) {
-  let context = surface?.drawing ?? canvas.getContext('2d');
-  if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  if (!surface?.native) throw new Error('Armory preview requires a prepared WebGL2 surface');
+  let context = surface.drawing;
   const room = canvas.ownerDocument.createElement('img');
   const roomMaterials = createAssetMaterials(canvas.ownerDocument, { room: roomUrl });
   const cachedMaterials = createCachedMaterials();
@@ -141,10 +141,6 @@ export function createArmoryPreview(
     if (surface?.native?.contextLost) {
       last = now;
       return;
-    }
-    if (surface) {
-      canvas = surface.canvas;
-      context = surface.drawing ?? null;
     }
     dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;

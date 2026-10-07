@@ -5,8 +5,8 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__bossVariety = {G,testJump}; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__bossVariety = {G,testJump}; artworkReady = true;',
       ),
     });
   });

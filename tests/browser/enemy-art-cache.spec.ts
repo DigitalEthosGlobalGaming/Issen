@@ -5,12 +5,13 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
     const renderer = createInkEnemyRenderer(document);
     const ready = await renderer.prepare();
-    const g = document.createElement('canvas').getContext('2d')!;
+    const g = await createTestDrawing(document.createElement('canvas'));
     const p = createPalette();
     const env = {
       time: 0,
@@ -110,13 +111,14 @@ test('enemy tint cache survives fog variants and stays bounded through arbitrary
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
     const renderer = createInkEnemyRenderer(document);
     await renderer.prepare();
     const canvas = document.createElement('canvas');
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     const palette = createPalette();
     const env = {
       time: 0,

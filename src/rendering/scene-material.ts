@@ -21,18 +21,9 @@ export function registerMaterialSink(target: SceneDrawing, sink: MaterialSink): 
 export function setSceneLighting(target: SceneDrawing, lighting: SceneLighting): void {
   sinks.get(target)?.lights(lighting);
 }
-export function supportsSceneMaterials(target: SceneDrawing): boolean {
-  return sinks.has(target);
-}
-
-/** Draw an explicitly selected material; the retained Canvas path uses its colour art. */
+/** Live material stamps require a registered native scene painter. */
 export function drawMaterialStamp(target: SceneDrawing, stamp: MaterialStamp): void {
   const sink = sinks.get(target);
-  if (sink) {
-    sink.draw(stamp);
-    return;
-  }
-  const { texture, x, y, width, height } = stamp;
-  if (texture.frame) target.drawImage(texture.source, ...texture.frame, x, y, width, height);
-  else target.drawImage(texture.source, x, y, width, height);
+  if (!sink) throw new Error('Material drawing requires a WebGL2 scene painter');
+  sink.draw(stamp);
 }

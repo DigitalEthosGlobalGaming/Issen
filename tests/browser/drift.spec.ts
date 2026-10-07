@@ -31,13 +31,14 @@ test('all 32 stage sprite atlas frames paint', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#c')).toHaveAttribute('data-debris', 'sprites');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createDriftRenderer } = await import('/src/rendering/scene/drift-renderer.ts');
     const { DRIFT_SPRITES } = await import('/src/rendering/scene/drift-catalog.ts');
     const renderer = createDriftRenderer();
     await renderer.prepare();
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 96;
-    const g = canvas.getContext('2d', { willReadFrequently: true })!;
+    const g = await createTestDrawing(canvas);
     const leaf = {
       x: 48,
       y: 48,

@@ -5,6 +5,7 @@ test('worker construction, runtime and composition errors settle through the own
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const original = window.Worker;
     const frame = {
@@ -54,7 +55,7 @@ test('worker construction, runtime and composition errors settle through the own
         const canvas = document.createElement('canvas');
         canvas.width = 160;
         canvas.height = 100;
-        const drawn = renderer.draw(canvas.getContext('2d')!, frame);
+        const drawn = renderer.draw(await createTestDrawing(canvas), frame);
         const snapshot = renderer.snapshot();
         renderer.dispose();
         results.push({
@@ -88,6 +89,7 @@ test('worker scenery preserves all nine lit compositions and foreground material
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
     const { setSceneLighting } = await import('/src/rendering/scene-material.ts');
@@ -184,13 +186,14 @@ test('worker requests coalesce and owners dispose independently, including pendi
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const a = createEnvironmentRenderer(document),
       b = createEnvironmentRenderer(document);
     const c = document.createElement('canvas');
     c.width = 200;
     c.height = 150;
-    const g = c.getContext('2d')!;
+    const g = await createTestDrawing(c);
     const frame = {
       width: 200,
       height: 150,
@@ -238,6 +241,7 @@ test('inactive owners defer composition until visible and keep the completed sce
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const r = createEnvironmentRenderer(document);
     const frame = {
@@ -261,7 +265,7 @@ test('inactive owners defer composition until visible and keep the completed sce
     const c = document.createElement('canvas');
     c.width = 180;
     c.height = 120;
-    const retained = r.draw(c.getContext('2d')!, { ...frame, stage: 3 });
+    const retained = r.draw(await createTestDrawing(c), { ...frame, stage: 3 });
     delete (document as any).hidden;
     document.dispatchEvent(new Event('visibilitychange'));
     const resumed = await ready;

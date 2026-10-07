@@ -4,8 +4,8 @@ test.beforeEach(async ({ page }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__blessingHarness = { G, ST, BLESS_BY, showShrineOffers, captureCheckpoint, playerDie, renderLives, updateWave, fx, frameLoop }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__blessingHarness = { G, ST, BLESS_BY, showShrineOffers, captureCheckpoint, playerDie, renderLives, updateWave, fx, frameLoop }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

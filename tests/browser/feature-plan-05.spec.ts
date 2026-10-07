@@ -47,8 +47,8 @@ test('pause lists current blessings and keeps actions visible in short landscape
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__pauseHarness = { G }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__pauseHarness = { G }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
@@ -102,8 +102,8 @@ test('item reveals match Armoury copy and cue once when each card appears', asyn
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__revealHarness = { runResults, ITEM_BY, itemPresentation, sfx }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__revealHarness = { runResults, ITEM_BY, itemPresentation, sfx }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

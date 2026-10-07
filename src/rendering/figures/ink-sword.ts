@@ -1,7 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
@@ -217,7 +217,7 @@ export function createInkSwordRenderer(doc: Document) {
       g.rotate(Math.atan2(ty, tx) - Math.atan2(dy, dx));
       const x = -(profile.root[0] - profile.frame[0]) * s,
         y = -(profile.root[1] - profile.frame[1]) * s;
-      if (pbrReady() && supportsSceneMaterials(g)) {
+      if (pbrReady()) {
         let material = materials.get(recipe.profile);
         if (!material) {
           material = {

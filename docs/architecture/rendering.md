@@ -104,8 +104,7 @@ player torso retains its cloth response on non-Sumi outfits; Sumi uses aligned
 PBR maps on all nine parts. Modular sword blades use the supplied
 PBR atlas instead of the generated steel study. The material shader also accepts
 packed roughness/metallic/AO and an emissive texture. OpenGL normal Y is converted
-to the scene's Y-down basis before rotation and mirroring. Canvas draws the colour
-art. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
+to the scene's Y-down basis before rotation and mirroring. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
 renderer, while the small prepared maps belong to their artwork owner.
 See [material studies](../features/material-studies.md) for authoring conventions,
 the selected artwork and the visual comparison fixture.
@@ -115,8 +114,11 @@ requires explicit resume. After eight seconds without restoration, a graphics
 error offers Reload while the run remains paused and its checkpoint remains intact.
 Auxiliary surfaces use the same eight-second deadline. Preview effects and tutorial
 timing/input stop during loss. No canvas replacement or alternate renderer occurs.
-The WebGL2-only surface lifecycle is complete; material/preparation separation and
-remaining fallback comparison test cleanup are in progress during W2.1.
+Material stamps require a native material sink; posed figures have no Canvas
+material branch. `cachedMaterialContext` explicitly marks Canvas texture
+preparation so aligned normal/surface/emission maps can still be baked there.
+Armoury previews require a prepared WebGL2 surface. Film fallback cleanup and
+the broad W2.1 check remain in progress.
 `SceneSurface` shares repeated initialization calls and owns each auxiliary
 surface's bound listeners and recovery deadline. Restoration cancels that deadline;
 disposal removes listeners, cancels recovery and releases any late-created context.

@@ -1,3 +1,4 @@
+import { registerMaterialSink } from '../../src/rendering/scene-material.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -57,6 +58,14 @@ function context() {
       calls.push(['image', ...args]);
     },
   };
+  registerMaterialSink(ctx, {
+    lights() {},
+    draw({ texture, x, y, width, height }) {
+      // Record the native stamp geometry, matching the existing pose assertions.
+      if (texture.frame) ctx.drawImage(texture.source, ...texture.frame, x, y, width, height);
+      else ctx.drawImage(texture.source, x, y, width, height);
+    },
+  });
   return { ctx, calls, depth: () => depth };
 }
 test('each rig composes four native-aspect parts, animates joints and freezes accessibility poses', async () => {

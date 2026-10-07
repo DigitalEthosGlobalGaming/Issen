@@ -68,8 +68,8 @@ test('every actual duel entry refills the run capacity before writing its checkp
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__duelAudit = { G, startBoss }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__duelAudit = { G, startBoss }; artworkReady = true;',
       ),
     });
   });

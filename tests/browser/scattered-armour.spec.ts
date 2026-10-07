@@ -7,6 +7,7 @@ test('Scattered Armour reuses the enemy silhouette and expires as separate sprit
   await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('.startup-loading')).toHaveCount(0);
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
     const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
@@ -17,7 +18,7 @@ test('Scattered Armour reuses the enemy silhouette and expires as separate sprit
     await Promise.all([enemy.prepare(), sword.prepare()]);
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 320;
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     const palette = createPalette();
     const renderer = createFigureRenderer(g, {
       inkEnemy: enemy,
@@ -107,8 +108,8 @@ test('selected Scattered Armour reaches the live kill renderer without duplicate
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__scatterHarness={G,frameLoop,startRun,killEnemy,drawEnemy,updateEnemies}; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__scatterHarness={G,frameLoop,startRun,killEnemy,drawEnemy,updateEnemies}; artworkReady = true;',
       ),
     });
   });

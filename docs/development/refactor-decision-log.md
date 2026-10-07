@@ -34,6 +34,9 @@
 - 2026-10-07 — W2.1 surfaces — explicitly acquire WebGL2 and pass its context to Pixi; use graphics Retry/Reload errors with fixed canvas identity — relying on Pixi's preferred-version flag or Canvas substitution — Pixi's installed context system permits WebGL1 fallback; the user requires WebGL2 only — revert the surface lifecycle commit.
 - 2026-10-07 — W2.1 blends — retain the owned blend filters in canvas-blends.ts — removing all Canvas-named code — they implement live Pixi film grading and translucent compositing, rather than an alternate rendering backend; texture-preparation Canvas also remains — restore prior blend definitions if a later rename changes output.
 
+- 2026-10-07 — W2.1 materials — require native material sinks, explicit cached Canvas preparation contexts and prepared Armoury surfaces — implicit Canvas colour-only material branch — enforces one live renderer while retaining aligned texture baking — revert the native-material checkpoint.
+- 2026-10-07 — W2.1 tests — migrate scene fixtures and comparisons to isolated native painters; anchor runtime harnesses at artworkReady assignment — injecting at the runtime return — original hooks published only after artwork readiness; early publication failed the unchanged maximum-2 repeat-draw tolerance — restore prior test hooks together with the old runtime lifecycle. No tolerance relaxed.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

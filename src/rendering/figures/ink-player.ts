@@ -1,6 +1,6 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { createPalette } from '../palette.ts';
@@ -114,7 +114,7 @@ export function createInkPlayerRenderer(doc: Document) {
       : key === 'torso'
         ? materials.get('cloth')
         : null;
-    if (material && supportsSceneMaterials(g)) {
+    if (material) {
       drawMaterialStamp(g, {
         texture: {
           source: tinted ?? source,

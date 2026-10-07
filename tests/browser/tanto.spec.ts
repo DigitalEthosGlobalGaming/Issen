@@ -21,8 +21,8 @@ test('Tanto intercepts attacks, exhausts charges and preserves the boss victory 
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__tanto = { G, frameLoop, playerDie, startBoss, startStandoff }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__tanto = { G, frameLoop, playerDie, startBoss, startStandoff }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

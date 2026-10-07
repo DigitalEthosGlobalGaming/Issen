@@ -16,8 +16,8 @@ test('player cuts move existing cloth and charm sprites without changing the sim
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__cloth = {P, G, killEnemy, apparelMotion, swingPlayer, update, render, frameLoop}; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__cloth = {P, G, killEnemy, apparelMotion, swingPlayer, update, render, frameLoop}; artworkReady = true;',
       ),
     });
   });

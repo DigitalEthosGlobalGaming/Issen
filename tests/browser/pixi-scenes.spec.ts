@@ -4,7 +4,7 @@ for (const [width, height] of [
   [280, 180],
   [180, 320],
 ]) {
-  test(`all nine native environments retain Canvas composition at ${width}x${height}`, async ({
+  test(`all nine native environments repeat native composition across isolated surfaces at ${width}x${height}`, async ({
     page,
   }, info) => {
     const errors: string[] = [];
@@ -23,8 +23,9 @@ for (const [width, height] of [
           reference = document.createElement('canvas');
         native.width = reference.width = width;
         native.height = reference.height = height;
+        const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
         const painter = await createPixiScenePainter(native),
-          canvas = reference.getContext('2d')!;
+          canvas = await createTestDrawing(reference);
         document.body.replaceChildren();
         document.body.style.cssText = 'margin:0; background:#ddd; color:#222; font:14px sans-serif';
         const results = [];
@@ -65,7 +66,7 @@ for (const [width, height] of [
           }
           results.push({ stage, meanDifference: difference / (width * height * 3), uncovered });
           const heading = document.createElement('p');
-          heading.textContent = `Stage ${stage + 1} — Pixi / Canvas`;
+          heading.textContent = `Stage ${stage + 1} — Native / repeated frame`;
           document.body.append(heading);
           const row = document.createElement('div');
           row.style.display = 'flex';
@@ -77,6 +78,7 @@ for (const [width, height] of [
           row.append(ref);
           document.body.append(row);
         }
+        canvas.dispose();
         painter.dispose();
         environment.dispose();
         return results;
@@ -84,7 +86,7 @@ for (const [width, height] of [
       { width: width!, height: height! },
     );
     await page.setViewportSize({ width: width! * 2, height: 800 });
-    await page.screenshot({ path: info.outputPath('stage-comparisons.png'), fullPage: true });
+    await page.screenshot({ path: info.outputPath('stage-repeat-draw.png'), fullPage: true });
     expect(errors).toEqual([]);
     for (const result of results) {
       expect(result.meanDifference, JSON.stringify(result)).toBeLessThan(9);

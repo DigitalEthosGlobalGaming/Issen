@@ -33,7 +33,7 @@ async function prepare(page: Page, edition = 'web') {
     let body = await response.text();
     body = body.replace(/const edition = [^;]+;/, `const edition = ${JSON.stringify(edition)};`);
     body = body.replace(
-      'frameLoop.start();',
+      'artworkReady = true;',
       `window.__mastery = { G, step: update, swipe: onSwipe, tap: onTap,
       stop: () => frameLoop.stop(), runFrames: () => frameLoop.start(), shrine: openShrine, checkpoint: captureCheckpoint,
       settleScene: async () => { while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },

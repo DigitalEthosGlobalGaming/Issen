@@ -1,7 +1,7 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
@@ -263,12 +263,11 @@ export function createInkEnemyRenderer(doc: Document) {
     cloth: boolean,
   ) {
     const material =
-      (cloth ||
-        key === 'head' ||
-        key === 'hand' ||
-        familyFor(key) === 'heads' ||
-        familyFor(key) === 'variationHeads') &&
-      supportsSceneMaterials(g)
+      cloth ||
+      key === 'head' ||
+      key === 'hand' ||
+      familyFor(key) === 'heads' ||
+      familyFor(key) === 'variationHeads'
         ? pbr[familyFor(key)].material(frame)
         : null;
     const im = sprite(key, frame, f, env, cloth, !material);
