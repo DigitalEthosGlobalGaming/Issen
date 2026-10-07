@@ -11,7 +11,7 @@ import {
 import { createItems } from '../../src/game/content/items.ts';
 import { STAT0 } from '../../src/game/progression/statistics.ts';
 import { rng } from '../../src/shared/random.ts';
-import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../src/shared/figure-model.ts';
 
 test('perfect kills vary, Bonk never cuts or disarms, and all styles are reachable', () => {
   const perfect = new Set(),

@@ -1,5 +1,5 @@
 import { clamp, easeInOut, easeOut } from '../../shared/math.ts';
-import { EPOSE, mixPose, approachPose } from '../../rendering/figures/model.ts';
+import { EPOSE, mixPose, approachPose } from '../../shared/figure-model.ts';
 import type { Random } from '../../shared/random.ts';
 import type { Boss } from './boss.ts';
 import { bossShownDirection } from './boss-openings.ts';

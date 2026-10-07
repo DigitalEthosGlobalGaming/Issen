@@ -18,7 +18,7 @@ test('native equipment and death poses retain colour-art coverage and isolated d
     const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
     const { createInkCharmRenderer } = await import('/src/rendering/figures/ink-charms.ts');
     const { createInkCompanionRenderer } = await import('/src/rendering/figures/ink-companions.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const { applyDeathPose } = await import('/src/rendering/figures/death.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const { BLADES, ROBES } = await import('/src/game/content/cosmetics.ts');

@@ -1,5 +1,5 @@
 import type { Direction } from '../../shared/directions.ts';
-import type { FigureSeed, Pose } from '../../rendering/figures/types.ts';
+import type { FigureSeed, Pose } from '../../shared/character.ts';
 import type { EnemyPosition } from '../combat/enemy.ts';
 import type { bossParameters } from './configuration.ts';
 export interface BossDefinition {

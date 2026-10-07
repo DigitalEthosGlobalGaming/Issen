@@ -49,7 +49,7 @@ for (const back of [true, false]) {
       const order = await page.evaluate(async (back) => {
         const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
         const { createPalette } = await import('/src/rendering/palette.ts');
-        const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+        const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
         const { REST_POSE } = await import('/src/rendering/figures/player.ts');
         const context = document.createElement('canvas').getContext('2d')!;
         const order: string[] = [];
@@ -123,7 +123,7 @@ for (const shared of [false, true])
     await page.goto('/');
     const result = await page.evaluate(async (shared) => {
       const previewPath = '/src/rendering/armory-preview.ts';
-      const modelPath = '/src/rendering/figures/model.ts';
+      const modelPath = '/src/shared/figure-model.ts';
       const palettePath = '/src/rendering/palette.ts';
       const { createArmoryPreview } = await import(previewPath);
       const { makeFig } = await import(modelPath);
@@ -371,7 +371,7 @@ test('figure renderer draws every blade and robe without touching another canvas
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const figurePath = '/src/rendering/figures/figure.ts';
-    const modelPath = '/src/rendering/figures/model.ts';
+    const modelPath = '/src/shared/figure-model.ts';
     const palettePath = '/src/rendering/palette.ts';
     const contentPath = '/src/game/content/cosmetics.ts';
     const { createFigureRenderer } = await import(figurePath);

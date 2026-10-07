@@ -171,7 +171,7 @@ import { modeKey as getModeKey } from './game/progression/modes.ts';
 
 import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
-import { makeFig, EPOSE } from './rendering/figures/model.ts';
+import { makeFig, EPOSE } from './shared/figure-model.ts';
 import { createPostPresentation } from './presentation/post.ts';
 import { createPostPreparation } from './presentation/post-preparation.ts';
 

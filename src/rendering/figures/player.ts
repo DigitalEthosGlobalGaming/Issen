@@ -1,6 +1,6 @@
 import { OPP } from '../../shared/directions.ts';
 import type { Direction } from '../../shared/directions.ts';
-import { approachPose, makeFig } from './model.ts';
+import { approachPose, makeFig } from '../../shared/figure-model.ts';
 import type { FigureSeed, Pose } from './types.ts';
 
 export const REST_POSE: Pose = { gx: 0.19, gy: -0.5, ang: 0.8 };

@@ -8,7 +8,7 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const renderer = createInkEnemyRenderer(document);
     const ready = await renderer.prepare();
     const g = await createTestDrawing(document.createElement('canvas'));
@@ -114,7 +114,7 @@ test('enemy tint cache survives fog variants and stays bounded through arbitrary
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const renderer = createInkEnemyRenderer(document);
     await renderer.prepare();
     const canvas = document.createElement('canvas');

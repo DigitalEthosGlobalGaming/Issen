@@ -2,38 +2,8 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Palette } from '../palette.ts';
 import type { Random } from '../../shared/random.ts';
 
-export interface Pose {
-  gx: number;
-  gy: number;
-  ang: number;
-}
-export type Point = [number, number];
-export interface FigureSeed {
-  hem: number[];
-  sl: [number[], number[]];
-  spots: [number, number, number, boolean][];
-  grass: [number, number, number, number][];
-  hair: Point[];
-  seed: number;
-}
-export interface Aura {
-  c: string;
-  mode: string;
-}
-export interface BladeStyle {
-  len: number;
-  kind?: string;
-  c?: string;
-  gold?: number;
-  aura?: Aura | null;
-  glow?: string;
-  alpha?: number;
-  d?: string;
-  l?: string;
-  m?: string;
-  edge?: string;
-  edgeW?: number;
-}
+import type { FigureSeed, Pose, BladeStyle, Aura } from '../../shared/character.ts';
+export type { Pose, Point, FigureSeed, Aura, BladeStyle } from '../../shared/character.ts';
 export interface Figure {
   /** Presentation-only spring angles in radians; no collision or pose changes. */
   secondary?: SecondaryMotion;

@@ -1,7 +1,7 @@
 import { clamp } from '../../shared/math.ts';
-import { EPOSE, approachPose } from '../../rendering/figures/model.ts';
+import { EPOSE, approachPose } from '../../shared/figure-model.ts';
 import type { Enemy, EnemyPosition } from './enemy.ts';
-import { deathDuration } from '../../rendering/figures/death.ts';
+import { deathDuration } from '../../shared/character-death.ts';
 export interface EnemyUpdateState {
   enemies: Enemy[];
   freezeT: number;

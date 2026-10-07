@@ -1,6 +1,6 @@
 import { createStandoffPhase } from '../../../src/game/phases/standoff.ts';
 import { waveConfig } from '../../../src/game/encounters/configuration.ts';
-import { makeFig, EPOSE } from '../../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../../src/shared/figure-model.ts';
 import { scoreGain, comboMultiplier } from '../../../src/game/progression/scoring.ts';
 
 export function standoffPhaseFixture(session) {

@@ -1,6 +1,6 @@
 import { DIRS } from '../../shared/directions.ts';
 import type { Random } from '../../shared/random.ts';
-import { EPOSE, makeFig } from '../../rendering/figures/model.ts';
+import { EPOSE, makeFig } from '../../shared/figure-model.ts';
 import type { Enemy, EnemyPosition } from './enemy.ts';
 
 export function pickEnemyLook(wave: number, random: Random = Math.random): string | null {

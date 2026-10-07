@@ -11,7 +11,7 @@ test('Scattered Armour reuses the enemy silhouette and expires as separate sprit
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
     const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const enemy = createInkEnemyRenderer(document),
       sword = createInkSwordRenderer(document);

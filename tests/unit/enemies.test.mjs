@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { updateEnemies } from '../../src/game/combat/enemy-update.ts';
 import { enemyPosition } from '../../src/rendering/figures/enemy-position.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
-import { EPOSE, makeFig } from '../../src/rendering/figures/model.ts';
+import { EPOSE, makeFig } from '../../src/shared/figure-model.ts';
 import { spawnEnemy, selectAttacker, orderedEnemies } from '../../src/game/combat/enemy-spawn.ts';
 import { targetSwipe } from '../../src/game/combat/targeting.ts';
 const layout = createLayout(390, 844);

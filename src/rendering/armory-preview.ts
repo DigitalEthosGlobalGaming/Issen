@@ -6,7 +6,7 @@ import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
 import { createInkSwordRenderer } from './figures/ink-sword.ts';
 import { createFigureRenderer } from './figures/figure.ts';
-import { makeFig, EPOSE } from './figures/model.ts';
+import { makeFig, EPOSE } from '../shared/figure-model.ts';
 import type { Figure, FigureEnvironment } from './figures/types.ts';
 import { createEffects } from './effects/state.ts';
 import { createEffectSpawner } from './effects/spawn.ts';

@@ -76,11 +76,27 @@ Five unchanged focused repeats passed (42.5s, kill-events-profile-repeat.log).
 `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 253 passed on the full retry (kill-events-broad-retry.log, terminal confirmed).
 No tests, assertions or deadlines were changed.
-Next: wire remaining phase/run events and proceed to plain shared character models,
-state tables/registry, player/
-companions, results/reward orchestration and root reduction. W3 and Part 4 still
-remain pending; develop stays unpushed. Current physical kill checkpoint d9b22c3.
-Prepared drafts under ignored tmp/runtime-refactor/drafts are NOT executed: move-character-models (physical move with compatibility re-exports), state-machine-draft and state-machine-tests-draft (foundation only; no actual grunt/boss tables yet), move-results-draft (later terminal ownership; requires refreshing its capture audit and verification). The full retry is finished. Isolated preview table-preview-e1c67d8d passed strict types and 31 targeted tests (table-preview-typecheck.log, table-preview-unit.log). This validates drafts only; no shared model/state table is applied to develop yet. Grunt table and seven state tests drafts are also prepared. Apply models, verify/commit physical move, then foundation and actual table steps separately.
+Current green event checkpoint: 58692a5. Shared character-model physical move
+is now complete: shared/character.ts owns the existing plain pose/seed/appearance
+types, shared/figure-model.ts owns seed/pose helpers and shared/character-death.ts
+owns death styles/duration/opacity/choice. Rendering retains temporary re-exports.
+All gameplay imports of rendering/presentation have been removed (rg audit).
+Strict types and all 326 units passed (character-model-*.log).
+`npx playwright test tests/browser/rendering.spec.ts tests/browser/death-presentation.spec.ts tests/browser/scattered-armour.spec.ts tests/browser/enemy-art-cache.spec.ts --config playwright.rendering-v2.config.ts`:
+all 17 passed (23.6s, character-model-browser.log, terminal confirmed).
+No record shape, RNG or behavior changes in the physical model move.
+Next: remove the unused figures/model.ts compatibility adapter separately; then
+state-machine/registry foundation and actual grunt/boss tables, migrating old
+update/spawn/idle adapters before removing them separately. Player/companions,
+results ownership, remaining phase/run events and root reduction still follow.
+W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.
+Prepared drafts under tmp/runtime-refactor/drafts: model move already RUN (do not
+repeat); state-machine-draft, state-machine-tests-draft, grunt-table-draft and
+grunt-tests-draft are NOT applied to develop. In isolated table-preview-e1c67d8d,
+these passed strict types and all 31 targeted cases, including seven grunt cases
+and same-frame foxfire dying pose (table-preview-*.log). Repeat checks after live
+application; isolated preview is preparation, not a develop checkpoint.
+move-results-draft is NOT applied; refresh its capture audit before the later move.
 Earlier checkpoint b360675: between controller, strict/all 316 units and
 ten actual trial/save browser cases passed (between-*.log).
 Then state tables/registry, player/companions, results/reward ownership and root

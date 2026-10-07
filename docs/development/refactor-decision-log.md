@@ -136,6 +136,8 @@
 
 - 2026-10-08 — W2 kill event split — commit run mutations/combat RNG before frozen flat cut snapshots, with synchronous profile/cosmetic listeners and shared scoring/combo rule events — pass mutable enemies to listeners or retain interleaved feedback — strict, all 326 units, 25 focused cases and the full 253-case browser retry pass; first run 252/253 had one unestablished pre-Options timeout, then five unchanged profile repeats passed; cosmetic reaction/RNG ordering within one input may differ, combat timing/balance/save shapes do not — revert the event-split checkpoint; d9b22c3 retains the extracted pre-split rules.
 
+- 2026-10-08 — W2 character model move — rehome plain character types, pose/seed helpers and death timing in shared modules, keeping temporary rendering re-exports — leave gameplay rendering imports or copy model implementations — strict, all 326 units and seventeen native rendering/death cases pass; save shapes and behavior are unchanged — revert the shared-model physical move and consumer import migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

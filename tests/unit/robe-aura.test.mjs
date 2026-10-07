@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
 import { createPalette } from '../../src/rendering/palette.ts';
-import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../src/shared/figure-model.ts';
 
 test('outfit aura is independent, stateless and respects caller and figure opacity', () => {
   const gradients = [],

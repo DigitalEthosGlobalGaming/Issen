@@ -123,12 +123,19 @@ own their encounter rules and dispatch through the live router. Gameplay events
 include phaseChanged, kill/cutChain and score/combo events; remaining phase/run
 emissions are the next step.
 
+Plain character records use shared/character.ts, seed/pose helpers use
+shared/figure-model.ts, and death style/timing values use shared/character-death.ts.
+Rendering reads these same models; gameplay no longer imports rendering or
+presentation. Rendering types/death modules retain compatibility re-exports.
+State-machine tables and the behaviour registry are the next W2 step.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Run fields and restart initialization                                 | `src/game/run-state.ts`                                                          |
 | Enemy spawn, targeting, damage, simulation                            | `src/game/combat/`                                                               |
+| Plain character types, seed/pose helpers, death timing | `src/shared/character.ts`, `figure-model.ts`, `character-death.ts` |
 | Wave difficulty, boss factories/openings/updates, standoffs           | `src/game/encounters/`                                                           |
 | Items, stages, cosmetics, bosses, blessings, awakenings               | `src/game/content/`                                                              |
 | Modifier composition and shrine rules                                 | `src/game/equipment/`, `src/game/shrine/`                                        |
@@ -149,7 +156,7 @@ emissions are the next step.
 | UI runtime wiring | `src/ui/wiring/` |
 | Temple and testing menu controls                                      | `src/ui/screens/template.ts`, `admin.ts`                                         |
 | Backgrounds, ambient grass/leaves, weather                            | `src/rendering/scene/`                                                           |
-| Figure geometry, poses, player animation, projection                  | `src/rendering/figures/`                                                         |
+| Figure geometry, player animation, projection                  | `src/rendering/figures/`                                                         |
 | Particle state, spawning, updates, drawing, films                     | `src/rendering/effects/`                                                         |
 | Isolated armory rendering                                             | `src/rendering/armory-preview.ts`                                                |
 | Screen fragments and controllers                                      | `src/ui/screens/`                                                                |

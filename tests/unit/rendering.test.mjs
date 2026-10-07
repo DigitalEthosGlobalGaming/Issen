@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createPalette } from '../../src/rendering/palette.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
 import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
-import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../src/shared/figure-model.ts';
 
 test('split enemy and boss shadows stay grounded, fade with the body and vanish at expiry', () => {
   const stack = [];

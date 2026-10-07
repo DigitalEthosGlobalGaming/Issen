@@ -1,6 +1,6 @@
 import { BOSSES, BOSS_IDENTITIES } from '../content/bosses.ts';
 import type { Random } from '../../shared/random.ts';
-import { EPOSE, makeFig } from '../../rendering/figures/model.ts';
+import { EPOSE, makeFig } from '../../shared/figure-model.ts';
 import { bossParameters } from './configuration.ts';
 import type { Boss } from './boss.ts';
 import type { Modifiers } from '../equipment/modifiers.ts';

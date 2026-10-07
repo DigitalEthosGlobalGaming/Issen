@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { updateBoss } from '../../src/game/encounters/boss-update.ts';
 import { bossPosition } from '../../src/rendering/figures/boss-position.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
-import { EPOSE } from '../../src/rendering/figures/model.ts';
+import { EPOSE } from '../../src/shared/figure-model.ts';
 import { createBoss } from '../../src/game/encounters/boss-create.ts';
 import {
   bossShownDirection,
