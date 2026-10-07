@@ -461,3 +461,5 @@ ui/wiring/menu-bindings.ts owns ordered panel/setup/admin/settings/Armoury/cinem
 game/session/session-bindings.ts shares explicit capabilities across checkpoint/run entry/trial/results/run lifetime owners. Factories are invoked at their original construction points, retaining eager dependency boundaries and current writable accessors.
 
 game/session/activity.ts owns plain mutable trial/daily metadata and failure/result state alongside the existing combat/random capabilities. Context and controller projections resolve current fields, and browser isolation hooks read the actual activity owner.
+
+presentation/graphics-lifecycle.ts owns graphics error suspension, main-canvas recovery deadlines and activity suspension. Readiness remains a current capability; recovery retains the same canvas and requires explicit run resume.

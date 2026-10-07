@@ -1,3 +1,4 @@
+import { bindGraphicsLifecycle } from './presentation/graphics-lifecycle.ts';
 import { createRunActivity } from './game/session/activity.ts';
 import { createSessionBindings, type SessionBindingViews } from './game/session/session-bindings.ts';
 import { createMenuBindings, type MenuBindingViews } from './ui/wiring/menu-bindings.ts';
@@ -1957,57 +1958,11 @@ export function startGame(
       refreshArmoryNew();
     }
   }
-  let graphicsFailed = false;
-  lifecycle.listen(document, GRAPHICS_ERROR_EVENT, () => {
-    graphicsFailed = true;
-    frameLoop.stop();
-    combatHaptics.stop();
-    audio.setInactive(true);
-    if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) {
-      G.pausedFrom = G.state;
-      G.state = 'paused';
-      showPauseScreen();
-    }
-  });
-  const resumeFrames = () => {
-    if (!graphicsFailed) frameLoop.start();
-  };
-  if (nativeScene) {
-    let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
-    lifecycle.listen(cvs, 'webglcontextlost', () => {
-      frameLoop.stop();
-      combatHaptics.stop();
-      audio.setInactive(true);
-      if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) {
-        G.pausedFrom = G.state;
-        G.state = 'paused';
-        showPauseScreen();
-      }
-      ($('bResume') as HTMLButtonElement).disabled = true;
-      recoveryTimer = lifecycle.timeout(() => {
-        if (!nativeScene?.contextLost) return;
-        reportGraphicsError(cvs);
-      }, 8000);
-    });
-    lifecycle.listen(cvs, 'webglcontextrestored', () => {
-      if (!nativeScene) return;
-      if (recoveryTimer !== undefined) lifecycle.clearTimeout(recoveryTimer);
-      ($('bResume') as HTMLButtonElement).disabled = false;
-      screenAnimation.invalidate();
-      audio.setInactive(!pageActive());
-      if (pageActive()) resumeFrames();
-    });
-  }
-  lifecycle.add(
-    onActivityChange((active) => {
-      if (active) visitToday();
-      audio.setInactive(!active);
-      if (!active) {
-        combatHaptics.stop();
-        frameLoop.stop();
-      } else if (artworkReady && !nativeScene?.contextLost) resumeFrames();
-    }),
-  );
+  bindGraphicsLifecycle(() => ({
+    lifecycle, frameLoop, combatHaptics, audio, G, showPauseScreen, cvs,
+    nativeScene, $, screenAnimation, visitToday,
+    get artworkReady() { return artworkReady; },
+  }));
 
   /* ---------------- boot ---------------- */
   let rt = 0;
