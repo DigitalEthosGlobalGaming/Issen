@@ -58,6 +58,8 @@
 
 - 2026-10-08 — W2 feedback move — move cosmetic factories/popups/stamps and drawing into feedback.ts with cosmetic RNG and explicit flash/sound ports — moving score mutation with popup display — feedback has no run record, so later rule listeners can call it without owning gameplay — revert the feedback move independently.
 
+- 2026-10-08 — W2 environment move — extract ambient factories, grass caches and weather drawing with explicit scene views — moving weather hazard simulation into presentation — hazards consume gameplay RNG and remain rule-owned; native materials, orientations, checkpoints and draw isolation pass — revert the environment drawing move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

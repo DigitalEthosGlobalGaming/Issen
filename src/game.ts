@@ -1,3 +1,4 @@
+import { createEnvironmentPresentation } from './presentation/environment.ts';
 import { createFeedbackPresentation } from './presentation/feedback.ts';
 import { createFiguresPresentation } from './presentation/figures.ts';
 import { createRuntimeScene, type PresentationFrame } from './presentation/scene.ts';
@@ -118,10 +119,7 @@ import {
 } from './game/combat/enemy-spawn.ts';
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
-import { createAmbient } from './rendering/scene/ambient.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
-import { DRIFT_DENSITY } from './rendering/scene/drift-catalog.ts';
-import { createWeatherRenderer } from './rendering/scene/weather-draw.ts';
 import { createWeatherParticles } from './rendering/scene/weather-particles.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
 import { updateWeather as simulateWeather } from './rendering/scene/weather-update.ts';
@@ -647,20 +645,8 @@ export function startGame(
   const driftRenderer = createDriftRenderer();
   let previewDemon = false;
   lifecycle.add(driftRenderer.dispose);
-  function ambient() {
-    const stage = activeTrial?.realm === 'demon' || previewDemon ? STAGES.length : G.stage;
-    return createAmbient({
-      width: W,
-      height: H,
-      scale: S,
-      layout: L,
-      random: R,
-      density: density() * (DRIFT_DENSITY[stage] ?? 1),
-      stage,
-      drawLeaf: driftRenderer.draw,
-      spriteMotion: true,
-    });
-  }
+  const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke } =
+    createEnvironmentPresentation(() => ({ activeTrial,previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg,time,wind,leaves,wx,bamboo,cinematic,cinematicWeather,WX,smokeSprite }));
   function buildGrass() {
     const built = ambient().buildGrass(STAGES[G.stage]!.gl);
     fg = built.fg;
@@ -791,72 +777,6 @@ export function startGame(
     buildGrass();
     buildWeather();
     prepareScene();
-  }
-  const snowGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
-  const demonGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
-  function blades(list: GrassBlade[], t: number, snowTips = false, demonic = false) {
-    let visible = list;
-    if (snowTips) {
-      let cached = snowGrass.get(list);
-      if (!cached) {
-        cached = list
-          .filter((_, index) => index % 9 === 0)
-          .map((blade) => ({
-            ...blade,
-            h: blade.h * 0.17,
-            w: blade.w * 0.6,
-          }));
-        snowGrass.set(list, cached);
-      }
-      visible = cached;
-    }
-    if (demonic) {
-      let cached = demonGrass.get(list);
-      if (!cached) {
-        const foreground = list === fg;
-        cached = list
-          .filter((_, index) => !foreground || index % 2 === 0)
-          .map((blade, index) => ({
-            ...blade,
-            h: blade.h * (foreground ? 0.28 : 0.65),
-            w: blade.w * 0.7,
-            col: index % 5 === 0 ? 'rgba(164,145,122,.65)' : 'rgba(86,71,64,.8)',
-          }));
-        demonGrass.set(list, cached);
-      }
-      visible = cached;
-    }
-    ambient().blades(
-      g,
-      visible,
-      demonic && reducedMotion() ? 0 : t,
-      demonic && reducedMotion() ? 1 : wind,
-    );
-  }
-  function drawLeaves(front: boolean) {
-    ambient().drawLeaves(g, leaves, front);
-  }
-  function weatherRenderer() {
-    return createWeatherRenderer(g, {
-      weather: STAGES[G.stage]!.weather,
-      width: W,
-      height: H,
-      scale: S,
-      time,
-      wind,
-      hazard: G.m.hazard,
-      particles: wx,
-      bamboo,
-      state: cinematic.active ? cinematicWeather : WX,
-      smokeSprite,
-      drawEmber: driftRenderer.drawEmber,
-    });
-  }
-  function drawWeather() {
-    weatherRenderer().drawWeather();
-  }
-  function drawSmoke() {
-    weatherRenderer().drawSmoke();
   }
   /* ---------------- figures ---------------- */
   const {
