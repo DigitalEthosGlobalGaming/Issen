@@ -40,10 +40,12 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has about 4,141 lines; composition-root reduction is NOT complete.
 
-Latest checkpoint: cosmetic clock/camera, ambient and transition updates moved.
-Strict types passed; all 274 units passed (cosmetic-updates-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts tests/browser/stage-variation.spec.ts --config playwright.rendering-v2.config.ts`:
-all 12 passed (cosmetic-updates-browser.log; terminal exit confirmed).
+Latest checkpoint: UI screens ownership moved without intentional behavior changes.
+Strict types passed; all 274 units passed (ui-screens-unit.log).
+`npx playwright test tests/browser/ui.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts --config playwright.rendering-v2.config.ts`:
+all 11 passed (ui-screens-browser.log; terminal completion confirmed).
+Continue the ordered UI cluster, then run-flow/router/phases. Full W2/W3 and
+Part 4 remain pending; do not push develop yet.
 
 Cached environment builders checkpoint: Strict types
 passed. All 274 units passed (environment-artwork-unit.log).

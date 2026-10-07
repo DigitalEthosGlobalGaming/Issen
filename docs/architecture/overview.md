@@ -90,6 +90,9 @@ layered image scenery to the shared scene composition and film pass, rendered
 through Pixi on WebGL2. Canvas remains a texture-preparation tool.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
+`ui/wiring/screens.ts` owns the HUD and animated screen adapters, retaining the
+explicit progression sync port before score display.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

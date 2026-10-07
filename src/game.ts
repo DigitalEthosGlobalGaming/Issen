@@ -73,8 +73,7 @@ import type { GrassBlade, Leaf } from './rendering/scene/ambient.ts';
 import type { WeatherParticle, Bamboo } from './rendering/scene/weather-state.ts';
 import { createLifecycle } from './platform/lifecycle.ts';
 import { createFrameLoop } from './platform/frame-loop.ts';
-import { createScreenAnimation } from './ui/screen-animation.ts';
-import { createHud } from './ui/hud.ts';
+import { createRuntimeScreens } from './ui/wiring/screens.ts';
 import { createRunState, resetRun } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
@@ -924,8 +923,8 @@ export function startGame(
     }
   }
 
-  const hudView = createHud($('app'));
-  const screenAnimation = createScreenAnimation(activeNow, hudView.activeScreen);
+  const { hudView, screenAnimation, showScreen, renderLives, hud, setScore, banner, renderHp } =
+    createRuntimeScreens($('app'), activeNow, () => ({ G, activeDaily: !!activeDaily, syncCollections }));
   let artworkReady = false;
   let sceneLoading = false;
   let sceneReadyToPresent = false;
@@ -977,21 +976,6 @@ export function startGame(
     sceneContinuation = action;
     return true;
   }
-  function showScreen(id: Screen | null) {
-    screenAnimation.show(id);
-    hudView.showScreen(id);
-  }
-  function renderLives() {
-    hudView.renderLives(G);
-  }
-  function hud(on: boolean) {
-    hudView.render(G, on, activeDaily ? 'Daily' : undefined);
-  }
-  function setScore() {
-    syncCollections();
-    hudView.renderScore(G);
-  }
-  const banner = hudView.showBanner;
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
   const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
@@ -1845,9 +1829,6 @@ export function startGame(
     if (def.mirror)
       hint('mirror', 'The Mirror never feints. Cut opposite to his arrow and blade.', 5000);
     captureCheckpoint();
-  }
-  function renderHp() {
-    hudView.renderBossHealth(G.boss);
   }
   function bossPos(b: Boss) {
     return bossPosition(b, L);

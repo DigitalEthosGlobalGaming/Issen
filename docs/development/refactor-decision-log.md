@@ -80,6 +80,8 @@
 
 - 2026-10-08 — W2 presentation checkpoint — retain the shared-preview exact-PNG assertion and record the isolated failure — speculative renderer changes or relaxed tolerance — first broad run had 252 passes and one preview-disposal failure; unchanged 20-case repeat and uninterrupted 253-case broad retry passed, with cause unestablished and ignored pixel diagnostics ready if it recurs — investigate the original assertion with the prepared diagnostics if reproduced.
 
+- 2026-10-08 — W2 UI screens — move the existing wiring through explicit current views and action ports — retain the monolithic closure — preserves callback ordering, save keys and current-run reads; strict, unit and focused browser checks pass — revert the UI screens move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
