@@ -1,3 +1,4 @@
+import { createPanelWiring } from './ui/wiring/panels.ts';
 import { createTitleSecrets } from './ui/wiring/secrets.ts';
 import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
 import { createEnvironmentState } from './presentation/environment-state.ts';
@@ -2723,12 +2724,6 @@ export function startGame(
       supportEmberBonusAmount(META, pending.hundredths),
     );
   }
-  function setBestLine() {
-    $('bTrials').hidden = !trialsUnlocked(playerStats.roninWave);
-    $('tBest').textContent =
-      (ST.bestScore ? `Best ${ST.bestScore.toLocaleString()}` : '') +
-      (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
-  }
   function toTitle() {
     activeDaily = null;
     ST = playerStats;
@@ -2752,38 +2747,10 @@ export function startGame(
     P.pose = { ...PREST };
     setBestLine();
   }
-  function openPanel(id: Screen) {
-    G.panelFrom = hudView.activeScreen || 'title';
-    G.panel = id;
-    if (id === 'support') {
-      supportPreview.draw(previewFrame(PREMIUM_FILM, false, $('supportPreview')));
-      renderSupport($('support'), premium.state, testerPremiumActive(testerPremium));
-      void premium.refresh();
-    }
-    if (id === 'armory') {
-      renderArmory();
-      void premium.refresh();
-    }
-    if (id === 'stats') renderStats();
-    if (id === 'setup') renderSetup();
-    if (id === 'template') renderTemplate($('templateContent'), META, saveMeta, premiumAccess());
-    if (id === 'admin') showAdmin();
-    if (id === 'trials')
-      renderTrials(
-        $('trials'),
-        TRIAL_PROGRESS,
-        playerStats.roninWave,
-        trialResult,
-        startTrial,
-        () => {
-          trialResult = null;
-          G.panel = null;
-          showScreen('title');
-        },
-        premiumAccess(),
-      );
-    showScreen(id);
-  }
+  const { setBestLine, openPanel, closePanel, renderStats } = createPanelWiring(() => ({
+    $, playerStats, ST, G, hudView, supportPreview, previewFrame, testerPremium, renderArmory, renderSetup, META, saveMeta, premiumAccess, showAdmin, TRIAL_PROGRESS, trialResult, startTrial, showScreen, UNL, ITEMS, setBestLine, renderStats,
+    clearTrialResult() { trialResult = null; },
+  }));
   const setupScreen = createSetupScreen(
     $('setup'),
     SETUP,
@@ -2855,11 +2822,6 @@ export function startGame(
     get EQ() { return EQ; },
     setTrialsWasUnlocked(value) { runTrialsWasUnlocked = value; },
   });
-  function closePanel() {
-    G.panel = null;
-    if (G.panelFrom === 'title') setBestLine();
-    showScreen(G.panelFrom);
-  }
   const scrollMenus = createScrollMenus($('app'));
   lifecycle.add(scrollMenus.dispose);
   function applySettings() {
@@ -3071,9 +3033,6 @@ export function startGame(
     G, ST, UNL, audioInit, tn, sfx, flash, saveStats, checkUnlocks, toast,
   }));
   bindTitleGestures($('title'), lifecycle, () => cinematic.logoTap());
-  function renderStats() {
-    renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length, META.earned);
-  }
   lifecycle.add(bindProfileReset($('options'), deleteCurrentProfile, isTestProfile()));
   function flushProfile() {
     store.set('issen.stats', playerStats);

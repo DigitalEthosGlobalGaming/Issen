@@ -99,6 +99,8 @@ it reads current statistics through explicit views and invokes progression ports
 `ui/wiring/admin.ts` owns testing-menu wiring and guards, with current profile/run
 views and explicit runtime action ports.
 
+`ui/wiring/panels.ts` owns panel navigation and current-profile statistics/title display.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
