@@ -1,28 +1,32 @@
 import { createSetupScreen } from '../screens/setup.ts';
 import { createTutorial } from '../screens/tutorial.ts';
 import { dailyRun } from '../../game/progression/daily.ts';
-import { templatePowers, pendingModeReveals, markModeRevealsSeen } from '../../game/progression/meta.ts';
+import {
+  templatePowers,
+  pendingModeReveals,
+  markModeRevealsSeen,
+} from '../../game/progression/meta.ts';
 import { store } from '../../platform/storage.ts';
 import type { Equipment, Setup } from '../../platform/saves.ts';
 import type { MetaProgress } from '../../game/progression/meta.ts';
 import type { Item } from '../../game/content/items.ts';
 
 export interface SetupViews {
- readonly $: (id: string) => HTMLElement;
- readonly SETUP: Setup;
- readonly EQ: Equipment;
- readonly META: MetaProgress;
- readonly ITEM_BY: Record<string, Item>;
- readonly saveMeta: () => void;
- readonly premiumAccess: () => boolean;
- readonly sfx: { glint: () => void };
- readonly toTitle: () => void;
- readonly reducedMotion: () => boolean;
+  readonly $: (id: string) => HTMLElement;
+  readonly SETUP: Setup;
+  readonly EQ: Equipment;
+  readonly META: MetaProgress;
+  readonly ITEM_BY: Record<string, Item>;
+  readonly saveMeta: () => void;
+  readonly premiumAccess: () => boolean;
+  readonly sfx: { glint: () => void };
+  readonly toTitle: () => void;
+  readonly reducedMotion: () => boolean;
 }
 
 /** Owns setup/tutorial callbacks while run entry remains an explicit action. */
 export function createSetupWiring(views: SetupViews) {
- const { $, SETUP, META, ITEM_BY, saveMeta, premiumAccess, sfx, toTitle, reducedMotion } = views;
+  const { $, SETUP, META, ITEM_BY, saveMeta, premiumAccess, sfx, toTitle, reducedMotion } = views;
   const setupScreen = createSetupScreen(
     $('setup'),
     SETUP,
@@ -68,5 +72,5 @@ export function createSetupWiring(views: SetupViews) {
     tutorial.start();
   }
 
- return { setupScreen, renderSetup, tutorial, launchTutorial };
+  return { setupScreen, renderSetup, tutorial, launchTutorial };
 }

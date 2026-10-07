@@ -10,39 +10,38 @@ import { createTitleSecrets } from './ui/wiring/secrets.ts';
 import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
 import { createEnvironmentState } from './presentation/environment-state.ts';
 import { createCuePresentation } from './presentation/cues.ts';
-import { createPresentationState, advancePresentationClock, advancePresentationCamera } from './presentation/state.ts';
+import {
+  createPresentationState,
+  advancePresentationClock,
+  advancePresentationCamera,
+} from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
 import { createEnvironmentPresentation } from './presentation/environment.ts';
 import { createFeedbackPresentation } from './presentation/feedback.ts';
 import { createFiguresPresentation } from './presentation/figures.ts';
-import { createRuntimeScene, type PresentationFrame } from './presentation/scene.ts';
+import { createRuntimeScene } from './presentation/scene.ts';
 import { createEventBus, type GameEvents } from './game/events.ts';
 import type { GameContext } from './game/session/context.ts';
 import type { PresentationContext } from './presentation/context.ts';
 import { reportGraphicsError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
-import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
+import { collectionBlessings } from './game/content/collections.ts';
 import {
   parseDailyLogin,
   recordDailyLogin,
   SEVEN_DAWNS_CREST,
 } from './game/progression/daily-login.ts';
-import {
-  awakeningCost,
-  awakeningPurchasable,
-  purchaseAwakening,
-} from './game/progression/awakening-purchases.ts';
+
 import {
   parseCollectionProgress,
   initializeCollections,
   syncCollectionProgress,
   collectionItemStats,
-  collectionChallengeText,
 } from './game/progression/collection-progress.ts';
 import { parsePendingSupport, type PendingSupportReward } from './platform/pending-support.ts';
 import { createRewardedSupport } from './platform/rewarded-support.ts';
 import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
-import { createScrollMenus } from './ui/scroll-menus.ts';
+
 import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.ts';
 import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
@@ -55,8 +54,8 @@ import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
 import { createLightingRig } from './rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from './ui/material-lighting.ts';
 import { disposeUiArt } from './rendering/ui-art.ts';
-import { createLightingDebug } from './ui/lighting-debug.ts';
-import { premium, listenToPurchases } from './platform/purchases.ts';
+
+import { premium } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
 import {
   editionAccess,
@@ -66,20 +65,14 @@ import {
 } from './platform/editions.ts';
 import { swiftSlashPoints, precisionZone, duelMasterTimings } from './game/progression/mastery.ts';
 import { PREMIUM_FILM } from './platform/premium.ts';
-import {
-  TESTER_PREMIUM_CAMPAIGN,
-  testerPremiumActive,
-  parseTesterPremium,
-} from './platform/tester-premium.ts';
-import { renderSupport } from './ui/screens/support.ts';
+import { testerPremiumActive, parseTesterPremium } from './platform/tester-premium.ts';
+
 import type { Item, ItemCategory } from './game/content/items.ts';
 import type { Enemy } from './game/combat/enemy.ts';
 import type { Boss } from './game/encounters/boss.ts';
-import type { Screen } from './game/run-state.ts';
+
 import type { Direction } from './shared/directions.ts';
-import type { Figure } from './rendering/figures/types.ts';
-import type { GrassBlade, Leaf } from './rendering/scene/ambient.ts';
-import type { WeatherParticle, Bamboo } from './rendering/scene/weather-state.ts';
+
 import { createLifecycle } from './platform/lifecycle.ts';
 import { createFrameLoop } from './platform/frame-loop.ts';
 import { createRuntimeScreens } from './ui/wiring/screens.ts';
@@ -88,9 +81,7 @@ import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
 import { createSecondaryMotion } from './rendering/figures/secondary-motion.ts';
-import { createArmoryScreen } from './ui/screens/armory.ts';
-import { createPresetScreen } from './ui/screens/presets.ts';
-import { parsePresets, presetEquipment } from './game/progression/presets.ts';
+
 import {
   appendGameOverUnlocks,
   renderGameOver,
@@ -142,19 +133,15 @@ import {
   updatePlayerAnimation,
 } from './rendering/figures/player.ts';
 import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
-import { createEffects } from './rendering/effects/state.ts';
-import { createEffectQuality, scaledCount, preferredDensity } from './rendering/effects/quality.ts';
+
+import { createEffectQuality, preferredDensity } from './rendering/effects/quality.ts';
 import {
   chooseDeathStyle,
-  deathDuration,
-  deathShadowOpacity,
   BOSS_SHADOW_DURATION,
   SHADOW_DURATION,
-  applyDeathPose,
 } from './rendering/figures/death.ts';
-import { parseSettings, preferenceEnabled, sensitivityScale } from './platform/settings.ts';
-import { createCinematic } from './ui/screens/cinematic.ts';
-import { createOptions } from './ui/screens/options.ts';
+import { parseSettings, preferenceEnabled } from './platform/settings.ts';
+
 import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
 import {
   startBlessingWave,
@@ -165,34 +152,26 @@ import {
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
-import { renderStatistics, bindProfileReset } from './ui/screens/stats.ts';
-import { bindSaveTransfer } from './ui/screens/save-transfer.ts';
-import { bindProfileManagement } from './ui/screens/profile-management.ts';
-import { deleteCurrentProfile } from './platform/storage.ts';
+
 import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
-import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
+import { makeFig, EPOSE } from './rendering/figures/model.ts';
 import { createPostPresentation } from './presentation/post.ts';
 import { createPostPreparation } from './presentation/post-preparation.ts';
-import type { PostFrame } from './rendering/effects/post-frame.ts';
+
 import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
 import type { createBackground } from './rendering/scene/background.ts';
 import { createEnvironmentRenderer } from './rendering/environment/index.ts';
-import { BASE, createPalette } from './rendering/palette.ts';
+import { createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
-import { bindPointer } from './input/pointer.ts';
-import { bindKeyboard } from './input/keyboard.ts';
-import { createSetupScreen } from './ui/screens/setup.ts';
-import { renderTemplate } from './ui/screens/template.ts';
+
 import { createAdminWiring } from './ui/wiring/admin.ts';
-import { createTutorial } from './ui/screens/tutorial.ts';
+
 import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
 import {
   parseMeta,
   templateModifiers,
   templatePowers,
-  EMPTY_UPGRADES,
-  TEMPLATE_UPGRADES,
   unlockBossMilestone,
   pendingModeReveals,
   markModeRevealsSeen,
@@ -207,8 +186,8 @@ import type { BladeStats } from './game/progression/statistics.ts';
 import { normalLives } from './game/equipment/lives.ts';
 import { interceptWithTanto } from './game/combat/tanto.ts';
 import { throwKnife, refillDuelKnives } from './game/combat/knife.ts';
-import { FORTUNES } from './game/content/fortunes.ts';
-import { BLESS, TIER, TIERNAME, BLESS_BY } from './game/content/blessings.ts';
+
+import { BLESS, BLESS_BY } from './game/content/blessings.ts';
 import {
   loadStatistics,
   parseStatistics,
@@ -229,24 +208,18 @@ import {
   completeTrial,
   grantTrialRewards,
 } from './game/progression/trials.ts';
-import { renderTrials } from './ui/screens/trials.ts';
+
 import { renderPauseBlessings } from './ui/screens/pause.ts';
 import { itemPresentation } from './ui/screens/item-presentation.ts';
 import type { TrialResult } from './ui/screens/trials.ts';
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
-import { deathsTotal } from './game/progression/statistics.ts';
+
 import { createAudio } from './audio/audio.ts';
 import { computeModifiers } from './game/equipment/modifiers.ts';
-import {
-  store,
-  isTestProfile,
-  switchTestProfile,
-  clearTestProfile,
-  clearActiveProfile,
-} from './platform/storage.ts';
+import { store, isTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
-import { TAU, clamp, lerp, easeOut, easeInOut, angDiff } from './shared/math.ts';
-import { rng, restorableRng, newRunSeed, shuffle } from './shared/random.ts';
+import { TAU, clamp, lerp } from './shared/math.ts';
+import { rng, restorableRng, newRunSeed } from './shared/random.ts';
 import {
   readRunCheckpoint,
   writeRunCheckpoint,
@@ -610,29 +583,77 @@ export function startGame(
   const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   let stageSeed = stageVisits.enter(0);
   const environmentState = createEnvironmentState();
-  const { buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather } =
-    createEnvironmentArtwork(cvs.ownerDocument, () => ({
-      W,H,DPR,S,stage: G.stage,environmentState,L,R,density,context2d,ambient,
-    }));
+  const {
+    buildBG,
+    buildMist,
+    buildGrass,
+    newLeaf,
+    buildLeaves,
+    gustLeaves,
+    buildWeatherArtwork,
+    rebalanceWeather,
+  } = createEnvironmentArtwork(cvs.ownerDocument, () => ({
+    W,
+    H,
+    DPR,
+    S,
+    stage: G.stage,
+    environmentState,
+    L,
+    R,
+    density,
+    context2d,
+    ambient,
+  }));
 
-  
   /* ---------------- ambient ---------------- */
-  
-  
+
   const WX = createWeatherState(() => 0.5);
-  
+
   const driftRenderer = createDriftRenderer();
-  
+
   lifecycle.add(driftRenderer.dispose);
-  const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition } =
-    createEnvironmentPresentation(() => ({ environmentState,activeTrial,previewDemon: environmentState.previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg: environmentState.fg,time: presentationState.time,wind: presentationState.wind,leaves: environmentState.leaves,wx: environmentState.wx,bamboo: environmentState.bamboo,cinematic,cinematicWeather: environmentState.cinematicWeather,WX,smokeSprite: environmentState.smokeSprite }));
+  const {
+    ambient,
+    blades,
+    drawLeaves,
+    weatherRenderer,
+    drawWeather,
+    drawSmoke,
+    updateAmbient,
+    updateTransition,
+  } = createEnvironmentPresentation(() => ({
+    environmentState,
+    activeTrial,
+    previewDemon: environmentState.previewDemon,
+    G,
+    W,
+    H,
+    S,
+    L,
+    R,
+    density,
+    driftRenderer,
+    reducedMotion,
+    g,
+    fg: environmentState.fg,
+    time: presentationState.time,
+    wind: presentationState.wind,
+    leaves: environmentState.leaves,
+    wx: environmentState.wx,
+    bamboo: environmentState.bamboo,
+    cinematic,
+    cinematicWeather: environmentState.cinematicWeather,
+    WX,
+    smokeSprite: environmentState.smokeSprite,
+  }));
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();
     if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
   }
   const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
   const { buildPost } = postArtwork;
-  
+
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
     if (anim && environmentState.bg) {
@@ -651,8 +672,38 @@ export function startGame(
   }
   /* ---------------- figures ---------------- */
   const {
-    figureRenderer, drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf, drawEnemy, drawBoss,
-  } = createFiguresPresentation(() => ({ g,inkCharm,inkCompanion,inkEnemy,inkPlayer,inkSword,time: presentationState.time,wind: presentationState.wind,G,W,H,cols,R,density,reducedMotion,reducedFlashes,robePal,accessible,EQ,SEAL,FONT }));
+    figureRenderer,
+    drawFigure,
+    drawSplit,
+    drawPetAt,
+    drawSword,
+    drawGlint,
+    tipOf,
+    drawEnemy,
+    drawBoss,
+  } = createFiguresPresentation(() => ({
+    g,
+    inkCharm,
+    inkCompanion,
+    inkEnemy,
+    inkPlayer,
+    inkSword,
+    time: presentationState.time,
+    wind: presentationState.wind,
+    G,
+    W,
+    H,
+    cols,
+    R,
+    density,
+    reducedMotion,
+    reducedFlashes,
+    robePal,
+    accessible,
+    EQ,
+    SEAL,
+    FONT,
+  }));
   function petOf() {
     return EQ.pet === 'nopet' && EQ.robe === 'scarecrow' ? 'crow' : EQ.pet;
   }
@@ -736,8 +787,16 @@ export function startGame(
   }
   /* ---------------- ensō glyph ---------------- */
   const { drawEnso, drawGlyphs } = createCuePresentation(() => ({
-    g, time: presentationState.time, SEAL, SEALARC, FONT, pz, G,
-    ordered: () => waveConfiguration().ordered, liveOrdered, veil: WX.veil,
+    g,
+    time: presentationState.time,
+    SEAL,
+    SEALARC,
+    FONT,
+    pz,
+    G,
+    ordered: () => waveConfiguration().ordered,
+    liveOrdered,
+    veil: WX.veil,
   }));
   /* ---------------- audio ---------------- */
   const audio = createAudio(settings.muted);
@@ -768,11 +827,12 @@ export function startGame(
 
   /* ---------------- game state ---------------- */
   const presentationState = createPresentationState();
-  let hitStop = 0, timeScale = 1;
+  let hitStop = 0,
+    timeScale = 1;
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
   const apparelMotion = createSecondaryMotion();
-  
+
   const effectQuality = createEffectQuality();
   // Transitional adapters preserve closure ownership while consumers migrate to slices.
   const context: GameContext<PresentationContext> = {
@@ -933,7 +993,11 @@ export function startGame(
   }
 
   const { hudView, screenAnimation, showScreen, renderLives, hud, setScore, banner, renderHp } =
-    createRuntimeScreens($('app'), activeNow, () => ({ G, activeDaily: !!activeDaily, syncCollections }));
+    createRuntimeScreens($('app'), activeNow, () => ({
+      G,
+      activeDaily: !!activeDaily,
+      syncCollections,
+    }));
   let artworkReady = false;
   let sceneLoading = false;
   let sceneReadyToPresent = false;
@@ -1050,13 +1114,49 @@ export function startGame(
     if (UNL.size !== before) refreshArmoryNew();
   }
   const {
-    flash, letterbox, punch, weatherBurst, killFx, updateFx,
-    pop, stamp, effectSpawner, addSlash, inkBurst, scraps, ring, sparks, dust,
-    effectRenderer, drawFx, drawFx2, drawStains, drawPops, drawStamps,
-  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite: environmentState.mistSprite,R,density,sfx,W,H,portrait,
-    state: presentationState, reducedFlashes, reducedMotion,
-    weather: STAGES[G.stage]!.weather, newLeaf, leaves: environmentState.leaves,
-    killEffect: () => accessible(EQ.fx) ? EQ.fx : 'ink', clink: () => sfx.clink(),
+    flash,
+    letterbox,
+    punch,
+    weatherBurst,
+    killFx,
+    updateFx,
+    pop,
+    stamp,
+    effectSpawner,
+    addSlash,
+    inkBurst,
+    scraps,
+    ring,
+    sparks,
+    dust,
+    effectRenderer,
+    drawFx,
+    drawFx2,
+    drawStains,
+    drawPops,
+    drawStamps,
+  } = createFeedbackPresentation(() => ({
+    g,
+    fx: presentationState.fx,
+    S,
+    time: presentationState.time,
+    FONT,
+    SEAL,
+    mistSprite: environmentState.mistSprite,
+    R,
+    density,
+    sfx,
+    W,
+    H,
+    portrait,
+    state: presentationState,
+    reducedFlashes,
+    reducedMotion,
+    weather: STAGES[G.stage]!.weather,
+    newLeaf,
+    leaves: environmentState.leaves,
+    killEffect: () => (accessible(EQ.fx) ? EQ.fx : 'ink'),
+    clink: () => sfx.clink(),
   }));
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     pts = gain(pts);
@@ -1568,7 +1668,12 @@ export function startGame(
     if (G.m.maneki) {
       G.manekiN = (G.manekiN || 0) + 1;
       if (G.manekiN % 7 === 0) {
-        presentationState.fx.coins.push({ x0: e.pos.x, y0: e.pos.y - e.pos.h * 0.6, t: 0, life: 0.8 });
+        presentationState.fx.coins.push({
+          x0: e.pos.x,
+          y0: e.pos.y - e.pos.h * 0.6,
+          t: 0,
+          life: 0.8,
+        });
         sfx.coin();
         addScore(Math.round(500 * comboMult()), 0, 0, '招き猫');
       }
@@ -2755,11 +2860,45 @@ export function startGame(
     setBestLine();
   }
   const { setBestLine, openPanel, closePanel, renderStats } = createPanelWiring(() => ({
-    $, playerStats, ST, G, hudView, supportPreview, previewFrame, testerPremium, renderArmory, renderSetup, META, saveMeta, premiumAccess, showAdmin, TRIAL_PROGRESS, trialResult, startTrial, showScreen, UNL, ITEMS, setBestLine, renderStats,
-    clearTrialResult() { trialResult = null; },
+    $,
+    playerStats,
+    ST,
+    G,
+    hudView,
+    supportPreview,
+    previewFrame,
+    testerPremium,
+    renderArmory,
+    renderSetup,
+    META,
+    saveMeta,
+    premiumAccess,
+    showAdmin,
+    TRIAL_PROGRESS,
+    trialResult,
+    startTrial,
+    showScreen,
+    UNL,
+    ITEMS,
+    setBestLine,
+    renderStats,
+    clearTrialResult() {
+      trialResult = null;
+    },
   }));
   const { setupScreen, renderSetup, tutorial, launchTutorial } = createSetupWiring({
-    $, SETUP, META, ITEM_BY, saveMeta, premiumAccess, sfx, toTitle, reducedMotion, get EQ() { return EQ; },
+    $,
+    SETUP,
+    META,
+    ITEM_BY,
+    saveMeta,
+    premiumAccess,
+    sfx,
+    toTitle,
+    reducedMotion,
+    get EQ() {
+      return EQ;
+    },
   });
   function testJump(stage: number, wave: number, boss: boolean) {
     if (!isTestProfile()) return;
@@ -2784,33 +2923,169 @@ export function startGame(
     showScreen(null);
   }
   const { showAdmin } = createAdminWiring($('adminContent'), {
-    AWAKENING, G, ITEMS, ITEM_BY, META, SETUP, UNL, applySeal, checkUnlocks, computeMods, hud, launchTutorial, playerEquipment, playerStats, refreshArmoryNew, renderLives, renderSetup, revoked, saveAwakening, saveMeta, setBestLine, showScreen, testJump, toast,
-    get EQ() { return EQ; },
-    setTrialsWasUnlocked(value) { runTrialsWasUnlocked = value; },
+    AWAKENING,
+    G,
+    ITEMS,
+    ITEM_BY,
+    META,
+    SETUP,
+    UNL,
+    applySeal,
+    checkUnlocks,
+    computeMods,
+    hud,
+    launchTutorial,
+    playerEquipment,
+    playerStats,
+    refreshArmoryNew,
+    renderLives,
+    renderSetup,
+    revoked,
+    saveAwakening,
+    saveMeta,
+    setBestLine,
+    showScreen,
+    testJump,
+    toast,
+    get EQ() {
+      return EQ;
+    },
+    setTrialsWasUnlocked(value) {
+      runTrialsWasUnlocked = value;
+    },
   });
-  const { scrollMenus, applySettings, saveSettings, lightingDebug, options } = createSettingsWiring({
-    $, G, cvs, screenAnimation, lifecycle, settings, reducedMotion, reducedFlashes, prepareScene, combatHaptics, audio, setMuteIcon, presentationState, environmentState, ambient, rebalanceWeather, lightingRig, previewFrame, audioInit, closePanel, launchTutorial, systemMotion,
-    get artworkReady() { return artworkReady; },
-    get savedRun() { return savedRun; },
-    get supportPreview() { return supportPreview; },
-  });
+  const { scrollMenus, applySettings, saveSettings, lightingDebug, options } = createSettingsWiring(
+    {
+      $,
+      G,
+      cvs,
+      screenAnimation,
+      lifecycle,
+      settings,
+      reducedMotion,
+      reducedFlashes,
+      prepareScene,
+      combatHaptics,
+      audio,
+      setMuteIcon,
+      presentationState,
+      environmentState,
+      ambient,
+      rebalanceWeather,
+      lightingRig,
+      previewFrame,
+      audioInit,
+      closePanel,
+      launchTutorial,
+      systemMotion,
+      get artworkReady() {
+        return artworkReady;
+      },
+      get savedRun() {
+        return savedRun;
+      },
+      get supportPreview() {
+        return supportPreview;
+      },
+    },
+  );
   const armoryWiring = createArmoryWiring({
-    $, META, ITEMS, accessibleUnlocks, accessible, computeMods, applySeal, G, UNL, premiumAccess, DAILY_LOGIN, COLLECTION_PROGRESS, ARMORY_SEEN, SEALS, CHARMCOL, AWAKENING, SETUP, saveMeta, toast, sfx, demoKill, openPanel, lifecycle,
-    get EQ() { return EQ; }, get ST() { return ST; },
+    $,
+    META,
+    ITEMS,
+    accessibleUnlocks,
+    accessible,
+    computeMods,
+    applySeal,
+    G,
+    UNL,
+    premiumAccess,
+    DAILY_LOGIN,
+    COLLECTION_PROGRESS,
+    ARMORY_SEEN,
+    SEALS,
+    CHARMCOL,
+    AWAKENING,
+    SETUP,
+    saveMeta,
+    toast,
+    sfx,
+    demoKill,
+    openPanel,
+    lifecycle,
+    get EQ() {
+      return EQ;
+    },
+    get ST() {
+      return ST;
+    },
   });
   const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
-  function refreshArmoryNew() { armoryWiring.refreshArmoryNew(); }
+  function refreshArmoryNew() {
+    armoryWiring.refreshArmoryNew();
+  }
   const { cinematic, sceneFilm, previewStage } = createCinematicWiring({
-    $, G, previewVisits, environmentState, buildLeaves, palette, buildBG, buildMist, buildGrass, buildWeather, prepareScene, setupAttract, settings, ITEMS, accessible, UNL, saveStats, toast, cvs, lifecycle,
-    get EQ() { return EQ; }, get ST() { return ST; },
-    get stageSeed() { return stageSeed; }, set stageSeed(value) { stageSeed = value; },
-    get MIST() { return MIST; }, set MIST(value) { MIST = value; },
+    $,
+    G,
+    previewVisits,
+    environmentState,
+    buildLeaves,
+    palette,
+    buildBG,
+    buildMist,
+    buildGrass,
+    buildWeather,
+    prepareScene,
+    setupAttract,
+    settings,
+    ITEMS,
+    accessible,
+    UNL,
+    saveStats,
+    toast,
+    cvs,
+    lifecycle,
+    get EQ() {
+      return EQ;
+    },
+    get ST() {
+      return ST;
+    },
+    get stageSeed() {
+      return stageSeed;
+    },
+    set stageSeed(value) {
+      stageSeed = value;
+    },
+    get MIST() {
+      return MIST;
+    },
+    set MIST(value) {
+      MIST = value;
+    },
   });
   const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
-    G, ST, UNL, audioInit, tn, sfx, flash, saveStats, checkUnlocks, toast,
+    G,
+    ST,
+    UNL,
+    audioInit,
+    tn,
+    sfx,
+    flash,
+    saveStats,
+    checkUnlocks,
+    toast,
   }));
   bindTitleGestures($('title'), lifecycle, () => cinematic.logoTap());
-  const { flushProfile } = bindProfileWiring({ $, lifecycle, playerStats, playerEquipment, saveMeta, saveAwakening, UNL });
+  const { flushProfile } = bindProfileWiring({
+    $,
+    lifecycle,
+    playerStats,
+    playerEquipment,
+    saveMeta,
+    saveAwakening,
+    UNL,
+  });
   const previewArtwork = { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword };
   const preview = createArmoryPreview(
     $('prevC'),
@@ -2885,18 +3160,92 @@ export function startGame(
 
   /* ---------------- input ---------------- */
   const { disposePointer, bindNavigation } = createInputWiring(cvs, {
-    $, G, settings, cinematic, audioInit, onSwipe, onTapDown, onTap, lifecycle, abandonSavedRun, continueSavedRun, openPanel, startDaily, startRun, options, closePanel, pause, resume, endRun, toTitle, rewardScreen, konamiInput,
-    get W() { return W; }, get H() { return H; },
-    get savedRun() { return savedRun; }, get activeTrial() { return activeTrial; },
+    $,
+    G,
+    settings,
+    cinematic,
+    audioInit,
+    onSwipe,
+    onTapDown,
+    onTap,
+    lifecycle,
+    abandonSavedRun,
+    continueSavedRun,
+    openPanel,
+    startDaily,
+    startRun,
+    options,
+    closePanel,
+    pause,
+    resume,
+    endRun,
+    toTitle,
+    rewardScreen,
+    konamiInput,
+    get W() {
+      return W;
+    },
+    get H() {
+      return H;
+    },
+    get savedRun() {
+      return savedRun;
+    },
+    get activeTrial() {
+      return activeTrial;
+    },
   });
   bindPurchaseWiring({
-    $, G, lifecycle, premiumAccess, savedEquipment, accessibleUnlocks, ITEMS, playerEquipment, savedFilm, META, SETUP, computeMods, renderArmory, saveMeta, openPanel, pause, audio, guided, edition, UNL,
-    get EQ() { return EQ; },
-    get initialPurchaseCheck() { return initialPurchaseCheck; }, set initialPurchaseCheck(value) { initialPurchaseCheck = value; },
-    get testerPremium() { return testerPremium; }, set testerPremium(value) { testerPremium = value; },
-    get runTemplate() { return runTemplate; }, set runTemplate(value) { runTemplate = value; },
-    get activeTrial() { return activeTrial; },
-    get trialFailure() { return trialFailure; }, set trialFailure(value) { trialFailure = value; },
+    $,
+    G,
+    lifecycle,
+    premiumAccess,
+    savedEquipment,
+    accessibleUnlocks,
+    ITEMS,
+    playerEquipment,
+    savedFilm,
+    META,
+    SETUP,
+    computeMods,
+    renderArmory,
+    saveMeta,
+    openPanel,
+    pause,
+    audio,
+    guided,
+    edition,
+    UNL,
+    get EQ() {
+      return EQ;
+    },
+    get initialPurchaseCheck() {
+      return initialPurchaseCheck;
+    },
+    set initialPurchaseCheck(value) {
+      initialPurchaseCheck = value;
+    },
+    get testerPremium() {
+      return testerPremium;
+    },
+    set testerPremium(value) {
+      testerPremium = value;
+    },
+    get runTemplate() {
+      return runTemplate;
+    },
+    set runTemplate(value) {
+      runTemplate = value;
+    },
+    get activeTrial() {
+      return activeTrial;
+    },
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
   });
   const disposeKeyboard = bindNavigation();
   function pause() {
@@ -2947,25 +3296,30 @@ export function startGame(
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }
   function updateWeather(dt: number) {
-    simulateWeather(cinematic.active ? environmentState.cinematicWeather : WX, environmentState.wx, dt, {
-      weather: STAGES[G.stage]!.weather,
-      phase: G.state,
-      width: W,
-      height: H,
-      scale: S,
-      wind: presentationState.wind,
-      time: presentationState.time,
-      hazard: G.m.hazard,
-      layout: L,
-      random: R,
-      hazardRandom: cinematic.active ? R : combatRandom,
-      flash,
-      sounds: sfx,
-      gustLeaves,
-      onShake: (amount) => {
-        presentationState.shake = Math.max(presentationState.shake, amount);
+    simulateWeather(
+      cinematic.active ? environmentState.cinematicWeather : WX,
+      environmentState.wx,
+      dt,
+      {
+        weather: STAGES[G.stage]!.weather,
+        phase: G.state,
+        width: W,
+        height: H,
+        scale: S,
+        wind: presentationState.wind,
+        time: presentationState.time,
+        hazard: G.m.hazard,
+        layout: L,
+        random: R,
+        hazardRandom: cinematic.active ? R : combatRandom,
+        flash,
+        sounds: sfx,
+        gustLeaves,
+        onShake: (amount) => {
+          presentationState.shake = Math.max(presentationState.shake, amount);
+        },
       },
-    });
+    );
   }
   function update(dt: number, raw: number) {
     if (sceneLoading) return;
@@ -3064,12 +3418,40 @@ export function startGame(
     });
   }
   const postPreparation = createPostPreparation(() => ({
-    W, H, G, R, reducedMotion, reducedFlashes, sceneFilm, pz, fx: presentationState.fx, buzz, S, time: presentationState.time,
+    W,
+    H,
+    G,
+    R,
+    reducedMotion,
+    reducedFlashes,
+    sceneFilm,
+    pz,
+    fx: presentationState.fx,
+    buzz,
+    S,
+    time: presentationState.time,
     signals: postSignals,
   }));
   const { advancePost, preparePresentation } = postPreparation;
   const postSignals = presentationState;
-  const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time: presentationState.time,reducedMotion,reducedFlashes,grainPats: postArtwork.grainPats,vig: postArtwork.vig,pz,inkEdge: postArtwork.inkEdge,lb: presentationState.lb,flashCol: presentationState.flashCol }));
+  const drawPost = createPostPresentation(() => ({
+    G,
+    g,
+    W,
+    H,
+    cvs,
+    sceneFilm,
+    premiumAccess,
+    time: presentationState.time,
+    reducedMotion,
+    reducedFlashes,
+    grainPats: postArtwork.grainPats,
+    vig: postArtwork.vig,
+    pz,
+    inkEdge: postArtwork.inkEdge,
+    lb: presentationState.lb,
+    flashCol: presentationState.flashCol,
+  }));
   function render(raw: number) {
     // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
     // inspection dialog covers it completely; its independent preview still draws.

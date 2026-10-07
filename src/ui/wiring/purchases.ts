@@ -18,37 +18,58 @@ import type { GameEdition } from '../../platform/editions.ts';
 import type { parseTesterPremium } from '../../platform/tester-premium.ts';
 
 export interface PurchaseViews {
- readonly $: (id: string) => HTMLElement;
- readonly G: RunState;
- readonly EQ: Equipment;
- readonly playerEquipment: Equipment;
- readonly savedEquipment: unknown;
- readonly savedFilm: unknown;
- readonly META: MetaProgress;
- readonly SETUP: Setup;
- readonly ITEMS: Item[];
- readonly activeTrial: TrialDefinition | null;
- readonly lifecycle: ReturnType<typeof createLifecycle>;
- readonly audio: ReturnType<typeof createAudio>;
- readonly guided: { readonly frozen: boolean };
- readonly edition: GameEdition;
- readonly UNL: Set<string>;
- initialPurchaseCheck: boolean;
- testerPremium: ReturnType<typeof parseTesterPremium>;
- runTemplate: ReturnType<typeof templateModifiers>;
- trialFailure: string;
- readonly premiumAccess: () => boolean;
- readonly accessibleUnlocks: () => Set<string>;
- readonly computeMods: () => void;
- readonly renderArmory: () => void;
- readonly saveMeta: () => void;
- readonly openPanel: (id: Screen) => void;
- readonly pause: () => void;
+  readonly $: (id: string) => HTMLElement;
+  readonly G: RunState;
+  readonly EQ: Equipment;
+  readonly playerEquipment: Equipment;
+  readonly savedEquipment: unknown;
+  readonly savedFilm: unknown;
+  readonly META: MetaProgress;
+  readonly SETUP: Setup;
+  readonly ITEMS: Item[];
+  readonly activeTrial: TrialDefinition | null;
+  readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly audio: ReturnType<typeof createAudio>;
+  readonly guided: { readonly frozen: boolean };
+  readonly edition: GameEdition;
+  readonly UNL: Set<string>;
+  initialPurchaseCheck: boolean;
+  testerPremium: ReturnType<typeof parseTesterPremium>;
+  runTemplate: ReturnType<typeof templateModifiers>;
+  trialFailure: string;
+  readonly premiumAccess: () => boolean;
+  readonly accessibleUnlocks: () => Set<string>;
+  readonly computeMods: () => void;
+  readonly renderArmory: () => void;
+  readonly saveMeta: () => void;
+  readonly openPanel: (id: Screen) => void;
+  readonly pause: () => void;
 }
 
 /** Purchase/profile UI keeps its existing ownership guards and persisted keys. */
 export function bindPurchaseWiring(views: PurchaseViews) {
- const { $, G, lifecycle, premiumAccess, savedEquipment, accessibleUnlocks, ITEMS, playerEquipment, savedFilm, META, SETUP, computeMods, renderArmory, saveMeta, openPanel, pause, audio, guided, edition, UNL } = views;
+  const {
+    $,
+    G,
+    lifecycle,
+    premiumAccess,
+    savedEquipment,
+    accessibleUnlocks,
+    ITEMS,
+    playerEquipment,
+    savedFilm,
+    META,
+    SETUP,
+    computeMods,
+    renderArmory,
+    saveMeta,
+    openPanel,
+    pause,
+    audio,
+    guided,
+    edition,
+    UNL,
+  } = views;
   $('bSupport').hidden = false;
   lifecycle.add(
     premium.subscribe((state) => {
@@ -69,7 +90,11 @@ export function bindPurchaseWiring(views: PurchaseViews) {
             if (!itemAccessible(restored[category], false))
               playerEquipment[category] = restored[category];
         }
-        if (views.initialPurchaseCheck && savedFilm === PREMIUM_FILM && playerEquipment.film === 'mono') {
+        if (
+          views.initialPurchaseCheck &&
+          savedFilm === PREMIUM_FILM &&
+          playerEquipment.film === 'mono'
+        ) {
           playerEquipment.film = PREMIUM_FILM;
         }
         views.initialPurchaseCheck = false;
@@ -130,5 +155,4 @@ export function bindPurchaseWiring(views: PurchaseViews) {
     store.set('issen.equip', playerEquipment);
     $('supportMessage').textContent = 'Supporter Print selected. Change films any time in Armory.';
   });
-
 }

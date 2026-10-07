@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2 presentation complete; UI extraction next
+## W1 complete; W2 presentation/UI complete; run flow next
 
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is
@@ -38,14 +38,52 @@ calls cosmetic artwork then resets live WX with combatRandom in the original ord
 That boundary split was committed separately (26af5a3) before the builder move.
 Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
-game.ts still has about 4,141 lines; composition-root reduction is NOT complete.
+game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: UI profile ownership moved without intentional behavior changes.
-Strict types passed; all 274 units passed (ui-profile-unit.log).
-`npx playwright test tests/browser/profile-reset.spec.ts tests/browser/save-transfer.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all 8 passed (ui-profile-browser.log; terminal completion confirmed).
-Continue the ordered UI cluster, then run-flow/router/phases. Full W2/W3 and
-Part 4 remain pending; do not push develop yet.
+Latest checkpoint: UI extraction and root import cleanup complete. Strict types
+passed and all 274 units passed (ui-cleanup-unit.log).
+`npx playwright test tests/browser/ui.spec.ts tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts --config playwright.rendering-v2.config.ts`:
+all 17 passed (ui-cleanup-browser.log; terminal completion confirmed).
+No intentional behavior changes or save-key/record changes. bossShownDirection's
+root import stays until the trial response-instrumentation harness migrates with
+the new phase API; other superseded imports are removed.
+
+Implemented UI owners under src/ui/wiring: screens (HUD/animation), panels
+(navigation/statistics/title record), secrets (title taps/swipes), admin (guarded
+testing controls), settings (preferences/options/lighting debug), setup (setup and
+isolated tutorial), armory (equipment/awakening/presets), input (pointer/keyboard/
+navigation), purchases (refresh/edition guards/supporter controls), cinematic
+(viewer session and grade), profile (reset/transfer/management).
+Mutable EQ/ST/settings/session reads retain current getters, not stale captured
+values. Callback registration and save-key ordering are preserved. UI mutations
+are existing wiring; rule extraction into phase/progression owners remains next.
+
+Focused checks, all terminal-confirmed; each preceded by strict types and all 274
+units. Logs tmp/runtime-refactor/ui-<owner>-{unit,browser}.log:
+
+| Owner | Browser files (tests/browser; rendering-v2 config) | Passed |
+| --- | --- | --- |
+| screens | ui, runtime-checkpoint-fixtures, presentation-readiness | 11 |
+| secrets | secrets, secret-recovery, cinematic, runtime-checkpoint-fixtures | 15 |
+| admin | admin-layout, offerings-admin, runtime-checkpoint-fixtures | 9 |
+| panels | ui, trials, runtime-checkpoint-fixtures | 16 |
+| settings | options, ui, runtime-checkpoint-fixtures | 21 |
+| setup | setup-progression, tutorial, runtime-checkpoint-fixtures | 9 |
+| armory | ui, temple-armoury, presets, runtime-checkpoint-fixtures | 14 |
+| input | input, options, secrets, runtime-checkpoint-fixtures | 20 |
+| purchases | premium, editions-mastery, runtime-checkpoint-fixtures | 15 |
+| cinematic | cinematic, secret-recovery, runtime-checkpoint-fixtures | 11 |
+| profile | profile-reset, save-transfer, runtime-checkpoint-fixtures | 8 |
+
+Each table command was `npx playwright test` plus every named
+`tests/browser/<file>.spec.ts --config playwright.rendering-v2.config.ts`.
+Next: run-flow and phase-router foundation, then waves/standoff/boss/shrine/death
+controllers; migrate temporary scenario drivers to actual APIs. Preserve existing
+same-frame phase cascades and game/cosmetic RNG order. Run broad browser checks
+when rule dispatch changes. Then kill rule/listeners, tables/registry and separate
+adapter removal, player/companions and final composition-root reduction.
+Full W2 production/Android gate and minor version 1.67.0 remain pending. W3 and
+Part 4 remain pending; do not push develop or mark the goal complete.
 
 Cached environment builders checkpoint: Strict types
 passed. All 274 units passed (environment-artwork-unit.log).
@@ -72,13 +110,11 @@ Ignored pixel diagnostics are prepared under tmp/runtime-refactor/preview-diagno
 with playwright.preview-diagnostic.config.ts if the failure recurs.
 A second uninterrupted broad run on e3e12a2 passed all 253 tests (11.7m),
 presentation-broad-recheck.log; terminal completion confirmed. The presentation
-cluster is green. No process remains. Continue UI extraction now.
+cluster is green. UI extraction followed and is now complete.
 UI dependency audit/plans are under tmp/runtime-refactor/audit-current.{json,md}
 and ui-extraction-plan.md, preserving immutable audit.json/audit.md.
-Draft UI screen/secret move scripts exist outside the repository and have NOT
-been executed. After a green broad checkpoint, continue ordered UI extraction. Cosmetic update call
-order is preserved: clock, ambient, existing rule update, transition, camera.
-Then ordered UI/screens/admin/secrets, run-flow/router/phases, kill rule/listeners,
+Cosmetic update call order is preserved: clock, ambient, existing rule update,
+transition, camera. Next is run-flow/router/phases, kill rule/listeners,
 state tables/registry and adapter removal, player/companions, final composition root.
 Full W2 unit/broad/production/Android gates and minor version 1.67.0 remain pending.
 W3 entirely pending, then Part 4 final verification/report and one develop push.

@@ -8,16 +8,16 @@ import type { Direction } from '../../shared/directions.ts';
 import type { ItemCategory } from '../../game/content/items.ts';
 
 export interface SecretViews {
- readonly G: Readonly<Pick<RunState, 'state' | 'panel'>>;
- readonly ST: Statistics;
- readonly UNL: ReadonlySet<string>;
- readonly audioInit: () => void;
- readonly tn: ReturnType<typeof createAudio>['tone'];
- readonly sfx: Pick<ReturnType<typeof createAudio>['cues'], 'caw' | 'perfect'>;
- readonly flash: (amount: number, colour?: string) => void;
- readonly saveStats: () => void;
- readonly checkUnlocks: () => void;
- readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
+  readonly G: Readonly<Pick<RunState, 'state' | 'panel'>>;
+  readonly ST: Statistics;
+  readonly UNL: ReadonlySet<string>;
+  readonly audioInit: () => void;
+  readonly tn: ReturnType<typeof createAudio>['tone'];
+  readonly sfx: Pick<ReturnType<typeof createAudio>['cues'], 'caw' | 'perfect'>;
+  readonly flash: (amount: number, colour?: string) => void;
+  readonly saveStats: () => void;
+  readonly checkUnlocks: () => void;
+  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
 }
 
 /** Title input owns its gesture/sequence state; progression remains behind explicit ports. */
@@ -89,7 +89,11 @@ export function createTitleSecrets(readViews: () => SecretViews) {
       });
     }
   }
-  function bindTitleGestures(el: HTMLElement, lifecycle: ReturnType<typeof createLifecycle>, logoTap: () => void) {
+  function bindTitleGestures(
+    el: HTMLElement,
+    lifecycle: ReturnType<typeof createLifecycle>,
+    logoTap: () => void,
+  ) {
     let sx = 0,
       sy = 0,
       id: number | null = null,
@@ -137,5 +141,5 @@ export function createTitleSecrets(readViews: () => SecretViews) {
     });
   }
 
- return { titleTap, konamiInput, bindTitleGestures };
+  return { titleTap, konamiInput, bindTitleGestures };
 }

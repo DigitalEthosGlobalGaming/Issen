@@ -1,5 +1,8 @@
 import { createCinematic } from '../screens/cinematic.ts';
-import { recordSecretEvent, reconcileCinematicCompanion } from '../../game/progression/secret-events.ts';
+import {
+  recordSecretEvent,
+  reconcileCinematicCompanion,
+} from '../../game/progression/secret-events.ts';
 import { createWeatherState } from '../../rendering/scene/weather-state.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { store } from '../../platform/storage.ts';
@@ -13,35 +16,56 @@ import type { parseSettings } from '../../platform/settings.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
 
 export interface CinematicViews {
- readonly $: (id: string) => HTMLElement;
- readonly G: RunState;
- readonly ST: Statistics;
- readonly EQ: Equipment;
- readonly UNL: Set<string>;
- readonly ITEMS: Item[];
- readonly settings: ReturnType<typeof parseSettings>;
- readonly cvs: HTMLCanvasElement;
- readonly lifecycle: ReturnType<typeof createLifecycle>;
- readonly environmentState: EnvironmentState;
- readonly previewVisits: ReturnType<typeof createStageVisitSeeds>;
- readonly palette: { clearFog: () => void };
- stageSeed: number;
- MIST: number[];
- readonly buildLeaves: () => void;
- readonly buildBG: () => void;
- readonly buildMist: () => void;
- readonly buildGrass: () => void;
- readonly buildWeather: (resetSimulation?: boolean) => void;
- readonly prepareScene: () => void;
- readonly setupAttract: () => void;
- readonly accessible: (id: string) => boolean;
- readonly saveStats: () => void;
- readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
+  readonly $: (id: string) => HTMLElement;
+  readonly G: RunState;
+  readonly ST: Statistics;
+  readonly EQ: Equipment;
+  readonly UNL: Set<string>;
+  readonly ITEMS: Item[];
+  readonly settings: ReturnType<typeof parseSettings>;
+  readonly cvs: HTMLCanvasElement;
+  readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly environmentState: EnvironmentState;
+  readonly previewVisits: ReturnType<typeof createStageVisitSeeds>;
+  readonly palette: { clearFog: () => void };
+  stageSeed: number;
+  MIST: number[];
+  readonly buildLeaves: () => void;
+  readonly buildBG: () => void;
+  readonly buildMist: () => void;
+  readonly buildGrass: () => void;
+  readonly buildWeather: (resetSimulation?: boolean) => void;
+  readonly prepareScene: () => void;
+  readonly setupAttract: () => void;
+  readonly accessible: (id: string) => boolean;
+  readonly saveStats: () => void;
+  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
 }
 
 /** Viewer state and grade remain separate from the live run and equipment. */
 export function createCinematicWiring(views: CinematicViews) {
- const { $, G, previewVisits, environmentState, buildLeaves, palette, buildBG, buildMist, buildGrass, buildWeather, prepareScene, setupAttract, settings, ITEMS, accessible, UNL, saveStats, toast, cvs, lifecycle } = views;
+  const {
+    $,
+    G,
+    previewVisits,
+    environmentState,
+    buildLeaves,
+    palette,
+    buildBG,
+    buildMist,
+    buildGrass,
+    buildWeather,
+    prepareScene,
+    setupAttract,
+    settings,
+    ITEMS,
+    accessible,
+    UNL,
+    saveStats,
+    toast,
+    cvs,
+    lifecycle,
+  } = views;
   let cinematicStage = 0;
   let cinematicStageSeed = views.stageSeed;
   let cinematicFilm = views.EQ.film;
@@ -106,5 +130,5 @@ export function createCinematicWiring(views: CinematicViews) {
   });
   const sceneFilm = () => (cinematic.active ? cinematicFilm : views.EQ.film);
 
- return { cinematic, sceneFilm, previewStage };
+  return { cinematic, sceneFilm, previewStage };
 }

@@ -5,7 +5,12 @@ import { STAGES } from '../../game/content/stages.ts';
 import { EMPTY_UPGRADES, TEMPLATE_UPGRADES, sanitizeSetup } from '../../game/progression/meta.ts';
 import { trialsUnlocked } from '../../game/progression/trials.ts';
 import { DEFAULT_EQUIPMENT, parseEquipment } from '../../platform/saves.ts';
-import { clearTestProfile, isTestProfile, switchTestProfile, store } from '../../platform/storage.ts';
+import {
+  clearTestProfile,
+  isTestProfile,
+  switchTestProfile,
+  store,
+} from '../../platform/storage.ts';
 import type { Equipment, Setup } from '../../platform/saves.ts';
 import type { Item, ItemCategory } from '../../game/content/items.ts';
 import type { RunState, Screen } from '../../game/run-state.ts';
@@ -14,38 +19,63 @@ import type { MetaProgress } from '../../game/progression/meta.ts';
 import type { AwakeningProgress } from '../../game/progression/awakening-progress.ts';
 
 export interface AdminViews {
- readonly AWAKENING: AwakeningProgress;
- readonly EQ: Equipment;
- readonly G: RunState;
- readonly ITEMS: Item[];
- readonly ITEM_BY: Record<string, Item>;
- readonly META: MetaProgress;
- readonly SETUP: Setup;
- readonly UNL: Set<string>;
- readonly playerEquipment: Equipment;
- readonly playerStats: Statistics;
- readonly revoked: Set<string>;
- readonly applySeal: () => void;
- readonly checkUnlocks: () => void;
- readonly computeMods: () => void;
- readonly hud: (on: boolean) => void;
- readonly launchTutorial: () => void;
- readonly refreshArmoryNew: () => void;
- readonly renderLives: () => void;
- readonly renderSetup: () => void;
- readonly saveAwakening: () => void;
- readonly saveMeta: () => void;
- readonly setBestLine: () => void;
- readonly setTrialsWasUnlocked: (value: boolean) => void;
- readonly showScreen: (id: Screen | null) => void;
- readonly testJump: (stage: number, wave: number, boss: boolean) => void;
- readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
+  readonly AWAKENING: AwakeningProgress;
+  readonly EQ: Equipment;
+  readonly G: RunState;
+  readonly ITEMS: Item[];
+  readonly ITEM_BY: Record<string, Item>;
+  readonly META: MetaProgress;
+  readonly SETUP: Setup;
+  readonly UNL: Set<string>;
+  readonly playerEquipment: Equipment;
+  readonly playerStats: Statistics;
+  readonly revoked: Set<string>;
+  readonly applySeal: () => void;
+  readonly checkUnlocks: () => void;
+  readonly computeMods: () => void;
+  readonly hud: (on: boolean) => void;
+  readonly launchTutorial: () => void;
+  readonly refreshArmoryNew: () => void;
+  readonly renderLives: () => void;
+  readonly renderSetup: () => void;
+  readonly saveAwakening: () => void;
+  readonly saveMeta: () => void;
+  readonly setBestLine: () => void;
+  readonly setTrialsWasUnlocked: (value: boolean) => void;
+  readonly showScreen: (id: Screen | null) => void;
+  readonly testJump: (stage: number, wave: number, boss: boolean) => void;
+  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
 }
 
 /** Testing controls retain their guards and persistence keys. EQ is a live getter. */
 export function createAdminWiring(root: HTMLElement, views: AdminViews) {
   function showAdmin() {
-    const { AWAKENING, G, ITEMS, ITEM_BY, META, SETUP, UNL, applySeal, checkUnlocks, computeMods, hud, launchTutorial, playerEquipment, playerStats, refreshArmoryNew, renderLives, renderSetup, revoked, saveAwakening, saveMeta, setBestLine, showScreen, testJump, toast } = views;
+    const {
+      AWAKENING,
+      G,
+      ITEMS,
+      ITEM_BY,
+      META,
+      SETUP,
+      UNL,
+      applySeal,
+      checkUnlocks,
+      computeMods,
+      hud,
+      launchTutorial,
+      playerEquipment,
+      playerStats,
+      refreshArmoryNew,
+      renderLives,
+      renderSetup,
+      revoked,
+      saveAwakening,
+      saveMeta,
+      setBestLine,
+      showScreen,
+      testJump,
+      toast,
+    } = views;
     renderAdmin(
       root,
       [

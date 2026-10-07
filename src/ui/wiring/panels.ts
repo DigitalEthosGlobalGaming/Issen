@@ -13,29 +13,33 @@ import type { Item } from '../../game/content/items.ts';
 import type { PreviewFrame } from '../../rendering/armory-preview.ts';
 
 export interface PanelViews {
- readonly $: { (id: 'supportPreview'): HTMLCanvasElement; (id: string): HTMLElement };
- readonly G: RunState;
- readonly ST: Statistics;
- readonly playerStats: Statistics;
- readonly META: MetaProgress;
- readonly UNL: ReadonlySet<string>;
- readonly ITEMS: readonly Item[];
- readonly hudView: { readonly activeScreen: Screen | null };
- readonly supportPreview: { draw: (frame: PreviewFrame) => void };
- readonly previewFrame: (film: string, effects: boolean, target: HTMLCanvasElement) => PreviewFrame;
- readonly testerPremium: Parameters<typeof testerPremiumActive>[0];
- readonly TRIAL_PROGRESS: Parameters<typeof renderTrials>[1];
- readonly trialResult: Parameters<typeof renderTrials>[3];
- readonly startTrial: Parameters<typeof renderTrials>[4];
- readonly showScreen: (id: Screen | null) => void;
- readonly premiumAccess: () => boolean;
- readonly saveMeta: () => void;
- readonly clearTrialResult: () => void;
- readonly showAdmin: () => void;
- readonly renderArmory: () => void;
- readonly renderSetup: () => void;
- readonly renderStats: () => void;
- readonly setBestLine: () => void;
+  readonly $: { (id: 'supportPreview'): HTMLCanvasElement; (id: string): HTMLElement };
+  readonly G: RunState;
+  readonly ST: Statistics;
+  readonly playerStats: Statistics;
+  readonly META: MetaProgress;
+  readonly UNL: ReadonlySet<string>;
+  readonly ITEMS: readonly Item[];
+  readonly hudView: { readonly activeScreen: Screen | null };
+  readonly supportPreview: { draw: (frame: PreviewFrame) => void };
+  readonly previewFrame: (
+    film: string,
+    effects: boolean,
+    target: HTMLCanvasElement,
+  ) => PreviewFrame;
+  readonly testerPremium: Parameters<typeof testerPremiumActive>[0];
+  readonly TRIAL_PROGRESS: Parameters<typeof renderTrials>[1];
+  readonly trialResult: Parameters<typeof renderTrials>[3];
+  readonly startTrial: Parameters<typeof renderTrials>[4];
+  readonly showScreen: (id: Screen | null) => void;
+  readonly premiumAccess: () => boolean;
+  readonly saveMeta: () => void;
+  readonly clearTrialResult: () => void;
+  readonly showAdmin: () => void;
+  readonly renderArmory: () => void;
+  readonly renderSetup: () => void;
+  readonly renderStats: () => void;
+  readonly setBestLine: () => void;
 }
 
 /** Panel callbacks read current run/profile views; they preserve the existing ports. */
@@ -48,7 +52,27 @@ export function createPanelWiring(readViews: () => PanelViews) {
       (ST.bestRonin ? `   Ronin best ${ST.bestRonin.toLocaleString()}` : '');
   }
   function openPanel(id: Screen) {
-    const { $, G, hudView, supportPreview, previewFrame, testerPremium, renderArmory, renderStats, renderSetup, META, saveMeta, premiumAccess, showAdmin, TRIAL_PROGRESS, playerStats, trialResult, startTrial, showScreen, clearTrialResult } = readViews();
+    const {
+      $,
+      G,
+      hudView,
+      supportPreview,
+      previewFrame,
+      testerPremium,
+      renderArmory,
+      renderStats,
+      renderSetup,
+      META,
+      saveMeta,
+      premiumAccess,
+      showAdmin,
+      TRIAL_PROGRESS,
+      playerStats,
+      trialResult,
+      startTrial,
+      showScreen,
+      clearTrialResult,
+    } = readViews();
     G.panelFrom = hudView.activeScreen || 'title';
     G.panel = id;
     if (id === 'support') {

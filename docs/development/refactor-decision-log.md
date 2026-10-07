@@ -102,6 +102,8 @@
 
 - 2026-10-08 — W2 UI profile — move the existing wiring through explicit current views and action ports — retain the monolithic closure — preserves callback ordering, save keys and current-run reads; strict, unit and focused browser checks pass — revert the UI profile move.
 
+- 2026-10-08 — W2 UI cluster — retain current getters for replaceable equipment/statistics and session flags, remove superseded root imports separately from moves — capture initial values or rewrite rule behavior during UI work — focused UI/save/isolation checks and all units pass; the pure boss direction import remains for existing trial response instrumentation until the phase API migrates — revert the UI cleanup commit or individual owner move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

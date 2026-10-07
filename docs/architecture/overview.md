@@ -68,7 +68,7 @@ owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signa
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions and service instances.
 It connects feature callbacks to audio, persistence, presentation owners and UI.
-It still contains encounter transitions, kill/damage orchestration, title secrets,
+It still contains encounter transitions, kill/damage orchestration,
 player/companion projection and frame preparation orchestration. These are not separate
 fully extracted owners yet; do not assume the proposed migration tree describes
 implemented files. W2 now introduces `game/session/context.ts`: `RunContext`
@@ -90,30 +90,13 @@ layered image scenery to the shared scene composition and film pass, rendered
 through Pixi on WebGL2. Canvas remains a texture-preparation tool.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
-`ui/wiring/screens.ts` owns the HUD and animated screen adapters, retaining the
-explicit progression sync port before score display.
-
-`ui/wiring/secrets.ts` owns title tap/sequence counters and pointer gesture binding;
-it reads current statistics through explicit views and invokes progression ports.
-
-`ui/wiring/admin.ts` owns testing-menu wiring and guards, with current profile/run
-views and explicit runtime action ports.
-
-`ui/wiring/panels.ts` owns panel navigation and current-profile statistics/title display.
-
-`ui/wiring/settings.ts` owns preference application, options and lighting-debug wiring.
-
-`ui/wiring/setup.ts` owns setup and isolated tutorial callbacks.
-
-`ui/wiring/armory.ts` owns Armoury/preset callbacks with current equipment/statistics getters.
-
-`ui/wiring/input.ts` owns pointer/keyboard and navigation binding through action ports.
-
-`ui/wiring/purchases.ts` owns guarded purchase refresh and supporter controls.
-
-`ui/wiring/cinematic.ts` owns viewer session/grade state and callbacks.
-
-`ui/wiring/profile.ts` owns profile transfer/reset/management binding.
+`ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and
+action ports; callbacks preserve the existing save keys and ordering. The owners
+are screens (HUD/animation), panels (navigation/statistics/title records), secrets
+(title taps/swipes), admin (guarded testing controls), settings (preferences/options/
+lighting debug), setup (setup/tutorial), armory (equipment/presets), input
+(pointer/keyboard/navigation), purchases (refresh/edition/supporter controls),
+cinematic (viewer session/grade), and profile (transfer/reset/management).
 
 ## Where changes belong
 
@@ -138,6 +121,7 @@ views and explicit runtime action ports.
 | Outfit awakening catalog                                              | `src/game/content/robe-awakenings.ts`                                            |
 | Knife target selection and charge spending                            | `src/game/combat/knife.ts`                                                       |
 | Tutorial practice scene and isolated canvas                           | `src/ui/screens/tutorial.ts`, `tutorial.css`                                     |
+| UI runtime wiring | `src/ui/wiring/` |
 | Temple and testing menu controls                                      | `src/ui/screens/template.ts`, `admin.ts`                                         |
 | Backgrounds, ambient grass/leaves, weather                            | `src/rendering/scene/`                                                           |
 | Figure geometry, poses, player animation, projection                  | `src/rendering/figures/`                                                         |

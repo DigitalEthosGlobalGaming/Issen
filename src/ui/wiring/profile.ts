@@ -7,18 +7,18 @@ import type { Equipment } from '../../platform/saves.ts';
 import type { Statistics } from '../../game/progression/statistics.ts';
 
 export interface ProfileViews {
- readonly $: (id: string) => HTMLElement;
- readonly lifecycle: ReturnType<typeof createLifecycle>;
- readonly playerStats: Statistics;
- readonly playerEquipment: Equipment;
- readonly saveMeta: () => void;
- readonly saveAwakening: () => void;
- readonly UNL: ReadonlySet<string>;
+  readonly $: (id: string) => HTMLElement;
+  readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly playerStats: Statistics;
+  readonly playerEquipment: Equipment;
+  readonly saveMeta: () => void;
+  readonly saveAwakening: () => void;
+  readonly UNL: ReadonlySet<string>;
 }
 
 /** Profile management binds existing transfer/reset controls without changing save keys. */
 export function bindProfileWiring(views: ProfileViews) {
- const { $, lifecycle, playerStats, playerEquipment, saveMeta, saveAwakening, UNL } = views;
+  const { $, lifecycle, playerStats, playerEquipment, saveMeta, saveAwakening, UNL } = views;
   lifecycle.add(bindProfileReset($('options'), deleteCurrentProfile, isTestProfile()));
   function flushProfile() {
     store.set('issen.stats', playerStats);
@@ -42,5 +42,5 @@ export function bindProfileWiring(views: ProfileViews) {
     ),
   );
 
- return { flushProfile };
+  return { flushProfile };
 }

@@ -4,7 +4,11 @@ import { parsePresets, presetEquipment } from '../../game/progression/presets.ts
 import { equipmentPack } from '../../game/content/collections.ts';
 import { collectionChallengeText } from '../../game/progression/collection-progress.ts';
 import { SEVEN_DAWNS_CREST } from '../../game/progression/daily-login.ts';
-import { awakeningCost, awakeningPurchasable, purchaseAwakening } from '../../game/progression/awakening-purchases.ts';
+import {
+  awakeningCost,
+  awakeningPurchasable,
+  purchaseAwakening,
+} from '../../game/progression/awakening-purchases.ts';
 import { store } from '../../platform/storage.ts';
 import { PREMIUM_FILM } from '../../platform/premium.ts';
 import type { Equipment, Setup } from '../../platform/saves.ts';
@@ -18,36 +22,60 @@ import type { RunState, Screen } from '../../game/run-state.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
 
 export interface ArmoryViews {
- readonly $: (id: string) => HTMLElement;
- readonly META: MetaProgress;
- readonly EQ: Equipment;
- readonly ST: Statistics;
- readonly SETUP: Setup;
- readonly G: RunState;
- readonly ITEMS: Item[];
- readonly UNL: Set<string>;
- readonly DAILY_LOGIN: DailyLoginProgress;
- readonly COLLECTION_PROGRESS: CollectionProgress;
- readonly AWAKENING: AwakeningProgress;
- readonly ARMORY_SEEN: Set<string>;
- readonly SEALS: Readonly<Record<string, string>>;
- readonly CHARMCOL: Readonly<Record<string, string>>;
- readonly lifecycle: ReturnType<typeof createLifecycle>;
- readonly accessibleUnlocks: () => Set<string>;
- readonly accessible: (id: string) => boolean;
- readonly premiumAccess: () => boolean;
- readonly computeMods: () => void;
- readonly applySeal: () => void;
- readonly saveMeta: () => void;
- readonly sfx: { glint: () => void };
- readonly demoKill: () => void;
- readonly openPanel: (id: Screen) => void;
- readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
+  readonly $: (id: string) => HTMLElement;
+  readonly META: MetaProgress;
+  readonly EQ: Equipment;
+  readonly ST: Statistics;
+  readonly SETUP: Setup;
+  readonly G: RunState;
+  readonly ITEMS: Item[];
+  readonly UNL: Set<string>;
+  readonly DAILY_LOGIN: DailyLoginProgress;
+  readonly COLLECTION_PROGRESS: CollectionProgress;
+  readonly AWAKENING: AwakeningProgress;
+  readonly ARMORY_SEEN: Set<string>;
+  readonly SEALS: Readonly<Record<string, string>>;
+  readonly CHARMCOL: Readonly<Record<string, string>>;
+  readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly accessibleUnlocks: () => Set<string>;
+  readonly accessible: (id: string) => boolean;
+  readonly premiumAccess: () => boolean;
+  readonly computeMods: () => void;
+  readonly applySeal: () => void;
+  readonly saveMeta: () => void;
+  readonly sfx: { glint: () => void };
+  readonly demoKill: () => void;
+  readonly openPanel: (id: Screen) => void;
+  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
 }
 
 /** Owns Armoury and preset callbacks; current equipment/statistics stay live views. */
 export function createArmoryWiring(views: ArmoryViews) {
- const { $, META, ITEMS, accessibleUnlocks, accessible, computeMods, applySeal, G, UNL, premiumAccess, DAILY_LOGIN, COLLECTION_PROGRESS, ARMORY_SEEN, SEALS, CHARMCOL, AWAKENING, SETUP, saveMeta, toast, sfx, demoKill, openPanel, lifecycle } = views;
+  const {
+    $,
+    META,
+    ITEMS,
+    accessibleUnlocks,
+    accessible,
+    computeMods,
+    applySeal,
+    G,
+    UNL,
+    premiumAccess,
+    DAILY_LOGIN,
+    COLLECTION_PROGRESS,
+    ARMORY_SEEN,
+    SEALS,
+    CHARMCOL,
+    AWAKENING,
+    SETUP,
+    saveMeta,
+    toast,
+    sfx,
+    demoKill,
+    openPanel,
+    lifecycle,
+  } = views;
   const PRESETS = parsePresets(store.get('issen.presets', null));
   const presetScreen = createPresetScreen($('armory'), {
     presets: PRESETS,
@@ -137,5 +165,5 @@ export function createArmoryWiring(views: ArmoryViews) {
     else $('bArmory').removeAttribute('aria-description');
   }
 
- return { PRESETS, presetScreen, armory, equipArmory, renderArmory, refreshArmoryNew };
+  return { PRESETS, presetScreen, armory, equipArmory, renderArmory, refreshArmoryNew };
 }
