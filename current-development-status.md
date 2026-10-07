@@ -10,7 +10,22 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: the original frame simulation sequence is physically owned
+Latest checkpoint: presentation/environment-host.ts physically owns per-game
+scenery state, artwork and environment drawing bindings. Lazy current-view ports
+retain viewport, stage, density, cinematic/weather and cosmetic time access.
+The live weather record remains gameplay-owned. Its deterministic initialization
+now precedes the host construction; both former state initializers use fixed 0.5,
+consume no random stream and make no storage/browser writes.
+Strict types and all 361 units pass (environment-host-typecheck.log,
+environment-host-unit.log). `npx playwright test tests/browser/rendering.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 14 pass in 25.4s (environment-host-browser.log; terminal confirmed).
+The initial host layout contract was too narrow; it now includes the actual
+drawing layout alongside artwork glows without changing behavior.
+Next: delete 75 semantically unused root imports separately, then reduce profile,
+presentation/UI/session binding blocks. No profile-loading draft was applied.
+All W2/W3/Part 4 requirements remain in scope; do not push develop early.
+
+Previous checkpoint:  the original frame simulation sequence is physically owned
 by game/session/frame-simulation.ts. Scene/trial gates, raw run/death deltas,
 cinematic isolation, enemy/phase ordering and camera/audio dispatch are retained.
 Visual clocks and browser capabilities are explicit ports; no rendering imports.

@@ -1,3 +1,4 @@
+import { createEnvironmentHost } from './presentation/environment-host.ts';
 import { createFrameSimulation } from './game/session/frame-simulation.ts';
 import { createEquipmentPresentation } from './presentation/equipment.ts';
 import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
@@ -444,70 +445,24 @@ export function startGame(
   const stageVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   let stageSeed = stageVisits.enter(0);
-  const environmentState = createEnvironmentState();
-  const {
-    buildBG,
-    buildMist,
-    buildGrass,
-    newLeaf,
-    buildLeaves,
-    gustLeaves,
-    buildWeatherArtwork,
-    rebalanceWeather,
-  } = createEnvironmentArtwork(cvs.ownerDocument, () => ({
+  const WX = createWeatherState(() => 0.5);
+
+  const { environmentState, driftRenderer, buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather, ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition } = createEnvironmentHost(cvs.ownerDocument, lifecycle, () => ({
     W,
     H,
     DPR,
     S,
-    stage: G.stage,
-    environmentState,
+    G,
     L,
     R,
     density,
     context2d,
-    ambient,
-  }));
-
-  /* ---------------- ambient ---------------- */
-
-  const WX = createWeatherState(() => 0.5);
-
-  const driftRenderer = createDriftRenderer();
-
-  lifecycle.add(driftRenderer.dispose);
-  const {
-    ambient,
-    blades,
-    drawLeaves,
-    weatherRenderer,
-    drawWeather,
-    drawSmoke,
-    updateAmbient,
-    updateTransition,
-  } = createEnvironmentPresentation(() => ({
-    environmentState,
     activeTrial,
-    previewDemon: environmentState.previewDemon,
-    G,
-    W,
-    H,
-    S,
-    L,
-    R,
-    density,
-    driftRenderer,
     reducedMotion,
     g,
-    fg: environmentState.fg,
-    time: presentationState.time,
-    wind: presentationState.wind,
-    leaves: environmentState.leaves,
-    wx: environmentState.wx,
-    bamboo: environmentState.bamboo,
+    presentationState,
     cinematic,
-    cinematicWeather: environmentState.cinematicWeather,
     WX,
-    smokeSprite: environmentState.smokeSprite,
   }));
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();

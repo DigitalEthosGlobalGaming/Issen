@@ -443,3 +443,5 @@ Native renderer service construction and disposal are owned by presentation/nati
 Equipment palettes, blade style selection and armoury preview frames are owned by presentation/equipment.ts with read-only current rule selections. Fallback blade/charm colour records retain per-game identity; preview effects remain independent of combat.
 
 Frame simulation gating and ordered dispatch are owned by game/session/frame-simulation.ts. Presentation clock/camera, weather, figures and audio remain explicit capabilities; the session owner imports no presentation or rendering implementation.
+
+presentation/environment-host.ts owns per-game environment state and the artwork/drawing factory bindings through explicit current views. Live weather hazards remain outside this presentation owner. Cached scenery and ambient drawing share one cosmetic state and disposable drift renderer.
