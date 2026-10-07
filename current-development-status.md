@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; post drawing moved; next environment/figures/feedback hosts
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; next environment/feedback hosts
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -33,7 +33,13 @@ two passed (post-owner-browser.log; film-regression.spec.ts does not exist and
 matched no cases).
 `npx playwright test tests/browser/trial-films.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
 all seven passed (post-owner-checkpoints.log; terminal exit confirmed).
-No process remains. Next environment/figures/feedback hosts, then finish post
+No process remains. Figure drawing now belongs to src/presentation/figures.ts: low-level frame
+renderer, enemy and boss projection/death drawing. Player/companion projection
+remains for the later ordered player step. Strict types passed; all 274 units
+passed (figures-owner-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|Scattered|actual title' --config playwright.rendering-v2.config.ts`:
+all seven matched cases passed (figures-owner-browser.log; terminal exit confirmed).
+No process remains. Next environment/feedback hosts, then finish post
 preparation ownership; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 

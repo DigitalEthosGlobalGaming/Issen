@@ -54,6 +54,8 @@
 
 - 2026-10-08 — W2 post move — move the unchanged prepared-frame drawing into presentation/post.ts, leaving clock/RNG advancement separate — combining state ownership changes with the move — repeated draws must remain isolated; native/trial films and saved encounters pass — revert the post-drawing move independently.
 
+- 2026-10-08 — W2 figures move — extract frame-specific figure renderer and enemy/boss projection with explicit views — moving player/companion gameplay early — respects ordered ownership and preserves plain records; saved boss/wave scenes and presentation isolation pass — revert the figure-host move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
