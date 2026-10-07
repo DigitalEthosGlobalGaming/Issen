@@ -6,11 +6,16 @@
 - 2026-10-07 — W1 conversion — tune colour quality through 90, 95, 98, 100, then lossless when needed — relaxing colour tolerances — preserve mean <= 0.5, maximum <= 8 and exact alpha — re-encode from original copies with the same validation.
 - 2026-10-07 — W1 audit — existing build/APK sizes are inventory only; matched projections require fresh verification web builds — comparing stale generated outputs — stale outputs cannot establish compression gains and store builds are excluded — replace estimates with final verified bundle accounting.
 
-## Future work
-
-- Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
 - 2026-10-07 — W1 loader — require prepacked surface data and omit scalar URLs from runtime catalogs and player/enemy loaders — retaining main-thread scalar packing — all 86 families have validated packed surfaces; runtime no longer needs separate scalar files — revert the loader preparation commit.
 - 2026-10-07 — W1 generation — keep six-map authoring ZIPs for frame compositions and provenance; installation packs surfaces, compacts runtime maps, then refreshes the catalog — compacting raw exports before composition — existing frame recipes need individual scalar data before the final aligned surface is produced; final installed runtime set is compact — revert the installation integration commit.
 - 2026-10-07 — W1 migration — stage WebP outputs while retaining generated PNGs, migrate URLs, then delete generated PNGs in a separate commit — combining conversion, migration and deletion — required concern-separated commits and recoverable originals — restore generated PNGs from ignored originals or pre-refactor.
 - 2026-10-07 — W1 conversion — encode with four bounded read-only workers; retain deterministic parent-only output and manifest writes — serial encoding — images are independent and the utility can prepare them concurrently without changing any encoding setting, tolerances or runtime scheduling; intentionally stopped and resumed the verified serial task after five compaction tests and a browser readback probe passed — set ISSEN_ASSET_WORKERS=1 or revert the worker-tool commit.
 - 2026-10-07 — W1 cache parity — composite a procedural zero-emission scratch plane with the original coverage and blend mode when emission is absent — clearing emission with destination-out — destination-out incorrectly removed prior additive emission; exact comparison against explicit zero maps passed across seven blend modes, preserving opaque alpha where the former map did — revert the blend-parity commit.
+
+- 2026-10-07 — W1 generators — hash-check staged zero-emission omissions and prefer existing emitting WebP outputs — trusting stale omission records — regenerated emitting maps must not be hidden by the one-off conversion manifest — revert the generator-maintenance commit.
+- 2026-10-07 — W1 regeneration — preserve initial backups and store changed later inputs under hash-addressed regenerated-originals — overwriting restore inputs or rejecting all changed exports — future material generation must remain usable without destroying the original restore evidence — revert the backup-maintenance commit; both original versions stay under ignored tmp.
+- 2026-10-07 — W1 documentation — refresh installed plane links after compaction with shared-directory grouping — leaving six-map links after removal — future installs must document only the runtime planes while keeping recipes, source links and provenance — revert the documentation utility commit.
+
+## Future work
+
+- Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -43,6 +43,7 @@ been pushed; runtime version is still 1.66.7.
 - Missing emissive now follows the same coverage and blend mode as an explicit
   opaque zero map. This preserves additive emission and source-over occlusion.
   The new exact parity test covers seven blend modes. No gameplay changes.
+- Generator maintenance now hash-checks staged zero-emission omissions, so regenerated PNGs and emitting WebPs remain in the catalog. Changed future exports preserve the initial original backup and receive a separate hash-addressed backup. Installation refreshes compact-plane README links while preserving recipes and shared-folder families. All five Python compaction tests and four focused Node loader/catalog/documentation tests passed. Node syntax checks passed. These changes affect future utility invocations; the current one-off conversion remains live and its original inputs have not changed.
 
 ## Verification already completed
 

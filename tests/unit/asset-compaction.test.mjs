@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { createPbrAtlas } from '../../src/rendering/pbr-atlas.ts';
 import { generateRuntimeCatalog } from '../../scripts/pbr/update-runtime-catalog.mjs';
 
@@ -90,9 +91,35 @@ test('catalog lists only installed runtime planes, supports optional emission an
     await writeFile(path.join(root, 'src/rendering/sample.webp'), 'fixture');
     for (const kind of ['diffuse', 'normal', 'surface'])
       await writeFile(path.join(root, `src/rendering/maps/sample_${kind}.webp`), 'fixture');
+    for (const kind of ['roughness', 'metallic', 'ao'])
+      await writeFile(
+        path.join(root, `src/rendering/maps/sample_${kind}.png`),
+        'legacy scalar fixture',
+      );
+    const zeroPath = 'src/rendering/maps/sample_emissive.png';
+    const zeroBytes = 'validated zero-emission fixture';
+    await writeFile(path.join(root, zeroPath), zeroBytes);
+    await mkdir(path.join(root, 'scripts/assets'), { recursive: true });
+    await writeFile(
+      path.join(root, 'scripts/assets/compaction-manifest.json'),
+      JSON.stringify({
+        files: [
+          {
+            originalPath: zeroPath,
+            originalHash: createHash('sha256').update(zeroBytes).digest('hex'),
+            action: 'zero-emission',
+          },
+        ],
+      }),
+    );
     const initial = await generateRuntimeCatalog(root);
     assert.match(initial, /sample_surface.webp/);
     assert.doesNotMatch(initial, /emissive:|roughness:|metallic:|ao:/);
+    // A new export must not be hidden by the old zero-emission record.
+    await writeFile(path.join(root, zeroPath), 'regenerated emitting fixture');
+    assert.match(await generateRuntimeCatalog(root), /emissive:.*sample_emissive.png/);
+    // An emitting WebP takes priority even if a staged zero PNG remains.
+    await writeFile(path.join(root, zeroPath), zeroBytes);
     await writeFile(path.join(root, 'src/rendering/maps/sample_emissive.webp'), 'fixture');
     assert.match(await generateRuntimeCatalog(root), /emissive:.*sample_emissive.webp/);
     await rm(path.join(root, 'src/rendering/maps/sample_normal.webp'));

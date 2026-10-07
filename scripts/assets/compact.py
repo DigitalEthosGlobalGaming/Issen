@@ -163,10 +163,15 @@ def run(root, apply, retain_generated_png=False, workers=4):
                           'sizeAfter':len(encoded), 'action':'replace-generated' if source in generated else 'retain-authoring',
                           'newPath':target.relative_to(root).as_posix(), 'newHash':digest(encoded),
                           'dimensions':dimensions, 'encoding':encoding}
+            # Preserve the one-off restore input when a later material export
+            # changes. Its new input gets an immutable hash-addressed backup.
+            if backup.exists() and digest(backup.read_bytes()) != original_hash:
+                backup = root/'tmp/asset-compaction/regenerated-originals'/original_hash/rel
+            record['backupPath'] = backup.relative_to(root).as_posix()
             if apply:
                 backup.parent.mkdir(parents=True, exist_ok=True)
                 if backup.exists() and digest(backup.read_bytes()) != original_hash:
-                    raise ValueError(f'Original backup already differs: {rel}')
+                    raise ValueError(f'Hash-addressed backup differs: {rel}')
                 if not backup.exists(): backup.write_bytes(original)
                 if encoded is not None: target.write_bytes(encoded)
                 if source in generated and not retain_generated_png: source.unlink()
