@@ -88,6 +88,9 @@ The runtime prepares camera shake and post-effect randomness once per presentati
 frame. Drawing synchronously reads the current poses and effects; it does not yet
 serialize the entire scene into an immutable snapshot. Repeated-draw tests verify
 that this path leaves gameplay, cosmetic state, RNG, haptics and saves unchanged.
+Scene-ready gameplay continuations run in runtime orchestration immediately after
+presentation. Direct drawScene calls never commit a pending scene transition;
+the readiness isolation test verifies this and exactly-once runtime settlement.
 
 `scene-material.ts` provides explicit material stamps and lighting inputs. The
 material shader accepts aligned colour/normal/mask textures, ambient and directional

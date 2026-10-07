@@ -4607,6 +4607,7 @@ export function startGame(
     // inspection dialog covers it completely; its independent preview still draws.
     if (G.panel === 'armory' && armory.inspectionExpanded) return;
     drawScene(preparePresentation(raw));
+    settlePresentedScene();
   }
   /** Synchronous draw of the current poses; presentation updates happen once above. */
   function drawScene(frame: PresentationFrame) {
@@ -4713,6 +4714,9 @@ export function startGame(
     drawPost(frame.post);
     nativeScene?.flush();
     cvs.dataset.graphicsBackend = 'pixi';
+  }
+  // Scene-ready continuation belongs to orchestration, never to a drawing call.
+  function settlePresentedScene() {
     if (sceneLoading && sceneReadyToPresent) {
       sceneLoading = false;
       sceneReadyToPresent = false;

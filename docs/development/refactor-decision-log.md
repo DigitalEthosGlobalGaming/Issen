@@ -46,6 +46,8 @@
 - 2026-10-08 — W2 context/events — use generic GameContext composition with separate gameplay/service and presentation contracts; retain transitional getters before moving owners — copying every closure local into a universal context — gameplay imports no renderer/presentation types and module consumers can receive narrow slices; original RNG/reference ownership remains — revert the foundation commit.
 - 2026-10-08 — W2 events — snapshot subscriptions per synchronous delivery; nested emissions finish immediately, and listener exceptions propagate — deferred or silently isolated listeners — deterministic order is required; duplicate subscriptions and idempotent unsubscribe are tested — revert the event-bus foundation.
 
+- 2026-10-08 — W2 presentation boundary — settle scene-ready gameplay continuation in runtime orchestration immediately after drawing — leaving phase/spawn mutations in drawScene — direct repeated drawing must not change gameplay; live timing remains the same frame, and readiness/checkpoint/isolation cases pass — revert the boundary commit before moving scene composition.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

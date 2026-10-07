@@ -28,7 +28,15 @@ tests and the thirteen seeded scenario/save cases. `npx playwright test tests/br
 all **nine passed** (context-event-browser.log; terminal exit confirmed). Logs in
 tmp/runtime-refactor. No process remains. Avoid repeating broad checks for this
 foundation alone: it adds contracts, not runtime behaviour. Run broad again after
-the presentation/shared-runtime change. No intentional gameplay changes yet. W3 remains entirely pending. Do not push develop.
+the presentation/shared-runtime change. No intentional gameplay changes yet. Before extracting presentation, moved the
+scene-ready gameplay continuation out of drawScene into runtime render orchestration
+(`settlePresentedScene`), still immediately after the presented frame. Direct draws
+now cannot spawn/transition gameplay or mutate a pending continuation. Strict types
+passed; all 270 units passed (presentation-readiness-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
+all eight passed (presentation-readiness-browser.log; terminal exit confirmed).
+No process remains. This is a separate concern before physical presentation moves;
+repeat broad regression at the presentation cluster checkpoint. W3 remains entirely pending. Do not push develop.
 
 W2.1 broad verification: `npx playwright test --config playwright.rendering-v2.config.ts`
 **249 passed, three failed**; log under
