@@ -7,7 +7,29 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2 kill events complete; state tables next
+## W1 complete; W2 ownership and composition reduction in progress
+
+
+Latest checkpoint: parry/block cosmetic reactions are owned by
+presentation/duel-feedback.ts. Rule events carry flat positions; listeners have
+no gameplay state/RNG capability. Hit stop and animation mutations remain rules.
+Actual combat orchestration produces identical run/profile/RNG outcomes with
+these listeners enabled or disabled. Cosmetic feedback now follows committed
+score/profile reactions within the same input call; no new effects or timing.
+
+Verification: `npm run typecheck`, `npm test`: strict types and all 361 units pass
+(duel-feedback-typecheck.log, duel-feedback-unit.log).
+`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 253 browser checks pass (duel-feedback-broad.log; terminal result confirmed).
+The log includes a missing wave configuration diagnostic in checkpoint recovery;
+the same unconditional guided-order read exists at pre-refactor. Investigate with
+an unchanged baseline reproduction before deciding whether a repair is in scope.
+
+Next: move native service construction/disposal, equipment appearance and frame
+simulation ordering into their actual owners, then reduce explicit binding setup.
+Prepared drafts are not applied. The composition root is still about 2,800 lines;
+W2 is incomplete. Continue remaining reaction ownership, W2 full gates/version,
+all W3 and Part 4. Do not push develop until the complete final verification.
 
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is

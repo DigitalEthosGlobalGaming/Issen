@@ -432,3 +432,8 @@ Parry, boss-victory and standoff profile reactions are owned by
 game/progression/encounter-listeners.ts. Boss events project completion flags and
 counts; listeners resolve current disposable/main statistics and never receive
 run state or gameplay RNG. Rule-owned persistence follows their synchronous updates.
+
+Parry/block effects, sounds and haptics are owned by
+presentation/duel-feedback.ts, subscribed to immutable rule-event positions.
+The listener has no gameplay state or gameplay random source. Combat rules retain
+hit stop and plain animation mutation; disposal removes both subscriptions.
