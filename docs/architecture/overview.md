@@ -441,3 +441,5 @@ hit stop and plain animation mutation; disposal removes both subscriptions.
 Native renderer service construction and disposal are owned by presentation/native-services.ts. Supplied lighting services remain borrowed; per-game services retain the original cleanup order.
 
 Equipment palettes, blade style selection and armoury preview frames are owned by presentation/equipment.ts with read-only current rule selections. Fallback blade/charm colour records retain per-game identity; preview effects remain independent of combat.
+
+Frame simulation gating and ordered dispatch are owned by game/session/frame-simulation.ts. Presentation clock/camera, weather, figures and audio remain explicit capabilities; the session owner imports no presentation or rendering implementation.

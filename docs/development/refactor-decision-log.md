@@ -185,3 +185,7 @@
 2026-10-08 — W2/native services — physically move native renderer construction and disposal to presentation/native-services.ts — retaining service setup in root considered — preserve supplied lighting ownership and construction/disposal order; strict/361 units and 17 startup/disposal/drawing browser checks pass — revert this physical move commit.
 
 2026-10-08 — W2/equipment presentation — physically move palettes/blade styles and preview-frame construction into presentation/equipment.ts — retaining visual selection in root considered — current read-only rule views preserve awakenings and independent previews; strict/361 units, 11 rendering and six corrected outfit/mobile cases pass; initial nonexistent outfit filters supplied no coverage — revert this physical move commit.
+
+2026-10-08 — W2/frame simulation — physically extract the original frame update sequence into a session owner — changing delta/dispatch order considered — preserve loading/trial gates, cinematic isolation, raw run/death time and sequential phase cascades through narrow ports; strict/361 units and 16 scene/trial/lifecycle browser cases pass — revert this physical move commit.
+
+2026-10-08 — W2/checkpoint diagnostic audit — retain the broad-run missing-wave diagnostic as unresolved — labeling it pre-existing from identical source considered — isolated unchanged pre-refactor recovery had zero page errors and the expected-error probe assertion failed; no reproduction claim or unrelated repair is justified yet — remove only this audit note after a conclusive investigation.

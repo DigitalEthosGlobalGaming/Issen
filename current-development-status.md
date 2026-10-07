@@ -10,7 +10,30 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: equipment appearance and preview-frame construction are
+Latest checkpoint: the original frame simulation sequence is physically owned
+by game/session/frame-simulation.ts. Scene/trial gates, raw run/death deltas,
+cinematic isolation, enemy/phase ordering and camera/audio dispatch are retained.
+Visual clocks and browser capabilities are explicit ports; no rendering imports.
+`npm run typecheck`, `npm test`: strict types and all 361 units pass
+(frame-simulation-typecheck.log, frame-simulation-unit.log).
+`npx playwright test tests/browser/scene-readiness.spec.ts tests/browser/trials.spec.ts tests/browser/performance.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 16 pass in 1.5m (frame-simulation-browser.log; terminal confirmed).
+performance.spec here asserts ordinary menu/blur/resize lifecycle behavior;
+no performance suites, benchmarks or profiles were run.
+
+Checkpoint diagnostic investigation: isolated unchanged pre-refactor source
+completed the original recovery actions with zero page errors. The added probe
+assertion expecting the diagnostic failed (checkpoint-diagnostic-baseline.log).
+Therefore its natural occurrence is NOT proven pre-existing. Identical source
+contains the throwing guided-order read, but that alone is insufficient proof.
+Keep the broad-run diagnostic unresolved and investigate before the W2 gate;
+do not loosen assertions or claim a baseline reproduction.
+
+Next: reduce remaining explicit binding setup and finish reaction ownership.
+The root remains about 2,700 lines, far from the composition target. W2/W3/Part 4
+are incomplete; continue autonomously and do not push develop early.
+
+Previous checkpoint:  equipment appearance and preview-frame construction are
 physically owned by presentation/equipment.ts. Read-only views supply current
 equipment, palettes, awakening eligibility, layout/lighting and companion state.
 Per-game fallback blade and charm palette identities are retained.

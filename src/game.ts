@@ -1,3 +1,4 @@
+import { createFrameSimulation } from './game/session/frame-simulation.ts';
 import { createEquipmentPresentation } from './presentation/equipment.ts';
 import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
 import { bindDuelFeedback } from './presentation/duel-feedback.ts';
@@ -2345,43 +2346,35 @@ export function startGame(
       },
     );
   }
-  function update(dt: number, raw: number) {
-    if (sceneLoading) return;
-    if (activeTrial && trialFailure) {
-      finishTrial(trialFailure);
-      return;
-    }
-    advancePresentationClock(presentationState, dt);
-    if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) G.runTime += raw;
-    updateAmbient(dt);
-    // Cinematic mode advances cosmetic time only: no encounters, weather hazards or run RNG.
-    if (cinematic.active) {
-      updateWeather(reducedMotion() ? 0 : dt);
-      audio.update(raw, STAGES[G.stage]!.weather, presentationState.wind, 0);
-      return;
-    }
-    if (G.freezeT > 0) G.freezeT -= dt;
-    if (G.petT > 0) G.petT -= dt;
-    updateWeather(dt);
-    updatePlayer(dt);
-    apparelMotion.update(raw, reducedMotion());
-    updateEnemies(dt, raw);
-    if (
-      !activeTrial &&
-      !activeDaily &&
-      G.state === 'playing' &&
-      waveConfiguration().ordered &&
-      liveOrdered()[0]?.state === 'idle'
-    )
-      guided.startOrder();
-    bossPhase.updateBackground(dt, raw);
-    phaseRouter.updateFrame(dt, raw);
-    updateFx(dt, raw);
-    renderTrialObjective();
-    updateTransition(raw);
-    advancePresentationCamera(presentationState, raw);
-    audio.update(raw, STAGES[G.stage]!.weather, presentationState.wind, WX.wo);
-  }
+  const frameSimulation = createFrameSimulation(() => ({
+    sceneLoading,
+    activeTrial,
+    trialFailure,
+    finishTrial,
+    G,
+    updateAmbient,
+    cinematic,
+    updateWeather,
+    reducedMotion,
+    audio,
+    presentationState,
+    updatePlayer,
+    apparelMotion,
+    updateEnemies,
+    activeDaily,
+    waveConfiguration,
+    liveOrdered,
+    guided,
+    bossPhase,
+    phaseRouter,
+    updateFx,
+    renderTrialObjective,
+    updateTransition,
+    WX,
+    advanceClock: dt => advancePresentationClock(presentationState, dt),
+    advanceCamera: raw => advancePresentationCamera(presentationState, raw),
+  }));
+  function update(dt: number, raw: number) { frameSimulation.update(dt, raw); }
 
   /* ---------------- render ---------------- */
   function drawPlayer() { playerFigures.drawPlayer(); }
