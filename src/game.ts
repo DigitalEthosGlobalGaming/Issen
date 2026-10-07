@@ -1,3 +1,4 @@
+import { createMenuBindings, type MenuBindingViews } from './ui/wiring/menu-bindings.ts';
 import { createPhaseBindings } from './game/session/phase-bindings.ts';
 import { bindBossFeedback } from './presentation/boss-feedback.ts';
 import { createFiguresHost } from './presentation/figures-host.ts';
@@ -1636,47 +1637,108 @@ export function startGame(
       return !!nativeScene?.contextLost;
     },
   });
-  const { setBestLine, openPanel, closePanel, renderStats } = createPanelWiring(() => ({
-    $,
-    playerStats,
-    ST,
-    G,
-    hudView,
-    supportPreview,
-    previewFrame,
-    testerPremium,
-    renderArmory,
-    renderSetup,
-    META,
-    saveMeta,
-    premiumAccess,
-    showAdmin,
-    TRIAL_PROGRESS,
-    trialResult,
-    startTrial,
-    showScreen,
-    UNL,
-    ITEMS,
-    setBestLine,
-    renderStats,
-    clearTrialResult() {
+    const { setBestLine, openPanel, closePanel, renderStats, setupScreen, renderSetup, tutorial, launchTutorial, showAdmin, scrollMenus, applySettings, saveSettings, lightingDebug, options, armoryWiring, cinematicWiring } = createMenuBindings(() => ({
+    get $(): MenuBindingViews['$'] { return $; },
+    get playerStats(): MenuBindingViews['playerStats'] { return playerStats; },
+    get G(): MenuBindingViews['G'] { return G; },
+    get hudView(): MenuBindingViews['hudView'] { return hudView; },
+    get previewFrame(): MenuBindingViews['previewFrame'] { return previewFrame; },
+    get testerPremium(): MenuBindingViews['testerPremium'] { return testerPremium; },
+    get renderArmory(): MenuBindingViews['renderArmory'] { return renderArmory; },
+    get META(): MenuBindingViews['META'] { return META; },
+    get saveMeta(): MenuBindingViews['saveMeta'] { return saveMeta; },
+    get premiumAccess(): MenuBindingViews['premiumAccess'] { return premiumAccess; },
+    get TRIAL_PROGRESS(): MenuBindingViews['TRIAL_PROGRESS'] { return TRIAL_PROGRESS; },
+    get trialResult(): MenuBindingViews['trialResult'] { return trialResult; },
+    get startTrial(): MenuBindingViews['startTrial'] { return startTrial; },
+    get showScreen(): MenuBindingViews['showScreen'] { return showScreen; },
+    get UNL(): MenuBindingViews['UNL'] { return UNL; },
+    get ITEMS(): MenuBindingViews['ITEMS'] { return ITEMS; },
+    get clearTrialResult(): MenuBindingViews['clearTrialResult'] { return () => {
       trialResult = null;
-    },
-  }));
-  const { setupScreen, renderSetup, tutorial, launchTutorial } = createSetupWiring({
-    $,
-    SETUP,
-    META,
-    ITEM_BY,
-    saveMeta,
-    premiumAccess,
-    sfx,
-    toTitle,
-    reducedMotion,
+    }; },
+    get SETUP(): MenuBindingViews['SETUP'] { return SETUP; },
+    get ITEM_BY(): MenuBindingViews['ITEM_BY'] { return ITEM_BY; },
+    get sfx(): MenuBindingViews['sfx'] { return sfx; },
+    get toTitle(): MenuBindingViews['toTitle'] { return toTitle; },
+    get reducedMotion(): MenuBindingViews['reducedMotion'] { return reducedMotion; },
     get EQ() {
       return EQ;
     },
-  });
+    get AWAKENING(): MenuBindingViews['AWAKENING'] { return AWAKENING; },
+    get applySeal(): MenuBindingViews['applySeal'] { return applySeal; },
+    get checkUnlocks(): MenuBindingViews['checkUnlocks'] { return checkUnlocks; },
+    get computeMods(): MenuBindingViews['computeMods'] { return computeMods; },
+    get hud(): MenuBindingViews['hud'] { return hud; },
+    get playerEquipment(): MenuBindingViews['playerEquipment'] { return playerEquipment; },
+    get refreshArmoryNew(): MenuBindingViews['refreshArmoryNew'] { return refreshArmoryNew; },
+    get renderLives(): MenuBindingViews['renderLives'] { return renderLives; },
+    get revoked(): MenuBindingViews['revoked'] { return revoked; },
+    get saveAwakening(): MenuBindingViews['saveAwakening'] { return saveAwakening; },
+    get testJump(): MenuBindingViews['testJump'] { return testJump; },
+    get toast(): MenuBindingViews['toast'] { return toast; },
+    get setTrialsWasUnlocked(): MenuBindingViews['setTrialsWasUnlocked'] { return (value) => {
+      runTrialsWasUnlocked = value;
+    }; },
+    get cvs(): MenuBindingViews['cvs'] { return cvs; },
+    get screenAnimation(): MenuBindingViews['screenAnimation'] { return screenAnimation; },
+    get lifecycle(): MenuBindingViews['lifecycle'] { return lifecycle; },
+    get settings(): MenuBindingViews['settings'] { return settings; },
+    get reducedFlashes(): MenuBindingViews['reducedFlashes'] { return reducedFlashes; },
+    get prepareScene(): MenuBindingViews['prepareScene'] { return prepareScene; },
+    get combatHaptics(): MenuBindingViews['combatHaptics'] { return combatHaptics; },
+    get audio(): MenuBindingViews['audio'] { return audio; },
+    get setMuteIcon(): MenuBindingViews['setMuteIcon'] { return setMuteIcon; },
+    get presentationState(): MenuBindingViews['presentationState'] { return presentationState; },
+    get environmentState(): MenuBindingViews['environmentState'] { return environmentState; },
+    get ambient(): MenuBindingViews['ambient'] { return ambient; },
+    get rebalanceWeather(): MenuBindingViews['rebalanceWeather'] { return rebalanceWeather; },
+    get lightingRig(): MenuBindingViews['lightingRig'] { return lightingRig; },
+    get audioInit(): MenuBindingViews['audioInit'] { return audioInit; },
+    get systemMotion(): MenuBindingViews['systemMotion'] { return systemMotion; },
+    get artworkReady() {
+        return artworkReady;
+      },
+    get savedRun() {
+        return savedRun;
+      },
+    get supportPreview() {
+        return supportPreview;
+      },
+    get accessibleUnlocks(): MenuBindingViews['accessibleUnlocks'] { return accessibleUnlocks; },
+    get accessible(): MenuBindingViews['accessible'] { return accessible; },
+    get DAILY_LOGIN(): MenuBindingViews['DAILY_LOGIN'] { return DAILY_LOGIN; },
+    get COLLECTION_PROGRESS(): MenuBindingViews['COLLECTION_PROGRESS'] { return COLLECTION_PROGRESS; },
+    get ARMORY_SEEN(): MenuBindingViews['ARMORY_SEEN'] { return ARMORY_SEEN; },
+    get SEALS(): MenuBindingViews['SEALS'] { return SEALS; },
+    get CHARMCOL(): MenuBindingViews['CHARMCOL'] { return CHARMCOL; },
+    get demoKill(): MenuBindingViews['demoKill'] { return demoKill; },
+    get ST() {
+      return ST;
+    },
+    get previewVisits(): MenuBindingViews['previewVisits'] { return previewVisits; },
+    get buildLeaves(): MenuBindingViews['buildLeaves'] { return buildLeaves; },
+    get palette(): MenuBindingViews['palette'] { return palette; },
+    get buildBG(): MenuBindingViews['buildBG'] { return buildBG; },
+    get buildMist(): MenuBindingViews['buildMist'] { return buildMist; },
+    get buildGrass(): MenuBindingViews['buildGrass'] { return buildGrass; },
+    get buildWeather(): MenuBindingViews['buildWeather'] { return buildWeather; },
+    get setupAttract(): MenuBindingViews['setupAttract'] { return setupAttract; },
+    get saveStats(): MenuBindingViews['saveStats'] { return saveStats; },
+    get stageSeed() {
+      return stageSeed;
+    },
+    set stageSeed(value) {
+      stageSeed = value;
+    },
+    get MIST() {
+      return MIST;
+    },
+    set MIST(value) {
+      MIST = value;
+    }
+  }));
+  
   function testJump(stage: number, wave: number, boss: boolean) {
     if (!isTestProfile()) return;
     SETUP.mode = 'waves';
@@ -1699,148 +1761,14 @@ export function startGame(
     G.panel = null;
     showScreen(null);
   }
-  const { showAdmin } = createAdminWiring($('adminContent'), {
-    AWAKENING,
-    G,
-    ITEMS,
-    ITEM_BY,
-    META,
-    SETUP,
-    UNL,
-    applySeal,
-    checkUnlocks,
-    computeMods,
-    hud,
-    launchTutorial,
-    playerEquipment,
-    playerStats,
-    refreshArmoryNew,
-    renderLives,
-    renderSetup,
-    revoked,
-    saveAwakening,
-    saveMeta,
-    setBestLine,
-    showScreen,
-    testJump,
-    toast,
-    get EQ() {
-      return EQ;
-    },
-    setTrialsWasUnlocked(value) {
-      runTrialsWasUnlocked = value;
-    },
-  });
-  const { scrollMenus, applySettings, saveSettings, lightingDebug, options } = createSettingsWiring(
-    {
-      $,
-      G,
-      cvs,
-      screenAnimation,
-      lifecycle,
-      settings,
-      reducedMotion,
-      reducedFlashes,
-      prepareScene,
-      combatHaptics,
-      audio,
-      setMuteIcon,
-      presentationState,
-      environmentState,
-      ambient,
-      rebalanceWeather,
-      lightingRig,
-      previewFrame,
-      audioInit,
-      closePanel,
-      launchTutorial,
-      systemMotion,
-      get artworkReady() {
-        return artworkReady;
-      },
-      get savedRun() {
-        return savedRun;
-      },
-      get supportPreview() {
-        return supportPreview;
-      },
-    },
-  );
-  const armoryWiring = createArmoryWiring({
-    $,
-    META,
-    ITEMS,
-    accessibleUnlocks,
-    accessible,
-    computeMods,
-    applySeal,
-    G,
-    UNL,
-    premiumAccess,
-    DAILY_LOGIN,
-    COLLECTION_PROGRESS,
-    ARMORY_SEEN,
-    SEALS,
-    CHARMCOL,
-    AWAKENING,
-    SETUP,
-    saveMeta,
-    toast,
-    sfx,
-    demoKill,
-    openPanel,
-    lifecycle,
-    get EQ() {
-      return EQ;
-    },
-    get ST() {
-      return ST;
-    },
-  });
+  
+  
+  
   const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
   function refreshArmoryNew() {
     armoryWiring.refreshArmoryNew();
   }
-  const cinematicWiring = createCinematicWiring({
-    $,
-    G,
-    previewVisits,
-    environmentState,
-    buildLeaves,
-    palette,
-    buildBG,
-    buildMist,
-    buildGrass,
-    buildWeather,
-    prepareScene,
-    setupAttract,
-    settings,
-    ITEMS,
-    accessible,
-    UNL,
-    saveStats,
-    toast,
-    cvs,
-    lifecycle,
-    get EQ() {
-      return EQ;
-    },
-    get ST() {
-      return ST;
-    },
-    get stageSeed() {
-      return stageSeed;
-    },
-    set stageSeed(value) {
-      stageSeed = value;
-    },
-    get MIST() {
-      return MIST;
-    },
-    set MIST(value) {
-      MIST = value;
-    },
-  });
+  
   const { cinematic, sceneFilm, previewStage } = cinematicWiring;
   const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
     G,

@@ -455,3 +455,5 @@ Successful boss cuts emit bossCut with flat direction/automatic/position values.
 Checkpoint restore explicitly discards superseded scene continuations before adopting saved run state. This keeps a pending title/cinematic setup callback from clearing a restored encounter when the scene key is unchanged; save records and RNG restoration retain their original shape/order.
 
 game/session/phase-bindings.ts owns ordered construction of seven phase controllers. A shared typed provider supplies each existing narrow contract; the waves controller receives the actual wave lifecycle capability and boss/standoff retain the explicit context.
+
+ui/wiring/menu-bindings.ts owns ordered panel/setup/admin/settings/Armoury/cinematic construction. Shared external ports are lazy, preserving original deferred callbacks and writable view accessors; internal menu capabilities are shared without eager reads of later factories.
