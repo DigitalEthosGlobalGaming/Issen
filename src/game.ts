@@ -1,3 +1,4 @@
+import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
 import { bindDuelFeedback } from './presentation/duel-feedback.ts';
 import { bindEncounterProgression } from './game/progression/encounter-listeners.ts';
 import { createSceneFlow } from './game/session/scene-flow.ts';
@@ -70,14 +71,6 @@ import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.t
 import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
 import { compositionKey } from './rendering/environment/worker-types.ts';
-import { createInkCharmRenderer } from './rendering/figures/ink-charms.ts';
-import { createInkCompanionRenderer } from './rendering/figures/ink-companions.ts';
-import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
-import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
-import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
-import { createLightingRig } from './rendering/lighting-rig.ts';
-import { createUiMaterialLighting } from './ui/material-lighting.ts';
-import { disposeUiArt } from './rendering/ui-art.ts';
 
 import { premium } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
@@ -178,9 +171,7 @@ import { makeFig, EPOSE } from './shared/figure-model.ts';
 import { createPostPresentation } from './presentation/post.ts';
 import { createPostPreparation } from './presentation/post-preparation.ts';
 
-import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
 import type { createBackground } from './rendering/scene/background.ts';
-import { createEnvironmentRenderer } from './rendering/environment/index.ts';
 import { createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 
@@ -250,10 +241,7 @@ import { kanji, roman } from './shared/format.ts';
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(
   surfaces: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
-  lighting?: {
-    rig: ReturnType<typeof createLightingRig>;
-    ui: ReturnType<typeof createUiMaterialLighting>;
-  },
+  lighting?: PreparedLighting,
 ): () => void {
   const lifecycle = createLifecycle();
   if (surfaces) for (const surface of surfaces.values()) lifecycle.add(surface.dispose);
@@ -276,25 +264,7 @@ export function startGame(
   const cvs = $('c'),
     mainG = nativeScene;
   let g = mainG;
-  const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
-  lifecycle.add(environmentRenderer.dispose);
-  const demonRealmRenderer = createDemonRealmRenderer(cvs.ownerDocument);
-  lifecycle.add(demonRealmRenderer.dispose);
-  const inkCharm = createInkCharmRenderer(cvs.ownerDocument);
-  const inkCompanion = createInkCompanionRenderer(cvs.ownerDocument);
-  const inkEnemy = createInkEnemyRenderer(cvs.ownerDocument);
-  const inkPlayer = createInkPlayerRenderer(cvs.ownerDocument);
-  const inkSword = createInkSwordRenderer(cvs.ownerDocument);
-  const lightingRig = lighting?.rig ?? createLightingRig();
-  const uiMaterialLighting =
-    lighting?.ui ?? createUiMaterialLighting(cvs.ownerDocument, lightingRig);
-  if (!lighting) lifecycle.add(uiMaterialLighting.dispose);
-  lifecycle.add(() => disposeUiArt(cvs.ownerDocument));
-  lifecycle.add(inkCharm.dispose);
-  lifecycle.add(inkCompanion.dispose);
-  lifecycle.add(inkEnemy.dispose);
-  lifecycle.add(inkPlayer.dispose);
-  lifecycle.add(inkSword.dispose);
+  const { environmentRenderer, demonRealmRenderer, inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword, lightingRig, uiMaterialLighting } = createNativeServices(cvs.ownerDocument, lifecycle, lighting);
   const R = Math.random;
   const settings = parseSettings(
     store.get('issen.settings', null),

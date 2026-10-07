@@ -10,7 +10,16 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: parry/block cosmetic reactions are owned by
+Latest checkpoint: native renderer construction/disposal is physically owned by
+presentation/native-services.ts. Prepared lighting retains borrowed ownership;
+existing renderer creation and cleanup order is unchanged. Strict types and all
+361 units pass (native-services-typecheck.log, native-services-unit.log).
+`npx playwright test tests/browser/class-lifecycle.spec.ts tests/browser/rendering.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 17 pass in 25.2s (native-services-browser.log; terminal confirmed).
+Next: equipment appearance, frame simulation and remaining composition bindings.
+W2 remains incomplete; continue all three workstreams and Part 4 before pushing.
+
+Previous checkpoint:  parry/block cosmetic reactions are owned by
 presentation/duel-feedback.ts. Rule events carry flat positions; listeners have
 no gameplay state/RNG capability. Hit stop and animation mutations remain rules.
 Actual combat orchestration produces identical run/profile/RNG outcomes with

@@ -437,3 +437,5 @@ Parry/block effects, sounds and haptics are owned by
 presentation/duel-feedback.ts, subscribed to immutable rule-event positions.
 The listener has no gameplay state or gameplay random source. Combat rules retain
 hit stop and plain animation mutation; disposal removes both subscriptions.
+
+Native renderer service construction and disposal are owned by presentation/native-services.ts. Supplied lighting services remain borrowed; per-game services retain the original cleanup order.

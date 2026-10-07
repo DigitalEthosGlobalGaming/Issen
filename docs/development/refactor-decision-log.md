@@ -181,3 +181,5 @@
 2026-10-08 — W2/encounter progression — move parry/boss/standoff profile counter reactions behind value events — retaining profile writes in combat controllers considered — current-view listeners preserve trial/profile isolation; boss/standoff rules commit run mutations then emit before save; strict/359 units and 16 live cases pass — revert this listener split commit.
 
 2026-10-08 — W2/duel feedback — move parry/block sparks, ring, shake, flash, audio and haptics behind value events — leaving cosmetic ports in combat considered — rule hit stop/animation and RNG are retained; score/profile now precede feedback within the same input; listener-enabled/disabled actual outcomes match; strict/361 units and full 253 browser checks pass — revert this listener split commit.
+
+2026-10-08 — W2/native services — physically move native renderer construction and disposal to presentation/native-services.ts — retaining service setup in root considered — preserve supplied lighting ownership and construction/disposal order; strict/361 units and 17 startup/disposal/drawing browser checks pass — revert this physical move commit.
