@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; next presentation extraction
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; next presentation hosts
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -17,8 +17,14 @@ move is complete. Contracts: src/game/session/context.ts, src/game/events.ts,
 src/presentation/context.ts. Transitional getters preserve original owner/RNG
 references. Bus listeners run synchronously in registration order, with defined
 reentrant/subscription semantics and readonly value payloads. No gameplay events
-are emitted yet; wire them while extracting rule/phase owners. Next implement named seven-layer composition,
-then presentation environment/figures/post/feedback ownership. Follow ordered
+are emitted yet; wire them while extracting rule/phase owners. Named seven-layer composition is now implemented in src/presentation/scene-composer.ts
+and src/presentation/scene.ts. Exact original layer order is preserved (foreground
+bamboo follows combat particles); installation requires one named neighbour.
+Strict types passed. All 274 units passed (scene-composer-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-scenes.spec.ts --config playwright.rendering-v2.config.ts`:
+all eight passed (scene-composer-browser.log; terminal exit confirmed), including
+native scene replay and actual runtime extension insertion without rule/RNG/save
+mutation. No process remains. Next presentation environment/figures/post/feedback ownership. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 
 Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**

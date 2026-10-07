@@ -49,7 +49,8 @@ surfaces as soon as they are created, releases them on failure or disposal, and
 keeps retry available after a failed start. A disposed instance cannot remount.
 
 `presentation/scene.ts` owns the ordered scene draw body, with explicit readonly
-scene inputs and drawing ports. Runtime orchestration settles scene readiness
+scene inputs and drawing ports. Its seven named passes use scene-composer.ts
+with explicit before/after neighbours. Runtime orchestration settles scene readiness
 after drawing; presentation cannot commit pending gameplay continuations.
 `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service

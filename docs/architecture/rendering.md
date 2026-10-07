@@ -142,20 +142,28 @@ live switching, shared film grading, and prototype limits.
 ### Main scene
 
 `src/ui/shell.html` provides the full-screen `canvas#c`. `src/game.ts` owns its
-frame composition and delegates individual kinds of drawing to `src/rendering/`.
+frame scheduling. `src/presentation/scene.ts` owns named frame composition and
+delegates individual kinds of drawing to `src/rendering/`.
 The canvas backing store is sized for the device pixel ratio, capped at 2, while
 drawing uses CSS-pixel coordinates. A resize rebuilds layout-dependent cached
 art and reprojects active figures.
 
 The main scene is assembled back to front in a deliberate order:
 
-1. cached stage background and light glows;
-2. stage transition, mist, grass and ground stains;
-3. rear leaves and enemies, including fog between depth groups;
-4. boss, attacking enemies, bamboo, player and pet;
-5. combat particles and foreground grass;
-6. gameplay glyphs, smoke, front leaves, weather and text popups;
-7. stamps and full-frame film, grain, vignette, damage, flash and letterbox effects.
+1. `environment`: cached stage background and light glows;
+2. `midground`: mist, mid grass, ground stains and rear leaves;
+3. `rear-enemies`: boss dimming, rear enemies and fog between depth groups;
+4. `combat`: boss, attacking enemies, player, companions and combat particles;
+5. `foreground`: foreground bamboo and grass;
+6. `atmosphere`: gameplay glyphs, smoke, front leaves, weather and text popups;
+7. `post`: camera restore, stamps, film, grain, vignette, damage, flash and letterbox.
+
+`presentation/scene-composer.ts` requires an explicit neighbour for extensions,
+for example `scene.composer.insert({ name: 'example', draw(frame, views) {} }, { after: 'combat' })`.
+The returned unsubscribe is idempotent. Installation/removal during a draw affects
+the next frame; pass names are unique and missing/ambiguous neighbours throw.
+The current order preserves the original runtime body, including bamboo after
+combat particles. Scene-ready gameplay settlement stays outside all passes.
 
 The order is part of the presentation contract. Adding a renderer without choosing
 its depth explicitly can make an otherwise correct effect appear behind fog,

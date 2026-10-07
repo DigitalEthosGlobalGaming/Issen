@@ -50,6 +50,8 @@
 
 - 2026-10-08 — W2 presentation move — move the unchanged draw body into presentation/scene.ts with explicit scene inputs and drawing ports — moving rule continuations with drawing or first changing pass order — the preceding boundary fix keeps pending gameplay outside presentation; native repeat-draw, checkpoint, context and live-scene checks pass — revert the scene-owner move independently.
 
+- 2026-10-08 — W2 composer — name the seven actual runtime layers and preserve foreground bamboo after combat particles — rearranging drawing to match the historical prose — source order is the output contract; explicit-neighbour hooks are validated, and mid-frame insert/removal applies on the next frame — revert the named-composer commit.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

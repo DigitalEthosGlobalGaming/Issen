@@ -30,14 +30,38 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
     harness.queue();
     const before = harness.snapshot(),
       initialScore = harness.score();
+    const order = [...harness.drawScene.composer.order];
+    const extensions: string[] = [];
+    const remove = harness.drawScene.composer.insert(
+      {
+        name: 'test-observer',
+        draw: () => extensions.push('observed'),
+      },
+      { after: 'combat' },
+    );
     harness.drawScene(frame);
     harness.drawScene(frame);
+    remove();
     const pure = before === harness.snapshot();
     harness.render(0);
     const settled = harness.score() - initialScore;
     harness.render(0);
     const settledAgain = harness.score() - initialScore;
-    return { pure, settled, settledAgain };
+    return { pure, settled, settledAgain, order, extensions };
   });
-  expect(result).toEqual({ pure: true, settled: 7, settledAgain: 7 });
+  expect(result).toEqual({
+    pure: true,
+    settled: 7,
+    settledAgain: 7,
+    order: [
+      'environment',
+      'midground',
+      'rear-enemies',
+      'combat',
+      'foreground',
+      'atmosphere',
+      'post',
+    ],
+    extensions: ['observed', 'observed'],
+  });
 });
