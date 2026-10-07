@@ -1,3 +1,4 @@
+import { createSessionBindings, type SessionBindingViews } from './game/session/session-bindings.ts';
 import { createMenuBindings, type MenuBindingViews } from './ui/wiring/menu-bindings.ts';
 import { createPhaseBindings } from './game/session/phase-bindings.ts';
 import { bindBossFeedback } from './presentation/boss-feedback.ts';
@@ -713,117 +714,236 @@ export function startGame(
     killEffect: () => (accessible(EQ.fx) ? EQ.fx : 'ink'),
     clink: () => sfx.clink(),
   }));
-  const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } =
-    createCheckpointFlow({
-      adoptPhase: () => phaseRouter.adoptCheckpoint(),
-      discardSceneContinuation: () => { sceneContinuation = undefined; },
-      $,
-      AWAKENING,
-      COLLECTION_PROGRESS,
-      G,
-      META,
-      SETUP,
-      UNL,
-      WX,
-      DAILY_LOGIN,
-      ITEMS,
-      accessibleUnlocks,
-      applySeal,
-      bossPos,
-      computeMods,
-      enemyPos,
-      hud,
-      playerEquipment,
-      playerStats,
-      premiumAccess,
-      renderHp,
-      renderLives,
-      saveAwakening,
-      saveMeta,
-      saveStats,
-      saveCollections,
-      setScore,
-      setStage,
-      syncCollections,
-      toast,
-      updateSavedRunButtons,
-      showScreen,
-      showShrineOffers,
-      showOver,
-      persistence: {
+  const sessionBindings: ReturnType<typeof createSessionBindings<typeof PREST, ResultReveal>> = createSessionBindings<typeof PREST, ResultReveal>(() => ({
+    get adoptPhase(): SessionBindingViews<typeof PREST, ResultReveal>['adoptPhase'] { return () => phaseRouter.adoptCheckpoint(); },
+    get discardSceneContinuation(): SessionBindingViews<typeof PREST, ResultReveal>['discardSceneContinuation'] { return () => { sceneContinuation = undefined; }; },
+    get $() { return $; },
+    get AWAKENING() { return AWAKENING; },
+    get COLLECTION_PROGRESS() { return COLLECTION_PROGRESS; },
+    get G() { return G; },
+    get META() { return META; },
+    get SETUP() { return SETUP; },
+    get UNL() { return UNL; },
+    get WX() { return WX; },
+    get DAILY_LOGIN() { return DAILY_LOGIN; },
+    get ITEMS() { return ITEMS; },
+    get accessibleUnlocks() { return accessibleUnlocks; },
+    get applySeal() { return applySeal; },
+    get bossPos() { return bossPos; },
+    get computeMods() { return computeMods; },
+    get enemyPos() { return enemyPos; },
+    get hud() { return hud; },
+    get playerEquipment() { return playerEquipment; },
+    get playerStats() { return playerStats; },
+    get premiumAccess() { return premiumAccess; },
+    get renderHp() { return renderHp; },
+    get renderLives() { return renderLives; },
+    get saveAwakening() { return saveAwakening; },
+    get saveMeta() { return saveMeta; },
+    get saveStats() { return saveStats; },
+    get saveCollections() { return saveCollections; },
+    get setScore() { return setScore; },
+    get setStage() { return setStage; },
+    get syncCollections() { return syncCollections; },
+    get toast() { return toast; },
+    get updateSavedRunButtons() { return updateSavedRunButtons; },
+    get showScreen() { return showScreen; },
+    get showShrineOffers() { return showShrineOffers; },
+    get showOver() { return showOver; },
+    get persistence(): SessionBindingViews<typeof PREST, ResultReveal>['persistence'] { return {
         read: readRunCheckpoint,
         write: writeRunCheckpoint,
         clear: clearRunCheckpoint,
-      },
-      storage: store,
-      resetClock: () => frameLoop.resetClock(),
-      get activeTrial() {
+      }; },
+    get storage(): SessionBindingViews<typeof PREST, ResultReveal>['storage'] { return store; },
+    get resetClock(): SessionBindingViews<typeof PREST, ResultReveal>['resetClock'] { return () => frameLoop.resetClock(); },
+    get activeTrial() {
         return activeTrial;
       },
-      get sceneLoading() {
+    get sceneLoading() {
         return sceneLoading;
       },
-      get EQ() {
+    get EQ() {
         return EQ;
       },
-      set EQ(value) {
+    set EQ(value) {
         EQ = value;
       },
-      get ST() {
+    get ST() {
         return ST;
       },
-      set ST(value) {
+    set ST(value) {
         ST = value;
       },
-      get activeDaily() {
+    get activeDaily() {
         return activeDaily;
       },
-      set activeDaily(value) {
+    set activeDaily(value) {
         activeDaily = value;
       },
-      get rewardLedger() {
+    get rewardLedger() {
         return rewardLedger;
       },
-      set rewardLedger(value) {
+    set rewardLedger(value) {
         rewardLedger = value;
       },
-      get runBossMilestone() {
+    get runBossMilestone() {
         return runBossMilestone;
       },
-      set runBossMilestone(value) {
+    set runBossMilestone(value) {
         runBossMilestone = value;
       },
-      get runRandom() {
+    get runRandom() {
         return runRandom;
       },
-      set runRandom(value) {
+    set runRandom(value) {
         runRandom = value;
       },
-      get runTemplate() {
+    get runTemplate() {
         return runTemplate;
       },
-      set runTemplate(value) {
+    set runTemplate(value) {
         runTemplate = value;
       },
-      get combatRandom() {
+    get combatRandom() {
         return combatRandom;
       },
-      set combatRandom(value) {
+    set combatRandom(value) {
         combatRandom = value;
       },
-      get savedRun() {
+    get savedRun() {
         return savedRun;
       },
-      set savedRun(value) {
+    set savedRun(value) {
         savedRun = value;
       },
-      get shrineOfferIds() {
+    get shrineOfferIds() {
         return shrineOfferIds;
       },
-      set shrineOfferIds(value) {
+    set shrineOfferIds(value) {
         shrineOfferIds = value;
       },
-    });
+    get events(): SessionBindingViews<typeof PREST, ResultReveal>['events'] { return context.events; },
+    get P() { return P; },
+    get PREST() { return PREST; },
+    get apparelMotion() { return apparelMotion; },
+    get audio() { return audio; },
+    get checkUnlocks() { return checkUnlocks; },
+    get clearHints() { return clearHints; },
+    get guided() { return guided; },
+    get hint() { return hint; },
+    get prepareScene() { return prepareScene; },
+    get presentationState() { return presentationState; },
+    get stageVisits() { return stageVisits; },
+    get startTrialEncounter() { return startTrialEncounter; },
+    get startWave() { return startWave; },
+    get startBoss() { return startBoss; },
+    get audioInit() { return audioInit; },
+    get buildLeaves() { return buildLeaves; },
+    get waveCfg() { return waveCfg; },
+    get clearTrialResult(): SessionBindingViews<typeof PREST, ResultReveal>['clearTrialResult'] { return () => {
+      trialResult = null;
+    }; },
+    get clearCheckpoint(): SessionBindingViews<typeof PREST, ResultReveal>['clearCheckpoint'] { return clearRunCheckpoint; },
+    get newRunSeed() { return newRunSeed; },
+    get resetWeather(): SessionBindingViews<typeof PREST, ResultReveal>['resetWeather'] { return (random) => {
+      Object.assign(WX, createWeatherState(random));
+    }; },
+    get clearEffects(): SessionBindingViews<typeof PREST, ResultReveal>['clearEffects'] { return () => {
+      for (const [key, particles] of Object.entries(presentationState.fx))
+        if (key !== 'scratches') particles.length = 0;
+    }; },
+    set activeTrial(value) {
+      activeTrial = value;
+    },
+    get runItemReveals() {
+      return runItemReveals;
+    },
+    set runItemReveals(value) {
+      runItemReveals = value;
+    },
+    get runTrialsWasUnlocked() {
+      return runTrialsWasUnlocked;
+    },
+    set runTrialsWasUnlocked(value) {
+      runTrialsWasUnlocked = value;
+    },
+    get stageSeed() {
+      return stageSeed;
+    },
+    set stageSeed(value) {
+      stageSeed = value;
+    },
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(value) {
+      timeScale = value;
+    },
+    get hitStop() {
+      return hitStop;
+    },
+    set hitStop(value) {
+      hitStop = value;
+    },
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+    get TRIAL_PROGRESS() { return TRIAL_PROGRESS; },
+    get R() { return R; },
+    get deferUntilSceneReady() { return deferUntilSceneReady; },
+    get banner() { return banner; },
+    get setWaveLabel(): SessionBindingViews<typeof PREST, ResultReveal>['setWaveLabel'] { return (label) => {
+      $('waveLbl').textContent = label;
+    }; },
+    get renderTrialObjective() { return renderTrialObjective; },
+    get store() { return store; },
+    get sfx() { return sfx; },
+    get hideTrialObjective(): SessionBindingViews<typeof PREST, ResultReveal>['hideTrialObjective'] { return () => {
+      $('trialObjective').hidden = true;
+    }; },
+    get toTitle() { return toTitle; },
+    get openPanel() { return openPanel; },
+    get focusTrialResult(): SessionBindingViews<typeof PREST, ResultReveal>['focusTrialResult'] { return () => {
+      $('trials')
+        .querySelector<HTMLButtonElement>('#trialResult button')
+        ?.focus({ preventScroll: true });
+    }; },
+    get trialResult() {
+      return trialResult;
+    },
+    set trialResult(value) {
+      trialResult = value;
+    },
+    get sceneContinuation() { return sceneContinuation; },
+    set sceneContinuation(value) { sceneContinuation = value; },
+    get rewardFlowBusy() { return rewardFlowBusy; },
+    set rewardFlowBusy(value) { rewardFlowBusy = value; },
+    get rewardScreen() { return rewardScreen; },
+    get supportPremium() { return supportPremium; },
+    get testerPremium() { return testerPremium; },
+    get lifecycle() { return lifecycle; },
+    get rewardSupport() { return rewardSupport; },
+    get captureCheckpoint() { return captureCheckpoint; },
+    get reviveDaruma() { return reviveDaruma; },
+    get finishTrial() { return finishTrial; },
+    get challenge() { return challenge; },
+    get runResults() { return runResults; },
+    get setBestLine(): SessionBindingViews<typeof PREST, ResultReveal>['setBestLine'] { return () => setBestLine(); },
+    get modeKey() { return modeKey; },
+    get clearRunCheckpoint() { return clearRunCheckpoint; },
+    get renderGameOver() { return renderGameOver; },
+    get refreshArmoryNew() { return refreshArmoryNew; },
+    get setupAttract() { return setupAttract; },
+    get showPauseScreen() { return showPauseScreen; },
+    get contextLost() {
+      return !!nativeScene?.contextLost;
+    }
+  }));
+  const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } = sessionBindings.checkpoint();
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     return combatScore.addScore(pts, x, y, label, size);
   }
@@ -862,231 +982,8 @@ export function startGame(
       position: enemyPos,
     });
   }
-  const { startRun, startDaily, startTrial, nextStep, startRushDuel } = createRunStart({
-    events: context.events,
-    $,
-    G,
-    META,
-    P,
-    PREST,
-    SETUP,
-    apparelMotion,
-    audio,
-    checkUnlocks,
-    clearHints,
-    computeMods,
-    guided,
-    hint,
-    hud,
-    playerStats,
-    playerEquipment,
-    premiumAccess,
-    prepareScene,
-    presentationState,
-    saveStats,
-    setScore,
-    setStage,
-    showScreen,
-    stageVisits,
-    startTrialEncounter,
-    startWave,
-    startBoss,
-    toast,
-    applySeal,
-    audioInit,
-    buildLeaves,
-    waveCfg,
-    clearTrialResult() {
-      trialResult = null;
-    },
-    clearCheckpoint: clearRunCheckpoint,
-    newRunSeed,
-    resetWeather(random) {
-      Object.assign(WX, createWeatherState(random));
-    },
-    clearEffects() {
-      for (const [key, particles] of Object.entries(presentationState.fx))
-        if (key !== 'scratches') particles.length = 0;
-    },
-    get EQ() {
-      return EQ;
-    },
-    set EQ(value) {
-      EQ = value;
-    },
-    get ST() {
-      return ST;
-    },
-    set ST(value) {
-      ST = value;
-    },
-    get activeDaily() {
-      return activeDaily;
-    },
-    set activeDaily(value) {
-      activeDaily = value;
-    },
-    get activeTrial() {
-      return activeTrial;
-    },
-    set activeTrial(value) {
-      activeTrial = value;
-    },
-    get rewardLedger() {
-      return rewardLedger;
-    },
-    set rewardLedger(value) {
-      rewardLedger = value;
-    },
-    get runBossMilestone() {
-      return runBossMilestone;
-    },
-    set runBossMilestone(value) {
-      runBossMilestone = value;
-    },
-    get runItemReveals() {
-      return runItemReveals;
-    },
-    set runItemReveals(value) {
-      runItemReveals = value;
-    },
-    get runRandom() {
-      return runRandom;
-    },
-    set runRandom(value) {
-      runRandom = value;
-    },
-    get runTemplate() {
-      return runTemplate;
-    },
-    set runTemplate(value) {
-      runTemplate = value;
-    },
-    get combatRandom() {
-      return combatRandom;
-    },
-    set combatRandom(value) {
-      combatRandom = value;
-    },
-    get savedRun() {
-      return savedRun;
-    },
-    set savedRun(value) {
-      savedRun = value;
-    },
-    get shrineOfferIds() {
-      return shrineOfferIds;
-    },
-    set shrineOfferIds(value) {
-      shrineOfferIds = value;
-    },
-    get runTrialsWasUnlocked() {
-      return runTrialsWasUnlocked;
-    },
-    set runTrialsWasUnlocked(value) {
-      runTrialsWasUnlocked = value;
-    },
-    get stageSeed() {
-      return stageSeed;
-    },
-    set stageSeed(value) {
-      stageSeed = value;
-    },
-    get timeScale() {
-      return timeScale;
-    },
-    set timeScale(value) {
-      timeScale = value;
-    },
-    get hitStop() {
-      return hitStop;
-    },
-    set hitStop(value) {
-      hitStop = value;
-    },
-    get trialFailure() {
-      return trialFailure;
-    },
-    set trialFailure(value) {
-      trialFailure = value;
-    },
-  });
-  const trialSession = createTrialSession(() => ({
-    events: context.events,
-    G,
-    TRIAL_PROGRESS,
-    UNL,
-    R,
-    playerStats,
-    playerEquipment,
-    deferUntilSceneReady,
-    waveCfg,
-    startBoss,
-    renderHp,
-    banner,
-    setWaveLabel: (label) => {
-      $('waveLbl').textContent = label;
-    },
-    renderTrialObjective,
-    store,
-    sfx,
-    buildLeaves,
-    guided,
-    audio,
-    hideTrialObjective: () => {
-      $('trialObjective').hidden = true;
-    },
-    toTitle,
-    computeMods,
-    openPanel,
-    focusTrialResult: () => {
-      $('trials')
-        .querySelector<HTMLButtonElement>('#trialResult button')
-        ?.focus({ preventScroll: true });
-    },
-    get activeTrial() {
-      return activeTrial;
-    },
-    set activeTrial(value) {
-      activeTrial = value;
-    },
-    get trialFailure() {
-      return trialFailure;
-    },
-    set trialFailure(value) {
-      trialFailure = value;
-    },
-    get trialResult() {
-      return trialResult;
-    },
-    set trialResult(value) {
-      trialResult = value;
-    },
-    get ST() {
-      return ST;
-    },
-    set ST(value) {
-      ST = value;
-    },
-    get EQ() {
-      return EQ;
-    },
-    set EQ(value) {
-      EQ = value;
-    },
-    get combatRandom() {
-      return combatRandom;
-    },
-    set combatRandom(value) {
-      combatRandom = value;
-    },
-    get hitStop() {
-      return hitStop;
-    },
-    set hitStop(value) {
-      hitStop = value;
-    },
-  }));
+  const { startRun, startDaily, startTrial, nextStep, startRushDuel } = sessionBindings.runStart();
+  const trialSession = sessionBindings.trial();
   function startTrialEncounter() {
     trialSession.startTrialEncounter();
   }
@@ -1530,113 +1427,14 @@ export function startGame(
   const rewardScreen = createRewardScreen(document.getElementById('app')!);
   lifecycle.add(rewardScreen.dispose);
   let rewardFlowBusy = false;
-  const resultsSession = createResultsSession(() => ({
-    events: context.events,
-    activeDaily,
-    G,
-    guided,
-    audio,
-    get timeScale() { return timeScale; }, set timeScale(value) { timeScale = value; },
-    presentationState,
-    clearHints,
-    $,
-    META,
-    showScreen,
-    hud,
-    get savedRun() { return savedRun; }, set savedRun(value) { savedRun = value; },
-    updateSavedRunButtons,
-    get sceneContinuation() { return sceneContinuation; }, set sceneContinuation(value) { sceneContinuation = value; },
-    get rewardFlowBusy() { return rewardFlowBusy; }, set rewardFlowBusy(value) { rewardFlowBusy = value; },
-    activeTrial,
-    rewardScreen,
-    supportPremium,
-    testerPremium,
-    lifecycle,
-    rewardSupport,
-    captureCheckpoint,
-    reviveDaruma,
-    finishTrial,
-    ST,
-    challenge,
-    saveStats,
-    runBossMilestone,
-    SETUP,
-    checkUnlocks,
-    rewardLedger,
-    runTrialsWasUnlocked,
-    saveMeta,
-    runResults,
-    runItemReveals,
-    setBestLine,
-    toast,
-    modeKey,
-    store,
-    clearRunCheckpoint,
-    renderGameOver,
-  }));
+  const resultsSession = sessionBindings.results();
   // Support benefits are independent of Web collection access.
   const supportPremium = () =>
     premium.state.owned || edition === 'premium' || testerPremiumActive(testerPremium);
   function showOver() { resultsSession.showOver(); }
   async function claimEmberBonus(pending: PendingSupportReward) { return resultsSession.claimEmberBonus(pending); }
   function recoverSupportReward() { resultsSession.recoverSupportReward(); }
-  const { toTitle, pause, resume, endRun } = createRunFlow({
-    $,
-    G,
-    playerStats,
-    playerEquipment,
-    applySeal,
-    clearHints,
-    refreshArmoryNew,
-    showScreen,
-    hud,
-    presentationState,
-    setStage,
-    setupAttract,
-    P,
-    PREST,
-    saveStats,
-    checkUnlocks,
-    showPauseScreen,
-    audio,
-    guided,
-    showShrineOffers,
-    renderTrialObjective,
-    captureCheckpoint,
-    showOver,
-    setBestLine: () => setBestLine(),
-    resetClock: () => frameLoop.resetClock(),
-    get ST() {
-      return ST;
-    },
-    set ST(value) {
-      ST = value;
-    },
-    get EQ() {
-      return EQ;
-    },
-    set EQ(value) {
-      EQ = value;
-    },
-    get activeDaily() {
-      return activeDaily;
-    },
-    set activeDaily(value) {
-      activeDaily = value;
-    },
-    get timeScale() {
-      return timeScale;
-    },
-    set timeScale(value) {
-      timeScale = value;
-    },
-    get shrineOfferIds() {
-      return shrineOfferIds;
-    },
-    get contextLost() {
-      return !!nativeScene?.contextLost;
-    },
-  });
+  const { toTitle, pause, resume, endRun } = sessionBindings.runFlow();
     const { setBestLine, openPanel, closePanel, renderStats, setupScreen, renderSetup, tutorial, launchTutorial, showAdmin, scrollMenus, applySettings, saveSettings, lightingDebug, options, armoryWiring, cinematicWiring } = createMenuBindings(() => ({
     get $(): MenuBindingViews['$'] { return $; },
     get playerStats(): MenuBindingViews['playerStats'] { return playerStats; },

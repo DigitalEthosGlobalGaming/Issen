@@ -6,13 +6,13 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8; W1 Smaller download notes are released locally.
 
-## Latest green checkpoint: Menu construction bindings
+## Latest green checkpoint: Session construction bindings
 
-Six menu factories now share ui/wiring/menu-bindings.ts. Narrow contracts, writable accessors and original factory order are retained. External ports stay lazy so later Armoury callbacks are not read during earlier menu construction.
-`npm run typecheck`: strict types pass (menu-bindings-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 364 units pass (menu-bindings-unit.log).
-`npx playwright test tests/browser/options.spec.ts tests/browser/presets.spec.ts tests/browser/setup-progression.spec.ts tests/browser/cinematic.spec.ts tests/browser/armoury-mobile.spec.ts tests/browser/support-progression.spec.ts tests/browser/admin-layout.spec.ts tests/browser/offerings-admin.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 31 pass in 2.2m (menu-bindings-browser.log; terminal exit 0 confirmed).
+Five session factories share game/session/session-bindings.ts. Their construction calls remain at their original points. Current writable views, narrow contracts and deferred setBestLine callback are preserved.
+`npm run typecheck`: strict types pass (session-bindings-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 364 units pass (session-bindings-unit.log).
+`npx playwright test tests/browser/feature-plan-06.spec.ts tests/browser/daily.spec.ts tests/browser/trials.spec.ts tests/browser/scene-continuation.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/support-rewards.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 18 pass in 2.1m (session-bindings-browser.log; terminal exit 0 confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
@@ -50,7 +50,7 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Regenerate/apply the session binding preview from this committed source, then strict/unit and focused run/daily/trial/checkpoint/results browser verification.
+Regenerate/apply the activity-state preview, migrate actual RNG browser hooks, then strict/unit and focused scene/trial/daily/isolation checks.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source

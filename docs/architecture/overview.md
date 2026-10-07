@@ -457,3 +457,5 @@ Checkpoint restore explicitly discards superseded scene continuations before ado
 game/session/phase-bindings.ts owns ordered construction of seven phase controllers. A shared typed provider supplies each existing narrow contract; the waves controller receives the actual wave lifecycle capability and boss/standoff retain the explicit context.
 
 ui/wiring/menu-bindings.ts owns ordered panel/setup/admin/settings/Armoury/cinematic construction. Shared external ports are lazy, preserving original deferred callbacks and writable view accessors; internal menu capabilities are shared without eager reads of later factories.
+
+game/session/session-bindings.ts shares explicit capabilities across checkpoint/run entry/trial/results/run lifetime owners. Factories are invoked at their original construction points, retaining eager dependency boundaries and current writable accessors.
