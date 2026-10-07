@@ -86,13 +86,21 @@ Strict types and all 326 units passed (character-model-*.log).
 all 17 passed (23.6s, character-model-browser.log, terminal confirmed).
 No record shape, RNG or behavior changes in the physical model move.
 Unused figures/model.ts compatibility adapter is removed separately after the src/tests/scripts/docs consumer audit found no references. Strict types and all 326 units passed (model-adapter-cleanup-*.log).
-Next: state-machine/registry foundation and actual grunt/boss tables, migrating old
+State-machine/registry foundation is now implemented. state-machine.ts dispatches
+typed tables and validates states/transitions, retaining existing record state/t;
+owners advance freeze/hazard/raw clocks before dispatch. behaviour-registry.ts
+provides stable ordered matching by existing record data with duplicate/unknown
+type validation. Four real API cases cover timer/hook ordering, invalid restored
+states, single dispatch and registry extension without serialized type fields.
+Strict types and all 330 units passed (state-foundation-*.log). Foundation is not
+wired to characters yet; model browser coverage remains seventeen cases green.
+Next: actual grunt/boss tables, migrating old
 update/spawn/idle adapters before removing them separately. Player/companions,
 results ownership, remaining phase/run events and root reduction still follow.
 W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.
 Prepared drafts under tmp/runtime-refactor/drafts: model move already RUN (do not
-repeat); state-machine-draft, state-machine-tests-draft, grunt-table-draft and
-grunt-tests-draft are NOT applied to develop. In isolated table-preview-e1c67d8d,
+repeat); state-machine-draft and state-machine-tests-draft are already RUN; grunt-table-draft
+and grunt-tests-draft remain NOT applied to develop. In isolated table-preview-e1c67d8d,
 these passed strict types and all 31 targeted cases, including seven grunt cases
 and same-frame foxfire dying pose (table-preview-*.log). Repeat checks after live
 application; isolated preview is preparation, not a develop checkpoint.

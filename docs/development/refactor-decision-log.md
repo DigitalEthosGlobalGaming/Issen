@@ -140,6 +140,8 @@
 
 - 2026-10-08 — W2 model adapter cleanup — remove the unused figures/model.ts re-export after consumer migration — retain a dead adapter — source/test/script/doc audit has no references, strict and all 326 units pass — restore the removed re-export file.
 
+- 2026-10-08 — W2 state foundation — retain state/t on plain records, validate states always and let owners advance specialized clocks before table dispatch; derive registry types from existing data in stable first-match order — add serialized discriminants or increment a universal timer twice — strict and all 330 units pass, with four actual dispatcher/registry cases; character wiring is the next step — revert the unwired foundation modules/tests.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -127,7 +127,11 @@ Plain character records use shared/character.ts, seed/pose helpers use
 shared/figure-model.ts, and death style/timing values use shared/character-death.ts.
 Rendering reads these same models; gameplay no longer imports rendering or
 presentation. Rendering types/death modules retain compatibility re-exports.
-State-machine tables and the behaviour registry are the next W2 step.
+game/state-machine.ts supplies typed plain-record table dispatch, transition
+validation and entry/exit/next hooks. Each character owner advances its own clock
+before dispatch to preserve freeze/hazards and raw shadow timing. The ordered
+game/behaviour-registry.ts matches existing record data, retaining checkpoint
+shapes. Character tables are not wired yet.
 
 ## Where changes belong
 
