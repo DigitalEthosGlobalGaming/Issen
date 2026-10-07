@@ -1,3 +1,4 @@
+import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
 import { createEnvironmentState } from './presentation/environment-state.ts';
 import { createCuePresentation } from './presentation/cues.ts';
 import { createPresentationState } from './presentation/state.ts';
@@ -124,7 +125,6 @@ import {
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
-import { createWeatherParticles } from './rendering/scene/weather-particles.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
 import { updateWeather as simulateWeather } from './rendering/scene/weather-update.ts';
 import {
@@ -168,7 +168,7 @@ import { createPostPresentation } from './presentation/post.ts';
 import { createPostPreparation } from './presentation/post-preparation.ts';
 import type { PostFrame } from './rendering/effects/post-frame.ts';
 import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
-import { blob, createBackground } from './rendering/scene/background.ts';
+import type { createBackground } from './rendering/scene/background.ts';
 import { createEnvironmentRenderer } from './rendering/environment/index.ts';
 import { BASE, createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
@@ -602,89 +602,25 @@ export function startGame(
   const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   let stageSeed = stageVisits.enter(0);
   const environmentState = createEnvironmentState();
-  
-  function buildBG() {
-    const result = createBackground(W, H, DPR, G.stage);
-    environmentState.bg = result.canvas;
-    L.glows = result.glows;
-  }
+  const { buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather } =
+    createEnvironmentArtwork(cvs.ownerDocument, () => ({
+      W,H,DPR,S,stage: G.stage,environmentState,L,R,density,context2d,ambient,
+    }));
 
+  
   /* ---------------- ambient ---------------- */
   
   
   const WX = createWeatherState(() => 0.5);
   
-  function buildMist() {
-    const st = STAGES[G.stage]!;
-    environmentState.mistSprite = document.createElement('canvas');
-    environmentState.mistSprite.width = environmentState.mistSprite.height = 128;
-    const m = context2d(environmentState.mistSprite);
-    const gr = m.createRadialGradient(64, 64, 0, 64, 64, 64);
-    gr.addColorStop(0, `rgba(${st.mist},1)`);
-    gr.addColorStop(0.5, `rgba(${st.mist},.45)`);
-    gr.addColorStop(1, `rgba(${st.mist},0)`);
-    m.fillStyle = gr;
-    m.fillRect(0, 0, 128, 128);
-    environmentState.mists = [];
-    for (let i = 0; i < 10; i++)
-      environmentState.mists.push({
-        x: R() * W,
-        y: L.horizonY + R() * (L.groundY - L.horizonY + H * 0.06),
-        w: W * (0.45 + R() * 0.7),
-        h: H * (0.05 + R() * 0.07),
-        a: 0.08 + R() * 0.13,
-        v: (5 + R() * 12) * S,
-      });
-  }
   const driftRenderer = createDriftRenderer();
   
   lifecycle.add(driftRenderer.dispose);
   const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke } =
     createEnvironmentPresentation(() => ({ activeTrial,previewDemon: environmentState.previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg: environmentState.fg,time: presentationState.time,wind: presentationState.wind,leaves: environmentState.leaves,wx: environmentState.wx,bamboo: environmentState.bamboo,cinematic,cinematicWeather: environmentState.cinematicWeather,WX,smokeSprite: environmentState.smokeSprite }));
-  function buildGrass() {
-    const built = ambient().buildGrass(STAGES[G.stage]!.gl);
-    environmentState.fg = built.fg;
-    environmentState.mid = built.mid;
-  }
-  function newLeaf(anywhere: boolean) {
-    return ambient().newLeaf(anywhere);
-  }
-  function buildLeaves() {
-    environmentState.leaves = ambient().buildLeaves();
-  }
-  function gustLeaves(n: number) {
-    ambient().gustLeaves(environmentState.leaves, n);
-  }
-  
-  function buildWeatherArtwork() {
-    const w = STAGES[G.stage]!.weather;
-    environmentState.weatherDensity = density();
-    const built = createWeatherParticles(w, W, H, S, R, environmentState.weatherDensity);
-    environmentState.wx = built.particles;
-    environmentState.bamboo = built.bamboo;
-    if (w === 'smoke') {
-      if (!environmentState.smokeSprite) {
-        environmentState.smokeSprite = document.createElement('canvas');
-        environmentState.smokeSprite.width = environmentState.smokeSprite.height = 128;
-        const m = context2d(environmentState.smokeSprite);
-        const gr = m.createRadialGradient(64, 64, 0, 64, 64, 64);
-        gr.addColorStop(0, 'rgba(14,12,11,1)');
-        gr.addColorStop(0.55, 'rgba(14,12,11,.6)');
-        gr.addColorStop(1, 'rgba(14,12,11,0)');
-        m.fillStyle = gr;
-        m.fillRect(0, 0, 128, 128);
-      }
-    }
-  }
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();
     if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
-  }
-  function rebalanceWeather() {
-    const target = createWeatherParticles(STAGES[G.stage]!.weather, W, H, S, R, density());
-    if (environmentState.wx.length > target.particles.length) environmentState.wx.length = target.particles.length;
-    else if (environmentState.wx.length < target.particles.length) environmentState.wx.push(...target.particles.slice(environmentState.wx.length));
-    environmentState.weatherDensity = density();
   }
   const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
   const { buildPost } = postArtwork;

@@ -328,6 +328,7 @@ returning. Leaked Canvas state can subtly recolor or displace every later layer.
 | Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`            |
 | Robe or blade appearance data                          | `src/game/content/cosmetics.ts`     |
 | Combat particles and transient effects                 | `src/rendering/effects/`            |
+| Runtime cached environment construction                | `src/presentation/environment-artwork.ts` |
 | Runtime ambient/grass/weather drawing host            | `src/presentation/environment.ts` |
 | Runtime feedback effect spawning/drawing              | `src/presentation/feedback.ts` |
 | Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts` |

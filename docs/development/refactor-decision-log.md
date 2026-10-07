@@ -74,6 +74,8 @@
 
 - 2026-10-08 — W2 weather boundary — separate cached weather artwork construction from the live WX reset in place, retaining artwork-then-rule order — moving combatRandom into presentation — weather hazard initialization is gameplay; old checkpoints and cinematic isolation pass before the physical move — revert the weather boundary split.
 
+- 2026-10-08 — W2 environment builders move — move background/mist/grass/drift/weather cache builders into environment-artwork.ts with cosmetic state/viewport/RNG ports — moving the live hazard reset with them — the preceding boundary split retains combat RNG outside presentation and preserves artwork/rule order; twelve scene/save/cinematic/stage cases pass — revert the builder move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

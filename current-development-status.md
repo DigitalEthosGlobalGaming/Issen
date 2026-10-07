@@ -7,122 +7,61 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; cosmetic state owned; feedback actions moved; cue drawing moved; environment state owned; weather boundary split; next environment cache move
+## W1 complete; W2 presentation extraction in progress
 
-W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
-materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
-deletions `81e3742` and `46030fc`. Scene composition is now physically owned by src/presentation/scene.ts.
-Context/events foundation remains alongside the closure; the first presentation
-move is complete. Contracts: src/game/session/context.ts, src/game/events.ts,
-src/presentation/context.ts. Transitional getters preserve original owner/RNG
-references. Bus listeners run synchronously in registration order, with defined
-reentrant/subscription semantics and readonly value payloads. No gameplay events
-are emitted yet; wire them while extracting rule/phase owners. Named seven-layer composition is now implemented in src/presentation/scene-composer.ts
-and src/presentation/scene.ts. Exact original layer order is preserved (foreground
-bamboo follows combat particles); installation requires one named neighbour.
-Strict types passed. All 274 units passed (scene-composer-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-scenes.spec.ts --config playwright.rendering-v2.config.ts`:
-all eight passed (scene-composer-browser.log; terminal exit confirmed), including
-native scene replay and actual runtime extension insertion without rule/RNG/save
-mutation. No process remains. Post drawing now physically belongs to src/presentation/post.ts; its unchanged
-body reads explicit PostViews. Prepared effects clocks, RNG and heartbeat haptics
-remain in advancePost until the next ownership step. Strict types and all 274
-units passed (post-owner-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/pixi-films.spec.ts tests/browser/film-regression.spec.ts --config playwright.rendering-v2.config.ts`:
-two passed (post-owner-browser.log; film-regression.spec.ts does not exist and
-matched no cases).
-`npx playwright test tests/browser/trial-films.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all seven passed (post-owner-checkpoints.log; terminal exit confirmed).
-No process remains. Figure drawing now belongs to src/presentation/figures.ts: low-level frame
-renderer, enemy and boss projection/death drawing. Player/companion projection
-remains for the later ordered player step. Strict types passed; all 274 units
-passed (figures-owner-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|Scattered|actual title' --config playwright.rendering-v2.config.ts`:
-all seven matched cases passed (figures-owner-browser.log; terminal exit confirmed).
-Feedback spawning/drawing now belongs to src/presentation/feedback.ts, including
-popups/stamps and preview-aware effect factories. It receives cosmetic effects,
-RNG and sound/flash ports only, with no run record. Strict types passed; all 274
-units passed (feedback-owner-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|scattered|actual title|preview' --config playwright.rendering-v2.config.ts`:
-all eight matched cases passed (feedback-owner-browser.log; terminal exit confirmed).
-Ambient and weather drawing now belongs to src/presentation/environment.ts:
-ambient factories, grass variants/caches, leaves and weather renderer. Hazard
-simulation/RNG remain in gameplay orchestration, separate from these draw methods.
-Strict types passed; all 274 units passed (environment-owner-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-scenes.spec.ts tests/browser/environment-materials.spec.ts --config playwright.rendering-v2.config.ts`:
-all nine passed (environment-owner-browser.log; terminal exit confirmed).
-Post preparation/history now belongs to src/presentation/post-preparation.ts.
-Camera/post RNG consumption stays in its original order. Explicit cosmetic signal
-ports retain shared flash/ink/shake ownership temporarily; postState is module-owned.
-The existing repeat-draw harness now snapshots postPreparation.state. Strict types
-passed; all 274 units passed (post-preparation-unit.log; initial syntax correction
-was then verified by strict types).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|actual title' --config playwright.rendering-v2.config.ts`:
-all seven passed (post-preparation-browser.log; terminal exit confirmed).
-Cached post artwork now belongs to src/presentation/post-artwork.ts, owning grain
-canvases/patterns, vignette and ink-edge caches. Original dimensions, fixed ink seed
-and visual random call order are preserved. Strict types passed; all 274 units
-passed (post-artwork-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-films.spec.ts tests/browser/trial-films.spec.ts --config playwright.rendering-v2.config.ts`:
-all nine passed (post-artwork-browser.log; terminal exit confirmed).
-Cosmetic state now belongs to src/presentation/state.ts: time/wind, effects,
-shake/zoom, flash, ink pulse and letterbox. Gameplay hitStop/timeScale and plain
-run/checkpoint records remain separate. Symbol-aware rewriting preserves bindings
-and shorthand property names; existing runtime harnesses read the owned state.
-PresentationContext exposes this state and its camera directly.
-Strict types and all 274 units passed (presentation-state-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts tests/browser/death-presentation.spec.ts tests/browser/new-blessings.spec.ts tests/browser/performance.spec.ts -g 'drawing the same|pending gameplay|checkpoint|actual title|death|paused|blessing|cinematic|loop|visible' --config playwright.rendering-v2.config.ts`:
-all 14 passed (presentation-state-browser.log; terminal exit confirmed). This
-performance.spec.ts contains ordinary frame/lifecycle assertions, not profiling.
-Final context alias simplification then passed strict types/units again.
-Feedback now owns flash, letterbox, camera punch, updateFx, weatherBurst and
-killFx. Inputs remain cosmetic-only: selected effect/Weather values, leaf/effect
-data, visual RNG and sound ports. Strict types passed; all 274 units passed
-(feedback-actions-unit.log).
-`npx playwright test tests/browser/death-presentation.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/scattered-armour.spec.ts --config playwright.rendering-v2.config.ts`:
-all nine passed (feedback-actions-browser.log; terminal exit confirmed).
-Encounter cues now belong to src/presentation/cues.ts, including ensō glyphs and
-wave/boss/standoff cue projection. The owner reads explicit encounter views and
-never resolves inputs or mutates rules. Strict types passed; all 274 units passed
-(cues-owner-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/encounter-flow.spec.ts --config playwright.rendering-v2.config.ts`:
-all seven passed (cues-owner-browser.log; terminal exit confirmed).
-Cached environment state now belongs to src/presentation/environment-state.ts:
-background/transition buffers, mist, grass, drift/weather particles, smoke and
-cinematic weather. Live WX hazard timers remain separate in gameplay orchestration.
-Symbol-aware references preserve sharing; PresentationContext exposes environment.
-Strict types and all 274 units passed (environment-state-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts tests/browser/stage-variation.spec.ts tests/browser/environment-materials.spec.ts --config playwright.rendering-v2.config.ts`:
-all 13 passed (environment-state-browser.log; terminal exit confirmed).
-buildWeather now calls a separate cosmetic buildWeatherArtwork and then resets
-live WX using combatRandom exactly as before. This rule/drawing boundary is
-separated before the cache builder move. Strict types and all 274 units passed
-(weather-boundary-unit.log).
+W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
+and obsolete comparison deletions are complete. Context/events foundation is
+committed (3d1f26f); it introduces explicit gameplay/service and presentation
+contracts. No gameplay events are emitted yet: wire them during phase/rule moves.
+The typed bus is synchronous, registration-ordered, reentrant and value-payload-only.
+The seeded scenario tests still use temporary inline input/HP drivers; migrate
+them to real extracted APIs and cover every state-table state as those appear.
+
+Implemented presentation owners:
+
+- scene.ts and scene-composer.ts: seven actual named layers with explicit-neighbour
+  hooks. Foreground bamboo follows combat particles, preserving source order.
+- figures.ts: frame renderer and enemy/boss projection/death drawing.
+- cues.ts: read-only wave/boss/standoff ensō/glyph projection.
+- feedback.ts: cosmetic spawning/drawing, popup/stamp, flash/camera/letterbox,
+  weather/cut bursts and effect updates. No RunState/combat RNG.
+- state.ts: cosmetic time/wind, effects and camera/flash/ink/letterbox signals.
+- environment.ts and environment-state.ts: ambient/grass/leaf/weather drawing,
+  cached scenery/particle state and cinematic weather.
+- environment-artwork.ts: cached background, mist, grass, drift and weather builders.
+- post.ts, post-preparation.ts, post-artwork.ts: prepared drawing, module-owned
+  cosmetic post history, camera/post frame preparation and cached grain/vignette/ink.
+
+PresentationContext exposes cosmetic and environment state directly. Gameplay
+hitStop/timeScale and live WX hazard timers stay outside presentation. buildWeather
+calls cosmetic artwork then resets live WX with combatRandom in the original order.
+That boundary split was committed separately (26af5a3) before the builder move.
+Scene-ready rule continuation likewise moved outside drawing first (75e8490).
+No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
+game.ts still has about 4,141 lines; composition-root reduction is NOT complete.
+
+Latest checkpoint: cached environment builders physically moved. Strict types
+passed. All 274 units passed (environment-artwork-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts tests/browser/stage-variation.spec.ts --config playwright.rendering-v2.config.ts`:
+all 12 passed (environment-artwork-browser.log; terminal exit confirmed).
+Immediately preceding weather boundary: strict types, 274 units and
 `npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts --config playwright.rendering-v2.config.ts`:
-all nine passed (weather-boundary-browser.log; terminal exit confirmed).
-No process remains. Next physically move cached environment builders; broad browser verification at presentation cluster end. Follow ordered
-UI/phase/kill/state-table/player extraction afterwards.
+all nine passed (weather-boundary-browser.log). Environment state: 13 passed
+(environment-state-browser.log). Cues: seven passed; feedback actions: nine;
+cosmetic state: 14; cached post: nine; post preparation: seven; environment drawing:
+nine; feedback drawing: eight; figures: seven; post drawing/films: two plus seven;
+composer: eight; first scene move: 12. All focused run logs are under
+tmp/runtime-refactor, and assertions/tolerances remain unchanged.
+The ordinary performance.spec.ts lifecycle assertions are not profiling.
 
-Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**
-(context-event-unit.log), including five event ordering/reentrancy/subscription
-tests and the thirteen seeded scenario/save cases. `npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/game.spec.ts tests/browser/encounter-flow.spec.ts tests/browser/pixi-backend.spec.ts -g 'checkpoint|runtime disposal|same prepared scene|seeded|boss|standoff|shrine|ends|ending a paused' --config playwright.rendering-v2.config.ts`:
-all **nine passed** (context-event-browser.log; terminal exit confirmed). Logs in
-tmp/runtime-refactor. No process remains. Avoid repeating broad checks for this
-foundation alone: it adds contracts, not runtime behaviour. Run broad again after
-the presentation/shared-runtime change. No intentional gameplay changes yet. Before extracting presentation, moved the
-scene-ready gameplay continuation out of drawScene into runtime render orchestration
-(`settlePresentedScene`), still immediately after the presented frame. Direct draws
-now cannot spawn/transition gameplay or mutate a pending continuation. Strict types
-passed; all 270 units passed (presentation-readiness-unit.log).
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all eight passed (presentation-readiness-browser.log; terminal exit confirmed).
-The first physical move preserves the original draw body and reads explicit scene
-inputs through SceneViews; it exposes no gameplay transition callback. Strict types
-passed, all 270 units passed (scene-owner-unit.log), and
-`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|actual title|context|pending gameplay|checkpoint' --config playwright.rendering-v2.config.ts`:
-all 12 passed (scene-owner-browser.log; terminal exit confirmed). No process remains.
-The scene-ready boundary was committed separately before this physical move;
-repeat broad regression at the presentation cluster checkpoint. W3 remains entirely pending. Do not push develop.
+No process remains. Next move the remaining cosmetic clock/camera, ambient and
+stage-transition update bodies into their owners; run one uninterrupted broad
+browser suite at the presentation cluster checkpoint before proceeding to UI.
+Then ordered UI/screens/admin/secrets, run-flow/router/phases, kill rule/listeners,
+state tables/registry and adapter removal, player/companions, final composition root.
+Full W2 unit/broad/production/Android gates and minor version 1.67.0 remain pending.
+W3 entirely pending, then Part 4 final verification/report and one develop push.
+Do not push develop or mark the goal complete yet.
 
 W2.1 broad verification: `npx playwright test --config playwright.rendering-v2.config.ts`
 **249 passed, three failed**; log under
