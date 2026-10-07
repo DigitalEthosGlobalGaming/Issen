@@ -467,3 +467,5 @@ presentation/graphics-lifecycle.ts owns graphics error suspension, main-canvas r
 presentation/viewport.ts owns resize debounce and viewport/scenery rebuilding. Current dimension accessors keep per-game geometry synchronized; repositioning plain characters is an explicit capability supplied by orchestration.
 
 presentation/kill-appearance.ts owns death appearance and debris callbacks through current value selections and visual randomness. Gameplay receives only the resulting death-record values; cosmetic listeners own flying swords, coins, stains and shake.
+
+presentation/standoff-feedback.ts reacts to immutable successful standoff outcomes. Gameplay owns challenger death, swing, hit stop, score and rewards; cosmetic geometry, feedback RNG, sound and haptics belong to the listener.

@@ -307,10 +307,7 @@ export function createStandoffPhase<Context>(
       const p = e.pos,
         cx = p.x,
         cy = p.y - p.h * 0.55,
-        a = DANG[dir],
-        v: [number, number] = [Math.cos(a), Math.sin(a)],
-        M = Math.max(W, H) * 1.3,
-        sc = p.h / 160;
+        a = DANG[dir];
       e.state = 'dying';
       e.t = 0;
       e.cutAng = a;
@@ -325,16 +322,7 @@ export function createStandoffPhase<Context>(
         e.deathType = 'dissolve';
       e.k = 0;
       swingPlayer(dir, true);
-      addSlash(cx - v[0] * M, cy - v[1] * M, cx + v[0] * M, cy + v[1] * M, Math.max(3, 3 * S), 0.6);
-      killFx(cx, cy, a + Math.PI / 2, sc);
-      scraps(cx, cy, 10, sc);
-      ring(cx, cy, p.h * 0.1, p.h * 1.3, 0.5, Math.max(2, 3 * S));
-      stamp('一閃', W / 2, H * 0.3, Math.max(56, 80 * S), true, 1.4);
-      punch(1.08, cx, cy);
       views.hitStop = 0.22;
-      flash(0.4);
-      sfx.perfect();
-      combatHaptics.play('slice');
       G.combo++;
       bumpCombo();
       G.kills++;
@@ -346,7 +334,7 @@ export function createStandoffPhase<Context>(
         '挑',
         Math.max(22, 28 * S),
       );
-      views.events.emit('standoffResolved', { won: true, perfect: true });
+      views.events.emit('standoffResolved', { won: true, perfect: true, direction: dir, x: cx, y: cy, height: p.h });
       saveStats();
       checkUnlocks();
     } else {

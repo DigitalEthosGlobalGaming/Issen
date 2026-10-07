@@ -144,7 +144,16 @@ test('standoff success, invalid swipe and timeout each emit one final outcome', 
       f.phase.onSwipe(f.views, G.so.e.dir);
     }
     assert.deepEqual(resolved.values, [
-      { won: outcome === 'success', perfect: outcome === 'success' },
+      {
+        won: outcome === 'success',
+        perfect: outcome === 'success',
+        ...(outcome === 'success' ? {
+          direction: G.so.e.dir,
+          x: G.so.e.pos.x,
+          y: G.so.e.pos.y - G.so.e.pos.h * 0.55,
+          height: G.so.e.pos.h,
+        } : {}),
+      },
     ]);
   }
 });

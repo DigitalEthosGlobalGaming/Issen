@@ -6,13 +6,13 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Kill appearance and debris ownership
+## Latest green checkpoint: Standoff success feedback events
 
-presentation/kill-appearance.ts owns cosmetic death selection, flying swords, coins, stains and shake capabilities. Current equipment/bonk values and original visual RNG call order are preserved; rules still select the same plain death record.
-`npm run typecheck`: strict types pass (kill-appearance-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 364 units pass (kill-appearance-unit.log).
-`npx playwright test tests/browser/death-presentation.spec.ts tests/browser/scattered-armour.spec.ts tests/browser/rendering.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 15 pass in 56.1s (kill-appearance-browser.log; terminal exit 0 confirmed).
+Successful standoff cuts emit an immutable position/direction snapshot after committing the rule outcome. presentation/standoff-feedback.ts owns cut debris, rings, stamps, sound and haptics. Actual seeded combat has identical outcomes and gameplay RNG with the listener enabled or disabled.
+`npm run typecheck`: strict types pass (standoff-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 365 units pass (standoff-feedback-unit.log).
+`npx playwright test tests/browser/feature-plan-06.spec.ts tests/browser/encounter-flow.spec.ts tests/browser/death-presentation.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 9 pass in 1.0m (standoff-feedback-browser.log; terminal exit 0 confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
@@ -51,13 +51,13 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Finish the standoff feedback event split with actual listener-enabled/disabled invariants, then remaining damage/wave/boss reactions and genuine composition reduction.
+Run the combined broad browser suite for all recent bindings and feedback changes, then consolidate remaining composition owners and scenario API coverage.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source
 before applying; never overwrite the root with a stale preview.
 
-Finish genuine composition reduction: root remains 2030 lines, far from
+Finish genuine composition reduction: root remains 2032 lines, far from
 the approximately 200-line target. Move remaining session state/services and
 presentation/UI/lifecycle bindings into their actual owners, finish remaining
 standoff/damage/wave/boss reactions, and migrate residual scenario adapters to

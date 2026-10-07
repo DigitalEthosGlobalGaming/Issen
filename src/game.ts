@@ -1,3 +1,4 @@
+import { bindStandoffFeedback } from './presentation/standoff-feedback.ts';
 import { createKillAppearance } from './presentation/kill-appearance.ts';
 import { createViewport } from './presentation/viewport.ts';
 import { bindGraphicsLifecycle } from './presentation/graphics-lifecycle.ts';
@@ -1247,6 +1248,7 @@ export function startGame(
     showBossBar: shown => { $('bossbar').classList.toggle('on', shown); },
     bossStain: p => { presentationState.fx.stains.push({ x:p.x, y:p.y+p.h*0.01, rx:p.h*0.3, t:0, life:BOSS_SHADOW_DURATION }); },
   })));
+  lifecycle.add(bindStandoffFeedback(context.events, () => ({ W, H, S, addSlash, killFx, scraps, ring, stamp, punch, flash, sfx, combatHaptics })));
   lifecycle.add(bindDuelFeedback(context.events, () => ({
     S, sparks, ring, flash, sfx, combatHaptics, letterbox, buzz,
     shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },

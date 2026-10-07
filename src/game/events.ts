@@ -69,7 +69,10 @@ export interface GameEvents {
     alpha: number;
     crow: boolean;
   }>;
-  standoffResolved: Readonly<{ won: boolean; perfect: boolean }>;
+  standoffResolved: Readonly<
+    | { won: false; perfect: false }
+    | { won: true; perfect: true; direction: Direction; x: number; y: number; height: number }
+  >;
   comboChanged: Readonly<{ combo: number; maximum: number; zen?: boolean }>;
   comboBroken: Readonly<{ previous: number }>;
   scoreAdded: Readonly<{
