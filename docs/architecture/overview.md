@@ -55,7 +55,8 @@ after drawing; presentation cannot commit pending gameplay continuations.
 `presentation/figures.ts` owns frame-specific figure rendering and enemy/boss
 projection, with gameplay updates kept in rule owners. `presentation/cues.ts` owns read-only wave/boss/standoff glyph projection.
 `presentation/environment.ts` owns ambient factories, cached grass variants and
-leaf/weather drawing. Hazard simulation remains separate.
+leaf/weather drawing. environment-state.ts owns its caches and cosmetic particle
+buffers. Live weather hazard timers/simulation remain gameplay-owned.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and
 weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.

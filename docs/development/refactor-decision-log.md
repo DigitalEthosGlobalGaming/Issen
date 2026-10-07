@@ -70,6 +70,8 @@
 
 - 2026-10-08 — W2 cues move — move ensō and encounter glyph projection into cues.ts with readonly encounter views — retaining cue composition in rule orchestration — input/target resolution stays in gameplay; rush-shrine and Daruma flows plus all saved encounters pass — revert the cue move.
 
+- 2026-10-08 — W2 environment state — consolidate fourteen cached scenery/cosmetic particle fields in environment-state.ts and expose it through PresentationContext — moving live WX hazard timers into presentation — live weather consumes gameplay RNG, while cinematic weather is cosmetic; thirteen native/cinematic/stage/save browser cases pass — revert the environment-state move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

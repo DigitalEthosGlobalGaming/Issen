@@ -1,3 +1,4 @@
+import { createEnvironmentState } from './presentation/environment-state.ts';
 import { createCuePresentation } from './presentation/cues.ts';
 import { createPresentationState } from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
@@ -600,38 +601,33 @@ export function startGame(
   const stageVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
   let stageSeed = stageVisits.enter(0);
-  let bg: HTMLCanvasElement | null = null,
-    prevBg: HTMLCanvasElement | null = null,
-    stageFade = 0;
+  const environmentState = createEnvironmentState();
+  
   function buildBG() {
     const result = createBackground(W, H, DPR, G.stage);
-    bg = result.canvas;
+    environmentState.bg = result.canvas;
     L.glows = result.glows;
   }
 
   /* ---------------- ambient ---------------- */
-  let mistSprite: HTMLCanvasElement | null = null;
-  let mists: { x: number; y: number; w: number; h: number; a: number; v: number }[] = [],
-    fg: GrassBlade[] = [],
-    mid: GrassBlade[] = [],
-    leaves: Leaf[] = [],
-    wx: WeatherParticle[] = [];
+  
+  
   const WX = createWeatherState(() => 0.5);
-  const cinematicWeather = createWeatherState(() => 0.5);
+  
   function buildMist() {
     const st = STAGES[G.stage]!;
-    mistSprite = document.createElement('canvas');
-    mistSprite.width = mistSprite.height = 128;
-    const m = context2d(mistSprite);
+    environmentState.mistSprite = document.createElement('canvas');
+    environmentState.mistSprite.width = environmentState.mistSprite.height = 128;
+    const m = context2d(environmentState.mistSprite);
     const gr = m.createRadialGradient(64, 64, 0, 64, 64, 64);
     gr.addColorStop(0, `rgba(${st.mist},1)`);
     gr.addColorStop(0.5, `rgba(${st.mist},.45)`);
     gr.addColorStop(1, `rgba(${st.mist},0)`);
     m.fillStyle = gr;
     m.fillRect(0, 0, 128, 128);
-    mists = [];
+    environmentState.mists = [];
     for (let i = 0; i < 10; i++)
-      mists.push({
+      environmentState.mists.push({
         x: R() * W,
         y: L.horizonY + R() * (L.groundY - L.horizonY + H * 0.06),
         w: W * (0.45 + R() * 0.7),
@@ -641,38 +637,36 @@ export function startGame(
       });
   }
   const driftRenderer = createDriftRenderer();
-  let previewDemon = false;
+  
   lifecycle.add(driftRenderer.dispose);
   const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke } =
-    createEnvironmentPresentation(() => ({ activeTrial,previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg,time: presentationState.time,wind: presentationState.wind,leaves,wx,bamboo,cinematic,cinematicWeather,WX,smokeSprite }));
+    createEnvironmentPresentation(() => ({ activeTrial,previewDemon: environmentState.previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg: environmentState.fg,time: presentationState.time,wind: presentationState.wind,leaves: environmentState.leaves,wx: environmentState.wx,bamboo: environmentState.bamboo,cinematic,cinematicWeather: environmentState.cinematicWeather,WX,smokeSprite: environmentState.smokeSprite }));
   function buildGrass() {
     const built = ambient().buildGrass(STAGES[G.stage]!.gl);
-    fg = built.fg;
-    mid = built.mid;
+    environmentState.fg = built.fg;
+    environmentState.mid = built.mid;
   }
   function newLeaf(anywhere: boolean) {
     return ambient().newLeaf(anywhere);
   }
   function buildLeaves() {
-    leaves = ambient().buildLeaves();
+    environmentState.leaves = ambient().buildLeaves();
   }
   function gustLeaves(n: number) {
-    ambient().gustLeaves(leaves, n);
+    ambient().gustLeaves(environmentState.leaves, n);
   }
-  let bamboo: Bamboo[] = [],
-    smokeSprite: HTMLCanvasElement | null = null,
-    weatherDensity = 1;
+  
   function buildWeather(resetSimulation = true) {
     const w = STAGES[G.stage]!.weather;
-    weatherDensity = density();
-    const built = createWeatherParticles(w, W, H, S, R, weatherDensity);
-    wx = built.particles;
-    bamboo = built.bamboo;
+    environmentState.weatherDensity = density();
+    const built = createWeatherParticles(w, W, H, S, R, environmentState.weatherDensity);
+    environmentState.wx = built.particles;
+    environmentState.bamboo = built.bamboo;
     if (w === 'smoke') {
-      if (!smokeSprite) {
-        smokeSprite = document.createElement('canvas');
-        smokeSprite.width = smokeSprite.height = 128;
-        const m = context2d(smokeSprite);
+      if (!environmentState.smokeSprite) {
+        environmentState.smokeSprite = document.createElement('canvas');
+        environmentState.smokeSprite.width = environmentState.smokeSprite.height = 128;
+        const m = context2d(environmentState.smokeSprite);
         const gr = m.createRadialGradient(64, 64, 0, 64, 64, 64);
         gr.addColorStop(0, 'rgba(14,12,11,1)');
         gr.addColorStop(0.55, 'rgba(14,12,11,.6)');
@@ -685,18 +679,18 @@ export function startGame(
   }
   function rebalanceWeather() {
     const target = createWeatherParticles(STAGES[G.stage]!.weather, W, H, S, R, density());
-    if (wx.length > target.particles.length) wx.length = target.particles.length;
-    else if (wx.length < target.particles.length) wx.push(...target.particles.slice(wx.length));
-    weatherDensity = density();
+    if (environmentState.wx.length > target.particles.length) environmentState.wx.length = target.particles.length;
+    else if (environmentState.wx.length < target.particles.length) environmentState.wx.push(...target.particles.slice(environmentState.wx.length));
+    environmentState.weatherDensity = density();
   }
   const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
   const { buildPost } = postArtwork;
   
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
-    if (anim && bg) {
-      prevBg = bg;
-      stageFade = 1;
+    if (anim && environmentState.bg) {
+      environmentState.prevBg = environmentState.bg;
+      environmentState.stageFade = 1;
     }
     G.stage = si;
     buildLeaves();
@@ -870,6 +864,7 @@ export function startGame(
       effects: () => effectSpawner(),
       layout: () => L,
       viewport: () => ({ width: W, height: H, dpr: DPR, scale: S }),
+      environment: environmentState,
       state: presentationState,
       camera: presentationState,
     },
@@ -1011,7 +1006,7 @@ export function startGame(
       reducedFlashes: reducedFlashes(),
       lowQuality: density() <= 0.3,
     };
-    const demon = activeTrial?.realm === 'demon' || previewDemon;
+    const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
     const key = `${demon}:${compositionKey(frame)}`;
     if (key === requestedSceneKey) return;
     requestedSceneKey = key;
@@ -1126,9 +1121,9 @@ export function startGame(
     flash, letterbox, punch, weatherBurst, killFx, updateFx,
     pop, stamp, effectSpawner, addSlash, inkBurst, scraps, ring, sparks, dust,
     effectRenderer, drawFx, drawFx2, drawStains, drawPops, drawStamps,
-  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite,R,density,sfx,W,H,portrait,
+  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite: environmentState.mistSprite,R,density,sfx,W,H,portrait,
     state: presentationState, reducedFlashes, reducedMotion,
-    weather: STAGES[G.stage]!.weather, newLeaf, leaves,
+    weather: STAGES[G.stage]!.weather, newLeaf, leaves: environmentState.leaves,
     killEffect: () => accessible(EQ.fx) ? EQ.fx : 'ink', clink: () => sfx.clink(),
   }));
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
@@ -3143,8 +3138,8 @@ export function startGame(
       presentationState.zoom = 1;
     }
     if (reducedFlashes()) presentationState.flashA = Math.min(presentationState.flashA, 0.035);
-    if (bg) {
-      ambient().balanceLeaves(leaves);
+    if (environmentState.bg) {
+      ambient().balanceLeaves(environmentState.leaves);
       rebalanceWeather();
     }
   }
@@ -3272,19 +3267,19 @@ export function startGame(
   let cinematicFilm = EQ.film;
   function previewStage(stage: number, newVisit = true) {
     if (newVisit) stageSeed = previewVisits.enter(stage, true);
-    previewDemon = stage === STAGES.length;
-    G.stage = previewDemon ? 0 : stage;
+    environmentState.previewDemon = stage === STAGES.length;
+    G.stage = environmentState.previewDemon ? 0 : stage;
     buildLeaves();
-    MIST = previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
+    MIST = environmentState.previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
     palette.clearFog();
-    prevBg = null;
-    stageFade = 0;
+    environmentState.prevBg = null;
+    environmentState.stageFade = 0;
     buildBG();
     buildMist();
     buildGrass();
     buildWeather(false);
     Object.assign(
-      cinematicWeather,
+      environmentState.cinematicWeather,
       createWeatherState(() => 0.5),
     );
     prepareScene();
@@ -3514,7 +3509,7 @@ export function startGame(
       reducedFlashes: reducedFlashes(),
       petActive: G.petT > 0,
       palette: cols,
-      background: bg,
+      background: environmentState.bg,
       appearance: {
         d: P.d,
         pal: playerRobePalette(),
@@ -3536,7 +3531,7 @@ export function startGame(
       effectsVisible,
       font: FONT,
       seal: SEAL,
-      mistSprite,
+      mistSprite: environmentState.mistSprite,
     };
   }
 
@@ -3758,7 +3753,7 @@ export function startGame(
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }
   function updateWeather(dt: number) {
-    simulateWeather(cinematic.active ? cinematicWeather : WX, wx, dt, {
+    simulateWeather(cinematic.active ? environmentState.cinematicWeather : WX, environmentState.wx, dt, {
       weather: STAGES[G.stage]!.weather,
       phase: G.state,
       width: W,
@@ -3791,11 +3786,11 @@ export function startGame(
       0.35 * Math.sin(presentationState.time * 0.87 + 1) +
       0.2 * Math.sin(presentationState.time * 2.3);
     if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) G.runTime += raw;
-    for (const m of mists) {
+    for (const m of environmentState.mists) {
       m.x += m.v * (0.5 + presentationState.wind * 0.5) * dt;
       if (m.x - m.w / 2 > W) m.x = -m.w / 2;
     }
-    ambient().updateLeaves(leaves, dt, presentationState.time, presentationState.wind);
+    ambient().updateLeaves(environmentState.leaves, dt, presentationState.time, presentationState.wind);
     // Cinematic mode advances cosmetic time only: no encounters, weather hazards or run RNG.
     if (cinematic.active) {
       updateWeather(reducedMotion() ? 0 : dt);
@@ -3847,9 +3842,9 @@ export function startGame(
     }
     updateFx(dt, raw);
     renderTrialObjective();
-    if (stageFade > 0) {
-      stageFade = Math.max(0, stageFade - raw / 1.3);
-      if (!stageFade) prevBg = null;
+    if (environmentState.stageFade > 0) {
+      environmentState.stageFade = Math.max(0, environmentState.stageFade - raw / 1.3);
+      if (!environmentState.stageFade) environmentState.prevBg = null;
     }
     if (presentationState.lbT > 0) {
       presentationState.lbT -= raw;
@@ -3918,7 +3913,7 @@ export function startGame(
     reducedMotion,
     activeTrial,
     cinematic,
-    previewDemon,
+    previewDemon: environmentState.previewDemon,
     demonRealmRenderer,
     time: presentationState.time,
     stageSeed,
@@ -3927,10 +3922,10 @@ export function startGame(
     reducedFlashes,
     density,
     cvs,
-    mistSprite,
-    mists,
+    mistSprite: environmentState.mistSprite,
+    mists: environmentState.mists,
     blades,
-    mid,
+    mid: environmentState.mid,
     drawStains,
     drawLeaves,
     sceneLoading,
@@ -3942,7 +3937,7 @@ export function startGame(
     drawFoxfire,
     drawFx,
     drawFx2,
-    fg,
+    fg: environmentState.fg,
     drawGlyphs,
     drawSmoke,
     drawWeather,
@@ -4001,8 +3996,8 @@ export function startGame(
         if (sceneLoading) return;
         if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
         if (!effectQuality.sample(interval, work)) return;
-        ambient().balanceLeaves(leaves);
-        if (Math.abs(weatherDensity - density()) >= 0.09) rebalanceWeather();
+        ambient().balanceLeaves(environmentState.leaves);
+        if (Math.abs(environmentState.weatherDensity - density()) >= 0.09) rebalanceWeather();
       },
     },
   );
@@ -4104,8 +4099,8 @@ export function startGame(
     viewportPrepared = true;
     screenAnimation.invalidate();
     if (artworkReady) prepareScene();
-    prevBg = null;
-    stageFade = 0;
+    environmentState.prevBg = null;
+    environmentState.stageFade = 0;
     for (const e of G.enemies) {
       e.pos = enemyPos(e);
       if (e.state === 'dying') e.deathGround = { ...e.pos };
