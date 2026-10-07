@@ -20,7 +20,7 @@ import { targetSwipe } from '../../src/game/combat/targeting.ts';
 import { resolveDamage } from '../../src/game/combat/damage.ts';
 import { initialSpawns, updateWave } from '../../src/game/encounters/waves.ts';
 import { createBoss } from '../../src/game/encounters/boss-create.ts';
-import { updateBoss } from '../../src/game/encounters/boss-update.ts';
+import { advanceBoss as updateBoss } from '../../src/game/encounters/boss-simulation.ts';
 import { parryOpening } from '../../src/game/encounters/boss-openings.ts';
 import {
   createStandoff,

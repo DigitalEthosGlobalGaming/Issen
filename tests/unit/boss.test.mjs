@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateBoss } from '../../src/game/encounters/boss-update.ts';
+import { advanceBoss as updateBoss } from '../../src/game/encounters/boss-simulation.ts';
 import { bossPosition } from '../../src/rendering/figures/boss-position.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
 import { EPOSE } from '../../src/shared/figure-model.ts';

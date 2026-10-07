@@ -7,7 +7,7 @@ import { parseRunCheckpoint } from '../../src/platform/run-checkpoint.ts';
 import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { updateWave } from '../../src/game/encounters/waves.ts';
-import { updateBoss } from '../../src/game/encounters/boss-update.ts';
+import { advanceBoss as updateBoss } from '../../src/game/encounters/boss-simulation.ts';
 import { updateStandoff, resolveStandoffSwipe } from '../../src/game/encounters/standoff.ts';
 import { BLESS_BY } from '../../src/game/content/blessings.ts';
 import { applyBlessing } from '../../src/game/shrine/blessings.ts';

@@ -1,6 +1,6 @@
 import { definePhase } from '../session/phase-router.ts';
 import { createBoss } from '../encounters/boss-create.ts';
-import { updateBoss as simulateBoss } from '../encounters/boss-update.ts';
+import { advanceBoss as simulateBoss } from '../encounters/boss-simulation.ts';
 import { parryOpening } from '../encounters/boss-openings.ts';
 import { refillDuelKnives } from '../combat/knife.ts';
 import { swiftSlashPoints, duelMasterTimings } from '../progression/mastery.ts';
