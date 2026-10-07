@@ -68,8 +68,12 @@ owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signa
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions and service instances.
 It connects feature callbacks to audio, persistence, presentation owners and UI.
-game/combat/kill.ts now owns cut/scoring/blessing/chain rules with explicit cosmetic
-ports; synchronous rule/listener splitting is the next step. The runtime still contains
+game/combat/kill.ts owns cut/blessing/chain run mutations and combat RNG, emitting
+flat frozen kill/cutChain snapshots before chained selection. Profile counters
+listen in game/progression/combat-listeners.ts; cut audio/haptics/FX listen in
+presentation/kill.ts. Shared scoring/combo rules live in game/progression/
+combat-score.ts; presentation/combat-score.ts reacts with HUD/popups. Presentation
+listener registration/removal cannot change combat state or combat RNG. The runtime still contains
 results/reward orchestration,
 player/companion projection and frame preparation orchestration. These are not separate
 fully extracted owners yet; do not assume the proposed migration tree describes
@@ -116,7 +120,8 @@ restoration and result-display ports.
 and feedback ports. Its createWaveLifecycle owns deferred entry, preparation
 and update/clear boundaries. Boss, standoff, shrine, death and between controllers
 own their encounter rules and dispatch through the live router. Gameplay events
-currently include phaseChanged; the remaining rule/listener split is in progress.
+include phaseChanged, kill/cutChain and score/combo events; remaining phase/run
+emissions are the next step.
 
 ## Where changes belong
 

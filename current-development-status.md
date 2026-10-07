@@ -7,13 +7,13 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2 presentation/UI complete; run flow next
+## W1 complete; W2 kill events complete; state tables next
 
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is
 committed (3d1f26f); it introduces explicit gameplay/service and presentation
 contracts. Live phaseChanged is wired through the phase router;
-other gameplay events still await rule/event moves.
+kill/score/combo events are wired through synchronous listeners; remaining phase/run events await wiring.
 The typed bus is synchronous, registration-ordered, reentrant and value-payload-only.
 The seeded scenario tests still use temporary inline input/HP drivers; migrate
 them to real extracted APIs and cover every state-table state as those appear.
@@ -38,8 +38,8 @@ hitStop/timeScale and live WX hazard timers stay outside presentation. buildWeat
 calls cosmetic artwork then resets live WX with combatRandom in the original order.
 That boundary split was committed separately (26af5a3) before the builder move.
 Scene-ready rule continuation likewise moved outside drawing first (75e8490).
-No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
-game.ts currently has 3109 lines; composition-root reduction is NOT complete.
+No balance or combat timing changes. Same-input cosmetic reaction/RNG ordering now follows committed kill snapshots; see tmp/runtime-refactor/behaviour-changes.md.
+game.ts currently has 3110 lines; composition-root reduction is NOT complete.
 
 Live phase-router integration is complete: inputs dispatch after existing scene-loading/
 guided gates. updateFrame visits boss, playing, standoff, between and dead in the
@@ -57,10 +57,31 @@ Seeded wave scenarios now call the production kill API. Three focused API cases
 cover perfect records/rewards, automatic power isolation and recursive slot refill.
 Strict types and all 321 units passed (enemy-kill-unit.log).
 Focused browser verification: all 25 passed (enemy-kill-browser.log, 1.8m, terminal confirmed): scattered-armour, new-blessings, trials, editions-mastery and runtime-checkpoint-fixtures with playwright.rendering-v2.config.ts.
-Next: split rule event emission from synchronous progression/presentation listeners. Then state tables/registry,
-player/companions, results/reward orchestration and composition-root reduction.
-Full W2/W3/Part 4 remain pending; develop stays unpushed.
-Latest green checkpoint b360675: between controller, strict/all 316 units and
+Kill/score/combo event split is complete and verified.
+game/combat/kill.ts now retains run mutations/combat RNG and emits frozen flat
+kill/cutChain values. game/progression/combat-listeners.ts owns profile counters;
+presentation/kill.ts owns cut audio/haptics/FX. game/progression/combat-score.ts
+owns shared score/combo changes and emits scoreAdded/comboChanged/comboBroken/
+comboProtected; presentation/combat-score.ts owns display reactions. Listeners
+are synchronous and lifecycle-disposed. Kill snapshots include projection/reward
+flags for reactions, retaining no mutable run/character/RNG references.
+Strict types and all 326 units passed (kill-events-typecheck.log, kill-events-unit.log),
+including payload/disposal/RNG isolation and real scoring/Zen/combo-bank cases.
+Focused browser command (kill-events-browser.log): scattered-armour, new-blessings,
+trials, editions-mastery and runtime-checkpoint-fixtures with
+playwright.rendering-v2.config.ts. All 25 passed (1.8m, terminal confirmed).
+First broad event run finished 252 passed / one failed (12.5m): named-profile
+save-transfer timed out before its first Options action; cause unestablished.
+Five unchanged focused repeats passed (42.5s, kill-events-profile-repeat.log).
+`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 253 passed on the full retry (kill-events-broad-retry.log, terminal confirmed).
+No tests, assertions or deadlines were changed.
+Next: wire remaining phase/run events and proceed to plain shared character models,
+state tables/registry, player/
+companions, results/reward orchestration and root reduction. W3 and Part 4 still
+remain pending; develop stays unpushed. Current physical kill checkpoint d9b22c3.
+Prepared drafts under ignored tmp/runtime-refactor/drafts are NOT executed: move-character-models (physical move with compatibility re-exports), state-machine-draft and state-machine-tests-draft (foundation only; no actual grunt/boss tables yet), move-results-draft (later terminal ownership; requires refreshing its capture audit and verification). The full retry is finished. Isolated preview table-preview-e1c67d8d passed strict types and 31 targeted tests (table-preview-typecheck.log, table-preview-unit.log). This validates drafts only; no shared model/state table is applied to develop yet. Grunt table and seven state tests drafts are also prepared. Apply models, verify/commit physical move, then foundation and actual table steps separately.
+Earlier checkpoint b360675: between controller, strict/all 316 units and
 ten actual trial/save browser cases passed (between-*.log).
 Then state tables/registry, player/companions, results/reward ownership and root
 reduction. Full W2/W3/Part 4 remain pending; develop stays unpushed. Death

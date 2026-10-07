@@ -1,3 +1,4 @@
+import { bindKillFeedback } from '../../src/presentation/kill.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
@@ -76,4 +77,56 @@ test('serpent chained cuts use the real kill API and refill each vacated slot', 
     G.pendingSpawns.map((p) => p.slot),
     [0, 1],
   );
+});
+
+test('cut payloads are frozen value snapshots and profile listeners dispose independently', () => {
+  const f = fixture(),
+    snapshots = [],
+    statsBefore = structuredClone(f.views.ST);
+  f.dispose();
+  f.events.on('kill', (event) => snapshots.push(event));
+  f.rules.killEnemy(f.enemy, 'up');
+  assert.deepEqual(f.views.ST, statsBefore, 'rules cannot write profile counters');
+  assert.equal(snapshots.length, 1);
+  const snapshot = snapshots[0];
+  assert.ok(Object.isFrozen(snapshot));
+  assert.ok(Object.values(snapshot).every((value) => value === null || typeof value !== 'object'));
+  assert.equal(snapshot.runPerfects, 1);
+  assert.equal(snapshot.x, f.enemy.pos.x);
+  const saved = { ...snapshot };
+  f.enemy.pos.x += 100;
+  f.views.G.combo = 99;
+  assert.deepEqual(snapshot, saved, 'snapshot cannot retain character/run references');
+});
+
+test('adding or removing cosmetic cut listeners cannot change run outcomes or combat RNG', () => {
+  const a = fixture(),
+    b = fixture();
+  a.views.G.m.serpent = b.views.G.m.serpent = 1;
+  for (const f of [a, b]) {
+    const enemy = spawnEnemy(
+      f.views.G,
+      1,
+      false,
+      () => ({ x: 140, y: 200, h: 150, fog: 0, alpha: 1 }),
+      f.runtime.random.next,
+    );
+    enemy.state = 'idle';
+    enemy.dir = 'up';
+  }
+  const feedback = [],
+    events = [];
+  a.events.on('kill', (event) => events.push(event));
+  const dispose = bindKillFeedback(a.events, () => ({
+    ...a.views,
+    killFx: (...args) => feedback.push(args),
+  }));
+  a.rules.killEnemy(a.enemy, 'up');
+  b.rules.killEnemy(b.enemy, 'up');
+  assert.deepEqual(a.views.G, b.views.G);
+  assert.equal(a.runtime.random.state(), b.runtime.random.state());
+  assert.equal(feedback.length, 2);
+  dispose();
+  a.events.emit('kill', events[0]);
+  assert.equal(feedback.length, 2, 'disposed feedback is no longer invoked');
 });

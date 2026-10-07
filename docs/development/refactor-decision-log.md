@@ -134,6 +134,8 @@
 
 - 2026-10-08 — W2 enemy kill move — move current kill rules first, retaining cosmetic construction behind explicit ports, and migrate seeded kills to the production API — combine event splitting with the physical move or retain inline test copies — strict, all 321 units and focused browser cases pass; score, chain and reward ordering is preserved — revert the physical kill move and driver migration.
 
+- 2026-10-08 — W2 kill event split — commit run mutations/combat RNG before frozen flat cut snapshots, with synchronous profile/cosmetic listeners and shared scoring/combo rule events — pass mutable enemies to listeners or retain interleaved feedback — strict, all 326 units, 25 focused cases and the full 253-case browser retry pass; first run 252/253 had one unestablished pre-Options timeout, then five unchanged profile repeats passed; cosmetic reaction/RNG ordering within one input may differ, combat timing/balance/save shapes do not — revert the event-split checkpoint; d9b22c3 retains the extracted pre-split rules.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

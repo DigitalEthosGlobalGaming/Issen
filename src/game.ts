@@ -1,3 +1,7 @@
+import { createCombatScore } from './game/progression/combat-score.ts';
+import { bindCombatScoreFeedback } from './presentation/combat-score.ts';
+import { bindKillFeedback } from './presentation/kill.ts';
+import { bindCombatProgression } from './game/progression/combat-listeners.ts';
 import { createEnemyKill } from './game/combat/kill.ts';
 import { createPhaseRouter, definePhase } from './game/session/phase-router.ts';
 import { createBetweenPhase } from './game/phases/between.ts';
@@ -846,15 +850,19 @@ export function startGame(
   const comboMult = () => comboMultiplier(G.combo, G.m);
   const gain = (p: number) => scoreGain(p, G);
   const modeKey = () => getModeKey(G);
+  const combatScore = createCombatScore(() => ({
+    G,
+    events: context.events,
+    activeTrial,
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+  }));
   function bumpCombo() {
-    G.maxCombo = Math.max(G.maxCombo, G.combo);
-    if (G.zen) ST.bestZen = Math.max(ST.bestZen, G.combo);
-    else {
-      ST.bestCombo = Math.max(ST.bestCombo, G.combo);
-      const q = bst();
-      if (q) q.c = Math.max(q.c, G.combo);
-      challenge('c', G.combo);
-    }
+    combatScore.bumpCombo();
   }
 
   const { hudView, screenAnimation, showScreen, renderLives, hud, setScore, banner, renderHp } =
@@ -1134,13 +1142,7 @@ export function startGame(
       },
     });
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
-    pts = gain(pts);
-    G.score += pts;
-    setScore();
-    if (G.zen) {
-      if (label) pop(x, y, label, size);
-    } else pop(x, y, (label ? label + ' ' : '') + '+' + pts, size);
-    return pts;
+    return combatScore.addScore(pts, x, y, label, size);
   }
   /* ---------------- enemies ---------------- */
   function enemyPos(e: Enemy) {
@@ -1457,7 +1459,8 @@ export function startGame(
   function updateWave(dt: number) {
     waveLifecycle.updateWave(dt);
   }
-  const killRules = createEnemyKill(() => ({
+  const readKillViews = () => ({
+    events: context.events,
     G,
     pz,
     enemyPos,
@@ -1506,7 +1509,7 @@ export function startGame(
     hideHint,
     liveOrdered,
     checkUnlocks,
-    deathAppearance(perfect, bonk, dir) {
+    deathAppearance(perfect: boolean, bonk: boolean, dir: Direction) {
       const deathType =
         !G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour'
           ? 'scatter'
@@ -1518,7 +1521,7 @@ export function startGame(
       const fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
       return { deathType, fallDir };
     },
-    disarm(pos) {
+    disarm(pos: Enemy['pos']) {
       const q = pos,
         s2 = q.h / 160;
       presentationState.fx.swords.push({
@@ -1535,7 +1538,7 @@ export function startGame(
         life: 2.4,
       });
     },
-    coin(pos) {
+    coin(pos: Enemy['pos']) {
       presentationState.fx.coins.push({
         x0: pos.x,
         y0: pos.y - pos.h * 0.6,
@@ -1543,7 +1546,7 @@ export function startGame(
         life: 0.8,
       });
     },
-    stain(P0) {
+    stain(P0: Enemy['pos']) {
       presentationState.fx.stains.push({
         x: P0.x + (R() - 0.5) * P0.h * 0.2,
         y: P0.y + P0.h * 0.01,
@@ -1552,10 +1555,16 @@ export function startGame(
         life: SHADOW_DURATION,
       });
     },
-    shake: (amount) => {
+    shake: (amount: number) => {
       presentationState.shake = Math.max(presentationState.shake, amount);
     },
-  }));
+  });
+  const killRules = createEnemyKill(readKillViews);
+  lifecycle.add(
+    bindCombatProgression(context.events, () => ({ ST, bst, challenge, checkUnlocks })),
+  );
+  lifecycle.add(bindKillFeedback(context.events, readKillViews));
+  lifecycle.add(bindCombatScoreFeedback(context.events, () => ({ setScore, pop, W, H })));
   function killEnemy(
     e: Enemy,
     dir: Direction,
@@ -1813,15 +1822,7 @@ export function startGame(
     }
   });
   function breakCombo() {
-    if (activeTrial?.cleanOpenings)
-      trialFailure = 'An opening was missed or a counter went the wrong way.';
-    if (protectCombo(G)) {
-      pop(W / 2, H * 0.4, 'Composure · combo kept');
-      return;
-    }
-    const previous = G.combo;
-    G.combo = G.bless && G.bless.has('banner') && G.combo >= 10 ? 10 : 0;
-    if (G.combo < previous) recordComboBreak(G, previous);
+    combatScore.breakCombo();
   }
   const shrinePhase = createShrinePhase<GameContext<PresentationContext>>(() => ({
     G,
