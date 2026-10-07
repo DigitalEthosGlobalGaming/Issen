@@ -1,3 +1,4 @@
+import { bossShownDirection } from './game/encounters/boss-openings.ts';
 import { createEnvironmentHost } from './presentation/environment-host.ts';
 import { createFrameSimulation } from './game/session/frame-simulation.ts';
 import { createEquipmentPresentation } from './presentation/equipment.ts';

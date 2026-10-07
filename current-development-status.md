@@ -10,7 +10,19 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: separately deleted 70 unused named root imports left by
+Latest checkpoint correction: restore bossShownDirection for the unchanged
+trial browser hook. Import deletion 47beda8 removed that test-only root binding;
+the profile verification caught ReferenceError before trial hook initialization.
+The stale failed run was stopped. A restarted run with the import restored passes
+all 10 save-transfer/daily/trial cases in 1.4m (profile-state-browser-retry.log),
+with unchanged assertions/timeouts. Strict types and 362 units pass alongside
+the pending profile ownership move. An exhaustive removed-name browser scan found
+only this and already-retained BLESS_BY as root hook dependencies; other matches
+import their modules directly in browser evaluations.
+The profile-state.ts move and its unit are still uncommitted and must be committed
+as the next green checkpoint. W2/W3/Part 4 remain incomplete and unpushed.
+
+Previous checkpoint:  separately deleted 70 unused named root imports left by
 completed moves. Strict types and all 361 units pass (root-import-cleanup-typecheck.log,
 root-import-cleanup-unit.log). Nine startup/readiness browser checks pass in 22.3s
 (root-import-cleanup-browser.log), and three blessing cases pass in 23.7s
