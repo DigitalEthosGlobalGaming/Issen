@@ -10,7 +10,21 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: seven phase controllers now share a typed construction provider
+Latest combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+passes all 254 cases in 13.5m (phase-bindings-broad.log; terminal exit 0 confirmed).
+This includes the checkpoint continuation fix and seven-phase binding move.
+Strict types and all 364 units also pass at that runtime checkpoint.
+Next: regenerate menu-binding preview from current source, apply only its root and
+new binding module, then strict/unit and focused actual menu/lifecycle checks.
+Independently regenerate/apply and verify the prepared session binding, activity,
+graphics lifecycle and viewport owners in small commits. Their isolated previews
+pass strict types, but are NOT applied or browser verified. Never copy stale roots.
+The standoff feedback preview is likewise isolated/typechecked only; it needs
+actual listener-enabled/disabled rule invariants and browser verification before
+an isolated reaction commit. W2 composition/reactions, all W3 and Part 4 remain
+required. No develop push until final verification/report is complete.
+
+Previous checkpoint:  seven phase controllers now share a typed construction provider
 in game/session/phase-bindings.ts. Existing narrow contracts, mutable accessors,
 construction order and wave lifecycle dependency are preserved.
 `npm run typecheck` and `node --test tests/unit/*.test.mjs`: strict types and
