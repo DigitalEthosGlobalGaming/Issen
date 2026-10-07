@@ -113,6 +113,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/cinematic.ts` owns viewer session/grade state and callbacks.
 
+`ui/wiring/profile.ts` owns profile transfer/reset/management binding.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

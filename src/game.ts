@@ -1,3 +1,4 @@
+import { bindProfileWiring } from './ui/wiring/profile.ts';
 import { createCinematicWiring } from './ui/wiring/cinematic.ts';
 import { bindPurchaseWiring } from './ui/wiring/purchases.ts';
 import { createInputWiring } from './ui/wiring/input.ts';
@@ -2809,28 +2810,7 @@ export function startGame(
     G, ST, UNL, audioInit, tn, sfx, flash, saveStats, checkUnlocks, toast,
   }));
   bindTitleGestures($('title'), lifecycle, () => cinematic.logoTap());
-  lifecycle.add(bindProfileReset($('options'), deleteCurrentProfile, isTestProfile()));
-  function flushProfile() {
-    store.set('issen.stats', playerStats);
-    store.set('issen.equip', playerEquipment);
-    saveMeta();
-    saveAwakening();
-    store.set('issen.unlocks', [...UNL]);
-  }
-  lifecycle.add(bindProfileManagement($('options'), flushProfile));
-  lifecycle.add(
-    bindSaveTransfer(
-      $('options'),
-      document.querySelector('.title-version')?.textContent || '',
-      () => {
-        store.set('issen.stats', playerStats);
-        store.set('issen.equip', playerEquipment);
-        saveMeta();
-        saveAwakening();
-        store.set('issen.unlocks', [...UNL]);
-      },
-    ),
-  );
+  const { flushProfile } = bindProfileWiring({ $, lifecycle, playerStats, playerEquipment, saveMeta, saveAwakening, UNL });
   const previewArtwork = { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword };
   const preview = createArmoryPreview(
     $('prevC'),
