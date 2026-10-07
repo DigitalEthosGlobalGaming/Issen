@@ -463,3 +463,5 @@ game/session/session-bindings.ts shares explicit capabilities across checkpoint/
 game/session/activity.ts owns plain mutable trial/daily metadata and failure/result state alongside the existing combat/random capabilities. Context and controller projections resolve current fields, and browser isolation hooks read the actual activity owner.
 
 presentation/graphics-lifecycle.ts owns graphics error suspension, main-canvas recovery deadlines and activity suspension. Readiness remains a current capability; recovery retains the same canvas and requires explicit run resume.
+
+presentation/viewport.ts owns resize debounce and viewport/scenery rebuilding. Current dimension accessors keep per-game geometry synchronized; repositioning plain characters is an explicit capability supplied by orchestration.

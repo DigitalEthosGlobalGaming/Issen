@@ -1,3 +1,4 @@
+import { createViewport } from './presentation/viewport.ts';
 import { bindGraphicsLifecycle } from './presentation/graphics-lifecycle.ts';
 import { createRunActivity } from './game/session/activity.ts';
 import { createSessionBindings, type SessionBindingViews } from './game/session/session-bindings.ts';
@@ -1965,39 +1966,14 @@ export function startGame(
   }));
 
   /* ---------------- boot ---------------- */
-  let rt = 0;
-  let viewportPrepared = false;
-  function resize() {
-    const r = cvs.getBoundingClientRect();
-    const width = Math.max(1, r.width);
-    const height = Math.max(1, r.height);
-    const ratio = Math.min(2, window.devicePixelRatio || 1);
-    if (
-      viewportPrepared &&
-      W === width &&
-      H === height &&
-      DPR === ratio &&
-      cvs.width === Math.round(width * ratio) &&
-      cvs.height === Math.round(height * ratio)
-    )
-      return;
-    W = width;
-    H = height;
-    DPR = ratio;
-    cvs.width = Math.round(W * DPR);
-    cvs.height = Math.round(H * DPR);
-    layout();
-    buildBG();
-    buildMist();
-    buildGrass();
-    buildLeaves();
-    buildWeather(false);
-    buildPost();
-    viewportPrepared = true;
-    screenAnimation.invalidate();
-    if (artworkReady) prepareScene();
-    environmentState.prevBg = null;
-    environmentState.stageFade = 0;
+  const { resize } = createViewport(() => ({
+    cvs, lifecycle, layout, buildBG, buildMist, buildGrass, buildLeaves,
+    buildWeather, buildPost, screenAnimation, prepareScene, environmentState,
+    get artworkReady() { return artworkReady; },
+    get W() { return W; }, set W(value) { W = value; },
+    get H() { return H; }, set H(value) { H = value; },
+    get DPR() { return DPR; }, set DPR(value) { DPR = value; },
+    reposition() {
     for (const e of G.enemies) {
       e.pos = enemyPos(e);
       if (e.state === 'dying') e.deathGround = { ...e.pos };
@@ -2006,11 +1982,8 @@ export function startGame(
       G.boss.pos = bossPos(G.boss);
       if (G.boss.state === 'dying') G.boss.deathGround = { ...G.boss.pos };
     }
-  }
-  lifecycle.listen(window, 'resize', () => {
-    lifecycle.clearTimeout(rt);
-    rt = lifecycle.timeout(resize, 80);
-  });
+    },
+  }));
   computeMods();
   applySeal();
   resize();

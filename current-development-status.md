@@ -6,13 +6,13 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Graphics and activity lifecycle
+## Latest green checkpoint: Viewport rebuilding
 
-presentation/graphics-lifecycle.ts owns graphics failure, the original eight-second restore deadline and activity suspension. Explicit resume, canvas identity and reverse lifecycle cleanup order remain intact.
-`npm run typecheck`: strict types pass (graphics-lifecycle-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 364 units pass (graphics-lifecycle-unit.log).
-`npx playwright test tests/browser/game.spec.ts tests/browser/graphics-errors.spec.ts tests/browser/class-lifecycle.spec.ts tests/browser/pixi-backend.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 34 pass in 1.7m (graphics-lifecycle-browser.log; terminal exit 0 confirmed).
+presentation/viewport.ts owns geometry rebuild and the original 80ms resize debounce. Current scalar accessors preserve layout propagation; character repositioning remains an explicit rule port, including grounded dying records.
+`npm run typecheck`: strict types pass (viewport-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 364 units pass (viewport-unit.log).
+`npx playwright test tests/browser/rendering.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/encounter-flow.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 16 pass in 47.0s (viewport-browser.log; terminal exit 0 confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
@@ -34,7 +34,7 @@ Native/equipment/environment/figure presentation, phased profile state,
 active equipment/profile policy and frame dispatch have explicit owners.
 Kill, combo/score, parry/block and successful boss-cut/victory cosmetics listen
 to immutable value events. Seven phases share their typed construction provider.
-Implemented binding/state/lifecycle owners: game/session/phase-bindings.ts, ui/wiring/menu-bindings.ts, game/session/session-bindings.ts, game/session/activity.ts, presentation/graphics-lifecycle.ts.
+Implemented binding/state/lifecycle owners: game/session/phase-bindings.ts, ui/wiring/menu-bindings.ts, game/session/session-bindings.ts, game/session/activity.ts, presentation/graphics-lifecycle.ts, presentation/viewport.ts.
 See docs/architecture/overview.md and refactor-decision-log.md for exact ownership,
 physical moves, separate fixes/deletions and prior verification checkpoints.
 
@@ -51,7 +51,7 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Regenerate/apply the viewport preview, then strict/unit and orientation/scene readiness/encounter browser checks.
+Finish remaining actual root services/state/projections and feedback reactions, migrate residual scenario adapters, then the full W2 gates before any lighting implementation.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source
