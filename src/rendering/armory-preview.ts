@@ -16,7 +16,7 @@ import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
-import roomUrl from '../ui/assets/armoury-room.png';
+import roomUrl from '../ui/assets/armoury-room.webp';
 import { createAssetMaterials } from './asset-materials.ts';
 import {
   createCachedMaterials,

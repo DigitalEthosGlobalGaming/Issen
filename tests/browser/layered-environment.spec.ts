@@ -75,7 +75,7 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
 });
 
 test('missing sprite assets report unavailable without substituted artwork', async ({ page }) => {
-  await page.route('**/mountain-atlas.png*', (route) => route.abort());
+  await page.route('**/mountain-atlas.webp*', (route) => route.abort());
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');

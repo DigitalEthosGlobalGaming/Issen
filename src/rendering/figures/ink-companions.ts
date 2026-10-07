@@ -1,8 +1,8 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-const COMPANION_URL = new URL('./assets/companion-parts-atlas.png', import.meta.url).href;
-const ROCK_URL = new URL('./assets/mystic-rock.png', import.meta.url).href;
+const COMPANION_URL = new URL('./assets/companion-parts-atlas.webp', import.meta.url).href;
+const ROCK_URL = new URL('./assets/mystic-rock.webp', import.meta.url).href;
 
 /** Verified packed windows, with source-pixel joints and native aspect ratios. */
 export const INK_COMPANION_FRAMES = [

@@ -1,3 +1,4 @@
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
@@ -46,42 +47,24 @@ const HEAD_BOTTOMS = [574, 570, 1160, 1168];
 const HEAD_WIDTHS = [0.19, 0.235, 0.205, 0.165];
 const LOOKS = new Set(['', 'mask', 'monk', 'jingasa', 'kasa', 'kabuto', 'hair']);
 const URLS = {
-  clothing: new URL('./assets/enemy-clothing-variants.png', import.meta.url).href,
-  variationHeads: new URL('./assets/enemy-headwear-variants.png', import.meta.url).href,
-  base: new URL('./assets/enemy-ronin-simple.png', import.meta.url).href,
-  heads: new URL('./assets/enemy-headwear-atlas.png', import.meta.url).href,
+  clothing: new URL('./assets/enemy-clothing-variants.webp', import.meta.url).href,
+  variationHeads: new URL('./assets/enemy-headwear-variants.webp', import.meta.url).href,
+  base: new URL('./assets/enemy-ronin-simple.webp', import.meta.url).href,
+  heads: new URL('./assets/enemy-headwear-atlas.webp', import.meta.url).href,
 };
 const PBR_SOURCES = {
-  base: {
-    surface: new URL('./assets/enemy-pbr/enemy-ronin-simple_surface.png', import.meta.url).href,
-    diffuse: new URL('./assets/enemy-pbr/enemy-ronin-simple_diffuse.png', import.meta.url).href,
-    normal: new URL('./assets/enemy-pbr/enemy-ronin-simple_normal.png', import.meta.url).href,
-    emissive: new URL('./assets/enemy-pbr/enemy-ronin-simple_emissive.png', import.meta.url).href,
-  },
-  clothing: {
-    surface: new URL('./assets/enemy-pbr/enemy-clothing-variants_surface.png', import.meta.url)
-      .href,
-    diffuse: new URL('./assets/enemy-pbr/enemy-clothing-variants_diffuse.png', import.meta.url)
-      .href,
-    normal: new URL('./assets/enemy-pbr/enemy-clothing-variants_normal.png', import.meta.url).href,
-    emissive: new URL('./assets/enemy-pbr/enemy-clothing-variants_emissive.png', import.meta.url)
-      .href,
-  },
-  heads: {
-    surface: new URL('./assets/enemy-pbr/enemy-headwear-atlas_surface.png', import.meta.url).href,
-    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-atlas_diffuse.png', import.meta.url).href,
-    normal: new URL('./assets/enemy-pbr/enemy-headwear-atlas_normal.png', import.meta.url).href,
-    emissive: new URL('./assets/enemy-pbr/enemy-headwear-atlas_emissive.png', import.meta.url).href,
-  },
-  variationHeads: {
-    surface: new URL('./assets/enemy-pbr/enemy-headwear-variants_surface.png', import.meta.url)
-      .href,
-    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-variants_diffuse.png', import.meta.url)
-      .href,
-    normal: new URL('./assets/enemy-pbr/enemy-headwear-variants_normal.png', import.meta.url).href,
-    emissive: new URL('./assets/enemy-pbr/enemy-headwear-variants_emissive.png', import.meta.url)
-      .href,
-  },
+  base: assetMaterialCatalog.find(
+    (pack) => pack.sourcePath === 'src/rendering/figures/assets/enemy-ronin-simple.png',
+  )!.maps,
+  clothing: assetMaterialCatalog.find(
+    (pack) => pack.sourcePath === 'src/rendering/figures/assets/enemy-clothing-variants.png',
+  )!.maps,
+  heads: assetMaterialCatalog.find(
+    (pack) => pack.sourcePath === 'src/rendering/figures/assets/enemy-headwear-atlas.png',
+  )!.maps,
+  variationHeads: assetMaterialCatalog.find(
+    (pack) => pack.sourcePath === 'src/rendering/figures/assets/enemy-headwear-variants.png',
+  )!.maps,
 };
 function familyFor(key: string): keyof typeof PBR_SOURCES {
   return key.startsWith('clothing:')

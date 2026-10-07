@@ -10,14 +10,15 @@ import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
 
 const artwork = import.meta.glob<string>(
   [
-    '/src/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
+    '/src/**/*.{jpg,jpeg,webp,avif,gif,svg,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
+    '/src/**/*.compact.png',
     '!/src/**/pbr/**',
     '!/src/**/*-pbr/**',
   ],
   { eager: true, query: '?url', import: 'default' },
 );
 const publicArtwork = import.meta.glob<string>(
-  '/public/**/*.{png,jpg,jpeg,webp,avif,gif,svg,PNG,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
+  '/public/**/*.{jpg,jpeg,webp,avif,gif,svg,JPG,JPEG,WEBP,AVIF,GIF,SVG}',
   { query: '?url', import: 'default' },
 );
 // Material owners decode selected maps separately from source artwork.

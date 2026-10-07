@@ -1,7 +1,7 @@
-import templeAtlas from './assets/temple-symbols-atlas.png';
-import trialAtlas from './assets/trial-symbols-atlas.png';
+import templeAtlas from './assets/temple-symbols-atlas.webp';
+import trialAtlas from './assets/trial-symbols-atlas.webp';
 import tantoSymbol from './assets/tanto-symbol.svg';
-import demonSymbol from './assets/demon-mirror-symbol.png';
+import demonSymbol from './assets/demon-mirror-symbol.webp';
 import collectionAtlas from './assets/collection-symbols.svg';
 import presetSymbol from './assets/preset-symbol.svg';
 import type { UpgradeId } from '../game/progression/meta.ts';

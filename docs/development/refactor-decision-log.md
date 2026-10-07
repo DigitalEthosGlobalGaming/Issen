@@ -19,6 +19,8 @@
 - 2026-10-07 — W1 encoding — use lossless `.compact.png` runtime siblings for eleven small colour assets whose tolerance-valid WebP increased bytes — larger WebP or relaxed colour tolerances — lossless recompression makes all eleven smaller, preserves authoring originals, colour chunks and pixel placement — restore manifest targets and remove compact siblings.
 - 2026-10-07 — W1 byte baseline — build `pre-refactor` in an isolated ignored detached checkout with linked dependencies — stale dist/APK inventories or the post-loader baseline — matched original web and Android web builds establish 261,053,490 and 284,964,042 total bytes, each with 258,901,059 image bytes — discard ignored verification outputs.
 
+- 2026-10-07 — W1 readiness — count only present weapon plane URLs in readiness — counting the undefined optional-emissive property — the latter kept startup blocked after zero-map removal; added a browser assertion for readiness and no emission request — restore the required-emission catalog and prior readiness predicate together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

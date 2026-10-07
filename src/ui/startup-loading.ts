@@ -1,6 +1,6 @@
 import './startup-loading.css';
 import type { ArtworkProgress } from '../platform/artwork-preload.ts';
-import logoUrl from './assets/issen-logo.png';
+import logoUrl from './assets/issen-logo.webp';
 
 export const STARTUP_LOGO_URL = logoUrl;
 

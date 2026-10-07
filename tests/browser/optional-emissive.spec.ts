@@ -55,3 +55,23 @@ test('an opaque non-emitting sprite occludes cached emission while transparent p
   expect(result.covered).toEqual([0, 0, 0, 255]);
   expect(result.uncovered).toEqual([200, 80, 40, 255]);
 });
+
+test('zero-emission blade prepares without requesting an absent map', async ({ page }) => {
+  const emissiveRequests: string[] = [];
+  page.on('request', request => {
+    if (request.url().includes('blade-profile-atlas_emissive')) emissiveRequests.push(request.url());
+  });
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
+    const renderer = createInkSwordRenderer(document);
+    await renderer.prepare();
+    const snapshot = { ready: renderer.ready, ...renderer.snapshot() };
+    renderer.dispose();
+    return snapshot;
+  });
+  expect(result.ready).toBe(true);
+  expect(result.pbrReady).toBe(true);
+  expect(result.loaded).not.toContain('emissive');
+  expect(emissiveRequests).toEqual([]);
+});

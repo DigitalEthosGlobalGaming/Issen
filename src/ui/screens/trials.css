@@ -64,7 +64,7 @@
   transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
-  background: url('../assets/ui-strokes-atlas.png') var(--stroke-x) var(--stroke-y) / 400% 200%
+  background: url('../assets/ui-strokes-atlas.webp') var(--stroke-x) var(--stroke-y) / 400% 200%
     no-repeat;
   opacity: 0.6;
 }

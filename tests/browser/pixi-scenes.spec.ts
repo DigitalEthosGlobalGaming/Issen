@@ -111,14 +111,14 @@ test('authored rock, cloth and steel materials support moving lights, fog and un
     const studies = [
       {
         profile: 'rock' as const,
-        src: '/src/rendering/environment/assets/foreground-boulders-atlas.png',
+        src: '/src/rendering/environment/assets/foreground-boulders-atlas.webp',
         frame: [0, 0, 887, 443] as const,
         width: 210,
         height: 105,
       },
       {
         profile: 'cloth' as const,
-        src: '/src/rendering/figures/assets/player-ronin-simple.png',
+        src: '/src/rendering/figures/assets/player-ronin-simple.webp',
         frame: [45, 54, 382, 358] as const,
         width: 128,
         height: 120,

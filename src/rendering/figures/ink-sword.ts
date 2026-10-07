@@ -20,12 +20,12 @@ const bladePack = assetMaterialCatalog.find(
   (pack) => pack.sourcePath === 'src/rendering/figures/assets/blade-profile-atlas.png',
 )!;
 const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: string } = {
-  blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.png', import.meta.url).href,
-  normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.png', import.meta.url).href,
-  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.png', import.meta.url).href,
+  blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.webp', import.meta.url).href,
+  normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.webp', import.meta.url).href,
+  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.webp', import.meta.url).href,
   emissive: bladePack.maps.emissive,
-  hilts: new URL('./assets/handle-guard-atlas.png', import.meta.url).href,
-  special: new URL('./assets/special-weapons-atlas.png', import.meta.url).href,
+  hilts: new URL('./assets/handle-guard-atlas.webp', import.meta.url).href,
+  special: new URL('./assets/special-weapons-atlas.webp', import.meta.url).href,
 };
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
@@ -253,7 +253,7 @@ export function createInkSwordRenderer(doc: Document) {
     draw,
     get ready() {
       return (
-        loaded.size === Object.keys(SOURCES).length &&
+        loaded.size === Object.values(SOURCES).filter(Boolean).length &&
         pbrReady() &&
         fittings.ready('hilts') &&
         fittings.ready('special')

@@ -13,7 +13,7 @@ import type {
 } from './worker-types.ts';
 
 type LocalRenderer = ReturnType<typeof createLocalEnvironmentRenderer>;
-const FOG_URL = new URL('./assets/fog-wisps-atlas.png', import.meta.url).href;
+const FOG_URL = new URL('./assets/fog-wisps-atlas.webp', import.meta.url).href;
 const emptySnapshot = (): EnvironmentSnapshot => ({
   foreground: { layers: 0, pixels: 0 },
   backend: 'loading',

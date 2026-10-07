@@ -1,13 +1,13 @@
 import { SEVEN_DAWNS_IMAGE } from '../../rendering/crest-art.ts';
 const crestUrls: Record<string, string> = {
   'seven-dawns': SEVEN_DAWNS_IMAGE,
-  tomoe: new URL('../assets/world-ui-crest-tomoe.png', import.meta.url).href,
-  kikyo: new URL('../assets/world-ui-crest-kikyo.png', import.meta.url).href,
-  juji: new URL('../assets/world-ui-crest-juji.png', import.meta.url).href,
-  aoi: new URL('../assets/world-ui-crest-aoi.png', import.meta.url).href,
-  fuji: new URL('../assets/world-ui-crest-fuji.png', import.meta.url).href,
-  tsuru: new URL('../assets/world-ui-crest-tsuru.png', import.meta.url).href,
-  rokumon: new URL('../assets/world-ui-crest-rokumon.png', import.meta.url).href,
+  tomoe: new URL('../assets/world-ui-crest-tomoe.webp', import.meta.url).href,
+  kikyo: new URL('../assets/world-ui-crest-kikyo.webp', import.meta.url).href,
+  juji: new URL('../assets/world-ui-crest-juji.webp', import.meta.url).href,
+  aoi: new URL('../assets/world-ui-crest-aoi.webp', import.meta.url).href,
+  fuji: new URL('../assets/world-ui-crest-fuji.webp', import.meta.url).href,
+  tsuru: new URL('../assets/world-ui-crest-tsuru.webp', import.meta.url).href,
+  rokumon: new URL('../assets/world-ui-crest-rokumon.compact.png', import.meta.url).href,
 };
 import type { Item, ItemCategory } from '../../game/content/items.ts';
 import type { Equipment } from '../../platform/saves.ts';

@@ -9,9 +9,9 @@ import {
 import { invalidateSceneTexture } from '../texture-revision.ts';
 import { drawAtlasSprite, releaseSceneryCutouts } from './scene-kit.ts';
 
-const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
-const terrainUrl = new URL('./assets/demon-terrain-atlas.png', import.meta.url).href;
-const mountainUrl = new URL('./assets/mountain-atlas.png', import.meta.url).href;
+const landmarkUrl = new URL('./assets/demon-landmarks-atlas.webp', import.meta.url).href;
+const terrainUrl = new URL('./assets/demon-terrain-atlas.webp', import.meta.url).href;
+const mountainUrl = new URL('./assets/mountain-atlas.webp', import.meta.url).href;
 
 /** Independently placed atlas props over a procedural sky; no flattened backdrop. */
 export function createDemonRealmRenderer(doc: Document) {

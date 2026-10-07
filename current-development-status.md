@@ -83,32 +83,23 @@ Subsequent utility/cache checks:
 
 ## Next steps
 
-1. Finish the live staged conversion. Inspect the handle and log before taking any
-   action. Then confirm a second staged apply is a no-op.
-2. Review the draft full raw-browser check at
-   `tmp/asset-compaction/compacted-planes.spec.ts`; it checks every converted plane
-   against its saved original, with the goal's exact data/alpha and colour
-   tolerances. The temporary subset probe is separate and does not replace it.
-3. Commit added WebP outputs and the conversion manifest separately from URL
-   migration and generated-PNG deletion. Keep authoring originals.
-4. Review draft `tmp/asset-compaction/migrate-urls.py`. Migrate actual URL consumers
-   and CSS to WebP, retain authoring provenance keys, use catalog maps for player
-   and enemy optional emission, and exclude authoring PNGs from runtime globs.
-   Audit dynamic consumers and test request intercepts; update their image
-   extensions where needed without changing gameplay assertions or tolerances.
-5. Regenerate the catalog through `scripts/pbr/update-runtime-catalog.mjs`, never
-   edit the generated catalog directly. The draft handles staged zero-emission
-   omissions. Verify focused native/material/asset suites and Canvas comparison.
-6. Remove generated PNGs with the final apply in a separate commit. Update pack
-   README links and future installation so omissions stay omitted. Verify all
-   source authoring files/recipes/provenance survive and placement is unchanged.
-7. Complete the W1 broad browser, production and Android web checks; produce
-   honest source/bundle/APK byte reports; update inventory, PBR README, rendering,
-   AGENTS and handoff; bump patch with "Smaller download" notes. Only then start
-   Workstream 2. Its runtime refactor and Workstream 3 lighting remain entirely
-   required; neither has started. Final report and final develop push remain.
-
-Decision log: `docs/development/refactor-decision-log.md`.
+1. URL migration is complete and green: `npm test` passed all 252 units;
+   strict TypeScript passed; the ten-file focused rendering/material/asset command
+   passed all 34 browser cases in an uninterrupted run, including Canvas
+   comparisons and context-loss checks. Log:
+   `tmp/asset-compaction/migrated-focused-browser.log`.
+   An initial run found weapon readiness counting an undefined emission property;
+   it is fixed, with a no-emission-request browser regression test. No thresholds
+   changed. Compact output additions are committed at `7a3f420`.
+2. Run final `node scripts/assets/compact.mjs --apply`, then its repeat-run no-op.
+   Commit generated PNG deletion separately; retain all authoring originals.
+   Refresh pack docs in a separate documentation commit and audit remaining refs.
+3. Complete W1 gates: every-plane raw browser check after cleanup, broad rendering
+   browser suite, `npm run test:production`, `npm run test:android-web` (outputs
+   under ignored tmp), byte source/build/APK projections, oversized-map report.
+4. Update inventory/PBR/rendering/AGENTS docs, patch version/changelog, handoff and
+   W1 checkpoint commit. Only then begin the W2 audit and ordered W2/W3 phases.
+   All Part 4 checks/report and final develop push remain required.
 
 ## Previous completed work (historical handoff)
 

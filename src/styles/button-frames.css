@@ -1,6 +1,6 @@
 /* 24 source pixels become 8 CSS pixels; corners never stretch with the control. */
 :is(#app button, .tutorial-overlay button, .startup-loading button) {
-  --button-frame: url('../ui/assets/button-normal.png');
+  --button-frame: url('../ui/assets/button-normal.webp');
   border-image-source: var(--button-frame);
   border-image-slice: 24 fill;
   border-image-width: 8px;
@@ -19,7 +19,7 @@
   [aria-selected='true'],
   :focus-visible
 ) {
-  --button-frame: url('../ui/assets/button-highlighted.png');
+  --button-frame: url('../ui/assets/button-highlighted.webp');
 }
 
 /* The highlight has a charcoal centre, keeping nested labels readable. */
@@ -30,12 +30,12 @@
 /* Secondary mouse/trackpad pointers can hover even when touch is primary. */
 @media (any-hover: hover) {
   :is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):hover {
-    --button-frame: url('../ui/assets/button-highlighted.png');
+    --button-frame: url('../ui/assets/button-highlighted.webp');
   }
 }
 
 :is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):active {
-  --button-frame: url('../ui/assets/button-highlighted.png');
+  --button-frame: url('../ui/assets/button-highlighted.webp');
 }
 
 #app .seg {

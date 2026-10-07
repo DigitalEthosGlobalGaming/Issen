@@ -63,11 +63,11 @@ test('each rig composes four native-aspect parts, animates joints and freezes ac
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
   assert.equal(images.filter((i) => !i.src.includes('/pbr/')).length, 2);
-  const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
+  const rock = images.find((i) => i.src.endsWith('mystic-rock.webp'));
   rock.naturalWidth = 1145;
   rock.naturalHeight = 1373;
   rock.onload();
-  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.png'));
+  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.webp'));
   parts.naturalWidth = parts.naturalHeight = 1254;
   parts.onload();
   await pending;
@@ -110,8 +110,8 @@ test('disposing during companion loading settles preparation and releases callba
 test('incorrect atlas geometry never renders incomplete parts', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
-  images.find((i) => i.src.endsWith('mystic-rock.png')).onerror();
-  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.png'));
+  images.find((i) => i.src.endsWith('mystic-rock.webp')).onerror();
+  const parts = images.find((i) => i.src.endsWith('companion-parts-atlas.webp'));
   parts.naturalWidth = 100;
   parts.naturalHeight = 200;
   parts.onload();
@@ -123,11 +123,11 @@ test('incorrect atlas geometry never renders incomplete parts', async () => {
 test('Mystic Rock retains the original floating sprite and freezes with reduced motion', async () => {
   const { renderer, images } = fixture();
   const pending = renderer.prepare();
-  const rock = images.find((i) => i.src.endsWith('mystic-rock.png'));
+  const rock = images.find((i) => i.src.endsWith('mystic-rock.webp'));
   rock.naturalWidth = 1145;
   rock.naturalHeight = 1373;
   rock.onload();
-  images.find((i) => i.src.endsWith('companion-parts-atlas.png')).onerror();
+  images.find((i) => i.src.endsWith('companion-parts-atlas.webp')).onerror();
   await pending;
   const a = context(),
     b = context();
