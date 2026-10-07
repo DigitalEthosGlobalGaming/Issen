@@ -138,6 +138,8 @@
 
 - 2026-10-08 — W2 character model move — rehome plain character types, pose/seed helpers and death timing in shared modules, keeping temporary rendering re-exports — leave gameplay rendering imports or copy model implementations — strict, all 326 units and seventeen native rendering/death cases pass; save shapes and behavior are unchanged — revert the shared-model physical move and consumer import migration.
 
+- 2026-10-08 — W2 model adapter cleanup — remove the unused figures/model.ts re-export after consumer migration — retain a dead adapter — source/test/script/doc audit has no references, strict and all 326 units pass — restore the removed re-export file.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

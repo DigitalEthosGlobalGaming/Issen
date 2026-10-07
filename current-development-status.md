@@ -85,8 +85,8 @@ Strict types and all 326 units passed (character-model-*.log).
 `npx playwright test tests/browser/rendering.spec.ts tests/browser/death-presentation.spec.ts tests/browser/scattered-armour.spec.ts tests/browser/enemy-art-cache.spec.ts --config playwright.rendering-v2.config.ts`:
 all 17 passed (23.6s, character-model-browser.log, terminal confirmed).
 No record shape, RNG or behavior changes in the physical model move.
-Next: remove the unused figures/model.ts compatibility adapter separately; then
-state-machine/registry foundation and actual grunt/boss tables, migrating old
+Unused figures/model.ts compatibility adapter is removed separately after the src/tests/scripts/docs consumer audit found no references. Strict types and all 326 units passed (model-adapter-cleanup-*.log).
+Next: state-machine/registry foundation and actual grunt/boss tables, migrating old
 update/spawn/idle adapters before removing them separately. Player/companions,
 results ownership, remaining phase/run events and root reduction still follow.
 W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.
