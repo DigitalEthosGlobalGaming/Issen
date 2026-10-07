@@ -66,6 +66,18 @@ the fix. Earlier natural probe was inconclusive and is superseded.
 Behaviour changes remain in tmp/runtime-refactor/behaviour-changes.md for final
 report: reaction ordering, first support retry, same-scene continue bug fix.
 
+## Actual-API scenario migration verified
+
+Headless scenarios now call actual daily/trial entry and completion, wave input
+and death for wrong cuts, and bounded winning/missed-parry/recovery paths for
+every reachable boss state (mirror intentionally has no feint). Fixed-date daily
+and repeated trial seed assert outcomes, disposable profile isolation and once-only
+settlement. Fixtures resolve current run RNG and trial boss combat/profile ports.
+`node --test tests/unit/*.test.mjs`: all 365 pass (scenario-api-unit.log).
+The frame/startup physical moves are currently applied but uncommitted, strict
+and 365 units pass; affected browser verification is live (frame-startup-browser.log).
+Preserve runtime source until its execution finishes. Do not reapply stale drafts.
+
 ## Resume here; all remaining work is required
 
 Apply the strictly verified frame/startup ownership draft, then strict/full units and affected browser checks. Apply the verified actual-API scenario draft separately and run new combined broad verification.
@@ -74,7 +86,7 @@ exist under tmp/runtime-refactor with strict logs. Except owners described above
 they are unapplied and have no live coverage. Regenerate each from current source
 before applying; never overwrite the root with a stale preview.
 
-Finish genuine composition reduction: root remains 2032 lines, far from
+Finish genuine composition reduction: root remains 1791 lines, far from
 the approximately 200-line target. Move remaining session state/services and
 presentation/UI/lifecycle bindings into their actual owners, finish remaining
 standoff/damage/wave/boss reactions, and migrate residual scenario adapters to

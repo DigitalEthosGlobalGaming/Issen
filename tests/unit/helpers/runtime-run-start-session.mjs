@@ -108,5 +108,5 @@ export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, star
   bindEncounterProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {} }));
   const flow = createRunStart(views);
   if (start) flow.startRun();
-  return { run: G, random: views.runRandom, views, flow, trace, weather };
+  return { run: G, get random() { return views.runRandom; }, views, flow, trace, weather };
 }

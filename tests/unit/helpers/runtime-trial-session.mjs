@@ -23,6 +23,10 @@ export function trialSessionFixture() {
     waveCfg: source.waveCfg,
     startBoss() {
       duel.views.activeTrial = source.activeTrial;
+      duel.views.activeDaily = source.activeDaily;
+      duel.views.combatRandom = source.combatRandom;
+      duel.views.ST = source.ST;
+      duel.views.EQ = source.EQ;
       duel.phase.startBoss();
     },
     renderHp() {},
