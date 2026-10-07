@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 import { scoreGain, comboMultiplier } from '../../src/game/progression/scoring.ts';
 
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };

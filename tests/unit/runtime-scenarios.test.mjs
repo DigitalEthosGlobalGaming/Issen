@@ -14,7 +14,7 @@ import { restorableRng } from '../../src/shared/random.ts';
 import { DIRS, OPP } from '../../src/shared/directions.ts';
 import { DEFAULT_EQUIPMENT } from '../../src/platform/saves.ts';
 import { waveConfig } from '../../src/game/encounters/configuration.ts';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { targetSwipe } from '../../src/game/combat/targeting.ts';
 import { resolveDamage } from '../../src/game/combat/damage.ts';

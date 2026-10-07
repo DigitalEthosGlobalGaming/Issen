@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { advanceGrunts, gruntBehaviours, gruntTable } from '../../src/game/combat/grunt.ts';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 import { EPOSE } from '../../src/shared/figure-model.ts';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
 import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';

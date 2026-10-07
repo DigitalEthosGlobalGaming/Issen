@@ -131,12 +131,8 @@ import { createBoss } from './game/encounters/boss-create.ts';
 import { bossPosition } from './rendering/figures/boss-position.ts';
 import { bossToIdle, updateBoss as simulateBoss } from './game/encounters/boss-update.ts';
 import { initialSpawns, updateWave as simulateWave } from './game/encounters/waves.ts';
-import {
-  pickEnemyLook,
-  spawnEnemy as createEnemy,
-  orderedEnemies,
-  selectAttacker,
-} from './game/combat/enemy-spawn.ts';
+import { createGrunt as createEnemy } from './game/combat/grunt-spawn.ts';
+import { pickEnemyLook, orderedEnemies, selectAttacker } from './game/combat/enemy-spawn.ts';
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { advanceGrunts as simulateEnemies } from './game/combat/grunt.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';

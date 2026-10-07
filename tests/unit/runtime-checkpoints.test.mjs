@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { checkpointSession } from './helpers/runtime-checkpoint-session.mjs';
 import { restorableRng } from '../../src/shared/random.ts';
 import { parseRunCheckpoint } from '../../src/platform/run-checkpoint.ts';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { updateWave } from '../../src/game/encounters/waves.ts';
 import { updateBoss } from '../../src/game/encounters/boss-update.ts';

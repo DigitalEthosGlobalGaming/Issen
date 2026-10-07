@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
 import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };
 const fixture = () => deathPhaseFixture(runStartSession(3441, setup));
 
