@@ -1,3 +1,4 @@
+import type { EnvironmentState } from './environment-state.ts';
 import { createAmbient } from '../rendering/scene/ambient.ts';
 import { createWeatherRenderer } from '../rendering/scene/weather-draw.ts';
 import { DRIFT_DENSITY } from '../rendering/scene/drift-catalog.ts';
@@ -11,6 +12,7 @@ import type { Random } from '../shared/random.ts';
 import type { RunState } from '../game/run-state.ts';
 
 export interface EnvironmentViews {
+  readonly environmentState: EnvironmentState;
   readonly activeTrial: { realm?: string } | null;
   readonly previewDemon: boolean;
   readonly G: Readonly<Pick<RunState, 'stage' | 'm'>>;
@@ -137,5 +139,29 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
     weatherRenderer().drawSmoke();
   }
 
-  return { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke };
+  function updateAmbient(dt: number) {
+    const { environmentState, W, time, wind } = readViews();
+    for (const m of environmentState.mists) {
+      m.x += m.v * (0.5 + wind * 0.5) * dt;
+      if (m.x - m.w / 2 > W) m.x = -m.w / 2;
+    }
+    ambient().updateLeaves(environmentState.leaves, dt, time, wind);
+  }
+  function updateTransition(raw: number) {
+    const { environmentState } = readViews();
+    if (environmentState.stageFade > 0) {
+      environmentState.stageFade = Math.max(0, environmentState.stageFade - raw / 1.3);
+      if (!environmentState.stageFade) environmentState.prevBg = null;
+    }
+  }
+  return {
+    ambient,
+    blades,
+    drawLeaves,
+    weatherRenderer,
+    drawWeather,
+    drawSmoke,
+    updateAmbient,
+    updateTransition,
+  };
 }

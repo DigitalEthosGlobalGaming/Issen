@@ -57,13 +57,14 @@ projection, with gameplay updates kept in rule owners. `presentation/cues.ts` ow
 `presentation/environment.ts` owns ambient factories, cached grass variants and
 leaf/weather drawing. environment-state.ts owns its caches and cosmetic particle
 buffers. environment-artwork.ts owns cached scenery/mist/grass/drift/weather
-builders. Live weather hazard timers/simulation remain gameplay-owned.
+builders; environment.ts advances ambient particles and stage transitions. Live
+weather hazard timers/simulation remain gameplay-owned.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and
 weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
 `presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
 separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
-owns cosmetic clocks, effects and camera/flash/letterbox signals; hit-stop and run
+owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signals; hit-stop and run
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service
 instances. It connects feature callbacks to audio, persistence, effects and UI.

@@ -18,3 +18,20 @@ export function createPresentationState() {
   };
 }
 export type PresentationState = ReturnType<typeof createPresentationState>;
+
+export function advancePresentationClock(presentationState: PresentationState, dt: number) {
+  presentationState.time += dt;
+  presentationState.wind =
+    1 +
+    0.55 * Math.sin(presentationState.time * 0.31) +
+    0.35 * Math.sin(presentationState.time * 0.87 + 1) +
+    0.2 * Math.sin(presentationState.time * 2.3);
+}
+
+export function advancePresentationCamera(presentationState: PresentationState, raw: number) {
+  if (presentationState.lbT > 0) {
+    presentationState.lbT -= raw;
+    presentationState.lb += (1 - presentationState.lb) * (1 - Math.exp(-raw * 14));
+  } else presentationState.lb += (0 - presentationState.lb) * (1 - Math.exp(-raw * 5));
+  presentationState.zoom += (1 - presentationState.zoom) * (1 - Math.exp(-raw * 7));
+}

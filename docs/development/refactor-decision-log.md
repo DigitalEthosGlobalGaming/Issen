@@ -76,6 +76,8 @@
 
 - 2026-10-08 — W2 environment builders move — move background/mist/grass/drift/weather cache builders into environment-artwork.ts with cosmetic state/viewport/RNG ports — moving the live hazard reset with them — the preceding boundary split retains combat RNG outside presentation and preserves artwork/rule order; twelve scene/save/cinematic/stage cases pass — revert the builder move independently.
 
+- 2026-10-08 — W2 cosmetic updates move — move clock/camera advancement and ambient/transition update bodies into their owned presentation modules — combining clocks or moving rule updates — original clock/ambient/rule/transition/camera order is preserved; twelve scene/save/cinematic/stage browser cases pass — revert the cosmetic-update move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

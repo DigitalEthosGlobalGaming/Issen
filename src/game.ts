@@ -1,7 +1,7 @@
 import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
 import { createEnvironmentState } from './presentation/environment-state.ts';
 import { createCuePresentation } from './presentation/cues.ts';
-import { createPresentationState } from './presentation/state.ts';
+import { createPresentationState, advancePresentationClock, advancePresentationCamera } from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
 import { createEnvironmentPresentation } from './presentation/environment.ts';
 import { createFeedbackPresentation } from './presentation/feedback.ts';
@@ -616,8 +616,8 @@ export function startGame(
   const driftRenderer = createDriftRenderer();
   
   lifecycle.add(driftRenderer.dispose);
-  const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke } =
-    createEnvironmentPresentation(() => ({ activeTrial,previewDemon: environmentState.previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg: environmentState.fg,time: presentationState.time,wind: presentationState.wind,leaves: environmentState.leaves,wx: environmentState.wx,bamboo: environmentState.bamboo,cinematic,cinematicWeather: environmentState.cinematicWeather,WX,smokeSprite: environmentState.smokeSprite }));
+  const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition } =
+    createEnvironmentPresentation(() => ({ environmentState,activeTrial,previewDemon: environmentState.previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg: environmentState.fg,time: presentationState.time,wind: presentationState.wind,leaves: environmentState.leaves,wx: environmentState.wx,bamboo: environmentState.bamboo,cinematic,cinematicWeather: environmentState.cinematicWeather,WX,smokeSprite: environmentState.smokeSprite }));
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();
     if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
@@ -3718,18 +3718,9 @@ export function startGame(
       finishTrial(trialFailure);
       return;
     }
-    presentationState.time += dt;
-    presentationState.wind =
-      1 +
-      0.55 * Math.sin(presentationState.time * 0.31) +
-      0.35 * Math.sin(presentationState.time * 0.87 + 1) +
-      0.2 * Math.sin(presentationState.time * 2.3);
+    advancePresentationClock(presentationState, dt);
     if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) G.runTime += raw;
-    for (const m of environmentState.mists) {
-      m.x += m.v * (0.5 + presentationState.wind * 0.5) * dt;
-      if (m.x - m.w / 2 > W) m.x = -m.w / 2;
-    }
-    ambient().updateLeaves(environmentState.leaves, dt, presentationState.time, presentationState.wind);
+    updateAmbient(dt);
     // Cinematic mode advances cosmetic time only: no encounters, weather hazards or run RNG.
     if (cinematic.active) {
       updateWeather(reducedMotion() ? 0 : dt);
@@ -3781,15 +3772,8 @@ export function startGame(
     }
     updateFx(dt, raw);
     renderTrialObjective();
-    if (environmentState.stageFade > 0) {
-      environmentState.stageFade = Math.max(0, environmentState.stageFade - raw / 1.3);
-      if (!environmentState.stageFade) environmentState.prevBg = null;
-    }
-    if (presentationState.lbT > 0) {
-      presentationState.lbT -= raw;
-      presentationState.lb += (1 - presentationState.lb) * (1 - Math.exp(-raw * 14));
-    } else presentationState.lb += (0 - presentationState.lb) * (1 - Math.exp(-raw * 5));
-    presentationState.zoom += (1 - presentationState.zoom) * (1 - Math.exp(-raw * 7));
+    updateTransition(raw);
+    advancePresentationCamera(presentationState, raw);
     audio.update(raw, STAGES[G.stage]!.weather, presentationState.wind, WX.wo);
   }
 
