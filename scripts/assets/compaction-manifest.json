@@ -589,7 +589,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.png",
@@ -628,7 +629,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_metallic.png",
@@ -638,7 +640,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_normal.png",
@@ -677,7 +680,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_surface.png",
@@ -716,7 +720,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.png",
@@ -755,7 +760,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_metallic.png",
@@ -765,7 +771,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_normal.png",
@@ -804,7 +811,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_surface.png",
@@ -843,7 +851,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.png",
@@ -882,7 +891,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_metallic.png",
@@ -892,7 +902,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_normal.png",
@@ -931,7 +942,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_surface.png",
@@ -970,7 +982,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.png",
@@ -1009,7 +1022,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_metallic.png",
@@ -1019,7 +1033,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_normal.png",
@@ -1058,7 +1073,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_surface.png",
@@ -1097,7 +1113,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.png",
@@ -1136,7 +1153,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_metallic.png",
@@ -1146,7 +1164,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_normal.png",
@@ -1185,7 +1204,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_surface.png",
@@ -1224,7 +1244,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.png",
@@ -1263,7 +1284,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_metallic.png",
@@ -1273,7 +1295,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_normal.png",
@@ -1312,7 +1335,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_surface.png",
@@ -1351,7 +1375,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_diffuse.png",
@@ -1390,7 +1415,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_metallic.png",
@@ -1400,7 +1426,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_normal.png",
@@ -1439,7 +1466,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-debris-atlas/drift-debris-atlas_surface.png",
@@ -1478,7 +1506,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_diffuse.png",
@@ -1546,7 +1575,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_normal.png",
@@ -1585,7 +1615,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_surface.png",
@@ -1624,7 +1655,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_diffuse.png",
@@ -1663,7 +1695,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_metallic.png",
@@ -1673,7 +1706,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_normal.png",
@@ -1712,7 +1746,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-leaves-atlas/drift-leaves-atlas_surface.png",
@@ -1751,7 +1786,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_diffuse.png",
@@ -1790,7 +1826,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_metallic.png",
@@ -1800,7 +1837,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_normal.png",
@@ -1839,7 +1877,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/drift-petals-atlas/drift-petals-atlas_surface.png",
@@ -1878,7 +1917,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.png",
@@ -1917,7 +1957,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_metallic.png",
@@ -1927,7 +1968,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_normal.png",
@@ -1966,7 +2008,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_surface.png",
@@ -2005,7 +2048,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.png",
@@ -2044,7 +2088,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_metallic.png",
@@ -2054,7 +2099,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_normal.png",
@@ -2093,7 +2139,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_surface.png",
@@ -2132,7 +2179,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.png",
@@ -2171,7 +2219,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_metallic.png",
@@ -2181,7 +2230,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_normal.png",
@@ -2220,7 +2270,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_surface.png",
@@ -2259,7 +2310,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.png",
@@ -2327,7 +2379,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_normal.png",
@@ -2366,7 +2419,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_surface.png",
@@ -2405,7 +2459,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.png",
@@ -2473,7 +2528,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_normal.png",
@@ -2512,7 +2568,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_surface.png",
@@ -2551,7 +2608,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.png",
@@ -2590,7 +2648,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_metallic.png",
@@ -2600,7 +2659,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_normal.png",
@@ -2639,7 +2699,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_surface.png",
@@ -2678,7 +2739,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.png",
@@ -2717,7 +2779,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_metallic.png",
@@ -2727,7 +2790,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_normal.png",
@@ -2766,7 +2830,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_surface.png",
@@ -2805,7 +2870,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.png",
@@ -2844,7 +2910,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_metallic.png",
@@ -2854,7 +2921,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_normal.png",
@@ -2893,7 +2961,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_surface.png",
@@ -2932,7 +3001,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.png",
@@ -2971,7 +3041,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_metallic.png",
@@ -2981,7 +3052,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_normal.png",
@@ -3020,7 +3092,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_surface.png",
@@ -3059,7 +3132,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.png",
@@ -3098,7 +3172,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_metallic.png",
@@ -3108,7 +3183,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_normal.png",
@@ -3147,7 +3223,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_surface.png",
@@ -3186,7 +3263,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.png",
@@ -3225,7 +3303,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_metallic.png",
@@ -3235,7 +3314,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_normal.png",
@@ -3274,7 +3354,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_surface.png",
@@ -3313,7 +3394,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.png",
@@ -3352,7 +3434,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_metallic.png",
@@ -3362,7 +3445,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_normal.png",
@@ -3401,7 +3485,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_surface.png",
@@ -3440,7 +3525,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.png",
@@ -3479,7 +3565,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_metallic.png",
@@ -3489,7 +3576,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_normal.png",
@@ -3528,7 +3616,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_surface.png",
@@ -3567,7 +3656,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.png",
@@ -3606,7 +3696,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_metallic.png",
@@ -3616,7 +3707,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_normal.png",
@@ -3655,7 +3747,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_surface.png",
@@ -3694,7 +3787,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.png",
@@ -3733,7 +3827,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_metallic.png",
@@ -3743,7 +3838,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_normal.png",
@@ -3782,7 +3878,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_surface.png",
@@ -3821,7 +3918,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.png",
@@ -3860,7 +3958,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_metallic.png",
@@ -3870,7 +3969,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_normal.png",
@@ -3909,7 +4009,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_surface.png",
@@ -3948,7 +4049,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.png",
@@ -3987,7 +4089,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_metallic.png",
@@ -3997,7 +4100,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_normal.png",
@@ -4036,7 +4140,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_surface.png",
@@ -4075,7 +4180,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-peak/snow-peak_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.png",
@@ -4114,7 +4220,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-peak/snow-peak_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_metallic.png",
@@ -4124,7 +4231,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-peak/snow-peak_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_normal.png",
@@ -4163,7 +4271,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-peak/snow-peak_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_surface.png",
@@ -4202,7 +4311,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.png",
@@ -4241,7 +4351,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_metallic.png",
@@ -4251,7 +4362,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_normal.png",
@@ -4290,7 +4402,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_surface.png",
@@ -4329,7 +4442,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.png",
@@ -4368,7 +4482,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_metallic.png",
@@ -4378,7 +4493,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_normal.png",
@@ -4417,7 +4533,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_surface.png",
@@ -4456,7 +4573,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.png",
@@ -4495,7 +4613,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_metallic.png",
@@ -4505,7 +4624,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_normal.png",
@@ -4544,7 +4664,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_surface.png",
@@ -4583,7 +4704,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.png",
@@ -4622,7 +4744,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_metallic.png",
@@ -4632,7 +4755,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_normal.png",
@@ -4671,7 +4795,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_surface.png",
@@ -4710,7 +4835,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.png",
@@ -4749,7 +4875,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_metallic.png",
@@ -4759,7 +4886,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_normal.png",
@@ -4798,7 +4926,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_surface.png",
@@ -4837,7 +4966,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.png",
@@ -4876,7 +5006,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_metallic.png",
@@ -4886,7 +5017,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_normal.png",
@@ -4925,7 +5057,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_surface.png",
@@ -4964,7 +5097,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.png",
@@ -5003,7 +5137,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_metallic.png",
@@ -5013,7 +5148,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_normal.png",
@@ -5052,7 +5188,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_surface.png",
@@ -5091,7 +5228,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.png",
@@ -5130,7 +5268,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_metallic.png",
@@ -5140,7 +5279,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_normal.png",
@@ -5179,7 +5319,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_surface.png",
@@ -5711,7 +5852,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/blade-pbr/blade-profile-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_diffuse.png",
@@ -5750,7 +5892,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/blade-pbr/blade-profile-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_metallic.png",
@@ -5760,7 +5903,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/blade-pbr/blade-profile-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_normal.png",
@@ -5799,7 +5943,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/blade-pbr/blade-profile-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_surface.png",
@@ -6041,7 +6186,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_diffuse.png",
@@ -6080,7 +6226,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_metallic.png",
@@ -6090,7 +6237,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_normal.png",
@@ -6129,7 +6277,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_surface.png",
@@ -6168,7 +6317,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_diffuse.png",
@@ -6207,7 +6357,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_metallic.png",
@@ -6217,7 +6368,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_normal.png",
@@ -6256,7 +6408,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_surface.png",
@@ -6295,7 +6448,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_diffuse.png",
@@ -6334,7 +6488,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_metallic.png",
@@ -6344,7 +6499,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_normal.png",
@@ -6383,7 +6539,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_surface.png",
@@ -6422,7 +6579,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_diffuse.png",
@@ -6461,7 +6619,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_metallic.png",
@@ -6471,7 +6630,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_normal.png",
@@ -6510,7 +6670,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_surface.png",
@@ -6723,7 +6884,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.png",
@@ -6762,7 +6924,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_metallic.png",
@@ -6772,7 +6935,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_normal.png",
@@ -6811,7 +6975,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_surface.png",
@@ -6850,7 +7015,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.png",
@@ -6889,7 +7055,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_metallic.png",
@@ -6899,7 +7066,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_normal.png",
@@ -6938,7 +7106,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_surface.png",
@@ -6977,7 +7146,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.png",
@@ -7016,7 +7186,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_metallic.png",
@@ -7026,7 +7197,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_normal.png",
@@ -7065,7 +7237,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_surface.png",
@@ -7104,7 +7277,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.png",
@@ -7143,7 +7317,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_metallic.png",
@@ -7153,7 +7328,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_normal.png",
@@ -7192,7 +7368,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_surface.png",
@@ -7231,7 +7408,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.png",
@@ -7270,7 +7448,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_metallic.png",
@@ -7280,7 +7459,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_normal.png",
@@ -7319,7 +7499,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_surface.png",
@@ -7358,7 +7539,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/katana/katana_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/katana/katana_diffuse.png",
@@ -7397,7 +7579,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/katana/katana_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/katana/katana_metallic.png",
@@ -7407,7 +7590,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/katana/katana_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/katana/katana_normal.png",
@@ -7446,7 +7630,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/katana/katana_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/katana/katana_surface.png",
@@ -7485,7 +7670,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.png",
@@ -7524,7 +7710,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_metallic.png",
@@ -7534,7 +7721,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_normal.png",
@@ -7573,7 +7761,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_surface.png",
@@ -7612,7 +7801,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.png",
@@ -7651,7 +7841,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_metallic.png",
@@ -7661,7 +7852,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_normal.png",
@@ -7700,7 +7892,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_surface.png",
@@ -7739,7 +7932,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.png",
@@ -7778,7 +7972,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_metallic.png",
@@ -7788,7 +7983,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_normal.png",
@@ -7827,7 +8023,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_surface.png",
@@ -7866,7 +8063,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.png",
@@ -7905,7 +8103,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_metallic.png",
@@ -7915,7 +8114,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_normal.png",
@@ -7954,7 +8154,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_surface.png",
@@ -7993,7 +8194,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.png",
@@ -8032,7 +8234,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_metallic.png",
@@ -8042,7 +8245,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_normal.png",
@@ -8081,7 +8285,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_surface.png",
@@ -8120,7 +8325,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.png",
@@ -8159,7 +8365,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_metallic.png",
@@ -8169,7 +8376,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_normal.png",
@@ -8208,7 +8416,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_surface.png",
@@ -8247,7 +8456,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.png",
@@ -8286,7 +8496,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_metallic.png",
@@ -8296,7 +8507,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_normal.png",
@@ -8335,7 +8547,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_surface.png",
@@ -8403,7 +8616,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/player-pbr/player-ronin-simple_ao.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/player-pbr/player-ronin-simple_diffuse.png",
@@ -8442,7 +8656,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/player-pbr/player-ronin-simple_emissive.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/player-pbr/player-ronin-simple_metallic.png",
@@ -8452,7 +8667,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/player-pbr/player-ronin-simple_metallic.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/player-pbr/player-ronin-simple_normal.png",
@@ -8491,7 +8707,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/rendering/figures/assets/player-pbr/player-ronin-simple_roughness.png"
     },
     {
       "originalPath": "src/rendering/figures/assets/player-pbr/player-ronin-simple_surface.png",
@@ -9023,7 +9240,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/armoury-room/armoury-room_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/armoury-room/armoury-room_diffuse.png",
@@ -9091,7 +9309,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/armoury-room/armoury-room_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/armoury-room/armoury-room_normal.png",
@@ -9130,7 +9349,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/armoury-room/armoury-room_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/armoury-room/armoury-room_surface.png",
@@ -9169,7 +9389,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.png",
@@ -9208,7 +9429,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_metallic.png",
@@ -9218,7 +9440,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_normal.png",
@@ -9257,7 +9480,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_surface.png",
@@ -9296,7 +9520,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.png",
@@ -9335,7 +9560,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_metallic.png",
@@ -9345,7 +9571,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_normal.png",
@@ -9384,7 +9611,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_surface.png",
@@ -9423,7 +9651,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-third/awakening-button-third_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.png",
@@ -9462,7 +9691,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-third/awakening-button-third_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_metallic.png",
@@ -9472,7 +9702,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-third/awakening-button-third_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_normal.png",
@@ -9511,7 +9742,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-button-third/awakening-button-third_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_surface.png",
@@ -9550,7 +9782,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.png",
@@ -9589,7 +9822,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_metallic.png",
@@ -9599,7 +9833,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_normal.png",
@@ -9638,7 +9873,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_surface.png",
@@ -9677,7 +9913,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-atlas/button-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.png",
@@ -9716,7 +9953,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-atlas/button-atlas_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-atlas/button-atlas_metallic.png",
@@ -9726,7 +9964,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-atlas/button-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-atlas/button-atlas_normal.png",
@@ -9765,7 +10004,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-atlas/button-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-atlas/button-atlas_surface.png",
@@ -9804,7 +10044,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-highlighted/button-highlighted_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-highlighted/button-highlighted_diffuse.png",
@@ -9843,7 +10084,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-highlighted/button-highlighted_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-highlighted/button-highlighted_metallic.png",
@@ -9853,7 +10095,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-highlighted/button-highlighted_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-highlighted/button-highlighted_normal.png",
@@ -9892,7 +10135,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-highlighted/button-highlighted_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-highlighted/button-highlighted_surface.png",
@@ -9931,7 +10175,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-normal/button-normal_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-normal/button-normal_diffuse.png",
@@ -9970,7 +10215,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-normal/button-normal_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-normal/button-normal_metallic.png",
@@ -9980,7 +10226,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-normal/button-normal_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-normal/button-normal_normal.png",
@@ -10019,7 +10266,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/button-normal/button-normal_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/button-normal/button-normal_surface.png",
@@ -10058,7 +10306,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.png",
@@ -10126,7 +10375,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_normal.png",
@@ -10165,7 +10415,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_surface.png",
@@ -10204,7 +10455,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/issen-logo/issen-logo_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/issen-logo/issen-logo_diffuse.png",
@@ -10272,7 +10524,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/issen-logo/issen-logo_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/issen-logo/issen-logo_normal.png",
@@ -10311,7 +10564,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/issen-logo/issen-logo_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/issen-logo/issen-logo_surface.png",
@@ -10350,7 +10604,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-atlas/panel-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.png",
@@ -10389,7 +10644,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-atlas/panel-atlas_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-atlas/panel-atlas_metallic.png",
@@ -10399,7 +10655,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-atlas/panel-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-atlas/panel-atlas_normal.png",
@@ -10438,7 +10695,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-atlas/panel-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-atlas/panel-atlas_surface.png",
@@ -10477,7 +10735,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-highlighted/panel-highlighted_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.png",
@@ -10516,7 +10775,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-highlighted/panel-highlighted_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_metallic.png",
@@ -10526,7 +10786,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-highlighted/panel-highlighted_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_normal.png",
@@ -10565,7 +10826,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-highlighted/panel-highlighted_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_surface.png",
@@ -10604,7 +10866,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-normal/panel-normal_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-normal/panel-normal_diffuse.png",
@@ -10643,7 +10906,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-normal/panel-normal_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-normal/panel-normal_metallic.png",
@@ -10653,7 +10917,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-normal/panel-normal_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-normal/panel-normal_normal.png",
@@ -10692,7 +10957,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/panel-normal/panel-normal_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/panel-normal/panel-normal_surface.png",
@@ -10731,7 +10997,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.png",
@@ -10799,7 +11066,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_normal.png",
@@ -10838,7 +11106,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_surface.png",
@@ -10877,7 +11146,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.png",
@@ -10945,7 +11215,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_normal.png",
@@ -10984,7 +11255,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_surface.png",
@@ -11023,7 +11295,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.png",
@@ -11062,7 +11335,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_metallic.png",
@@ -11072,7 +11346,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_normal.png",
@@ -11111,7 +11386,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_surface.png",
@@ -11150,7 +11426,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.png",
@@ -11188,7 +11465,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_metallic.png",
@@ -11198,7 +11476,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_normal.png",
@@ -11237,7 +11516,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_surface.png",
@@ -11276,7 +11556,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.png",
@@ -11314,7 +11595,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_metallic.png",
@@ -11324,7 +11606,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_normal.png",
@@ -11363,7 +11646,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_surface.png",
@@ -11402,7 +11686,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.png",
@@ -11440,7 +11725,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_metallic.png",
@@ -11450,7 +11736,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_normal.png",
@@ -11489,7 +11776,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_surface.png",
@@ -11528,7 +11816,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.png",
@@ -11566,7 +11855,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_metallic.png",
@@ -11576,7 +11866,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_normal.png",
@@ -11615,7 +11906,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_surface.png",
@@ -11654,7 +11946,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.png",
@@ -11692,7 +11985,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_metallic.png",
@@ -11702,7 +11996,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_normal.png",
@@ -11741,7 +12036,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_surface.png",
@@ -11780,7 +12076,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.png",
@@ -11818,7 +12115,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_metallic.png",
@@ -11828,7 +12126,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_normal.png",
@@ -11867,7 +12166,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_surface.png",
@@ -11906,7 +12206,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.png",
@@ -11944,7 +12245,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_metallic.png",
@@ -11954,7 +12256,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_normal.png",
@@ -11993,7 +12296,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_surface.png",
@@ -12032,7 +12336,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.png",
@@ -12070,7 +12375,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_metallic.png",
@@ -12080,7 +12386,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_normal.png",
@@ -12119,7 +12426,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_surface.png",
@@ -12158,7 +12466,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.png",
@@ -12197,7 +12506,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_metallic.png",
@@ -12207,7 +12517,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_normal.png",
@@ -12246,7 +12557,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_surface.png",
@@ -12285,7 +12597,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.png",
@@ -12324,7 +12637,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_metallic.png",
@@ -12334,7 +12648,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_normal.png",
@@ -12373,7 +12688,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_surface.png",
@@ -12412,7 +12728,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.png",
@@ -12451,7 +12768,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_metallic.png",
@@ -12461,7 +12779,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_normal.png",
@@ -12500,7 +12819,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_surface.png",
@@ -12539,7 +12859,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.png",
@@ -12578,7 +12899,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_metallic.png",
@@ -12588,7 +12910,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_normal.png",
@@ -12627,7 +12950,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_surface.png",
@@ -12666,7 +12990,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.png",
@@ -12704,7 +13029,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_metallic.png",
@@ -12714,7 +13040,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_normal.png",
@@ -12753,7 +13080,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_surface.png",
@@ -12792,7 +13120,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.png",
@@ -12831,7 +13160,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_metallic.png",
@@ -12841,7 +13171,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_normal.png",
@@ -12880,7 +13211,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_surface.png",
@@ -12919,7 +13251,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_ao.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.png",
@@ -12957,7 +13290,8 @@
       "action": "zero-emission",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_emissive.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_metallic.png",
@@ -12967,7 +13301,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_metallic.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_normal.png",
@@ -13006,7 +13341,8 @@
       "action": "redundant-scalar",
       "newPath": null,
       "newHash": null,
-      "encoding": null
+      "encoding": null,
+      "backupPath": "tmp/asset-compaction/originals/src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_roughness.png"
     },
     {
       "originalPath": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_surface.png",
