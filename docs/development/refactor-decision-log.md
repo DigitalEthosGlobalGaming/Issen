@@ -146,6 +146,8 @@
 
 - 2026-10-08 — W2 grunt adapter removal — migrate runtime/scenario/checkpoint callers to advanceGrunts, then delete the unused enemy-update adapter separately — leave an unused legacy export — each step passes strict types and all 337 units; consumer audit has no adapter imports — restore the adapter and prior caller imports.
 
+- 2026-10-08 — W2 grunt construction move — move the existing plain record/look factory into grunt-spawn.ts and retain a temporary spawnEnemy adapter — combine construction changes with table behavior or delete before caller migration — strict, all 337 units and four live checkpoint fixtures pass; record fields/RNG order unchanged — revert the construction physical move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

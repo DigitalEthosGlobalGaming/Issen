@@ -105,7 +105,8 @@ and legacy checkpoint unit fixtures.
 all 21 passed (1.6m, grunt-table-browser.log, terminal confirmed).
 Runtime and all test update callers now import advanceGrunts directly; legacy checkpoint/scenario checks use the actual owner. Strict types and all 337 units passed (grunt-api-*.log). Source/test/script audit has no enemy-update.ts imports.
 Unused enemy-update.ts adapter is removed; strict types and all 337 units passed again (grunt-adapter-*.log).
-Next: migrate spawn ownership/callers, preserving a thin spawn adapter until all consumers migrate. Then boss tables/registry and player animation
+Grunt construction is physically moved to game/combat/grunt-spawn.ts (createGrunt, plain records and seed/pose/look initialization). enemy-spawn.ts retains a thin spawnEnemy adapter plus ordering/selection utilities. Strict types and all 337 units passed (grunt-spawn-*.log); all four unchanged runtime checkpoint browser fixtures passed (17.5s, terminal confirmed).
+Next: migrate construction consumers, then remove spawnEnemy adapter separately. Then boss tables/registry and player animation
 states/companions. Results/reward orchestration, remaining phase/run events and
 composition-root reduction remain required. No timing/balance/save changes.
 W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.

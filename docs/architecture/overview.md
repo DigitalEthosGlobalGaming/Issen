@@ -134,7 +134,9 @@ game/behaviour-registry.ts matches existing record data, retaining checkpoint
 shapes. game/combat/grunt.ts now dispatches enter/idle/attack/strike/dying/fade through
 the registry's feint/Zen/Still/base tables. Shared finishing preserves pose/timer
 ordering when rule callbacks change state in the same frame. Runtime and tests now call advanceGrunts directly; the unused updateEnemies adapter
-has been removed separately. Boss/player tables remain next.
+has been removed separately. game/combat/grunt-spawn.ts owns plain construction
+and look selection; spawnEnemy temporarily delegates while callers migrate.
+Boss/player tables remain next.
 
 ### Adding an enemy behaviour
 
