@@ -129,8 +129,6 @@ import { targetSwipe } from './game/combat/targeting.ts';
 import { bossShownDirection, parryOpening } from './game/encounters/boss-openings.ts';
 import { createBoss } from './game/encounters/boss-create.ts';
 import { bossPosition } from './rendering/figures/boss-position.ts';
-import { advanceBoss as simulateBoss } from './game/encounters/boss-simulation.ts';
-import { resetBossIdle as bossToIdle } from './game/encounters/boss-states.ts';
 import { initialSpawns, updateWave as simulateWave } from './game/encounters/waves.ts';
 import { createGrunt as createEnemy } from './game/combat/grunt-spawn.ts';
 import { pickEnemyLook, orderedEnemies, selectAttacker } from './game/combat/enemy-spawn.ts';
@@ -1720,9 +1718,6 @@ export function startGame(
   }
   function bossPos(b: Boss) {
     return bossPosition(b, L);
-  }
-  function toIdle(b: Boss, base: number) {
-    bossToIdle(b, base, combatRandom);
   }
   function bossTipWorld(b: Boss): [number, number] {
     const tp = tipOf(b.pose, b.lean, b.def.spear ? 0.98 : 0.52);

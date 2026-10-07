@@ -384,5 +384,5 @@ Boss simulation now dispatches the ten existing states through game/encounters/b
 The boss-behaviours registry owns each typed machine and its direction, parry and
 configuration hooks for base, mirror, twin and spear; visual definitions stay plain
 content. boss-simulation.ts advances simulation/lifetime/raw-shadow clocks and
-applies the existing transition-frame pose/lean rules. boss-update.ts temporarily
-adapts the existing exports until consumers migrate. No checkpoint fields change.
+applies the existing transition-frame pose/lean rules. All consumers now import advanceBoss directly; the unused boss-update.ts
+adapters and legacy idle reset have been removed separately. No checkpoint fields change.

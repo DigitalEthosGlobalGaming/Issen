@@ -155,3 +155,5 @@
 2026-10-08 — W2/grunt construction — removed unused spawnEnemy compatibility function after migrating every import — keeping a dormant adapter considered — source/test audit and strict plus 337 units confirm no consumer remains; ordering utilities retained — revert this cleanup commit.
 
 2026-10-08 — W2/boss tables — replace the ten-state update switch with typed handlers and a base/mirror/twin/spear machine-and-hook registry — serializing a new type or dispatching again after transitions considered — deriving identity from existing definitions preserves old saves, RNG order and one-handler-per-frame behavior; idle transitions keep their distinct random ranges and raw shadow expiry skips pose work — revert this table/registry commit; compatibility exports retained until separately migrated.
+
+2026-10-08 — W2/boss cleanup — delete boss-update.ts and unused root toIdle/resetBossIdle after consumer migration — leaving dormant exports considered — source/test import audit, strict types and 343 passing units confirm no remaining adapter consumer; actual idle transitions use the validated table machine — revert this cleanup commit.

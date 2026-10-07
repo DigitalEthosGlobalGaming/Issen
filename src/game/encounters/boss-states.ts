@@ -15,14 +15,6 @@ export interface BossEnvironment {
   recovered: (boss: Boss) => void;
   position: (boss: Boss) => EnemyPosition;
 }
-export function resetBossIdle(b: Boss, base: number, R: Random = Math.random) {
-  b.fromStrike = false;
-  b.twinDone = false;
-  b.state = 'idle';
-  b.t = 0;
-  b.idleT = base + R() * (b.bp.idleMax - b.bp.idleMin);
-}
-
 export interface BossContext {
   G: { boss: Boss | null; state: string };
   env: BossEnvironment;
