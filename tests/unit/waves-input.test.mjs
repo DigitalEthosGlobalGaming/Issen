@@ -1,3 +1,4 @@
+import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
@@ -64,7 +65,13 @@ function fixture() {
     hud() {},
     saveStats() {},
   };
-  return { session, views, enemy, trace, phase: createWavesPhase((ctx) => ctx) };
+  return {
+    session,
+    views,
+    enemy,
+    trace,
+    phase: createWavesPhase((ctx) => ctx, waveLifecycleFixture(session).lifecycle),
+  };
 }
 
 test('actual wave phase routes correct and wrong swipes while preserving the cut direction', () => {

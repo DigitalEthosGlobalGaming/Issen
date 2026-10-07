@@ -3,7 +3,7 @@ import type { RunPhase } from '../run-state.ts';
 
 export interface PhaseController<Context> {
   enter(context: Context): void;
-  update(context: Context, dt: number): void;
+  update(context: Context, dt: number, raw?: number): void;
   onSwipe(context: Context, direction: Direction): void;
   onTap(context: Context): void;
   /** True consumes pointer-down; false leaves it available for swipe/release. */
@@ -90,8 +90,15 @@ export function createPhaseRouter<Context>(
       controller(restored);
       active = restored;
     },
-    update(dt: number) {
-      dispatch((phase) => phase.update(context, dt));
+    update(dt: number, raw = dt) {
+      dispatch((phase) => phase.update(context, dt, raw));
+    },
+    /** Preserve the original same-frame cascade; each phase runs at its old position. */
+    updateFrame(dt: number, raw = dt) {
+      synchronize();
+      for (const phase of ['boss', 'playing', 'standoff', 'between', 'dead'] as const) {
+        if (active === phase) dispatch((controller) => controller.update(context, dt, raw));
+      }
     },
     onSwipe(direction: Direction) {
       dispatch((phase) => phase.onSwipe(context, direction));

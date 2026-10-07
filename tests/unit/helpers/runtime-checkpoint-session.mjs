@@ -95,6 +95,7 @@ export function checkpointSession(checkpoint, position) {
       trace.push('over');
       G.state = 'over';
     },
+    adoptPhase() {},
     resetClock() {
       trace.push('clock');
     },

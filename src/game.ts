@@ -1,3 +1,4 @@
+import { createPhaseRouter, definePhase } from './game/session/phase-router.ts';
 import { createBetweenPhase } from './game/phases/between.ts';
 import { createDeathPhase } from './game/phases/death.ts';
 import { createShrinePhase } from './game/phases/shrine.ts';
@@ -1023,6 +1024,7 @@ export function startGame(
   }));
   const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } =
     createCheckpointFlow({
+      adoptPhase: () => phaseRouter.adoptCheckpoint(),
       $,
       AWAKENING,
       COLLECTION_PROGRESS,
@@ -1721,38 +1723,41 @@ export function startGame(
     startSwing(P, dir);
     apparelMotion.kick(dir, reducedMotion(), perfect);
   }
-  const wavesPhase = createWavesPhase<GameContext<PresentationContext>>(() => ({
-    G,
-    W,
-    ST,
-    activeTrial,
-    combatRandom,
-    waveConfiguration,
-    killEnemy,
-    orderSucceeded: () => guided.orderSucceeded(),
-    pop,
-    sfx,
-    swingPlayer,
-    playerDie,
-    enemyPos,
-    earn,
-    addScore,
-    comboMult,
-    sparks,
-    buzz,
-    hud,
-    saveStats,
-    knifeTrail(pos) {
-      presentationState.fx.knives.push({
-        x0: L.player.x,
-        y0: L.player.y - L.player.h * 0.55,
-        x1: pos.x,
-        y1: pos.y - pos.h * 0.55,
-        t: 0,
-        life: 0.18,
-      });
-    },
-  }));
+  const wavesPhase = createWavesPhase<GameContext<PresentationContext>>(
+    () => ({
+      G,
+      W,
+      ST,
+      activeTrial,
+      combatRandom,
+      waveConfiguration,
+      killEnemy,
+      orderSucceeded: () => guided.orderSucceeded(),
+      pop,
+      sfx,
+      swingPlayer,
+      playerDie,
+      enemyPos,
+      earn,
+      addScore,
+      comboMult,
+      sparks,
+      buzz,
+      hud,
+      saveStats,
+      knifeTrail(pos) {
+        presentationState.fx.knives.push({
+          x0: L.player.x,
+          y0: L.player.y - L.player.h * 0.55,
+          x1: pos.x,
+          y1: pos.y - pos.h * 0.55,
+          t: 0,
+          life: 0.18,
+        });
+      },
+    }),
+    waveLifecycle,
+  );
   function onSwipe(dir: Direction) {
     if (sceneLoading) return;
     if (
@@ -1764,12 +1769,7 @@ export function startGame(
       )
     )
       return;
-    if (G.state === 'standoff') {
-      standoffSwipe(dir);
-      return;
-    }
-    if (G.state === 'playing') wavesPhase.onSwipe(context, dir);
-    else if (G.state === 'boss') bossSwipe(dir);
+    phaseRouter.onSwipe(dir);
   }
 
   /* ---------------- boss ---------------- */
@@ -1881,21 +1881,12 @@ export function startGame(
     // practice so the pointer adapter can still recognize the teaching gesture.
     if (guided.phase === 'order-practice') return false;
     if (guided.tap()) return true;
-    if (G.state === 'boss') return bossPhase.onTapDown(context);
-    return false;
+    return phaseRouter.onTapDown();
   }
   function onTap() {
     if (sceneLoading) return;
     if (guided.tap()) return;
-    if (G.state === 'playing') {
-      wavesPhase.onTap(context);
-      return;
-    }
-    if (G.state === 'standoff') {
-      standoffPhase.onTap(context);
-      return;
-    }
-    if (G.state === 'boss') bossPhase.onTap(context);
+    phaseRouter.onTap();
   }
 
   /* ---------------- standoff & shrine ---------------- */
@@ -2806,6 +2797,27 @@ export function startGame(
     openShrine,
     nextStep,
   }));
+  const phaseRouter = createPhaseRouter(
+    context,
+    {
+      read: () => G.state,
+      write: (state) => {
+        G.state = state;
+      },
+      changed: (from, to) => context.events.emit('phaseChanged', { from, to }),
+    },
+    {
+      title: definePhase({}),
+      playing: wavesPhase,
+      boss: bossPhase,
+      between: betweenPhase,
+      standoff: standoffPhase,
+      shrine: shrinePhase,
+      dead: deathPhase,
+      over: definePhase({}),
+      paused: definePhase({}),
+    },
+  );
   /* ---------------- update ---------------- */
   function updatePlayer(dt: number) {
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
@@ -2865,11 +2877,8 @@ export function startGame(
       liveOrdered()[0]?.state === 'idle'
     )
       guided.startOrder();
-    if (G.boss) updateBoss(dt, raw);
-    updateWave(dt);
-    if (G.state === 'standoff') updateStandoff(dt);
-    if (G.state === 'between') betweenPhase.update(context, dt);
-    if (G.state === 'dead') deathPhase.updateDeath(raw);
+    bossPhase.updateBackground(dt, raw);
+    phaseRouter.updateFrame(dt, raw);
     updateFx(dt, raw);
     renderTrialObjective();
     updateTransition(raw);

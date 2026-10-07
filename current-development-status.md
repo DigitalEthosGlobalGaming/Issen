@@ -12,7 +12,7 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is
 committed (3d1f26f); it introduces explicit gameplay/service and presentation
-contracts. Live phaseChanged is now wired in the uncommitted router integration;
+contracts. Live phaseChanged is wired through the phase router;
 other gameplay events still await rule/event moves.
 The typed bus is synchronous, registration-ordered, reentrant and value-payload-only.
 The seeded scenario tests still use temporary inline input/HP drivers; migrate
@@ -41,26 +41,19 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts currently has 3261 lines; composition-root reduction is NOT complete.
 
-IN PROGRESS, UNCOMMITTED: live phase-router wiring is implemented. Inputs now
-dispatch after existing scene-loading/guided gates. updateFrame dispatches boss,
-playing, standoff, between, dead in the original order so transitions can advance
-later phases in the same frame. Raw delta reaches boss shadow cleanup and death;
-bossPhase.updateBackground handles dying/other inactive boss animation separately.
-Checkpoint restore calls silent adoptPhase after restoring records/UI. Only live
-phaseChanged is emitted so far; all other rule events remain pending.
-Strict types passed; all 318 units passed (router-live-unit.log), including two
-new cascade/raw-delta/no-earlier-phase-update tests.
-`npx playwright test --config playwright.rendering-v2.config.ts`:
-First run completed with 251 passed and two failed (11.6m): both stage-variation
-orientations used the stale cinematicStageSeed closure hook moved during UI
-extraction. A read-only cinematicWiring.savedStageSeed accessor replaces it;
-unchanged assertions passed all seven focused stage-variation/cinematic cases
-(cinematic-audit-browser.log, terminal confirmed), and strict types passed.
-This audit-accessor fix is committed separately from the pending router wiring.
-Rerun the exact broad command before claiming the router checkpoint green. If green, finalize
-this handoff/overview/decision log and commit router integration, then continue
-immediately with kill rule ownership and event/listener splitting. Kill move and
-tests draft scripts are prepared outside the repository but NOT executed.
+Live phase-router integration is complete: inputs dispatch after existing scene-loading/
+guided gates. updateFrame visits boss, playing, standoff, between and dead in the
+original order, retaining same-frame cascades and raw death/boss cleanup delta.
+Checkpoint restore adopts records silently without replaying entry/rewards.
+Strict types and all 318 units passed (router-live-final-unit.log).
+`npx playwright test --config playwright.rendering-v2.config.ts`: all 253 passed
+on the full retry (router-live-broad-retry.log, terminal confirmed). First run
+251/253 exposed the stale cinematicStageSeed audit hook; separately committed
+a53202b supplies its read-only owner accessor, with seven focused cases green.
+Next: move kill rules and migrate seeded kill drivers; split rule event emission
+from synchronous progression/presentation listeners. Then state tables/registry,
+player/companions, results/reward orchestration and composition-root reduction.
+Full W2/W3/Part 4 remain pending; develop stays unpushed.
 Latest green checkpoint b360675: between controller, strict/all 316 units and
 ten actual trial/save browser cases passed (between-*.log).
 Then state tables/registry, player/companions, results/reward ownership and root
@@ -84,7 +77,7 @@ Logs run-flow-*.log and checkpoint-flow-*.log retain exact commands/results;
 nonexistent context-loss.spec/run-checkpoint.spec patterns matched no cases, and
 real graphics/context files were explicitly verified.
 
-Router foundation 556acb9 is now integrated in the uncommitted step above.
+Router foundation 556acb9 is integrated in the live runtime.
 Owner entry APIs still perform existing direct record writes; router synchronizes
 them for dispatch, and all passive enter callbacks avoid replaying entry/rewards.
 Other rule event emission and listener ownership remain next.

@@ -472,8 +472,8 @@ export function createBossPhase<Context>(
   }
   return Object.assign(
     definePhase<Context>({
-      update(_context, dt) {
-        updateBoss(dt);
+      update(_context, dt, raw = dt) {
+        updateBoss(dt, raw);
       },
       onSwipe(_context, dir) {
         bossSwipe(dir);
@@ -497,6 +497,14 @@ export function createBossPhase<Context>(
         }
       },
     }),
-    { startBoss, updateBoss, bossSwipe },
+    {
+      startBoss,
+      updateBoss,
+      bossSwipe,
+      updateBackground(dt: number, raw = dt) {
+        const { G } = current();
+        if (G.boss && G.state !== 'boss') updateBoss(dt, raw);
+      },
+    },
   );
 }

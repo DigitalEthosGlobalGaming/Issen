@@ -130,6 +130,8 @@
 
 - 2026-10-08 — W2 cinematic audit repair — expose the viewer's original scene seed through a read-only owner accessor and migrate stale response instrumentation — restore the removed closure variable or weaken stage variation assertions — broad router run found two ReferenceErrors from the prior UI extraction; strict and seven unchanged cinematic/stage checks pass; accessor changes no viewer behavior — revert the accessor/hook fix together.
 
+- 2026-10-08 — W2 live phase router — preserve ordered same-frame cascades through updateFrame, pass raw delta and silently adopt restored checkpoints — dispatch only one phase per frame or replay entry on restore — strict, all 318 units and the full 253-case browser retry pass; no gameplay/save changes — revert the live router integration and its driver tests together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -114,7 +114,7 @@ function driveWave(seed, options = setup, trial) {
     hud() {},
     saveStats() {},
   };
-  const phase = createWavesPhase((ctx) => ctx);
+  const phase = createWavesPhase((ctx) => ctx, lifecycleFixture.lifecycle);
   const spawned = [];
   lifecycleFixture.views.spawnEnemy = (slot) => {
     spawned.push(spawnEnemy(run, slot, false, position, random.next).dir);

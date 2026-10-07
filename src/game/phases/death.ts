@@ -333,7 +333,7 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
   }
   return Object.assign(
     definePhase<Context>({
-      update(_context, raw) {
+      update(_context, dt, raw = dt) {
         updateDeath(raw);
       },
     }),

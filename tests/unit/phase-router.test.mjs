@@ -146,3 +146,59 @@ test('a nested phase event enters only the final selected phase', () => {
     'enter:paused',
   ]);
 });
+
+test('frame dispatch preserves boss/wave to between to death cascades and raw delta', () => {
+  for (const start of ['boss', 'playing', 'standoff']) {
+    const updates = [];
+    const f = fixture({
+      [start]: {
+        update(ctx, dt, raw) {
+          updates.push([start, dt, raw]);
+          ctx.state = 'between';
+        },
+      },
+      between: {
+        update(ctx, dt, raw) {
+          updates.push(['between', dt, raw]);
+          ctx.state = 'dead';
+        },
+      },
+      dead: {
+        update(ctx, dt, raw) {
+          updates.push(['dead', dt, raw]);
+          ctx.state = 'over';
+        },
+      },
+    });
+    f.router.transition(start);
+    f.router.updateFrame(0.05, 0.2);
+    assert.deepEqual(updates, [
+      [start, 0.05, 0.2],
+      ['between', 0.05, 0.2],
+      ['dead', 0.05, 0.2],
+    ]);
+    assert.equal(f.router.active, 'over');
+  }
+});
+
+test('frame dispatch does not update an earlier phase entered by the between timer', () => {
+  const updates = [];
+  const f = fixture({
+    between: {
+      update(ctx) {
+        updates.push('between');
+        ctx.state = 'boss';
+      },
+    },
+    boss: {
+      update() {
+        updates.push('boss');
+      },
+    },
+  });
+  f.router.transition('between');
+  f.router.updateFrame(0.1);
+  assert.deepEqual(updates, ['between']);
+  f.router.updateFrame(0.1);
+  assert.deepEqual(updates, ['between', 'boss']);
+});

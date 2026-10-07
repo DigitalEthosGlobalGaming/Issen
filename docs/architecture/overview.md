@@ -99,9 +99,9 @@ lighting debug), setup (setup/tutorial), armory (equipment/presets), input
 cinematic (viewer session/grade), and profile (transfer/reset/management).
 
 `game/session/phase-router.ts` supplies synchronous phase-controller dispatch and
-checkpoint adoption. It is introduced alongside the closure; live input/update
-branching migrates as phase bodies move, so its presence alone does not mean the
-runtime already uses it.
+checkpoint adoption. Live input uses the active controller; updateFrame preserves
+the existing boss/playing/standoff/between/dead order and later-phase same-frame
+cascades. Checkpoint adoption is silent and does not replay entry or rewards.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
 profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
@@ -112,7 +112,9 @@ encounter start/finish are owned by game/session/trials.ts, with explicit profil
 restoration and result-display ports.
 `game/phases/waves.ts` owns swipe targeting and knife input through explicit rule
 and feedback ports. Its createWaveLifecycle owns deferred entry, preparation
-and update/clear boundaries; live router dispatch remains pending.
+and update/clear boundaries. Boss, standoff, shrine, death and between controllers
+own their encounter rules and dispatch through the live router. Gameplay events
+currently include phaseChanged; the remaining rule/listener split is in progress.
 
 ## Where changes belong
 

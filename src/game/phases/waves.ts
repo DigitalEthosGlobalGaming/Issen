@@ -51,9 +51,15 @@ export interface WavesViews {
   readonly saveStats: () => void;
 }
 
-/** Wave inputs own targeting/knife rules; entry/update move in subsequent steps. */
-export function createWavesPhase<Context>(readViews: (context: Context) => WavesViews) {
+/** Wave inputs and update dispatch share the owning lifecycle. */
+export function createWavesPhase<Context>(
+  readViews: (context: Context) => WavesViews,
+  lifecycle: ReturnType<typeof createWaveLifecycle>,
+) {
   return definePhase<Context>({
+    update(_context, dt) {
+      lifecycle.updateWave(dt);
+    },
     onSwipe(context, dir) {
       const {
         G,

@@ -86,6 +86,7 @@ export interface CheckpointFlowViews {
   readonly showShrineOffers: (offers: (typeof BLESS)[number][]) => void;
   readonly showOver: () => void;
   readonly resetClock: () => void;
+  readonly adoptPhase: () => void;
 }
 
 /** Version-one records and rule RNG restore through explicit persistence/scene ports. */
@@ -222,6 +223,7 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
       renderHp();
       $('bossbar').classList.toggle('on', G.state === 'boss');
     } else $('bossbar').classList.remove('on');
+    views.adoptPhase();
   }
   function continueSavedRun() {
     if (!views.savedRun || views.savedRun.status !== 'active') return;
