@@ -56,6 +56,8 @@
 
 - 2026-10-08 — W2 figures move — extract frame-specific figure renderer and enemy/boss projection with explicit views — moving player/companion gameplay early — respects ordered ownership and preserves plain records; saved boss/wave scenes and presentation isolation pass — revert the figure-host move.
 
+- 2026-10-08 — W2 feedback move — move cosmetic factories/popups/stamps and drawing into feedback.ts with cosmetic RNG and explicit flash/sound ports — moving score mutation with popup display — feedback has no run record, so later rule listeners can call it without owning gameplay — revert the feedback move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; next environment/feedback hosts
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; next environment host
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -39,7 +39,13 @@ remains for the later ordered player step. Strict types passed; all 274 units
 passed (figures-owner-unit.log).
 `npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|Scattered|actual title' --config playwright.rendering-v2.config.ts`:
 all seven matched cases passed (figures-owner-browser.log; terminal exit confirmed).
-No process remains. Next environment/feedback hosts, then finish post
+Feedback spawning/drawing now belongs to src/presentation/feedback.ts, including
+popups/stamps and preview-aware effect factories. It receives cosmetic effects,
+RNG and sound/flash ports only, with no run record. Strict types passed; all 274
+units passed (feedback-owner-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|scattered|actual title|preview' --config playwright.rendering-v2.config.ts`:
+all eight matched cases passed (feedback-owner-browser.log; terminal exit confirmed).
+No process remains. Next environment host, then finish post
 preparation ownership; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 

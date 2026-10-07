@@ -53,7 +53,9 @@ scene inputs and drawing ports. Its seven named passes use scene-composer.ts
 with explicit before/after neighbours. Runtime orchestration settles scene readiness
 after drawing; presentation cannot commit pending gameplay continuations.
 `presentation/figures.ts` owns frame-specific figure rendering and enemy/boss
-projection, with gameplay updates kept in rule owners. `presentation/post.ts` owns prepared full-frame drawing; effects advancement
+projection, with gameplay updates kept in rule owners. `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
+and drawing, with explicit sound/flash ports and no run record.
+`presentation/post.ts` owns prepared full-frame drawing; effects advancement
 remains separate from replay. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service
 instances. It connects feature callbacks to audio, persistence, effects and UI.

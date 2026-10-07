@@ -1,3 +1,4 @@
+import { createFeedbackPresentation } from './presentation/feedback.ts';
 import { createFiguresPresentation } from './presentation/figures.ts';
 import { createRuntimeScene, type PresentationFrame } from './presentation/scene.ts';
 import { createEventBus, type GameEvents } from './game/events.ts';
@@ -131,8 +132,6 @@ import {
   updatePlayerAnimation,
 } from './rendering/figures/player.ts';
 import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
-import { createEffectSpawner } from './rendering/effects/spawn.ts';
-import { createEffectRenderer } from './rendering/effects/draw.ts';
 import { createEffects } from './rendering/effects/state.ts';
 import { createEffectQuality, scaledCount, preferredDensity } from './rendering/effects/quality.ts';
 import {
@@ -1321,21 +1320,10 @@ export function startGame(
     );
     if (UNL.size !== before) refreshArmoryNew();
   }
-  function pop(x: number, y: number, text: string, size?: number) {
-    const ax = portrait ? W * 0.25 : W * 0.18,
-      ay = portrait ? H * 0.8 : H * 0.7,
-      lh = Math.max(22, 26 * S);
-    while (fx.pops.length >= 4) fx.pops.shift();
-    const n = fx.pops.filter((q) => q.t < q.life * 0.7).length;
-    fx.pops.push({
-      x: ax,
-      y: ay - n * lh,
-      text,
-      t: 0,
-      life: 0.8,
-      size: Math.min(size || Math.max(16, 19 * S), Math.max(18, 23 * S)),
-    });
-  }
+  const {
+    pop, stamp, effectSpawner, addSlash, inkBurst, scraps, ring, sparks, dust,
+    effectRenderer, drawFx, drawFx2, drawStains, drawPops, drawStamps,
+  } = createFeedbackPresentation(() => ({ g,fx,S,time,FONT,SEAL,mistSprite,R,density,flash,sfx,W,H,portrait }));
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     pts = gain(pts);
     G.score += pts;
@@ -1348,44 +1336,6 @@ export function startGame(
   function flash(a: number, col?: string) {
     flashA = Math.max(flashA, reducedFlashes() ? Math.min(a, 0.035) : a);
     flashCol = col || '255,255,255';
-  }
-  function stamp(text: string, x: number, y: number, size: number, seal: boolean, life?: number) {
-    fx.stamps.push({
-      text,
-      x: portrait ? W * 0.27 : W * 0.18,
-      y: portrait ? H * 0.62 : H * 0.36,
-      size: size * 0.8,
-      seal: !!seal,
-      t: 0,
-      life: (life || 1.1) * 0.75,
-    });
-  }
-  function effectSpawner(state = fx, scale = S, preview = false) {
-    return createEffectSpawner(state, {
-      scale,
-      random: R,
-      density: density(),
-      flash: preview ? () => {} : flash,
-      sounds: sfx,
-    });
-  }
-  function addSlash(...args: Parameters<ReturnType<typeof createEffectSpawner>['addSlash']>) {
-    effectSpawner().addSlash(...args);
-  }
-  function inkBurst(...args: Parameters<ReturnType<typeof createEffectSpawner>['inkBurst']>) {
-    effectSpawner().inkBurst(...args);
-  }
-  function scraps(...args: Parameters<ReturnType<typeof createEffectSpawner>['scraps']>) {
-    effectSpawner().scraps(...args);
-  }
-  function ring(...args: Parameters<ReturnType<typeof createEffectSpawner>['ring']>) {
-    effectSpawner().ring(...args);
-  }
-  function sparks(...args: Parameters<ReturnType<typeof createEffectSpawner>['sparks']>) {
-    effectSpawner().sparks(...args);
-  }
-  function dust(...args: Parameters<ReturnType<typeof createEffectSpawner>['dust']>) {
-    effectSpawner().dust(...args);
   }
   function letterbox(d: number) {
     lbT = Math.max(lbT, d);
@@ -4318,30 +4268,6 @@ export function startGame(
         }
       }
     }
-  }
-  function effectRenderer(context = g, state = fx, scale = S) {
-    return createEffectRenderer(context, state, {
-      scale,
-      time,
-      font: FONT,
-      seal: SEAL,
-      mistSprite,
-    });
-  }
-  function drawFx() {
-    effectRenderer().drawFx();
-  }
-  function drawFx2() {
-    effectRenderer().drawFx2();
-  }
-  function drawStains() {
-    effectRenderer().drawStains();
-  }
-  function drawPops() {
-    effectRenderer().drawPops();
-  }
-  function drawStamps() {
-    effectRenderer().drawStamps();
   }
   function advancePost(raw: number): PostFrame {
     const prepared = preparePost(
