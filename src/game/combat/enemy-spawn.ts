@@ -1,18 +1,7 @@
 import type { Random } from '../../shared/random.ts';
-import type { Enemy, EnemyPosition } from './enemy.ts';
-import { createGrunt, type EnemySpawnState } from './grunt-spawn.ts';
+import type { Enemy } from './enemy.ts';
 export { pickEnemyLook } from './grunt-spawn.ts';
 export type { EnemySpawnState } from './grunt-spawn.ts';
-/** Temporary compatibility adapter while construction consumers migrate. */
-export function spawnEnemy(
-  state: EnemySpawnState,
-  slot: number,
-  attract: boolean,
-  position: (enemy: Enemy) => EnemyPosition,
-  random: Random = Math.random,
-): Enemy {
-  return createGrunt(state, slot, attract, position, random);
-}
 export function orderedEnemies(enemies: readonly Enemy[]): Enemy[] {
   return enemies
     .filter((enemy) => !['dying', 'strike', 'fade'].includes(enemy.state))

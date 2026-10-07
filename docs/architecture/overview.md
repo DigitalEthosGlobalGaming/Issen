@@ -135,7 +135,8 @@ shapes. game/combat/grunt.ts now dispatches enter/idle/attack/strike/dying/fade 
 the registry's feint/Zen/Still/base tables. Shared finishing preserves pose/timer
 ordering when rule callbacks change state in the same frame. Runtime and tests now call advanceGrunts directly; the unused updateEnemies adapter
 has been removed separately. game/combat/grunt-spawn.ts owns plain construction
-and look selection; spawnEnemy temporarily delegates while callers migrate.
+and look selection; all construction consumers call createGrunt directly. The
+unused spawn adapter has been removed; enemy-spawn.ts retains ordering/selection.
 Boss/player tables remain next.
 
 ### Adding an enemy behaviour

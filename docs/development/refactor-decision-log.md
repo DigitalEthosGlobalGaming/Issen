@@ -151,3 +151,5 @@
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
+
+2026-10-08 — W2/grunt construction — removed unused spawnEnemy compatibility function after migrating every import — keeping a dormant adapter considered — source/test audit and strict plus 337 units confirm no consumer remains; ordering utilities retained — revert this cleanup commit.
