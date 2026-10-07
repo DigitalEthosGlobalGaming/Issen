@@ -6,108 +6,91 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Frame composition and runtime startup
+## Latest green checkpoint: Session state and browser service owners
 
-game/session/frame-bindings.ts owns simulation dispatch, prepared scene/post composition and the frame scheduler. game/session/startup.ts owns ordered startup, artwork readiness/error handling and cleanup. Current clocks, geometry, scene continuation, pause gates and draw-isolation hooks remain intact.
-`npm run typecheck`: strict types pass (frame-startup-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 365 units pass (frame-startup-unit.log).
-`npx playwright test tests/browser/game.spec.ts tests/browser/class-lifecycle.spec.ts tests/browser/cinematic.spec.ts tests/browser/performance.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/pixi-backend.spec.ts tests/browser/secondary-motion.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 50 pass in 2.1m (frame-startup-browser.log; terminal exit 0 confirmed).
-Logs are under ignored tmp/runtime-refactor. This checkpoint now has combined full browser coverage, including the import cleanup and scenario/Options fixture changes.
+game/session/runtime-state.ts owns eleven plain mutable lifetime fields: template,
+ledger, milestones/reveals, checkpoint/offers, clocks, knocks, reward flow and crest
+reveal flag. game/session/state-view.ts forwards only explicit named fields into
+nine binding providers, preserving replacement identities and lazy service getters.
+platform/runtime-preferences.ts owns settings/access/haptic capabilities and browser
+access flags. ui/wiring/audio.ts owns audio/guided/mute wiring. Construction calls,
+save keys, checkpoint records, gameplay RNG and settings application remain intact.
+Semantic reference audits are in tmp/runtime-refactor; source moves use actual
+records rather than global text substitution. New units exercise actual run entry
+against the session owner, deferred service reads and capability isolation.
+`npm run typecheck`: pass (state-services-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 368 pass (state-services-unit.log).
+`npx playwright test tests/browser/options.spec.ts tests/browser/daily.spec.ts tests/browser/trials.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/scene-continuation.spec.ts tests/browser/secrets.spec.ts tests/browser/cinematic.spec.ts tests/browser/support-rewards.spec.ts tests/browser/death-presentation.spec.ts tests/browser/class-lifecycle.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 44 pass in 3.7m (state-services-browser.log; terminal exit 0 confirmed).
 
-Latest combined broad: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 254 pass in 14.0m (frame-startup-broad.log; terminal exit 0 confirmed), covering
-frame/startup moves, import cleanup, actual-API scenarios and corrected Options
-fixture. No live state/service ownership changes were applied during this run.
-The earlier Options failure is retained in standoff-bindings-broad.log; controlled
-unchanged-baseline proof is in paused-options-baseline.log. The corrected fixture
-awaits actual scene/wave entry and retains the original snapshot equality/timeouts.
+Latest passing combined broad:
+`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 254 pass in 14.0m (frame-startup-broad.log; terminal exit 0 confirmed).
+That invocation covers frame/startup moves, unused import cleanup and corrected
+Options fixture, and predates the latest state/service ownership batch.
 
 ## Completed ownership and important evidence
 
-W1 is complete and committed (5406e90). Layout-preserving compact planes,
-optional emissive and exact data maps are standard; tight repacking stays
-cancelled. See docs/development/asset-compaction-results.md and commands below.
+W1 is complete and committed (5406e90), with layout-preserving compact planes,
+optional emissive and exact data maps. Tight repacking stays cancelled. See
+docs/development/asset-compaction-results.md and preserved verification below.
 
-W2 WebGL2-only startup/recovery, typed context/events, seven-layer composer,
-UI owners, all live phase controllers/router, checkpoint/run/trial/results
-owners, kill/score/profile reactions, state-machine/behaviour registries,
-actual grunt/boss/player tables and companion rules are implemented.
-Native/equipment/environment/figure presentation, phased profile state,
-active equipment/profile policy and frame dispatch have explicit owners.
-Kill, combo/score, parry/block and successful boss-cut/victory/standoff cosmetics listen
-to immutable value events. Seven phases share their typed construction provider.
-Implemented binding/state/lifecycle owners: game/session/phase-bindings.ts, ui/wiring/menu-bindings.ts, game/session/session-bindings.ts, game/session/activity.ts, presentation/graphics-lifecycle.ts, presentation/viewport.ts.
-See docs/architecture/overview.md and refactor-decision-log.md for exact ownership,
-physical moves, separate fixes/deletions and prior verification checkpoints.
+W2 WebGL2-only startup/recovery, typed context/events, ordered seven-layer composer,
+UI/session/phase owners, actual grunt/boss/player tables and behaviour registries,
+companions, profile policy/equipment/progress, frame scheduling and artwork startup
+are implemented. Kill/combo/score/parry/block and successful boss/standoff feedback
+react to immutable event values. Rules own outcomes and gameplay RNG. Runtime
+dimensions, mutable profile identity and remaining service/action projections still
+need genuine composition reduction. See overview.md and refactor-decision-log.md.
 
-Support first-claim failed-save rollback is fixed and proved on unchanged
-pre-refactor. The rush single-badge fixture now chooses a single blessing;
-unchanged baseline seed proved Twin intentionally has three badges.
-Checkpoint adoption now discards superseded scene continuation. Controlled real
-renderer completion on unchanged pre-refactor reproduces the missing-wave
-exception/null configuration (scene-continuation-baseline.log; exit 1). Actual
-live and headless saved-wave/enemy/RNG regressions pass; broad coverage includes
-the fix. Earlier natural probe was inconclusive and is superseded.
-Behaviour changes remain in tmp/runtime-refactor/behaviour-changes.md for final
-report: reaction ordering, first support retry, same-scene continue bug fix.
+Actual-API scenarios drive daily/trial entry/completion and wrong swipe damage,
+normal/Ronin waves, rush/boss fights, standoff/shrine/death/results. Bounded winning
+and missed-parry/recovery paths visit every reachable boss state; mirror has no
+feint. Fixed-date daily/repeated trial seed assert profile isolation and once-only
+settlement. Fixtures resolve current RNG/profile ports (c55acea; 365 units before
+new state-view tests). Checkpoint compatibility fixtures and round trips remain.
 
-## Composition import cleanup
-
-Separate deletion step removes 52 unused named imports in 44 declarations,
-identified by TypeScript symbols (including shorthand references). Actual browser
-hook imports BLESS_BY and bossShownDirection are retained. Redundant empty lines
-are collapsed. `npm run typecheck` and all 365 units pass
-(composition-imports-typecheck.log, composition-imports-unit.log).
-Completed combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`,
-log frame-startup-broad.log. All 254 now pass; terminal exit 0 confirmed. Next apply the strictly checked isolated session-state/browser-service batch and its actual run-entry projection tests.
-
-## Actual-API scenario coverage
-
-Daily/trial entry and completion, wrong wave input and death, and bounded winning/
-missed-parry/recovery boss paths now use actual owners. Every reachable boss state
-is visited; mirror intentionally disables feint. Fixed-date daily and repeated
-trial seed verify outcomes, profile isolation and once-only settlement. Fixtures
-resolve current run and trial combat RNG/profile ports. All 365 units pass
-(scenario-api-unit.log). The migration is committed at c55acea.
+Controlled unchanged pre-refactor proofs document first support failed-save retry,
+the intentional Twin three-badge fixture, and stale scene continuation on checkpoint
+adoption. Fixes and real browser/headless regressions are committed. The previous
+combined run had 253 pass/one paused Options snapshot race in 14.0m. Held actual
+renderer completion on pre-refactor reproduces checkpoint/RNG mutation while state
+stays paused (paused-options-baseline.log; original equality assertion fails).
+The fixture now waits for ready scene and actual wave configuration before freezing
+an encounter; original equality/timeouts remain, intentional paused scene adoption
+remains separately tested. Corrected full254 run above proves combined coverage.
 
 ## Resume here; all remaining work is required
 
-Finish explicit runtime state/service/context ownership and remaining repeated root projections. The actual-API scenario migration is already applied and all 365 units pass; do not reapply its draft.
-Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
-exist under tmp/runtime-refactor with strict logs. All applied owners are listed above; any other isolated drafts have no live coverage. Regenerate each from current source
-before applying; never overwrite the root with a stale preview.
+Finish genuine composition reduction: root is 1606 lines, far from the approximately
+200-line target. Consolidate remaining profile identity, geometry/equipment colour,
+scene loading state and explicit context/service/action projections into their true
+owners. Remaining enemy/player helpers, secret/shrine/result view callbacks and
+damage/wave/boss reactions need owning orchestration/presentation modules. Do not
+rename the remaining monolith. Preserve plain records and both random streams.
+Keep root BLESS_BY/bossShownDirection and artworkReady instrumentation until actual
+browser hooks migrate. Applied drafts are non-idempotent; regenerate isolated
+previews from current source rather than overwriting with old copies.
 
-Finish genuine composition reduction: root remains 1723 lines, far from
-the approximately 200-line target. Move remaining session state/services and
-presentation/UI/lifecycle bindings into their actual owners, finish remaining
-standoff/damage/wave/boss reactions, and migrate residual scenario adapters to
-actual new APIs. Keep plain checkpoint shapes and separate gameplay/cosmetic RNG.
-Do not merely rename the remaining monolith. Keep root BLESS_BY and
-bossShownDirection until their actual browser hooks migrate. Preserve artworkReady
-assignment as test instrumentation anchor until explicit hook migration.
-
-After W2 is fully implemented: scenario/checkpoint/full unit/broad browser,
+After complete W2 implementation: scenario/checkpoint/full unit/broad browser,
 test:production and Android web gates; docs/behaviour report and phone checklist;
-bump minor to 1.67.0 with lock/title/changelog synchronized and commit.
+minor 1.67.0 with lock/title/changelog synchronized and committed.
 W3 is entirely pending: audit/read APIs, MRT G-buffer/light pre-pass/composite,
 16 lights/PBR/masks/old shader removal, instanced grass/leaves, event lights,
-half resolution/extension hooks; all ordered verification gates, docs and minor
-1.68.0. Do not start W3 implementation before W2 finishes.
-Part 4: final exact checks/report, bytes/future opt-in capture comparisons,
-completion status/report commit, ONE develop push and verified pushed hash.
-No partial completion claim or early develop push.
+half-resolution/extension hooks; all ordered gates/docs and minor 1.68.0.
+Do not implement W3 before W2 finishes. Part 4: final exact checks/report, byte
+results/future opt-in captures, completion status/report commit, ONE develop push
+and verified pushed hash. No partial completion claim or early develop push.
 
 ## Execution rules
 
-Preserve runtime source during browser verification. Small green commits;
-physical moves, behaviour changes and deletions stay separate. Tests/tolerances/
-timeouts are not loosened. Named-pipe TS7 and repository writes need elevated
-execution in this session; authorization is the goal. Disposable output goes
-under tmp. Existing baseline under tmp/asset-compaction/restore-baseline has a
-node_modules junction; do not recursively delete through it. Prepared lighting
-is borrowed. Do not run performance suites; ordinary browser lifecycle tests in
-performance.spec.ts are functional checks and permitted.
+Preserve source while browser verification runs. Keep physical moves, behavior
+changes and deletions in separate commits. Assertions/tolerances/timeouts are not
+loosened. Named-pipe TS7 and repository writes require elevated execution in this
+session; the goal authorizes them. Disposable files live under ignored tmp.
+Existing baseline has a node_modules junction; do not recursively delete through
+it. Prepared lighting is borrowed. No profiles or performance suites; ordinary
+browser performance.spec.ts exercises functional lifecycle and is permitted.
 
 ## W1 verification commands and results
 

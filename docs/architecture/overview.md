@@ -161,6 +161,8 @@ Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects
 
 | Concern                                                               | Maintained location                                                              |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Mutable session lifetime and named state projections | `src/game/session/runtime-state.ts`, `state-view.ts` |
+| Browser preferences/access/haptics and audio/guided/mute wiring | `src/platform/runtime-preferences.ts`, `src/ui/wiring/audio.ts` |
 | Runtime frame composition and startup lifetime | `src/game/session/frame-bindings.ts`, `startup.ts` |
 | Run entry, checkpoints, pause/resume, trial and result orchestration | `src/game/session/` |
 | Active phase inputs and encounter lifecycle | `src/game/phases/` |
@@ -481,3 +483,10 @@ presentation/kill-appearance.ts owns death appearance and debris callbacks throu
 presentation/standoff-feedback.ts reacts to immutable successful standoff outcomes. Gameplay owns challenger death, swing, hit stop, score and rewards; cosmetic geometry, feedback RNG, sound and haptics belong to the listener.
 
 game/session/frame-bindings.ts wires simulation, prepared post/scene drawing and the scheduler through current narrow views. Scene readiness remains an orchestration action after drawing. game/session/startup.ts owns the ordered startup and artwork/error/disposal lifetime; runtime readiness is published through an explicit callback.
+
+game/session/runtime-state.ts owns plain run lifetime metadata independently of
+serialized combat records. state-view.ts forwards only named fields into typed
+bindings without eager service reads or copied replacement identities.
+platform/runtime-preferences.ts owns current browser settings, access and haptic
+capabilities; ui/wiring/audio.ts owns audio/guided/mute controls with current phase
+and settings actions. These owners retain original staged construction and cleanup.
