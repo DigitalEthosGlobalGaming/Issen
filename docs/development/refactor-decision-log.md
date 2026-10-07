@@ -21,6 +21,10 @@
 
 - 2026-10-07 — W1 readiness — count only present weapon plane URLs in readiness — counting the undefined optional-emissive property — the latter kept startup blocked after zero-map removal; added a browser assertion for readiness and no emission request — restore the required-emission catalog and prior readiness predicate together.
 
+- 2026-10-07 — W1 verification — add `ISSEN_ANDROID_BUILD_DIR` for Android web verification output under ignored tmp — overwriting the existing mobile build — preserve existing build inventory and satisfy disposable-output rules without changing normal Android builds — remove the optional config override.
+- 2026-10-07 — W1 verification — record Android encounter-reload failure as pre-existing — changing unrelated runtime checkpoint flow during asset work — the original assertion fails on both compact develop and the untouched pre-refactor Android web build; logs in tmp/asset-compaction/android-recovery-{recheck,baseline}.log — investigate checkpoint lifecycle separately; no assertion/tolerance change.
+- 2026-10-07 — W1 APK accounting — report unsigned ZIP container projections using one frozen debug native shell and matched fresh Android web builds — stale APK comparison or a store/native build — honors the no-store-build rule and isolates web-asset savings; projections are neither APK build results nor installable APKs — discard ignored projection ZIPs and JSON.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

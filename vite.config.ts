@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
         ],
       },
     },
-    build: mode === 'android' ? { outDir: '.mobile-build', reportCompressedSize: false } : {},
+    build: mode === 'android' ? { outDir: env.ISSEN_ANDROID_BUILD_DIR ?? '.mobile-build', reportCompressedSize: false } : {},
     plugins:
       mode === 'android'
         ? [

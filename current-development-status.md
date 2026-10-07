@@ -1,105 +1,62 @@
 # Rendering, assets and runtime refactor in progress
 
-Complete all three workstreams in `main-goal.md` in order, then Part 4 verification
-and one push of `develop`. No profiles, benchmarks, store builds or changes to
-`codex/lit-rendering-only`. Preserve authoring artwork, recipes, provenance and
-`issen.*` compatibility.
+Complete all three workstreams in `main-goal.md` strictly in order, then Part 4
+verification/report and one develop push. No profiles, benchmarks, store builds,
+real-save changes or modifications of `codex/lit-rendering-only`.
 
-Restore point: `pre-refactor` at `ad353b3`, pushed successfully from clean develop
-after confirming it matched origin. Never modify that branch. Develop has not
-been pushed; runtime version is still 1.66.7.
+Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
+develop, unpushed. Current version 1.66.7. All W2/W3 work remains required.
 
-## Current work: W1 staged conversion complete; pixel verification next
+## Current: W1 cleanup complete, broad gate running
 
-- W1.0 audit: `tmp/asset-compaction/audit.md` and `audit.json`. All 86 families
-  have exact scalar-to-surface channel equality; 78 emissive maps are zero.
-  Planned scalar deletion saves 63,900,172 bytes; zero-emission deletion saves
-  8,365,453 bytes. No generated PNGs have been deleted in the real asset tree.
-- Original scoped PNG inventory: 271,253,993 bytes. Existing dist and APK outputs
-  are stale inventory, not matched verification evidence.
-- Conversion tool, generated catalog and optional emissive loaders are implemented.
-  Runtime player/enemy loaders no longer depend on scalar maps. Sword emission is
-  optional, generated maps are excluded from startup retention, and installation
-  compacts validated final packs before refreshing the catalog.
-- The initial serial converter was intentionally stopped after confirming the
-  task-owned process identity. Completed validated outputs and the manifest were
-  retained. Bounded encoding workers are committed in `73562da`; workers only
-  encode/read while the parent writes outputs and manifest entries in filename
-  order. Default worker count is four, configurable with `ISSEN_ASSET_WORKERS`.
-- The four-worker staged converter completed successfully (terminal exit 0).
-  A second refinement converted eleven size-regressing WebPs to exact lossless
-  `.compact.png` siblings; all eleven now shrink. Original generated PNGs remain
-  in place and original authoring PNGs are preserved. No converter is live.
-  Logs: `tmp/asset-compaction/conversion-workers.log`, `png-exceptions.log`.
-  Staged repeat-run: zero changes. Every-plane raw browser check passed for
-  all 352 conversions (180 exact data planes), with alpha/dimensions unchanged.
-  Strict TypeScript also passed. Next:
-  commit validated added outputs separately, then migrate URLs and remove generated
-  PNGs in distinct commits. All W2/W3 and final verification remain required.
-  New focused utility checks: six Python and four Node tests pass, including
-  exact PNG metadata/pixels and idempotence. No tolerances were relaxed.
-  Matched restore-point web/Android byte baselines are recorded in
-  `tmp/asset-compaction/restore-baseline-build-bytes.json`; both builds passed.
-- Early colour atlases required lossless WebP to satisfy the unchanged tolerances.
-  No dimensions, alpha or data channels are relaxed. Early byte counts are partial;
-  final source/bundle/APK projections must wait for conversion and verification.
-- Missing emissive now follows the same coverage and blend mode as an explicit
-  opaque zero map. This preserves additive emission and source-over occlusion.
-  The new exact parity test covers seven blend modes. No gameplay changes.
-- Generator maintenance now hash-checks staged zero-emission omissions, so regenerated PNGs and emitting WebPs remain in the catalog. Changed future exports preserve the initial original backup and receive a separate hash-addressed backup. Installation refreshes compact-plane README links while preserving recipes and shared-folder families. All five Python compaction tests and four focused Node loader/catalog/documentation tests passed. Node syntax checks passed. These changes affect future utility invocations; the initial conversion is complete and its original inputs have not changed.
-
-## Verification already completed
-
-Before staged asset conversion:
-
-- `npm run typecheck`: passed.
-- `npm test`: all 251 unit tests passed; log
-  `tmp/asset-compaction/preparation-unit.log`.
-- `npx playwright test --config playwright.rendering-v2.config.ts`: all 242
-  browser tests passed in one uninterrupted run (11.1m); log
-  `tmp/asset-compaction/preparation-browser.log`.
-- `npm run test:production`: all four production tests passed; log
-  `tmp/asset-compaction/baseline-production.log`. Verified baseline production
-  bundle: 204,159,032 bytes total; 202,508,970 PNG/WebP bytes, recorded in
-  `tmp/asset-compaction/baseline-build-bytes.json`.
-- `node --test scripts/pbr/tests/cli.test.mjs`: all six exporter tests passed.
-
-Subsequent utility/cache checks:
-
-- `python scripts/assets/tests/compact.test.py` with Pillow-enabled Python: all
-  five tests passed, including multiple-worker staged retention, deletion,
-  exact pixels and idempotence.
-- `node --test tests/unit/asset-compaction.test.mjs`: all three tests passed.
-- `node --check scripts/assets/compact.mjs`: passed.
-- `npm run typecheck`: passed after the blend-mode parity fix.
-- `npx playwright test tests/browser/optional-emissive.spec.ts
-  tests/browser/zero-emission-parity.spec.ts tests/browser/cached-materials.spec.ts
-  tests/browser/cached-material-lighting.spec.ts --config
-  playwright.rendering-v2.config.ts`: all four tests passed.
-- `npx playwright test --config tmp/asset-compaction/raw-probe.config.ts`: the
-  completed conversion subset passed raw WebGL decoded-pixel, alpha and dimension
-  checks, including normal/surface and nonzero emissive data. This is a subset
-  check, not the final every-plane test or a complete W1 checkpoint.
+- Audit: `tmp/asset-compaction/audit.md` and audit.json; all 86 families have exact
+  surface/scalar equality, 78 emissive maps are zero. Removed 602 generated PNGs
+  in isolated deletion commit `9e31acc`. Original 86 authoring PNG hashes are
+  intact. No resizing/repacking/geometry changes.
+- Compact additions: `7a3f420`, migrated consumers/catalog: `069fca6`. Runtime
+  uses 352 compact files including 180 data planes and eleven lossless PNG
+  exceptions; all shrink. Missing emission is zero, no scalar dependencies.
+- Final apply `node scripts/assets/compact.mjs --apply`: 602 changes;
+  repeat: zero changes. Logs final-cleanup.log / final-repeat.log under audit tmp.
+- Six Python compaction tests, four focused Node utility tests, all 252 full units,
+  strict TypeScript, all 352 raw browser image comparisons, and all 34 focused
+  rendering/material/asset/Canvas browser checks passed. Focused log:
+  `tmp/asset-compaction/migrated-focused-browser.log`.
+- `npm run test:production`: four passed after final cleanup; log w1-production.log.
+- `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android npm run test:android-web`:
+  four passed, encounter-reload assertion failed. The same original assertion also
+  fails on the untouched restore-point Android web build, proved in an isolated
+  preview/config. Logs w1-android-web.log, android-recovery-recheck.log,
+  android-recovery-baseline.log. No tolerances/assertions changed. The initial
+  baseline config attempt had the wrong server cwd; corrected run proves failure.
+- Broad command `npx playwright test --config playwright.rendering-v2.config.ts`
+  is live. Log `tmp/asset-compaction/w1-broad-browser.log`, execution session 18225.
+  Poll actual terminal to establish completion; do not start a duplicate or edit
+  runtime/version/changelog while it is running. Production/Android sessions are
+  terminal. Baseline proof session 45414 may need final terminal poll.
+- Matched builds: detached `pre-refactor` checkout under
+  `tmp/asset-compaction/restore-baseline`, dependencies linked, source clean.
+  `tmp/asset-compaction/byte-results.json` records source runtime 266,530,086 to
+  120,472,123 bytes; checked texture tree includes 61,352,478 authoring bytes.
+  Web bundle 261,053,490 to 120,505,485; Android web 284,964,042 to 144,388,949.
+  Unsigned ZIP projections 295,487,341 to 158,550,019 using an identical frozen
+  debug native shell. These are estimates, not built/installable APKs. No dist,
+  native release/store build or stale APK was modified.
+- Refreshed 83 pack README links preserving recipes/provenance; standard asset
+  docs and Android tmp-output override are prepared. No W1 version bump yet.
 
 ## Next steps
 
-1. URL migration is complete and green: `npm test` passed all 252 units;
-   strict TypeScript passed; the ten-file focused rendering/material/asset command
-   passed all 34 browser cases in an uninterrupted run, including Canvas
-   comparisons and context-loss checks. Log:
-   `tmp/asset-compaction/migrated-focused-browser.log`.
-   An initial run found weapon readiness counting an undefined emission property;
-   it is fixed, with a no-emission-request browser regression test. No thresholds
-   changed. Compact output additions are committed at `7a3f420`.
-2. Run final `node scripts/assets/compact.mjs --apply`, then its repeat-run no-op.
-   Commit generated PNG deletion separately; retain all authoring originals.
-   Refresh pack docs in a separate documentation commit and audit remaining refs.
-3. Complete W1 gates: every-plane raw browser check after cleanup, broad rendering
-   browser suite, `npm run test:production`, `npm run test:android-web` (outputs
-   under ignored tmp), byte source/build/APK projections, oversized-map report.
-4. Update inventory/PBR/rendering/AGENTS docs, patch version/changelog, handoff and
-   W1 checkpoint commit. Only then begin the W2 audit and ordered W2/W3 phases.
-   All Part 4 checks/report and final develop push remain required.
+1. Finish the live broad gate, fix regressions under goal decision rules. Record
+   exact result; do not claim success from partial logs.
+2. Commit green Android tmp-output override separately from asset documentation.
+   Check refreshed README idempotence/links. Finish byte/oversized-map report and
+   W1 audit/report documentation. PNG exceptions are a recorded conservative fork.
+3. After broad gate, bump patch to 1.66.8, package lock/title version/changelog
+   `Smaller download`, repeat affected production/Android version checks. Complete
+   W1 checkpoint/handoff commit only once all W1 requirements are accounted for.
+4. Immediately begin W2 audit and ordered phases, then W3 and Part 4. Never push
+   develop until the full goal/report/final gates are done. No approval gates.
 
 ## Previous completed work (historical handoff)
 

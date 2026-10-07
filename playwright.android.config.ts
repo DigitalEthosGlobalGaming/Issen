@@ -14,7 +14,7 @@ export default defineConfig({
     hasTouch: true,
   },
   webServer: {
-    command: 'vite preview --outDir .mobile-build --host 127.0.0.1 --port 4175 --strictPort',
+    command: `vite preview --outDir ${JSON.stringify(process.env.ISSEN_ANDROID_BUILD_DIR ?? '.mobile-build')} --host 127.0.0.1 --port 4175 --strictPort`,
     url: 'http://127.0.0.1:4175',
     reuseExistingServer: false,
   },
