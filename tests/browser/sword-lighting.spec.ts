@@ -70,7 +70,6 @@ test('PBR sword atlas responds to a moving light and keeps transparent coverage'
 });
 
 test('tilde opens lighting controls and edits remain session-only', async ({ page }, testInfo) => {
-  test.setTimeout(60000);
   await page.goto('/');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink', { timeout: 30000 });
   const saved = await page.evaluate(() => localStorage.getItem('issen.settings'));
@@ -106,7 +105,7 @@ test('tilde opens lighting controls and edits remain session-only', async ({ pag
   await page.keyboard.press('Backquote');
   await expect(panel).toBeHidden();
   await page.reload();
-  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink', { timeout: 30000 });
+  await expect(page.locator('#c')).toHaveAttribute('data-renderer', 'ink');
   await page.keyboard.press('Backquote');
   await expect(page.getByLabel('Light intensity', { exact: true })).toHaveValue('2');
 });

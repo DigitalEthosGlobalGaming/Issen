@@ -2,10 +2,7 @@
 
 Implemented in 1.62.0. The six blade profiles in `figures/assets/blade-pbr/`
 provide aligned 1254×1254 diffuse, OpenGL normal, roughness, metallic, ambient
-occlusion and emissive material data. Since 1.66.3, zero-emission and safely constant
-scalar images are removed; per-family omission metadata preserves exact values,
-and RGB surface maps retain roughness, metallic and AO. Emission is optional.
-`ink-sword.ts` keeps the existing recipe frames,
+occlusion and emissive maps. `ink-sword.ts` keeps the existing recipe frames,
 grips, tips, tints and animation transforms. Since 1.66.0, handles, guards, beam
 and pan also use their generated PBR packs while retaining their colour artwork.
 
@@ -63,7 +60,7 @@ and roughness base 0.25; wood uses 0.8 and 0.7 with zero metallic response.
 ## First outfit
 
 The first outfit, Sumi, uses a Sprite/OpenGL PBR Forge conversion of
-`player-ronin-simple.png`. Its retained maps and omission metadata live in `figures/assets/player-pbr/`.
+`player-ronin-simple.png`. Its six exported maps live in `figures/assets/player-pbr/`.
 `pbr-atlas.ts` owns decoded maps and packed surface data per player renderer.
 `ink-player.ts` applies aligned frame materials to all nine Sumi parts: torso,
 head, two robe panels, two sleeves, two forearms and the hand stamp. Existing

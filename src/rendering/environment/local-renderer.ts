@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
 import {
   createCachedMaterials,
   clearCachedMaterial,
@@ -10,7 +11,6 @@ import { invalidateSceneTexture } from '../texture-revision.ts';
 import { createBambooForegroundRenderer } from './bamboo-foreground.ts';
 import { drawRainwaterHollow } from './hollow.ts';
 import { drawStageVariations } from './stage-variation.ts';
-import { packedLandmarks, landmarkManifest, type LandmarkLease } from './packed-landmarks.ts';
 import { drawHollowBambooRoad } from './bamboo.ts';
 import { drawWhiteSilencePass } from './winter.ts';
 import { drawEmberCourtyard } from './temple.ts';
@@ -26,15 +26,7 @@ import { drawMountainTiles } from './mountains.ts';
 import { drawFieldMidground } from './midground.ts';
 import { drawMeadowTransition } from './meadow.ts';
 import { drawEnvironmentMotion } from './motion.ts';
-import { drawAtlasSprite, setSceneryAtmosphere } from './scene-kit.ts';
-import {
-  packedScenery,
-  sceneryAtlas,
-  sceneryManifest,
-  type SceneryLease,
-} from './packed-scenery.ts';
-import { SCENERY_SOURCES, SCENE_ASSETS } from './scenery-sources.ts';
-import type { PackedSceneryAtlas } from './packed-scene-atlas.ts';
+import { drawAtlasSprite, setSceneryAtmosphere, releaseSceneryCutouts } from './scene-kit.ts';
 
 export type EnvironmentBackend = 'loading' | 'layered' | 'unavailable';
 export interface EnvironmentFrame {
@@ -51,13 +43,72 @@ export interface EnvironmentFrame {
   lowQuality: boolean;
 }
 
+const CHERRY_URL = new URL('./assets/cherry-trees-atlas.png', import.meta.url).href;
+const PETALS_URL = new URL('./assets/petal-ground-atlas.png', import.meta.url).href;
+const BAMBOO_URL = new URL('./assets/bamboo-atlas.png', import.meta.url).href;
+const ROCKS_URL = new URL('./assets/rocks-atlas.png', import.meta.url).href;
+const PINE_URL = new URL('./assets/pine-atlas.png', import.meta.url).href;
+const MOUNTAIN_URL = new URL('./assets/mountain-atlas.png', import.meta.url).href;
+const BANKS_URL = new URL('./assets/field-banks-atlas.png', import.meta.url).href;
+const SHRUBS_URL = new URL('./assets/shrubs-atlas.png', import.meta.url).href;
+const FIELD_ROCKS_URL = new URL('./assets/field-rocks-atlas.png', import.meta.url).href;
+const GRASS_EDGES_URL = new URL('./assets/grass-edges-atlas.png', import.meta.url).href;
+const MEADOW_PATCHES_URL = new URL('./assets/meadow-patches-atlas.png', import.meta.url).href;
+const FOREGROUND_BOULDERS_URL = new URL('./assets/foreground-boulders-atlas.png', import.meta.url)
+  .href;
+const FOG_WISPS_URL = new URL('./assets/fog-wisps-atlas.png', import.meta.url).href;
+
+const ASSET_URLS = [
+  BAMBOO_URL,
+  ROCKS_URL,
+  PINE_URL,
+  MOUNTAIN_URL,
+  BANKS_URL,
+  SHRUBS_URL,
+  FIELD_ROCKS_URL,
+  GRASS_EDGES_URL,
+  MEADOW_PATCHES_URL,
+  FOG_WISPS_URL,
+  FOREGROUND_BOULDERS_URL,
+  CHERRY_URL,
+  PETALS_URL,
+  new URL('./assets/reeds-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-pines-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-boulders-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-rocks-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-posts-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-walls-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-roofs-atlas.png', import.meta.url).href,
+  new URL('./assets/temple-steps-atlas.png', import.meta.url).href,
+  new URL('./assets/sea-stacks-atlas.png', import.meta.url).href,
+  new URL('./assets/foam-strips-atlas.png', import.meta.url).href,
+  new URL('./assets/fallen-bamboo-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-peak.png', import.meta.url).href,
+  new URL('./assets/woodland-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/snow-woodland-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/landmark-stones-atlas.png', import.meta.url).href,
+  new URL('./assets/bamboo-landmarks-atlas.png', import.meta.url).href,
+  new URL('./assets/cherry-landmarks-atlas.png', import.meta.url).href,
+];
+
+/** Decode only the current scene's kit; shared images survive a scene switch. */
+function sceneAssets(stage: number): number[] {
+  if (stage === 0) return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
+  if (stage === 1) return [2, 3, 4, 5, 6, 25, 27];
+  if (stage === 2) return [3, 4, 5, 6, 11, 12, 27, 29];
+  if (stage === 3) return [2, 3, 4, 5, 6, 7, 13, 25, 27];
+  if (stage === 4) return [0, 3, 4, 6, 23, 27, 28];
+  if (stage === 5) return [3, 14, 15, 16, 24, 26];
+  if (stage === 6) return [2, 3, 6, 17, 18, 19, 20, 27];
+  if (stage === 7) return [2, 3, 4, 6, 10, 21, 22, 25, 27];
+  if (stage === 8) return [2, 3, 6, 9, 17, 20, 25, 27];
+  return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
+}
+
 /** Instance-owned image loading and caches; safe for independent previews. */
 export function createLocalEnvironmentRenderer(doc: Document) {
   const cachedMaterials = createCachedMaterials();
-  const landmarkStore = packedLandmarks(doc);
-  let landmarks: LandmarkLease | undefined;
-  const sceneryStore = packedScenery(doc);
-  let scenery: SceneryLease | undefined;
+  let materials: ReturnType<typeof createAssetMaterials<string>> | undefined;
   const foreground = createBambooForegroundRenderer(doc);
   let disposed = false;
   let status: EnvironmentBackend = 'loading';
@@ -66,12 +117,13 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   let pending: Promise<void> | undefined;
   let preparedStage = -1;
   let generation = 0;
-  let images: (PackedSceneryAtlas | undefined)[] = [];
+  let images: HTMLImageElement[] = [];
   let cached: HTMLCanvasElement | undefined;
   let distant: HTMLCanvasElement | undefined;
   let nearby: HTMLCanvasElement | undefined;
   let cacheKey = '';
   let builds = 0;
+  const settleLoads: Array<() => void> = [];
 
   function prepare(stage = 0): Promise<void> {
     if (pending && stage === preparedStage) return pending;
@@ -80,45 +132,91 @@ export function createLocalEnvironmentRenderer(doc: Document) {
     preparedStage = stage;
     ready = false;
     failed = false;
-    const actualStage = stage >= 0 && stage < SCENE_ASSETS.length ? stage : 0;
-    const previousLandmarks = landmarks,
-      previousScenery = scenery;
-    const nextLandmarks = landmarkStore.acquire(
-      landmarkManifest.dependencies[`stage-${stage}`] ?? [],
+    const required = sceneAssets(stage);
+    cacheKey = '';
+    cachedMaterials.dispose();
+    materials ??= createAssetMaterials<string>(doc, {});
+    materials.select(
+      Object.fromEntries(required.map((index) => [String(index), ASSET_URLS[index]!])),
     );
-    const nextScenery = sceneryStore.acquireGroup(`stage-${actualStage}`);
-    landmarks = nextLandmarks;
-    scenery = nextScenery;
+    const requestedMaterials = materials;
+    const materialPending = requestedMaterials.prepare();
+    for (const settle of settleLoads.splice(0)) settle();
+    images.forEach((image, index) => {
+      image.onload = image.onerror = null;
+      if (!required.includes(index)) {
+        releaseSceneryCutouts([image]);
+        image.removeAttribute('src');
+        delete images[index];
+      }
+    });
     status = 'loading';
-    pending = Promise.all([nextLandmarks.ready, nextScenery.ready])
-      .then(() => {
-        if (disposed || request !== generation) return;
-        cachedMaterials.dispose();
-        images = [];
-        for (const index of SCENE_ASSETS[actualStage]!)
-          images[index] = sceneryAtlas(SCENERY_SOURCES[index]!, nextScenery, cachedMaterials);
-        cacheKey = '';
-        ready = true;
-        status = 'layered';
-      })
-      .catch(() => {
-        nextLandmarks.release();
-        nextScenery.release();
-        if (!disposed && request === generation) {
-          failed = true;
-          status = 'unavailable';
+    pending = Promise.all(
+      required.map(
+        (index) =>
+          new Promise<void>((resolve) => {
+            const existing = images[index];
+            if (existing?.complete && existing.naturalWidth) {
+              if (
+                index >= 25 &&
+                (existing.naturalWidth !== 1254 || existing.naturalHeight !== 1254)
+              )
+                failed = true;
+              resolve();
+              return;
+            }
+            settleLoads.push(resolve);
+            const image = existing ?? doc.createElement('img');
+            images[index] = image;
+            image.decoding = 'async';
+            image.onload = () => {
+              if (request !== generation) {
+                resolve();
+                return;
+              }
+              if (
+                !image.naturalWidth ||
+                !image.naturalHeight ||
+                (index >= 25 && (image.naturalWidth !== 1254 || image.naturalHeight !== 1254))
+              )
+                failed = true;
+              image.onload = image.onerror = null;
+              resolve();
+            };
+            image.onerror = () => {
+              if (request !== generation) {
+                resolve();
+                return;
+              }
+              failed = true;
+              image.onload = image.onerror = null;
+              resolve();
+            };
+            image.src = ASSET_URLS[index]!;
+          }),
+      ),
+    ).then(async () => {
+      const mapResults = await materialPending;
+      if (!disposed && request === generation) {
+        if (!mapResults.every(Boolean)) failed = true;
+        for (const index of required) {
+          const image = images[index];
+          if (image)
+            cachedMaterials.bind(image, (frame) =>
+              requestedMaterials.material(String(index), frame),
+            );
         }
-      })
-      .finally(() => {
-        previousLandmarks?.release();
-        previousScenery?.release();
-      });
+        settleLoads.length = 0;
+        ready = !failed;
+        status = failed ? 'unavailable' : 'layered';
+      }
+    });
     return pending;
   }
 
   function stamp(
     ctx: SceneDrawing,
-    image: PackedSceneryAtlas,
+    image: HTMLImageElement,
     cell: number,
     x: number,
     foot: number,
@@ -177,13 +275,18 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       if (frame.stage === 6) variationContext.globalCompositeOperation = 'destination-over';
       drawStageVariations(
         variationContext,
-        landmarks!,
+        {
+          woodland: images[25],
+          snowWoodland: images[26],
+          stones: images[27],
+          bambooLandmarks: images[28],
+          cherryLandmarks: images[29],
+        },
         frame.stage,
         frame.stageSeed ?? 0,
         w,
         h,
         frame.lowQuality,
-        cachedMaterials,
       );
       variationContext.restore();
       cached = canvas;
@@ -505,16 +608,20 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   }
 
   function dispose() {
-    landmarks?.release();
-    landmarks = undefined;
-    scenery?.release();
-    scenery = undefined;
+    materials?.dispose();
     cachedMaterials.dispose();
     foreground.dispose();
     disposed = true;
     generation++;
     status = 'loading';
+    for (const image of images) {
+      if (!image) continue;
+      image.onload = image.onerror = null;
+      image.removeAttribute('src');
+    }
+    releaseSceneryCutouts(images.filter(Boolean));
     images = [];
+    for (const settle of settleLoads.splice(0)) settle();
     for (const layer of [cached, distant, nearby]) {
       if (layer) {
         layer.width = 0;
@@ -587,10 +694,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       backend: status,
       stage: cacheKey ? preparedStage : undefined,
       builds,
-      loadedImages:
-        images.filter((image) => image?.naturalWidth).length +
-        (landmarks ? landmarkStore.snapshot().pages : 0),
-      packedPages: { landmarks: landmarkStore.snapshot(), scenery: sceneryStore.snapshot() },
+      loadedImages: images.filter((image) => image?.naturalWidth).length,
       width: cached?.width ?? 0,
       height: cached?.height ?? 0,
       layers: [cached, distant, nearby].filter(Boolean).length,

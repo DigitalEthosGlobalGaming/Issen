@@ -4,7 +4,7 @@ Generated from [fallen-bamboo-atlas.png](../../fallen-bamboo-atlas.png) with `wo
 
 Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](fallen-bamboo-atlas_diffuse.png), [normal](fallen-bamboo-atlas_normal.png), [roughness](fallen-bamboo-atlas_roughness.png), metallic constant (see `fallen-bamboo-atlas.material.json`), [ao](fallen-bamboo-atlas_ao.png), emissive constant (see `fallen-bamboo-atlas.material.json`).
+Maps: [diffuse](fallen-bamboo-atlas_diffuse.png), [normal](fallen-bamboo-atlas_normal.png), [roughness](fallen-bamboo-atlas_roughness.png), [metallic](fallen-bamboo-atlas_metallic.png), [ao](fallen-bamboo-atlas_ao.png), [emissive](fallen-bamboo-atlas_emissive.png).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -13,5 +13,3 @@ Renderer lighting is connected through [index.ts](../../../index.ts). Visual rev
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
-
-Redundant generated maps and exact replacements: [fallen-bamboo-atlas.material.json](fallen-bamboo-atlas.material.json).

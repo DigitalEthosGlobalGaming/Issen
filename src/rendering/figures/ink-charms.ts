@@ -1,40 +1,75 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-import { CHARM_RECIPES as RECIPES } from './charm-catalog.ts';
-import { packedSpritePlacement } from '../packed-assets.ts';
-import type { FigureLease } from './packed-figures.ts';
+const ATLAS_URL = new URL('./assets/charm-atlas.png', import.meta.url).href;
+/** Packed source windows; the generated rows are not equal thirds. */
+const FRAMES = [
+  [110, 22, 265, 336],
+  [501, 21, 166, 336],
+  [802, 42, 247, 311],
+  [1159, 25, 268, 334],
+  [157, 384, 173, 245],
+  [491, 369, 200, 275],
+  [809, 371, 238, 283],
+  [1199, 374, 192, 287],
+  [147, 650, 170, 353],
+  [509, 650, 141, 332],
+  [810, 670, 238, 296],
+  [1179, 681, 227, 293],
+] as const;
+const RECIPES: Record<string, readonly [number, string?]> = {
+  'first-strike': [1, '#b8322a'],
+  'pilgrims-bead': [2, '#7e654c'],
+  hisshou: [0, '#9b3930'],
+  kaiun: [2],
+  yakuyoke: [0, '#586766'],
+  enmei: [1, '#68775b'],
+  shobai: [2, '#aa713b'],
+  kotsu: [3, '#4e6571'],
+  gakugyo: [1, '#8574a0'],
+  suzu: [4],
+  maneki: [5],
+  daruma: [6],
+  kitsunebi: [7],
+  furin: [8],
+  ofuda: [9],
+  kinun: [2, '#d2ae48'],
+  kachi: [0, '#424b75'],
+  shingan: [3, '#745b88'],
+  ryoen: [3, '#b67572'],
+  kagami: [10],
+  omikuji: [11],
+};
 
 /** Caller owns position/animation; this renderer only replaces the physical charm. */
 export function createInkCharmRenderer(doc: Document) {
-  let lease: FigureLease | undefined;
+  const materials = createAssetMaterials(doc, { charms: ATLAS_URL });
+  let image: HTMLImageElement | undefined;
   let pending: Promise<boolean> | undefined;
   let settle: ((ready: boolean) => void) | undefined;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
-  const isDisposed = () => state === 'disposed';
   const cache = new Map<string, HTMLCanvasElement>();
   function prepare(): Promise<boolean> {
     if (state === 'disposed') return Promise.resolve(false);
     if (pending) return pending;
     state = 'loading';
+    image = doc.createElement('img');
+    const img = image;
     pending = new Promise<boolean>((resolve) => {
       settle = resolve;
-      void (async () => {
-        try {
-          const { packedFigures } = await import('./packed-figures.ts');
-          if (isDisposed()) return;
-          const acquired = packedFigures(doc).acquireGroup('charms');
-          lease = acquired;
-          await acquired.ready;
-          if (!isDisposed()) state = 'ready';
-        } catch {
-          lease?.release();
-          lease = undefined;
-          if (!isDisposed()) state = 'unavailable';
-        } finally {
-          settle = undefined;
-          resolve(state === 'ready');
-        }
-      })();
+      const finish = (ok: boolean) => {
+        img.onload = img.onerror = null;
+        if (state !== 'disposed') state = ok ? 'ready' : 'unavailable';
+        settle = undefined;
+        resolve(ok && state !== 'disposed');
+      };
+      img.onload = async () => {
+        const valid = img.naturalWidth === 1536 && img.naturalHeight === 1024;
+        const loaded = valid && (await materials.prepare()).every(Boolean);
+        finish(loaded);
+      };
+      img.onerror = () => finish(false);
+      img.src = ATLAS_URL;
     });
     return pending;
   }
@@ -50,34 +85,19 @@ export function createInkCharmRenderer(doc: Document) {
     if (!id || !Object.hasOwn(RECIPES, id) || ![x, y, size].every(Number.isFinite) || size <= 0)
       return false;
     if (state === 'idle') void prepare();
-    if (state !== 'ready') return false;
+    if (state !== 'ready' || !image) return false;
     const [cell, tone] = RECIPES[id]!;
-    const packed = lease?.sprite(`charm.${cell}`);
-    if (!packed || packed.metadata.empty) return false;
-    const [sw, sh] = packed.metadata.logicalSize;
-    const [sx, sy, pw, ph] = packed.metadata.frame;
-    const [tx, ty] = packed.metadata.trim;
+    const [sx, sy, sw, sh] = FRAMES[cell]!;
     const tint = tone ?? color;
     const key = `${cell}:${tint ?? ''}`;
     let sprite = cache.get(key);
     if (!sprite) {
       sprite = doc.createElement('canvas');
-      // Keep the original tint-cache sampling grid; only atlas storage is trimmed.
       sprite.width = Math.max(1, Math.round((128 * sw) / sh));
       sprite.height = 128;
       const c = sprite.getContext('2d');
       if (!c) return false;
-      c.drawImage(
-        packed.colour,
-        sx,
-        sy,
-        pw,
-        ph,
-        (tx * sprite.width) / sw,
-        (ty * sprite.height) / sh,
-        (pw * sprite.width) / sw,
-        (ph * sprite.height) / sh,
-      );
+      c.drawImage(image, sx, sy, sw, sh, 0, 0, sprite.width, sprite.height);
       if (tint) {
         c.globalCompositeOperation = 'source-atop';
         c.globalAlpha = tone ? 0.46 : 0.16;
@@ -93,21 +113,17 @@ export function createInkCharmRenderer(doc: Document) {
       }
     }
     const width = (size * sw) / sh;
-    const material = packed.material;
-    const placed = packedSpritePlacement(packed.metadata, x - width / 2, y, width, size);
-    const cacheFrame = [
-      (tx * sprite.width) / sw,
-      (ty * sprite.height) / sh,
-      (pw * sprite.width) / sw,
-      (ph * sprite.height) / sh,
-    ] as const;
+    const material = materials.material('charms', FRAMES[cell]!);
     if (material)
       drawMaterialStamp(g, {
-        texture: { source: sprite, revision: 0, frame: cacheFrame },
+        texture: { source: sprite, revision: 0 },
         material,
-        ...placed,
+        x: x - width / 2,
+        y,
+        width,
+        height: size,
       });
-    else g.drawImage(sprite, ...cacheFrame, placed.x, placed.y, placed.width, placed.height);
+    else g.drawImage(sprite, x - width / 2, y, width, size);
     return true;
   }
   return {
@@ -115,9 +131,13 @@ export function createInkCharmRenderer(doc: Document) {
     draw,
     snapshot: () => ({ state, cached: cache.size, supported: Object.keys(RECIPES) }),
     dispose() {
+      materials.dispose();
       state = 'disposed';
-      lease?.release();
-      lease = undefined;
+      if (image) {
+        image.onload = image.onerror = null;
+        image.removeAttribute('src');
+      }
+      image = undefined;
       settle?.(false);
       settle = undefined;
       for (const c of cache.values()) c.width = c.height = 0;

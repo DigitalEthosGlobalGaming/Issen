@@ -26,8 +26,7 @@ test('outfit and charm packs load aligned material maps and submit material stam
     const aligned = stamps.every(
       (stamp) =>
         stamp.material.normal.frame.join() === stamp.material.surface.frame.join() &&
-        (!stamp.material.emissive ||
-          stamp.material.emissive.frame.join() === stamp.material.normal.frame.join()),
+        stamp.material.emissive.frame.join() === stamp.material.normal.frame.join(),
     );
     const count = stamps.length;
     const allOutfits = ready.length === Object.keys(INK_OUTFIT_RECIPES).length;

@@ -3,7 +3,7 @@
   overflow: hidden;
   background:
     linear-gradient(#17130fe6, #17130fe0),
-    var(--issen-ui-armoury-room) center / cover;
+    url('../assets/armoury-room.png') center / cover;
 }
 .armWrap {
   display: flex;
@@ -157,13 +157,13 @@
   z-index: -1;
   pointer-events: none;
   border: 10px solid transparent;
-  border-image: var(--issen-ui-awakening-button-normal) 32 fill / 10px / 0 stretch;
+  border-image: url('../assets/awakening-button-normal.png') 32 fill / 10px / 0 stretch;
 }
 .arm-forms button[data-form='awakened']::before {
-  border-image-source: var(--issen-ui-awakening-button-awakened);
+  border-image-source: url('../assets/awakening-button-awakened.png');
 }
 .arm-forms button[data-form='third']::before {
-  border-image-source: var(--issen-ui-awakening-button-third);
+  border-image-source: url('../assets/awakening-button-third.png');
 }
 .arm-forms button[aria-pressed='true'] {
   color: #f3d797;

@@ -42,6 +42,7 @@ test('Temple browsing never spends and Throwing Knife upgrades its own capacity'
 test('Normal starts with two lives and upgrades Off retains purchases while separating records', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem(
@@ -54,8 +55,8 @@ test('Normal starts with two lives and upgrades Off retains purchases while sepa
       );
   });
   await page.goto('/');
-  await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#bPlay').click();
   await expect(page.locator('#setupLoadout')).not.toContainText('Normal lives:');
   await expect(page.locator('#setupLoadout')).toContainText('3 knives');

@@ -20,7 +20,7 @@ npm run test:performance-tools
 ```
 
 The first command is the complete standard **web** suite: five repetitions per
-scenario, 3 seconds of warmup, 5 seconds of measurement (at least 30 seconds for
+scenario, 3 seconds of warmup, 5 seconds of measurement (at least 10 seconds for
 `cinematic-transitions`), then one separate
 diagnostic capture. Every repetition starts in a disposable browser context.
 These are initial defaults, not a statistical confidence guarantee. Use longer
@@ -28,22 +28,6 @@ samples when investigating variance or infrequent events. A short integration
 check is `--repeats=2 --warmup=500 --duration=1000`; do not use its numbers to make
 release performance claims. Timing runs use one browser at a time, independently
 of the normal Playwright regression suite's worker count.
-
-Use `--http-cache=disabled` for a separate cold HTTP-cache comparison. The default
-also uses fresh contexts but does not explicitly disable browser caching. Keep
-this setting identical across compared runs.
-The disabled setting uses CDP for page requests and `cache: 'no-store'` for
-application worker fetches; the collector verifies the worker policy. Application
-decoded-page sharing still operates within each sample.
-
-Loading records include navigation to artwork readiness, the first prepared title frame submitted, prepared Armoury
-and inspection frames, and scene request-to-ready latency. These markers do not
-establish when the compositor displayed a frame. Explicit image decode-method
-calls and worker Blob bitmap decoding are recorded separately; elapsed method
-times may overlap and must not be summed as wall-clock loading time. Image
-response counts and unique encoded asset bytes come from response headers;
-resource timing retains browser-reported transfer sizes. Unknown sizes remain
-explicit, and header sizes are not total network traffic.
 
 Use `--help` for options and `--doctor` to inspect prerequisites. Unknown options,
 scenarios and invalid numeric values fail immediately. Missing Android tooling
@@ -66,7 +50,7 @@ without stopping or reusing the other server.
   650 ms; it does not activate cinematic mode and therefore does not render Demon.
   `cinematic-transitions` opens the real viewer, waits for each requested composition
   to appear, then advances after a 350 ms interval. Its measurement lasts at least
-  30 seconds and guards that all nine stages and Demon had a prepared frame submitted. Preparation,
+  10 seconds and guards that all nine stages and Demon actually appeared. Preparation,
   decoding and rebuilding remain included; each sample records `measurementMs`.
 
 Fixtures fix seed 424242, Free edition, High cosmetic density and synthetic saves.
@@ -99,25 +83,8 @@ scenes and visible Armoury previews must still produce callbacks. The estimated
 missed-slot calculation uses a 60 fps target for visible animated scenes.
 Forced GC is used only in the explicit retained-memory experiment, not in
 timing windows. Audio contexts and observed canvas/image objects are instrumented;
-The resource probe now tracks ImageBitmap creation, receipt, transfer and closure
-in the page and application composition worker, plus live OffscreenCanvas pixel
-extents. Weak references avoid keeping measured objects alive; retained records
-and wrappers still add instrumentation overhead. The collector inspects workers
-through Playwright after the timing window, independently from game messages.
-Library workers outside the application probe are explicitly marked uninstrumented.
-A further fresh context records texture API allocation/upload/delete events and
-current declared mip extents by surface. These wrappers are enabled only by the
-collector's `textureCounters` flag; headline timing and CPU/trace contexts keep
-them disabled. Reallocation replaces a level's extent, deletion/context loss
-removes it from the active estimate, and storage mip levels count as one API call.
-Compressed/3D calls are marked unmodelled rather than treated as RGBA storage.
-`profiles/<scenario>-textures.json` records this independent diagnostic capture.
-Declared extents and successful JavaScript method returns do not establish driver
-allocation, physical residency or GPU execution duration.
-Created/received totals are ownership events, not unique physical allocations;
-transferred pixels leave the sending realm's active count. Object pixel extents
-are nominal storage estimates, not resident GPU memory. CSS decoded images,
-browser-internal surfaces and physical GPU allocations remain outside coverage.
+CSS images, worker OffscreenCanvases/ImageBitmaps, browser-internal surfaces and all
+resident decoded/GPU storage are not counted.
 
 ## Results and interpretation
 
@@ -133,18 +100,6 @@ missing samples/diagnostics were completed. It rejects changed host, browser,
 graphics or tooling identity. It neither rebuilds nor replaces successful samples.
 A recovered run becomes passing only when all required repetitions and diagnostics
 exist. Report the failure and recovery when using it as a baseline.
-
-If a fixed window was too short for cinematic coverage, resample the exact saved
-build with a longer window instead of mixing durations into existing samples:
-
-```sh
-node tests/performance/benchmarks/resume-run.mjs tmp/performance/<failed-run> --resample --duration=30000
-```
-
-This discards samples/diagnostics only in the new result copy, records the original
-configuration and collects every sample again. The original run remains intact.
-Use the new duration for the corresponding after run. The original failed results
-are not a passing baseline or part of the new timing aggregates.
 
 For the separate unchanged-viewport resize investigation:
 

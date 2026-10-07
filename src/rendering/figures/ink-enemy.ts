@@ -1,26 +1,106 @@
-import {
-  BASE_FRAMES,
-  HEAD_FRAMES,
-  CLOTHING_FRAMES,
-  VARIANT_HEAD_FRAMES,
-  ENEMY_SOURCE_STEMS,
-  enemySpriteId,
-} from './enemy-catalog.ts';
-import { packedSpritePlacement } from '../packed-assets.ts';
-import type { FigureLease } from './packed-figures.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createPbrAtlas } from '../pbr-atlas.ts';
 import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
 type Part = EnemyPart;
 type Frame = readonly [number, number, number, number];
+const BASE_FRAMES = {
+  torso: [63, 92, 343, 334],
+  head: [510, 101, 230, 319],
+  leftPanel: [865, 63, 365, 395],
+  rightPanel: [38, 470, 385, 371],
+  leftSleeve: [508, 502, 242, 336],
+  rightSleeve: [911, 502, 246, 339],
+  leftForearm: [157, 875, 139, 314],
+  rightForearm: [550, 875, 139, 320],
+  hand: [971, 944, 166, 228],
+} as const satisfies Record<string, Frame>;
+const HEAD_FRAMES: Record<string, Frame> = {
+  kasa: [8, 137, 557, 290],
+  kabuto: [582, 64, 458, 419],
+  hair: [1105, 54, 400, 450],
+  mask: [63, 600, 382, 331],
+  jingasa: [490, 588, 576, 301],
+  monk: [1110, 527, 396, 452],
+};
+// Packed windows measured from alpha; clothing rows divide at y440, not half-height.
+const CLOTHING_FRAMES: readonly Frame[] = [
+  [85, 34, 367, 378],
+  [562, 22, 400, 413],
+  [1117, 42, 286, 377],
+  [53, 459, 427, 509],
+  [538, 460, 481, 532],
+  [1102, 459, 377, 522],
+];
+const VARIANT_HEAD_FRAMES: readonly Frame[] = [
+  [54, 110, 493, 468],
+  [653, 79, 577, 522],
+  [82, 660, 494, 504],
+  [724, 632, 423, 540],
+];
 // Neck centers in source pixels. Complete heads replace, rather than overlay, the base face.
 const HEAD_NECKS = [360, 932, 333, 945];
 const HEAD_BOTTOMS = [574, 570, 1160, 1168];
 const HEAD_WIDTHS = [0.19, 0.235, 0.205, 0.165];
 const LOOKS = new Set(['', 'mask', 'monk', 'jingasa', 'kasa', 'kabuto', 'hair']);
-function familyFor(key: string): keyof typeof ENEMY_SOURCE_STEMS {
+const URLS = {
+  clothing: new URL('./assets/enemy-clothing-variants.png', import.meta.url).href,
+  variationHeads: new URL('./assets/enemy-headwear-variants.png', import.meta.url).href,
+  base: new URL('./assets/enemy-ronin-simple.png', import.meta.url).href,
+  heads: new URL('./assets/enemy-headwear-atlas.png', import.meta.url).href,
+};
+const PBR_SOURCES = {
+  base: {
+    surface: new URL('./assets/enemy-pbr/enemy-ronin-simple_surface.png', import.meta.url).href,
+    diffuse: new URL('./assets/enemy-pbr/enemy-ronin-simple_diffuse.png', import.meta.url).href,
+    normal: new URL('./assets/enemy-pbr/enemy-ronin-simple_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-ronin-simple_roughness.png', import.meta.url).href,
+    metallic: new URL('./assets/enemy-pbr/enemy-ronin-simple_metallic.png', import.meta.url).href,
+    ao: new URL('./assets/enemy-pbr/enemy-ronin-simple_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-ronin-simple_emissive.png', import.meta.url).href,
+  },
+  clothing: {
+    surface: new URL('./assets/enemy-pbr/enemy-clothing-variants_surface.png', import.meta.url)
+      .href,
+    diffuse: new URL('./assets/enemy-pbr/enemy-clothing-variants_diffuse.png', import.meta.url)
+      .href,
+    normal: new URL('./assets/enemy-pbr/enemy-clothing-variants_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-clothing-variants_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-clothing-variants_metallic.png', import.meta.url)
+      .href,
+    ao: new URL('./assets/enemy-pbr/enemy-clothing-variants_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-clothing-variants_emissive.png', import.meta.url)
+      .href,
+  },
+  heads: {
+    surface: new URL('./assets/enemy-pbr/enemy-headwear-atlas_surface.png', import.meta.url).href,
+    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-atlas_diffuse.png', import.meta.url).href,
+    normal: new URL('./assets/enemy-pbr/enemy-headwear-atlas_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-headwear-atlas_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-headwear-atlas_metallic.png', import.meta.url).href,
+    ao: new URL('./assets/enemy-pbr/enemy-headwear-atlas_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-headwear-atlas_emissive.png', import.meta.url).href,
+  },
+  variationHeads: {
+    surface: new URL('./assets/enemy-pbr/enemy-headwear-variants_surface.png', import.meta.url)
+      .href,
+    diffuse: new URL('./assets/enemy-pbr/enemy-headwear-variants_diffuse.png', import.meta.url)
+      .href,
+    normal: new URL('./assets/enemy-pbr/enemy-headwear-variants_normal.png', import.meta.url).href,
+    roughness: new URL('./assets/enemy-pbr/enemy-headwear-variants_roughness.png', import.meta.url)
+      .href,
+    metallic: new URL('./assets/enemy-pbr/enemy-headwear-variants_metallic.png', import.meta.url)
+      .href,
+    ao: new URL('./assets/enemy-pbr/enemy-headwear-variants_ao.png', import.meta.url).href,
+    emissive: new URL('./assets/enemy-pbr/enemy-headwear-variants_emissive.png', import.meta.url)
+      .href,
+  },
+};
+function familyFor(key: string): keyof typeof PBR_SOURCES {
   return key.startsWith('clothing:')
     ? 'clothing'
     : key.startsWith('variationHead:')
@@ -31,14 +111,17 @@ function familyFor(key: string): keyof typeof ENEMY_SOURCE_STEMS {
 }
 /** Front-view puppet, in the caller's normalized figure transform. No gameplay state. */
 export function createInkEnemyRenderer(doc: Document) {
-  let lease: FigureLease | undefined;
-  const loaded = new Set<string>();
+  const pbr = {
+    base: createPbrAtlas(doc, PBR_SOURCES.base, 1254),
+    clothing: createPbrAtlas(doc, PBR_SOURCES.clothing, 1536, 1024),
+    heads: createPbrAtlas(doc, PBR_SOURCES.heads, 1536, 1024),
+    variationHeads: createPbrAtlas(doc, PBR_SOURCES.variationHeads, 1254),
+  };
+  const images = new Map<string, HTMLImageElement>(),
+    loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
-    tones = new Map<string, HTMLCanvasElement>();
-  function resolve(key: string, frame: Frame) {
-    const id = enemySpriteId(familyFor(key), frame);
-    return id ? lease?.sprite(id) : null;
-  }
+    tones = new Map<string, HTMLCanvasElement>(),
+    finish = new Set<() => void>();
   // Separate costly pixel recoloring from cheap fog composites. Both stores are bounded.
   const budgets = { variants: 6_000_000, tones: 2_000_000 };
   let variantPixels = 0,
@@ -65,22 +148,37 @@ export function createInkEnemyRenderer(doc: Document) {
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
-    pending = (async () => {
-      try {
-        const { packedFigures } = await import('./packed-figures.ts');
-        if (disposed) return false;
-        const acquired = packedFigures(doc).acquireGroup('enemies');
-        lease = acquired;
-        await acquired.ready;
-        if (disposed) return false;
-        for (const key of Object.keys(ENEMY_SOURCE_STEMS)) loaded.add(key);
-        return true;
-      } catch {
-        lease?.release();
-        lease = undefined;
-        return false;
-      }
-    })();
+    const pbrReady = Promise.all(Object.values(pbr).map((atlas) => atlas.prepare()));
+    pending = Promise.all(
+      Object.entries(URLS).map(
+        ([key, url]) =>
+          new Promise<void>((resolve) => {
+            const image = doc.createElement('img');
+            images.set(key, image);
+            const done = () => {
+              finish.delete(done);
+              image.onload = null;
+              image.onerror = null;
+              resolve();
+            };
+            finish.add(done);
+            image.onload = () => {
+              if (
+                !disposed &&
+                image.naturalWidth === (key === 'base' || key === 'variationHeads' ? 1254 : 1536) &&
+                image.naturalHeight === (key === 'base' || key === 'variationHeads' ? 1254 : 1024)
+              )
+                loaded.add(key);
+              done();
+            };
+            image.onerror = done;
+            image.src = url;
+          }),
+      ),
+    ).then(async () => {
+      const materials = await pbrReady;
+      return Object.keys(URLS).every((key) => loaded.has(key)) && materials.every(Boolean);
+    });
     return pending;
   }
   function supports(f: Figure) {
@@ -90,6 +188,7 @@ export function createInkEnemyRenderer(doc: Document) {
       !f.back &&
       LOOKS.has(v) &&
       loaded.has('base') &&
+      Object.values(pbr).every((atlas) => atlas.ready) &&
       (!f.varied || (loaded.has('clothing') && loaded.has('variationHeads'))) &&
       (v === '' || loaded.has('heads'))
     );
@@ -105,8 +204,9 @@ export function createInkEnemyRenderer(doc: Document) {
     cloth: boolean,
     applyFog = true,
   ): HTMLCanvasElement | null {
-    const packed = resolve(key, frame);
-    if (!packed) return null;
+    const family = familyFor(key),
+      image = pbr[family].diffuse ?? images.get(family);
+    if (!image) return null;
     const fog = applyFog ? Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4)) : 0;
     const mist = env.palette(1).robe;
     const palette = cloth ? f.pal : null,
@@ -146,19 +246,7 @@ export function createInkEnemyRenderer(doc: Document) {
           c.width = c.height = 0;
           return null;
         }
-        const [px, py, pw, ph] = packed.metadata.frame;
-        const [tx, ty] = packed.metadata.trim;
-        tg.drawImage(
-          packed.colour,
-          px,
-          py,
-          pw,
-          ph,
-          (tx * tone.width) / sw,
-          (ty * tone.height) / sh,
-          (pw * tone.width) / sw,
-          (ph * tone.height) / sh,
-        );
+        tg.drawImage(image, sx, sy, sw, sh, 0, 0, tone.width, tone.height);
         const data = tg.getImageData(0, 0, tone.width, tone.height),
           a = rgb(palette.robeD),
           b = rgb(palette.robeL);
@@ -174,21 +262,7 @@ export function createInkEnemyRenderer(doc: Document) {
         retain(tones, toneKey, tone);
       }
       g.drawImage(tone, 0, 0);
-    } else {
-      const [px, py, pw, ph] = packed.metadata.frame;
-      const [tx, ty] = packed.metadata.trim;
-      g.drawImage(
-        packed.colour,
-        px,
-        py,
-        pw,
-        ph,
-        (tx * c.width) / sw,
-        (ty * c.height) / sh,
-        (pw * c.width) / sw,
-        (ph * c.height) / sh,
-      );
-    }
+    } else g.drawImage(image, sx, sy, sw, sh, 0, 0, c.width, c.height);
     if (fog) {
       g.globalCompositeOperation = 'source-atop';
       g.globalAlpha = fog;
@@ -222,8 +296,6 @@ export function createInkEnemyRenderer(doc: Document) {
     env: FigureEnvironment,
     cloth: boolean,
   ) {
-    const packed = resolve(key, frame);
-    if (!packed) return;
     const material =
       (cloth ||
         key === 'head' ||
@@ -231,34 +303,27 @@ export function createInkEnemyRenderer(doc: Document) {
         familyFor(key) === 'heads' ||
         familyFor(key) === 'variationHeads') &&
       supportsSceneMaterials(g)
-        ? packed.material
+        ? pbr[familyFor(key)].material(frame)
         : null;
     const im = sprite(key, frame, f, env, cloth, !material);
     if (!im) return;
-    const [sw, sh] = packed.metadata.logicalSize;
-    const [tx, ty] = packed.metadata.trim;
-    const [, , pw, ph] = packed.metadata.frame;
-    const crop = [
-      (tx * im.width) / sw,
-      (ty * im.height) / sh,
-      (pw * im.width) / sw,
-      (ph * im.height) / sh,
-    ] as const;
-    const placed = packedSpritePlacement(packed.metadata, x, y, w, h);
     if (material) {
       // Keep palette recolouring in the diffuse cache, then apply fog after lighting.
       const fog = Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4));
       const mist = rgb(env.palette(1).robe);
       drawMaterialStamp(g, {
-        texture: { source: im, revision: 0, frame: crop },
+        texture: { source: im, revision: 0 },
         material: {
           ...material,
           fog,
           fogColor: [mist[0]! / 255, mist[1]! / 255, mist[2]! / 255],
         },
-        ...placed,
+        x,
+        y,
+        width: w,
+        height: h,
       });
-    } else g.drawImage(im, ...crop, placed.x, placed.y, placed.width, placed.height);
+    } else g.drawImage(im, x, y, w, h);
   }
   function joints(f: Figure) {
     const l = f.lean || 0,
@@ -418,7 +483,9 @@ export function createInkEnemyRenderer(doc: Document) {
     prepare,
     drawPart,
     snapshot: () => ({
-      ready: Object.keys(ENEMY_SOURCE_STEMS).every((key) => loaded.has(key)) && !disposed,
+      ready:
+        Object.keys(URLS).every((key) => loaded.has(key)) &&
+        Object.values(pbr).every((atlas) => atlas.ready),
       loaded: [...loaded],
       cachedParts: cache.size,
       toneParts: tones.size,
@@ -429,13 +496,19 @@ export function createInkEnemyRenderer(doc: Document) {
     }),
     dispose() {
       disposed = true;
-      lease?.release();
-      lease = undefined;
+      for (const atlas of Object.values(pbr)) atlas.dispose();
+      for (const im of images.values()) {
+        im.onload = null;
+        im.onerror = null;
+        im.removeAttribute('src');
+      }
+      for (const fn of [...finish]) fn();
       for (const c of cache.values()) c.width = c.height = 0;
       for (const c of tones.values()) c.width = c.height = 0;
       cache.clear();
       tones.clear();
       variantPixels = tonePixels = 0;
+      images.clear();
       loaded.clear();
     },
   };

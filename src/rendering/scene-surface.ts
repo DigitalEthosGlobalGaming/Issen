@@ -1,69 +1,101 @@
 import type { SceneDrawing } from './scene-drawing.ts';
 import type { PixiScenePainter } from './pixi/scene-painter.ts';
 
-export interface SceneSurface {
+/** Owns a scene context, including initialization and auxiliary recovery. */
+export class SceneSurface {
   canvas: HTMLCanvasElement;
-  drawing: SceneDrawing;
+  drawing?: SceneDrawing;
   native?: PixiScenePainter;
-  dispose(): void;
-}
+  private initialization?: Promise<void>;
+  private disposed = false;
+  private timer?: ReturnType<typeof setTimeout>;
 
-/** Select a context before runtime input/resize binding. Failure gets a fresh canvas. */
-export async function createSceneSurface(
-  canvas: HTMLCanvasElement,
-  pixi: boolean,
-  recoverPreview = false,
-): Promise<SceneSurface> {
-  if (pixi) {
-    try {
-      const { createPixiScenePainter } = await import('./pixi/scene-painter.ts');
-      const drawing = await createPixiScenePainter(canvas);
-      canvas.dataset.graphicsBackend = 'pixi';
-      const surface: SceneSurface = { canvas, drawing, native: drawing, dispose };
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      function clearRecovery() {
-        clearTimeout(timer);
-        timer = undefined;
-      }
-      function recover() {
-        clearRecovery();
-        timer = setTimeout(() => {
-          timer = undefined;
-          if (!drawing.contextLost) return;
-          const replacement = canvas.cloneNode(false) as HTMLCanvasElement;
-          const context = replacement.getContext('2d');
-          if (!context) return;
-          dispose();
-          canvas.replaceWith(replacement);
-          replacement.dataset.graphicsBackend = 'canvas';
-          replacement.dataset.rendererFallback = 'context-loss';
-          replacement.dataset.contextState = 'ready';
-          surface.canvas = replacement;
-          surface.drawing = context;
-          surface.native = undefined;
-        }, 8000);
-      }
-      function dispose() {
-        clearRecovery();
-        canvas.removeEventListener('webglcontextlost', recover);
-        canvas.removeEventListener('webglcontextrestored', clearRecovery);
-        drawing.dispose();
-      }
-      if (recoverPreview) {
-        canvas.addEventListener('webglcontextlost', recover);
-        canvas.addEventListener('webglcontextrestored', clearRecovery);
-      }
-      return surface;
-    } catch (error) {
-      // A failed WebGL initialization may already have fixed the old context type.
-      const replacement = canvas.cloneNode(false) as HTMLCanvasElement;
-      canvas.replaceWith(replacement);
-      canvas = replacement;
-      canvas.dataset.rendererFallback = error instanceof Error ? error.name : 'initialization';
-    }
+  constructor(
+    canvas: HTMLCanvasElement,
+    private readonly recoverPreview = false,
+  ) {
+    this.canvas = canvas;
   }
-  const drawing = canvas.getContext('2d');
-  if (!drawing) throw new Error('No supported scene rendering context');
-  canvas.dataset.graphicsBackend = 'canvas';
-  return { canvas, drawing, dispose() {} };
+
+  initialize(pixi = true): Promise<void> {
+    if (this.disposed) return Promise.resolve();
+    return (this.initialization ??= this.prepare(pixi));
+  }
+
+  private async prepare(pixi: boolean): Promise<void> {
+    if (pixi) {
+      try {
+        const { createPixiScenePainter } = await import('./pixi/scene-painter.ts');
+        if (this.disposed) return;
+        const drawing = await createPixiScenePainter(this.canvas);
+        if (this.disposed) {
+          drawing.dispose();
+          return;
+        }
+        this.canvas.dataset.graphicsBackend = 'pixi';
+        this.drawing = this.native = drawing;
+        if (this.recoverPreview) {
+          this.canvas.addEventListener('webglcontextlost', this.recover);
+          this.canvas.addEventListener('webglcontextrestored', this.clearRecovery);
+        }
+        return;
+      } catch (error) {
+        if (this.disposed) return;
+        // A failed WebGL attempt may have fixed the old canvas's context type.
+        this.replaceCanvas();
+        this.canvas.dataset.rendererFallback =
+          error instanceof Error ? error.name : 'initialization';
+      }
+    }
+    const drawing = this.canvas.getContext('2d');
+    if (!drawing) throw new Error('No supported scene rendering context');
+    this.canvas.dataset.graphicsBackend = 'canvas';
+    this.drawing = drawing;
+  }
+
+  private replaceCanvas(): void {
+    const replacement = this.canvas.cloneNode(false) as HTMLCanvasElement;
+    this.canvas.replaceWith(replacement);
+    this.canvas = replacement;
+  }
+
+  private readonly clearRecovery = (): void => {
+    clearTimeout(this.timer);
+    this.timer = undefined;
+  };
+
+  private readonly recover = (): void => {
+    this.clearRecovery();
+    if (this.disposed) return;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      if (this.disposed || !this.native?.contextLost) return;
+      const replacement = this.canvas.cloneNode(false) as HTMLCanvasElement;
+      const drawing = replacement.getContext('2d');
+      if (!drawing) return;
+      this.releaseContext();
+      this.canvas.replaceWith(replacement);
+      this.canvas = replacement;
+      this.canvas.dataset.graphicsBackend = 'canvas';
+      this.canvas.dataset.rendererFallback = 'context-loss';
+      this.canvas.dataset.contextState = 'ready';
+      this.drawing = drawing;
+    }, 8000);
+  };
+
+  private releaseContext(): void {
+    this.clearRecovery();
+    this.canvas.removeEventListener('webglcontextlost', this.recover);
+    this.canvas.removeEventListener('webglcontextrestored', this.clearRecovery);
+    const drawing = this.drawing;
+    this.drawing = this.native = undefined;
+    drawing?.dispose?.();
+  }
+
+  // Runtime lifecycle owners register this callback without rebinding it.
+  readonly dispose = (): void => {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.releaseContext();
+  };
 }

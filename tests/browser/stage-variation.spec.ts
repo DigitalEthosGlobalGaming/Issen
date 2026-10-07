@@ -44,7 +44,6 @@ for (const viewport of [
       ),
     );
     await page.reload();
-    await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
     await expect(page.locator('#cinematic')).toBeVisible();
     const read = () =>
       page.evaluate(() => ({

@@ -26,16 +26,27 @@ checks are independent of earned unlocks/ranks. See
 
 ## Startup and ownership
 
-Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
-shell and screen fragments after source artwork loads and decodes, then calls
-`startGame()` in `src/game.ts`. Startup loading/progress and retry are owned by
-`platform/artwork-preload.ts` and `ui/startup-loading.ts`.
-Generated PBR maps are excluded from this lifetime preloader. Material owners
+Root `index.html` loads `src/main.ts`. It imports the ordered styles, creates one
+`MainGame` instance from `src/main-game.ts` and calls `begin()`. That class owns
+the startup preloader, loading view, lighting services, mounted root and runtime
+disposer. It preloads
+source artwork and the startup logo, mounts the shell and screen fragments,
+prepares scene surfaces, then calls `startGame()` in `src/game.ts`.
+Startup loading/progress and retry use
+`platform/artwork-preload.ts` and `ui/startup-loading.ts`; retry calls the same
+instance's `begin()` without mounting a second root.
+Catalogued runtime PBR maps are excluded from this lifetime preloader. Material
+owners
 decode selected packs, release departed packs, and retain shared scenery packs
 across scene changes. UI textures use a separate owned shader surface and share
 the session lighting rig with startup and gameplay.
-The returned disposer stops the runtime. `main.ts` removes the mounted root and
-registers disposal with Vite HMR before a replacement instance starts.
+`MainGame.dispose()` stops the runtime and releases startup resources and the
+mounted root. `main.ts` exports a forwarding disposer for tests and registers it
+with Vite HMR before a replacement instance starts.
+
+Concurrent `begin()` calls share one initialization promise. The class retains
+surfaces as soon as they are created, releases them on failure or disposal, and
+keeps retry available after a failed start. A disposed instance cannot remount.
 
 `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service

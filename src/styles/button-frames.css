@@ -1,6 +1,6 @@
 /* 24 source pixels become 8 CSS pixels; corners never stretch with the control. */
 :is(#app button, .tutorial-overlay button, .startup-loading button) {
-  --button-frame: var(--issen-ui-button-normal);
+  --button-frame: url('../ui/assets/button-normal.png');
   border-image-source: var(--button-frame);
   border-image-slice: 24 fill;
   border-image-width: 8px;
@@ -19,7 +19,7 @@
   [aria-selected='true'],
   :focus-visible
 ) {
-  --button-frame: var(--issen-ui-button-highlighted);
+  --button-frame: url('../ui/assets/button-highlighted.png');
 }
 
 /* The highlight has a charcoal centre, keeping nested labels readable. */
@@ -30,12 +30,12 @@
 /* Secondary mouse/trackpad pointers can hover even when touch is primary. */
 @media (any-hover: hover) {
   :is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):hover {
-    --button-frame: var(--issen-ui-button-highlighted);
+    --button-frame: url('../ui/assets/button-highlighted.png');
   }
 }
 
 :is(#app button, .tutorial-overlay button, .startup-loading button):not(:disabled):active {
-  --button-frame: var(--issen-ui-button-highlighted);
+  --button-frame: url('../ui/assets/button-highlighted.png');
 }
 
 #app .seg {

@@ -1,4 +1,4 @@
-/** Backend-independent scene data. Coordinates are logical pixels, Y points down. */
+/** Shared scene texture, material and lighting data. Coordinates are logical pixels, Y points down. */
 export interface SceneTransform {
   a: number;
   b: number;
@@ -7,15 +7,6 @@ export interface SceneTransform {
   tx: number;
   ty: number;
 }
-
-export const IDENTITY: Readonly<SceneTransform> = Object.freeze({
-  a: 1,
-  b: 0,
-  c: 0,
-  d: 1,
-  tx: 0,
-  ty: 0,
-});
 
 export interface SceneTexture {
   source: HTMLImageElement | HTMLCanvasElement | ImageBitmap;
@@ -72,26 +63,6 @@ export interface SceneLighting {
   directional: readonly [number, number, number];
   direction: readonly [number, number, number];
   points: readonly SceneLight[];
-}
-
-export interface SceneFrame {
-  width: number;
-  height: number;
-  dpr: number;
-  time: number;
-  reducedMotion: boolean;
-  reducedFlashes: boolean;
-  /** Already ordered by the compositor; a backend must not reorder transparency. */
-  sprites: readonly SceneSprite[];
-  lighting: SceneLighting;
-}
-
-export interface SceneBackend {
-  readonly canvas: HTMLCanvasElement;
-  readonly kind: 'canvas' | 'pixi';
-  resize(width: number, height: number, dpr: number): void;
-  render(frame: SceneFrame): void;
-  dispose(): void;
 }
 
 /** Inverse transpose of the 2D linear transform; preserves mirrored normals. */

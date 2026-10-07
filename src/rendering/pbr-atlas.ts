@@ -6,9 +6,7 @@ type Frame = readonly [number, number, number, number];
 /** Instance-owned decoded PBR maps. Every part shares aligned atlas UVs. */
 export function createPbrAtlas(
   doc: Document,
-  sources: { diffuse: string; normal: string } & Partial<
-    Record<Exclude<MapKind, 'diffuse' | 'normal'>, string>
-  >,
+  sources: Record<Exclude<MapKind, 'surface'>, string> & { surface?: string },
   width: number,
   height = width,
 ) {
@@ -25,20 +23,17 @@ export function createPbrAtlas(
       (sources.surface
         ? (['diffuse', 'normal', 'emissive', 'surface'] as const)
         : (['diffuse', 'normal', 'roughness', 'metallic', 'ao', 'emissive'] as const)
-      )
-        .filter((kind) => kind !== 'emissive' || sources.emissive !== undefined)
-        .map(async (kind) => {
-          if (!sources[kind]) return false;
-          const image = doc.createElement('img');
-          images.set(kind, image);
-          image.src = sources[kind]!;
-          try {
-            await image.decode();
-            return !disposed && image.naturalWidth === width && image.naturalHeight === height;
-          } catch {
-            return false;
-          }
-        }),
+      ).map(async (kind) => {
+        const image = doc.createElement('img');
+        images.set(kind, image);
+        image.src = sources[kind]!;
+        try {
+          await image.decode();
+          return !disposed && image.naturalWidth === width && image.naturalHeight === height;
+        } catch {
+          return false;
+        }
+      }),
     ).then((loaded) => {
       if (disposed || loaded.some((value) => !value)) return false;
       if (sources.surface) {
@@ -81,9 +76,7 @@ export function createPbrAtlas(
         material = {
           normal: { source: images.get('normal')!, revision: 0, frame },
           surface: { source: images.get('surface') ?? surface, revision: 0, frame },
-          emissive: images.has('emissive')
-            ? { source: images.get('emissive')!, revision: 0, frame }
-            : undefined,
+          emissive: { source: images.get('emissive')!, revision: 0, frame },
           normalY: -1,
           lighting: 1,
           depth: 0,

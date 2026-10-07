@@ -27,6 +27,10 @@ export function mountStartupLoading(retry: () => void) {
         : '';
       button.hidden = !blocked;
     },
+    fail(message: string) {
+      error.textContent = message;
+      button.hidden = false;
+    },
     remove() {
       button.removeEventListener('click', retry);
       element.remove();

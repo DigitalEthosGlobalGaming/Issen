@@ -28,31 +28,7 @@ export function summarize(samples) {
       taskMs: stats(rows.map((s) => s.taskMs)),
       heapEndBytes: stats(rows.map((s) => s.heapEnd)),
       startupMs: stats(rows.map((s) => s.startupMs)),
-      firstCompleteTitleMs: stats(rows.map((s) => s.loading?.firstCompleteTitleMs)),
-      firstUseMs: stats(
-        rows.map((s) => s.loading?.phases.find((p) => p.name === scenario)?.latencyMs),
-      ),
-      titleImageCount: stats(rows.map((s) => s.loading?.networkImages.beforeTitle.uniqueAssets)),
-      titleEncodedAssetBytes: stats(
-        rows.map((s) => s.loading?.networkImages.beforeTitle.knownEncodedAssetBytes),
-      ),
-      sceneReadyMs: stats(
-        rows.flatMap(
-          (s) =>
-            s.loading?.scenes
-              .filter((r) => !r.cancelled && r.latencyMs !== null)
-              .map((r) => r.latencyMs) ?? [],
-        ),
-      ),
       noisy: render.median > 0 && (render.max - render.min) / render.median > 0.25,
-      sceneSubmissionMs: stats(
-        rows.flatMap(
-          (s) =>
-            s.loading?.scenes
-              .filter((r) => !r.cancelled && Number.isFinite(r.submissionLatencyMs))
-              .map((r) => r.submissionLatencyMs) ?? [],
-        ),
-      ),
     };
   });
 }
@@ -71,7 +47,6 @@ export function comparison(current, baseline) {
     'duration',
     'repeats',
     'headed',
-    'httpCache',
     'platform',
     'cpu',
     'graphics',
@@ -86,19 +61,7 @@ export function comparison(current, baseline) {
     const before = summarize(baseline.samples).find((s) => s.scenario === now.scenario);
     if (!before) throw Error(`Baseline lacks scenario ${now.scenario}`);
     const deltas = Object.fromEntries(
-      [
-        'renderMs',
-        'frameP95Ms',
-        'taskMs',
-        'heapEndBytes',
-        'startupMs',
-        'firstCompleteTitleMs',
-        'firstUseMs',
-        'titleImageCount',
-        'titleEncodedAssetBytes',
-        'sceneReadyMs',
-        'sceneSubmissionMs',
-      ].map((key) => {
+      ['renderMs', 'frameP95Ms', 'taskMs', 'heapEndBytes', 'startupMs'].map((key) => {
         const b = before[key].median,
           a = now[key].median;
         return [
@@ -167,15 +130,6 @@ export async function writeReport(out, results) {
       (s) =>
         `| ${s.scenario} | ${number(s.updateCalls.median)} | ${number(s.renderCalls.median)} | ${number(s.previewCalls.median)} | ${number(s.previewFrameP95Ms.median)} |`,
     ),
-    ``,
-    `| Scenario | Artwork ready ms | Complete title submission ms | First prepared use ms | Title unique images | Known title encoded bytes | Scene ready p95 ms |`,
-    `|---|---:|---:|---:|---:|---:|---:|`,
-    ...results.summary.map(
-      (s) =>
-        `| ${s.scenario} | ${number(s.startupMs.median)} | ${number(s.firstCompleteTitleMs.median)} | ${number(s.firstUseMs.median)} | ${number(s.titleImageCount.median)} | ${number(s.titleEncodedAssetBytes.median)} | ${number(s.sceneReadyMs.p95)} |`,
-    ),
-    ``,
-    `HTTP cache: ${results.manifest.httpCache || 'unspecified'}. Scene readiness excludes cancelled requests; per-stage latencies are retained in individual samples. Title submission is not compositor-confirmed display time. Encoded bytes count unique image bodies with known response-header lengths, not wire traffic.`,
     ``,
     `Stress-100 uses 100 animated waiting actors through real update/render systems, not 100 simultaneous fights.`,
     `menu-cycles timing covers its settled title; retained-memory cycling is a separate diagnostic.`,

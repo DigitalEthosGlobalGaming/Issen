@@ -56,7 +56,15 @@ outside that contract. No live full-scene Canvas bitmap is uploaded each frame.
 
 ## Native backend and materials
 
-`src/main.ts` selects WebGL before acquiring contexts for the main scene, Armoury
+The active entry path is `main.ts` → `main-game.ts` → `scene-surface.ts` →
+`pixi/scene-painter.ts`. `game.ts` connects the painter to
+`platform/frame-loop.ts`; Pixi does not own scheduling. Material-colour and
+atlas-isolation browser checks exercise this same painter. The former test-only
+`createPixiBackend` implementation has been removed. `scene-frame.ts` retains
+the texture, material, sprite and lighting contracts shared with the shaders.
+
+
+`MainGame` selects WebGL before acquiring contexts for the main scene, Armoury
 and support preview. `?renderer=canvas` selects the retained Canvas path without
 changing saves. `scene-surface.ts` replaces a canvas if WebGL initialization fails,
 then acquires its 2D context. Tutorial scenes own and dispose a separate surface.
@@ -105,6 +113,10 @@ rebinds input and resumes presentation through Canvas with the run intact.
 Auxiliary surfaces use the same eight-second fallback deadline. Preview effects
 stop updating while their context is lost; tutorial timing and practice input
 pause until restoration or fallback, without affecting the live run.
+`SceneSurface` shares repeated initialization calls and owns each auxiliary
+surface's bound listeners and recovery deadline. Restoration cancels that deadline;
+disposal removes listeners, cancels recovery and releases any late-created context.
+The runtime retains ownership of combat suspension and main-canvas input rebinding.
 The pinned Pixi version needs a guarded filter bind-group adapter. It detaches
 pooled targets after rendering, before resize can destroy them, and cleans up the
 shared binding group during disposal. Warning-sensitive native and stage-switch

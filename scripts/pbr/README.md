@@ -8,9 +8,7 @@ applies the selected preset and downloads its material pack.
 ## Quick start
 
 Requires Node.js 22.12 or newer, the repository's installed dependencies, Microsoft
-Edge, Python 3 with Pillow, and internet access to load PBR Forge. Set `PBR_PYTHON`
-to the Python executable when it is not available as `python`.
-Install dependencies once with `npm ci`
+Edge and internet access to load PBR Forge. Install dependencies once with `npm ci`
 from the repository root if they are not already installed. Use `--channel chrome`
 for installed Chrome or `--headed` to watch the browser.
 
@@ -73,13 +71,7 @@ when the browser can capture one.
 The CLI exports into the requested folder. It does not install maps, change game
 assets, edit shader settings or write player saves.
 
-After export, `map_cleanup.py` removes zero-emission images and safely constant
-roughness/metallic/AO images from the ZIP. The manifest records exact replacements
-in `omittedMaps`; zero scalar values retain their material meaning. Matching cached
-exports receive the same cleanup without launching Forge again. Nonzero emission
-and varying scalar data remain stored. Diffuse and normal images remain intact.
-
-The ZIP contains the nonredundant maps produced for the selected mode. Review
+The ZIP contains the maps produced by PBR Forge for the selected mode. Review
 normal strength, roughness and metallic response with lighting before copying
 the needed maps into the owning asset directory. The adjacent manifest records
 the settings used, including Sprite-only controls skipped in Texture mode.
@@ -119,22 +111,6 @@ packs roughness, metallic and AO into RGB with opaque alpha. The tool verifies
 every pixel against the former browser packing path. The six exported maps remain
 available for editing; runtime owners load the packed surface instead of decoding
 and combining three scalar maps during scene changes.
-
-Installation accepts omission metadata, reconstructs constants transiently for
-mixed-material compositions, classifies the final maps again, and deletes stale
-redundant installed PNGs. It writes per-family `*.material.json` metadata and
-regenerates the runtime catalog. `pack-surfaces.mjs` bakes omitted scalar constants
-directly into the surface channels. Missing files without omission metadata fail.
-
-To apply the same policy to existing installed catalog packs:
-
-```powershell
-python scripts/pbr/clean-installed.py
-node scripts/pbr/update-runtime-catalog.mjs
-```
-
-The cleanup report stays under ignored `tmp/pbr-inventory/`. Cleanup restricts
-deletion to catalogued generated map files; original colour artwork is retained.
 
 To refresh packed textures after manually editing any scalar map:
 

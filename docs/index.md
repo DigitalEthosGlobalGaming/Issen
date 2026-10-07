@@ -1,4 +1,3 @@
-- [Packed asset pipeline plan](architecture/asset-pipeline-plan.md): proposed tight atlases, stable sprite metadata, loading groups and before/after measurement.
 - [Startup artwork loading](features/artwork-loading.md): image preloading, decoded-image progress, retry and safe startup disposal.
 
 # Repository documentation

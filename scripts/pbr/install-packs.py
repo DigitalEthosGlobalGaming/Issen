@@ -10,7 +10,6 @@ from io import BytesIO
 from pathlib import Path
 
 from PIL import Image, ImageChops
-from map_cleanup import redundant_maps, reconstructed_map
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG = json.loads((ROOT / "scripts/pbr/asset-packs.json").read_text(encoding="utf-8"))
@@ -40,15 +39,7 @@ for job in CATALOG["assets"]:
             assert manifest["actual"]["engine"] == "opengl", "Normal convention mismatch"
             with zipfile.ZipFile(archive) as z:
                 assert z.testzip() is None, "ZIP checksum failure"
-                maps = {}
-                for kind in KINDS:
-                    name = f"{source.stem}_{kind}.png"
-                    if name in z.namelist():
-                        maps[kind] = Image.open(BytesIO(z.read(name))).convert("RGBA")
-                    elif kind in manifest.get("omittedMaps", {}):
-                        maps[kind] = reconstructed_map(kind, manifest["omittedMaps"][kind], original.size)
-                    else:
-                        raise ValueError(f"Required map missing without omission metadata: {kind}")
+                maps = {kind: Image.open(BytesIO(z.read(f"{source.stem}_{kind}.png"))).convert("RGBA") for kind in KINDS}
             assert all(image.size == original.size for image in maps.values()), "Map dimensions mismatch"
             assert ImageChops.difference(original.getchannel("A"), maps["diffuse"].getchannel("A")).getbbox() is None, "Diffuse alpha changed"
             exports[preset] = maps
@@ -60,24 +51,17 @@ for job in CATALOG["assets"]:
             for kind in KINDS:
                 final[kind].paste(exports[part["preset"]][kind].crop((x, y, x + w, y + h)), (x, y))
         output.mkdir(parents=True, exist_ok=True)
-        omitted = redundant_maps(final)
         for kind, image in final.items():
-            destination = output / f"{source.stem}_{kind}.png"
-            if kind in omitted:
-                destination.unlink(missing_ok=True)
-            else:
-                image.save(destination)
+            image.save(output / f"{source.stem}_{kind}.png")
         metadata = {**job, "generated": datetime.now(timezone.utc).date().isoformat(), "sourceHash": source_hash,
-                    "dimensions": list(original.size), "renderer": "not connected", "exports": provenance,
-                    "mapCleanupVersion": 1, "omittedMaps": omitted}
+                    "dimensions": list(original.size), "renderer": "not connected", "exports": provenance}
         (output / "generation.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-        (output / f"{source.stem}.material.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         source_link = Path(os.path.relpath(source, output)).as_posix()
         tool_link = Path(os.path.relpath(ROOT / "scripts/pbr/README.md", output)).as_posix()
         used = ", ".join(f"`{preset}`" for preset in presets)
         text = f"# {source.stem} PBR pack\n\nGenerated from [{source.name}]({source_link}) with {used}, {job['mode'].title()}/OpenGL.\n\n"
-        text += f"Aligned {original.width}×{original.height} material maps. Original diffuse alpha is retained. Constant scalar maps and zero emission are recorded in metadata instead of image files.\n\n"
-        text += "Maps: " + ", ".join(f"[{kind}]({source.stem}_{kind}.png)" for kind in KINDS if kind not in omitted) + ".\n\n"
+        text += f"Six aligned {original.width}×{original.height} maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.\n\n"
+        text += "Maps: " + ", ".join(f"[{kind}]({source.stem}_{kind}.png)" for kind in KINDS) + ".\n\n"
         text += "Exact settings and provenance: [generation.json](generation.json).\n\n"
         text += "Generated and installed; renderer lighting is not connected by this pack. Visual review is pending. Source artwork is unchanged.\n\n"
         if job.get("compositions"):
@@ -99,5 +83,4 @@ failed = sum(job["status"] == "failed" for job in results)
 print(f"{len(results) - failed}/{len(results)} packs installed; {failed} failed.")
 if not failed:
     subprocess.run(["node", "scripts/pbr/pack-surfaces.mjs"], cwd=ROOT, check=True)
-    subprocess.run(["node", "scripts/pbr/update-runtime-catalog.mjs"], cwd=ROOT, check=True)
 sys.exit(1 if failed else 0)

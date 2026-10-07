@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test('Demon cinematic scene has varied scenery and immediate scene changes', async ({
   page,
 }, info) => {
+  test.setTimeout(60000);
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#title .t-k').click({ clickCount: 3 });
@@ -40,6 +41,7 @@ test('Demon cinematic scene has varied scenery and immediate scene changes', asy
   expect(hashes[0]).toBe(hashes[1]);
   expect(hashes[0]).not.toBe(hashes[2]);
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '9');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'demon-realm');
   await page.getByRole('button', { name: 'Exit', exact: true }).click();

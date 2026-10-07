@@ -1,6 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { packedScenery, sceneryAtlas, type SceneryLease } from './packed-scenery.ts';
-import type { PackedSceneryAtlas } from './packed-scene-atlas.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
 import {
   createCachedMaterials,
   clearCachedMaterial,
@@ -8,39 +7,40 @@ import {
   cachedMaterialContext,
 } from '../cached-materials.ts';
 import { invalidateSceneTexture } from '../texture-revision.ts';
-import { drawAtlasSprite } from './scene-kit.ts';
+import { drawAtlasSprite, releaseSceneryCutouts } from './scene-kit.ts';
+
+const landmarkUrl = new URL('./assets/demon-landmarks-atlas.png', import.meta.url).href;
+const terrainUrl = new URL('./assets/demon-terrain-atlas.png', import.meta.url).href;
+const mountainUrl = new URL('./assets/mountain-atlas.png', import.meta.url).href;
 
 /** Independently placed atlas props over a procedural sky; no flattened backdrop. */
 export function createDemonRealmRenderer(doc: Document) {
+  const materials = createAssetMaterials(doc, {
+    landmarks: landmarkUrl,
+    terrain: terrainUrl,
+    mountains: mountainUrl,
+  });
   const cachedMaterials = createCachedMaterials();
-  let lease: SceneryLease | undefined;
-  let landmarks: PackedSceneryAtlas, terrain: PackedSceneryAtlas, mountains: PackedSceneryAtlas;
-  let ready = false;
-  let preparing: Promise<boolean> | undefined;
-  function prepare(): Promise<boolean> {
-    if (disposed) return Promise.resolve(false);
-    return (preparing ??= (async () => {
-      lease = packedScenery(doc).acquireGroup('demon');
-      try {
-        await lease.ready;
-        if (disposed) return false;
-        landmarks = sceneryAtlas('demon-landmarks-atlas', lease, cachedMaterials);
-        terrain = sceneryAtlas('demon-terrain-atlas', lease, cachedMaterials);
-        mountains = sceneryAtlas('mountain-atlas', lease, cachedMaterials);
-        ready = true;
-        return true;
-      } catch {
-        lease.release();
-        return false;
-      }
-    })());
-  }
+  const landmarks = doc.createElement('img'),
+    terrain = doc.createElement('img'),
+    mountains = doc.createElement('img');
+  landmarks.decoding = terrain.decoding = mountains.decoding = 'async';
+  landmarks.src = landmarkUrl;
+  terrain.src = terrainUrl;
+  mountains.src = mountainUrl;
   const mountainLayer = doc.createElement('canvas');
   let mountainKey = '';
   let disposed = false;
+  void materials.prepare().then(() => {
+    if (disposed) return;
+    cachedMaterials.bind(landmarks, (frame) => materials.material('landmarks', frame));
+    cachedMaterials.bind(terrain, (frame) => materials.material('terrain', frame));
+    cachedMaterials.bind(mountains, (frame) => materials.material('mountains', frame));
+    mountainKey = '';
+  });
   function stamp(
     g: SceneDrawing,
-    image: PackedSceneryAtlas,
+    image: HTMLImageElement,
     cell: number,
     x: number,
     base: number,
@@ -79,7 +79,20 @@ export function createDemonRealmRenderer(doc: Document) {
     g.restore();
   }
   return {
-    prepare,
+    async prepare() {
+      await Promise.all([
+        landmarks.decode(),
+        terrain.decode(),
+        mountains.decode(),
+        materials.prepare(),
+      ]);
+      return (
+        !disposed &&
+        materials.ready('landmarks') &&
+        materials.ready('terrain') &&
+        materials.ready('mountains')
+      );
+    },
     draw(
       g: SceneDrawing,
       width: number,
@@ -89,10 +102,6 @@ export function createDemonRealmRenderer(doc: Document) {
       seed = 131304,
     ): boolean {
       if (disposed) return false;
-      if (!ready) {
-        void prepare();
-        return false;
-      }
       const variation = (i: number) => {
         const n = Math.sin(seed * 0.731 + i * 12.9898) * 43758.5453;
         return n - Math.floor(n);
@@ -246,9 +255,13 @@ export function createDemonRealmRenderer(doc: Document) {
       );
     },
     dispose() {
-      lease?.release();
+      materials.dispose();
       cachedMaterials.dispose();
       disposed = true;
+      releaseSceneryCutouts([landmarks, terrain, mountains]);
+      landmarks.removeAttribute('src');
+      terrain.removeAttribute('src');
+      mountains.removeAttribute('src');
       mountainLayer.width = mountainLayer.height = 0;
     },
   };

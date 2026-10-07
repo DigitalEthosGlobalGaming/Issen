@@ -7,7 +7,8 @@
   padding: 28px 24px;
   color: var(--paper, #e8dfce);
   background: transparent;
-  background-image: var(--issen-ui-world-ui-scroll-rod), var(--issen-ui-world-ui-scroll-rod);
+  background-image:
+    url('../assets/world-ui-scroll-rod.png'), url('../assets/world-ui-scroll-rod.png');
   background-position:
     top center,
     bottom center;
@@ -23,7 +24,7 @@
   position: absolute;
   inset: 0;
   border: 12px solid transparent;
-  border-image: var(--issen-ui-world-ui-scroll-paper) 36 fill / 12px stretch;
+  border-image: url('../assets/world-ui-scroll-paper.png') 36 fill / 12px stretch;
   filter: sepia(0.4) brightness(0.16);
   z-index: -1;
   pointer-events: none;

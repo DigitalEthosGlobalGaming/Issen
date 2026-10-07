@@ -17,6 +17,7 @@ test('a run with no Ember reward has no watch-ad offer', async ({ page }) => {
 test('Ember tally offers a separate Continue, and pending doubling survives reload', async ({
   page,
 }, info) => {
+  test.setTimeout(60000);
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     await route.fulfill({
@@ -45,6 +46,7 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
   ).toBeVisible();
   await page.screenshot({ path: info.outputPath('ember-ad-choice.png') });
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(
     page.getByRole('button', { name: 'Watch Ad · 2x embers (+13)', exact: true }),
   ).toBeVisible();

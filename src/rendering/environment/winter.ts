@@ -1,4 +1,3 @@
-import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createBackground } from '../scene/background.ts';
@@ -10,7 +9,7 @@ export function drawWhiteSilencePass(
   base: SceneDrawing,
   far: SceneDrawing,
   near: SceneDrawing,
-  atlases: Record<string, SceneryAtlas>,
+  atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
   scale: number,
@@ -21,7 +20,7 @@ export function drawWhiteSilencePass(
   // Explicit source windows retain complete selected objects and exclude neighbouring-cell dust.
   function snowSprite(
     g: SceneDrawing,
-    image: SceneryAtlas,
+    image: HTMLImageElement,
     rect: readonly [number, number, number, number],
     x: number,
     foot: number,

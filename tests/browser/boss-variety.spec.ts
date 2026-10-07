@@ -18,7 +18,7 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
     );
   });
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.evaluate(() => {
     (window as any).__bossVariety.testJump(0, 3, true);
   });

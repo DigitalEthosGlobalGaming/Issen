@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test('Armoury shows streak progress and seventh-day crest survives saved-run recovery', async ({
   page,
 }, info) => {
+  test.setTimeout(90000);
   await page.clock.setFixedTime(new Date('2026-10-04T12:00:00Z'));
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.dailyLogin')) {

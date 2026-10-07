@@ -1,4 +1,3 @@
-import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
@@ -7,11 +6,11 @@ import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
 
 interface RidgeAtlases {
-  mountains: SceneryAtlas;
-  pines: SceneryAtlas;
-  banks: SceneryAtlas;
-  shrubs: SceneryAtlas;
-  rocks: SceneryAtlas;
+  mountains: HTMLImageElement;
+  pines: HTMLImageElement;
+  banks: HTMLImageElement;
+  shrubs: HTMLImageElement;
+  rocks: HTMLImageElement;
 }
 
 /** Last Light Ridge: one left-hand slope above a broad, empty valley. */
@@ -30,7 +29,7 @@ export function drawLastLightRidge(
   const unit = Math.min(height, width * 1.3);
   function sprite(
     g: SceneDrawing,
-    atlas: SceneryAtlas,
+    atlas: HTMLImageElement,
     cell: number,
     x: number,
     foot: number,

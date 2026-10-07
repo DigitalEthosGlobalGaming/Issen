@@ -53,7 +53,9 @@ export type SceneDrawing = Pick<
   | 'shadowOffsetY'
   | 'imageSmoothingEnabled'
   | 'imageSmoothingQuality'
->;
+> & {
+  dispose?(): void;
+};
 
 const nativePaths = new WeakMap<SceneDrawing, (path: string) => void>();
 const canvasPaths = new Map<string, Path2D>();

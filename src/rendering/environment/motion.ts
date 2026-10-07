@@ -1,4 +1,3 @@
-import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { EnvironmentFrame } from './local-renderer.ts';
 import { createLayout } from '../layout.ts';
@@ -10,7 +9,7 @@ import { drawMeadowFog } from './meadow.ts';
 export function drawEnvironmentMotion(
   ctx: SceneDrawing,
   frame: EnvironmentFrame,
-  fog?: SceneryAtlas,
+  fog?: HTMLImageElement,
 ) {
   if (frame.stage === 3) drawHollowMotion(ctx, frame);
   if (frame.stage === 7) drawShoreMotion(ctx, frame);

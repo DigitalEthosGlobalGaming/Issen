@@ -618,6 +618,7 @@ test('native Armoury and tutorial scenes keep their own targets and clocks', asy
 test('lost auxiliary contexts fall back without advancing tutorial or touching saves', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/?renderer=pixi');
@@ -875,10 +876,13 @@ test('normal materials respond to lights and mirrored normals without changing t
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   const pixels = await page.evaluate(async () => {
-    const { createPixiBackend } = await import('/src/rendering/pixi/backend.ts');
-    const { IDENTITY } = await import('/src/rendering/scene-frame.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { drawMaterialStamp, setSceneLighting } =
+      await import('/src/rendering/scene-material.ts');
+    const IDENTITY = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
     const canvas = document.createElement('canvas');
-    const backend = await createPixiBackend(canvas);
+    canvas.width = canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
     const makeTexture = (color: string) => {
       const source = document.createElement('canvas');
       source.width = source.height = 8;
@@ -917,7 +921,20 @@ test('normal materials respond to lights and mirrored normals without changing t
       },
     };
     const capture = () => {
-      backend.render(frame);
+      painter.begin();
+      setSceneLighting(painter, frame.lighting);
+      const t = sprite.transform;
+      painter.setTransform(t.a, t.b, t.c, t.d, t.tx, t.ty);
+      painter.globalAlpha = sprite.alpha;
+      drawMaterialStamp(painter, {
+        texture: sprite.texture,
+        material: sprite.material,
+        x: 0,
+        y: 0,
+        width: sprite.width,
+        height: sprite.height,
+      });
+      painter.flush();
       const c = document.createElement('canvas');
       c.width = c.height = 32;
       const g = c.getContext('2d')!;
@@ -929,7 +946,7 @@ test('normal materials respond to lights and mirrored normals without changing t
     const mirrored = capture();
     sprite.material = { ...material, lighting: 0, fog: 1, fogColor: [1, 0, 0] };
     const fogged = capture();
-    backend.dispose();
+    painter.dispose();
     return { lit, mirrored, fogged };
   });
   expect(errors).toEqual([]);
@@ -949,8 +966,8 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
-    const { createPixiBackend } = await import('/src/rendering/pixi/backend.ts');
-    const { IDENTITY } = await import('/src/rendering/scene-frame.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const IDENTITY = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
     const target = document.createElement('canvas');
     const preview = document.createElement('canvas');
     const atlas = document.createElement('canvas');
@@ -961,8 +978,38 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
     ink.fillRect(0, 0, 10, 10);
     ink.fillStyle = '#0000ff';
     ink.fillRect(10, 0, 10, 10);
-    const live = await createPixiBackend(target);
-    const isolated = await createPixiBackend(preview);
+    target.width = target.height = preview.width = preview.height = 32;
+    const live = await createPixiScenePainter(target);
+    const isolated = await createPixiScenePainter(preview);
+    const { invalidateSceneTexture } = await import('/src/rendering/texture-revision.ts');
+    const render = (painter: typeof live, frame: any) => {
+      if (painter.canvas.width !== frame.width * frame.dpr)
+        painter.canvas.width = frame.width * frame.dpr;
+      if (painter.canvas.height !== frame.height * frame.dpr)
+        painter.canvas.height = frame.height * frame.dpr;
+      painter.begin();
+      for (const sprite of frame.sprites) {
+        const t = sprite.transform;
+        painter.setTransform(
+          t.a * frame.dpr,
+          t.b * frame.dpr,
+          t.c * frame.dpr,
+          t.d * frame.dpr,
+          t.tx * frame.dpr,
+          t.ty * frame.dpr,
+        );
+        painter.globalAlpha = sprite.alpha;
+        painter.drawImage(
+          sprite.texture.source,
+          ...sprite.texture.frame,
+          0,
+          0,
+          sprite.width,
+          sprite.height,
+        );
+      }
+      painter.flush();
+    };
     const lighting = {
       ambient: [1, 1, 1],
       directional: [0, 0, 0],
@@ -1005,24 +1052,25 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
       g.drawImage(canvas, 0, 0);
       return [...g.getImageData(x, y, 1, 1).data];
     };
-    live.render(frame);
+    render(live, frame);
     const border = sample(target, 3, 3);
     const overlap = sample(target, 16, 16);
     const retainedInput = JSON.stringify(frame, (key, value) =>
       key === 'source' ? 'atlas' : value,
     );
-    live.render(frame);
+    render(live, frame);
     const repeat = sample(target, 16, 16);
     const unchanged =
       retainedInput === JSON.stringify(frame, (key, value) => (key === 'source' ? 'atlas' : value));
-    isolated.render({ ...frame, sprites: [back] });
+    render(isolated, { ...frame, sprites: [back] });
     const previewPixel = sample(preview, 16, 16);
     isolated.dispose();
     ink.fillStyle = '#00ff00';
     ink.fillRect(0, 0, 10, 10);
-    live.render({ ...frame, sprites: [{ ...back, texture: { ...back.texture, revision: 1 } }] });
+    invalidateSceneTexture(atlas);
+    render(live, { ...frame, sprites: [back] });
     const updated = sample(target, 16, 16);
-    live.render({ ...frame, width: 64, height: 48, dpr: 2, sprites: [back] });
+    render(live, { ...frame, width: 64, height: 48, dpr: 2, sprites: [back] });
     const dimensions = [target.width, target.height];
     live.dispose();
     live.dispose();

@@ -3,12 +3,11 @@
 Use [docs/index.md](docs/index.md) when unfamiliar with the repository.
 
 Before starting a future work request, read
-[current development status](current-development-status.md). While its status is
-paused, briefly tell the user that the asset pipeline migration, performance
-validation and lit-only integration are unfinished and saved in that document.
-Do not resume that work or its benchmarks automatically; continue it only when
-the user asks. This notice does not block unrelated requested work. Update the
-handoff when the paused work resumes or finishes.
+[current development status](current-development-status.md). Asset packing and
+its unfinished performance comparison have been cancelled; use the original
+assets approach. The separate lit-only integration remains unintegrated. Do not
+resume it or run benchmarks unless the user asks. Update the handoff when that
+work resumes or finishes.
 
 - For ownership or feature placement, read [implemented architecture](docs/architecture/overview.md).
 - For commands and verification, read [local development](docs/development/local-development.md).

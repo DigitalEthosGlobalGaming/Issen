@@ -5,18 +5,6 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { loadPreset, listPresets, validatePreset } from './preset.mjs';
 import { createPbrForge } from './pbr-forge/index.mjs';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import { fileURLToPath } from 'node:url';
-
-const runFile = promisify(execFile);
-export async function cleanupArchive(archive) {
-  await runFile(
-    process.env.PBR_PYTHON ?? 'python',
-    [fileURLToPath(new URL('./map_cleanup.py', import.meta.url)), archive],
-    { windowsHide: true },
-  );
-}
 
 export const HELP = `PBR Forge batch CLI
 
@@ -75,7 +63,6 @@ export async function convertBatch(options, dependencies = {}) {
   const log = dependencies.log ?? console.log,
     errorLog = dependencies.error ?? console.error;
   const createConverter = dependencies.createConverter ?? createPbrForge;
-  const cleanup = dependencies.cleanupArchive ?? cleanupArchive;
   const result = { converted: 0, skipped: 0, failed: 0, files: [] };
   let converter;
   try {
@@ -91,7 +78,6 @@ export async function convertBatch(options, dependencies = {}) {
           .update(JSON.stringify({ sourceHash, preset }))
           .digest('hex');
         if (!force && (await completed(destination, jobHash))) {
-          await cleanup(destination);
           result.skipped++;
           result.files.push({ source, destination, status: 'skipped' });
           log(`SKIP ${name}: source and preset match the completed export`);
@@ -107,8 +93,9 @@ export async function convertBatch(options, dependencies = {}) {
         const zip = await readFile(partial);
         if (zip.length < 22 || !zip.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])))
           throw new Error('PBR Forge did not return a ZIP archive.');
+        await rename(partial, destination);
         await writeFile(
-          `${partial}.json`,
+          `${destination}.json`,
           JSON.stringify(
             {
               version: 1,
@@ -123,9 +110,6 @@ export async function convertBatch(options, dependencies = {}) {
             2,
           ) + '\n',
         );
-        await cleanup(partial);
-        await rename(partial, destination);
-        await rename(`${partial}.json`, `${destination}.json`);
         result.converted++;
         result.files.push({ source, destination, status: 'converted' });
         log(`OK ${name} -> ${destination}`);
@@ -137,7 +121,6 @@ export async function convertBatch(options, dependencies = {}) {
         errorLog(`FAIL ${name}: ${error.message}`);
       } finally {
         await rm(partial, { force: true });
-        await rm(`${partial}.json`, { force: true });
       }
     }
   } finally {

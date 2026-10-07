@@ -79,56 +79,6 @@ export function initProbe({
     p.last = 0;
     p.measure = true;
   };
-  const workers = [];
-  if (window.Worker) {
-    const NativeWorker = window.Worker;
-    window.Worker = new Proxy(NativeWorker, {
-      construct(target, args, constructor) {
-        if (
-          (new URLSearchParams(location.search).has('textureCounters') ||
-            new URLSearchParams(location.search).get('httpCache') === 'disabled') &&
-          (args[1]?.name === 'issen-scenery' || String(args[0]).includes('compose.worker'))
-        ) {
-          const url = new URL(String(args[0]), location.href);
-          if (new URLSearchParams(location.search).has('textureCounters'))
-            url.searchParams.set('textureCounters', '1');
-          if (new URLSearchParams(location.search).get('httpCache') === 'disabled')
-            url.searchParams.set('httpCache', 'disabled');
-          args[0] = url;
-        }
-        const worker = Reflect.construct(target, args, constructor);
-        const record = {
-          ref: new WeakRef(worker),
-          terminated: false,
-          instrumented:
-            args[1]?.name === 'issen-scenery' || String(args[0]).includes('compose.worker'),
-        };
-        workers.push(record);
-        worker.addEventListener('message', (event) => window.__resourceProbe.receive(event.data));
-        const post = worker.postMessage.bind(worker);
-        worker.postMessage = (...values) => {
-          const result = post(...values);
-          window.__resourceProbe.transferred(
-            Array.isArray(values[1]) ? values[1] : values[1]?.transfer,
-          );
-          return result;
-        };
-        const terminate = worker.terminate.bind(worker);
-        worker.terminate = () => {
-          record.terminated = true;
-          return terminate();
-        };
-        return worker;
-      },
-    });
-  }
-  p.resourceSnapshot = () => ({
-    dom: window.__resourceProbe.snapshot(),
-    workers: workers.map((record) => ({
-      terminated: record.terminated || !record.ref.deref(),
-      instrumented: record.instrumented,
-    })),
-  });
   const create = document.createElement.bind(document);
   document.createElement = function (...a) {
     const e = create(...a);

@@ -4,7 +4,7 @@ Generated from [temple-roofs-atlas.png](../../temple-roofs-atlas.png) with `ston
 
 Six aligned 2172Ã—724 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](temple-roofs-atlas_diffuse.png), [normal](temple-roofs-atlas_normal.png), roughness constant (see `temple-roofs-atlas.material.json`), metallic constant (see `temple-roofs-atlas.material.json`), [ao](temple-roofs-atlas_ao.png), emissive constant (see `temple-roofs-atlas.material.json`).
+Maps: [diffuse](temple-roofs-atlas_diffuse.png), [normal](temple-roofs-atlas_normal.png), [roughness](temple-roofs-atlas_roughness.png), [metallic](temple-roofs-atlas_metallic.png), [ao](temple-roofs-atlas_ao.png), [emissive](temple-roofs-atlas_emissive.png).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -13,5 +13,3 @@ Renderer lighting is connected through [index.ts](../../../index.ts). Visual rev
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
-
-Redundant generated maps and exact replacements: [temple-roofs-atlas.material.json](temple-roofs-atlas.material.json).

@@ -1,4 +1,3 @@
-import type { SceneryAtlas } from './packed-scene-atlas.ts';
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createBackground } from '../scene/background.ts';
@@ -10,7 +9,7 @@ export function drawMoonwatchClearing(
   base: SceneDrawing,
   far: SceneDrawing,
   near: SceneDrawing,
-  atlases: Record<string, SceneryAtlas>,
+  atlases: Record<string, HTMLImageElement>,
   width: number,
   height: number,
   scale: number,

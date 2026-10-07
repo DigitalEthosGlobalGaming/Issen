@@ -7,7 +7,6 @@ coverage/
 .verification*/
 tmp/
 *.tsbuildinfo
-**/__pycache__/
 .mobile-build/
 .android-tools/
 android/.gradle/

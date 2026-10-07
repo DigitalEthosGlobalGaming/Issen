@@ -4,7 +4,7 @@ Generated from [companion-atlas.png](../../companion-atlas.png) with `cloth`, Sp
 
 Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](companion-atlas_diffuse.png), [normal](companion-atlas_normal.png), [roughness](companion-atlas_roughness.png), metallic constant (see `companion-atlas.material.json`), [ao](companion-atlas_ao.png), emissive constant (see `companion-atlas.material.json`).
+Maps: [diffuse](companion-atlas_diffuse.png), [normal](companion-atlas_normal.png), [roughness](companion-atlas_roughness.png), [metallic](companion-atlas_metallic.png), [ao](companion-atlas_ao.png), [emissive](companion-atlas_emissive.png).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -15,5 +15,3 @@ This is a material starting point. Mixed artwork uses the dominant preset; indiv
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
 
 Retained source: inspect its lighting with Material preview in the tilde panel; it is not placed in gameplay.
-
-Redundant generated maps and exact replacements: [companion-atlas.material.json](companion-atlas.material.json).

@@ -16,5 +16,3 @@ exports are omitted because the runtime uses flat sprites and diffuse alpha.
 
 See [sword lighting](../../../../../docs/features/sword-lighting.md) for ownership,
 lighting controls and verification.
-
-Redundant generated maps and exact replacements: [blade-profile-atlas.material.json](blade-profile-atlas.material.json).

@@ -7,32 +7,17 @@ import { fileURLToPath } from 'node:url';
 import { preview } from 'vite';
 import { options } from '../config.mjs';
 import { openTarget } from '../targets.mjs';
-import { measure, captureTextureCounters } from '../collect.mjs';
+import { measure } from '../collect.mjs';
 import { writeReport } from '../report.mjs';
-import { parseArgs } from 'node:util';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 process.chdir(root);
 
 const input = path.resolve(process.argv[2]);
-const { values } = parseArgs({
-  args: process.argv.slice(3),
-  options: {
-    resample: { type: 'boolean', default: false },
-    duration: { type: 'string' },
-  },
-});
-if (values.duration && !values.resample)
-  throw Error(
-    'Changing duration requires --resample; mixed sampling configurations are not comparable',
-  );
-const duration = values.duration === undefined ? undefined : Number(values.duration);
-if (duration !== undefined && (!Number.isFinite(duration) || duration <= 0))
-  throw Error('--duration must be positive');
 const original = JSON.parse(await readFile(path.join(input, 'results.json'), 'utf8'));
 if (original.status !== 'failed' || original.manifest.target !== 'web')
   throw Error('Expected a failed web run');
-const manifest = { ...original.manifest, ...(duration === undefined ? {} : { duration }) };
+const manifest = original.manifest;
 if (
   manifest.platform !== `${platform()} ${release()}` ||
   manifest.cpu !== cpus()[0].model ||
@@ -74,8 +59,6 @@ const config = options([
   `--warmup=${manifest.warmup}`,
   `--duration=${manifest.duration}`,
   `--repeats=${manifest.repeats}`,
-  `--http-cache=${manifest.httpCache ?? 'default'}`,
-  ...(manifest.headed ? ['--headed'] : []),
 ]);
 config.scenarios = manifest.scenarios;
 const out = path.resolve(
@@ -86,8 +69,6 @@ await cp(input, out, { recursive: true, errorOnExist: true, force: false });
 await writeFile(path.join(out, 'original-failure.json'), JSON.stringify(original, null, 2));
 const results = {
   ...original,
-  manifest,
-  ...(values.resample ? { samples: [], diagnostics: [] } : {}),
   status: 'running',
   errors: [],
   recovery: {
@@ -95,8 +76,6 @@ const results = {
     originalErrors: original.errors,
     resumedAt: new Date().toISOString(),
     completed: [],
-    resampled: values.resample,
-    originalDuration: original.manifest.duration,
   },
 };
 let target, server;
@@ -126,9 +105,7 @@ try {
     }
     if (!results.diagnostics.some((d) => d.scenario === scenario)) {
       console.log(`${scenario}: resumed diagnostic`);
-      const diagnostic = await measure(target, origin, config, scenario, 0, out, true);
-      diagnostic.textures = await captureTextureCounters(target, origin, config, scenario, out);
-      results.diagnostics.push(diagnostic);
+      results.diagnostics.push(await measure(target, origin, config, scenario, 0, out, true));
       results.recovery.completed.push({ scenario, diagnostic: true });
       await writeReport(out, results);
     }

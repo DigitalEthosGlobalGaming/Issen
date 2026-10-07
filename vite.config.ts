@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import { readFileSync } from 'node:fs';
 import { loadEnv } from 'vite';
-import { validatePackedAssets } from './scripts/assets/build.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
@@ -44,14 +43,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: mode === 'android' ? { outDir: '.mobile-build', reportCompressedSize: false } : {},
-    plugins: [
-      {
-        name: 'issen-packed-assets',
-        async buildStart() {
-          await validatePackedAssets();
-        },
-      },
-      ...(mode === 'android'
+    plugins:
+      mode === 'android'
         ? [
             {
               name: 'issen-offline-fonts',
@@ -81,7 +74,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           ]
-        : []),
-    ],
+        : [],
   };
 });

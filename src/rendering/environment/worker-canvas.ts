@@ -30,18 +30,7 @@ export function createWorkerDocument(): Document {
         try {
           const response = await fetch(value, { signal: controller.signal });
           if (!response.ok) throw Error(`HTTP ${response.status}: ${value}`);
-          const decoded = await createImageBitmap(await response.blob());
-          let bitmap: ImageBitmap;
-          const raster = new OffscreenCanvas(decoded.width, decoded.height);
-          try {
-            const ctx = raster.getContext('2d');
-            if (!ctx) throw Error('Unable to rasterize worker page');
-            ctx.drawImage(decoded, 0, 0);
-            bitmap = raster.transferToImageBitmap();
-          } finally {
-            decoded.close();
-            raster.width = raster.height = 0;
-          }
+          const bitmap = await createImageBitmap(await response.blob());
           if (controller.signal.aborted) {
             bitmap.close();
             return;

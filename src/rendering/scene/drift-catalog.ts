@@ -1,10 +1,10 @@
 import type { Random } from '../../shared/random.ts';
 
 export const DRIFT_ATLASES: Readonly<Record<string, string>> = {
-  leaves: 'drift-leaves-atlas',
-  petals: 'drift-petals-atlas',
-  debris: 'drift-debris-atlas',
-  fire: 'drift-fire-atlas',
+  leaves: new URL('../environment/assets/drift-leaves-atlas.png', import.meta.url).href,
+  petals: new URL('../environment/assets/drift-petals-atlas.png', import.meta.url).href,
+  debris: new URL('../environment/assets/drift-debris-atlas.png', import.meta.url).href,
+  fire: new URL('../environment/assets/drift-fire-atlas.png', import.meta.url).href,
 };
 
 /** Frame rectangles and pivots are normalized to the atlas and frame respectively. */
@@ -137,15 +137,4 @@ export function chooseDriftSprite(stage: number, random: Random): DriftSprite {
     if (roll < 0) return DRIFT_BY_ID.get(id)!;
   }
   return DRIFT_BY_ID.get(mixture[mixture.length - 1]![0])!;
-}
-
-/** Logical selections can combine any reused sprite; they never own atlas pages. */
-export function driftDependencies(stage: number, embers = false): string[] {
-  const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
-  return [
-    ...new Set([
-      ...mixture.map(([id]) => id),
-      ...(embers ? ['fire.coal', 'fire.ember', 'fire.streak'] : []),
-    ]),
-  ].sort();
 }

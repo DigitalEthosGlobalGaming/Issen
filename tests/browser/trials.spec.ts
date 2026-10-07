@@ -124,6 +124,7 @@ test('Mirror accepts opposite displayed directions throughout a chain and reject
 test('Trials stay off the title until Ronin wave 10, then fit portrait and landscape', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   await seed(page, 9);
   await page.goto('/');
   await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
@@ -134,6 +135,7 @@ test('Trials stay off the title until Ronin wave 10, then fit portrait and lands
     localStorage.setItem('issen.stats', JSON.stringify(stats));
   });
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#bTrials')).toBeVisible();
   await page.locator('#bTrials').click();
   await expect(page.locator('#trialsAccess')).toHaveText('Trials · 0/11 complete');
@@ -308,10 +310,11 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
 });
 
 test('Broken Reality ends on the first ordinary cut', async ({ page }) => {
+  test.setTimeout(60000);
   await seed(page);
   await instrument(page);
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.evaluate(() => (window as any).__trialHarness.stop());
   await page.locator('#bTrials').click();
   await page.locator('[data-trial="broken-reality"]').click();

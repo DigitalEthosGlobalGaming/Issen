@@ -8,19 +8,8 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
-    const { packedFigures } = await import('/src/rendering/figures/packed-figures.ts');
-    const { default: manifest } = await import('/src/rendering/generated/figures/manifest.json');
     const renderer = createInkEnemyRenderer(document);
     const ready = await renderer.prepare();
-    const lease = packedFigures(document).acquireGroup('enemies');
-    await lease.ready;
-    const sourceIds = new WeakMap<object, Map<string, string>>();
-    for (const id of manifest.dependencies.enemies) {
-      const sprite = lease.sprite(id)!;
-      let frames = sourceIds.get(sprite.colour);
-      if (!frames) sourceIds.set(sprite.colour, (frames = new Map()));
-      frames.set(sprite.metadata.frame.join(), id);
-    }
     const g = document.createElement('canvas').getContext('2d')!;
     const p = createPalette();
     const env = {
@@ -39,8 +28,7 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
     };
     const sources = new Set<string>();
     CanvasRenderingContext2D.prototype.drawImage = function (...args) {
-      const id = sourceIds.get(args[0])?.get(args.slice(1, 5).join());
-      if (id) sources.add(id.split('.')[1]!);
+      if (args[0] instanceof HTMLImageElement) sources.add(args[0].src.split('/').pop()!);
       return draw.apply(this, args);
     };
     try {
@@ -86,7 +74,6 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
       }
       const repeatedReads = pixelReads - readsAfterWarm;
       renderer.dispose();
-      lease.release();
       return {
         ready,
         bossSources,
@@ -99,16 +86,18 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
       CanvasRenderingContext2D.prototype.drawImage = draw;
       CanvasRenderingContext2D.prototype.getImageData = read;
       renderer.dispose();
-      lease.release();
     }
   });
   expect(result.ready).toBe(true);
   expect(result.repeatedReads).toBe(0);
   expect(result.snapshot.loaded.sort()).toEqual(['base', 'clothing', 'heads', 'variationHeads']);
-  expect(result.bossSources.sort()).toEqual(['base', 'heads']);
-  expect(result.variedSources).toContain('clothing');
-  expect(result.variedSources).toContain('variationHeads');
-  expect(result.variedSources).not.toContain('heads');
+  expect(result.bossSources.sort()).toEqual([
+    'enemy-headwear-atlas_diffuse.png',
+    'enemy-ronin-simple_diffuse.png',
+  ]);
+  expect(result.variedSources).toContain('enemy-clothing-variants_diffuse.png');
+  expect(result.variedSources).toContain('enemy-headwear-variants_diffuse.png');
+  expect(result.variedSources).not.toContain('enemy-headwear-atlas_diffuse.png');
   expect(result.snapshot.variantPixels + result.snapshot.tonePixels).toBeLessThanOrEqual(8_000_000);
   expect(result.snapshot.cachedParts).toBeLessThanOrEqual(192);
   expect(result.snapshot.toneParts).toBeLessThanOrEqual(48);

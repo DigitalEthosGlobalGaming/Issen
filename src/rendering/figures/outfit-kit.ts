@@ -1,11 +1,10 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Figure } from './types.ts';
-import { OUTFIT_FRAMES as FRAMES, OUTFIT_SOURCE_STEMS } from './outfit-catalog.ts';
-import { packedSpritePlacement } from '../packed-assets.ts';
-import type { FigureLease } from './packed-figures.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
+type Frame = readonly [number, number, number, number];
 type Attachment = {
   atlas: AtlasKey;
   frame: number;
@@ -142,47 +141,97 @@ export function supportsInkOutfit(id?: string): boolean {
   return !!id && Object.hasOwn(INK_OUTFIT_RECIPES, id);
 }
 
+const SOURCES = {
+  masks: new URL('./assets/player-mask-atlas.png', import.meta.url).href,
+  special: new URL('./assets/player-special-headwear-atlas.png', import.meta.url).href,
+  armour: new URL('./assets/armour-plates-atlas.png', import.meta.url).href,
+  headwear: new URL('./assets/outfit-headwear-atlas.png', import.meta.url).href,
+  cloth: new URL('./assets/outfit-cloth-atlas.png', import.meta.url).href,
+};
+// Updated from each atlas's measured alpha bounds, not nominal grid cell bounds.
+const FRAMES: Record<AtlasKey, readonly Frame[]> = {
+  masks: [
+    [150, 40, 436, 535],
+    [692, 79, 525, 497],
+    [144, 589, 458, 555],
+    [733, 654, 381, 497],
+  ],
+  special: [
+    [147, 92, 357, 501],
+    [703, 85, 494, 507],
+    [101, 702, 458, 411],
+    [690, 783, 526, 369],
+  ],
+  armour: [
+    [77, 72, 588, 538],
+    [847, 114, 349, 476],
+    [62, 693, 380, 484],
+    [620, 729, 584, 412],
+  ],
+  headwear: [
+    [85, 126, 488, 450],
+    [630, 204, 605, 322],
+    [141, 653, 399, 522],
+    [747, 872, 399, 220],
+  ],
+  cloth: [
+    [146, 53, 408, 551],
+    [718, 53, 394, 552],
+    [64, 663, 746, 532],
+    [927, 692, 208, 481],
+  ],
+};
 export function createOutfitKit(doc: Document) {
-  let lease: FigureLease | undefined;
+  const materials = createAssetMaterials(doc, SOURCES);
+  const images = new Map<AtlasKey, HTMLImageElement>();
   const loaded = new Set<AtlasKey>();
   const tinted = new Map<string, HTMLCanvasElement>();
-
+  const finish = new Set<() => void>();
   let disposed = false,
     pending: Promise<void> | undefined;
   function prepare() {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
-    pending = (async () => {
-      try {
-        const { packedFigures } = await import('./packed-figures.ts');
-        if (disposed) return;
-        const acquired = packedFigures(doc).acquireGroup('outfits');
-        lease = acquired;
-        await acquired.ready;
-        if (!disposed)
-          for (const key of Object.keys(OUTFIT_SOURCE_STEMS) as AtlasKey[]) loaded.add(key);
-      } catch {
-        lease?.release();
-        lease = undefined;
-      }
-    })();
+    pending = Promise.all(
+      (Object.keys(SOURCES) as AtlasKey[]).map(
+        (key) =>
+          new Promise<void>((resolve) => {
+            const image = doc.createElement('img');
+            images.set(key, image);
+            const done = () => {
+              finish.delete(done);
+              image.onload = null;
+              image.onerror = null;
+              resolve();
+            };
+            finish.add(done);
+            image.onload = () => {
+              if (!disposed && image.naturalWidth === 1254 && image.naturalHeight === 1254)
+                loaded.add(key);
+              done();
+            };
+            image.onerror = done;
+            image.src = SOURCES[key];
+          }),
+      ),
+    ).then(async () => {
+      await materials.prepare();
+    });
     return pending;
   }
   function ready(id?: string) {
     return (
       !disposed &&
       supportsInkOutfit(id) &&
-      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key))
+      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key) && materials.ready(key))
     );
   }
   function stamp(g: SceneDrawing, a: Attachment, lean: number) {
-    const frame = FRAMES[a.atlas][a.frame];
-    const packed = lease?.sprite(`outfit.${a.atlas}.${a.frame}`);
-    if (!packed || !frame || packed.metadata.empty) return;
-    const [sw, sh] = packed.metadata.logicalSize;
-    const [sx, sy, pw, ph] = packed.metadata.frame;
-    const [tx, ty] = packed.metadata.trim;
-    let source = packed.colour as HTMLImageElement | ImageBitmap | HTMLCanvasElement;
+    const image = images.get(a.atlas),
+      frame = FRAMES[a.atlas][a.frame];
+    if (!image || !frame) return;
+    const [sx, sy, sw, sh] = frame;
+    let source: CanvasImageSource = image;
     if (a.tint) {
       const key = a.atlas + ':' + a.frame + ':' + a.tint;
       let c = tinted.get(key);
@@ -192,7 +241,7 @@ export function createOutfitKit(doc: Document) {
         c.height = sh;
         const cg = c.getContext('2d');
         if (!cg) return;
-        cg.drawImage(packed.colour, sx, sy, pw, ph, tx, ty, pw, ph);
+        cg.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
         cg.globalCompositeOperation = 'source-atop';
         cg.globalAlpha = 0.38;
         cg.fillStyle = a.tint;
@@ -204,16 +253,18 @@ export function createOutfitKit(doc: Document) {
     const h = (a.width * sh) / sw;
     const x = a.x + lean - a.width * (a.anchorX ?? 0.5),
       y = a.y - h * (a.anchorY ?? 0);
-    const material = packed.material;
-    const placed = packedSpritePlacement(packed.metadata, x, y, a.width, h);
-    const crop = a.tint ? ([tx, ty, pw, ph] as const) : packed.metadata.frame;
+    const material = materials.material(a.atlas, frame);
     if (material)
       drawMaterialStamp(g, {
-        texture: { source, revision: 0, frame: crop },
+        texture: { source, revision: 0, frame: a.tint ? undefined : frame },
         material,
-        ...placed,
+        x,
+        y,
+        width: a.width,
+        height: h,
       });
-    else g.drawImage(source, ...crop, placed.x, placed.y, placed.width, placed.height);
+    else if (a.tint) g.drawImage(source, x, y, a.width, h);
+    else g.drawImage(source, sx, sy, sw, sh, x, y, a.width, h);
   }
   return {
     prepare,
@@ -311,13 +362,19 @@ export function createOutfitKit(doc: Document) {
       outfits: Object.keys(INK_OUTFIT_RECIPES).filter(ready),
     }),
     dispose() {
+      materials.dispose();
       disposed = true;
-      lease?.release();
-      lease = undefined;
+      for (const im of images.values()) {
+        im.onload = null;
+        im.onerror = null;
+        im.removeAttribute('src');
+      }
+      for (const fn of [...finish]) fn();
       for (const c of tinted.values()) {
         c.width = 0;
         c.height = 0;
       }
+      images.clear();
       loaded.clear();
       tinted.clear();
     },

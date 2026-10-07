@@ -1,39 +1,59 @@
-import { PLAYER_FRAMES } from './player-catalog.ts';
-import { packedSpritePlacement } from '../packed-assets.ts';
-import type { FigureLease } from './packed-figures.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { drawMaterialStamp } from '../scene-material.ts';
+import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { createSurfaceMapLibrary } from '../surface-maps.ts';
+import { createPbrAtlas } from '../pbr-atlas.ts';
 import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
+const ATLAS_URL = new URL('./assets/player-ronin-simple.png', import.meta.url).href;
+const PBR_SOURCES = {
+  surface: new URL('./assets/player-pbr/player-ronin-simple_surface.png', import.meta.url).href,
+  diffuse: new URL('./assets/player-pbr/player-ronin-simple_diffuse.png', import.meta.url).href,
+  normal: new URL('./assets/player-pbr/player-ronin-simple_normal.png', import.meta.url).href,
+  roughness: new URL('./assets/player-pbr/player-ronin-simple_roughness.png', import.meta.url).href,
+  metallic: new URL('./assets/player-pbr/player-ronin-simple_metallic.png', import.meta.url).href,
+  ao: new URL('./assets/player-pbr/player-ronin-simple_ao.png', import.meta.url).href,
+  emissive: new URL('./assets/player-pbr/player-ronin-simple_emissive.png', import.meta.url).href,
+};
 type Part = 'body' | 'head' | 'arms';
-export { PLAYER_FRAMES } from './player-catalog.ts';
+type Frame = readonly [number, number, number, number];
+/** Tight source frames in original 1254² atlas; see adjacent provenance metadata. */
+export const PLAYER_FRAMES = {
+  torso: [45, 54, 382, 358],
+  head: [523, 110, 229, 282],
+  leftPanel: [864, 45, 366, 392],
+  rightPanel: [37, 452, 380, 369],
+  leftSleeve: [503, 464, 233, 368],
+  rightSleeve: [924, 465, 257, 368],
+  leftForearm: [134, 861, 165, 344],
+  rightForearm: [554, 861, 155, 344],
+  hand: [959, 926, 165, 236],
+} as const satisfies Record<string, Frame>;
 export type InkPlayerRenderer = ReturnType<typeof createInkPlayerRenderer>;
 
 /** Per-runtime atlas ownership. draw/drawPart inherit normalized figure transforms and alpha. */
 export function createInkPlayerRenderer(doc: Document) {
-  let lease: FigureLease | undefined;
+  const materials = createSurfaceMapLibrary(doc);
+  const pbr = createPbrAtlas(doc, PBR_SOURCES, 1254);
   const outfits = createOutfitKit(doc);
   const palettes = createPalette();
   const tones = new Map<string, HTMLCanvasElement>();
   let currentTone: string | undefined;
+  let currentPbr = false;
   function tonePart(key: keyof typeof PLAYER_FRAMES): HTMLCanvasElement | null {
-    if (!currentTone || key === 'head' || key === 'hand' || !lease) return null;
+    if (!currentTone || key === 'head' || key === 'hand' || !atlas) return null;
     const id = currentTone + ':' + key,
       prior = tones.get(id);
     if (prior) return prior;
-    const [, , sw, sh] = PLAYER_FRAMES[key],
+    const [sx, sy, sw, sh] = PLAYER_FRAMES[key],
       c = doc.createElement('canvas');
     // Keep source detail for the large foreground and Armoury crops.
     c.width = sw;
     c.height = sh;
     const cg = c.getContext('2d');
     if (!cg) return null;
-    const sprite = lease.sprite(`player.${key}`);
-    if (!sprite) return null;
-    const [px, py, pw, ph] = sprite.metadata.frame;
-    cg.drawImage(sprite.colour, px, py, pw, ph, ...sprite.metadata.trim, pw, ph);
+    cg.drawImage(atlas, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const data = cg.getImageData(0, 0, c.width, c.height),
       pal = palettes.robe(currentTone),
       parse = (v: string) => (v.match(/[\d.]+/g) || []).map(Number),
@@ -48,33 +68,38 @@ export function createInkPlayerRenderer(doc: Document) {
     tones.set(id, c);
     return c;
   }
+  let atlas: HTMLImageElement | null = null;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
-  const isDisposed = () => state === 'disposed';
   let pending: Promise<boolean> | null = null;
   let settle: ((ready: boolean) => void) | undefined;
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (state === 'disposed') return Promise.resolve(false);
+    void outfits.prepare();
+    void pbr.prepare();
     state = 'loading';
+    const image = doc.createElement('img');
+    atlas = image;
     pending = new Promise<boolean>((resolve) => {
       settle = resolve;
-      void (async () => {
-        try {
-          const { packedFigures } = await import('./packed-figures.ts');
-          if (isDisposed()) return;
-          const acquired = packedFigures(doc).acquireGroup('player');
-          lease = acquired;
-          await Promise.all([acquired.ready, outfits.prepare()]);
-          if (!isDisposed()) state = 'ready';
-        } catch {
-          lease?.release();
-          lease = undefined;
-          if (!isDisposed()) state = 'unavailable';
-        } finally {
-          settle = undefined;
-          resolve(state === 'ready');
-        }
-      })();
+      image.onload = () => {
+        state =
+          image.naturalWidth === 1254 && image.naturalHeight === 1254 ? 'ready' : 'unavailable';
+        resolve(state === 'ready');
+        settle = undefined;
+      };
+      image.onerror = () => {
+        state = 'unavailable';
+        resolve(false);
+        settle = undefined;
+      };
+    });
+    image.src = ATLAS_URL;
+    pending = pending.then(async (ready) => {
+      await outfits.prepare();
+      const pbrReady = await pbr.prepare();
+      if (!pbrReady && state !== 'disposed') state = 'unavailable';
+      return ready && pbrReady;
     });
     return pending;
   }
@@ -86,28 +111,29 @@ export function createInkPlayerRenderer(doc: Document) {
     w: number,
     h: number,
   ) {
-    const sprite = lease?.sprite(`player.${key}`);
-    if (!sprite || sprite.metadata.empty) return;
+    const [sx, sy, sw, sh] = PLAYER_FRAMES[key];
     const tinted = tonePart(key);
-    const placed = packedSpritePlacement(sprite.metadata, x, y, w, h);
-    const crop = tinted
-      ? ([...sprite.metadata.trim, sprite.metadata.frame[2], sprite.metadata.frame[3]] as const)
-      : sprite.metadata.frame;
-    if (sprite.material) {
+    const source = currentPbr ? pbr.diffuse! : atlas!;
+    const material = currentPbr
+      ? pbr.material(PLAYER_FRAMES[key])
+      : key === 'torso'
+        ? materials.get('cloth')
+        : null;
+    if (material && supportsSceneMaterials(g)) {
       drawMaterialStamp(g, {
-        texture: { source: tinted ?? sprite.colour, revision: 0, frame: crop },
-        material: sprite.material,
-        ...placed,
+        texture: {
+          source: tinted ?? source,
+          revision: 0,
+          frame: tinted ? undefined : [sx, sy, sw, sh],
+        },
+        material,
+        x,
+        y,
+        width: w,
+        height: h,
       });
-    } else
-      g.drawImage(
-        tinted ?? sprite.colour,
-        ...crop,
-        placed.x,
-        placed.y,
-        placed.width,
-        placed.height,
-      );
+    } else if (tinted) g.drawImage(tinted, x, y, w, h);
+    else g.drawImage(source, sx, sy, sw, sh, x, y, w, h);
   }
   function joints(f: Figure) {
     const l = f.lean || 0,
@@ -144,7 +170,7 @@ export function createInkPlayerRenderer(doc: Document) {
   }
   function drawPart(g: SceneDrawing, part: Part, f: Figure, env: FigureEnvironment): boolean {
     if (!f.back || !supportsInkOutfit(f.robeId)) return false;
-    if (state !== 'ready' || !lease) {
+    if (state !== 'ready' || !atlas) {
       if (state === 'idle') void prepare();
       return false;
     }
@@ -152,6 +178,7 @@ export function createInkPlayerRenderer(doc: Document) {
     if (env.reducedMotion && f.secondary) f = { ...f, secondary: undefined };
     const recipe = outfits.recipe(f.robeId);
     currentTone = recipe?.tone;
+    currentPbr = pbr.ready;
     const l = f.lean || 0;
     g.save();
     if (part === 'body') {
@@ -230,15 +257,21 @@ export function createInkPlayerRenderer(doc: Document) {
       parts: state === 'ready' ? 9 : 0,
       outfits: outfits.snapshot(),
       toneParts: tones.size,
-      pbrReady: state === 'ready',
+      pbrReady: pbr.ready,
     }),
     dispose() {
       state = 'disposed';
       outfits.dispose();
-      lease?.release();
-      lease = undefined;
+      materials.dispose();
+      pbr.dispose();
       for (const c of tones.values()) c.width = c.height = 0;
       tones.clear();
+      if (atlas) {
+        atlas.onload = null;
+        atlas.onerror = null;
+        atlas.removeAttribute('src');
+      }
+      atlas = null;
       settle?.(false);
       settle = undefined;
     },

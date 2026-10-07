@@ -25,9 +25,9 @@ window.__profile = {
    const scene=cvs.dataset.rendererBackend==='demon-realm'?STAGES.length:environmentRenderer.snapshot().stage;
    const requested=Number(document.querySelector('#cinematic').dataset.scene);
    if(window.__probe.measure) {
-    if(Number.isInteger(scene) && scene===requested && window.__loadingProbe.submittedStage===requested) window.__renderedScenes.add(scene);
+    if(Number.isInteger(scene)) window.__renderedScenes.add(scene);
    }
-   if(scene===requested && window.__loadingProbe.submittedStage===requested && performance.now()>=window.__sceneAt) {
+   if(scene===requested && performance.now()>=window.__sceneAt) {
     cinematic.swipe('left'); window.__sceneTransitions++; window.__sceneAt=performance.now()+350;
    }
   }

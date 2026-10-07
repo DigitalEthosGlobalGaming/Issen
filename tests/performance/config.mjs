@@ -36,7 +36,6 @@ export function options(argv) {
       seed: { type: 'string', default: '424242' },
       channel: { type: 'string', default: 'msedge' },
       port: { type: 'string', default: '5199' },
-      'http-cache': { type: 'string', default: 'default' },
       headed: { type: 'boolean', default: false },
       compare: { type: 'string' },
       doctor: { type: 'boolean' },
@@ -50,7 +49,6 @@ export function options(argv) {
     target: ['web', 'emulator', 'android-device'],
     mode: ['full', 'timing', 'diagnostic', 'build'],
     suite: ['all', ...Object.keys(suites)],
-    'http-cache': ['default', 'disabled'],
   })) {
     if (!allowed.includes(values[key])) throw Error(`Invalid --${key}: ${values[key]}`);
   }
@@ -73,7 +71,6 @@ export function options(argv) {
       : suites[values.suite];
   for (const s of values.scenarios)
     if (!allScenarios.includes(s)) throw Error(`Unknown scenario: ${s}`);
-  values.httpCache = values['http-cache'];
   return values;
 }
 
@@ -88,7 +85,6 @@ npm run test-performance -- --target=emulator --mode=build
 Targets: web (default), emulator, android-device. Modes: full, timing, diagnostic, build.
 Defaults: 5 repeats, 3000ms warmup, 5000ms samples, 390x844 DPR2, Edge headless.
 --headed --viewport=1440x900 --dpr=1 --port=5199 --seed=424242
---http-cache=default|disabled (fresh contexts in both cases)
 Android requires --device and a dedicated --package ending .performance.
 No APK build, installation, emulator download, or real-save access is performed.
 Outputs: unique ignored tmp/performance/<timestamp-id>/ directory.

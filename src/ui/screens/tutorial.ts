@@ -6,8 +6,7 @@ import {
 } from '../../platform/activity.ts';
 import './tutorial.css';
 import type { SceneDrawing } from '../../rendering/scene-drawing.ts';
-import type { SceneSurface } from '../../rendering/scene-surface.ts';
-import { createSceneSurface } from '../../rendering/scene-surface.ts';
+import { SceneSurface } from '../../rendering/scene-surface.ts';
 
 /** A practice scene with its own clock, canvas and inputs. It never touches a run or profile. */
 export function createTutorial(
@@ -50,15 +49,22 @@ export function createTutorial(
   const listeners = new AbortController();
   let active = false;
   let disposed = false;
-  if (pixi)
-    void createSceneSurface(canvas, true, true).then((prepared) => {
+  if (pixi) {
+    surface = new SceneSurface(canvas, true);
+  }
+  surface
+    ?.initialize()
+    .then(() => {
       if (disposed) {
-        prepared.dispose();
+        surface?.dispose();
         return;
       }
-      surface = prepared;
-      canvas = prepared.canvas;
-      context = prepared.drawing;
+      if (!surface) return;
+      canvas = surface.canvas;
+      context = surface.drawing ?? null;
+    })
+    .catch(() => {
+      if (!disposed) feedback.textContent = 'Practice could not start. Skip to return to the game.';
     });
   let step = 0;
   let started = 0;
@@ -154,7 +160,7 @@ export function createTutorial(
       started += now - contextPausedAt;
       contextPausedAt = undefined;
     }
-    if (surface) {
+    if (surface?.drawing) {
       canvas = surface.canvas;
       context = surface.drawing;
     }

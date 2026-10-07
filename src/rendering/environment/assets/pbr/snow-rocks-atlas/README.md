@@ -4,7 +4,7 @@ Generated from [snow-rocks-atlas.png](../../snow-rocks-atlas.png) with `stone`, 
 
 Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
 
-Maps: [diffuse](snow-rocks-atlas_diffuse.png), [normal](snow-rocks-atlas_normal.png), [roughness](snow-rocks-atlas_roughness.png), metallic constant (see `snow-rocks-atlas.material.json`), [ao](snow-rocks-atlas_ao.png), emissive constant (see `snow-rocks-atlas.material.json`).
+Maps: [diffuse](snow-rocks-atlas_diffuse.png), [normal](snow-rocks-atlas_normal.png), [roughness](snow-rocks-atlas_roughness.png), [metallic](snow-rocks-atlas_metallic.png), [ao](snow-rocks-atlas_ao.png), [emissive](snow-rocks-atlas_emissive.png).
 
 Exact settings and provenance: [generation.json](generation.json).
 
@@ -13,5 +13,3 @@ Renderer lighting is connected through [index.ts](../../../index.ts). Visual rev
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 
 Exports passed ZIP integrity, dimensions, applied-setting and diffuse-alpha checks. See [PBR tool instructions](../../../../../../scripts/pbr/README.md).
-
-Redundant generated maps and exact replacements: [snow-rocks-atlas.material.json](snow-rocks-atlas.material.json).

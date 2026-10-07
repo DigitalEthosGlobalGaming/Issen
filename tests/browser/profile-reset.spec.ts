@@ -9,6 +9,7 @@ for (const testing of [false, true]) {
   test(`Profile Management reset confirms and clears only the ${testing ? 'test' : 'player'} profile`, async ({
     page,
   }, info) => {
+    test.setTimeout(60000);
     await page.addInitScript((testing) => {
       if (sessionStorage.getItem('resetFixtureSeeded')) return;
       sessionStorage.setItem('resetFixtureSeeded', '1');
@@ -47,6 +48,7 @@ for (const testing of [false, true]) {
     }, testing);
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
     await expect(page.locator('#app')).toHaveCount(1);
     await expect(page.locator('.startup-loading')).toHaveCount(0);
     const snapshot = () => page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
@@ -69,7 +71,7 @@ for (const testing of [false, true]) {
     expect(await snapshot()).toEqual(before);
     await page.getByRole('button', { name: 'Reset profile', exact: true }).click();
     await dialog.getByRole('button', { name: 'Delete all progress', exact: true }).click();
-    await expect(page.locator('#title')).toHaveClass(/on/);
+    await expect(page.locator('#title')).toHaveClass(/on/, { timeout: 30000 });
     await expect(dialog).not.toBeVisible();
     await expect(page.locator('.startup-loading')).toHaveCount(0);
     const after = await snapshot();

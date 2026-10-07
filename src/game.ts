@@ -114,7 +114,7 @@ import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
 import { createAmbient } from './rendering/scene/ambient.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
-import { DRIFT_DENSITY, driftDependencies } from './rendering/scene/drift-catalog.ts';
+import { DRIFT_DENSITY } from './rendering/scene/drift-catalog.ts';
 import { createWeatherRenderer } from './rendering/scene/weather-draw.ts';
 import { createWeatherParticles } from './rendering/scene/weather-particles.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
@@ -1192,12 +1192,7 @@ export function startGame(
     sceneReadyToPresent = false;
     cvs.dataset.sceneState = 'loading';
     screenAnimation.invalidate();
-    const pending = Promise.all([
-      demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
-      driftRenderer.prepare(
-        driftDependencies(demon ? STAGES.length : G.stage, STAGES[G.stage]!.weather === 'smoke'),
-      ),
-    ]).then((results) => results.every(Boolean));
+    const pending = demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame);
     void pending
       .then((ready) => {
         if (lifecycle.disposed || request !== sceneRequest) return;
@@ -4882,32 +4877,27 @@ export function startGame(
       reducedFlashes: reducedFlashes(),
       lowQuality: density() <= 0.3,
     }),
-    driftRenderer.prepare(driftDependencies(G.stage, STAGES[G.stage]!.weather === 'smoke')),
-  ])
-    .then(() => {
-      if (artworkDisposed) return;
-      const failed = [
-        inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
-        !inkCompanion.ready ? 'companions' : null,
-        !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
-        !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
-          ? 'outfits'
-          : null,
-        !inkSword.ready ? 'weapons' : null,
-        environmentRenderer.backend !== 'layered' ? 'scene' : null,
-        !driftRenderer.ready ? 'drifting debris' : null,
-      ].filter((name): name is string => !!name);
-      if (failed.length) {
-        artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
-        return;
-      }
-      artworkLoading.remove();
-      artworkReady = true;
-      if (pageActive()) frameLoop.start();
-    })
-    .catch(() => {
-      if (!artworkDisposed)
-        artworkLoading.update({ loaded: 0, total: 7, pending: 0, failed: ['required artwork'] });
-    });
+    driftRenderer.prepare(),
+  ]).then(() => {
+    if (artworkDisposed) return;
+    const failed = [
+      inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
+      !inkCompanion.ready ? 'companions' : null,
+      !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
+      !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
+        ? 'outfits'
+        : null,
+      !inkSword.ready ? 'weapons' : null,
+      environmentRenderer.backend !== 'layered' ? 'scene' : null,
+      !driftRenderer.ready ? 'drifting debris' : null,
+    ].filter((name): name is string => !!name);
+    if (failed.length) {
+      artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
+      return;
+    }
+    artworkLoading.remove();
+    artworkReady = true;
+    if (pageActive()) frameLoop.start();
+  });
   return lifecycle.dispose;
 }

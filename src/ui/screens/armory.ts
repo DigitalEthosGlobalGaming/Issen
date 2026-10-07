@@ -1,14 +1,13 @@
-import { uiTextureSource } from '../ui-texture.ts';
 import { SEVEN_DAWNS_IMAGE } from '../../rendering/crest-art.ts';
 const crestUrls: Record<string, string> = {
   'seven-dawns': SEVEN_DAWNS_IMAGE,
-  tomoe: uiTextureSource('world-ui-crest-tomoe'),
-  kikyo: uiTextureSource('world-ui-crest-kikyo'),
-  juji: uiTextureSource('world-ui-crest-juji'),
-  aoi: uiTextureSource('world-ui-crest-aoi'),
-  fuji: uiTextureSource('world-ui-crest-fuji'),
-  tsuru: uiTextureSource('world-ui-crest-tsuru'),
-  rokumon: uiTextureSource('world-ui-crest-rokumon'),
+  tomoe: new URL('../assets/world-ui-crest-tomoe.png', import.meta.url).href,
+  kikyo: new URL('../assets/world-ui-crest-kikyo.png', import.meta.url).href,
+  juji: new URL('../assets/world-ui-crest-juji.png', import.meta.url).href,
+  aoi: new URL('../assets/world-ui-crest-aoi.png', import.meta.url).href,
+  fuji: new URL('../assets/world-ui-crest-fuji.png', import.meta.url).href,
+  tsuru: new URL('../assets/world-ui-crest-tsuru.png', import.meta.url).href,
+  rokumon: new URL('../assets/world-ui-crest-rokumon.png', import.meta.url).href,
 };
 import type { Item, ItemCategory } from '../../game/content/items.ts';
 import type { Equipment } from '../../platform/saves.ts';
@@ -163,7 +162,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
         (hid ? 'Hidden outfit or item' : it.n) + (own ? '' : ' (locked)'),
       );
       const swc = armTab === 'seal' ? SEALS[it.id] : armTab === 'charm' ? CHARMCOL[it.id] : null;
-      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : crestUrls[it.id] ? `<img class="crest-symbol" ${it.id === 'seven-dawns' ? `src="${crestUrls[it.id]}"` : `data-ui-texture="${crestUrls[it.id]}"`} alt="" />` : it.k}</span><span class="tn">${hid ? 'Hidden' : it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${on ? '<span class="arm-equipped" aria-hidden="true">装</span>' : ''}${on && selectedAwakening(it) ? `<span class="arm-form-mark${aw ? '' : ' suppressed'}" aria-hidden="true">${it.id === 'steel' && EQ.bladeThird ? '極' : '真'}</span>` : ''}`;
+      b.innerHTML = `<span class="tk${swc ? ' sw' : ''}${it.k.length >= 4 ? ' k4' : it.k.length === 3 ? ' k3' : ''}"${swc ? ` style="background:${swc}"` : ''}>${hid ? '？' : crestUrls[it.id] ? `<img class="crest-symbol" src="${crestUrls[it.id]}" alt="" />` : it.k}</span><span class="tn">${hid ? 'Hidden' : it.n}</span>${!accessible(it.id) ? '<small>Requires Premium</small>' : ''}${on ? '<span class="arm-equipped" aria-hidden="true">装</span>' : ''}${on && selectedAwakening(it) ? `<span class="arm-form-mark${aw ? '' : ' suppressed'}" aria-hidden="true">${it.id === 'steel' && EQ.bladeThird ? '極' : '真'}</span>` : ''}`;
       const states = on ? ['Equipped'] : [];
       if (on && selectedAwakening(it)) {
         states.push(it.id === 'steel' && EQ.bladeThird ? 'Third Awakening' : 'Awakened');

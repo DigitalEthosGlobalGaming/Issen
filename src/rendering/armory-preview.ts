@@ -16,9 +16,14 @@ import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
-import type { UiLease } from '../ui/packed-ui.ts';
-import type { PackedRoom } from './armory-room.ts';
-import { cachedMaterialContext, drawCachedImage, clearCachedMaterial } from './cached-materials.ts';
+import roomUrl from '../ui/assets/armoury-room.png';
+import { createAssetMaterials } from './asset-materials.ts';
+import {
+  createCachedMaterials,
+  cachedMaterialContext,
+  drawCachedImage,
+  clearCachedMaterial,
+} from './cached-materials.ts';
 import { drawArmoryRoom, drawRoomWind, roomWindow } from './armory-room.ts';
 import { setSceneLighting } from './scene-material.ts';
 import type { SceneLighting } from './scene-frame.ts';
@@ -59,8 +64,11 @@ export function createArmoryPreview(
 ) {
   let context = surface?.drawing ?? canvas.getContext('2d');
   if (!context) throw new Error('Armory preview requires a 2D canvas context');
-  let room: PackedRoom | undefined;
-  let roomLease: UiLease | undefined;
+  const room = canvas.ownerDocument.createElement('img');
+  const roomMaterials = createAssetMaterials(canvas.ownerDocument, { room: roomUrl });
+  const cachedMaterials = createCachedMaterials();
+  room.decoding = 'async';
+  room.src = roomUrl;
   const { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword } = artwork ?? {
     inkCharm: createInkCharmRenderer(canvas.ownerDocument),
     inkCompanion: createInkCompanionRenderer(canvas.ownerDocument),
@@ -75,26 +83,16 @@ export function createArmoryPreview(
   void inkSword.prepare();
   const roomCache = canvas.ownerDocument.createElement('canvas');
   let roomDisposed = false;
-  const roomPrepared = import('../ui/packed-ui.ts').then(async ({ packedUi }) => {
-    if (roomDisposed) return false;
-    const lease = packedUi(canvas.ownerDocument).acquire(['ui.armoury-room.0']);
-    roomLease = lease;
-    await lease.ready;
-    if (roomDisposed) {
-      lease.release();
-      return false;
-    }
-    const sprite = lease.sprite('ui.armoury-room.0');
-    if (!sprite) throw Error('Armoury room unavailable');
-    room = {
-      sprite,
-      naturalWidth: sprite.metadata.logicalSize[0],
-      naturalHeight: sprite.metadata.logicalSize[1],
-    };
+  void roomMaterials.prepare().then(() => {
+    if (roomDisposed) return;
+    cachedMaterials.bind(room, (frame) => roomMaterials.material('room', frame));
     roomCache.width = 0;
-    return true;
   });
-  void roomPrepared.catch(() => {});
+  let roomReady = false;
+  room.onload = () => {
+    roomReady = true;
+    roomCache.width = 0;
+  };
   const fx = createEffects();
   let dummy = makeFig(4242);
   let elapsed = 9,
@@ -146,7 +144,7 @@ export function createArmoryPreview(
     }
     if (surface) {
       canvas = surface.canvas;
-      context = surface.drawing;
+      context = surface.drawing ?? null;
     }
     dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;
@@ -169,7 +167,7 @@ export function createArmoryPreview(
       roomCache.width = width;
       roomCache.height = height;
       const background = cachedMaterialContext(roomCache.getContext('2d')!);
-      if (room) {
+      if ((roomReady || room.complete) && room.naturalWidth) {
         drawArmoryRoom(background, room, width, height);
       }
       const gradient = background.createLinearGradient(0, 0, 0, height);
@@ -188,7 +186,7 @@ export function createArmoryPreview(
       roomCache.width,
       roomCache.height,
     );
-    if (room)
+    if (room.naturalWidth)
       drawRoomWind(
         g,
         roomWindow(width, height, room.naturalWidth, room.naturalHeight),
@@ -283,7 +281,8 @@ export function createArmoryPreview(
   return {
     prepare: () =>
       Promise.all([
-        roomPrepared,
+        room.decode().catch(() => {}),
+        roomMaterials.prepare(),
         inkCharm.prepare(),
         inkCompanion.prepare(),
         inkEnemy.prepare(),
@@ -294,8 +293,10 @@ export function createArmoryPreview(
     draw,
     dispose() {
       roomDisposed = true;
-      roomLease?.release();
-      room = undefined;
+      roomMaterials.dispose();
+      cachedMaterials.dispose();
+      room.onload = null;
+      room.removeAttribute('src');
       roomCache.width = roomCache.height = 0;
       // Borrowed artwork belongs to the runtime. Closing a preview must not
       // invalidate another canvas's prepared parts or in-flight image loads.

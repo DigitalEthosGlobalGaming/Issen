@@ -1,6 +1,5 @@
 import type { createLightingRig } from '../rendering/lighting-rig.ts';
-import { packedMaterialEntries } from '../rendering/packed-catalog.ts';
-import { createPackedMaterialPreview } from './packed-material-preview.ts';
+import { assetMaterialCatalog } from '../rendering/asset-material-catalog.ts';
 
 /** Non-modal, session-only lighting controls; does not mutate profile or gameplay state. */
 export function createLightingDebug(
@@ -38,23 +37,24 @@ export function createLightingDebug(
   empty.value = '';
   empty.textContent = 'None';
   previewSelect.append(empty);
-  for (const entry of packedMaterialEntries) {
+  for (const pack of assetMaterialCatalog) {
     const option = doc.createElement('option');
-    option.value = entry.key;
-    option.textContent = entry.label;
+    option.value = pack.source;
+    option.textContent = pack.sourcePath.split('/').pop()!.replace('.png', '').replaceAll('-', ' ');
     previewSelect.append(option);
   }
   const previewImage = doc.createElement('img');
   previewImage.className = 'lighting-material-preview';
   previewImage.hidden = true;
   previewImage.alt = 'Selected PBR material';
-  const materialPreview = createPackedMaterialPreview(previewImage, rig);
   previewLabel.append(previewSelect);
   root.append(previewLabel, previewImage);
   previewSelect.addEventListener(
     'change',
     () => {
-      void materialPreview.select(previewSelect.value);
+      previewImage.hidden = !previewSelect.value;
+      if (previewSelect.value) previewImage.src = previewSelect.value;
+      else previewImage.removeAttribute('src');
     },
     { signal: events.signal },
   );
@@ -202,10 +202,8 @@ export function createLightingDebug(
   sync();
   return {
     refresh: position,
-    preparePreview: materialPreview.prepare,
     dispose() {
       events.abort();
-      materialPreview.dispose();
       root.remove();
       marker.remove();
     },

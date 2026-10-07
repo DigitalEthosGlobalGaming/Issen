@@ -20,26 +20,6 @@ export async function measure(
     if (r.status() >= 400) errors.push(`HTTP ${r.status()}: ${r.url()}`);
   };
   page.on('response', onResponse);
-  const imageResponses = [];
-  const onImageResponse = (response) => {
-    const url = response.url();
-    if (!/^https?:/.test(url)) return;
-    const headers = response.headers();
-    if (
-      !headers['content-type']?.startsWith('image/') &&
-      !/\.(png|svg|jpe?g|webp)(?:\?|$)/i.test(url)
-    )
-      return;
-    const length = Number(headers['content-length']);
-    const timing = response.request().timing();
-    imageResponses.push({
-      url,
-      encodedBodyBytes: Number.isFinite(length) ? length : null,
-      requestStartEpochMs: timing.startTime,
-    });
-  };
-  page.on('response', onImageResponse);
-
   let inactive = false;
   const verifyResume = async () => {
     if (!inactive) return null;
@@ -70,10 +50,6 @@ export async function measure(
   };
   try {
     await cdp.send('Performance.enable');
-    if (config.httpCache === 'disabled') {
-      await cdp.send('Network.enable');
-      await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
-    }
     if (diagnostic) {
       await cdp.send('Profiler.enable');
       await cdp.send('Profiler.start');
@@ -81,14 +57,8 @@ export async function measure(
     const url = new URL(origin);
     url.searchParams.set('scenario', scenario);
     url.searchParams.set('seed', String(config.seed));
-    url.searchParams.set('httpCache', config.httpCache);
     await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(() => window.__profile?.schemaVersion === 1, {}, { timeout: 60000 });
-    await page.waitForFunction(
-      () => window.__loadingProbe.firstCompleteTitleMs !== null,
-      {},
-      { timeout: 60000 },
-    );
     const startupMs = await page.evaluate(() => window.__profile.readyMs);
     if (diagnostic) {
       const profile = await cdp.send('Profiler.stop');
@@ -97,14 +67,7 @@ export async function measure(
         JSON.stringify(profile.profile),
       );
     }
-    await page.evaluate((name) => window.__loadingProbe.beginPhase(name), scenario);
     await configure(page, scenario);
-    if (['combat', 'armoury', 'inspection', 'inactive-inspection'].includes(scenario))
-      await page.waitForFunction(
-        (name) => window.__loadingProbe.readyPhases[name] != null,
-        scenario,
-        { timeout: 60000 },
-      );
     await page.waitForTimeout(config.warmup);
     if (scenario.startsWith('inactive-')) {
       await page.waitForFunction(
@@ -134,7 +97,7 @@ export async function measure(
     }
     // Allow a complete cycle, including cold worker composition, at default settings.
     const measurementMs =
-      scenario === 'cinematic-transitions' ? Math.max(30000, config.duration) : config.duration;
+      scenario === 'cinematic-transitions' ? Math.max(10000, config.duration) : config.duration;
     await page.waitForTimeout(measurementMs);
     const b = metrics(await cdp.send('Performance.getMetrics'));
     const sample = await page.evaluate(() => {
@@ -148,95 +111,11 @@ export async function measure(
         previewFrames: p.previewFrames,
         longTasks: p.longTasks,
         memory: p.memory(),
-        resources: p.resourceSnapshot(),
-        loading: {
-          ...window.__loadingProbe.snapshot(),
-          timeOrigin: performance.timeOrigin,
-          imageResourceTiming: performance
-            .getEntriesByType('resource')
-            .filter(
-              (entry) =>
-                /^https?:/.test(entry.name) && /\.(png|svg|jpe?g|webp)(?:\?|$)/i.test(entry.name),
-            )
-            .map((entry) => ({
-              url: entry.name,
-              startTime: entry.startTime,
-              duration: entry.duration,
-              encodedBodySize: entry.encodedBodySize,
-              transferSize: entry.transferSize,
-            })),
-          paints: performance
-            .getEntriesByType('paint')
-            .map((entry) => ({ name: entry.name, startTime: entry.startTime })),
-        },
         state: window.__profile.state(),
         audio: p.contexts.map((c) => c.state),
         actual: { viewport: { width: innerWidth, height: innerHeight }, dpr: devicePixelRatio },
       };
     });
-    sample.resources.workerSnapshots = await Promise.all(
-      page.workers().map(async (worker) => {
-        try {
-          const resources = await worker.evaluate(() => ({
-            resources: globalThis.__resourceProbe?.snapshot() ?? null,
-            timeOrigin: performance.timeOrigin,
-            imageResourceTiming: performance
-              .getEntriesByType('resource')
-              .filter(
-                (entry) =>
-                  /^https?:/.test(entry.name) && /\.(png|svg|jpe?g|webp)(?:\?|$)/i.test(entry.name),
-              )
-              .map((entry) => ({
-                url: entry.name,
-                startTime: entry.startTime,
-                duration: entry.duration,
-                encodedBodySize: entry.encodedBodySize,
-                transferSize: entry.transferSize,
-              })),
-          }));
-          if (!resources.resources && worker.url().includes('compose.worker'))
-            throw Error('Composition worker resource probe missing');
-          if (
-            config.httpCache === 'disabled' &&
-            worker.url().includes('compose.worker') &&
-            resources.resources?.fetchCachePolicy !== 'worker-no-store'
-          )
-            throw Error('Composition worker cold-cache policy missing');
-          return { instrumented: !!resources.resources, ...resources };
-        } catch (error) {
-          if (
-            /Execution context was destroyed|Target closed|Worker has been closed/.test(
-              error.message,
-            )
-          )
-            return { terminated: true };
-          throw error;
-        }
-      }),
-    );
-    const imageTotals = (rows) => {
-      const unique = new Map();
-      for (const row of rows)
-        if (!unique.has(row.url) || unique.get(row.url) < row.encodedBodyBytes)
-          unique.set(row.url, row.encodedBodyBytes);
-      return {
-        responses: rows.length,
-        uniqueAssets: unique.size,
-        knownEncodedAssetBytes: [...unique.values()].reduce((sum, value) => sum + (value ?? 0), 0),
-        unknownEncodedAssets: [...unique.values()].filter((value) => value === null).length,
-      };
-    };
-    sample.loading.networkImages = {
-      all: imageTotals(imageResponses),
-      beforeTitle: imageTotals(
-        imageResponses.filter(
-          (row) =>
-            row.requestStartEpochMs <=
-            sample.loading.timeOrigin + sample.loading.firstCompleteTitleMs,
-        ),
-      ),
-      responses: imageResponses,
-    };
     checkState(scenario, initial, sample.state);
     if (
       scenario.startsWith('inactive-') &&
@@ -334,63 +213,6 @@ export async function measure(
     if (inactive) await target.inactive(page, true);
     page.off('pageerror', onError);
     page.off('response', onResponse);
-    page.off('response', onImageResponse);
-    await close();
-  }
-}
-
-/** Fresh context: texture wrappers never share headline timing/CPU-trace samples. */
-export async function captureTextureCounters(target, origin, config, scenario, out) {
-  const { page, cdp, close } = await target.sample();
-  let inactive = false;
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('response', (response) => {
-    if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);
-  });
-  try {
-    if (config.httpCache === 'disabled') {
-      await cdp.send('Network.enable');
-      await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
-    }
-    const url = new URL(origin);
-    url.searchParams.set('scenario', scenario);
-    url.searchParams.set('seed', String(config.seed));
-    url.searchParams.set('textureCounters', '1');
-    url.searchParams.set('httpCache', config.httpCache);
-    await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForFunction(() => window.__profile?.schemaVersion === 1, {}, { timeout: 60000 });
-    await configure(page, scenario);
-    await page.waitForTimeout(config.warmup);
-    if (scenario.startsWith('inactive-')) {
-      await target.inactive(page, false);
-      inactive = true;
-      await page.waitForTimeout(200);
-    }
-    await page.waitForTimeout(1000);
-    const dom = await page.evaluate(() => window.__textureProbe.snapshot());
-    const workers = await Promise.all(
-      page.workers().map(async (worker) => {
-        const counters = await worker.evaluate(() => globalThis.__textureProbe?.snapshot() ?? null);
-        if (worker.url().includes('compose.worker') && !counters?.installed)
-          throw Error('Worker texture counters were not installed');
-        return { instrumented: !!counters, counters };
-      }),
-    );
-    if (!dom.installed) throw Error('Texture counters were not installed');
-    if (errors.length) throw Error(errors.join('\n'));
-    const result = {
-      scenario,
-      independentContext: true,
-      counterWindowMs: 1000,
-      coverage: 'API calls and declared RGBA extents; not physical GPU memory or execution time',
-      dom,
-      workers,
-    };
-    await writeFile(`${out}/profiles/${scenario}-textures.json`, JSON.stringify(result, null, 2));
-    return result;
-  } finally {
-    if (inactive) await target.inactive(page, true);
     await close();
   }
 }

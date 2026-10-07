@@ -41,10 +41,10 @@ test('every stage retains aligned material layers, including foreground bamboo',
           return (
             m.normal.source.width === m.surface.source.width &&
             m.normal.source.height === m.surface.source.height &&
-            (!m.emissive || m.emissive.source.width === m.surface.source.width) &&
+            m.emissive.source.width === m.surface.source.width &&
             (m.surfaceCoverage ||
               (m.normal.frame?.join() === m.surface.frame?.join() &&
-                (!m.emissive || m.normal.frame?.join() === m.emissive.frame?.join())))
+                m.normal.frame?.join() === m.emissive.frame?.join()))
           );
         }),
         coverage: stamps.some((stamp) => {

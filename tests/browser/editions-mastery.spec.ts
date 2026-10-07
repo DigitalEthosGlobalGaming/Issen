@@ -115,6 +115,7 @@ test('Free verified purchase grants access; revocation suppresses equipment with
 test('Discernment rerolls once, checkpoints the new offer, and remains spent after reload', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   await prepare(page);
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();

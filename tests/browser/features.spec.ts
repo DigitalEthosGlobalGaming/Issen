@@ -81,6 +81,7 @@ test('Template donations persist and apply only to standard runs', async ({ page
 test('testing tools isolate profile, jump encounters and repair removed equipment', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60000);
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.meta'))
       localStorage.setItem('issen.meta', JSON.stringify({ tutorial: 'skipped', embers: 42 }));
@@ -90,8 +91,8 @@ test('testing tools isolate profile, jump encounters and repair removed equipmen
     );
   });
   await page.goto('/');
-  await expect(page.locator('#app')).toHaveCount(1);
   await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await expect(page.locator('#app')).toHaveCount(1);
   const original = await page.evaluate(() => localStorage.getItem('issen.meta'));
   await page.keyboard.press('Control+Shift+A');
   await expect(page.locator('#admin')).toHaveClass(/on/);

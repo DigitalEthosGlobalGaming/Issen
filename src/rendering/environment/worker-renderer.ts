@@ -1,7 +1,6 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { EnvironmentFrame, createLocalEnvironmentRenderer } from './local-renderer.ts';
-import { packedScenery, sceneryAtlas, type SceneryLease } from './packed-scenery.ts';
-import type { PackedSceneryAtlas } from './packed-scene-atlas.ts';
+import { createAssetMaterials } from '../asset-materials.ts';
 import { createCachedMaterials } from '../cached-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
@@ -14,6 +13,7 @@ import type {
 } from './worker-types.ts';
 
 type LocalRenderer = ReturnType<typeof createLocalEnvironmentRenderer>;
+const FOG_URL = new URL('./assets/fog-wisps-atlas.png', import.meta.url).href;
 const emptySnapshot = (): EnvironmentSnapshot => ({
   foreground: { layers: 0, pixels: 0 },
   backend: 'loading',
@@ -31,9 +31,9 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     type: 'module',
     name: 'issen-scenery',
   });
-  let fogLease: SceneryLease | undefined;
+  const fogMaps = createAssetMaterials(doc, { fog: FOG_URL });
   const fogBindings = createCachedMaterials();
-  let fog: PackedSceneryAtlas | undefined;
+  let fog: HTMLImageElement | undefined;
   let fogPending: Promise<void> | undefined;
   let fallback: LocalRenderer | undefined;
   const getFallback = () => fallback;
@@ -109,17 +109,17 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
   }
   function prepareFog(): Promise<void> {
     return (fogPending ??= (async () => {
-      const lease = packedScenery(doc).acquireGroup('fog');
-      fogLease = lease;
+      fog = doc.createElement('img');
+      fog.src = FOG_URL;
       try {
-        await lease.ready;
-        if (!disposed) fog = sceneryAtlas('fog-wisps-atlas', lease, fogBindings);
+        await Promise.all([fog.decode(), fogMaps.prepare()]);
+        if (!disposed && fogMaps.ready('fog'))
+          fogBindings.bind(fog, (frame) => fogMaps.material('fog', frame));
       } catch {
-        lease.release();
+        /* Keep the unavailable-image path visible through the scene owner. */
       }
     })());
   }
-
   async function pump() {
     if (running || disposed || fallback || doc.hidden || !desired) return;
     const frame = { ...desired },
@@ -292,8 +292,8 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
       doc.removeEventListener('visibilitychange', onVisibility);
       release();
       fogBindings.dispose();
-      fogLease?.release();
-      fog = undefined;
+      fogMaps.dispose();
+      fog?.removeAttribute('src');
       for (const [id, request] of requests) {
         clearTimeout(request.timer);
         request.resolve({ id, ok: false, layers: [], foreground: [], snapshot: emptySnapshot() });
