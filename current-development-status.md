@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; cosmetic state owned; feedback actions moved; cue drawing moved; environment state owned; next cache/rule boundary
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; cosmetic state owned; feedback actions moved; cue drawing moved; environment state owned; weather boundary split; next environment cache move
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -94,8 +94,13 @@ Symbol-aware references preserve sharing; PresentationContext exposes environmen
 Strict types and all 274 units passed (environment-state-unit.log).
 `npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts tests/browser/stage-variation.spec.ts tests/browser/environment-materials.spec.ts --config playwright.rendering-v2.config.ts`:
 all 13 passed (environment-state-browser.log; terminal exit confirmed).
-No process remains. Next split buildWeather's hazard reset from cosmetic artwork,
-then physically move cached environment builders; broad browser verification at presentation cluster end. Follow ordered
+buildWeather now calls a separate cosmetic buildWeatherArtwork and then resets
+live WX using combatRandom exactly as before. This rule/drawing boundary is
+separated before the cache builder move. Strict types and all 274 units passed
+(weather-boundary-unit.log).
+`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/cinematic.spec.ts --config playwright.rendering-v2.config.ts`:
+all nine passed (weather-boundary-browser.log; terminal exit confirmed).
+No process remains. Next physically move cached environment builders; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 
 Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**

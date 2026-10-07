@@ -72,6 +72,8 @@
 
 - 2026-10-08 — W2 environment state — consolidate fourteen cached scenery/cosmetic particle fields in environment-state.ts and expose it through PresentationContext — moving live WX hazard timers into presentation — live weather consumes gameplay RNG, while cinematic weather is cosmetic; thirteen native/cinematic/stage/save browser cases pass — revert the environment-state move.
 
+- 2026-10-08 — W2 weather boundary — separate cached weather artwork construction from the live WX reset in place, retaining artwork-then-rule order — moving combatRandom into presentation — weather hazard initialization is gameplay; old checkpoints and cinematic isolation pass before the physical move — revert the weather boundary split.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

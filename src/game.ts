@@ -656,7 +656,7 @@ export function startGame(
     ambient().gustLeaves(environmentState.leaves, n);
   }
   
-  function buildWeather(resetSimulation = true) {
+  function buildWeatherArtwork() {
     const w = STAGES[G.stage]!.weather;
     environmentState.weatherDensity = density();
     const built = createWeatherParticles(w, W, H, S, R, environmentState.weatherDensity);
@@ -675,6 +675,9 @@ export function startGame(
         m.fillRect(0, 0, 128, 128);
       }
     }
+  }
+  function buildWeather(resetSimulation = true) {
+    buildWeatherArtwork();
     if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
   }
   function rebalanceWeather() {
