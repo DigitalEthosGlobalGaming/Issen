@@ -78,6 +78,8 @@
 
 - 2026-10-08 — W2 cosmetic updates move — move clock/camera advancement and ambient/transition update bodies into their owned presentation modules — combining clocks or moving rule updates — original clock/ambient/rule/transition/camera order is preserved; twelve scene/save/cinematic/stage browser cases pass — revert the cosmetic-update move.
 
+- 2026-10-08 — W2 presentation checkpoint — retain the shared-preview exact-PNG assertion and record the isolated failure — speculative renderer changes or relaxed tolerance — first broad run had 252 passes and one preview-disposal failure; unchanged 20-case repeat and uninterrupted 253-case broad retry passed, with cause unestablished and ignored pixel diagnostics ready if it recurs — investigate the original assertion with the prepared diagnostics if reproduced.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -66,10 +66,10 @@ weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
 separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
 owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signals; hit-stop and run
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
-owns the player profile, current run, scene dimensions, camera effects and service
-instances. It connects feature callbacks to audio, persistence, effects and UI.
-It still contains encounter transitions, kill/damage presentation, title secrets,
-main scene layer order and post-processing orchestration. These are not separate
+owns the player profile, current run, scene dimensions and service instances.
+It connects feature callbacks to audio, persistence, presentation owners and UI.
+It still contains encounter transitions, kill/damage orchestration, title secrets,
+player/companion projection and frame preparation orchestration. These are not separate
 fully extracted owners yet; do not assume the proposed migration tree describes
 implemented files. W2 now introduces `game/session/context.ts`: `RunContext`
 holds plain run records and seeded randomness; `ServicesContext` holds browser

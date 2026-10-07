@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2 presentation extraction in progress
+## W1 complete; W2 presentation complete; UI extraction next
 
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is
@@ -59,8 +59,22 @@ composer: eight; first scene move: 12. All focused run logs are under
 tmp/runtime-refactor, and assertions/tolerances remain unchanged.
 The ordinary performance.spec.ts lifecycle assertions are not profiling.
 
-No process remains. Next run one uninterrupted broad browser suite at the
-presentation cluster checkpoint before proceeding to UI. Cosmetic update call
+Presentation broad first run:
+`npx playwright test --config playwright.rendering-v2.config.ts`: 252 passed,
+one failed (presentation-broad-browser.log; terminal confirmed). Failure:
+rendering.spec.ts shared-artwork preview disposal changed another preview's PNG.
+`npx playwright test tests/browser/rendering.spec.ts -g 'armory preview effects stay local' --repeat-each=10 --config playwright.rendering-v2.config.ts`:
+all 20 passed unchanged (preview-isolation-repeat.log; terminal confirmed).
+No assertion/tolerance or renderer change was made; cause is unestablished.
+Ignored pixel diagnostics are prepared under tmp/runtime-refactor/preview-diagnostics
+with playwright.preview-diagnostic.config.ts if the failure recurs.
+A second uninterrupted broad run on e3e12a2 passed all 253 tests (11.7m),
+presentation-broad-recheck.log; terminal completion confirmed. The presentation
+cluster is green. No process remains. Continue UI extraction now.
+UI dependency audit/plans are under tmp/runtime-refactor/audit-current.{json,md}
+and ui-extraction-plan.md, preserving immutable audit.json/audit.md.
+Draft UI screen/secret move scripts exist outside the repository and have NOT
+been executed. After a green broad checkpoint, continue ordered UI extraction. Cosmetic update call
 order is preserved: clock, ambient, existing rule update, transition, camera.
 Then ordered UI/screens/admin/secrets, run-flow/router/phases, kill rule/listeners,
 state tables/registry and adapter removal, player/companions, final composition root.
