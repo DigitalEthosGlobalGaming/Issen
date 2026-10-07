@@ -1,3 +1,4 @@
+import { createKillAppearance } from './presentation/kill-appearance.ts';
 import { createViewport } from './presentation/viewport.ts';
 import { bindGraphicsLifecycle } from './presentation/graphics-lifecycle.ts';
 import { createRunActivity } from './game/session/activity.ts';
@@ -1177,6 +1178,7 @@ export function startGame(
   function updateWave(dt: number) {
     waveLifecycle.updateWave(dt);
   }
+  const killAppearance = createKillAppearance(() => ({ R, bonk: !!G.m.bonk, fxId: EQ.fx, accessible, presentationState }));
   const readKillViews = () => ({
     events: context.events,
     G,
@@ -1227,55 +1229,11 @@ export function startGame(
     hideHint,
     liveOrdered,
     checkUnlocks,
-    deathAppearance(perfect: boolean, bonk: boolean, dir: Direction) {
-      const deathType =
-        !G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour'
-          ? 'scatter'
-          : !G.m.bonk &&
-              accessible(EQ.fx) &&
-              ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
-            ? 'dissolve'
-            : chooseDeathStyle(perfect, !!G.m.bonk, R);
-      const fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
-      return { deathType, fallDir };
-    },
-    disarm(pos: Enemy['pos']) {
-      const q = pos,
-        s2 = q.h / 160;
-      presentationState.fx.swords.push({
-        x: q.x + q.h * 0.1,
-        y: q.y - q.h * 0.6,
-        vx: (R() - 0.5) * 260 * s2,
-        vy: -(380 + R() * 200) * s2,
-        ang: R() * TAU,
-        vr: (R() < 0.5 ? -1 : 1) * (10 + R() * 6),
-        len: q.h * 0.5,
-        ground: q.y + q.h * 0.01,
-        t: 0,
-        stuck: false,
-        life: 2.4,
-      });
-    },
-    coin(pos: Enemy['pos']) {
-      presentationState.fx.coins.push({
-        x0: pos.x,
-        y0: pos.y - pos.h * 0.6,
-        t: 0,
-        life: 0.8,
-      });
-    },
-    stain(P0: Enemy['pos']) {
-      presentationState.fx.stains.push({
-        x: P0.x + (R() - 0.5) * P0.h * 0.2,
-        y: P0.y + P0.h * 0.01,
-        rx: P0.h * (0.12 + R() * 0.1),
-        t: 0,
-        life: SHADOW_DURATION,
-      });
-    },
-    shake: (amount: number) => {
-      presentationState.shake = Math.max(presentationState.shake, amount);
-    },
+    deathAppearance: killAppearance.deathAppearance,
+    disarm: killAppearance.disarm,
+    coin: killAppearance.coin,
+    stain: killAppearance.stain,
+    shake: killAppearance.shake,
   });
   const killRules = createEnemyKill(readKillViews);
   lifecycle.add(

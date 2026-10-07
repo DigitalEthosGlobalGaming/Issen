@@ -6,13 +6,13 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Viewport rebuilding
+## Latest green checkpoint: Kill appearance and debris ownership
 
-presentation/viewport.ts owns geometry rebuild and the original 80ms resize debounce. Current scalar accessors preserve layout propagation; character repositioning remains an explicit rule port, including grounded dying records.
-`npm run typecheck`: strict types pass (viewport-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 364 units pass (viewport-unit.log).
-`npx playwright test tests/browser/rendering.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/encounter-flow.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 16 pass in 47.0s (viewport-browser.log; terminal exit 0 confirmed).
+presentation/kill-appearance.ts owns cosmetic death selection, flying swords, coins, stains and shake capabilities. Current equipment/bonk values and original visual RNG call order are preserved; rules still select the same plain death record.
+`npm run typecheck`: strict types pass (kill-appearance-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 364 units pass (kill-appearance-unit.log).
+`npx playwright test tests/browser/death-presentation.spec.ts tests/browser/scattered-armour.spec.ts tests/browser/rendering.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 15 pass in 56.1s (kill-appearance-browser.log; terminal exit 0 confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
@@ -51,13 +51,13 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Finish remaining actual root services/state/projections and feedback reactions, migrate residual scenario adapters, then the full W2 gates before any lighting implementation.
+Finish the standoff feedback event split with actual listener-enabled/disabled invariants, then remaining damage/wave/boss reactions and genuine composition reduction.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source
 before applying; never overwrite the root with a stale preview.
 
-Finish genuine composition reduction: root remains over 2,000 lines, far from
+Finish genuine composition reduction: root remains 2030 lines, far from
 the approximately 200-line target. Move remaining session state/services and
 presentation/UI/lifecycle bindings into their actual owners, finish remaining
 standoff/damage/wave/boss reactions, and migrate residual scenario adapters to

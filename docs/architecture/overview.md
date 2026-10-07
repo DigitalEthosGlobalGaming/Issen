@@ -465,3 +465,5 @@ game/session/activity.ts owns plain mutable trial/daily metadata and failure/res
 presentation/graphics-lifecycle.ts owns graphics error suspension, main-canvas recovery deadlines and activity suspension. Readiness remains a current capability; recovery retains the same canvas and requires explicit run resume.
 
 presentation/viewport.ts owns resize debounce and viewport/scenery rebuilding. Current dimension accessors keep per-game geometry synchronized; repositioning plain characters is an explicit capability supplied by orchestration.
+
+presentation/kill-appearance.ts owns death appearance and debris callbacks through current value selections and visual randomness. Gameplay receives only the resulting death-record values; cosmetic listeners own flying swords, coins, stains and shake.
