@@ -14,8 +14,11 @@ encounter/reload case passes inside the full run. Logs: cached-views-regression-
 typecheck.log, cached-views-regression-unit.log, cached-views-foundation-broad.log
 under tmp/runtime-refactor. This supersedes the earlier foundation reload failure.
 
-The prepared composition is now APPLIED and uncommitted. game.ts is
-230 lines with original unused import scaffolding retained for separate cleanup.
+The domain composition is committed at f01fad7. Separate root import cleanup
+removes 127 unused imports and leaves 129 lines. Strict checks, all 371 units and
+all six startup/preview/disposal/scene-continuation browsers pass in 28.2s
+(composition-imports-typecheck.log / composition-imports-unit.log /
+composition-imports-browser.log). Root cleanup is ready for its separate commit.
 Runtime owners: foundation, presentation, UI base, profile/equipment rules, combat
 wiring, scene continuation, phases, sessions, menu/controls, frame/viewport and
 synchronous reaction wiring. Renderer-dependent frame-bindings/startup moved
@@ -46,10 +49,7 @@ This is not a full passing combined-run claim or a proven pre-existing failure.
 Targeted/actual scenario coverage is green for the internal composition checkpoint;
 the fully passing broad W2 checkpoint remains required before lighting.
 
-Unused root imports are retained for a separate deletion. Prepared cleanup/audit
-removes 127 unused imports and leaves 129 lines. The original composition apply
-manifest and generators are stale after the actual callback fix; never overwrite
-current source from those files.
+Original composition/import apply manifests are now stale; preserve current source.
 
 An isolated wave-cues-preview now owns wave/knife/missed-swipe cosmetic feedback
 and wave/knife profile progression through immutable value events. Wave preparation
