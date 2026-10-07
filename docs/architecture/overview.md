@@ -413,3 +413,7 @@ the trial session owner.
 Remaining player/pet/foxfire drawing is owned by presentation/player-figures.ts
 with read-only run, animation, equipment and layout views. Its draw passes preserve
 the existing composer order and figure/companion output.
+
+Active awakening eligibility and modifier composition are owned by
+game/equipment/active.ts with current equipment/profile/run views. Trial modifiers
+and the title/over versus running upgrade policy retain their existing semantics.

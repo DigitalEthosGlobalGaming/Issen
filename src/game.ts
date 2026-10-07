@@ -1,3 +1,4 @@
+import { createActiveEquipment } from './game/equipment/active.ts';
 import { createPlayerFigures } from './presentation/player-figures.ts';
 import { createResultsSession } from './game/session/results.ts';
 import { visiblePet, saveWithFoxfire } from './game/player/companions.ts';
@@ -727,36 +728,21 @@ export function startGame(
     events: createEventBus<GameEvents>(),
   };
   lifecycle.add(context.events.clear);
-  function powersEnabled() {
-    return G.state === 'title' || G.state === 'over' ? SETUP.upgrades !== false : G.upgradesEnabled;
-  }
-  function isSp() {
-    return !!(
-      META.upgrades.awakening &&
-      powersEnabled() &&
-      EQ.bladeSp &&
-      SPECIAL[EQ.blade] &&
-      UNL.has(EQ.blade + '+')
-    );
-  }
-  function isSteelThird() {
-    return !!(
-      META.upgrades.awakening &&
-      powersEnabled() &&
-      EQ.blade === 'steel' &&
-      EQ.bladeThird &&
-      UNL.has('steel++')
-    );
-  }
-  function isRobeSp() {
-    return !!(
-      META.upgrades.awakening >= 2 &&
-      powersEnabled() &&
-      EQ.robeSp &&
-      ROBE_AWAKENINGS[EQ.robe] &&
-      UNL.has(EQ.robe + '+')
-    );
-  }
+  const activeEquipment = createActiveEquipment(() => ({
+    G,
+    SETUP,
+    META,
+    EQ,
+    UNL,
+    ITEM_BY,
+    activeTrial,
+    accessible,
+    runTemplate,
+  }));
+  function powersEnabled() { return activeEquipment.powersEnabled(); }
+  function isSp() { return activeEquipment.isSp(); }
+  function isSteelThird() { return activeEquipment.isSteelThird(); }
+  function isRobeSp() { return activeEquipment.isRobeSp(); }
   function playerRobePalette() {
     const base = robePal(EQ.robe);
     const accent = isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.st?.c : null;
@@ -769,13 +755,7 @@ export function startGame(
     recordChallenge(AWAKENING, META.upgrades.awakening, G.runBlade, G.runRobe, metric, value);
     saveAwakening();
   }
-  function bladeMods() {
-    return isSteelThird()
-      ? STEEL_THIRD.m
-      : isSp()
-        ? SPECIAL[EQ.blade]!.m
-        : (ITEM_BY[EQ.blade] || {}).m;
-  }
+  function bladeMods() { return activeEquipment.bladeMods(); }
   function bladeStyle() {
     const b = BLADES[EQ.blade];
     if (isSteelThird())
@@ -800,23 +780,7 @@ export function startGame(
     if (!id) return null;
     return ST.bl[id] || (ST.bl[id] = { k: 0, p: 0, d: 0, w: 0, rw: 0, c: 0, sc: 0 });
   }
-  function computeMods() {
-    if (activeTrial) {
-      G.m = computeModifiers([], new Set());
-      G.m.hazard = 0;
-      return;
-    }
-    G.m = computeModifiers(
-      [
-        bladeMods(),
-        isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]!.m : (ITEM_BY[EQ.robe] || {}).m,
-        accessible(EQ.charm) ? (ITEM_BY[EQ.charm] || {}).m : undefined,
-        G.fortune?.m,
-        runTemplate,
-      ],
-      G.bless,
-    );
-  }
+  function computeMods() { return activeEquipment.computeMods(); }
   const pz = () => precisionZone(PZ, G.m?.pz ?? 0, G.m?.precision ?? 0);
   function pickLook(n: number) {
     return pickEnemyLook(n, R);
