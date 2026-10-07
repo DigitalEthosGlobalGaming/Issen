@@ -35,8 +35,8 @@ import { createSetupWiring } from './ui/wiring/setup.ts';
 import { createSettingsWiring } from './ui/wiring/settings.ts';
 import { createPanelWiring } from './ui/wiring/panels.ts';
 import { createTitleSecrets } from './ui/wiring/secrets.ts';
-import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
-import { createEnvironmentState } from './presentation/environment-state.ts';
+
+
 import { createCuePresentation } from './presentation/cues.ts';
 import {
   createPresentationState,
@@ -44,7 +44,7 @@ import {
   advancePresentationCamera,
 } from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
-import { createEnvironmentPresentation } from './presentation/environment.ts';
+
 import { createFeedbackPresentation } from './presentation/feedback.ts';
 import { createFiguresPresentation } from './presentation/figures.ts';
 import { createRuntimeScene } from './presentation/scene.ts';
@@ -52,38 +52,28 @@ import { createEventBus, type GameEvents } from './game/events.ts';
 import type { GameContext } from './game/session/context.ts';
 import type { PresentationContext } from './presentation/context.ts';
 import { reportGraphicsError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
-import { collectionBlessings } from './game/content/collections.ts';
+
 import {
   parseDailyLogin,
   recordDailyLogin,
   SEVEN_DAWNS_CREST,
 } from './game/progression/daily-login.ts';
 
-import {
-  parseCollectionProgress,
-  initializeCollections,
-  syncCollectionProgress,
-  collectionItemStats,
-} from './game/progression/collection-progress.ts';
-import { parsePendingSupport, type PendingSupportReward } from './platform/pending-support.ts';
+import { parseCollectionProgress, initializeCollections, syncCollectionProgress } from './game/progression/collection-progress.ts';
+import { type PendingSupportReward } from './platform/pending-support.ts';
 import { createRewardedSupport } from './platform/rewarded-support.ts';
 import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
 
-import { dailyRun, dailyResult, type DailyRun } from './game/progression/daily.ts';
+import { type DailyRun } from './game/progression/daily.ts';
 import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
 import { compositionKey } from './rendering/environment/worker-types.ts';
 
 import { premium } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
-import {
-  editionAccess,
-  itemAccessible,
-  trialAccessible,
-  type GameEdition,
-} from './platform/editions.ts';
-import { swiftSlashPoints, precisionZone, duelMasterTimings } from './game/progression/mastery.ts';
+import { editionAccess, itemAccessible, type GameEdition } from './platform/editions.ts';
+import { precisionZone } from './game/progression/mastery.ts';
 import { PREMIUM_FILM } from './platform/premium.ts';
 import { testerPremiumActive, parseTesterPremium } from './platform/tester-premium.ts';
 
@@ -96,7 +86,7 @@ import type { Direction } from './shared/directions.ts';
 import { createLifecycle } from './platform/lifecycle.ts';
 import { createFrameLoop } from './platform/frame-loop.ts';
 import { createRuntimeScreens } from './ui/wiring/screens.ts';
-import { createRunState, resetRun } from './game/run-state.ts';
+import { createRunState } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
 import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
@@ -109,36 +99,22 @@ import {
 } from './ui/screens/game-over.ts';
 import { createRunResults } from './ui/screens/run-results.ts';
 import type { ResultReveal } from './ui/screens/run-results.ts';
-import { recordRun } from './game/progression/run-records.ts';
-import {
-  recordSecretEvent,
-  preserveSecretDiscoveries,
-  reconcileCinematicCompanion,
-} from './game/progression/secret-events.ts';
-import {
-  createRunRewardLedger,
-  accrueRunReward,
-  settleRunReward,
-  grantSupportEmberBonus,
-  supportEmberBonusAmount,
-} from './game/progression/run-rewards.ts';
-import { protectCombo, recoverAfterWave } from './game/progression/run-powers.ts';
-import { resolveDamage } from './game/combat/damage.ts';
-import {
-  createStandoff,
-  updateStandoff as simulateStandoff,
-  resolveStandoffSwipe,
-} from './game/encounters/standoff.ts';
-import { targetSwipe } from './game/combat/targeting.ts';
-import { bossShownDirection, parryOpening } from './game/encounters/boss-openings.ts';
-import { createBoss } from './game/encounters/boss-create.ts';
+
+import { recordSecretEvent, reconcileCinematicCompanion } from './game/progression/secret-events.ts';
+import { createRunRewardLedger } from './game/progression/run-rewards.ts';
+
+
+
+
+
+
 import { bossPosition } from './rendering/figures/boss-position.ts';
-import { initialSpawns, updateWave as simulateWave } from './game/encounters/waves.ts';
+
 import { createGrunt as createEnemy } from './game/combat/grunt-spawn.ts';
 import { pickEnemyLook, orderedEnemies, selectAttacker } from './game/combat/enemy-spawn.ts';
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { advanceGrunts as simulateEnemies } from './game/combat/grunt.ts';
-import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
+
 import { createWeatherState } from './rendering/scene/weather-state.ts';
 import { updateWeather as simulateWeather } from './rendering/scene/weather-update.ts';
 import {
@@ -157,18 +133,13 @@ import {
 } from './rendering/figures/death.ts';
 import { parseSettings, preferenceEnabled } from './platform/settings.ts';
 
-import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
-import {
-  startBlessingWave,
-  recordBlessingCut,
-  recordComboBreak,
-  nextBlessingAttacker,
-} from './game/shrine/triggered.ts';
+
+
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
 
-import { unlockEligibleItems } from './game/progression/unlocks.ts';
+
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE } from './shared/figure-model.ts';
 import { createPostPresentation } from './presentation/post.ts';
@@ -181,46 +152,23 @@ import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 import { createAdminWiring } from './ui/wiring/admin.ts';
 
 import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
-import {
-  parseMeta,
-  templateModifiers,
-  templatePowers,
-  unlockBossMilestone,
-  pendingModeReveals,
-  markModeRevealsSeen,
-  sanitizeSetup,
-} from './game/progression/meta.ts';
+import { parseMeta, templateModifiers, sanitizeSetup } from './game/progression/meta.ts';
 import { createLayout } from './rendering/layout.ts';
-import { BLADES, ROBES } from './game/content/cosmetics.ts';
-import { SPECIAL, STEEL_THIRD } from './game/content/awakenings.ts';
-import { ROBE_AWAKENINGS } from './game/content/robe-awakenings.ts';
-import { parseAwakeningProgress, recordChallenge } from './game/progression/awakening-progress.ts';
+
+
+
+import { parseAwakeningProgress } from './game/progression/awakening-progress.ts';
 import type { BladeStats } from './game/progression/statistics.ts';
-import { normalLives } from './game/equipment/lives.ts';
-import { interceptWithTanto } from './game/combat/tanto.ts';
-import { throwKnife, refillDuelKnives } from './game/combat/knife.ts';
+
+
+
 
 import { BLESS, BLESS_BY } from './game/content/blessings.ts';
-import {
-  loadStatistics,
-  parseStatistics,
-  loadSetup,
-  loadUnlocks,
-  loadEquipment,
-  parseEquipment,
-  DEFAULT_EQUIPMENT,
-} from './platform/saves.ts';
+import { loadStatistics, loadSetup, loadUnlocks, loadEquipment } from './platform/saves.ts';
 import { createItems } from './game/content/items.ts';
-import { TRIALS } from './game/content/trials.ts';
+
 import type { TrialDefinition } from './game/content/trials.ts';
-import {
-  parseTrialProgress,
-  trialsUnlocked,
-  trialPassed,
-  trialFailureAfterCut,
-  completeTrial,
-  grantTrialRewards,
-} from './game/progression/trials.ts';
+import { parseTrialProgress, trialsUnlocked, grantTrialRewards } from './game/progression/trials.ts';
 
 import { renderPauseBlessings } from './ui/screens/pause.ts';
 import { itemPresentation } from './ui/screens/item-presentation.ts';
@@ -228,19 +176,19 @@ import type { TrialResult } from './ui/screens/trials.ts';
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
 
 import { createAudio } from './audio/audio.ts';
-import { computeModifiers } from './game/equipment/modifiers.ts';
+
 import { store, isTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
-import { TAU, clamp, lerp } from './shared/math.ts';
+import { TAU } from './shared/math.ts';
 import { rng, restorableRng, newRunSeed } from './shared/random.ts';
 import {
   readRunCheckpoint,
   writeRunCheckpoint,
   clearRunCheckpoint,
 } from './platform/run-checkpoint.ts';
-import type { RunCheckpoint } from './platform/run-checkpoint.ts';
-import { DIRS, OPP, DANG, directionMatches } from './shared/directions.ts';
-import { kanji, roman } from './shared/format.ts';
+
+
+
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(
   surfaces: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,

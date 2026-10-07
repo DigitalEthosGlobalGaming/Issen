@@ -10,7 +10,21 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: presentation/environment-host.ts physically owns per-game
+Latest checkpoint: separately deleted 70 unused named root imports left by
+completed moves. Strict types and all 361 units pass (root-import-cleanup-typecheck.log,
+root-import-cleanup-unit.log). Nine startup/readiness browser checks pass in 22.3s
+(root-import-cleanup-browser.log), and three blessing cases pass in 23.7s
+(root-import-cleanup-blessings.log), both using the rendering-v2 config and
+--trace retain-on-failure; terminal results confirmed.
+The initial symbol audit missed four shorthand value references; strict checking
+caught them, the uncommitted cleanup was restored and the audit corrected.
+BLESS_BY is retained for the existing new-blessings browser hook until explicit
+test API migration. No gameplay/runtime statements changed.
+Next: profile loading/persistence and larger presentation/UI/session bindings.
+The composition root remains about 2,600 lines. W2 and subsequent W3/Part 4
+are NOT complete. Continue autonomously; no develop push before final verification.
+
+Previous checkpoint:  presentation/environment-host.ts physically owns per-game
 scenery state, artwork and environment drawing bindings. Lazy current-view ports
 retain viewport, stage, density, cinematic/weather and cosmetic time access.
 The live weather record remains gameplay-owned. Its deterministic initialization
