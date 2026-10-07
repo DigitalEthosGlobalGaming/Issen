@@ -107,6 +107,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/armory.ts` owns Armoury/preset callbacks with current equipment/statistics getters.
 
+`ui/wiring/input.ts` owns pointer/keyboard and navigation binding through action ports.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

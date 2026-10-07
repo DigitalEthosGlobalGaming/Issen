@@ -1,3 +1,4 @@
+import { createInputWiring } from './ui/wiring/input.ts';
 import { createArmoryWiring } from './ui/wiring/armory.ts';
 import { createSetupWiring } from './ui/wiring/setup.ts';
 import { createSettingsWiring } from './ui/wiring/settings.ts';
@@ -2958,38 +2959,10 @@ export function startGame(
   }
 
   /* ---------------- input ---------------- */
-  const pointerActions: Parameters<typeof bindPointer>[1] = {
-    active: pageActive,
-    activate: audioInit,
-    threshold: () => {
-      const k = G.m ? G.m.swipe : 1;
-      return Math.max(22 * k, Math.min(W, H) * 0.055 * k) * sensitivityScale(settings.sensitivity);
-    },
-    swipe: (direction) => (cinematic.active ? cinematic.swipe(direction) : onSwipe(direction)),
-    tapDown: () => (cinematic.active ? false : onTapDown()),
-    tap: () => {
-      if (!cinematic.active) onTap();
-    },
-  };
-  let disposePointer = bindPointer(cvs, pointerActions);
-  lifecycle.listen($('bPlay'), 'click', () => {
-    audioInit();
-    if (savedRun?.status === 'active') abandonSavedRun();
-    openPanel('setup');
-  });
-  lifecycle.listen($('bContinue'), 'click', () => {
-    audioInit();
-    continueSavedRun();
-  });
-  lifecycle.listen($('bAbandon'), 'click', () => {
-    audioInit();
-    abandonSavedRun();
-  });
-  lifecycle.listen($('bDaily'), 'click', startDaily);
-  lifecycle.listen($('bBegin'), 'click', () => {
-    audioInit();
-    G.panel = null;
-    startRun();
+  const { disposePointer, bindNavigation } = createInputWiring(cvs, {
+    $, G, settings, cinematic, audioInit, onSwipe, onTapDown, onTap, lifecycle, abandonSavedRun, continueSavedRun, openPanel, startDaily, startRun, options, closePanel, pause, resume, endRun, toTitle, rewardScreen, konamiInput,
+    get W() { return W; }, get H() { return H; },
+    get savedRun() { return savedRun; }, get activeTrial() { return activeTrial; },
   });
   $('bSupport').hidden = false;
   lifecycle.add(
@@ -3072,61 +3045,7 @@ export function startGame(
     store.set('issen.equip', playerEquipment);
     $('supportMessage').textContent = 'Supporter Print selected. Change films any time in Armory.';
   });
-  lifecycle.listen($('bArmory'), 'click', () => openPanel('armory'));
-  lifecycle.listen($('bStats'), 'click', () => openPanel('stats'));
-  lifecycle.listen($('bTemplate'), 'click', () => openPanel('template'));
-  lifecycle.listen($('bTrials'), 'click', () => openPanel('trials'));
-  const openOptions = () => {
-    if (G.panel === 'options') return;
-    openPanel('options');
-    options.open();
-  };
-  lifecycle.listen($('bOptions'), 'click', openOptions);
-  lifecycle.listen($('bPauseOptions'), 'click', openOptions);
-  $('testBadge').hidden = !isTestProfile();
-  lifecycle.listen(window, 'keydown', (event) => {
-    if (event.ctrlKey && event.shiftKey && event.code === 'KeyA') {
-      event.preventDefault();
-      if (activeTrial) return;
-      if (G.panel === 'admin') {
-        closePanel();
-        return;
-      }
-      pause();
-      openPanel('admin');
-    }
-  });
-  lifecycle.listen($('bAgain'), 'click', () => {
-    if (G.overReady) {
-      audioInit();
-      startRun();
-    }
-  });
-  lifecycle.listen($('bResume'), 'click', resume);
-  lifecycle.listen($('bEnd'), 'click', endRun);
-  lifecycle.listen($('pauseBtn'), 'pointerup', (e) => {
-    e.stopPropagation();
-    pause();
-  });
-  lifecycle.listen($('pauseBtn'), 'pointerdown', (e) => e.stopPropagation());
-  lifecycle.listen($('bMenu'), 'click', toTitle);
-  document.querySelectorAll('[data-back]').forEach((b) => lifecycle.listen(b, 'click', closePanel));
-  const disposeKeyboard = bindKeyboard({
-    active: () => pageActive() && !rewardScreen.open,
-    bindings: () => settings.bindings,
-    state: () => ({ phase: G.state, panelOpen: !!G.panel, overReady: G.overReady }),
-    closePanel: () => (G.panel === 'options' ? options.back() : closePanel()),
-    titleDirection: konamiInput,
-    start: () => {
-      audioInit();
-      startRun();
-    },
-    resume,
-    pause,
-    swipe: onSwipe,
-    tapDown: onTapDown,
-    tap: onTap,
-  });
+  const disposeKeyboard = bindNavigation();
   function pause() {
     if (['playing', 'boss', 'between', 'standoff'].includes(G.state)) {
       G.pauseN = (G.pauseN || 0) + 1;
