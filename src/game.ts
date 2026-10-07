@@ -1,3 +1,4 @@
+import { createSetupWiring } from './ui/wiring/setup.ts';
 import { createSettingsWiring } from './ui/wiring/settings.ts';
 import { createPanelWiring } from './ui/wiring/panels.ts';
 import { createTitleSecrets } from './ui/wiring/secrets.ts';
@@ -2752,50 +2753,9 @@ export function startGame(
     $, playerStats, ST, G, hudView, supportPreview, previewFrame, testerPremium, renderArmory, renderSetup, META, saveMeta, premiumAccess, showAdmin, TRIAL_PROGRESS, trialResult, startTrial, showScreen, UNL, ITEMS, setBestLine, renderStats,
     clearTrialResult() { trialResult = null; },
   }));
-  const setupScreen = createSetupScreen(
-    $('setup'),
-    SETUP,
-    (setup) => store.set('issen.setup', setup),
-    {
-      getMilestone: () => META.bossMilestone,
-      hasVitality: () => META.upgrades.vitality >= 1,
-      getReveals: () => pendingModeReveals(META),
-      getLoadoutSummary: () => {
-        const power = templatePowers(META, SETUP, premiumAccess());
-        const summary: string[] = [];
-        if (power.tanto > 0) summary.push(`${power.tanto} Tanto strikes`);
-        if (power.knives > 0) summary.push(`${power.knives} knives`);
-        if (power.composure > 0) summary.push(`${power.composure} combo protections`);
-        if (EQ.charm === 'omikuji') summary.push('Fortune rolled at run start');
-        return summary.join(' · ');
-      },
-      onRevealed: () => {
-        markModeRevealsSeen(META);
-        saveMeta();
-      },
-      onRevealSound: () => sfx.glint(),
-    },
-  );
-  const renderSetup = () => {
-    setupScreen.render();
-    const daily = dailyRun();
-    $('dailyDate').textContent = daily.day;
-    $('dailyLoadout').textContent =
-      `${ITEM_BY[daily.equipment.blade]?.n} · ${ITEM_BY[daily.equipment.robe]?.n} · ${ITEM_BY[daily.equipment.charm]?.n}`;
-  };
-  const tutorial = createTutorial(
-    $('app'),
-    (status) => {
-      META.tutorial = status;
-      saveMeta();
-      toTitle();
-    },
-    reducedMotion,
-  );
-  function launchTutorial() {
-    toTitle();
-    tutorial.start();
-  }
+  const { setupScreen, renderSetup, tutorial, launchTutorial } = createSetupWiring({
+    $, SETUP, META, ITEM_BY, saveMeta, premiumAccess, sfx, toTitle, reducedMotion, get EQ() { return EQ; },
+  });
   function testJump(stage: number, wave: number, boss: boolean) {
     if (!isTestProfile()) return;
     SETUP.mode = 'waves';

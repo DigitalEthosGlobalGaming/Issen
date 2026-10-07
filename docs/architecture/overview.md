@@ -103,6 +103,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/settings.ts` owns preference application, options and lighting-debug wiring.
 
+`ui/wiring/setup.ts` owns setup and isolated tutorial callbacks.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
