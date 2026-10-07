@@ -1,3 +1,4 @@
+import { bindPurchaseWiring } from './ui/wiring/purchases.ts';
 import { createInputWiring } from './ui/wiring/input.ts';
 import { createArmoryWiring } from './ui/wiring/armory.ts';
 import { createSetupWiring } from './ui/wiring/setup.ts';
@@ -2964,86 +2965,14 @@ export function startGame(
     get W() { return W; }, get H() { return H; },
     get savedRun() { return savedRun; }, get activeTrial() { return activeTrial; },
   });
-  $('bSupport').hidden = false;
-  lifecycle.add(
-    premium.subscribe((state) => {
-      if (lifecycle.disposed) return;
-      $('premiumBadge').hidden = !premiumAccess();
-      $('premiumBadge').textContent = premium.state.owned
-        ? 'Premium'
-        : testerPremiumActive(testerPremium)
-          ? 'Tester Premium'
-          : edition === 'web'
-            ? 'Web'
-            : 'Premium';
-      if (premiumAccess()) {
-        UNL.add(PREMIUM_FILM);
-        if (initialPurchaseCheck) {
-          const restored = parseEquipment(savedEquipment, accessibleUnlocks(), ITEMS);
-          for (const category of ['charm', 'fx', 'film', 'seal'] as const)
-            if (!itemAccessible(restored[category], false))
-              playerEquipment[category] = restored[category];
-        }
-        if (initialPurchaseCheck && savedFilm === PREMIUM_FILM && playerEquipment.film === 'mono') {
-          playerEquipment.film = PREMIUM_FILM;
-        }
-        initialPurchaseCheck = false;
-      } else {
-        UNL.delete(PREMIUM_FILM);
-        if (playerEquipment.film === PREMIUM_FILM) playerEquipment.film = 'mono';
-        if (EQ.film === PREMIUM_FILM) EQ.film = 'mono';
-      }
-      if (!premiumAccess()) {
-        Object.assign(playerEquipment, parseEquipment(playerEquipment, accessibleUnlocks(), ITEMS));
-        if (EQ !== playerEquipment)
-          Object.assign(EQ, parseEquipment(EQ, accessibleUnlocks(), ITEMS));
-        if (G.state !== 'title') {
-          runTemplate = templateModifiers(META, SETUP, false);
-          G.shrineRerolls = 0;
-          computeMods();
-        }
-      }
-      renderSupport($('support'), state, testerPremiumActive(testerPremium));
-      if (G.panel === 'armory') renderArmory();
-      if (G.panel === 'template')
-        renderTemplate($('templateContent'), META, saveMeta, premiumAccess());
-      if (activeTrial && !trialAccessible(activeTrial.id, premiumAccess()))
-        trialFailure = 'Premium access is required for this Trial.';
-    }),
-  );
-  lifecycle.add(listenToPurchases());
-  void premium.refresh().finally(() => {
-    initialPurchaseCheck = false;
-  });
-  lifecycle.listen(document, 'visibilitychange', () => {
-    if (!document.hidden) void premium.refresh();
-  });
-  lifecycle.listen($('bSupport'), 'click', () => openPanel('support'));
-  const purchaseAction = async (action: () => Promise<void>) => {
-    pause();
-    audio.setPaused(true);
-    await action();
-    if (!lifecycle.disposed) audio.setPaused(G.state === 'paused' || guided.frozen);
-  };
-  lifecycle.listen($('bPurchasePremium'), 'click', () => {
-    testerPremium = { campaign: TESTER_PREMIUM_CAMPAIGN };
-    store.set('issen.testerPremium', testerPremium);
-    UNL.add(PREMIUM_FILM);
-    $('premiumBadge').hidden = false;
-    $('premiumBadge').textContent = 'Tester Premium';
-    renderSupport($('support'), premium.state, true);
-  });
-  lifecycle.listen($('bRestorePremium'), 'click', () => {
-    void purchaseAction(premium.restore);
-  });
-  lifecycle.listen($('bRefreshPremium'), 'click', () => {
-    void premium.refresh();
-  });
-  lifecycle.listen($('bEquipPremium'), 'click', () => {
-    if (!premiumAccess()) return;
-    playerEquipment.film = PREMIUM_FILM;
-    store.set('issen.equip', playerEquipment);
-    $('supportMessage').textContent = 'Supporter Print selected. Change films any time in Armory.';
+  bindPurchaseWiring({
+    $, G, lifecycle, premiumAccess, savedEquipment, accessibleUnlocks, ITEMS, playerEquipment, savedFilm, META, SETUP, computeMods, renderArmory, saveMeta, openPanel, pause, audio, guided, edition, UNL,
+    get EQ() { return EQ; },
+    get initialPurchaseCheck() { return initialPurchaseCheck; }, set initialPurchaseCheck(value) { initialPurchaseCheck = value; },
+    get testerPremium() { return testerPremium; }, set testerPremium(value) { testerPremium = value; },
+    get runTemplate() { return runTemplate; }, set runTemplate(value) { runTemplate = value; },
+    get activeTrial() { return activeTrial; },
+    get trialFailure() { return trialFailure; }, set trialFailure(value) { trialFailure = value; },
   });
   const disposeKeyboard = bindNavigation();
   function pause() {

@@ -109,6 +109,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/input.ts` owns pointer/keyboard and navigation binding through action ports.
 
+`ui/wiring/purchases.ts` owns guarded purchase refresh and supporter controls.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
