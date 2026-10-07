@@ -64,6 +64,8 @@
 
 - 2026-10-08 — W2 post artwork — move cached grain, vignette and ink-edge construction/state into post-artwork.ts — retaining texture caches in the runtime — preserves dimensions and RNG order while completing explicit post artwork ownership; native/trial films and saves pass — revert the cache move independently.
 
+- 2026-10-08 — W2 cosmetic state — consolidate twelve cosmetic fields in presentation/state.ts, using symbol-aware reference rewriting and direct context state/camera references — copying values or maintaining closure getter bridges — preserves shared identity, clocks and visual RNG while leaving gameplay hit-stop/time scale and checkpoint records untouched; fourteen affected browser cases pass — revert the cosmetic-state ownership commit.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

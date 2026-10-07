@@ -10,7 +10,7 @@ async function observe(page: import('@playwright/test').Page) {
       response,
       body: (await response.text()).replace(
         'if (pageActive()) frameLoop.start();',
-        'window.__performance = { G, fx, preview, supportPreview, frameLoop, render, state: () => ({ time, runTime:G.runTime, enemies:JSON.stringify(G.enemies), particles:JSON.stringify(fx) }) }; if (pageActive()) frameLoop.start();',
+        'window.__performance = { G, fx: presentationState.fx, preview, supportPreview, frameLoop, render, state: () => ({ time: presentationState.time, runTime:G.runTime, enemies:JSON.stringify(G.enemies), particles:JSON.stringify(presentationState.fx) }) }; if (pageActive()) frameLoop.start();',
       ),
     });
   });

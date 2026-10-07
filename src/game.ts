@@ -1,3 +1,4 @@
+import { createPresentationState } from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
 import { createEnvironmentPresentation } from './presentation/environment.ts';
 import { createFeedbackPresentation } from './presentation/feedback.ts';
@@ -644,7 +645,7 @@ export function startGame(
   let previewDemon = false;
   lifecycle.add(driftRenderer.dispose);
   const { ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke } =
-    createEnvironmentPresentation(() => ({ activeTrial,previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg,time,wind,leaves,wx,bamboo,cinematic,cinematicWeather,WX,smokeSprite }));
+    createEnvironmentPresentation(() => ({ activeTrial,previewDemon,G,W,H,S,L,R,density,driftRenderer,reducedMotion,g,fg,time: presentationState.time,wind: presentationState.wind,leaves,wx,bamboo,cinematic,cinematicWeather,WX,smokeSprite }));
   function buildGrass() {
     const built = ambient().buildGrass(STAGES[G.stage]!.gl);
     fg = built.fg;
@@ -691,7 +692,7 @@ export function startGame(
   }
   const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
   const { buildPost } = postArtwork;
-  let inkPulse = 0;
+  
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
     if (anim && bg) {
@@ -711,15 +712,15 @@ export function startGame(
   /* ---------------- figures ---------------- */
   const {
     figureRenderer, drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf, drawEnemy, drawBoss,
-  } = createFiguresPresentation(() => ({ g,inkCharm,inkCompanion,inkEnemy,inkPlayer,inkSword,time,wind,G,W,H,cols,R,density,reducedMotion,reducedFlashes,robePal,accessible,EQ,SEAL,FONT }));
+  } = createFiguresPresentation(() => ({ g,inkCharm,inkCompanion,inkEnemy,inkPlayer,inkSword,time: presentationState.time,wind: presentationState.wind,G,W,H,cols,R,density,reducedMotion,reducedFlashes,robePal,accessible,EQ,SEAL,FONT }));
   function petOf() {
     return EQ.pet === 'nopet' && EQ.robe === 'scarecrow' ? 'crow' : EQ.pet;
   }
   function drawFoxfire() {
     if (!G.m || !G.m.foxfire) return;
     const p = L.player,
-      x = p.x + p.h * 0.34 + Math.cos(time * 1.4) * p.h * 0.05,
-      y = p.y - p.h * 1.02 + Math.sin(time * 2.8) * p.h * 0.025,
+      x = p.x + p.h * 0.34 + Math.cos(presentationState.time * 1.4) * p.h * 0.05,
+      y = p.y - p.h * 1.02 + Math.sin(presentationState.time * 2.8) * p.h * 0.025,
       r = Math.max(6, p.h * 0.035),
       a = G.foxUsed && G.state !== 'title' ? 0.22 : 0.9;
     g.save();
@@ -732,7 +733,7 @@ export function startGame(
     g.beginPath();
     g.arc(x, y, r * 2.4, 0, TAU);
     g.fill();
-    const tip = y - r * 1.6 - Math.sin(time * 9) * r * 0.3;
+    const tip = y - r * 1.6 - Math.sin(presentationState.time * 9) * r * 0.3;
     g.fillStyle = `rgba(230,245,255,${a})`;
     g.beginPath();
     g.moveTo(x, tip);
@@ -754,7 +755,7 @@ export function startGame(
       else G.darumaUsed = true;
     }
     timeScale = 1;
-    lbT = 0;
+    presentationState.lbT = 0;
     P.fall = 0;
     P.pose = { ...PREST };
     breakCombo();
@@ -764,7 +765,7 @@ export function startGame(
     renderLives();
     setScore();
     hud(true);
-    inkPulse = 0;
+    presentationState.inkPulse = 0;
     const inBoss = G.diedInBoss;
     G.enemies = [];
     G.attacker = null;
@@ -803,7 +804,7 @@ export function startGame(
   ) {
     renderEnso(
       g,
-      { time, seal: SEAL, sealArc: SEALARC, font: FONT, perfectZone: pz(), noArc: !!G.m.noArc },
+      { time: presentationState.time, seal: SEAL, sealArc: SEALARC, font: FONT, perfectZone: pz(), noArc: !!G.m.noArc },
       x,
       y,
       r,
@@ -840,22 +841,12 @@ export function startGame(
   lifecycle.listen($('mute'), 'pointerdown', (e) => e.stopPropagation());
 
   /* ---------------- game state ---------------- */
-  let time = 0,
-    wind = 1,
-    shake = 0,
-    hitStop = 0,
-    timeScale = 1,
-    flashA = 0,
-    flashCol = '255,255,255',
-    lb = 0,
-    lbT = 0,
-    zoom = 1,
-    zoomX = 0,
-    zoomY = 0;
+  const presentationState = createPresentationState();
+  let hitStop = 0, timeScale = 1;
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
   const apparelMotion = createSecondaryMotion();
-  let fx = createEffects();
+  
   const effectQuality = createEffectQuality();
   // Transitional adapters preserve closure ownership while consumers migrate to slices.
   const context: GameContext<PresentationContext> = {
@@ -894,32 +885,8 @@ export function startGame(
       effects: () => effectSpawner(),
       layout: () => L,
       viewport: () => ({ width: W, height: H, dpr: DPR, scale: S }),
-      camera: {
-        get shake() {
-          return shake;
-        },
-        set shake(value) {
-          shake = value;
-        },
-        get zoom() {
-          return zoom;
-        },
-        set zoom(value) {
-          zoom = value;
-        },
-        get zoomX() {
-          return zoomX;
-        },
-        set zoomX(value) {
-          zoomX = value;
-        },
-        get zoomY() {
-          return zoomY;
-        },
-        set zoomY(value) {
-          zoomY = value;
-        },
-      },
+      state: presentationState,
+      camera: presentationState,
     },
     events: createEventBus<GameEvents>(),
   };
@@ -1053,7 +1020,7 @@ export function startGame(
       width: W,
       height: H,
       dpr: DPR,
-      time,
+      time: presentationState.time,
       stage: G.stage,
       reducedMotion: reducedMotion(),
       reducedFlashes: reducedFlashes(),
@@ -1173,7 +1140,7 @@ export function startGame(
   const {
     pop, stamp, effectSpawner, addSlash, inkBurst, scraps, ring, sparks, dust,
     effectRenderer, drawFx, drawFx2, drawStains, drawPops, drawStamps,
-  } = createFeedbackPresentation(() => ({ g,fx,S,time,FONT,SEAL,mistSprite,R,density,flash,sfx,W,H,portrait }));
+  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite,R,density,flash,sfx,W,H,portrait }));
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     pts = gain(pts);
     G.score += pts;
@@ -1184,17 +1151,17 @@ export function startGame(
     return pts;
   }
   function flash(a: number, col?: string) {
-    flashA = Math.max(flashA, reducedFlashes() ? Math.min(a, 0.035) : a);
-    flashCol = col || '255,255,255';
+    presentationState.flashA = Math.max(presentationState.flashA, reducedFlashes() ? Math.min(a, 0.035) : a);
+    presentationState.flashCol = col || '255,255,255';
   }
   function letterbox(d: number) {
-    lbT = Math.max(lbT, d);
+    presentationState.lbT = Math.max(presentationState.lbT, d);
   }
   function punch(z: number, x: number, y: number) {
     if (reducedMotion()) return;
-    zoom = Math.max(zoom, z);
-    zoomX = x;
-    zoomY = y;
+    presentationState.zoom = Math.max(presentationState.zoom, z);
+    presentationState.zoomX = x;
+    presentationState.zoomY = y;
   }
 
   /* ---------------- enemies ---------------- */
@@ -1223,7 +1190,7 @@ export function startGame(
     simulateEnemies(G, dt, {
       rawDelta: raw,
       surge: WX.surge,
-      time,
+      time: presentationState.time,
       perfectZone: pz,
       sounds: sfx,
       pet: EQ.pet,
@@ -1283,8 +1250,8 @@ export function startGame(
     P.pose = { ...PREST };
     timeScale = 1;
     hitStop = 0;
-    lbT = 0;
-    for (const [key, particles] of Object.entries(fx))
+    presentationState.lbT = 0;
+    for (const [key, particles] of Object.entries(presentationState.fx))
       if (key !== 'scratches') particles.length = 0;
     ST.runs++;
     saveStats();
@@ -1668,7 +1635,7 @@ export function startGame(
     if (e.deathType === 'disarm') {
       const q = e.pos,
         s2 = q.h / 160;
-      fx.swords.push({
+      presentationState.fx.swords.push({
         x: q.x + q.h * 0.1,
         y: q.y - q.h * 0.6,
         vx: (R() - 0.5) * 260 * s2,
@@ -1698,7 +1665,7 @@ export function startGame(
     if (G.m.maneki) {
       G.manekiN = (G.manekiN || 0) + 1;
       if (G.manekiN % 7 === 0) {
-        fx.coins.push({ x0: e.pos.x, y0: e.pos.y - e.pos.h * 0.6, t: 0, life: 0.8 });
+        presentationState.fx.coins.push({ x0: e.pos.x, y0: e.pos.y - e.pos.h * 0.6, t: 0, life: 0.8 });
         sfx.coin();
         addScore(Math.round(500 * comboMult()), 0, 0, '招き猫');
       }
@@ -1726,7 +1693,7 @@ export function startGame(
     killFx(cx, cy, e.cutAng + Math.PI / 2, sc);
     scraps(cx, cy, 6, sc);
     ring(cx, cy, P0.h * 0.08, P0.h * 0.55, 0.32, Math.max(1.5, 2 * S));
-    fx.stains.push({
+    presentationState.fx.stains.push({
       x: P0.x + (R() - 0.5) * P0.h * 0.2,
       y: P0.y + P0.h * 0.01,
       rx: P0.h * (0.12 + R() * 0.1),
@@ -1807,7 +1774,7 @@ export function startGame(
       ring(cx, cy, P0.h * 0.1, P0.h * 1.3, 0.5, Math.max(2, 3 * S));
       letterbox(0.5);
       punch(1.07, cx, cy);
-      shake = Math.max(shake, 10 * S);
+      presentationState.shake = Math.max(presentationState.shake, 10 * S);
       hitStop = 0.15;
       flash(0.32);
       sfx.perfect();
@@ -1827,7 +1794,7 @@ export function startGame(
         P0.x,
         P0.y - P0.h * 1.05,
       );
-      shake = Math.max(shake, 7 * S);
+      presentationState.shake = Math.max(presentationState.shake, 7 * S);
       hitStop = 0.055;
       flash(0.08);
     }
@@ -1898,7 +1865,7 @@ export function startGame(
       for (let i = 0; i < scaledCount(16, density()); i++) {
         const a = R() * TAU,
           sp = (120 + R() * 260) * sc;
-        fx.splash.push({
+        presentationState.fx.splash.push({
           x: cx,
           y: cy,
           vx: Math.cos(a) * sp,
@@ -1912,7 +1879,7 @@ export function startGame(
       for (let i = 0; i < scaledCount(22, density()); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 200) * sc;
-        fx.splash.push({
+        presentationState.fx.splash.push({
           x: cx,
           y: cy,
           vx: Math.cos(a) * sp,
@@ -1928,7 +1895,7 @@ export function startGame(
       for (let i = 0; i < scaledCount(14, density()); i++) {
         const a = R() * TAU,
           sp = (60 + R() * 240) * sc;
-        fx.petals.push({
+        presentationState.fx.petals.push({
           x: cx,
           y: cy,
           vx: Math.cos(a) * sp,
@@ -1942,7 +1909,7 @@ export function startGame(
       }
     } else if (w === 'smoke') {
       for (let i = 0; i < scaledCount(14, density()); i++)
-        fx.embers.push({
+        presentationState.fx.embers.push({
           x: cx + (R() - 0.5) * 30 * sc,
           y: cy,
           vx: (R() - 0.5) * 140 * sc,
@@ -2097,7 +2064,7 @@ export function startGame(
     swingPlayer('block');
     sparks(tw[0], tw[1], 24);
     ring(tw[0], tw[1], 4 * S, 90 * S, 0.35, Math.max(2, 2.5 * S));
-    shake = Math.max(shake, 11 * S);
+    presentationState.shake = Math.max(presentationState.shake, 11 * S);
     hitStop = 0.09;
     flash(0.3);
     sfx.clang();
@@ -2160,7 +2127,7 @@ export function startGame(
         pos.y - pos.h,
         'Knife',
       );
-      fx.knives.push({
+      presentationState.fx.knives.push({
         x0: L.player.x,
         y0: L.player.y - L.player.h * 0.55,
         x1: pos.x,
@@ -2211,7 +2178,7 @@ export function startGame(
     swingPlayer(dir);
     sparks(tw[0], tw[1], 16);
     ring(tw[0], tw[1], 3 * S, 70 * S, 0.28, Math.max(1.5, 2 * S));
-    shake = Math.max(shake, 7 * S);
+    presentationState.shake = Math.max(presentationState.shake, 7 * S);
     hitStop = 0.05;
     flash(0.12);
     sfx.block();
@@ -2264,7 +2231,7 @@ export function startGame(
       killFx(cx, cy, a + Math.PI / 2, sc);
       scraps(cx, cy, 8, sc);
       ring(cx, cy, p.h * 0.1, p.h * 0.7, 0.35, Math.max(2, 2.5 * S));
-      shake = Math.max(shake, 12 * S);
+      presentationState.shake = Math.max(presentationState.shake, 12 * S);
       hitStop = 0.08;
       flash(0.15);
       sfx.slice();
@@ -2328,7 +2295,7 @@ export function startGame(
         G.nextT = 2.2;
         $('bossbar').classList.remove('on');
         inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
-        fx.stains.push({
+        presentationState.fx.stains.push({
           x: p.x,
           y: p.y + p.h * 0.01,
           rx: p.h * 0.3,
@@ -2422,7 +2389,7 @@ export function startGame(
       dt,
       {
         nextWave: (n) => {
-          lbT = 0;
+          presentationState.lbT = 0;
           startWave(n, true);
         },
         step: () => sfx.step(),
@@ -2633,7 +2600,7 @@ export function startGame(
     );
     inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 16, p.h / 420);
     flash(0.35, '150,22,16');
-    shake = Math.max(shake, 12 * S);
+    presentationState.shake = Math.max(presentationState.shake, 12 * S);
     hitStop = 0.08;
     sfx.hurt();
     combatHaptics.play('damage');
@@ -2693,7 +2660,7 @@ export function startGame(
     const outcome = resolveDamage(G, reason);
     renderLives();
     if (outcome.kind === 'hurt') {
-      if (outcome.lifeLost) inkPulse = 1;
+      if (outcome.lifeLost) presentationState.inkPulse = 1;
       struck(killer, outcome.keepCombo, outcome.label);
       return;
     }
@@ -2724,7 +2691,7 @@ export function startGame(
     inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 40, p.h / 420);
     scraps(p.x + p.h * 0.05, p.y - p.h * 0.7, 10, p.h / 300);
     flash(0.45, '150,22,16');
-    shake = Math.max(shake, 18 * S);
+    presentationState.shake = Math.max(presentationState.shake, 18 * S);
     letterbox(2.5);
     sfx.death();
     combatHaptics.play('damage');
@@ -2739,7 +2706,7 @@ export function startGame(
     guided.reset();
     audio.setPaused(false);
     timeScale = 1;
-    lbT = 0;
+    presentationState.lbT = 0;
     clearHints();
     $('bossbar').classList.remove('on');
     const reward = { before: META.embers, after: META.embers, gained: 0 };
@@ -2812,7 +2779,7 @@ export function startGame(
     guided.reset();
     audio.setPaused(false);
     timeScale = 1;
-    lbT = 0;
+    presentationState.lbT = 0;
     clearHints();
     $('bossbar').classList.remove('on');
     const { record: rec, newBest: nb } = recordRun(ST, G);
@@ -2962,7 +2929,7 @@ export function startGame(
     hud(false);
     $('bossbar').classList.remove('on');
     timeScale = 1;
-    lbT = 0;
+    presentationState.lbT = 0;
     if (G.stage !== 0) setStage(0, true);
     setupAttract();
     P.fall = 0;
@@ -3272,10 +3239,10 @@ export function startGame(
     document.documentElement.dataset.motion = settings.reducedMotion;
     $('app').dataset.reducedFlashes = String(reducedFlashes());
     if (reducedMotion()) {
-      shake = 0;
-      zoom = 1;
+      presentationState.shake = 0;
+      presentationState.zoom = 1;
     }
-    if (reducedFlashes()) flashA = Math.min(flashA, 0.035);
+    if (reducedFlashes()) presentationState.flashA = Math.min(presentationState.flashA, 0.035);
     if (bg) {
       ambient().balanceLeaves(leaves);
       rebalanceWeather();
@@ -3640,8 +3607,8 @@ export function startGame(
     const rb = ROBES[EQ.robe] || {};
     return {
       lighting: lightingRig.lighting(target.width, target.height),
-      time,
-      wind,
+      time: presentationState.time,
+      wind: presentationState.wind,
       effectDensity: density(),
       reducedMotion: reducedMotion(),
       reducedFlashes: reducedFlashes(),
@@ -3888,10 +3855,10 @@ export function startGame(
 
   /* ---------------- update ---------------- */
   function updateFx(dt: number, raw: number) {
-    updateEffects(fx, dt, raw, {
+    updateEffects(presentationState.fx, dt, raw, {
       scale: S,
-      wind,
-      time,
+      wind: presentationState.wind,
+      time: presentationState.time,
       random: R,
       onSwordStuck: () => sfx.clink(),
     });
@@ -3906,8 +3873,8 @@ export function startGame(
       width: W,
       height: H,
       scale: S,
-      wind,
-      time,
+      wind: presentationState.wind,
+      time: presentationState.time,
       hazard: G.m.hazard,
       layout: L,
       random: R,
@@ -3916,7 +3883,7 @@ export function startGame(
       sounds: sfx,
       gustLeaves,
       onShake: (amount) => {
-        shake = Math.max(shake, amount);
+        presentationState.shake = Math.max(presentationState.shake, amount);
       },
     });
   }
@@ -3926,22 +3893,22 @@ export function startGame(
       finishTrial(trialFailure);
       return;
     }
-    time += dt;
-    wind =
+    presentationState.time += dt;
+    presentationState.wind =
       1 +
-      0.55 * Math.sin(time * 0.31) +
-      0.35 * Math.sin(time * 0.87 + 1) +
-      0.2 * Math.sin(time * 2.3);
+      0.55 * Math.sin(presentationState.time * 0.31) +
+      0.35 * Math.sin(presentationState.time * 0.87 + 1) +
+      0.2 * Math.sin(presentationState.time * 2.3);
     if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) G.runTime += raw;
     for (const m of mists) {
-      m.x += m.v * (0.5 + wind * 0.5) * dt;
+      m.x += m.v * (0.5 + presentationState.wind * 0.5) * dt;
       if (m.x - m.w / 2 > W) m.x = -m.w / 2;
     }
-    ambient().updateLeaves(leaves, dt, time, wind);
+    ambient().updateLeaves(leaves, dt, presentationState.time, presentationState.wind);
     // Cinematic mode advances cosmetic time only: no encounters, weather hazards or run RNG.
     if (cinematic.active) {
       updateWeather(reducedMotion() ? 0 : dt);
-      audio.update(raw, STAGES[G.stage]!.weather, wind, 0);
+      audio.update(raw, STAGES[G.stage]!.weather, presentationState.wind, 0);
       return;
     }
     if (G.freezeT > 0) G.freezeT -= dt;
@@ -3993,12 +3960,12 @@ export function startGame(
       stageFade = Math.max(0, stageFade - raw / 1.3);
       if (!stageFade) prevBg = null;
     }
-    if (lbT > 0) {
-      lbT -= raw;
-      lb += (1 - lb) * (1 - Math.exp(-raw * 14));
-    } else lb += (0 - lb) * (1 - Math.exp(-raw * 5));
-    zoom += (1 - zoom) * (1 - Math.exp(-raw * 7));
-    audio.update(raw, STAGES[G.stage]!.weather, wind, WX.wo);
+    if (presentationState.lbT > 0) {
+      presentationState.lbT -= raw;
+      presentationState.lb += (1 - presentationState.lb) * (1 - Math.exp(-raw * 14));
+    } else presentationState.lb += (0 - presentationState.lb) * (1 - Math.exp(-raw * 5));
+    presentationState.zoom += (1 - presentationState.zoom) * (1 - Math.exp(-raw * 7));
+    audio.update(raw, STAGES[G.stage]!.weather, presentationState.wind, WX.wo);
   }
 
   /* ---------------- render ---------------- */
@@ -4120,16 +4087,12 @@ export function startGame(
     }
   }
   const postPreparation = createPostPreparation(() => ({
-    W, H, G, R, reducedMotion, reducedFlashes, sceneFilm, pz, fx, buzz, S, time,
+    W, H, G, R, reducedMotion, reducedFlashes, sceneFilm, pz, fx: presentationState.fx, buzz, S, time: presentationState.time,
     signals: postSignals,
   }));
   const { advancePost, preparePresentation } = postPreparation;
-  const postSignals = {
-    get inkPulse() { return inkPulse; }, set inkPulse(value: number) { inkPulse = value; },
-    get flashA() { return flashA; }, set flashA(value: number) { flashA = value; },
-    get shake() { return shake; }, set shake(value: number) { shake = value; },
-  };
-  const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time,reducedMotion,reducedFlashes,grainPats: postArtwork.grainPats,vig: postArtwork.vig,pz,inkEdge: postArtwork.inkEdge,lb,flashCol }));
+  const postSignals = presentationState;
+  const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time: presentationState.time,reducedMotion,reducedFlashes,grainPats: postArtwork.grainPats,vig: postArtwork.vig,pz,inkEdge: postArtwork.inkEdge,lb: presentationState.lb,flashCol: presentationState.flashCol }));
   function render(raw: number) {
     // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
     // inspection dialog covers it completely; its independent preview still draws.
@@ -4145,15 +4108,15 @@ export function startGame(
     W,
     H,
     DPR,
-    zoom,
-    zoomX,
-    zoomY,
+    zoom: presentationState.zoom,
+    zoomX: presentationState.zoomX,
+    zoomY: presentationState.zoomY,
     reducedMotion,
     activeTrial,
     cinematic,
     previewDemon,
     demonRealmRenderer,
-    time,
+    time: presentationState.time,
     stageSeed,
     environmentRenderer,
     G,
@@ -4408,7 +4371,7 @@ export function startGame(
       width: W,
       height: H,
       dpr: DPR,
-      time,
+      time: presentationState.time,
       stage: G.stage,
       reducedMotion: reducedMotion(),
       reducedFlashes: reducedFlashes(),

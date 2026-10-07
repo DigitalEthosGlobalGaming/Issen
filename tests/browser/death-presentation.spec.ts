@@ -9,7 +9,7 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__deathHarness = { G, g, fx, frameLoop, startRun, killEnemy, drawEnemy, drawStains, updateEnemies, updateFx }; artworkReady = true;',
+        'window.__deathHarness = { G, g, fx: presentationState.fx, frameLoop, startRun, killEnemy, drawEnemy, drawStains, updateEnemies, updateFx }; artworkReady = true;',
       ),
     });
   });

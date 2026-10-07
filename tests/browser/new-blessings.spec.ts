@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__blessingHarness = { G, ST, BLESS_BY, showShrineOffers, captureCheckpoint, playerDie, renderLives, updateWave, fx, frameLoop }; artworkReady = true;',
+      'window.__blessingHarness = { G, ST, BLESS_BY, showShrineOffers, captureCheckpoint, playerDie, renderLives, updateWave, fx: presentationState.fx, frameLoop }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

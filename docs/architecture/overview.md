@@ -58,7 +58,9 @@ leaf/weather drawing. Hazard simulation remains separate.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, with explicit sound/flash ports and no run record.
 `presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
-separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. `game.ts` remains the composition and orchestration layer. Its private closure
+separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
+owns cosmetic clocks, effects and camera/flash/letterbox signals; hit-stop and run
+time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service
 instances. It connects feature callbacks to audio, persistence, effects and UI.
 It still contains encounter transitions, kill/damage presentation, title secrets,
