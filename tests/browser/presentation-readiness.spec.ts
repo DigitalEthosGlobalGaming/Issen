@@ -11,7 +11,7 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
         'artworkReady = true;',
         `window.__presentationBoundary = {
         frameLoop, drawScene, preparePresentation, render,
-        snapshot: () => JSON.stringify({ G, random: runRandom.state(), saves: Object.entries(localStorage) }),
+        snapshot: () => JSON.stringify({ G, random: activity.runRandom.state(), saves: Object.entries(localStorage) }),
         queue() {
           sceneLoading = true; sceneReadyToPresent = true;
           sceneContinuation = () => { G.score += 7; };

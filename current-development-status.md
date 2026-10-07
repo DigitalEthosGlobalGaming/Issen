@@ -4,15 +4,16 @@ Complete all three workstreams in main-goal.md strictly in order, then Part 4
 verification/report and one develop push. No approval gates. No profiles,
 benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
-develop, unpushed. Version 1.66.8; W1 Smaller download notes are released locally.
+develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Session construction bindings
+## Latest green checkpoint: Run activity state
 
-Five session factories share game/session/session-bindings.ts. Their construction calls remain at their original points. Current writable views, narrow contracts and deferred setBestLine callback are preserved.
-`npm run typecheck`: strict types pass (session-bindings-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 364 units pass (session-bindings-unit.log).
-`npx playwright test tests/browser/feature-plan-06.spec.ts tests/browser/daily.spec.ts tests/browser/trials.spec.ts tests/browser/scene-continuation.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/support-rewards.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 18 pass in 2.1m (session-bindings-browser.log; terminal exit 0 confirmed).
+game/session/activity.ts owns mutable trial/daily metadata, failure/result state and both existing random capabilities as a plain record. Sixty-six semantic root references and six actual browser RNG hooks now use this owner. Original initialization order and checkpoint records are unchanged.
+`npm run typecheck`: strict types pass (activity-state-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 364 units pass (activity-state-unit.log).
+`npx playwright test tests/browser/cinematic.spec.ts tests/browser/renderer-shortcut.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/stage-variation.spec.ts tests/browser/trials.spec.ts tests/browser/daily.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 17 pass in 1.9m (activity-state-browser.log; terminal exit 0 confirmed).
+`npx playwright test tests/browser/options.spec.ts tests/browser/pixi-backend.spec.ts -g 'Options preserves paused|same prepared scene' --config playwright.rendering-v2.config.ts --trace retain-on-failure`: both pass in 10.5s (activity-state-hooks.log; terminal confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
@@ -34,6 +35,7 @@ Native/equipment/environment/figure presentation, phased profile state,
 active equipment/profile policy and frame dispatch have explicit owners.
 Kill, combo/score, parry/block and successful boss-cut/victory cosmetics listen
 to immutable value events. Seven phases share their typed construction provider.
+Implemented binding/state/lifecycle owners: game/session/phase-bindings.ts, ui/wiring/menu-bindings.ts, game/session/session-bindings.ts, game/session/activity.ts.
 See docs/architecture/overview.md and refactor-decision-log.md for exact ownership,
 physical moves, separate fixes/deletions and prior verification checkpoints.
 
@@ -50,7 +52,7 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Regenerate/apply the activity-state preview, migrate actual RNG browser hooks, then strict/unit and focused scene/trial/daily/isolation checks.
+Regenerate/apply the graphics lifecycle preview, then strict/unit and actual graphics failure, restoration, activity and disposal browser checks.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source

@@ -27,7 +27,7 @@ for (const viewport of [
         response,
         body: (await response.text()).replace(
           'artworkReady = true;',
-          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicWiring.savedStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: runRandom.state(), cache: environmentRenderer.snapshot() }); artworkReady = true;',
+          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicWiring.savedStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: activity.runRandom.state(), cache: environmentRenderer.snapshot() }); artworkReady = true;',
         ),
       });
     });

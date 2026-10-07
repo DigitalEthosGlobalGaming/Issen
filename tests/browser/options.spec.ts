@@ -53,7 +53,7 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__optionsHarness = { G, randomState: () => runRandom.state() }; artworkReady = true;',
+        'window.__optionsHarness = { G, randomState: () => activity.runRandom.state() }; artworkReady = true;',
       ),
     });
   });

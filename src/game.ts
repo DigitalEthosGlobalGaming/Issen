@@ -1,3 +1,4 @@
+import { createRunActivity } from './game/session/activity.ts';
 import { createSessionBindings, type SessionBindingViews } from './game/session/session-bindings.ts';
 import { createMenuBindings, type MenuBindingViews } from './ui/wiring/menu-bindings.ts';
 import { createPhaseBindings } from './game/session/phase-bindings.ts';
@@ -304,16 +305,16 @@ export function startGame(
   let ST = profileFoundation.ST;
   const { SETUP, UNL, DAILY_LOGIN, TRIAL_PROGRESS, playerStats } = profileFoundation;
   let loginCrestRevealed = false;
-  let activeTrial: TrialDefinition | null = null;
-  let activeDaily: DailyRun | null = null;
-  let trialFailure = '';
-  let trialResult: TrialResult | null = null;
-  let combatRandom = R;
-  let runRandom = restorableRng(0);
-  let runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
+  const activity = createRunActivity(R, playerStats.roninWave);
+  
+  
+  
+  
+  
+  
   const { META, AWAKENING, COLLECTION_PROGRESS, saveAwakening, saveCollections, saveMeta, ARMORY_SEEN } = createProfileProgress(profileServices, () => ST, SETUP, UNL);
   const syncCollections = () => {
-    if (!activeTrial && !activeDaily && !['title'].includes(G.state))
+    if (!activity.activeTrial && !activity.activeDaily && !['title'].includes(G.state))
       syncCollectionProgress(COLLECTION_PROGRESS, META, ST, G);
   };
   let runTemplate = templateModifiers(META, SETUP, premiumAccess());
@@ -337,7 +338,7 @@ export function startGame(
   }
   function earn(event: 'kill' | 'wave' | 'boss') { return profileRules.earn(event); }
   const saveStats = () => {
-    if (!activeTrial && !activeDaily) {
+    if (!activity.activeTrial && !activity.activeDaily) {
       syncCollections();
       saveCollections();
       store.set('issen.stats', ST);
@@ -382,7 +383,7 @@ export function startGame(
     R,
     density,
     context2d,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     reducedMotion,
     g,
     presentationState,
@@ -391,7 +392,7 @@ export function startGame(
   }));
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();
-    if (resetSimulation) Object.assign(WX, createWeatherState(combatRandom));
+    if (resetSimulation) Object.assign(WX, createWeatherState(activity.combatRandom));
   }
   const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
   const { buildPost } = postArtwork;
@@ -501,11 +502,11 @@ export function startGame(
     run: {
       state: G,
       get random() {
-        return runRandom;
+        return activity.runRandom;
       },
       set random(value) {
-        runRandom = value;
-        combatRandom = value.next;
+        activity.runRandom = value;
+        activity.combatRandom = value.next;
       },
       get equipment() {
         return EQ;
@@ -515,16 +516,16 @@ export function startGame(
       },
       setup: SETUP,
       get trial() {
-        return activeTrial;
+        return activity.activeTrial;
       },
       set trial(value) {
-        activeTrial = value;
+        activity.activeTrial = value;
       },
       get daily() {
-        return activeDaily;
+        return activity.activeDaily;
       },
       set daily(value) {
-        activeDaily = value;
+        activity.activeDaily = value;
       },
     },
     services: { audio, storage: store, settings, notify: toast },
@@ -542,8 +543,8 @@ export function startGame(
   lifecycle.add(context.events.clear);
   const profileRules = createProfileRules(() => ({
     G,
-    activeTrial,
-    activeDaily,
+    activeTrial: activity.activeTrial,
+    activeDaily: activity.activeDaily,
     rewardLedger,
     AWAKENING,
     META,
@@ -568,7 +569,7 @@ export function startGame(
     EQ,
     UNL,
     ITEM_BY,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     accessible,
     runTemplate,
   }));
@@ -598,12 +599,12 @@ export function startGame(
   const combatScore = createCombatScore(() => ({
     G,
     events: context.events,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     get trialFailure() {
-      return trialFailure;
+      return activity.trialFailure;
     },
     set trialFailure(value) {
-      trialFailure = value;
+      activity.trialFailure = value;
     },
   }));
   function bumpCombo() {
@@ -613,7 +614,7 @@ export function startGame(
   const { hudView, screenAnimation, showScreen, renderLives, hud, setScore, banner, renderHp } =
     createRuntimeScreens($('app'), activeNow, () => ({
       G,
-      activeDaily: !!activeDaily,
+      activeDaily: !!activity.activeDaily,
       syncCollections,
     }));
   let artworkReady = false;
@@ -633,7 +634,7 @@ export function startGame(
     reducedMotion,
     reducedFlashes,
     density,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     environmentState,
     compositionKey,
     cvs,
@@ -654,7 +655,7 @@ export function startGame(
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
   const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
-    if (activeTrial || activeDaily) return;
+    if (activity.activeTrial || activity.activeDaily) return;
     if (G.hints[key]) return;
     G.hints[key] = 1;
     store.set('issen.hints', G.hints);
@@ -758,7 +759,7 @@ export function startGame(
     get storage(): SessionBindingViews<typeof PREST, ResultReveal>['storage'] { return store; },
     get resetClock(): SessionBindingViews<typeof PREST, ResultReveal>['resetClock'] { return () => frameLoop.resetClock(); },
     get activeTrial() {
-        return activeTrial;
+        return activity.activeTrial;
       },
     get sceneLoading() {
         return sceneLoading;
@@ -776,10 +777,10 @@ export function startGame(
         ST = value;
       },
     get activeDaily() {
-        return activeDaily;
+        return activity.activeDaily;
       },
     set activeDaily(value) {
-        activeDaily = value;
+        activity.activeDaily = value;
       },
     get rewardLedger() {
         return rewardLedger;
@@ -794,10 +795,10 @@ export function startGame(
         runBossMilestone = value;
       },
     get runRandom() {
-        return runRandom;
+        return activity.runRandom;
       },
     set runRandom(value) {
-        runRandom = value;
+        activity.runRandom = value;
       },
     get runTemplate() {
         return runTemplate;
@@ -806,10 +807,10 @@ export function startGame(
         runTemplate = value;
       },
     get combatRandom() {
-        return combatRandom;
+        return activity.combatRandom;
       },
     set combatRandom(value) {
-        combatRandom = value;
+        activity.combatRandom = value;
       },
     get savedRun() {
         return savedRun;
@@ -842,7 +843,7 @@ export function startGame(
     get buildLeaves() { return buildLeaves; },
     get waveCfg() { return waveCfg; },
     get clearTrialResult(): SessionBindingViews<typeof PREST, ResultReveal>['clearTrialResult'] { return () => {
-      trialResult = null;
+      activity.trialResult = null;
     }; },
     get clearCheckpoint(): SessionBindingViews<typeof PREST, ResultReveal>['clearCheckpoint'] { return clearRunCheckpoint; },
     get newRunSeed() { return newRunSeed; },
@@ -854,7 +855,7 @@ export function startGame(
         if (key !== 'scratches') particles.length = 0;
     }; },
     set activeTrial(value) {
-      activeTrial = value;
+      activity.activeTrial = value;
     },
     get runItemReveals() {
       return runItemReveals;
@@ -863,10 +864,10 @@ export function startGame(
       runItemReveals = value;
     },
     get runTrialsWasUnlocked() {
-      return runTrialsWasUnlocked;
+      return activity.runTrialsWasUnlocked;
     },
     set runTrialsWasUnlocked(value) {
-      runTrialsWasUnlocked = value;
+      activity.runTrialsWasUnlocked = value;
     },
     get stageSeed() {
       return stageSeed;
@@ -887,10 +888,10 @@ export function startGame(
       hitStop = value;
     },
     get trialFailure() {
-      return trialFailure;
+      return activity.trialFailure;
     },
     set trialFailure(value) {
-      trialFailure = value;
+      activity.trialFailure = value;
     },
     get TRIAL_PROGRESS() { return TRIAL_PROGRESS; },
     get R() { return R; },
@@ -913,10 +914,10 @@ export function startGame(
         ?.focus({ preventScroll: true });
     }; },
     get trialResult() {
-      return trialResult;
+      return activity.trialResult;
     },
     set trialResult(value) {
-      trialResult = value;
+      activity.trialResult = value;
     },
     get sceneContinuation() { return sceneContinuation; },
     set sceneContinuation(value) { sceneContinuation = value; },
@@ -952,8 +953,8 @@ export function startGame(
     return enemyPosition(e, L, W, H);
   }
   function spawnEnemy(slot: number, attract = false) {
-    if (activeTrial && !attract && G.toSpawn <= 0) return;
-    return createEnemy(G, slot, attract, enemyPos, attract ? R : combatRandom);
+    if (activity.activeTrial && !attract && G.toSpawn <= 0) return;
+    return createEnemy(G, slot, attract, enemyPos, attract ? R : activity.combatRandom);
   }
   function setupAttract() {
     if (deferUntilSceneReady(setupAttract)) return;
@@ -967,7 +968,7 @@ export function startGame(
     return orderedEnemies(G.enemies);
   }
   function pickAttacker() {
-    return selectAttacker(G.enemies, waveConfiguration().ordered, combatRandom);
+    return selectAttacker(G.enemies, waveConfiguration().ordered, activity.combatRandom);
   }
   function updateEnemies(dt: number, raw = dt) {
     simulateEnemies(G, dt, {
@@ -991,7 +992,7 @@ export function startGame(
     trialSession.finishTrial(message);
   }
   function renderTrialObjective() {
-    const trial = activeTrial;
+    const trial = activity.activeTrial;
     const visible = !!trial && ['playing', 'boss', 'between'].includes(G.state);
     $('trialObjective').hidden = !visible;
     if (!trial || !visible) return;
@@ -1009,7 +1010,7 @@ export function startGame(
     W,
     H,
     S,
-    combatRandom,
+    combatRandom: activity.combatRandom,
     renderLives,
     pop,
     setStage,
@@ -1035,7 +1036,7 @@ export function startGame(
     dust,
     earn,
     addScore,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     orderSucceeded: () => guided.orderSucceeded(),
     swingPlayer,
     playerDie,
@@ -1056,7 +1057,7 @@ export function startGame(
       },
     bossPos,
     renderHp,
-    activeDaily,
+    activeDaily: activity.activeDaily,
     guided,
     flash,
     breakCombo,
@@ -1139,10 +1140,10 @@ export function startGame(
     },
     startBoss,
     get trialFailure() {
-      return trialFailure;
+      return activity.trialFailure;
     },
     set trialFailure(value) {
-      trialFailure = value;
+      activity.trialFailure = value;
     },
     bossSwipe,
     clearHints,
@@ -1179,7 +1180,7 @@ export function startGame(
     G,
     pz,
     enemyPos,
-    combatRandom,
+    combatRandom: activity.combatRandom,
     waveConfiguration,
     ST,
     earn,
@@ -1198,7 +1199,7 @@ export function startGame(
     combatHaptics,
     renderLives,
     pop,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     hud,
     setScore,
     W,
@@ -1214,10 +1215,10 @@ export function startGame(
     },
     flash,
     get trialFailure() {
-      return trialFailure;
+      return activity.trialFailure;
     },
     set trialFailure(value) {
-      trialFailure = value;
+      activity.trialFailure = value;
     },
     gustLeaves,
     notifications,
@@ -1447,13 +1448,13 @@ export function startGame(
     get saveMeta(): MenuBindingViews['saveMeta'] { return saveMeta; },
     get premiumAccess(): MenuBindingViews['premiumAccess'] { return premiumAccess; },
     get TRIAL_PROGRESS(): MenuBindingViews['TRIAL_PROGRESS'] { return TRIAL_PROGRESS; },
-    get trialResult(): MenuBindingViews['trialResult'] { return trialResult; },
+    get trialResult(): MenuBindingViews['trialResult'] { return activity.trialResult; },
     get startTrial(): MenuBindingViews['startTrial'] { return startTrial; },
     get showScreen(): MenuBindingViews['showScreen'] { return showScreen; },
     get UNL(): MenuBindingViews['UNL'] { return UNL; },
     get ITEMS(): MenuBindingViews['ITEMS'] { return ITEMS; },
     get clearTrialResult(): MenuBindingViews['clearTrialResult'] { return () => {
-      trialResult = null;
+      activity.trialResult = null;
     }; },
     get SETUP(): MenuBindingViews['SETUP'] { return SETUP; },
     get ITEM_BY(): MenuBindingViews['ITEM_BY'] { return ITEM_BY; },
@@ -1476,7 +1477,7 @@ export function startGame(
     get testJump(): MenuBindingViews['testJump'] { return testJump; },
     get toast(): MenuBindingViews['toast'] { return toast; },
     get setTrialsWasUnlocked(): MenuBindingViews['setTrialsWasUnlocked'] { return (value) => {
-      runTrialsWasUnlocked = value;
+      activity.runTrialsWasUnlocked = value;
     }; },
     get cvs(): MenuBindingViews['cvs'] { return cvs; },
     get screenAnimation(): MenuBindingViews['screenAnimation'] { return screenAnimation; },
@@ -1660,7 +1661,7 @@ export function startGame(
       return savedRun;
     },
     get activeTrial() {
-      return activeTrial;
+      return activity.activeTrial;
     },
   });
   bindPurchaseWiring({
@@ -1706,13 +1707,13 @@ export function startGame(
       runTemplate = value;
     },
     get activeTrial() {
-      return activeTrial;
+      return activity.activeTrial;
     },
     get trialFailure() {
-      return trialFailure;
+      return activity.trialFailure;
     },
     set trialFailure(value) {
-      trialFailure = value;
+      activity.trialFailure = value;
     },
   });
   const disposeKeyboard = bindNavigation();
@@ -1720,9 +1721,9 @@ export function startGame(
     combatHaptics.stop();
     audio.setPaused(true);
     renderPauseBlessings($('paused'), G.bless);
-    $('pauseSeed').textContent = activeDaily
-      ? `Daily · ${activeDaily.day}`
-      : activeTrial
+    $('pauseSeed').textContent = activity.activeDaily
+      ? `Daily · ${activity.activeDaily.day}`
+      : activity.activeTrial
         ? ''
         : `Seed ${G.seed}`;
     showScreen('paused');
@@ -1771,7 +1772,7 @@ export function startGame(
         hazard: G.m.hazard,
         layout: L,
         random: R,
-        hazardRandom: cinematic.active ? R : combatRandom,
+        hazardRandom: cinematic.active ? R : activity.combatRandom,
         flash,
         sounds: sfx,
         gustLeaves,
@@ -1783,8 +1784,8 @@ export function startGame(
   }
   const frameSimulation = createFrameSimulation(() => ({
     sceneLoading,
-    activeTrial,
-    trialFailure,
+    activeTrial: activity.activeTrial,
+    trialFailure: activity.trialFailure,
     finishTrial,
     G,
     updateAmbient,
@@ -1796,7 +1797,7 @@ export function startGame(
     updatePlayer,
     apparelMotion,
     updateEnemies,
-    activeDaily,
+    activeDaily: activity.activeDaily,
     waveConfiguration,
     liveOrdered,
     guided,
@@ -1867,7 +1868,7 @@ export function startGame(
     zoomX: presentationState.zoomX,
     zoomY: presentationState.zoomY,
     reducedMotion,
-    activeTrial,
+    activeTrial: activity.activeTrial,
     cinematic,
     previewDemon: environmentState.previewDemon,
     demonRealmRenderer,
