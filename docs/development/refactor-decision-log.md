@@ -132,6 +132,8 @@
 
 - 2026-10-08 — W2 live phase router — preserve ordered same-frame cascades through updateFrame, pass raw delta and silently adopt restored checkpoints — dispatch only one phase per frame or replay entry on restore — strict, all 318 units and the full 253-case browser retry pass; no gameplay/save changes — revert the live router integration and its driver tests together.
 
+- 2026-10-08 — W2 enemy kill move — move current kill rules first, retaining cosmetic construction behind explicit ports, and migrate seeded kills to the production API — combine event splitting with the physical move or retain inline test copies — strict, all 321 units and focused browser cases pass; score, chain and reward ordering is preserved — revert the physical kill move and driver migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

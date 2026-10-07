@@ -68,7 +68,9 @@ owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signa
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions and service instances.
 It connects feature callbacks to audio, persistence, presentation owners and UI.
-It still contains encounter transitions, kill/damage orchestration,
+game/combat/kill.ts now owns cut/scoring/blessing/chain rules with explicit cosmetic
+ports; synchronous rule/listener splitting is the next step. The runtime still contains
+results/reward orchestration,
 player/companion projection and frame preparation orchestration. These are not separate
 fully extracted owners yet; do not assume the proposed migration tree describes
 implemented files. W2 now introduces `game/session/context.ts`: `RunContext`

@@ -1,3 +1,4 @@
+import { createEnemyKill } from './game/combat/kill.ts';
 import { createPhaseRouter, definePhase } from './game/session/phase-router.ts';
 import { createBetweenPhase } from './game/phases/between.ts';
 import { createDeathPhase } from './game/phases/death.ts';
@@ -1456,38 +1457,69 @@ export function startGame(
   function updateWave(dt: number) {
     waveLifecycle.updateWave(dt);
   }
-  function killEnemy(
-    e: Enemy,
-    dir: Direction,
-    chained = false,
-    preserveStreak = false,
-    automatic = false,
-  ) {
-    const wasAtk = e === G.attacker,
-      p = e.state === 'attack' ? clamp(e.p) : 0,
-      swiftPoints = G.m.swift && !chained ? swiftSlashPoints(Math.max(0, e.life - 0.9), e.T) : null,
-      perfect =
-        !automatic &&
-        !G.m.noPerfect &&
-        ((wasAtk && p >= pz()) || (!chained && G.bless.has('flurry') && (G.combo + 1) % 10 === 0));
-    e.k = e.state === 'attack' ? Math.pow(p, 1.6) : 0;
-    e.state = 'dying';
-    e.t = 0;
-    e.cutAng = DANG[dir];
-    e.pos = enemyPos(e);
-    e.shadowTime = 0;
-    e.deathGround = { ...e.pos };
-    e.deathType =
-      !G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour'
-        ? 'scatter'
-        : !G.m.bonk &&
-            accessible(EQ.fx) &&
-            ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
-          ? 'dissolve'
-          : chooseDeathStyle(perfect, !!G.m.bonk, R);
-    e.fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
-    if (e.deathType === 'disarm') {
-      const q = e.pos,
+  const killRules = createEnemyKill(() => ({
+    G,
+    pz,
+    enemyPos,
+    combatRandom,
+    waveConfiguration,
+    ST,
+    earn,
+    sfx,
+    addScore,
+    comboMult,
+    bst,
+    challenge,
+    bumpCombo,
+    addSlash,
+    killFx,
+    scraps,
+    ring,
+    S,
+    swingPlayer,
+    combatHaptics,
+    renderLives,
+    pop,
+    activeTrial,
+    hud,
+    setScore,
+    W,
+    H,
+    stamp,
+    letterbox,
+    punch,
+    get hitStop() {
+      return hitStop;
+    },
+    set hitStop(value) {
+      hitStop = value;
+    },
+    flash,
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+    gustLeaves,
+    notifications,
+    hideHint,
+    liveOrdered,
+    checkUnlocks,
+    deathAppearance(perfect, bonk, dir) {
+      const deathType =
+        !G.m.bonk && accessible(EQ.fx) && EQ.fx === 'scattered-armour'
+          ? 'scatter'
+          : !G.m.bonk &&
+              accessible(EQ.fx) &&
+              ['falling-leaves', 'ember-ash', 'ink-wash'].includes(EQ.fx)
+            ? 'dissolve'
+            : chooseDeathStyle(perfect, !!G.m.bonk, R);
+      const fallDir = dir === 'left' ? -1 : dir === 'right' ? 1 : R() < 0.5 ? -1 : 1;
+      return { deathType, fallDir };
+    },
+    disarm(pos) {
+      const q = pos,
         s2 = q.h / 160;
       presentationState.fx.swords.push({
         x: q.x + q.h * 0.1,
@@ -1502,221 +1534,36 @@ export function startGame(
         stuck: false,
         life: 2.4,
       });
-    }
-    for (const o of G.enemies)
-      if (o !== e && (o.state === 'idle' || o.state === 'attack'))
-        o.flinch = 0.6 + 0.4 * combatRandom();
-    if (wasAtk) {
-      G.attacker = null;
-      G.gapT = waveConfiguration().gap;
-    }
-    const comboGrew = perfect || !G.bless.has('oath');
-    if (comboGrew) G.combo++;
-    G.kills++;
-    ST.kills++;
-    earn('kill');
-    if (e.fake) ST.feintKills = (ST.feintKills || 0) + 1;
-    if (G.m.maneki) {
-      G.manekiN = (G.manekiN || 0) + 1;
-      if (G.manekiN % 7 === 0) {
-        presentationState.fx.coins.push({
-          x0: e.pos.x,
-          y0: e.pos.y - e.pos.h * 0.6,
-          t: 0,
-          life: 0.8,
-        });
-        sfx.coin();
-        addScore(Math.round(500 * comboMult()), 0, 0, '招き猫');
-      }
-    }
-    {
-      const q = bst();
-      if (q) q.k++;
-      challenge('k');
-    }
-    bumpCombo();
-    const P0 = e.pos,
-      cx = P0.x,
-      cy = P0.y - P0.h * 0.55,
-      v: [number, number] = [Math.cos(e.cutAng), Math.sin(e.cutAng)],
-      len = P0.h * (automatic ? 0.55 : 0.95),
-      sc = P0.h / 160;
-    addSlash(
-      cx - (v[0] * len) / 2,
-      cy - (v[1] * len) / 2,
-      cx + (v[0] * len) / 2,
-      cy + (v[1] * len) / 2,
-      Math.max(3, P0.h * 0.03),
-      0.3,
-    );
-    killFx(cx, cy, e.cutAng + Math.PI / 2, sc);
-    scraps(cx, cy, 6, sc);
-    ring(cx, cy, P0.h * 0.08, P0.h * 0.55, 0.32, Math.max(1.5, 2 * S));
-    presentationState.fx.stains.push({
-      x: P0.x + (R() - 0.5) * P0.h * 0.2,
-      y: P0.y + P0.h * 0.01,
-      rx: P0.h * (0.12 + R() * 0.1),
-      t: 0,
-      life: SHADOW_DURATION,
-    });
-    if (!automatic) swingPlayer(dir, perfect);
-    if (G.m.bonk) sfx.bonk();
-    else sfx.slice();
-    combatHaptics.play('slice');
-    if (G.m.restore && !G.zen && !G.hard) {
-      G.clean = (G.clean || 0) + 1;
-      if (G.clean >= G.m.restore) {
-        G.clean = 0;
-        if (G.lives < G.maxLives) {
-          G.lives++;
-          renderLives();
-          pop(0, 0, '正宗 +1 life');
-        }
-      }
-    }
-    if (perfect) {
-      G.perfects++;
-      ST.perfects++;
-      if (!activeTrial) ST.bestRunPerfects = Math.max(ST.bestRunPerfects, G.perfects);
-      if (G.bless.has('echo')) {
-        G.combo += 2;
-        bumpCombo();
-      }
-      {
-        const q = bst();
-        if (q) q.p++;
-        challenge('p');
-      }
-      G.pStreak++;
-      if (!chained) {
-        const reward = recordBlessingCut(G, true);
-        if (reward.knife) {
-          G.knives++;
-          hud(true);
-          pop(P0.x, P0.y - P0.h * 1.4, 'Knife +1');
-        }
-        if (reward.precisionWard) {
-          renderLives();
-          pop(P0.x, P0.y - P0.h * 1.4, 'Ward ready');
-        }
-        if (reward.stormCharged) pop(P0.x, P0.y - P0.h * 1.5, 'Lightning charged');
-        if (reward.rekindled) {
-          bumpCombo();
-          setScore();
-          pop(P0.x, P0.y - P0.h * 1.5, `Rekindle +${reward.rekindled}`);
-        }
-      }
-      ST.bestPStreak = Math.max(ST.bestPStreak, G.pStreak);
-      G.petT = 0.7;
-      if (G.m.freeze) {
-        G.freezeT = 0.8 * G.m.freeze;
-        pop(W / 2, H * 0.4, '凍', Math.max(22, 28 * S));
-      }
-      const pts = addScore(
-        Math.round(
-          (swiftPoints ?? 400 + Math.min(500, (G.pStreak - 1) * 100)) *
-            comboMult() *
-            (swiftPoints === null ? G.m.perfect : 1),
-        ),
-        P0.x,
-        P0.y - P0.h * 1.05,
-      );
-      stamp('一閃', W / 2, H * 0.3, Math.max(52, 74 * S), true, 1.1);
-      addSlash(
-        cx - v[0] * Math.max(W, H) * 1.3,
-        cy - v[1] * Math.max(W, H) * 1.3,
-        cx + v[0] * Math.max(W, H) * 1.3,
-        cy + v[1] * Math.max(W, H) * 1.3,
-        Math.max(2, 2.5 * S),
-        0.5,
-      );
-      ring(cx, cy, P0.h * 0.1, P0.h * 1.3, 0.5, Math.max(2, 3 * S));
-      letterbox(0.5);
-      punch(1.07, cx, cy);
-      presentationState.shake = Math.max(presentationState.shake, 10 * S);
-      hitStop = 0.15;
-      flash(0.32);
-      sfx.perfect();
-
-      if (pts) void 0;
-    } else {
-      if (!preserveStreak) {
-        if (wasAtk) G.pStreak = 0;
-        if (!chained) recordBlessingCut(G, false);
-      }
-      addScore(
-        Math.round(
-          (swiftPoints ?? 100 + (wasAtk ? 40 : 20)) *
-            comboMult() *
-            (swiftPoints === null ? G.m.normal : 1),
-        ),
-        P0.x,
-        P0.y - P0.h * 1.05,
-      );
-      presentationState.shake = Math.max(presentationState.shake, 7 * S);
-      hitStop = 0.055;
-      flash(0.08);
-    }
-    if (
-      !chained &&
-      perfect &&
-      G.bless.has('finalflourish') &&
-      G.toSpawn <= 0 &&
-      !G.pendingSpawns.length &&
-      !G.enemies.some(
-        (other) => other.state === 'idle' || other.state === 'attack' || other.state === 'enter',
-      )
-    )
-      G.blessingTriggers.flourishPending = true;
-    if (activeTrial) trialFailure ||= trialFailureAfterCut(activeTrial, G) || '';
-    if (comboGrew && G.combo > 0 && G.combo % 10 === 0 && G.m.comboBonus)
-      addScore((G.m.comboBonus * G.combo) / 10, 0, 0, '歌舞伎');
-    if (comboGrew && G.combo > 0 && G.combo % 10 === 0 && G.m.furin) {
-      G.slowT = Math.max(G.slowT, 2);
-      pop(0, 0, '風鈴');
-      sfx.chime();
-    }
-    if (comboGrew && G.combo > 0 && G.combo % 10 === 0) {
-      stamp(kanji(G.combo) + '連', W / 2, H * 0.2, Math.max(40, 54 * S), false, 1.2);
-      gustLeaves(26);
-      sfx.drum();
-    }
-    if (notifications.activeHint === 'swipe') hideHint();
-    if (waveConfiguration().refill && G.toSpawn > 0)
-      G.pendingSpawns.push({ slot: e.slot, t: 0.45 });
-    if (!chained && G.m.serpent && combatRandom() < G.m.serpent) {
-      const nx = waveConfiguration().ordered
-        ? liveOrdered()[0]
-        : G.enemies.find((q) => (q.state === 'idle' || q.state === 'attack') && q.dir === dir);
-      if (nx && (nx.state === 'idle' || nx.state === 'attack') && nx.dir === dir) {
-        killEnemy(nx, dir, true);
-        pop(0, 0, '大蛇', Math.max(20, 26 * S));
-        return;
-      }
-    }
-    if (!chained && G.bless.has('tempest')) {
-      G.tempN = (G.tempN || 0) + 1;
-      if (G.tempN % 5 === 0) {
-        const c = G.enemies.filter((q) => q.state === 'idle' || q.state === 'attack');
-        const nx = waveConfiguration().ordered
-          ? liveOrdered()[0]
-          : c[(combatRandom() * c.length) | 0];
-        if (nx && (nx.state === 'idle' || nx.state === 'attack')) {
-          killEnemy(nx, nx.dir, true);
-          pop(0, 0, '颯');
-        }
-      }
-    }
-    if (perfect && !chained && G.bless.has('swallow')) {
-      const nx = waveConfiguration().ordered
-        ? liveOrdered()[0]
-        : G.enemies.find((q) => (q.state === 'idle' || q.state === 'attack') && q.dir === dir);
-      if (nx && (nx.state === 'idle' || nx.state === 'attack') && nx.dir === dir) {
-        killEnemy(nx, dir, true);
-        pop(nx.pos.x, nx.pos.y - nx.pos.h * 1.3, '燕', Math.max(20, 26 * S));
-      }
-    }
-    checkUnlocks();
+    },
+    coin(pos) {
+      presentationState.fx.coins.push({
+        x0: pos.x,
+        y0: pos.y - pos.h * 0.6,
+        t: 0,
+        life: 0.8,
+      });
+    },
+    stain(P0) {
+      presentationState.fx.stains.push({
+        x: P0.x + (R() - 0.5) * P0.h * 0.2,
+        y: P0.y + P0.h * 0.01,
+        rx: P0.h * (0.12 + R() * 0.1),
+        t: 0,
+        life: SHADOW_DURATION,
+      });
+    },
+    shake: (amount) => {
+      presentationState.shake = Math.max(presentationState.shake, amount);
+    },
+  }));
+  function killEnemy(
+    e: Enemy,
+    dir: Direction,
+    chained = false,
+    preserveStreak = false,
+    automatic = false,
+  ) {
+    killRules.killEnemy(e, dir, chained, preserveStreak, automatic);
   }
   function swingPlayer(dir: Direction | 'block', perfect = false) {
     if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();

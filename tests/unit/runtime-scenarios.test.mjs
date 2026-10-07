@@ -1,3 +1,4 @@
+import { enemyKillFixture } from './helpers/runtime-enemy-kill.mjs';
 import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';
 import { shrinePhaseFixture } from './helpers/runtime-shrine-phase.mjs';
 import { bossPhaseFixture } from './helpers/runtime-boss-phase.mjs';
@@ -52,8 +53,10 @@ function session(seed = 123456, options = setup, equipment = DEFAULT_EQUIPMENT) 
 // game.ts. Replace those handlers with extracted phase/kill APIs as they appear;
 // assertions concern outcomes and invariants, never a per-tick snapshot.
 function driveWave(seed, options = setup, trial) {
-  const { run, random } = session(seed, options),
-    ledger = createRunRewardLedger();
+  const runtime = session(seed, options),
+    { run, random } = runtime,
+    ledger = runtime.views.rewardLedger;
+  const kill = enemyKillFixture(runtime);
   const lifecycleFixture = waveLifecycleFixture({
     run,
     random,
@@ -78,20 +81,9 @@ function driveWave(seed, options = setup, trial) {
     activeTrial: trial ?? null,
     combatRandom: random.next,
     waveConfiguration: () => run.cfg,
-    // Temporary kill port until the production kill-rule API is extracted.
-    killEnemy(enemy) {
+    killEnemy(enemy, direction, chained, preserveStreak, automatic) {
       cut = enemy;
-      enemy.state = 'dying';
-      enemy.t = 0;
-      run.attacker = null;
-      run.gapT = run.cfg.gap;
-      run.kills++;
-      run.perfects++;
-      run.combo++;
-      run.maxCombo = Math.max(run.maxCombo, run.combo);
-      run.score += scoreGain(Math.round(300 * comboMultiplier(run.combo, run.m)), run);
-      accrueRunReward(ledger, 'kill');
-      if (run.cfg.refill && run.toSpawn > 0) run.pendingSpawns.push({ slot: enemy.slot, t: 0.45 });
+      kill.rules.killEnemy(enemy, direction, chained, preserveStreak, automatic);
     },
     orderSucceeded() {},
     pop() {},

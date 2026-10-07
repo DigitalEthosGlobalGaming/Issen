@@ -39,7 +39,7 @@ calls cosmetic artwork then resets live WX with combatRandom in the original ord
 That boundary split was committed separately (26af5a3) before the builder move.
 Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
-game.ts currently has 3261 lines; composition-root reduction is NOT complete.
+game.ts currently has 3109 lines; composition-root reduction is NOT complete.
 
 Live phase-router integration is complete: inputs dispatch after existing scene-loading/
 guided gates. updateFrame visits boss, playing, standoff, between and dead in the
@@ -50,8 +50,14 @@ Strict types and all 318 units passed (router-live-final-unit.log).
 on the full retry (router-live-broad-retry.log, terminal confirmed). First run
 251/253 exposed the stale cinematicStageSeed audit hook; separately committed
 a53202b supplies its read-only owner accessor, with seven focused cases green.
-Next: move kill rules and migrate seeded kill drivers; split rule event emission
-from synchronous progression/presentation listeners. Then state tables/registry,
+Enemy kill physical move is complete: game/combat/kill.ts owns the current cut,
+combo, score, reward, blessing and chain rules through explicit current views.
+Appearance/disarm/coin/stain/shake ports keep rendering state outside gameplay.
+Seeded wave scenarios now call the production kill API. Three focused API cases
+cover perfect records/rewards, automatic power isolation and recursive slot refill.
+Strict types and all 321 units passed (enemy-kill-unit.log).
+Focused browser verification: all 25 passed (enemy-kill-browser.log, 1.8m, terminal confirmed): scattered-armour, new-blessings, trials, editions-mastery and runtime-checkpoint-fixtures with playwright.rendering-v2.config.ts.
+Next: split rule event emission from synchronous progression/presentation listeners. Then state tables/registry,
 player/companions, results/reward orchestration and composition-root reduction.
 Full W2/W3/Part 4 remain pending; develop stays unpushed.
 Latest green checkpoint b360675: between controller, strict/all 316 units and
