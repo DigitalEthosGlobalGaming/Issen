@@ -445,3 +445,5 @@ Equipment palettes, blade style selection and armoury preview frames are owned b
 Frame simulation gating and ordered dispatch are owned by game/session/frame-simulation.ts. Presentation clock/camera, weather, figures and audio remain explicit capabilities; the session owner imports no presentation or rendering implementation.
 
 presentation/environment-host.ts owns per-game environment state and the artwork/drawing factory bindings through explicit current views. Live weather hazards remain outside this presentation owner. Cached scenery and ambient drawing share one cosmetic state and disposable drift renderer.
+
+Profile foundation (statistics/setup/unlocks/daily/trial reconciliation), progression records/initial persistence and equipment loading are owned by game/progression/profile-state.ts. Its phased calls preserve original ordering and profile identity; metadata saves resolve current statistics through an explicit provider. Session variables and run-only sync eligibility remain in the runtime.

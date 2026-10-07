@@ -1,4 +1,5 @@
 import { bossShownDirection } from './game/encounters/boss-openings.ts';
+import { createProfileFoundation, createProfileProgress, createProfileEquipment } from './game/progression/profile-state.ts';
 import { createEnvironmentHost } from './presentation/environment-host.ts';
 import { createFrameSimulation } from './game/session/frame-simulation.ts';
 import { createEquipmentPresentation } from './presentation/equipment.ts';
@@ -293,18 +294,11 @@ export function startGame(
 
   /* ---------------- persistent stats & unlocks ---------------- */
 
-  let ST = loadStatistics();
-  const SETUP = loadSetup();
-  const UNL = loadUnlocks();
-  const DAILY_LOGIN = parseDailyLogin(store.get('issen.dailyLogin', null));
-  if (UNL.has(SEVEN_DAWNS_CREST)) DAILY_LOGIN.earned = true;
+  const profileServices = { store, loadStatistics, loadSetup, loadUnlocks, loadEquipment, premiumAccess, accessible, isTestProfile };
+  const profileFoundation = createProfileFoundation(profileServices);
+  let ST = profileFoundation.ST;
+  const { SETUP, UNL, DAILY_LOGIN, TRIAL_PROGRESS, playerStats } = profileFoundation;
   let loginCrestRevealed = false;
-  if (reconcileCinematicCompanion(ST, UNL)) store.set('issen.unlocks', [...UNL]);
-  UNL.delete(PREMIUM_FILM);
-  if (premiumAccess()) UNL.add(PREMIUM_FILM);
-  const TRIAL_PROGRESS = parseTrialProgress(store.get('issen.trials', null));
-  grantTrialRewards(TRIAL_PROGRESS, UNL);
-  const playerStats = ST;
   let activeTrial: TrialDefinition | null = null;
   let activeDaily: DailyRun | null = null;
   let trialFailure = '';
@@ -312,26 +306,11 @@ export function startGame(
   let combatRandom = R;
   let runRandom = restorableRng(0);
   let runTrialsWasUnlocked = trialsUnlocked(playerStats.roninWave);
-  const META = parseMeta(store.get('issen.meta', null), ST, UNL);
-  const AWAKENING = parseAwakeningProgress(store.get('issen.awakening', null), ST.bl);
-  const saveAwakening = () => store.set('issen.awakening', AWAKENING);
-  saveAwakening();
-  const COLLECTION_PROGRESS = parseCollectionProgress(store.get('issen.collections', null), ST);
-  initializeCollections(COLLECTION_PROGRESS, META, ST);
-  const saveCollections = () => store.set('issen.collections', COLLECTION_PROGRESS);
+  const { META, AWAKENING, COLLECTION_PROGRESS, saveAwakening, saveCollections, saveMeta, ARMORY_SEEN } = createProfileProgress(profileServices, () => ST, SETUP, UNL);
   const syncCollections = () => {
     if (!activeTrial && !activeDaily && !['title'].includes(G.state))
       syncCollectionProgress(COLLECTION_PROGRESS, META, ST, G);
   };
-  const saveMeta = () => {
-    initializeCollections(COLLECTION_PROGRESS, META, ST);
-    saveCollections();
-    return store.set('issen.meta', META);
-  };
-  saveMeta();
-  const ARMORY_SEEN = parseArmorySeen(store.get('issen.armorySeen', null), UNL);
-  store.set('issen.armorySeen', [...ARMORY_SEEN]);
-  Object.assign(SETUP, sanitizeSetup(SETUP, META));
   let runTemplate = templateModifiers(META, SETUP, premiumAccess());
   let rewardLedger = createRunRewardLedger();
   let runBossMilestone = 0;
@@ -359,17 +338,9 @@ export function startGame(
       store.set('issen.stats', ST);
     }
   };
-  const revokedSave = store.get('issen.revoked', []);
-  const revoked = new Set<string>(
-    isTestProfile() && Array.isArray(revokedSave)
-      ? revokedSave.filter((id): id is string => typeof id === 'string')
-      : [],
-  );
-  const accessibleUnlocks = () => new Set([...UNL].filter(accessible));
-  let EQ = loadEquipment(accessibleUnlocks(), ITEMS);
-  const playerEquipment = EQ;
-  const savedFilm = (store.get('issen.equip', {}) as { film?: unknown } | null)?.film;
-  const savedEquipment = store.get('issen.equip', {});
+  const profileEquipment = createProfileEquipment(profileServices, UNL, ITEMS);
+  let EQ = profileEquipment.EQ;
+  const { revoked, accessibleUnlocks, playerEquipment, savedFilm, savedEquipment } = profileEquipment;
   let initialPurchaseCheck = true;
   const SEALS: Record<string, string> = {
     verm: '#a3271d',

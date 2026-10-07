@@ -10,7 +10,26 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint correction: restore bossShownDirection for the unchanged
+Latest checkpoint: phased profile loading/reconciliation and initial
+persistence are physically owned by game/progression/profile-state.ts. Foundation,
+progression and equipment stages keep original save keys, read/write order and
+base profile identities. saveMeta resolves current statistics through an explicit
+provider, preserving disposable daily/trial and checkpoint-replaced statistics.
+Root keeps run/session variables and collection sync eligibility.
+`npm run typecheck`, `npm test`: strict types and all 362 units pass
+(profile-state-typecheck.log, profile-state-unit.log). The added actual owner test
+checks replaced statistics, original identity and failed metadata persistence.
+`npx playwright test tests/browser/save-transfer.spec.ts tests/browser/trials.spec.ts tests/browser/daily.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 10 pass in 1.4m on the restarted run (profile-state-browser-retry.log;
+terminal confirmed). The earlier stopped run exposed the separately fixed trial
+hook import; no assertions or timeouts were loosened.
+Next: larger presentation/UI/session binding groups, remaining event reactions,
+actual scenario/test API migration and complete root reduction. Audit newly stale
+imports separately and retain both known root hooks until explicitly migrated.
+The missing-wave broad diagnostic still lacks a natural baseline reproduction.
+W2/W3/Part 4 remain incomplete. Continue without review; no early develop push.
+
+Previous checkpoint correction:  restore bossShownDirection for the unchanged
 trial browser hook. Import deletion 47beda8 removed that test-only root binding;
 the profile verification caught ReferenceError before trial hook initialization.
 The stale failed run was stopped. A restarted run with the import restored passes
