@@ -162,7 +162,7 @@ import { unlockEligibleItems } from './game/progression/unlocks.ts';
 import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE, mixPose, approachPose } from './rendering/figures/model.ts';
 import { createPostPresentation } from './presentation/post.ts';
-import { createPostState, preparePost } from './rendering/effects/post-frame.ts';
+import { createPostPreparation } from './presentation/post-preparation.ts';
 import type { PostFrame } from './rendering/effects/post-frame.ts';
 import { createDemonRealmRenderer } from './rendering/environment/demon-realm.ts';
 import { blob, createBackground } from './rendering/scene/background.ts';
@@ -761,7 +761,6 @@ export function startGame(
   }
   let inkEdge: HTMLCanvasElement | null = null,
     inkPulse = 0;
-  let postState = createPostState();
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
     if (anim && bg) {
@@ -4189,48 +4188,17 @@ export function startGame(
       }
     }
   }
-  function advancePost(raw: number): PostFrame {
-    const prepared = preparePost(
-      postState,
-      {
-        raw,
-        width: W,
-        height: H,
-        nitrate: sceneFilm() === 'nitrate',
-        reducedMotion: reducedMotion(),
-        reducedFlashes: reducedFlashes(),
-        active: ['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state),
-        limitedLives: !G.zen && !G.hard && G.maxLives > 1,
-        dead: G.state === 'dead',
-        lives: G.lives,
-        maxLives: G.maxLives,
-        imminentAttack: !!(
-          (G.attacker && G.attacker.p >= pz()) ||
-          (G.boss && ['windup', 'flash'].includes(G.boss.state))
-        ),
-        inkPulse,
-        flash: flashA,
-        scratches: fx.scratches,
-      },
-      R,
-    );
-    postState = prepared.state;
-    inkPulse = prepared.inkPulse;
-    flashA = prepared.flash;
-    fx.scratches = prepared.scratches;
-    if (prepared.heartbeat) buzz(8);
-    return prepared.frame;
-  }
+  const postPreparation = createPostPreparation(() => ({
+    W, H, G, R, reducedMotion, reducedFlashes, sceneFilm, pz, fx, buzz, S, time,
+    signals: postSignals,
+  }));
+  const { advancePost, preparePresentation } = postPreparation;
+  const postSignals = {
+    get inkPulse() { return inkPulse; }, set inkPulse(value: number) { inkPulse = value; },
+    get flashA() { return flashA; }, set flashA(value: number) { flashA = value; },
+    get shake() { return shake; }, set shake(value: number) { shake = value; },
+  };
   const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time,reducedMotion,reducedFlashes,grainPats,vig,pz,inkEdge,lb,flashCol }));
-  function preparePresentation(raw: number): PresentationFrame {
-    const sx = reducedMotion() ? 0 : (R() - 0.5) * shake,
-      sy = reducedMotion()
-        ? 0
-        : (R() - 0.5) * shake +
-          (sceneFilm() === 'nitrate' ? Math.sin(time * 7) * 1.2 + (R() < 0.02 ? R() * 4 : 0) : 0);
-    shake = Math.max(0, shake - raw * 45 * S);
-    return { cameraX: sx, cameraY: sy, post: advancePost(raw) };
-  }
   function render(raw: number) {
     // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
     // inspection dialog covers it completely; its independent preview still draws.

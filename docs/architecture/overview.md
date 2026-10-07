@@ -57,8 +57,8 @@ projection, with gameplay updates kept in rule owners. `presentation/environment
 leaf/weather drawing. Hazard simulation remains separate.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, with explicit sound/flash ports and no run record.
-`presentation/post.ts` owns prepared full-frame drawing; effects advancement
-remains separate from replay. `game.ts` remains the composition and orchestration layer. Its private closure
+`presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
+separate from replay. `game.ts` remains the composition and orchestration layer. Its private closure
 owns the player profile, current run, scene dimensions, camera effects and service
 instances. It connects feature callbacks to audio, persistence, effects and UI.
 It still contains encounter transitions, kill/damage presentation, title secrets,

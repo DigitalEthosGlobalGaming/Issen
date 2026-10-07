@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; next post preparation/state
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; next cached post/environment state
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -51,8 +51,16 @@ simulation/RNG remain in gameplay orchestration, separate from these draw method
 Strict types passed; all 274 units passed (environment-owner-unit.log).
 `npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-scenes.spec.ts tests/browser/environment-materials.spec.ts --config playwright.rendering-v2.config.ts`:
 all nine passed (environment-owner-browser.log; terminal exit confirmed).
-No process remains. Next finish post
-preparation ownership; broad browser verification at presentation cluster end. Follow ordered
+Post preparation/history now belongs to src/presentation/post-preparation.ts.
+Camera/post RNG consumption stays in its original order. Explicit cosmetic signal
+ports retain shared flash/ink/shake ownership temporarily; postState is module-owned.
+The existing repeat-draw harness now snapshots postPreparation.state. Strict types
+passed; all 274 units passed (post-preparation-unit.log; initial syntax correction
+was then verified by strict types).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|actual title' --config playwright.rendering-v2.config.ts`:
+all seven passed (post-preparation-browser.log; terminal exit confirmed).
+No process remains. Next cached post artwork and remaining environment/feedback
+state ownership; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 
 Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**

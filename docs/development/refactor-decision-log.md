@@ -60,6 +60,8 @@
 
 - 2026-10-08 — W2 environment move — extract ambient factories, grass caches and weather drawing with explicit scene views — moving weather hazard simulation into presentation — hazards consume gameplay RNG and remain rule-owned; native materials, orientations, checkpoints and draw isolation pass — revert the environment drawing move.
 
+- 2026-10-08 — W2 post preparation — move camera/post preparation and cosmetic post history into post-preparation.ts, retaining temporary shared signal ports — advancing post inside draws — repeated draw isolation includes the module-owned history and haptics; camera/post cosmetic RNG order is preserved — revert the preparation move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
