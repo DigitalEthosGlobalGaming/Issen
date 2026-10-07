@@ -340,3 +340,6 @@ Shrine menu wiring invokes its choice API; checkpoint keys/order remain unchange
 `game/phases/death.ts` owns damage, fatal checkpoint boundaries, raw-time death
 advancement and revival. Animation/camera/reason-copy feedback are explicit ports.
 Reward offer and results UI orchestration still await their session owner.
+
+`game/phases/between.ts` owns the timer selecting the next trial encounter, boss,
+shrine or wave through explicit continuation ports.

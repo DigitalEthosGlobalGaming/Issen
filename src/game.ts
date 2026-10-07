@@ -1,3 +1,4 @@
+import { createBetweenPhase } from './game/phases/between.ts';
 import { createDeathPhase } from './game/phases/death.ts';
 import { createShrinePhase } from './game/phases/shrine.ts';
 import { createTrialSession } from './game/session/trials.ts';
@@ -2794,6 +2795,16 @@ export function startGame(
     renderTrialObjective();
   }
 
+  const betweenPhase = createBetweenPhase<GameContext<PresentationContext>>(() => ({
+    G,
+    activeTrial,
+    trialFailure,
+    finishTrial,
+    startTrialEncounter,
+    startBoss,
+    openShrine,
+    nextStep,
+  }));
   /* ---------------- update ---------------- */
   function updatePlayer(dt: number) {
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
@@ -2856,22 +2867,7 @@ export function startGame(
     if (G.boss) updateBoss(dt, raw);
     updateWave(dt);
     if (G.state === 'standoff') updateStandoff(dt);
-    if (G.state === 'between') {
-      G.nextT -= dt;
-      if (G.nextT <= 0) {
-        if (activeTrial) {
-          if (trialFailure) finishTrial(trialFailure);
-          else if (activeTrial.waveCount && G.wave < activeTrial.waveCount) startTrialEncounter();
-          else if (activeTrial.bosses && G.bossesSlain < activeTrial.bosses.length)
-            startTrialEncounter();
-          else finishTrial();
-        } else if (!G.afterBoss && G.wave % 3 === 0) startBoss();
-        else if (G.afterBoss) {
-          G.afterBoss = false;
-          openShrine();
-        } else nextStep();
-      }
-    }
+    if (G.state === 'between') betweenPhase.update(context, dt);
     if (G.state === 'dead') deathPhase.updateDeath(raw);
     updateFx(dt, raw);
     renderTrialObjective();

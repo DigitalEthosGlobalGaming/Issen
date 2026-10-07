@@ -40,25 +40,21 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: damage/struck, death timing and revival now belong to
-`src/game/phases/death.ts`. Player pose/fall, camera/ink and reason copy are ports;
-gameplay imports no rendering/presentation/UI module. Raw-time death advancement
-still pauses during reward offers. Five actual API cases cover lost save/one
-results entry, ward/life/combo, isolated trial failure, phoenix boss revival and
-Tanto automatic kill. Seeded scenario death now uses the real API.
-Strict types passed; all 314 units passed (death-final-unit.log).
-`npx playwright test tests/browser/support-rewards.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/new-blessings.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all eleven passed (death-browser.log; terminal confirmed).
-`npx playwright test tests/browser/tanto.spec.ts tests/browser/feature-plan-06.spec.ts --config playwright.rendering-v2.config.ts`:
-all seven passed (death-intercepts-browser.log; terminal confirmed).
-Next wire live router input/update dispatch, preserving inactive boss dying
-updates and same-frame playing/boss/standoff -> between/dead cascades. Between
-advance needs its own controller; checkpoint adoption must stay silent. Results/
-reward-screen orchestration remains in the closure for later session/UI ownership.
-Then kill/events, state tables/registry, player/companions and root reduction.
-Full W2/W3/Part 4 remain pending; develop stays unpushed. Previous checkpoints:
-shrine d77ded7 (309 units/17 browser), trials 523b4fd (306/16), boss f350035
-(303/20), standoff fa674bf (300/five). Logs retain exact commands/results.
+Latest checkpoint: inter-encounter timer/next trial/boss/shrine/wave selection
+now belongs to `src/game/phases/between.ts`. Two actual API cases cover pause,
+one next-phase selection and trial continuation/failure. Strict types passed;
+all 316 units passed (between-unit.log).
+`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/trials.spec.ts --config playwright.rendering-v2.config.ts`:
+all ten passed (between-browser.log; terminal confirmed).
+Next wire the live router (draft script prepared, NOT executed), preserving
+inactive boss dying updates and same-frame playing/boss/standoff -> between/dead
+cascades. Adopt restored checkpoints silently. Then kill/events, state tables/
+registry, player/companions, results/reward ownership and root reduction.
+Full W2/W3/Part 4 remain pending; develop stays unpushed. Death checkpoint
+5aa27b4: strict, 314 units, five actual API cases and eighteen browser
+recovery/reward/intercept cases passed (death-*.log). Shrine d77ded7: 309/17;
+trials 523b4fd: 306/16; boss f350035: 303/20; standoff fa674bf: 300/five.
+No intentional gameplay or record changes; exact commands remain in logs.
 
 Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
 passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave
