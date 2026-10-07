@@ -161,3 +161,5 @@
 2026-10-08 — W2/player move — physically move unchanged player animation to game/player/player.ts before replacing pose dispatch — combining the move and table implementation considered — separate green commits distinguish ownership from behavior; retain the rest-pose re-export used by browser coverage — revert this physical move commit.
 
 2026-10-08 — W2/player table — derive idle/swing/block/death table state from original animation fields — adding serialized state/t or inventing a hurt animation considered — createPlayerAnimation has no hurt field; transient clock/state views retain exact save shape, deadline-frame rest selection and fallen pose priority with independent lean — revert this table commit.
+
+2026-10-08 — W2/companions — physically extract companion selection, foxfire rescue and revival under game/player — keeping revival in death controller considered — companion owner centralizes abilities while phase retains dispatch; narrow ports preserve existing mutation/checkpoint/reaction order; 346 units and five live cases pass — revert this physical move commit.

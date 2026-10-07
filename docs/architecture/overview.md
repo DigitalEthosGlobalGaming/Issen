@@ -396,3 +396,8 @@ time are transient views of existing swingDir/swingT/fallen fields, preserving
 checkpoint shape. The existing animation has no distinct hurt field or timer.
 The clock advances before state selection; fallen pose priority and the independent
 swing lean clock retain their original behavior.
+
+Companion selection, foxfire rescue and Daruma/Phoenix/support revival are owned
+by game/player/companions.ts with narrow capabilities. Death dispatch retains its
+existing revival priority and timer. Drawing remains presentation work; this
+physical move preserves checkpoint fields and reaction order.

@@ -1,3 +1,4 @@
+import { visiblePet, saveWithFoxfire } from './game/player/companions.ts';
 import { createCombatScore } from './game/progression/combat-score.ts';
 import { bindCombatScoreFeedback } from './presentation/combat-score.ts';
 import { bindKillFeedback } from './presentation/kill.ts';
@@ -603,7 +604,7 @@ export function startGame(
     FONT,
   }));
   function petOf() {
-    return EQ.pet === 'nopet' && EQ.robe === 'scarecrow' ? 'crow' : EQ.pet;
+    return visiblePet(EQ);
   }
   function drawFoxfire() {
     if (!G.m || !G.m.foxfire) return;
@@ -632,11 +633,7 @@ export function startGame(
     g.restore();
   }
   function foxSave(e: Enemy) {
-    e.p = 0.5;
-    killEnemy(e, e.dir, true);
-    pop(0, 0, '狐火');
-    flash(0.25, '150,200,255');
-    sfx.glint();
+    saveWithFoxfire(e, { killEnemy, pop, flash, sfx });
   }
   function reviveDaruma(ph = false, support = false) {
     deathPhase.reviveDaruma(ph, support);
