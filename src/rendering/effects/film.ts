@@ -1,38 +1,15 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { applySceneFilm } from '../scene-drawing.ts';
-const filmCopies = new WeakMap<SceneDrawing, HTMLCanvasElement>();
-
-function copyFilmSource(g: SceneDrawing): HTMLCanvasElement {
-  let copy = filmCopies.get(g);
-  if (!copy) {
-    copy = g.canvas.ownerDocument.createElement('canvas');
-    filmCopies.set(g, copy);
-  }
-  if (copy.width !== g.canvas.width) copy.width = g.canvas.width;
-  if (copy.height !== g.canvas.height) copy.height = g.canvas.height;
-  const context = copy.getContext('2d')!;
-  context.globalCompositeOperation = 'copy';
-  context.drawImage(g.canvas, 0, 0);
-  return copy;
-}
-
 export function applyFilm(
   g: SceneDrawing,
   W: number,
   H: number,
-  source: CanvasImageSource,
+  _source: CanvasImageSource,
   f: string,
   time = 0,
   preferences: { reducedMotion?: boolean; reducedFlashes?: boolean } = {},
 ) {
   if (applySceneFilm(g, f, W, H, time, preferences)) return;
-  if (f !== 'trial-glitch') {
-    const copy = filmCopies.get(g);
-    if (copy) {
-      copy.width = copy.height = 0;
-      filmCopies.delete(g);
-    }
-  }
   if (preferences.reducedMotion || preferences.reducedFlashes) time = 0;
   if (f === 'mono') return;
   g.save();
@@ -101,86 +78,6 @@ export function applyFilm(
     g.globalCompositeOperation = 'soft-light';
     g.fillStyle = glow;
     g.fillRect(0, 0, W, H);
-  } else if (f === 'trial-glitch') {
-    // Source rectangles use backing pixels; destinations use logical scene coordinates.
-    const sx = 'width' in source && typeof source.width === 'number' ? source.width / W : 1;
-    const sy = 'height' in source && typeof source.height === 'number' ? source.height / H : 1;
-    // Fractional rows/transforms can overlap antialiased edges. Retain the
-    // original sequential self-copy there so its exact feedback is preserved.
-    const transform = g.getTransform();
-    const disjoint =
-      source === g.canvas &&
-      Number.isInteger(sx) &&
-      Number.isInteger(sy) &&
-      transform.a === sx &&
-      transform.d === sy &&
-      transform.b === 0 &&
-      transform.c === 0 &&
-      transform.e === 0 &&
-      transform.f === 0 &&
-      g.filter === 'none' &&
-      g.shadowBlur === 0 &&
-      g.shadowOffsetX === 0 &&
-      g.shadowOffsetY === 0;
-    // Snapshot once per disjoint pass instead of preserving the destination
-    // for every self-copy. Prepared copies retain the full backing resolution.
-    const stripSource = disjoint ? copyFilmSource(g) : source;
-    // A small inset keeps the moving edges filled, even at the widest displacement.
-    const inset = W * 0.008;
-    for (let strip = 0; strip < 64; strip++) {
-      const y = Math.floor((strip * H) / 64);
-      const h = Math.floor(((strip + 1) * H) / 64) - y;
-      if (!h) continue;
-      const shift = preferences.reducedMotion
-        ? 0
-        : W * 0.005 * Math.sin(strip * 0.24 + time * 1.7) +
-          W * 0.002 * Math.sin(strip * 0.71 - time * 2.3);
-      g.drawImage(
-        stripSource,
-        (inset + shift) * sx,
-        y * sy,
-        (W - inset * 2) * sx,
-        h * sy,
-        0,
-        y,
-        W,
-        h,
-      );
-    }
-    const colours = ['#00ffd5', '#ff19d9', '#3822ff', '#d8ff00'];
-    g.globalCompositeOperation = 'color';
-    g.globalAlpha = 0.32;
-    for (let band = 0; band < 18; band++) {
-      const y = Math.floor((band * H) / 18);
-      g.fillStyle = colours[(band * 7) % colours.length]!;
-      g.fillRect(0, y, W, Math.ceil(H / 18));
-    }
-    g.globalCompositeOperation = 'source-over';
-    g.globalAlpha = 0.35;
-    const bandSource = disjoint ? copyFilmSource(g) : source;
-    for (let band = 1; band < 12; band += 2) {
-      const y = Math.floor((band * H) / 12);
-      const h = Math.max(1, Math.floor(H / 90));
-      const shift = preferences.reducedMotion
-        ? 0
-        : W * (band % 3 === 0 ? -0.035 : 0.025) * (0.7 + 0.3 * Math.sin(time * 1.9 + band));
-      g.drawImage(bandSource, 0, y * sy, W * sx, h * sy, shift, y, W, h);
-    }
-    g.globalCompositeOperation = 'overlay';
-    g.globalAlpha = 0.09;
-    g.fillStyle = '#070015';
-    for (let y = 0; y < H; y += 4) g.fillRect(0, y, W, 1);
-    g.globalCompositeOperation = 'screen';
-    g.globalAlpha = 0.3;
-    for (let block = 0; block < 24; block++) {
-      g.fillStyle = colours[block % colours.length]!;
-      g.fillRect(
-        (((block * 137) % 997) / 997) * W,
-        (((block * 263) % 991) / 991) * H,
-        W * (0.012 + (block % 4) * 0.008),
-        Math.max(1, H * 0.003),
-      );
-    }
   } else if (f === 'trial-dusk' || f === 'trial-dawn') {
     const gradient = g.createLinearGradient(0, 0, 0, H);
     gradient.addColorStop(0, f === 'trial-dusk' ? 'rgba(92,65,138,.42)' : 'rgba(123,176,158,.32)');
@@ -196,10 +93,6 @@ export function applyFilm(
     g.globalCompositeOperation = 'color';
     g.fillStyle = 'rgba(70,94,124,.45)';
     g.fillRect(0, 0, W, H);
-  } else if (f === 'noir') {
-    g.globalCompositeOperation = 'overlay';
-    g.globalAlpha = 0.55;
-    g.drawImage(source, 0, 0, W, H);
   } else if (f === 'cyan') {
     g.globalCompositeOperation = 'color';
     g.fillStyle = 'rgba(38,86,140,.6)';

@@ -42,8 +42,7 @@ export function mountStartupLoading(retry: () => void) {
       element.querySelector('h1')!.textContent = 'Graphics not supported';
       status.textContent = 'This device’s graphics are not supported by Issen.';
       progress.hidden = true;
-      error.textContent =
-        'Issen requires WebGL2. Try again after closing other apps or updating your browser.';
+      error.textContent = 'Try again after closing other apps or updating your browser.';
       button.textContent = reload ? 'Reload' : 'Retry';
       button.hidden = false;
       action = reload ? () => location.reload() : retry;

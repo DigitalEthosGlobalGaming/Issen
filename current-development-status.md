@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.0 baseline complete; W2.1 surfaces/materials native-only; film cleanup next
+## W1 complete; W2.0 baseline complete; W2.1 native-only implementation complete; comparison cleanup/broad verification next
 
 W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
 `tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
@@ -110,7 +110,17 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
    are not an uninterrupted broad-suite pass. No process remains. Remaining
    W2.1: remove Canvas-only film self-copy and path fallback code, migrate film
    tests to native targets, delete fallback-only film reference/tooling separately,
-   refresh related docs, run broad browser tests. Then ordered W2 extraction. Native blend filters
+   refresh related docs, run broad browser tests. Then ordered W2 extraction.
+   Film and SVG path native-only implementation now complete. Removed Canvas
+   self-copy/snapshot storage and noir/glitch alternate film bodies; native filters
+   and procedural native geometry remain. Strict types passed; all 265 unit tests
+   passed (native-film-unit.log). `npx playwright test tests/browser/pixi-films.spec.ts tests/browser/trial-films.spec.ts tests/browser/rendering.spec.ts --config playwright.rendering-v2.config.ts`:
+   all 15 passed (native-film-browser.log, terminal exit confirmed).
+   `npx playwright test tests/browser/stage-landmark-visibility.spec.ts tests/browser/scenery-depth.spec.ts --config playwright.rendering-v2.config.ts`:
+   all five passed (native-depth-browser.log, terminal exit confirmed). No process
+   remains. Next separately delete Canvas-only film parity test/reference and its
+   dedicated comparison wrapper/benchmark (do not run profiling), then run broad
+   shared-runtime regression. W2 context/events and extraction have not begun. Native blend filters
    remain because film output depends on them. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
    Require WebGL2, use one graphics error screen, retain eight-second context-loss
    recovery with explicit resume and Reload on failure. Then follow the eight

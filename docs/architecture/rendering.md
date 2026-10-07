@@ -117,8 +117,11 @@ timing/input stop during loss. No canvas replacement or alternate renderer occur
 Material stamps require a native material sink; posed figures have no Canvas
 material branch. `cachedMaterialContext` explicitly marks Canvas texture
 preparation so aligned normal/surface/emission maps can still be baked there.
-Armoury previews require a prepared WebGL2 surface. Film fallback cleanup and
-the broad W2.1 check remain in progress.
+Armoury previews require a prepared WebGL2 surface. Films and SVG scene paths
+also require registered native sinks. Noir and glitch use owned Pixi filters;
+Canvas film self-copies, copy storage and Canvas Path2D fallback are removed.
+Remaining procedural film geometry is drawn by the same native painter.
+The broad W2.1 check remains pending.
 `SceneSurface` shares repeated initialization calls and owns each auxiliary
 surface's bound listeners and recovery deadline. Restoration cancels that deadline;
 disposal removes listeners, cancels recovery and releases any late-created context.
@@ -158,7 +161,7 @@ figures or post-processing.
 ### Cached and generated canvases
 
 Static or expensive artwork is drawn once to off-screen canvases and then submitted
-as reusable textures (or copied with `drawImage` on the Canvas backend).
+as reusable textures.
 `src/rendering/scene/background.ts` creates a seeded stage
 background at the current size and device pixel ratio. `src/game.ts` similarly
 generates reusable mist, smoke, grain, vignette and ink-edge material. These are
@@ -176,7 +179,7 @@ buttons, including segmented choices, Armoury tiles and Temple upgrades. The
 normal and highlighted centres remain dark; existing labels, equipped badges,
 rarity indicators, disabled opacity and focus outlines retain their own meaning.
 See the [atlas contract](../../src/ui/assets/button-atlas.md) for slice geometry
-and regeneration. Gameplay Canvas rendering does not consume these UI assets.
+and regeneration. The gameplay painter uses explicit prepared textures for these UI assets.
 
 Bounded panels use the heavier frames in `src/styles/panel-frames.css`, imported
 after button frames. Temple tiles use compact panel corners with selection and

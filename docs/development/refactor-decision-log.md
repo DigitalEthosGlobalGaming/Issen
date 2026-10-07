@@ -37,6 +37,8 @@
 - 2026-10-07 — W2.1 materials — require native material sinks, explicit cached Canvas preparation contexts and prepared Armoury surfaces — implicit Canvas colour-only material branch — enforces one live renderer while retaining aligned texture baking — revert the native-material checkpoint.
 - 2026-10-07 — W2.1 tests — migrate scene fixtures and comparisons to isolated native painters; anchor runtime harnesses at artworkReady assignment — injecting at the runtime return — original hooks published only after artwork readiness; early publication failed the unchanged maximum-2 repeat-draw tolerance — restore prior test hooks together with the old runtime lifecycle. No tolerance relaxed.
 
+- 2026-10-07 — W2.1 films — remove Canvas self-copy storage and noir/glitch bodies; require native film and SVG path sinks — retaining dead alternate film code — scene films now run only on WebGL2; timing/accessibility/pixel-region tests migrated and passed — revert the native-film checkpoint.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

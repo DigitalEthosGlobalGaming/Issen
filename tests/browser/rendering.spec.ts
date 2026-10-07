@@ -503,7 +503,8 @@ test('film effects restore context state and leave other canvases untouched', as
     const live = document.createElement('canvas');
     const preview = document.createElement('canvas');
     const liveContext = live.getContext('2d')!;
-    const previewContext = preview.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const previewContext = await createTestDrawing(preview);
     liveContext.fillStyle = 'red';
     liveContext.fillRect(0, 0, 30, 30);
     previewContext.fillStyle = 'blue';
