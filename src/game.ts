@@ -2558,7 +2558,7 @@ export function startGame(
   function refreshArmoryNew() {
     armoryWiring.refreshArmoryNew();
   }
-  const { cinematic, sceneFilm, previewStage } = createCinematicWiring({
+  const cinematicWiring = createCinematicWiring({
     $,
     G,
     previewVisits,
@@ -2598,6 +2598,7 @@ export function startGame(
       MIST = value;
     },
   });
+  const { cinematic, sceneFilm, previewStage } = cinematicWiring;
   const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
     G,
     ST,

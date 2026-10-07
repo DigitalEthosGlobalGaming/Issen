@@ -130,5 +130,13 @@ export function createCinematicWiring(views: CinematicViews) {
   });
   const sceneFilm = () => (cinematic.active ? cinematicFilm : views.EQ.film);
 
-  return { cinematic, sceneFilm, previewStage };
+  return {
+    cinematic,
+    sceneFilm,
+    previewStage,
+    /** Read-only original scene identity retained while the viewer changes visits. */
+    get savedStageSeed() {
+      return cinematicStageSeed;
+    },
+  };
 }

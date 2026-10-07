@@ -12,7 +12,8 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 W2.0 baseline harness: 637a4de. W2.1 native-only surfaces/materials/films/paths
 and obsolete comparison deletions are complete. Context/events foundation is
 committed (3d1f26f); it introduces explicit gameplay/service and presentation
-contracts. No gameplay events are emitted yet: wire them during phase/rule moves.
+contracts. Live phaseChanged is now wired in the uncommitted router integration;
+other gameplay events still await rule/event moves.
 The typed bus is synchronous, registration-ordered, reentrant and value-payload-only.
 The seeded scenario tests still use temporary inline input/HP drivers; migrate
 them to real extracted APIs and cover every state-table state as those appear.
@@ -38,23 +39,34 @@ calls cosmetic artwork then resets live WX with combatRandom in the original ord
 That boundary split was committed separately (26af5a3) before the builder move.
 Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
-game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
+game.ts currently has 3261 lines; composition-root reduction is NOT complete.
 
-Latest checkpoint: inter-encounter timer/next trial/boss/shrine/wave selection
-now belongs to `src/game/phases/between.ts`. Two actual API cases cover pause,
-one next-phase selection and trial continuation/failure. Strict types passed;
-all 316 units passed (between-unit.log).
-`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/trials.spec.ts --config playwright.rendering-v2.config.ts`:
-all ten passed (between-browser.log; terminal confirmed).
-Next wire the live router (draft script prepared, NOT executed), preserving
-inactive boss dying updates and same-frame playing/boss/standoff -> between/dead
-cascades. Adopt restored checkpoints silently. Then kill/events, state tables/
-registry, player/companions, results/reward ownership and root reduction.
-Full W2/W3/Part 4 remain pending; develop stays unpushed. Death checkpoint
-5aa27b4: strict, 314 units, five actual API cases and eighteen browser
-recovery/reward/intercept cases passed (death-*.log). Shrine d77ded7: 309/17;
-trials 523b4fd: 306/16; boss f350035: 303/20; standoff fa674bf: 300/five.
-No intentional gameplay or record changes; exact commands remain in logs.
+IN PROGRESS, UNCOMMITTED: live phase-router wiring is implemented. Inputs now
+dispatch after existing scene-loading/guided gates. updateFrame dispatches boss,
+playing, standoff, between, dead in the original order so transitions can advance
+later phases in the same frame. Raw delta reaches boss shadow cleanup and death;
+bossPhase.updateBackground handles dying/other inactive boss animation separately.
+Checkpoint restore calls silent adoptPhase after restoring records/UI. Only live
+phaseChanged is emitted so far; all other rule events remain pending.
+Strict types passed; all 318 units passed (router-live-unit.log), including two
+new cascade/raw-delta/no-earlier-phase-update tests.
+`npx playwright test --config playwright.rendering-v2.config.ts`:
+First run completed with 251 passed and two failed (11.6m): both stage-variation
+orientations used the stale cinematicStageSeed closure hook moved during UI
+extraction. A read-only cinematicWiring.savedStageSeed accessor replaces it;
+unchanged assertions passed all seven focused stage-variation/cinematic cases
+(cinematic-audit-browser.log, terminal confirmed), and strict types passed.
+This audit-accessor fix is committed separately from the pending router wiring.
+Rerun the exact broad command before claiming the router checkpoint green. If green, finalize
+this handoff/overview/decision log and commit router integration, then continue
+immediately with kill rule ownership and event/listener splitting. Kill move and
+tests draft scripts are prepared outside the repository but NOT executed.
+Latest green checkpoint b360675: between controller, strict/all 316 units and
+ten actual trial/save browser cases passed (between-*.log).
+Then state tables/registry, player/companions, results/reward ownership and root
+reduction. Full W2/W3/Part 4 remain pending; develop stays unpushed. Death
+5aa27b4: 314 units/18 browser; shrine d77ded7: 309/17; trials 523b4fd: 306/16;
+boss f350035: 303/20; standoff fa674bf: 300/five. No gameplay/save changes.
 
 Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
 passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave
@@ -72,13 +84,10 @@ Logs run-flow-*.log and checkpoint-flow-*.log retain exact commands/results;
 nonexistent context-loss.spec/run-checkpoint.spec patterns matched no cases, and
 real graphics/context files were explicitly verified.
 
-Router foundation (556acb9) remains alongside the closure, NOT yet wired into
-game.ts. It provides synchronous validated controller dispatch and checkpoint
-adoption without replaying enter effects; five tests passed plus all 279 units at
-that checkpoint. No live gameplay events emitted yet.
-Next move waves input/update and phase entry bodies, followed by standoff/boss/
-shrine/death, and replace input/update branching with the phase router. Trial
-encounter start/finish remain in the closure for those phase owners.
+Router foundation 556acb9 is now integrated in the uncommitted step above.
+Owner entry APIs still perform existing direct record writes; router synchronizes
+them for dispatch, and all passive enter callbacks avoid replaying entry/rewards.
+Other rule event emission and listener ownership remain next.
 Remaining rule capture/type audit: tmp/runtime-refactor/rule-port-audit.json.
 Preserve same-frame phase cascades and game/cosmetic RNG consumption order.
 Full W2, W3 and Part 4 remain pending; do not push develop.

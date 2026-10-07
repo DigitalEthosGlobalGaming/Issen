@@ -128,6 +128,8 @@
 
 - 2026-10-08 — W2 between move — give the existing inter-encounter timer its own controller before wiring router dispatch — leave phase selection in the composition update — strict, all 316 units, two controller cases and ten trial/save browser cases pass; existing next-phase order is unchanged — revert this between-controller physical move.
 
+- 2026-10-08 — W2 cinematic audit repair — expose the viewer's original scene seed through a read-only owner accessor and migrate stale response instrumentation — restore the removed closure variable or weaken stage variation assertions — broad router run found two ReferenceErrors from the prior UI extraction; strict and seven unchanged cinematic/stage checks pass; accessor changes no viewer behavior — revert the accessor/hook fix together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
