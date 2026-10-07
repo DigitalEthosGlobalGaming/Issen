@@ -1,3 +1,28 @@
+# Rendering, assets and runtime refactor in progress
+
+Goal: complete all three workstreams in `main-goal.md`, in order, then final verification and one push of `develop`. No performance runs or profiles. Preserve `codex/lit-rendering-only`, authoring artwork, recipes, provenance and `issen.*` compatibility.
+
+Restore point: `pre-refactor` at `ad353b3`, pushed successfully. Local `develop` matched `origin/develop` and was clean before work began. Do not modify the restore branch or push develop until Part 4 passes.
+
+## Current checkpoint: W1.0 audit and W1.1 conversion tool
+
+- Audit completed in `tmp/asset-compaction/audit.md` and `audit.json`: 86 families, all scalar channels exact, 78 zero-emission maps. Exact scalar deletion saves 63,900,172 bytes; zero-emission deletion saves 8,365,453 bytes. These are encoded source savings, not GPU memory measurements.
+- Source PNG inventory totals 271,253,993 bytes excluding Play Store. Existing dist/APK outputs are stale and are not verification evidence.
+- Added `scripts/assets/compact.mjs`, Pillow helper and five tests. Tool preserves atlas dimensions, exact data, alpha and colour tolerances, records hashes/actions/bytes, retains authoring PNGs and backs up generated inputs before deletion. A second run is a no-op.
+- No actual runtime conversions or deletions applied yet. Runtime version remains 1.66.7; bump patch at W1.5.
+
+Verification (exact commands):
+
+- `python scripts/assets/tests/compact.test.py` with a Pillow-enabled interpreter: all five tests passed (zero-emission alpha semantics, scalar equality/mismatch, exact data, source retention, deletion and idempotence).
+- `npm run typecheck`: passed.
+- `node --check scripts/assets/compact.mjs`: passed.
+
+Next: W1.2/W1.3 prepare generated catalog, PBR export/install integration and optional emissive runtime support before applying compaction. Test the generator and loaders, then apply conversion with `ISSEN_PYTHON` pointing to Python 3 with Pillow >=12. Backups go under ignored `tmp/asset-compaction/originals/`. Redirect existing source and map URLs to aligned WebP outputs while retaining authoring originals outside startup's runtime glob. Keep deletions, URL migration and behaviour changes in separate commits. Validate every converted plane in-browser and run the required W1 focused suites, Canvas comparison, production and Android web checks. Log any tolerance fork. Do not loosen tests.
+
+Decision log: `docs/development/refactor-decision-log.md`.
+
+## Previous completed work (historical handoff)
+
 # Current development status
 
 **Asset packing cancelled at the user's request on 7 October 2026.**
