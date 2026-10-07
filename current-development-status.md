@@ -11,14 +11,13 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
-deletions `81e3742` and `46030fc`. No runtime functions have been extracted yet.
-Context/events foundation is now introduced alongside the closure; no runtime
-functions moved. Contracts: src/game/session/context.ts, src/game/events.ts,
+deletions `81e3742` and `46030fc`. Scene composition is now physically owned by src/presentation/scene.ts.
+Context/events foundation remains alongside the closure; the first presentation
+move is complete. Contracts: src/game/session/context.ts, src/game/events.ts,
 src/presentation/context.ts. Transitional getters preserve original owner/RNG
 references. Bus listeners run synchronously in registration order, with defined
 reentrant/subscription semantics and readonly value payloads. No gameplay events
-are emitted yet; wire them while extracting rule/phase owners. Composer draft
-remains outside the repository; next implement named seven-layer composition,
+are emitted yet; wire them while extracting rule/phase owners. Next implement named seven-layer composition,
 then presentation environment/figures/post/feedback ownership. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 
@@ -35,7 +34,12 @@ now cannot spawn/transition gameplay or mutate a pending continuation. Strict ty
 passed; all 270 units passed (presentation-readiness-unit.log).
 `npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
 all eight passed (presentation-readiness-browser.log; terminal exit confirmed).
-No process remains. This is a separate concern before physical presentation moves;
+The first physical move preserves the original draw body and reads explicit scene
+inputs through SceneViews; it exposes no gameplay transition callback. Strict types
+passed, all 270 units passed (scene-owner-unit.log), and
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|actual title|context|pending gameplay|checkpoint' --config playwright.rendering-v2.config.ts`:
+all 12 passed (scene-owner-browser.log; terminal exit confirmed). No process remains.
+The scene-ready boundary was committed separately before this physical move;
 repeat broad regression at the presentation cluster checkpoint. W3 remains entirely pending. Do not push develop.
 
 W2.1 broad verification: `npx playwright test --config playwright.rendering-v2.config.ts`

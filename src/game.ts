@@ -1,3 +1,4 @@
+import { createRuntimeScene, type PresentationFrame } from './presentation/scene.ts';
 import { createEventBus, type GameEvents } from './game/events.ts';
 import type { GameContext } from './game/session/context.ts';
 import type { PresentationContext } from './presentation/context.ts';
@@ -35,7 +36,6 @@ import { createInkEnemyRenderer } from './rendering/figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './rendering/figures/ink-player.ts';
 import { createInkSwordRenderer } from './rendering/figures/ink-sword.ts';
 import { createLightingRig } from './rendering/lighting-rig.ts';
-import { setSceneLighting } from './rendering/scene-material.ts';
 import { createUiMaterialLighting } from './ui/material-lighting.ts';
 import { disposeUiArt } from './rendering/ui-art.ts';
 import { createLightingDebug } from './ui/lighting-debug.ts';
@@ -4588,11 +4588,6 @@ export function startGame(
       g.fillRect(0, 0, W, H);
     }
   }
-  interface PresentationFrame {
-    readonly cameraX: number;
-    readonly cameraY: number;
-    readonly post: PostFrame;
-  }
   function preparePresentation(raw: number): PresentationFrame {
     const sx = reducedMotion() ? 0 : (R() - 0.5) * shake,
       sy = reducedMotion()
@@ -4609,112 +4604,52 @@ export function startGame(
     drawScene(preparePresentation(raw));
     settlePresentedScene();
   }
-  /** Synchronous draw of the current poses; presentation updates happen once above. */
-  function drawScene(frame: PresentationFrame) {
-    nativeScene?.begin();
-    lightingDebug.refresh();
-    setSceneLighting(g, lightingRig.lighting(W * DPR, H * DPR));
-    g.setTransform(DPR, 0, 0, DPR, 0, 0);
-    g.save();
-    g.translate(frame.cameraX, frame.cameraY);
-    if (zoom > 1.001 && !reducedMotion()) {
-      g.translate(zoomX, zoomY);
-      g.scale(zoom, zoom);
-      g.translate(-zoomX, -zoomY);
-    }
-    const demonRealm = activeTrial?.realm === 'demon' || (cinematic.active && previewDemon);
-    const inkEnvironment = demonRealm
-      ? demonRealmRenderer.draw(
-          g,
-          W,
-          H,
-          time,
-          reducedMotion(),
-          activeTrial ? activeTrial.seed : stageSeed,
-        )
-      : environmentRenderer.draw(g, {
-          stageSeed,
-          width: W,
-          height: H,
-          dpr: DPR,
-          time,
-          stage: G.stage,
-          reducedMotion: reducedMotion(),
-          reducedFlashes: reducedFlashes(),
-          lowQuality: density() <= 0.3,
-        });
-    cvs.dataset.renderer = 'ink';
-    cvs.dataset.scene = String(
-      demonRealm ? STAGES.length : (environmentRenderer.snapshot().stage ?? G.stage),
-    );
-    cvs.dataset.rendererBackend = demonRealm ? 'demon-realm' : environmentRenderer.backend;
-    cvs.dataset.artwork = 'ink';
-    if (mistSprite)
-      for (const m of mists) {
-        g.globalAlpha = m.a;
-        g.drawImage(mistSprite, m.x - m.w / 2, m.y - m.h / 2, m.w, m.h);
-      }
-    g.globalAlpha = 1;
-    blades(mid, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
-    if (!cinematic.active) drawStains();
-    drawLeaves(false);
-    const b = sceneLoading ? null : G.boss;
-    if (b && ['windup', 'flash', 'feint'].includes(b.state)) {
-      const k = b.state === 'flash' ? 1 : clamp(b.t / b.dur);
-      g.fillStyle = `rgba(0,0,0,${0.2 * k})`;
-      g.fillRect(-30, -30, W + 60, H + 60);
-    }
-    const back = (sceneLoading ? [] : G.enemies)
-      .filter((e) => e !== G.attacker && e.state !== 'strike')
-      .sort((a, c) => a.pos.y - c.pos.y);
-    for (const e of back) drawEnemy(e);
-    if (G.event === 'fog' && (G.state === 'playing' || G.state === 'dead')) {
-      const y0 = L.horizonY,
-        y1 = L.groundY + L.eH * 0.25,
-        mc = STAGES[G.stage]!.mist,
-        fg2 = g.createLinearGradient(0, y0, 0, y1);
-      fg2.addColorStop(0, `rgba(${mc},0)`);
-      fg2.addColorStop(0.3, `rgba(${mc},.88)`);
-      fg2.addColorStop(0.85, `rgba(${mc},.88)`);
-      fg2.addColorStop(1, `rgba(${mc},0)`);
-      g.fillStyle = fg2;
-      g.fillRect(-30, y0, W + 60, y1 - y0);
-    }
-    if (b) drawBoss();
-    if (!sceneLoading)
-      for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
-    if (!cinematic.active && !sceneLoading) {
-      drawPlayer();
-      drawPet();
-      drawFoxfire();
-      drawFx();
-      drawFx2();
-    }
-    if (inkEnvironment && !demonRealm)
-      environmentRenderer.drawForeground(g, {
-        width: W,
-        height: H,
-        dpr: DPR,
-        time,
-        stage: G.stage,
-        reducedMotion: reducedMotion(),
-        reducedFlashes: reducedFlashes(),
-        lowQuality: density() <= 0.3,
-      });
-    blades(fg, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
-    if (!cinematic.active) drawGlyphs();
-    if (!demonRealm) {
-      drawSmoke();
-      drawLeaves(true);
-      drawWeather();
-    } else drawLeaves(true);
-    if (!cinematic.active) drawPops();
-    g.restore();
-    if (!cinematic.active) drawStamps();
-    drawPost(frame.post);
-    nativeScene?.flush();
-    cvs.dataset.graphicsBackend = 'pixi';
-  }
+  const drawScene = createRuntimeScene(() => ({
+    nativeScene,
+    lightingDebug,
+    g,
+    lightingRig,
+    W,
+    H,
+    DPR,
+    zoom,
+    zoomX,
+    zoomY,
+    reducedMotion,
+    activeTrial,
+    cinematic,
+    previewDemon,
+    demonRealmRenderer,
+    time,
+    stageSeed,
+    environmentRenderer,
+    G,
+    reducedFlashes,
+    density,
+    cvs,
+    mistSprite,
+    mists,
+    blades,
+    mid,
+    drawStains,
+    drawLeaves,
+    sceneLoading,
+    drawEnemy,
+    L,
+    drawBoss,
+    drawPlayer,
+    drawPet,
+    drawFoxfire,
+    drawFx,
+    drawFx2,
+    fg,
+    drawGlyphs,
+    drawSmoke,
+    drawWeather,
+    drawPops,
+    drawStamps,
+    drawPost,
+  }));
   // Scene-ready continuation belongs to orchestration, never to a drawing call.
   function settlePresentedScene() {
     if (sceneLoading && sceneReadyToPresent) {

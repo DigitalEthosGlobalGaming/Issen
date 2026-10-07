@@ -320,7 +320,7 @@ returning. Leaked Canvas state can subtly recolor or displace every later layer.
 | Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`            |
 | Robe or blade appearance data                          | `src/game/content/cosmetics.ts`     |
 | Combat particles and transient effects                 | `src/rendering/effects/`            |
-| Main scene composition and full-frame post effects     | `src/game.ts`                       |
+| Main scene composition / post orchestration             | `src/presentation/scene.ts` / `src/game.ts` |
 | HUD or screen layout and styling                       | `src/ui/` and `src/styles/`         |
 | Armory-only composition                                | `src/rendering/armory-preview.ts`   |
 | Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`               |

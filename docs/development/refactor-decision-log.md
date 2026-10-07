@@ -48,6 +48,8 @@
 
 - 2026-10-08 — W2 presentation boundary — settle scene-ready gameplay continuation in runtime orchestration immediately after drawing — leaving phase/spawn mutations in drawScene — direct repeated drawing must not change gameplay; live timing remains the same frame, and readiness/checkpoint/isolation cases pass — revert the boundary commit before moving scene composition.
 
+- 2026-10-08 — W2 presentation move — move the unchanged draw body into presentation/scene.ts with explicit scene inputs and drawing ports — moving rule continuations with drawing or first changing pass order — the preceding boundary fix keeps pending gameplay outside presentation; native repeat-draw, checkpoint, context and live-scene checks pass — revert the scene-owner move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
