@@ -30,10 +30,10 @@ untouched. Metadata and application chunks account for bundle/image differences.
 | --- | ---: | ---: |
 | Runtime PNG/compact plane set | 266,530,086 | 120,472,123 |
 | Checked texture tree, including retained authoring PNGs | 266,530,086 | 181,824,601 |
-| Production verification bundle | 261,053,490 | 120,505,485 |
+| Production verification bundle | 261,053,490 | 120,506,570 |
 | Production/Android image bytes | 258,901,059 | 118,716,745 |
-| Android web verification bundle | 284,964,042 | 144,388,949 |
-| Unsigned APK-container ZIP projection | 295,487,341 | 158,550,019 |
+| Android web verification bundle | 284,964,042 | 144,390,034 |
+| Unsigned APK-container ZIP projection | 295,487,341 | 158,550,091 |
 
 The source table excludes out-of-scope native/branding/store artwork. Authoring
 PNG preservation adds 61,352,478 bytes to the checked texture tree. Build totals
@@ -52,7 +52,7 @@ uses the ignored `byte-report.py` and the restore-point checkout.
 
 - Six Python compaction tests: exact data/alpha, PNG metadata and pixel preservation,
   threaded idempotence, mismatch retention, optional emission, future regeneration.
-- Four Node loader/catalog/provenance utility cases and all 252 units passed.
+- Ten Node loader/catalog/provenance/exporter utility cases and all 252 units passed.
 - Strict TypeScript passed; all 352 raw-browser conversion comparisons passed.
 - The ten-file focused rendering/material/asset command passed 34 cases, including
   Canvas comparison, context restoration and missing-emission weapon readiness.
@@ -61,8 +61,11 @@ uses the ignored `byte-report.py` and the restore-point checkout.
   on both compact develop and untouched pre-refactor. This proven pre-existing
   failure remains recorded; no test/tolerance was skipped or relaxed.
 - All 266 runtime-plane README links exist; a second refresh changes zero files.
-- Broad workstream gate and final version checks are recorded in the status handoff
-  when completed. Do not infer final goal completion from this intermediate report.
+- Broad rendering workstream gate passed all 245 cases in one uninterrupted run.
+- Final version 1.66.8 production build/typecheck and four production tests passed;
+  the release-note indicator browser check passed. Android remained four passing
+  cases and the proven pre-existing recovery failure. Exact commands/logs are in
+  the status handoff. W1 is complete; W2, W3 and final goal verification remain.
 
 ## Future oversized-map review (no downscaling performed)
 

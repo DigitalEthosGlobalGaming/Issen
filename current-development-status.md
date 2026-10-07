@@ -5,58 +5,81 @@ verification/report and one develop push. No profiles, benchmarks, store builds,
 real-save changes or modifications of `codex/lit-rendering-only`.
 
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
-develop, unpushed. Current version 1.66.7. All W2/W3 work remains required.
+develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## Current: W1 cleanup complete, broad gate running
+## W1 complete; next W2.0 audit and validation harness
 
-- Audit: `tmp/asset-compaction/audit.md` and audit.json; all 86 families have exact
-  surface/scalar equality, 78 emissive maps are zero. Removed 602 generated PNGs
-  in isolated deletion commit `9e31acc`. Original 86 authoring PNG hashes are
-  intact. No resizing/repacking/geometry changes.
-- Compact additions: `7a3f420`, migrated consumers/catalog: `069fca6`. Runtime
-  uses 352 compact files including 180 data planes and eleven lossless PNG
-  exceptions; all shrink. Missing emission is zero, no scalar dependencies.
-- Final apply `node scripts/assets/compact.mjs --apply`: 602 changes;
-  repeat: zero changes. Logs final-cleanup.log / final-repeat.log under audit tmp.
-- Six Python compaction tests, four focused Node utility tests, all 252 full units,
-  strict TypeScript, all 352 raw browser image comparisons, and all 34 focused
-  rendering/material/asset/Canvas browser checks passed. Focused log:
-  `tmp/asset-compaction/migrated-focused-browser.log`.
-- `npm run test:production`: four passed after final cleanup; log w1-production.log.
-- `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android npm run test:android-web`:
-  four passed, encounter-reload assertion failed. The same original assertion also
-  fails on the untouched restore-point Android web build, proved in an isolated
-  preview/config. Logs w1-android-web.log, android-recovery-recheck.log,
-  android-recovery-baseline.log. No tolerances/assertions changed. The initial
-  baseline config attempt had the wrong server cwd; corrected run proves failure.
-- Broad command `npx playwright test --config playwright.rendering-v2.config.ts`
-  is live. Log `tmp/asset-compaction/w1-broad-browser.log`, execution session 18225.
-  Poll actual terminal to establish completion; do not start a duplicate or edit
-  runtime/version/changelog while it is running. Production/Android sessions are
-  terminal. Baseline proof session 45414 may need final terminal poll.
-- Matched builds: detached `pre-refactor` checkout under
-  `tmp/asset-compaction/restore-baseline`, dependencies linked, source clean.
-  `tmp/asset-compaction/byte-results.json` records source runtime 266,530,086 to
-  120,472,123 bytes; checked texture tree includes 61,352,478 authoring bytes.
-  Web bundle 261,053,490 to 120,505,485; Android web 284,964,042 to 144,388,949.
-  Unsigned ZIP projections 295,487,341 to 158,550,019 using an identical frozen
-  debug native shell. These are estimates, not built/installable APKs. No dist,
-  native release/store build or stale APK was modified.
-- Refreshed 83 pack README links preserving recipes/provenance; standard asset
-  docs and Android tmp-output override are prepared. No W1 version bump yet.
+W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
+`tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
+have exact scalar/surface equality; 78 zero-emission maps are removed. All 86
+authoring PNG hashes, recipes, provenance and sprite geometry remain intact.
 
-## Next steps
+Ordered commits: compact additions `7a3f420`, runtime URLs/catalog `069fca6`,
+602 generated-PNG deletions `9e31acc`, documentation `9be233b`. Future regeneration
+correctly cleans stale emission when inputs become zero (`5eb29a3`). There are
+352 runtime siblings (180 exact data planes); eleven colour PNG exceptions make
+every sibling smaller without relaxing tolerances. Final compaction apply is a
+no-op. No converter/browser/build process remains live.
 
-1. Finish the live broad gate, fix regressions under goal decision rules. Record
-   exact result; do not claim success from partial logs.
-2. Commit green Android tmp-output override separately from asset documentation.
-   Check refreshed README idempotence/links. Finish byte/oversized-map report and
-   W1 audit/report documentation. PNG exceptions are a recorded conservative fork.
-3. After broad gate, bump patch to 1.66.8, package lock/title version/changelog
-   `Smaller download`, repeat affected production/Android version checks. Complete
-   W1 checkpoint/handoff commit only once all W1 requirements are accounted for.
-4. Immediately begin W2 audit and ordered phases, then W3 and Part 4. Never push
-   develop until the full goal/report/final gates are done. No approval gates.
+## W1 verification commands and results
+
+Commands run from the repository; Python uses the Pillow-enabled ISSEN_PYTHON.
+All logs below are in ignored `tmp/asset-compaction/`.
+
+- `& $env:ISSEN_PYTHON scripts/assets/tests/compact.test.py`: six passed,
+  w1-final-python.log. `node scripts/assets/compact.mjs --apply`: zero changes,
+  w1-final-noop.log. Node utility/export checks:
+  `node --test tests/unit/asset-compaction.test.mjs tests/unit/asset-pack-docs.test.mjs scripts/pbr/tests/cli.test.mjs`:
+  ten passed, w1-final-tools.log.
+- `npm test`: all 252 passed, w1-final-unit.log.
+- `npm run typecheck`: passed, migrated-typecheck.log; strict checking also passed
+  in the final production and Android web builds.
+- `npx playwright test tests/browser/compacted-planes.spec.ts --config playwright.rendering-v2.config.ts`:
+  all 352 conversions passed (180 exact data), every-plane-browser.log; the same
+  test passed again after cleanup in the broad suite.
+- `npx playwright test tests/browser/pixi-backend.spec.ts tests/browser/pixi-scenes.spec.ts tests/browser/pixi-catalogue.spec.ts tests/browser/material-colour.spec.ts tests/browser/asset-materials.spec.ts tests/browser/environment-materials.spec.ts tests/browser/artwork-loading.spec.ts tests/browser/enemy-art-cache.spec.ts tests/browser/optional-emissive.spec.ts tests/browser/zero-emission-parity.spec.ts --config playwright.rendering-v2.config.ts`:
+  all 34 passed, migrated-focused-browser.log. Includes Canvas comparisons and
+  context-loss/restore cases. Weapon optional-emission readiness regression fixed.
+- `npx playwright test --config playwright.rendering-v2.config.ts`: all 245 passed
+  in one uninterrupted 11.5m run, w1-broad-browser.log (terminal exit confirmed).
+- `npm run test:production`: final version all four passed,
+  w1-version-production.log (terminal exit confirmed).
+- `$env:ISSEN_ANDROID_BUILD_DIR='tmp/.verification-build-android'; npm run test:android-web`:
+  final version four passed and encounter reload failed, w1-version-android.log.
+  The same original assertion fails on unchanged pre-refactor Android web build:
+  `npx playwright test tests/android/offline.spec.ts -g 'encounter recovery' --config tmp/asset-compaction/android-baseline.config.ts`,
+  android-recovery-baseline.log; focused compact recheck also fails. This is a
+  proven pre-existing exception under the goal decision rules; no assertion or
+  tolerance was skipped/changed. A first baseline attempt had wrong server cwd;
+  the corrected run is the evidence.
+- `npx playwright test tests/browser/changelog.spec.ts --config playwright.rendering-v2.config.ts`:
+  passed, w1-changelog-browser.log. `node scripts/pbr/refresh-pack-docs.mjs`:
+  second refresh zero changes, all 266 plane links independently checked.
+
+Matched byte results are in `tmp/asset-compaction/byte-results.json`. Web bundle
+261,053,490 to 120,506,570 bytes; Android web 284,964,042 to 144,390,034. Runtime
+planes 266,530,086 to 120,472,123; checked texture tree includes authoring originals
+and totals 181,824,601. Unsigned ZIP projection 295,487,341 to 158,550,091 using
+one frozen native shell. Projections are neither native builds nor installable
+APKs. Existing dist/store/APK outputs remain untouched. Baseline checkout under
+`tmp/asset-compaction/restore-baseline` is detached at pre-refactor, clean, with
+linked dependencies; preserve it while pre-existing failure evidence is needed.
+Future oversized normal/surface review and opt-in captures are listed in W1 report.
+
+## Next steps (all required)
+
+1. Begin W2.0: read the complete W2 section, audit every game.ts function and its
+   closure/RNG dependencies into `tmp/runtime-refactor/audit.md`; write seeded
+   headless scenario smoke tests and old checkpoint fixtures before moving code.
+2. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
+   Require WebGL2, use one graphics error screen, retain eight-second context-loss
+   recovery with explicit resume and Reload on failure. Then follow the eight
+   ordered extraction phases, green/checkpoint commits, explicit narrow contexts,
+   synchronous typed events, plain state records, state tables/behaviour registry.
+3. Finish W2 gates/docs/minor version; proceed through all W3 lighting phases and
+   gates/minor version. Do not start W3 before W2 completes. W3 is entirely pending.
+4. Part 4 final checks/report, commit completion handoff and push develop once.
+   No approval gates; never declare completion from W1 alone or push prematurely.
 
 ## Previous completed work (historical handoff)
 

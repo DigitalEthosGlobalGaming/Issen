@@ -27,6 +27,8 @@
 
 - 2026-10-07 — W1 regeneration — remove validated superseded compact emission when a later export becomes zero and accept compact PNG surface exceptions — keeping stale emitting siblings or requiring WebP for every family — later installations must preserve current omission and size policies; round-trip emitting-to-zero regression test passes — revert the regeneration cleanup commit.
 
+- 2026-10-07 — W1 checkpoint — complete asset work with the proven pre-existing Android recovery failure recorded — changing unrelated checkpoint behaviour during asset compaction — all conversion, rendering, strict type, unit and production gates pass; the goal explicitly permits evidenced pre-existing failures — restore W1 from pre-refactor or revert the ordered W1 commits.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
