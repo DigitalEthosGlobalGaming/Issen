@@ -1,3 +1,4 @@
+import { bossBehaviours } from './boss-behaviours.ts';
 import { BOSSES, BOSS_IDENTITIES } from '../content/bosses.ts';
 import type { Random } from '../../shared/random.ts';
 import { EPOSE, makeFig } from '../../shared/figure-model.ts';
@@ -51,11 +52,7 @@ export function createBoss(
     kageUsed: 0,
     pos: { x: 0, y: 0, h: 0, fog: 0, alpha: 0 },
   };
-  if (def.mirror) b.bp.feint = 0;
-  if (def.spear) {
-    b.bp.flash *= 0.8;
-    b.bp.wind *= 1.2;
-  }
+  bossBehaviours.resolve(b).behaviour.configure(b);
   b.pos = position(b);
   return b;
 }

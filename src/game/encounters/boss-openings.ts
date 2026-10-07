@@ -1,4 +1,5 @@
-import { DIRS, OPP } from '../../shared/directions.ts';
+import { bossBehaviours } from './boss-behaviours.ts';
+import { DIRS } from '../../shared/directions.ts';
 import type { Random } from '../../shared/random.ts';
 import type { Boss } from './boss.ts';
 
@@ -9,7 +10,7 @@ export function chainLength(count: number, mode: string, random: Random = Math.r
   return (count <= 4 ? 2 : 3) + (random() < 0.5 ? 1 : 0);
 }
 export function bossShownDirection(boss: Boss) {
-  return boss.def.mirror ? OPP[boss.sdir] : boss.sdir;
+  return bossBehaviours.resolve(boss).behaviour.shownDirection(boss);
 }
 export function parryOpening(
   boss: Boss,
@@ -17,7 +18,7 @@ export function parryOpening(
   random: Random = Math.random,
 ): { second: boolean; counterDamage: boolean } {
   boss.glint = 0;
-  const second = !!(boss.def.twin && !boss.twinDone);
+  const second = bossBehaviours.resolve(boss).behaviour.secondParry(boss);
   if (second) {
     boss.twinDone = true;
     boss.state = 'windup';

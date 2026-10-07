@@ -379,3 +379,10 @@ Reward offer and results UI orchestration still await their session owner.
 
 `game/phases/between.ts` owns the timer selecting the next trial encounter, boss,
 shrine or wave through explicit continuation ports.
+
+Boss simulation now dispatches the ten existing states through game/encounters/boss-states.ts.
+The boss-behaviours registry owns each typed machine and its direction, parry and
+configuration hooks for base, mirror, twin and spear; visual definitions stay plain
+content. boss-simulation.ts advances simulation/lifetime/raw-shadow clocks and
+applies the existing transition-frame pose/lean rules. boss-update.ts temporarily
+adapts the existing exports until consumers migrate. No checkpoint fields change.
