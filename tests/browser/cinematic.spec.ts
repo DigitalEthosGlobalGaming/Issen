@@ -25,7 +25,7 @@ test('cinematic scenes isolate gameplay, support remapped keys and swipes, and e
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__cinematicHarness = { G, WX, random: () => activity.runRandom.state() }; artworkReady = true;',
+        'window.__cinematicHarness = { G: foundation.run.G, WX: foundation.run.WX, random: () => foundation.run.activity.runRandom.state() }; artworkReady = true;',
       ),
     });
   });

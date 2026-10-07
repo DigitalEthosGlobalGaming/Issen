@@ -22,7 +22,7 @@ test('Tanto intercepts attacks, exhausts charges and preserves the boss victory 
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__tanto = { G, frameLoop, playerDie, startBoss, startStandoff }; artworkReady = true;',
+      'window.__tanto = { G: foundation.run.G, frameLoop, playerDie, startBoss, startStandoff }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

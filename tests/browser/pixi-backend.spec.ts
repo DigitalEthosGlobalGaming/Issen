@@ -392,7 +392,7 @@ test('drawing the same prepared scene twice preserves poses, RNG, post state and
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__preparedScene = { frameLoop, preparePresentation, drawScene, snapshot: () => JSON.stringify({ G, P, fx: presentationState.fx, postState: postPreparation.state, shake: presentationState.shake, rng: activity.runRandom.state(), saves: Object.entries(localStorage), haptics: window.drawHaptics }) }; artworkReady = true;',
+        'window.__preparedScene = { frameLoop, preparePresentation, drawScene, snapshot: () => JSON.stringify({ G: foundation.run.G, P: foundation.run.P, fx: foundation.view.presentationState.fx, postState: postPreparation.state, shake: foundation.view.presentationState.shake, rng: foundation.run.activity.runRandom.state(), saves: Object.entries(localStorage), haptics: window.drawHaptics }) }; artworkReady = true;',
       ),
     });
   });

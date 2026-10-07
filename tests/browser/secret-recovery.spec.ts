@@ -69,7 +69,7 @@ test('every actual duel entry refills the run capacity before writing its checkp
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__duelAudit = { G, startBoss }; artworkReady = true;',
+        'window.__duelAudit = { G: foundation.run.G, startBoss }; artworkReady = true;',
       ),
     });
   });

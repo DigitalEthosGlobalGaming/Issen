@@ -50,11 +50,11 @@ async function instrument(page: Page) {
     const body = (await response.text()).replace(
       'artworkReady = true;',
       `
-      window.__trialHarness = { G, step: update, swipe: onSwipe, tap: onTap,
+      window.__trialHarness = { G: foundation.run.G, step: update, swipe: onSwipe, tap: onTap,
         startBoss, shownDirection: bossShownDirection,
-        stop: () => frameLoop.stop(), getEquipment: () => EQ,
+        stop: () => frameLoop.stop(), getEquipment: () => foundation.profile.profileEquipment.EQ,
         settleScene: async () => {
-          while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); }
+          while (foundation.run.sceneState.sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); }
         } };
       frameLoop.start();`,
     );

@@ -134,7 +134,7 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__bossState = () => G.boss; artworkReady = true;',
+      'window.__bossState = () => foundation.run.G.boss; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

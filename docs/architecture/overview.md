@@ -65,9 +65,11 @@ weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
 `presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
 separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
 owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signals; hit-stop and run
-time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. Its private closure
-owns the player profile, current run, scene dimensions and service instances.
-It connects feature callbacks to audio, persistence, presentation owners and UI.
+time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. runtime/foundation.ts constructs explicit browser/profile/run/view records and
+base services before domain wiring. Current profile identities remain in their
+profile owners; geometry, seals and visit seeds have presentation owners, and
+scene-state.ts owns request/continuation lifetime. game.ts connects narrow selected
+fields and feature actions to audio, persistence, presentation owners and UI.
 game/combat/kill.ts owns cut/blessing/chain run mutations and combat RNG, emitting
 flat frozen kill/cutChain snapshots before chained selection. Profile counters
 listen in game/progression/combat-listeners.ts; cut audio/haptics/FX listen in
@@ -502,3 +504,20 @@ life-loss, fatal and all three revival paths produce identical run/profile/comba
 RNG outcomes when these subscriptions are absent. The event bus freezes snapshots;
 lifetime disposal removes every reaction. Rules retain hit stop, slow motion,
 checkpoint boundaries, trial failure and encounter restart.
+
+runtime/foundation.ts owns base context construction; it keeps plain run/profile
+records separate from browser and presentation capabilities. Domain binding views
+forward named fields so replacement profile/layout/scene identities remain live.
+presentation/geometry.ts owns viewport/layout/fog, seal.ts owns CSS/texture seal
+selection, stage-state.ts owns independent cosmetic visit ledgers, and
+game/session/scene-state.ts owns request/continuation lifetime. Actual browser
+probes read these owner APIs; they do not require redundant root aliases.
+
+
+Phase, kill and frame bindings lazily create their lifetime views once. Every
+selected mutable field forwards to its owning record, including replacement
+profile/layout identities and current trial activity; stable methods remain
+capabilities. Value snapshots (such as scene/environment request inputs) are not
+cached. An actual damage-phase regression replaces those records after initial
+use and checks current writes and frozen geometry events. The unchanged eight-
+trial encounter/reload flow and all 254 combined browser cases pass.

@@ -8,8 +8,8 @@ test('held cinematic leave does not replace a continued encounter with title ene
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const hook = `const held = []; window.__sceneContinuation = { G, loading: () => sceneLoading, pending: () => held.length,
-      hold: () => { const compose = environmentRenderer.compose; environmentRenderer.compose = frame => compose(frame).then(ready => new Promise(resolve => held.push(() => resolve(ready)))); },
+    const hook = `const held = []; window.__sceneContinuation = { G: foundation.run.G, loading: () => foundation.run.sceneState.sceneLoading, pending: () => held.length,
+      hold: () => { const compose = foundation.browser.environmentRenderer.compose; foundation.browser.environmentRenderer.compose = frame => compose(frame).then(ready => new Promise(resolve => held.push(() => resolve(ready)))); },
       release: () => { for (const action of held.splice(0)) action(); } }; artworkReady = true;`;
     await route.fulfill({
       response,

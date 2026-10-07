@@ -14,12 +14,12 @@ test.beforeEach(async ({ page }) => {
         'artworkReady = true;',
         `
       { let releaseScene;
-      const composeScene = environmentRenderer.compose.bind(environmentRenderer);
+      const composeScene = foundation.browser.environmentRenderer.compose.bind(foundation.browser.environmentRenderer);
       window.__sceneReadiness = {
-        G, startWave, startRushDuel,
+        G: foundation.run.G, startWave, startRushDuel,
         hold() {
           const blocked = new Promise(resolve => { releaseScene = resolve; });
-          environmentRenderer.compose = async frame => { await blocked; return composeScene(frame); };
+          foundation.browser.environmentRenderer.compose = async frame => { await blocked; return composeScene(frame); };
         },
         release() { releaseScene(); },
         freezeMenu() { screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }

@@ -36,11 +36,11 @@ async function prepare(page: Page, edition = 'web') {
     body = body.replace(editionInput, `edition: ${JSON.stringify(edition)}`);
     body = body.replace(
       'artworkReady = true;',
-      `window.__mastery = { G, step: update, swipe: onSwipe, tap: onTap,
+      `window.__mastery = { G: foundation.run.G, step: update, swipe: onSwipe, tap: onTap,
       stop: () => frameLoop.stop(), runFrames: () => frameLoop.start(), shrine: openShrine, checkpoint: captureCheckpoint,
-      settleScene: async () => { while (sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },
-      equipment: () => EQ, stats: () => ST, modifiers: computeMods, parry: () => bossPhase.onTapDown(context), pause, startRun, killEnemy,
-      access: premiumAccess, premium, title: () => showScreen('title') }; frameLoop.start();`,
+      settleScene: async () => { while (foundation.run.sceneState.sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },
+      equipment: () => foundation.profile.profileEquipment.EQ, stats: () => foundation.profile.profileFoundation.ST, modifiers: computeMods, parry: () => bossPhase.onTapDown(context), pause, startRun, killEnemy,
+      access: foundation.browser.premiumAccess, premium, title: () => showScreen('title') }; frameLoop.start();`,
     );
     await route.fulfill({ response, body });
   });

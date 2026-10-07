@@ -24,7 +24,7 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__bossState = () => G.boss; artworkReady = true;',
+      'window.__bossState = () => foundation.run.G.boss; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

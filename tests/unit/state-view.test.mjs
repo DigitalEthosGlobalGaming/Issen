@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { stateView } from '../../src/game/session/state-view.ts';
+import { stateView, cacheView } from '../../src/game/session/state-view.ts';
 import { createRuntimeSessionState } from '../../src/game/session/runtime-state.ts';
 import { createRunStart } from '../../src/game/session/run-start.ts';
+import { createDeathPhase } from '../../src/game/phases/death.ts';
+import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
 
 test('named state projections keep replacement identity and defer later service reads', () => {
@@ -58,4 +60,48 @@ test('actual run entry writes replacement ledger, reveals and clocks into the se
   assert.equal(state.timeScale, 1);
   assert.equal(f.run.seed, 123456);
   assert.equal(f.run.state, 'playing');
+});
+
+
+test('cached phase views observe replaced geometry, profile and trial activity during actual damage', () => {
+  const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };
+  const runtime = runStartSession(3441, setup), fixture = deathPhaseFixture(runtime);
+  const geometry = { L: fixture.views.L }, profile = { ST: fixture.views.ST };
+  const clocks = { hitStop: 0, timeScale: 1 };
+  const activity = { activeTrial: null, trialFailure: '' };
+  const descriptors = Object.getOwnPropertyDescriptors(fixture.views);
+  for (const key of ['L', 'ST', 'hitStop', 'timeScale', 'activeTrial', 'trialFailure'])
+    delete descriptors[key];
+  const ports = Object.defineProperties({}, descriptors);
+  const readViews = cacheView(() => stateView(geometry, ['L'],
+    stateView(profile, ['ST'], stateView(clocks, ['hitStop', 'timeScale'],
+      stateView(activity, ['activeTrial', 'trialFailure'], ports)))));
+  const phase = createDeathPhase(readViews), struck = [];
+  runtime.views.events.on('struck', event => struck.push(event));
+  runtime.run.lives = 2;
+  phase.playerDie(null, 'wrong');
+  assert.equal(runtime.run.lives, 1);
+  assert.equal(clocks.hitStop, 0.08);
+  const oldProfile = structuredClone(profile.ST);
+  const oldProfileRecord = profile.ST;
+  geometry.L = { player: { x: 301, y: 402, h: 153 } };
+  profile.ST = structuredClone(profile.ST);
+  activity.activeTrial = { id: 'live-trial' };
+  phase.playerDie(null, 'late');
+  assert.equal(activity.trialFailure, 'A mistake');
+  assert.equal(runtime.run.lives, 1);
+  assert.equal(struck.length, 1);
+  activity.activeTrial = null;
+  phase.playerDie(null, 'feint');
+  assert.equal(runtime.run.state, 'dead');
+  assert.equal(clocks.timeScale, 0.3);
+  assert.equal(profile.ST.feinted, (oldProfile.feinted || 0) + 1);
+  assert.deepEqual(oldProfileRecord, oldProfile);
+  assert.deepEqual(struck.at(-1), {
+    reason: 'feint', lives: 0, fatal: true, lifeLost: true,
+    x: 301, y: 402, height: 153, label: '',
+  });
+  assert.ok(Object.isFrozen(struck.at(-1)));
+  geometry.L.player.x = 999;
+  assert.equal(struck.at(-1).x, 301);
 });

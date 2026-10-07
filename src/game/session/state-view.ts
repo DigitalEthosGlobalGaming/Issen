@@ -19,3 +19,10 @@ export function stateView<State extends object, Key extends keyof State, Ports e
   }
   return view;
 }
+
+/** Construct a lifetime view lazily. Mutable selections must be forwarded getters;
+ * other ports must remain stable for this runtime. Never cache value snapshots. */
+export function cacheView<View extends object>(create: () => View): () => View {
+  let view: View | undefined;
+  return () => (view ??= create());
+}

@@ -1,7 +1,12 @@
+import { createRuntimeFoundation } from './runtime/foundation.ts';
+import { createSealPresentation } from './presentation/seal.ts';
+import { createStageState } from './presentation/stage-state.ts';
+import { createPresentationGeometry } from './presentation/geometry.ts';
+import { createSceneState } from './game/session/scene-state.ts';
 import { createRuntimePreferences } from './platform/runtime-preferences.ts';
 import { createRuntimeAudio } from './ui/wiring/audio.ts';
 import { createRuntimeSessionState } from './game/session/runtime-state.ts';
-import { stateView } from './game/session/state-view.ts';
+import { stateView, cacheView } from './game/session/state-view.ts';
 import type { PhaseBindingViews } from './game/session/phase-bindings.ts';
 import { startRuntime } from './game/session/startup.ts';
 import { createFrameBindings } from './game/session/frame-bindings.ts';
@@ -95,7 +100,6 @@ import type { ResultReveal } from './ui/screens/run-results.ts';
 
 import { recordSecretEvent } from './game/progression/secret-events.ts';
 
-
 import { bossPosition } from './rendering/figures/boss-position.ts';
 
 import { createGrunt as createEnemy } from './game/combat/grunt-spawn.ts';
@@ -111,7 +115,6 @@ import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 import { createEffectQuality } from './rendering/effects/quality.ts';
 import { BOSS_SHADOW_DURATION } from './rendering/figures/death.ts';
 
-
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
@@ -121,8 +124,6 @@ import { makeFig, EPOSE } from './shared/figure-model.ts';
 import type { createBackground } from './rendering/scene/background.ts';
 import { createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
-
-
 
 import { createLayout } from './rendering/layout.ts';
 
@@ -137,8 +138,6 @@ import { itemPresentation } from './ui/screens/item-presentation.ts';
 
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
 
-
-
 import { store, isTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
 
@@ -149,194 +148,95 @@ import {
   clearRunCheckpoint,
 } from './platform/run-checkpoint.ts';
 
-
 export function startGame(
   surfaces: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
   lighting?: PreparedLighting,
 ): () => void {
-  const lifecycle = createLifecycle();
-  if (surfaces) for (const surface of surfaces.values()) lifecycle.add(surface.dispose);
-  const nativeScene = surfaces.get('c')?.native;
-  if (!nativeScene) throw new Error('A prepared WebGL2 scene is required');
-  ('use strict');
-  function $(id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
-  function $(id: 'bAgain'): HTMLButtonElement;
-  function $(id: string): HTMLElement;
-  function $(id: string): HTMLElement {
-    const el = document.getElementById(id);
-    if (!el) throw new Error('Missing game element ' + id);
-    return el;
-  }
-  function context2d(canvas: HTMLCanvasElement) {
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Canvas 2D unavailable');
-    return context;
-  }
-  const cvs = $('c'),
-    mainG = nativeScene;
-  let g = mainG;
-  const { environmentRenderer, demonRealmRenderer, inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword, lightingRig, uiMaterialLighting } = createNativeServices(cvs.ownerDocument, lifecycle, lighting);
-  const R = Math.random;
-  const browserPreferences = createRuntimePreferences({ lifecycle, storage: store, effectDensity: () => effectQuality.density, edition: import.meta.env.VITE_GAME_EDITION as GameEdition });
-  const { settings, systemMotion, reducedMotion, reducedFlashes, buzz, combatHaptics, edition, premiumAccess, accessible, density } = browserPreferences;
-  const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
+  const foundation = createRuntimeFoundation(surfaces, lighting, { edition: import.meta.env.VITE_GAME_EDITION as GameEdition, saveSettings: () => saveSettings() });
 
-  const PZ = 0.78; // perfect-cut zone starts at this fraction of the attack ring
+  ('use strict');
+
+   // perfect-cut zone starts at this fraction of the attack ring
 
   /* ---------------- stages ---------------- */
   /* ---------------- layout ---------------- */
-  let W = 1,
-    H = 1,
-    DPR = 1,
-    S = 1,
-    portrait = true;
-  let L: ReturnType<typeof createLayout> & {
-    glows?: ReturnType<typeof createBackground>['glows'];
-  } = createLayout(1, 1);
-  function layout() {
-    portrait = H >= W * 0.9;
-    S = Math.max(W, H) / 900;
-    L = createLayout(W, H);
-  }
 
   /* ---------------- colours ---------------- */
-  let MIST: number[] = [146, 141, 132];
-  const palette = createPalette();
-  const cols = (fog: number) => palette.fog(fog, MIST);
+
   /* ---------------- armory data ---------------- */
-  const ITEMS = [
-    ...createItems(() => new Set([...UNL].filter((id) => id !== PREMIUM_FILM))),
-    SUPPORTER_FILM_ITEM,
-  ];
-  const equipmentPresentation = createEquipmentPresentation(() => ({
-    $,
-    EQ,
-    robePal,
+
+  const equipmentPresentation = createEquipmentPresentation(() => (stateView(foundation.view.sealState, ["SEAL"], stateView(foundation.profile.profileEquipment, ["EQ"], {
+    $: foundation.browser.$,
+    robePal: foundation.view.robePal,
     isRobeSp,
     isSteelThird,
     isSp,
-    lightingRig,
-    presentationState,
-    density,
-    reducedMotion,
-    reducedFlashes,
-    G,
-    cols,
+    lightingRig: foundation.browser.lightingRig,
+    presentationState: foundation.view.presentationState,
+    density: foundation.browser.density,
+    reducedMotion: foundation.browser.reducedMotion,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    G: foundation.run.G,
+    cols: foundation.view.cols,
     environmentState,
-    P,
+    P: foundation.run.P,
     petOf,
-    FONT,
-    SEAL,
-  }));
+    FONT: foundation.view.FONT
+  }))));
   const { CHARMCOL } = equipmentPresentation;
-  const ITEM_BY: Record<string, Item> = {};
-  for (const it of ITEMS) ITEM_BY[it.id] = it;
-  const robePal = palette.robe;
 
   /* ---------------- persistent stats & unlocks ---------------- */
 
-  const profileServices = { store, loadStatistics, loadSetup, loadUnlocks, loadEquipment, premiumAccess, accessible, isTestProfile };
-  const profileFoundation = createProfileFoundation(profileServices);
-  let ST = profileFoundation.ST;
-  const { SETUP, UNL, DAILY_LOGIN, TRIAL_PROGRESS, playerStats } = profileFoundation;
-
-  const activity = createRunActivity(R, playerStats.roninWave);
-
-  const { META, AWAKENING, COLLECTION_PROGRESS, saveAwakening, saveCollections, saveMeta, ARMORY_SEEN } = createProfileProgress(profileServices, () => ST, SETUP, UNL);
-  const syncCollections = () => {
-    if (!activity.activeTrial && !activity.activeDaily && !['title'].includes(G.state))
-      syncCollectionProgress(COLLECTION_PROGRESS, META, ST, G);
-  };
-  const sessionState = createRuntimeSessionState<ResultReveal>(META, SETUP, premiumAccess(), readRunCheckpoint);
-
-
-
-
-
   function updateSavedRunButtons() {
-    const available = sessionState.savedRun?.status === 'active';
-    $('bContinue').hidden = !available;
-    $('bAbandon').hidden = !available;
-    $('bPlay').textContent = available ? 'Start new run' : 'Draw your blade';
+    const available = foundation.run.sessionState.savedRun?.status === 'active';
+    foundation.browser.$('bContinue').hidden = !available;
+    foundation.browser.$('bAbandon').hidden = !available;
+    foundation.browser.$('bPlay').textContent = available ? 'Start new run' : 'Draw your blade';
     for (const id of ['bArmory', 'bStats', 'bTemplate', 'bSupport', 'bTrials'])
-      ($(id) as HTMLButtonElement).disabled = available;
-    $('tSeed').textContent = available
-      ? sessionState.savedRun!.dailyDay
-        ? `Daily · ${sessionState.savedRun!.dailyDay}`
-        : `Saved run · seed ${sessionState.savedRun!.seed}`
+      (foundation.browser.$(id) as HTMLButtonElement).disabled = available;
+    foundation.browser.$('tSeed').textContent = available
+      ? foundation.run.sessionState.savedRun!.dailyDay
+        ? `Daily · ${foundation.run.sessionState.savedRun!.dailyDay}`
+        : `Saved run · seed ${foundation.run.sessionState.savedRun!.seed}`
       : '';
   }
   function earn(event: 'kill' | 'wave' | 'boss') { return profileRules.earn(event); }
-  const saveStats = () => {
-    if (!activity.activeTrial && !activity.activeDaily) {
-      syncCollections();
-      saveCollections();
-      store.set('issen.stats', ST);
-    }
-  };
-  const profileEquipment = createProfileEquipment(profileServices, UNL, ITEMS);
-  let EQ = profileEquipment.EQ;
-  const { revoked, accessibleUnlocks, playerEquipment, savedFilm, savedEquipment } = profileEquipment;
-
-  const SEALS: Record<string, string> = {
-    verm: '#a3271d',
-    gold: '#a67c22',
-    indigo: '#2d3e72',
-    jade: '#2f6f55',
-    sumiseal: '#1b1a18',
-    'trial-platinum': '#aebbc5',
-    'trial-copper': '#c1845e',
-    'quiet-seal': '#678b7b',
-  };
-  let SEAL = '#a3271d',
-    SEALARC = '#a3271d';
-  function applySeal() {
-    SEAL = SEALS[EQ.seal] || '#a3271d';
-    SEALARC = EQ.seal === 'sumiseal' ? '#e9e3d6' : SEAL;
-    document.documentElement.style.setProperty('--seal', SEAL);
-    void setSealTextures($('app'), SEAL);
-  }
 
   /* ---------------- background ---------------- */
-  const stageVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
-  const previewVisits = createStageVisitSeeds((R() * 0x100000000) >>> 0);
-  let stageSeed = stageVisits.enter(0);
-  const WX = createWeatherState(() => 0.5);
 
-  const { environmentState, driftRenderer, buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather, ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition } = createEnvironmentHost(cvs.ownerDocument, lifecycle, () => ({
-    W,
-    H,
-    DPR,
-    S,
-    G,
-    L,
-    R,
-    density,
-    context2d,
-    activeTrial: activity.activeTrial,
-    reducedMotion,
-    g,
-    presentationState,
+  const { environmentState, driftRenderer, buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather, ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition } = createEnvironmentHost(foundation.browser.cvs.ownerDocument, foundation.lifecycle, () => (stateView(foundation.view.geometry, ["W","H","DPR","S","L"], {
+    G: foundation.run.G,
+    R: foundation.view.R,
+    density: foundation.browser.density,
+    context2d: foundation.browser.context2d,
+    activeTrial: foundation.run.activity.activeTrial,
+    reducedMotion: foundation.browser.reducedMotion,
+    g: foundation.browser.g,
+    presentationState: foundation.view.presentationState,
     cinematic,
-    WX,
-  }));
+    WX: foundation.run.WX
+  })));
   function buildWeather(resetSimulation = true) {
     buildWeatherArtwork();
-    if (resetSimulation) Object.assign(WX, createWeatherState(activity.combatRandom));
+    if (resetSimulation) Object.assign(foundation.run.WX, createWeatherState(foundation.run.activity.combatRandom));
   }
-  const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
+  const postArtwork = createPostArtwork(foundation.browser.cvs.ownerDocument, () => (stateView(foundation.view.geometry, ["W","H"], {
+    R: foundation.view.R,
+    mainG: foundation.browser.mainG,
+    context2d: foundation.browser.context2d
+  })));
   const { buildPost } = postArtwork;
 
   function setStage(si: number, anim: boolean) {
-    stageSeed = stageVisits.enter(si);
+    foundation.view.stageState.stageSeed = foundation.view.stageVisits.enter(si);
     if (anim && environmentState.bg) {
       environmentState.prevBg = environmentState.bg;
       environmentState.stageFade = 1;
     }
-    G.stage = si;
+    foundation.run.G.stage = si;
     buildLeaves();
-    MIST = STAGES[si]!.fog;
-    palette.clearFog();
+    foundation.view.geometry.MIST = STAGES[si]!.fog;
+    foundation.view.palette.clearFog();
     buildBG();
     buildMist();
     buildGrass();
@@ -344,43 +244,37 @@ export function startGame(
     prepareScene();
   }
   /* ---------------- figures ---------------- */
-  const { figureRenderer, drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf, drawEnemy, drawBoss, playerFigures, drawEnso, drawGlyphs } = createFiguresHost(() => ({
-    g,
-    inkCharm,
-    inkCompanion,
-    inkEnemy,
-    inkPlayer,
-    inkSword,
-    presentationState,
-    G,
-    W,
-    H,
-    cols,
-    R,
-    density,
-    reducedMotion,
-    reducedFlashes,
-    robePal,
-    accessible,
-    EQ,
-    SEAL,
-    FONT,
-    L,
-    P,
-    apparelMotion,
+  const { figureRenderer, drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf, drawEnemy, drawBoss, playerFigures, drawEnso, drawGlyphs } = createFiguresHost(() => (stateView(foundation.view.sealState, ["SEAL","SEALARC"], stateView(foundation.profile.profileEquipment, ["EQ"], stateView(foundation.view.geometry, ["W","H","L"], {
+    g: foundation.browser.g,
+    inkCharm: foundation.browser.inkCharm,
+    inkCompanion: foundation.browser.inkCompanion,
+    inkEnemy: foundation.browser.inkEnemy,
+    inkPlayer: foundation.browser.inkPlayer,
+    inkSword: foundation.browser.inkSword,
+    presentationState: foundation.view.presentationState,
+    G: foundation.run.G,
+    cols: foundation.view.cols,
+    R: foundation.view.R,
+    density: foundation.browser.density,
+    reducedMotion: foundation.browser.reducedMotion,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    robePal: foundation.view.robePal,
+    accessible: foundation.browser.accessible,
+    FONT: foundation.view.FONT,
+    P: foundation.run.P,
+    apparelMotion: foundation.view.apparelMotion,
     playerRobePalette,
     isRobeSp,
     bladeStyle,
     CHARMCOL,
     petOf,
-    SEALARC,
     pz,
     waveConfiguration,
     liveOrdered,
-    WX,
-  }));
+    WX: foundation.run.WX
+  })))));
   function petOf() {
-    return visiblePet(EQ);
+    return visiblePet(foundation.profile.profileEquipment.EQ);
   }
   function drawFoxfire() { playerFigures.drawFoxfire(); }
   function foxSave(e: Enemy) {
@@ -392,90 +286,77 @@ export function startGame(
   function drawPet() { playerFigures.drawPet(); }
   /* ---------------- ensō glyph ---------------- */
   /* ---------------- audio ---------------- */
-  const { audio, audioInit, tn, sfx, guided, setMuteIcon } = createRuntimeAudio({
-    $, settings, lifecycle, storage: store,
-    get phase() { return G.state; },
-    get saveSettings() { return saveSettings; },
-  });
 
   /* ---------------- game state ---------------- */
-  const presentationState = createPresentationState();
 
-  const G = createRunState(store.get('issen.hints', {}));
-  const P = createPlayerAnimation();
-  const apparelMotion = createSecondaryMotion();
-
-  const effectQuality = createEffectQuality();
   // Transitional adapters preserve closure ownership while consumers migrate to slices.
   const context: GameContext<PresentationContext> = {
     run: {
-      state: G,
+      state: foundation.run.G,
       get random() {
-        return activity.runRandom;
+        return foundation.run.activity.runRandom;
       },
       set random(value) {
-        activity.runRandom = value;
-        activity.combatRandom = value.next;
+        foundation.run.activity.runRandom = value;
+        foundation.run.activity.combatRandom = value.next;
       },
       get equipment() {
-        return EQ;
+        return foundation.profile.profileEquipment.EQ;
       },
       set equipment(value) {
-        EQ = value;
+        foundation.profile.profileEquipment.EQ = value;
       },
-      setup: SETUP,
+      setup: foundation.profile.SETUP,
       get trial() {
-        return activity.activeTrial;
+        return foundation.run.activity.activeTrial;
       },
       set trial(value) {
-        activity.activeTrial = value;
+        foundation.run.activity.activeTrial = value;
       },
       get daily() {
-        return activity.activeDaily;
+        return foundation.run.activity.activeDaily;
       },
       set daily(value) {
-        activity.activeDaily = value;
+        foundation.run.activity.activeDaily = value;
       },
     },
-    services: { audio, storage: store, settings, notify: toast },
+    services: { audio: foundation.browser.audio, storage: store, settings: foundation.browser.settings, notify: toast },
     presentation: {
-      random: R,
+      random: foundation.view.R,
       effects: () => effectSpawner(),
-      layout: () => L,
-      viewport: () => ({ width: W, height: H, dpr: DPR, scale: S }),
+      layout: () => foundation.view.geometry.L,
+      viewport: () => ({ width: foundation.view.geometry.W, height: foundation.view.geometry.H, dpr: foundation.view.geometry.DPR, scale: foundation.view.geometry.S }),
       environment: environmentState,
-      state: presentationState,
-      camera: presentationState,
+      state: foundation.view.presentationState,
+      camera: foundation.view.presentationState,
     },
     events: createEventBus<GameEvents>(),
   };
-  lifecycle.add(context.events.clear);
-  const profileRules = createProfileRules(() => (stateView(activity, ["activeTrial", "activeDaily"], stateView(sessionState, ["rewardLedger", "runItemReveals"], {
-    G,
-    AWAKENING,
-    META,
-    saveAwakening,
-    ST,
-    UNL,
-    ITEMS,
-    ITEM_BY,
-    revoked,
-    COLLECTION_PROGRESS,
-    accessible,
+  foundation.lifecycle.add(context.events.clear);
+  const profileRules = createProfileRules(() => (stateView(foundation.run.activity, ["activeTrial", "activeDaily"], stateView(foundation.run.sessionState, ["rewardLedger", "runItemReveals"], stateView(foundation.profile.profileFoundation, ["ST"], {
+    G: foundation.run.G,
+    AWAKENING: foundation.profile.AWAKENING,
+    META: foundation.profile.META,
+    saveAwakening: foundation.profile.saveAwakening,
+    UNL: foundation.profile.UNL,
+    ITEMS: foundation.profile.ITEMS,
+    ITEM_BY: foundation.profile.ITEM_BY,
+    revoked: foundation.profile.revoked,
+    COLLECTION_PROGRESS: foundation.profile.COLLECTION_PROGRESS,
+    accessible: foundation.browser.accessible,
     refreshArmoryNew,
     store,
     itemPresentation,
     TYPE_WORD
-  }))));
-  const activeEquipment = createActiveEquipment(() => (stateView(activity, ["activeTrial"], stateView(sessionState, ["runTemplate"], {
-    G,
-    SETUP,
-    META,
-    EQ,
-    UNL,
-    ITEM_BY,
-    accessible
-  }))));
+  })))));
+  const activeEquipment = createActiveEquipment(() => (stateView(foundation.run.activity, ["activeTrial"], stateView(foundation.run.sessionState, ["runTemplate"], stateView(foundation.profile.profileEquipment, ["EQ"], {
+    G: foundation.run.G,
+    SETUP: foundation.profile.SETUP,
+    META: foundation.profile.META,
+    UNL: foundation.profile.UNL,
+    ITEM_BY: foundation.profile.ITEM_BY,
+    accessible: foundation.browser.accessible
+  })))));
   function powersEnabled() { return activeEquipment.powersEnabled(); }
   function isSp() { return activeEquipment.isSp(); }
   function isSteelThird() { return activeEquipment.isSteelThird(); }
@@ -486,28 +367,28 @@ export function startGame(
   function bladeStyle() { return equipmentPresentation.bladeStyle(); }
   function bst() { return profileRules.bst(); }
   function computeMods() { return activeEquipment.computeMods(); }
-  const pz = () => precisionZone(PZ, G.m?.pz ?? 0, G.m?.precision ?? 0);
+  const pz = () => precisionZone(foundation.view.PZ, foundation.run.G.m?.pz ?? 0, foundation.run.G.m?.precision ?? 0);
   function pickLook(n: number) {
-    return pickEnemyLook(n, R);
+    return pickEnemyLook(n, foundation.view.R);
   }
   function waveConfiguration() {
-    if (!G.cfg) throw new Error('Encounter requires a wave configuration');
-    return G.cfg;
+    if (!foundation.run.G.cfg) throw new Error('Encounter requires a wave configuration');
+    return foundation.run.G.cfg;
   }
-  const waveCfg = (w: number) => waveConfig(w, G.mode, G.m);
-  const bossParams = (n: number) => bossParameters(n, G.mode, G.m);
-  const comboMult = () => comboMultiplier(G.combo, G.m);
-  const gain = (p: number) => scoreGain(p, G);
-  const modeKey = () => getModeKey(G);
+  const waveCfg = (w: number) => waveConfig(w, foundation.run.G.mode, foundation.run.G.m);
+  const bossParams = (n: number) => bossParameters(n, foundation.run.G.mode, foundation.run.G.m);
+  const comboMult = () => comboMultiplier(foundation.run.G.combo, foundation.run.G.m);
+  const gain = (p: number) => scoreGain(p, foundation.run.G);
+  const modeKey = () => getModeKey(foundation.run.G);
   const combatScore = createCombatScore(() => ({
-    G,
+    G: foundation.run.G,
     events: context.events,
-    activeTrial: activity.activeTrial,
+    activeTrial: foundation.run.activity.activeTrial,
     get trialFailure() {
-      return activity.trialFailure;
+      return foundation.run.activity.trialFailure;
     },
     set trialFailure(value) {
-      activity.trialFailure = value;
+      foundation.run.activity.trialFailure = value;
     },
   }));
   function bumpCombo() {
@@ -515,53 +396,38 @@ export function startGame(
   }
 
   const { hudView, screenAnimation, showScreen, renderLives, hud, setScore, banner, renderHp } =
-    createRuntimeScreens($('app'), activeNow, () => ({
-      G,
-      activeDaily: !!activity.activeDaily,
-      syncCollections,
+    createRuntimeScreens(foundation.browser.$('app'), activeNow, () => ({
+      G: foundation.run.G,
+      activeDaily: !!foundation.run.activity.activeDaily,
+      syncCollections: foundation.profile.syncCollections,
     }));
   let artworkReady = false;
-  let sceneLoading = false;
-  let sceneReadyToPresent = false;
-  let sceneRequest = 0;
-  let requestedSceneKey = '';
-  let requestedSceneIdentity = '';
-  let sceneContinuation: (() => void) | undefined;
-  const sceneFlow = createSceneFlow(() => ({
-    stageSeed,
-    W,
-    H,
-    DPR,
-    presentationState,
-    G,
-    reducedMotion,
-    reducedFlashes,
-    density,
-    activeTrial: activity.activeTrial,
+
+  const sceneFlow = createSceneFlow(() => (stateView(foundation.run.sceneState, ["requestedSceneKey","sceneRequest","requestedSceneIdentity","sceneContinuation","sceneLoading","sceneReadyToPresent"], stateView(foundation.view.geometry, ["W","H","DPR"], stateView(foundation.view.stageState, ["stageSeed"], {
+    presentationState: foundation.view.presentationState,
+    G: foundation.run.G,
+    reducedMotion: foundation.browser.reducedMotion,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    density: foundation.browser.density,
+    activeTrial: foundation.run.activity.activeTrial,
     environmentState,
     compositionKey,
-    cvs,
+    cvs: foundation.browser.cvs,
     screenAnimation,
-    demonRealmRenderer,
-    environmentRenderer,
-    lifecycle,
-    frameLoop,
-    get requestedSceneKey() { return requestedSceneKey; }, set requestedSceneKey(value) { requestedSceneKey = value; },
-    get sceneRequest() { return sceneRequest; }, set sceneRequest(value) { sceneRequest = value; },
-    get requestedSceneIdentity() { return requestedSceneIdentity; }, set requestedSceneIdentity(value) { requestedSceneIdentity = value; },
-    get sceneContinuation() { return sceneContinuation; }, set sceneContinuation(value) { sceneContinuation = value; },
-    get sceneLoading() { return sceneLoading; }, set sceneLoading(value) { sceneLoading = value; },
-    get sceneReadyToPresent() { return sceneReadyToPresent; }, set sceneReadyToPresent(value) { sceneReadyToPresent = value; },
-  }));
+    demonRealmRenderer: foundation.browser.demonRealmRenderer,
+    environmentRenderer: foundation.browser.environmentRenderer,
+    lifecycle: foundation.lifecycle,
+    frameLoop
+  })))));
   function prepareScene() { return sceneFlow.prepareScene(); }
   function deferUntilSceneReady(action: () => void) { return sceneFlow.deferUntilSceneReady(action); }
-  const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
-  const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
+  const notifications = createNotifications(foundation.browser.$('hint'), foundation.browser.$('toast'), () => foundation.browser.sfx.unlock());
+  const runResults = createRunResults(foundation.browser.$('over'), () => foundation.browser.sfx.reveal(), foundation.browser.reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
-    if (activity.activeTrial || activity.activeDaily) return;
-    if (G.hints[key]) return;
-    G.hints[key] = 1;
-    store.set('issen.hints', G.hints);
+    if (foundation.run.activity.activeTrial || foundation.run.activity.activeDaily) return;
+    if (foundation.run.G.hints[key]) return;
+    foundation.run.G.hints[key] = 1;
+    store.set('issen.hints', foundation.run.G.hints);
     notifications.hint(key, text, dur || 3500);
   }
   const hideHint = notifications.hideHint,
@@ -595,60 +461,55 @@ export function startGame(
     drawStains,
     drawPops,
     drawStamps,
-  } = createFeedbackPresentation(() => ({
-    g,
-    fx: presentationState.fx,
-    S,
-    time: presentationState.time,
-    FONT,
-    SEAL,
+  } = createFeedbackPresentation(() => (stateView(foundation.view.sealState, ["SEAL"], stateView(foundation.view.geometry, ["S","W","H","portrait"], {
+    g: foundation.browser.g,
+    fx: foundation.view.presentationState.fx,
+    time: foundation.view.presentationState.time,
+    FONT: foundation.view.FONT,
     mistSprite: environmentState.mistSprite,
-    R,
-    density,
-    sfx,
-    W,
-    H,
-    portrait,
-    state: presentationState,
-    reducedFlashes,
-    reducedMotion,
-    weather: STAGES[G.stage]!.weather,
+    R: foundation.view.R,
+    density: foundation.browser.density,
+    sfx: foundation.browser.sfx,
+    state: foundation.view.presentationState,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    reducedMotion: foundation.browser.reducedMotion,
+    weather: STAGES[foundation.run.G.stage]!.weather,
     newLeaf,
     leaves: environmentState.leaves,
-    killEffect: () => (accessible(EQ.fx) ? EQ.fx : 'ink'),
-    clink: () => sfx.clink(),
-  }));
-  const sessionBindings: ReturnType<typeof createSessionBindings<typeof PREST, ResultReveal>> = createSessionBindings<typeof PREST, ResultReveal>(() => (stateView(activity, ["activeTrial", "activeDaily", "runRandom", "combatRandom", "runTrialsWasUnlocked", "trialFailure", "trialResult"], stateView(sessionState, ["rewardLedger", "runBossMilestone", "runTemplate", "savedRun", "shrineOfferIds", "runItemReveals", "timeScale", "hitStop", "rewardFlowBusy"], {
+    killEffect: () => (foundation.browser.accessible(foundation.profile.profileEquipment.EQ.fx) ? foundation.profile.profileEquipment.EQ.fx : 'ink'),
+    clink: () => foundation.browser.sfx.clink()
+  }))));
+  const sessionBindings: ReturnType<typeof createSessionBindings<typeof PREST, ResultReveal>> = createSessionBindings<typeof PREST, ResultReveal>(() => (stateView(foundation.run.activity, ["activeTrial", "activeDaily", "runRandom", "combatRandom", "runTrialsWasUnlocked", "trialFailure", "trialResult"], stateView(foundation.run.sessionState, ["rewardLedger", "runBossMilestone", "runTemplate", "savedRun", "shrineOfferIds", "runItemReveals", "timeScale", "hitStop", "rewardFlowBusy"], stateView(foundation.view.stageState, ["stageSeed"], stateView(foundation.profile.profileFoundation, ["ST"], stateView(foundation.profile.profileEquipment, ["EQ"], stateView(foundation.run.sceneState, ["sceneLoading","sceneContinuation"], {
     get adoptPhase(): SessionBindingViews<typeof PREST, ResultReveal>['adoptPhase'] { return () => phaseRouter.adoptCheckpoint(); },
-    get discardSceneContinuation(): SessionBindingViews<typeof PREST, ResultReveal>['discardSceneContinuation'] { return () => { sceneContinuation = undefined; }; },
-    get $() { return $; },
-    get AWAKENING() { return AWAKENING; },
-    get COLLECTION_PROGRESS() { return COLLECTION_PROGRESS; },
-    get G() { return G; },
-    get META() { return META; },
-    get SETUP() { return SETUP; },
-    get UNL() { return UNL; },
-    get WX() { return WX; },
-    get DAILY_LOGIN() { return DAILY_LOGIN; },
-    get ITEMS() { return ITEMS; },
-    get accessibleUnlocks() { return accessibleUnlocks; },
-    get applySeal() { return applySeal; },
+    get discardSceneContinuation(): SessionBindingViews<typeof PREST, ResultReveal>['discardSceneContinuation'] { return () => { foundation.run.sceneState.sceneContinuation = undefined; }; },
+    get $() { return foundation.browser.$; },
+    get AWAKENING() { return foundation.profile.AWAKENING; },
+    get COLLECTION_PROGRESS() { return foundation.profile.COLLECTION_PROGRESS; },
+    get G() { return foundation.run.G; },
+    get META() { return foundation.profile.META; },
+    get SETUP() { return foundation.profile.SETUP; },
+    get UNL() { return foundation.profile.UNL; },
+    get WX() { return foundation.run.WX; },
+    get DAILY_LOGIN() { return foundation.profile.DAILY_LOGIN; },
+    get ITEMS() { return foundation.profile.ITEMS; },
+    get accessibleUnlocks() { return foundation.profile.accessibleUnlocks; },
+    get applySeal() { return foundation.view.applySeal; },
     get bossPos() { return bossPos; },
     get computeMods() { return computeMods; },
     get enemyPos() { return enemyPos; },
     get hud() { return hud; },
-    get playerEquipment() { return playerEquipment; },
-    get playerStats() { return playerStats; },
-    get premiumAccess() { return premiumAccess; },
+    get playerEquipment() { return foundation.profile.playerEquipment; },
+    get playerStats() { return foundation.profile.playerStats; },
+    get premiumAccess() { return foundation.browser.premiumAccess; },
     get renderHp() { return renderHp; },
     get renderLives() { return renderLives; },
-    get saveAwakening() { return saveAwakening; },
-    get saveMeta() { return saveMeta; },
-    get saveStats() { return saveStats; },
-    get saveCollections() { return saveCollections; },
+    get saveAwakening() { return foundation.profile.saveAwakening; },
+    get saveMeta() { return foundation.profile.saveMeta; },
+    get saveStats() { return foundation.profile.saveStats; },
+    get saveCollections() { return foundation.profile.saveCollections; },
     get setScore() { return setScore; },
     get setStage() { return setStage; },
-    get syncCollections() { return syncCollections; },
+    get syncCollections() { return foundation.profile.syncCollections; },
     get toast() { return toast; },
     get updateSavedRunButtons() { return updateSavedRunButtons; },
     get showScreen() { return showScreen; },
@@ -661,83 +522,60 @@ export function startGame(
       }; },
     get storage(): SessionBindingViews<typeof PREST, ResultReveal>['storage'] { return store; },
     get resetClock(): SessionBindingViews<typeof PREST, ResultReveal>['resetClock'] { return () => frameLoop.resetClock(); },
-    get sceneLoading() {
-        return sceneLoading;
-      },
-    get EQ() {
-        return EQ;
-      },
-    set EQ(value) {
-        EQ = value;
-      },
-    get ST() {
-        return ST;
-      },
-    set ST(value) {
-        ST = value;
-      },
     get events(): SessionBindingViews<typeof PREST, ResultReveal>['events'] { return context.events; },
-    get P() { return P; },
+    get P() { return foundation.run.P; },
     get PREST() { return PREST; },
-    get apparelMotion() { return apparelMotion; },
-    get audio() { return audio; },
+    get apparelMotion() { return foundation.view.apparelMotion; },
+    get audio() { return foundation.browser.audio; },
     get checkUnlocks() { return checkUnlocks; },
     get clearHints() { return clearHints; },
-    get guided() { return guided; },
+    get guided() { return foundation.browser.guided; },
     get hint() { return hint; },
     get prepareScene() { return prepareScene; },
-    get presentationState() { return presentationState; },
-    get stageVisits() { return stageVisits; },
+    get presentationState() { return foundation.view.presentationState; },
+    get stageVisits() { return foundation.view.stageVisits; },
     get startTrialEncounter() { return startTrialEncounter; },
     get startWave() { return startWave; },
     get startBoss() { return startBoss; },
-    get audioInit() { return audioInit; },
+    get audioInit() { return foundation.browser.audioInit; },
     get buildLeaves() { return buildLeaves; },
     get waveCfg() { return waveCfg; },
     get clearTrialResult(): SessionBindingViews<typeof PREST, ResultReveal>['clearTrialResult'] { return () => {
-      activity.trialResult = null;
+      foundation.run.activity.trialResult = null;
     }; },
     get clearCheckpoint(): SessionBindingViews<typeof PREST, ResultReveal>['clearCheckpoint'] { return clearRunCheckpoint; },
     get newRunSeed() { return newRunSeed; },
     get resetWeather(): SessionBindingViews<typeof PREST, ResultReveal>['resetWeather'] { return (random) => {
-      Object.assign(WX, createWeatherState(random));
+      Object.assign(foundation.run.WX, createWeatherState(random));
     }; },
     get clearEffects(): SessionBindingViews<typeof PREST, ResultReveal>['clearEffects'] { return () => {
-      for (const [key, particles] of Object.entries(presentationState.fx))
+      for (const [key, particles] of Object.entries(foundation.view.presentationState.fx))
         if (key !== 'scratches') particles.length = 0;
     }; },
-    get stageSeed() {
-      return stageSeed;
-    },
-    set stageSeed(value) {
-      stageSeed = value;
-    },
-    get TRIAL_PROGRESS() { return TRIAL_PROGRESS; },
-    get R() { return R; },
+    get TRIAL_PROGRESS() { return foundation.profile.TRIAL_PROGRESS; },
+    get R() { return foundation.view.R; },
     get deferUntilSceneReady() { return deferUntilSceneReady; },
     get banner() { return banner; },
     get setWaveLabel(): SessionBindingViews<typeof PREST, ResultReveal>['setWaveLabel'] { return (label) => {
-      $('waveLbl').textContent = label;
+      foundation.browser.$('waveLbl').textContent = label;
     }; },
     get renderTrialObjective() { return renderTrialObjective; },
     get store() { return store; },
-    get sfx() { return sfx; },
+    get sfx() { return foundation.browser.sfx; },
     get hideTrialObjective(): SessionBindingViews<typeof PREST, ResultReveal>['hideTrialObjective'] { return () => {
-      $('trialObjective').hidden = true;
+      foundation.browser.$('trialObjective').hidden = true;
     }; },
     get toTitle() { return toTitle; },
     get openPanel() { return openPanel; },
     get focusTrialResult(): SessionBindingViews<typeof PREST, ResultReveal>['focusTrialResult'] { return () => {
-      $('trials')
+      foundation.browser.$('trials')
         .querySelector<HTMLButtonElement>('#trialResult button')
         ?.focus({ preventScroll: true });
     }; },
-    get sceneContinuation() { return sceneContinuation; },
-    set sceneContinuation(value) { sceneContinuation = value; },
     get rewardScreen() { return rewardScreen; },
     get supportPremium() { return supportPremium; },
-    get testerPremium() { return browserPreferences.testerPremium; },
-    get lifecycle() { return lifecycle; },
+    get testerPremium() { return foundation.browser.browserPreferences.testerPremium; },
+    get lifecycle() { return foundation.lifecycle; },
     get rewardSupport() { return rewardSupport; },
     get captureCheckpoint() { return captureCheckpoint; },
     get reviveDaruma() { return reviveDaruma; },
@@ -752,43 +590,43 @@ export function startGame(
     get setupAttract() { return setupAttract; },
     get showPauseScreen() { return showPauseScreen; },
     get contextLost() {
-      return !!nativeScene?.contextLost;
+      return !!foundation.browser.nativeScene?.contextLost;
     }
-  }))));
+  }))))))));
   const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } = sessionBindings.checkpoint();
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     return combatScore.addScore(pts, x, y, label, size);
   }
   /* ---------------- enemies ---------------- */
   function enemyPos(e: Enemy) {
-    return enemyPosition(e, L, W, H);
+    return enemyPosition(e, foundation.view.geometry.L, foundation.view.geometry.W, foundation.view.geometry.H);
   }
   function spawnEnemy(slot: number, attract = false) {
-    if (activity.activeTrial && !attract && G.toSpawn <= 0) return;
-    return createEnemy(G, slot, attract, enemyPos, attract ? R : activity.combatRandom);
+    if (foundation.run.activity.activeTrial && !attract && foundation.run.G.toSpawn <= 0) return;
+    return createEnemy(foundation.run.G, slot, attract, enemyPos, attract ? foundation.view.R : foundation.run.activity.combatRandom);
   }
   function setupAttract() {
     if (deferUntilSceneReady(setupAttract)) return;
-    G.enemies = [];
-    G.cfg = null;
-    G.boss = null;
-    G.attacker = null;
+    foundation.run.G.enemies = [];
+    foundation.run.G.cfg = null;
+    foundation.run.G.boss = null;
+    foundation.run.G.attacker = null;
     for (let i = 0; i < 5; i++) spawnEnemy(i, true);
   }
   function liveOrdered() {
-    return orderedEnemies(G.enemies);
+    return orderedEnemies(foundation.run.G.enemies);
   }
   function pickAttacker() {
-    return selectAttacker(G.enemies, waveConfiguration().ordered, activity.combatRandom);
+    return selectAttacker(foundation.run.G.enemies, waveConfiguration().ordered, foundation.run.activity.combatRandom);
   }
   function updateEnemies(dt: number, raw = dt) {
-    simulateEnemies(G, dt, {
+    simulateEnemies(foundation.run.G, dt, {
       rawDelta: raw,
-      surge: WX.surge,
-      time: presentationState.time,
+      surge: foundation.run.WX.surge,
+      time: foundation.view.presentationState.time,
       perfectZone: pz,
-      sounds: sfx,
-      pet: EQ.pet,
+      sounds: foundation.browser.sfx,
+      pet: foundation.profile.profileEquipment.EQ.pet,
       foxSave,
       playerDie,
       position: enemyPos,
@@ -803,39 +641,35 @@ export function startGame(
     trialSession.finishTrial(message);
   }
   function renderTrialObjective() {
-    const trial = activity.activeTrial;
-    const visible = !!trial && ['playing', 'boss', 'between'].includes(G.state);
-    $('trialObjective').hidden = !visible;
+    const trial = foundation.run.activity.activeTrial;
+    const visible = !!trial && ['playing', 'boss', 'between'].includes(foundation.run.G.state);
+    foundation.browser.$('trialObjective').hidden = !visible;
     if (!trial || !visible) return;
-    $('trialObjective').textContent =
-      trial.duelMaster && G.boss
-        ? `Duel Master · ${20 - G.boss.hp}/20 exchanges · No mistakes`
+    foundation.browser.$('trialObjective').textContent =
+      trial.duelMaster && foundation.run.G.boss
+        ? `Duel Master · ${20 - foundation.run.G.boss.hp}/20 exchanges · No mistakes`
         : trial.wave
-          ? `${trial.name} · ${trial.waveCount ? `Wave ${G.wave}/${trial.waveCount} · ` : ''}${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
-          : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
+          ? `${trial.name} · ${trial.waveCount ? `Wave ${foundation.run.G.wave}/${trial.waveCount} · ` : ''}${foundation.run.G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${foundation.run.G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
+          : `${trial.name} · ${foundation.run.G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
   }
-    const { waveLifecycle, wavesPhase, bossPhase, standoffPhase, shrinePhase, deathPhase, betweenPhase } = createPhaseBindings(() => (stateView(activity, ["combatRandom", "activeTrial", "activeDaily", "trialFailure"], stateView(sessionState, ["hitStop", "runBossMilestone", "shrineOfferIds", "timeScale", "rewardFlowBusy"], {
+    const { waveLifecycle, wavesPhase, bossPhase, standoffPhase, shrinePhase, deathPhase, betweenPhase } = createPhaseBindings(cacheView(() => (stateView(foundation.run.activity, ["combatRandom", "activeTrial", "activeDaily", "trialFailure"], stateView(foundation.run.sessionState, ["hitStop", "runBossMilestone", "shrineOfferIds", "timeScale", "rewardFlowBusy"], stateView(foundation.profile.profileEquipment, ["EQ"], stateView(foundation.view.geometry, ["W","H","S","L"], stateView(foundation.profile.profileFoundation, ["ST"], {
     events: context.events,
-    G,
-    ST,
-    W,
-    H,
-    S,
+    G: foundation.run.G,
     renderLives,
     pop,
     setStage,
     bst,
     challenge,
-    saveStats,
+    saveStats: foundation.profile.saveStats,
     checkUnlocks,
     startStandoff,
     waveCfg,
     waveConfiguration,
     banner,
     setWaveLabel: (label) => {
-      $('waveLbl').textContent = label;
+      foundation.browser.$('waveLbl').textContent = label;
     },
-    sfx,
+    sfx: foundation.browser.sfx,
     hint,
     captureCheckpoint,
     deferUntilSceneReady,
@@ -846,18 +680,18 @@ export function startGame(
     dust,
     earn,
     addScore,
-    orderSucceeded: () => guided.orderSucceeded(),
+    orderSucceeded: () => foundation.browser.guided.orderSucceeded(),
     swingPlayer,
     playerDie,
     enemyPos,
     comboMult,
     sparks,
-    buzz,
+    buzz: foundation.browser.buzz,
     hud,
     knifeTrail(pos) {
-        presentationState.fx.knives.push({
-          x0: L.player.x,
-          y0: L.player.y - L.player.h * 0.55,
+        foundation.view.presentationState.fx.knives.push({
+          x0: foundation.view.geometry.L.player.x,
+          y0: foundation.view.geometry.L.player.y - foundation.view.geometry.L.player.h * 0.55,
           x1: pos.x,
           y1: pos.y - pos.h * 0.55,
           t: 0,
@@ -866,13 +700,13 @@ export function startGame(
       },
     bossPos,
     renderHp,
-    guided,
+    guided: foundation.browser.guided,
     flash,
     breakCombo,
     setScore,
     bossTipWorld,
     ring,
-    combatHaptics,
+    combatHaptics: foundation.browser.combatHaptics,
     letterbox,
     bumpCombo,
     notifications,
@@ -882,21 +716,20 @@ export function startGame(
     scraps,
     stamp,
     punch,
-    EQ,
     inkBurst,
     shake: (amount) => {
-        presentationState.shake = Math.max(presentationState.shake, amount);
+        foundation.view.presentationState.shake = Math.max(foundation.view.presentationState.shake, amount);
       },
     setBossLabels: (wave, glyph, name) => {
-        $('waveLbl').textContent = wave;
-        $('bossK').textContent = glyph;
-        $('bossN').textContent = name;
+        foundation.browser.$('waveLbl').textContent = wave;
+        foundation.browser.$('bossK').textContent = glyph;
+        foundation.browser.$('bossN').textContent = name;
       },
     showBossBar: (shown) => {
-        $('bossbar').classList.toggle('on', shown);
+        foundation.browser.$('bossbar').classList.toggle('on', shown);
       },
     bossStain: (p) => {
-        presentationState.fx.stains.push({
+        foundation.view.presentationState.fx.stains.push({
           x: p.x,
           y: p.y + p.h * 0.01,
           rx: p.h * 0.3,
@@ -904,51 +737,49 @@ export function startGame(
           life: BOSS_SHADOW_DURATION,
         });
       },
-    L,
     pickLook,
     startWave,
-    accessible,
+    accessible: foundation.browser.accessible,
     makeFigure: makeFig,
     guardPose: EPOSE.guard,
     clearLetterbox: () => {
-        presentationState.lbT = 0;
+        foundation.view.presentationState.lbT = 0;
       },
     toast,
     nextStep,
     showShrineOffers,
-    premiumAccess,
+    premiumAccess: foundation.browser.premiumAccess,
     computeMods,
     showScreen,
     resetKnocks: () => {
-      sessionState.knocks = 0;
+      foundation.run.sessionState.knocks = 0;
     },
     startBoss,
     bossSwipe,
     reasonMessage: (reason) => DEATH_REASONS[reason] || '',
     fallPlayer: (fall) => {
-      P.fall = fall;
+      foundation.run.P.fall = fall;
     },
     showOver,
     finishTrial,
     startTrialEncounter,
     openShrine
-  } satisfies Omit<PhaseBindingViews, "hitStop" | "runBossMilestone" | "shrineOfferIds" | "timeScale" | "rewardFlowBusy" | "combatRandom" | "activeTrial" | "activeDaily" | "trialFailure">))), context);
+  } satisfies Omit<PhaseBindingViews, "hitStop" | "runBossMilestone" | "shrineOfferIds" | "timeScale" | "rewardFlowBusy" | "combatRandom" | "activeTrial" | "activeDaily" | "trialFailure" | "ST" | "W" | "H" | "S" | "L" | "EQ">))) satisfies Omit<PhaseBindingViews, "hitStop" | "runBossMilestone" | "shrineOfferIds" | "timeScale" | "rewardFlowBusy" | "combatRandom" | "activeTrial" | "activeDaily" | "trialFailure">)))), context);
   function startWave(n: number, skipEvent = false) {
     waveLifecycle.startWave(n, skipEvent);
   }
   function updateWave(dt: number) {
     waveLifecycle.updateWave(dt);
   }
-  const killAppearance = createKillAppearance(() => ({ R, bonk: !!G.m.bonk, fxId: EQ.fx, accessible, presentationState }));
-  const readKillViews = () => (stateView(activity, ["combatRandom", "activeTrial", "trialFailure"], stateView(sessionState, ["hitStop"], {
+  const killAppearance = createKillAppearance(() => ({ R: foundation.view.R, bonk: !!foundation.run.G.m.bonk, fxId: foundation.profile.profileEquipment.EQ.fx, accessible: foundation.browser.accessible, presentationState: foundation.view.presentationState }));
+  const readKillViews = cacheView(() => (stateView(foundation.run.activity, ["combatRandom", "activeTrial", "trialFailure"], stateView(foundation.run.sessionState, ["hitStop"], stateView(foundation.view.geometry, ["S","W","H"], stateView(foundation.profile.profileFoundation, ["ST"], {
     events: context.events,
-    G,
+    G: foundation.run.G,
     pz,
     enemyPos,
     waveConfiguration,
-    ST,
     earn,
-    sfx,
+    sfx: foundation.browser.sfx,
     addScore,
     comboMult,
     bst,
@@ -958,15 +789,12 @@ export function startGame(
     killFx,
     scraps,
     ring,
-    S,
     swingPlayer,
-    combatHaptics,
+    combatHaptics: foundation.browser.combatHaptics,
     renderLives,
     pop,
     hud,
     setScore,
-    W,
-    H,
     stamp,
     letterbox,
     punch,
@@ -981,36 +809,36 @@ export function startGame(
     coin: killAppearance.coin,
     stain: killAppearance.stain,
     shake: killAppearance.shake
-  })));
+  }))))));
   const killRules = createEnemyKill(readKillViews);
-  lifecycle.add(
-    bindCombatProgression(context.events, () => ({ ST, bst, challenge, checkUnlocks })),
+  foundation.lifecycle.add(
+    bindCombatProgression(context.events, () => ({ ST: foundation.profile.profileFoundation.ST, bst, challenge, checkUnlocks })),
   );
-  lifecycle.add(bindEncounterProgression(context.events, () => ({ ST, bst, challenge })));
-  lifecycle.add(bindBossFeedback(context.events, () => ({
-    W, H, S, addSlash, killFx, scraps, ring, flash, sfx, combatHaptics,
+  foundation.lifecycle.add(bindEncounterProgression(context.events, () => ({ ST: foundation.profile.profileFoundation.ST, bst, challenge })));
+  foundation.lifecycle.add(bindBossFeedback(context.events, () => ({
+    W: foundation.view.geometry.W, H: foundation.view.geometry.H, S: foundation.view.geometry.S, addSlash, killFx, scraps, ring, flash, sfx: foundation.browser.sfx, combatHaptics: foundation.browser.combatHaptics,
     stamp, letterbox, punch, inkBurst,
-    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
-    showBossBar: shown => { $('bossbar').classList.toggle('on', shown); },
-    bossStain: p => { presentationState.fx.stains.push({ x:p.x, y:p.y+p.h*0.01, rx:p.h*0.3, t:0, life:BOSS_SHADOW_DURATION }); },
+    shake: amount => { foundation.view.presentationState.shake = Math.max(foundation.view.presentationState.shake, amount); },
+    showBossBar: shown => { foundation.browser.$('bossbar').classList.toggle('on', shown); },
+    bossStain: p => { foundation.view.presentationState.fx.stains.push({ x:p.x, y:p.y+p.h*0.01, rx:p.h*0.3, t:0, life:BOSS_SHADOW_DURATION }); },
   })));
-  lifecycle.add(bindStandoffFeedback(context.events, () => ({ W, H, S, addSlash, killFx, scraps, ring, stamp, punch, flash, sfx, combatHaptics })));
-  lifecycle.add(bindDuelFeedback(context.events, () => ({
-    S, sparks, ring, flash, sfx, combatHaptics, letterbox, buzz,
-    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
+  foundation.lifecycle.add(bindStandoffFeedback(context.events, () => ({ W: foundation.view.geometry.W, H: foundation.view.geometry.H, S: foundation.view.geometry.S, addSlash, killFx, scraps, ring, stamp, punch, flash, sfx: foundation.browser.sfx, combatHaptics: foundation.browser.combatHaptics })));
+  foundation.lifecycle.add(bindDuelFeedback(context.events, () => ({
+    S: foundation.view.geometry.S, sparks, ring, flash, sfx: foundation.browser.sfx, combatHaptics: foundation.browser.combatHaptics, letterbox, buzz: foundation.browser.buzz,
+    shake: amount => { foundation.view.presentationState.shake = Math.max(foundation.view.presentationState.shake, amount); },
   })));
-  lifecycle.add(bindDamageFeedback(context.events, () => ({
-    W, H, S, addSlash, inkBurst, scraps, flash, pop, sfx, combatHaptics,
+  foundation.lifecycle.add(bindDamageFeedback(context.events, () => ({
+    W: foundation.view.geometry.W, H: foundation.view.geometry.H, S: foundation.view.geometry.S, addSlash, inkBurst, scraps, flash, pop, sfx: foundation.browser.sfx, combatHaptics: foundation.browser.combatHaptics,
     renderLives, setScore, hud, letterbox,
-    inkPulse: value => { presentationState.inkPulse = value; },
-    clearLetterbox: () => { presentationState.lbT = 0; },
-    resetPlayer: () => { P.fall = 0; P.pose = { ...PREST }; },
+    inkPulse: value => { foundation.view.presentationState.inkPulse = value; },
+    clearLetterbox: () => { foundation.view.presentationState.lbT = 0; },
+    resetPlayer: () => { foundation.run.P.fall = 0; foundation.run.P.pose = { ...PREST }; },
     banner, stamp, clearHints,
-    hideBossBar: () => { $('bossbar').classList.remove('on'); },
-    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
+    hideBossBar: () => { foundation.browser.$('bossbar').classList.remove('on'); },
+    shake: amount => { foundation.view.presentationState.shake = Math.max(foundation.view.presentationState.shake, amount); },
   })));
-  lifecycle.add(bindKillFeedback(context.events, readKillViews));
-  lifecycle.add(bindCombatScoreFeedback(context.events, () => ({ setScore, pop, W, H })));
+  foundation.lifecycle.add(bindKillFeedback(context.events, readKillViews));
+  foundation.lifecycle.add(bindCombatScoreFeedback(context.events, () => ({ setScore, pop, W: foundation.view.geometry.W, H: foundation.view.geometry.H })));
   function killEnemy(
     e: Enemy,
     dir: Direction,
@@ -1021,17 +849,17 @@ export function startGame(
     killRules.killEnemy(e, dir, chained, preserveStreak, automatic);
   }
   function swingPlayer(dir: Direction | 'block', perfect = false) {
-    if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();
-    startSwing(P, dir);
-    apparelMotion.kick(dir, reducedMotion(), perfect);
+    if (foundation.profile.profileEquipment.EQ.blade === 'koken' && foundation.run.G.state !== 'title') foundation.browser.sfx.hum();
+    startSwing(foundation.run.P, dir);
+    foundation.view.apparelMotion.kick(dir, foundation.browser.reducedMotion(), perfect);
   }
 
   function onSwipe(dir: Direction) {
-    if (sceneLoading) return;
+    if (foundation.run.sceneState.sceneLoading) return;
     if (
-      guided.swipe(
+      foundation.browser.guided.swipe(
         dir,
-        G.state === 'playing' && waveConfiguration().ordered
+        foundation.run.G.state === 'playing' && waveConfiguration().ordered
           ? (liveOrdered()[0]?.dir ?? null)
           : null,
       )
@@ -1052,23 +880,23 @@ export function startGame(
     bossPhase.bossSwipe(dir, automatic);
   }
   function bossPos(b: Boss) {
-    return bossPosition(b, L);
+    return bossPosition(b, foundation.view.geometry.L);
   }
   function bossTipWorld(b: Boss): [number, number] {
     const tp = tipOf(b.pose, b.lean, b.def.spear ? 0.98 : 0.52);
     return [b.pos.x + tp[0] * b.pos.h, b.pos.y + tp[1] * b.pos.h];
   }
   function onTapDown() {
-    if (sceneLoading) return false;
+    if (foundation.run.sceneState.sceneLoading) return false;
     // Finger-down begins a possible swipe. Consume taps on release during cut
     // practice so the pointer adapter can still recognize the teaching gesture.
-    if (guided.phase === 'order-practice') return false;
-    if (guided.tap()) return true;
+    if (foundation.browser.guided.phase === 'order-practice') return false;
+    if (foundation.browser.guided.tap()) return true;
     return phaseRouter.onTapDown();
   }
   function onTap() {
-    if (sceneLoading) return;
-    if (guided.tap()) return;
+    if (foundation.run.sceneState.sceneLoading) return;
+    if (foundation.browser.guided.tap()) return;
     phaseRouter.onTap();
   }
 
@@ -1084,13 +912,13 @@ export function startGame(
     standoffPhase.onSwipe(context, dir);
   }
 
-  lifecycle.listen($('shrineK'), 'click', () => {
-    audioInit();
-    sfx.knock();
-    sessionState.knocks++;
-    if (recordSecretEvent(ST, { kind: 'shrineKnocks', count: sessionState.knocks })) {
-      saveStats();
-      sfx.bell();
+  foundation.lifecycle.listen(foundation.browser.$('shrineK'), 'click', () => {
+    foundation.browser.audioInit();
+    foundation.browser.sfx.knock();
+    foundation.run.sessionState.knocks++;
+    if (recordSecretEvent(foundation.profile.profileFoundation.ST, { kind: 'shrineKnocks', count: foundation.run.sessionState.knocks })) {
+      foundation.profile.saveStats();
+      foundation.browser.sfx.bell();
       checkUnlocks();
     }
   });
@@ -1101,24 +929,24 @@ export function startGame(
   function applyPick(id: string) {
     shrinePhase.applyPick(id);
   }
-  lifecycle.listen($('oScore'), 'click', (e) => {
+  foundation.lifecycle.listen(foundation.browser.$('oScore'), 'click', (e) => {
     e.stopPropagation();
-    audioInit();
-    G.claps = (G.claps || 0) + 1;
-    tn({ f0: 700 + G.claps * 90, dur: 0.06, g: 0.05 });
-    if (recordSecretEvent(ST, { kind: 'scoreClaps', count: G.claps })) {
-      saveStats();
-      sfx.popper();
-      const previous = sessionState.runItemReveals.length;
+    foundation.browser.audioInit();
+    foundation.run.G.claps = (foundation.run.G.claps || 0) + 1;
+    foundation.browser.tn({ f0: 700 + foundation.run.G.claps * 90, dur: 0.06, g: 0.05 });
+    if (recordSecretEvent(foundation.profile.profileFoundation.ST, { kind: 'scoreClaps', count: foundation.run.G.claps })) {
+      foundation.profile.saveStats();
+      foundation.browser.sfx.popper();
+      const previous = foundation.run.sessionState.runItemReveals.length;
       checkUnlocks();
-      const newReveals = sessionState.runItemReveals.slice(previous);
+      const newReveals = foundation.run.sessionState.runItemReveals.slice(previous);
       if (newReveals.length) {
-        appendGameOverUnlocks($('over'), newReveals);
-        G.overReady = false;
-        $('bAgain').disabled = true;
+        appendGameOverUnlocks(foundation.browser.$('over'), newReveals);
+        foundation.run.G.overReady = false;
+        foundation.browser.$('bAgain').disabled = true;
         runResults.startUnlocks(newReveals, () => {
-          G.overReady = true;
-          $('bAgain').disabled = false;
+          foundation.run.G.overReady = true;
+          foundation.browser.$('bAgain').disabled = false;
         });
       }
     }
@@ -1126,14 +954,14 @@ export function startGame(
   function openShrine() {
     shrinePhase.openShrine();
   }
-  lifecycle.listen($('bRerollShrine'), 'click', () => shrinePhase.reroll());
+  foundation.lifecycle.listen(foundation.browser.$('bRerollShrine'), 'click', () => shrinePhase.reroll());
   function showShrineOffers(opts: (typeof BLESS)[number][]) {
-    ($('bRerollShrine') as HTMLButtonElement).hidden = G.shrineRerolls < 1 || !premiumAccess();
-    renderShrine($('blessList'), opts, (bl) => {
+    (foundation.browser.$('bRerollShrine') as HTMLButtonElement).hidden = foundation.run.G.shrineRerolls < 1 || !foundation.browser.premiumAccess();
+    renderShrine(foundation.browser.$('blessList'), opts, (bl) => {
       shrinePhase.pick(bl);
     });
     showScreen('shrine');
-    sfx.drum();
+    foundation.browser.sfx.drum();
   }
 
   /* ---------------- death & menus ---------------- */
@@ -1144,134 +972,116 @@ export function startGame(
   function finishDaily() { resultsSession.finishDaily(); }
   const rewardSupport = createRewardedSupport();
   const rewardScreen = createRewardScreen(document.getElementById('app')!);
-  lifecycle.add(rewardScreen.dispose);
+  foundation.lifecycle.add(rewardScreen.dispose);
 
   const resultsSession = sessionBindings.results();
   // Support benefits are independent of Web collection access.
   const supportPremium = () =>
-    premium.state.owned || edition === 'premium' || testerPremiumActive(browserPreferences.testerPremium);
+    premium.state.owned || foundation.browser.edition === 'premium' || testerPremiumActive(foundation.browser.browserPreferences.testerPremium);
   function showOver() { resultsSession.showOver(); }
   async function claimEmberBonus(pending: PendingSupportReward) { return resultsSession.claimEmberBonus(pending); }
   function recoverSupportReward() { resultsSession.recoverSupportReward(); }
   const { toTitle, pause, resume, endRun } = sessionBindings.runFlow();
-    const { setBestLine, openPanel, closePanel, renderStats, setupScreen, renderSetup, tutorial, launchTutorial, showAdmin, scrollMenus, applySettings, saveSettings, lightingDebug, options, armoryWiring, cinematicWiring } = createMenuBindings(() => (stateView(activity, ["trialResult"], stateView(sessionState, ["savedRun"], {
-    get $(): MenuBindingViews['$'] { return $; },
-    get playerStats(): MenuBindingViews['playerStats'] { return playerStats; },
-    get G(): MenuBindingViews['G'] { return G; },
+    const { setBestLine, openPanel, closePanel, renderStats, setupScreen, renderSetup, tutorial, launchTutorial, showAdmin, scrollMenus, applySettings, saveSettings, lightingDebug, options, armoryWiring, cinematicWiring } = createMenuBindings(() => (stateView(foundation.run.activity, ["trialResult"], stateView(foundation.run.sessionState, ["savedRun"], stateView(foundation.view.geometry, ["MIST"], stateView(foundation.view.stageState, ["stageSeed"], stateView(foundation.profile.profileFoundation, ["ST"], stateView(foundation.profile.profileEquipment, ["EQ"], {
+    get $(): MenuBindingViews['$'] { return foundation.browser.$; },
+    get playerStats(): MenuBindingViews['playerStats'] { return foundation.profile.playerStats; },
+    get G(): MenuBindingViews['G'] { return foundation.run.G; },
     get hudView(): MenuBindingViews['hudView'] { return hudView; },
     get previewFrame(): MenuBindingViews['previewFrame'] { return previewFrame; },
-    get testerPremium(): MenuBindingViews['testerPremium'] { return browserPreferences.testerPremium; },
+    get testerPremium(): MenuBindingViews['testerPremium'] { return foundation.browser.browserPreferences.testerPremium; },
     get renderArmory(): MenuBindingViews['renderArmory'] { return renderArmory; },
-    get META(): MenuBindingViews['META'] { return META; },
-    get saveMeta(): MenuBindingViews['saveMeta'] { return saveMeta; },
-    get premiumAccess(): MenuBindingViews['premiumAccess'] { return premiumAccess; },
-    get TRIAL_PROGRESS(): MenuBindingViews['TRIAL_PROGRESS'] { return TRIAL_PROGRESS; },
+    get META(): MenuBindingViews['META'] { return foundation.profile.META; },
+    get saveMeta(): MenuBindingViews['saveMeta'] { return foundation.profile.saveMeta; },
+    get premiumAccess(): MenuBindingViews['premiumAccess'] { return foundation.browser.premiumAccess; },
+    get TRIAL_PROGRESS(): MenuBindingViews['TRIAL_PROGRESS'] { return foundation.profile.TRIAL_PROGRESS; },
     get startTrial(): MenuBindingViews['startTrial'] { return startTrial; },
     get showScreen(): MenuBindingViews['showScreen'] { return showScreen; },
-    get UNL(): MenuBindingViews['UNL'] { return UNL; },
-    get ITEMS(): MenuBindingViews['ITEMS'] { return ITEMS; },
+    get UNL(): MenuBindingViews['UNL'] { return foundation.profile.UNL; },
+    get ITEMS(): MenuBindingViews['ITEMS'] { return foundation.profile.ITEMS; },
     get clearTrialResult(): MenuBindingViews['clearTrialResult'] { return () => {
-      activity.trialResult = null;
+      foundation.run.activity.trialResult = null;
     }; },
-    get SETUP(): MenuBindingViews['SETUP'] { return SETUP; },
-    get ITEM_BY(): MenuBindingViews['ITEM_BY'] { return ITEM_BY; },
-    get sfx(): MenuBindingViews['sfx'] { return sfx; },
+    get SETUP(): MenuBindingViews['SETUP'] { return foundation.profile.SETUP; },
+    get ITEM_BY(): MenuBindingViews['ITEM_BY'] { return foundation.profile.ITEM_BY; },
+    get sfx(): MenuBindingViews['sfx'] { return foundation.browser.sfx; },
     get toTitle(): MenuBindingViews['toTitle'] { return toTitle; },
-    get reducedMotion(): MenuBindingViews['reducedMotion'] { return reducedMotion; },
-    get EQ() {
-      return EQ;
-    },
-    get AWAKENING(): MenuBindingViews['AWAKENING'] { return AWAKENING; },
-    get applySeal(): MenuBindingViews['applySeal'] { return applySeal; },
+    get reducedMotion(): MenuBindingViews['reducedMotion'] { return foundation.browser.reducedMotion; },
+    get AWAKENING(): MenuBindingViews['AWAKENING'] { return foundation.profile.AWAKENING; },
+    get applySeal(): MenuBindingViews['applySeal'] { return foundation.view.applySeal; },
     get checkUnlocks(): MenuBindingViews['checkUnlocks'] { return checkUnlocks; },
     get computeMods(): MenuBindingViews['computeMods'] { return computeMods; },
     get hud(): MenuBindingViews['hud'] { return hud; },
-    get playerEquipment(): MenuBindingViews['playerEquipment'] { return playerEquipment; },
+    get playerEquipment(): MenuBindingViews['playerEquipment'] { return foundation.profile.playerEquipment; },
     get refreshArmoryNew(): MenuBindingViews['refreshArmoryNew'] { return refreshArmoryNew; },
     get renderLives(): MenuBindingViews['renderLives'] { return renderLives; },
-    get revoked(): MenuBindingViews['revoked'] { return revoked; },
-    get saveAwakening(): MenuBindingViews['saveAwakening'] { return saveAwakening; },
+    get revoked(): MenuBindingViews['revoked'] { return foundation.profile.revoked; },
+    get saveAwakening(): MenuBindingViews['saveAwakening'] { return foundation.profile.saveAwakening; },
     get testJump(): MenuBindingViews['testJump'] { return testJump; },
     get toast(): MenuBindingViews['toast'] { return toast; },
     get setTrialsWasUnlocked(): MenuBindingViews['setTrialsWasUnlocked'] { return (value) => {
-      activity.runTrialsWasUnlocked = value;
+      foundation.run.activity.runTrialsWasUnlocked = value;
     }; },
-    get cvs(): MenuBindingViews['cvs'] { return cvs; },
+    get cvs(): MenuBindingViews['cvs'] { return foundation.browser.cvs; },
     get screenAnimation(): MenuBindingViews['screenAnimation'] { return screenAnimation; },
-    get lifecycle(): MenuBindingViews['lifecycle'] { return lifecycle; },
-    get settings(): MenuBindingViews['settings'] { return settings; },
-    get reducedFlashes(): MenuBindingViews['reducedFlashes'] { return reducedFlashes; },
+    get lifecycle(): MenuBindingViews['lifecycle'] { return foundation.lifecycle; },
+    get settings(): MenuBindingViews['settings'] { return foundation.browser.settings; },
+    get reducedFlashes(): MenuBindingViews['reducedFlashes'] { return foundation.browser.reducedFlashes; },
     get prepareScene(): MenuBindingViews['prepareScene'] { return prepareScene; },
-    get combatHaptics(): MenuBindingViews['combatHaptics'] { return combatHaptics; },
-    get audio(): MenuBindingViews['audio'] { return audio; },
-    get setMuteIcon(): MenuBindingViews['setMuteIcon'] { return setMuteIcon; },
-    get presentationState(): MenuBindingViews['presentationState'] { return presentationState; },
+    get combatHaptics(): MenuBindingViews['combatHaptics'] { return foundation.browser.combatHaptics; },
+    get audio(): MenuBindingViews['audio'] { return foundation.browser.audio; },
+    get setMuteIcon(): MenuBindingViews['setMuteIcon'] { return foundation.browser.setMuteIcon; },
+    get presentationState(): MenuBindingViews['presentationState'] { return foundation.view.presentationState; },
     get environmentState(): MenuBindingViews['environmentState'] { return environmentState; },
     get ambient(): MenuBindingViews['ambient'] { return ambient; },
     get rebalanceWeather(): MenuBindingViews['rebalanceWeather'] { return rebalanceWeather; },
-    get lightingRig(): MenuBindingViews['lightingRig'] { return lightingRig; },
-    get audioInit(): MenuBindingViews['audioInit'] { return audioInit; },
-    get systemMotion(): MenuBindingViews['systemMotion'] { return systemMotion; },
+    get lightingRig(): MenuBindingViews['lightingRig'] { return foundation.browser.lightingRig; },
+    get audioInit(): MenuBindingViews['audioInit'] { return foundation.browser.audioInit; },
+    get systemMotion(): MenuBindingViews['systemMotion'] { return foundation.browser.systemMotion; },
     get artworkReady() {
         return artworkReady;
       },
     get supportPreview() {
         return supportPreview;
       },
-    get accessibleUnlocks(): MenuBindingViews['accessibleUnlocks'] { return accessibleUnlocks; },
-    get accessible(): MenuBindingViews['accessible'] { return accessible; },
-    get DAILY_LOGIN(): MenuBindingViews['DAILY_LOGIN'] { return DAILY_LOGIN; },
-    get COLLECTION_PROGRESS(): MenuBindingViews['COLLECTION_PROGRESS'] { return COLLECTION_PROGRESS; },
-    get ARMORY_SEEN(): MenuBindingViews['ARMORY_SEEN'] { return ARMORY_SEEN; },
-    get SEALS(): MenuBindingViews['SEALS'] { return SEALS; },
+    get accessibleUnlocks(): MenuBindingViews['accessibleUnlocks'] { return foundation.profile.accessibleUnlocks; },
+    get accessible(): MenuBindingViews['accessible'] { return foundation.browser.accessible; },
+    get DAILY_LOGIN(): MenuBindingViews['DAILY_LOGIN'] { return foundation.profile.DAILY_LOGIN; },
+    get COLLECTION_PROGRESS(): MenuBindingViews['COLLECTION_PROGRESS'] { return foundation.profile.COLLECTION_PROGRESS; },
+    get ARMORY_SEEN(): MenuBindingViews['ARMORY_SEEN'] { return foundation.profile.ARMORY_SEEN; },
+    get SEALS(): MenuBindingViews['SEALS'] { return foundation.view.SEALS; },
     get CHARMCOL(): MenuBindingViews['CHARMCOL'] { return CHARMCOL; },
     get demoKill(): MenuBindingViews['demoKill'] { return demoKill; },
-    get ST() {
-      return ST;
-    },
-    get previewVisits(): MenuBindingViews['previewVisits'] { return previewVisits; },
+    get previewVisits(): MenuBindingViews['previewVisits'] { return foundation.view.previewVisits; },
     get buildLeaves(): MenuBindingViews['buildLeaves'] { return buildLeaves; },
-    get palette(): MenuBindingViews['palette'] { return palette; },
+    get palette(): MenuBindingViews['palette'] { return foundation.view.palette; },
     get buildBG(): MenuBindingViews['buildBG'] { return buildBG; },
     get buildMist(): MenuBindingViews['buildMist'] { return buildMist; },
     get buildGrass(): MenuBindingViews['buildGrass'] { return buildGrass; },
     get buildWeather(): MenuBindingViews['buildWeather'] { return buildWeather; },
     get setupAttract(): MenuBindingViews['setupAttract'] { return setupAttract; },
-    get saveStats(): MenuBindingViews['saveStats'] { return saveStats; },
-    get stageSeed() {
-      return stageSeed;
-    },
-    set stageSeed(value) {
-      stageSeed = value;
-    },
-    get MIST() {
-      return MIST;
-    },
-    set MIST(value) {
-      MIST = value;
-    }
-  }))));
+    get saveStats(): MenuBindingViews['saveStats'] { return foundation.profile.saveStats; }
+  }))))))));
 
   function testJump(stage: number, wave: number, boss: boolean) {
     if (!isTestProfile()) return;
-    SETUP.mode = 'waves';
+    foundation.profile.SETUP.mode = 'waves';
     startRun();
-    G.enemies = [];
-    G.pendingSpawns = [];
-    G.attacker = null;
-    G.boss = null;
-    G.so = null;
-    G.toSpawn = 0;
-    G.pausedFrom = null;
+    foundation.run.G.enemies = [];
+    foundation.run.G.pendingSpawns = [];
+    foundation.run.G.attacker = null;
+    foundation.run.G.boss = null;
+    foundation.run.G.so = null;
+    foundation.run.G.toSpawn = 0;
+    foundation.run.G.pausedFrom = null;
     const ordinal = Math.max(0, Math.min(STAGES.length - 1, Math.floor(stage)));
-    G.bossCount = ordinal;
+    foundation.run.G.bossCount = ordinal;
     if (boss) {
-      G.wave = ordinal * 3 + 3;
+      foundation.run.G.wave = ordinal * 3 + 3;
       setStage(ordinal, true);
-      G.cfg = waveCfg(G.wave);
+      foundation.run.G.cfg = waveCfg(foundation.run.G.wave);
       startBoss();
     } else startWave(ordinal * 3 + Math.max(1, Math.min(3, Math.floor(wave))), true);
-    G.panel = null;
+    foundation.run.G.panel = null;
     showScreen(null);
   }
 
@@ -1282,74 +1092,74 @@ export function startGame(
 
   const { cinematic, sceneFilm, previewStage } = cinematicWiring;
   const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
-    G,
-    ST,
-    UNL,
-    audioInit,
-    tn,
-    sfx,
+    G: foundation.run.G,
+    ST: foundation.profile.profileFoundation.ST,
+    UNL: foundation.profile.UNL,
+    audioInit: foundation.browser.audioInit,
+    tn: foundation.browser.tn,
+    sfx: foundation.browser.sfx,
     flash,
-    saveStats,
+    saveStats: foundation.profile.saveStats,
     checkUnlocks,
     toast,
   }));
-  bindTitleGestures($('title'), lifecycle, () => cinematic.logoTap());
+  bindTitleGestures(foundation.browser.$('title'), foundation.lifecycle, () => cinematic.logoTap());
   const { flushProfile } = bindProfileWiring({
-    $,
-    lifecycle,
-    playerStats,
-    playerEquipment,
-    saveMeta,
-    saveAwakening,
-    UNL,
+    $: foundation.browser.$,
+    lifecycle: foundation.lifecycle,
+    playerStats: foundation.profile.playerStats,
+    playerEquipment: foundation.profile.playerEquipment,
+    saveMeta: foundation.profile.saveMeta,
+    saveAwakening: foundation.profile.saveAwakening,
+    UNL: foundation.profile.UNL,
   });
-  const previewArtwork = { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword };
+  const previewArtwork = { inkCharm: foundation.browser.inkCharm, inkCompanion: foundation.browser.inkCompanion, inkEnemy: foundation.browser.inkEnemy, inkPlayer: foundation.browser.inkPlayer, inkSword: foundation.browser.inkSword };
   const preview = createArmoryPreview(
-    $('prevC'),
+    foundation.browser.$('prevC'),
     {
-      random: R,
+      random: foundation.view.R,
       now: activeNow,
-      sounds: sfx,
+      sounds: foundation.browser.sfx,
     },
     previewArtwork,
     surfaces?.get('prevC'),
   );
   const supportPreview = createArmoryPreview(
-    $('supportPreview'),
+    foundation.browser.$('supportPreview'),
     {
       random: rng(4242),
       now: activeNow,
-      sounds: sfx,
+      sounds: foundation.browser.sfx,
     },
     previewArtwork,
     surfaces?.get('supportPreview'),
   );
-  lifecycle.add(preview.dispose);
-  lifecycle.add(supportPreview.dispose);
+  foundation.lifecycle.add(preview.dispose);
+  foundation.lifecycle.add(supportPreview.dispose);
   function demoKill() {
-    preview.demo(armory.tab === 'fx' ? (armory.selected ?? EQ.fx) : EQ.fx, !!(G.m && G.m.bonk));
+    preview.demo(armory.tab === 'fx' ? (armory.selected ?? foundation.profile.profileEquipment.EQ.fx) : foundation.profile.profileEquipment.EQ.fx, !!(foundation.run.G.m && foundation.run.G.m.bonk));
   }
   function drawPreview() {
     lightingDebug.refresh();
     preview.draw(
       previewFrame(
-        EQ.film === PREMIUM_FILM && !premiumAccess() ? 'mono' : EQ.film,
+        foundation.profile.profileEquipment.EQ.film === PREMIUM_FILM && !foundation.browser.premiumAccess() ? 'mono' : foundation.profile.profileEquipment.EQ.film,
         armory.tab === 'fx',
       ),
     );
   }
-  function previewFrame(film: string, effectsVisible: boolean, target = $('prevC')): PreviewFrame { return equipmentPresentation.previewFrame(film, effectsVisible, target); }
+  function previewFrame(film: string, effectsVisible: boolean, target = foundation.browser.$('prevC')): PreviewFrame { return equipmentPresentation.previewFrame(film, effectsVisible, target); }
   /* ---------------- input ---------------- */
-  const { disposePointer, bindNavigation } = createInputWiring(cvs, {
-    $,
-    G,
-    settings,
+  const { disposePointer, bindNavigation } = createInputWiring(foundation.browser.cvs, stateView(foundation.view.geometry, ["W","H"], {
+    $: foundation.browser.$,
+    G: foundation.run.G,
+    settings: foundation.browser.settings,
     cinematic,
-    audioInit,
+    audioInit: foundation.browser.audioInit,
     onSwipe,
     onTapDown,
     onTap,
-    lifecycle,
+    lifecycle: foundation.lifecycle,
     abandonSavedRun,
     continueSavedRun,
     openPanel,
@@ -1363,66 +1173,57 @@ export function startGame(
     toTitle,
     rewardScreen,
     konamiInput,
-    get W() {
-      return W;
-    },
-    get H() {
-      return H;
-    },
     get savedRun() {
-      return sessionState.savedRun;
+      return foundation.run.sessionState.savedRun;
     },
     get activeTrial() {
-      return activity.activeTrial;
-    },
-  });
-  bindPurchaseWiring(stateView(activity, ["activeTrial", "trialFailure"], stateView(sessionState, ["runTemplate"], {
-    $,
-    G,
-    lifecycle,
-    premiumAccess,
-    savedEquipment,
-    accessibleUnlocks,
-    ITEMS,
-    playerEquipment,
-    savedFilm,
-    META,
-    SETUP,
+      return foundation.run.activity.activeTrial;
+    }
+  }));
+  bindPurchaseWiring(stateView(foundation.run.activity, ["activeTrial", "trialFailure"], stateView(foundation.run.sessionState, ["runTemplate"], stateView(foundation.profile.profileEquipment, ["EQ"], {
+    $: foundation.browser.$,
+    G: foundation.run.G,
+    lifecycle: foundation.lifecycle,
+    premiumAccess: foundation.browser.premiumAccess,
+    savedEquipment: foundation.profile.savedEquipment,
+    accessibleUnlocks: foundation.profile.accessibleUnlocks,
+    ITEMS: foundation.profile.ITEMS,
+    playerEquipment: foundation.profile.playerEquipment,
+    savedFilm: foundation.profile.savedFilm,
+    META: foundation.profile.META,
+    SETUP: foundation.profile.SETUP,
     computeMods,
     renderArmory,
-    saveMeta,
+    saveMeta: foundation.profile.saveMeta,
     openPanel,
     pause,
-    audio,
-    guided,
-    edition,
-    UNL,
-    get EQ() {
-      return EQ;
-    },
+    audio: foundation.browser.audio,
+    guided: foundation.browser.guided,
+    edition: foundation.browser.edition,
+    UNL: foundation.profile.UNL,
     get initialPurchaseCheck() {
-      return browserPreferences.initialPurchaseCheck;
+      return foundation.browser.browserPreferences.initialPurchaseCheck;
     },
     set initialPurchaseCheck(value) {
-      browserPreferences.initialPurchaseCheck = value;
+      foundation.browser.browserPreferences.initialPurchaseCheck = value;
     },
     get testerPremium() {
-      return browserPreferences.testerPremium;
+      return foundation.browser.browserPreferences.testerPremium;
     },
     set testerPremium(value) {
-      browserPreferences.testerPremium = value;
+      foundation.browser.browserPreferences.testerPremium = value;
     }
-  })));
+  }))));
   const disposeKeyboard = bindNavigation();
   function showPauseScreen() {
-    combatHaptics.stop();
-    audio.setPaused(true);
-    renderPauseBlessings($('paused'), G.bless);
-    $('pauseSeed').textContent = activity.activeDaily
-      ? `Daily · ${activity.activeDaily.day}`
-      : activity.activeTrial
+    foundation.browser.combatHaptics.stop();
+    foundation.browser.audio.setPaused(true);
+    renderPauseBlessings(foundation.browser.$('paused'), foundation.run.G.bless);
+    foundation.browser.$('pauseSeed').textContent = foundation.run.activity.activeDaily
+      ? `Daily · ${foundation.run.activity.activeDaily.day}`
+      : foundation.run.activity.activeTrial
         ? ''
-        : `Seed ${G.seed}`;
+        : `Seed ${foundation.run.G.seed}`;
     showScreen('paused');
     renderTrialObjective();
   }
@@ -1430,9 +1231,9 @@ export function startGame(
   const phaseRouter = createPhaseRouter(
     context,
     {
-      read: () => G.state,
+      read: () => foundation.run.G.state,
       write: (state) => {
-        G.state = state;
+        foundation.run.G.state = state;
       },
       changed: (from, to) => context.events.emit('phaseChanged', { from, to }),
     },
@@ -1448,35 +1249,29 @@ export function startGame(
       paused: definePhase({}),
     },
   );
-  const { frameLoop, update, render, drawScene, postPreparation, advancePost, preparePresentation } = createFrameBindings(() => (stateView(activity, ["activeTrial", "trialFailure", "activeDaily", "combatRandom"], stateView(sessionState, ["hitStop", "timeScale"], {
-    G,
-    P,
-    WX,
-    R,
-    W,
-    H,
-    S,
-    DPR,
-    L,
-    g,
-    cvs,
-    nativeScene,
-    presentationState,
+  const { frameLoop, update, render, drawScene, postPreparation, advancePost, preparePresentation } = createFrameBindings(cacheView(() => (stateView(foundation.run.activity, ["activeTrial", "trialFailure", "activeDaily", "combatRandom"], stateView(foundation.run.sessionState, ["hitStop", "timeScale"], stateView(foundation.view.stageState, ["stageSeed"], stateView(foundation.run.sceneState, ["sceneLoading"], stateView(foundation.view.geometry, ["W","H","S","DPR","L"], {
+    G: foundation.run.G,
+    P: foundation.run.P,
+    WX: foundation.run.WX,
+    R: foundation.view.R,
+    g: foundation.browser.g,
+    cvs: foundation.browser.cvs,
+    nativeScene: foundation.browser.nativeScene,
+    presentationState: foundation.view.presentationState,
     environmentState,
     postArtwork,
     playerFigures,
-    sceneLoading,
     finishTrial,
     updateAmbient,
     cinematic,
-    reducedMotion,
-    reducedFlashes,
-    audio,
-    apparelMotion,
+    reducedMotion: foundation.browser.reducedMotion,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    audio: foundation.browser.audio,
+    apparelMotion: foundation.view.apparelMotion,
     updateEnemies,
     waveConfiguration,
     liveOrdered,
-    guided,
+    guided: foundation.browser.guided,
     bossPhase,
     phaseRouter,
     updateFx,
@@ -1484,14 +1279,13 @@ export function startGame(
     updateTransition,
     sceneFilm,
     pz,
-    buzz,
-    premiumAccess,
+    buzz: foundation.browser.buzz,
+    premiumAccess: foundation.browser.premiumAccess,
     lightingDebug,
-    lightingRig,
-    stageSeed,
-    demonRealmRenderer,
-    environmentRenderer,
-    density,
+    lightingRig: foundation.browser.lightingRig,
+    demonRealmRenderer: foundation.browser.demonRealmRenderer,
+    environmentRenderer: foundation.browser.environmentRenderer,
+    density: foundation.browser.density,
     blades,
     drawStains,
     drawLeaves,
@@ -1505,102 +1299,105 @@ export function startGame(
     drawPops,
     drawStamps,
     screenAnimation,
-    effectQuality,
+    effectQuality: foundation.view.effectQuality,
     ambient,
     rebalanceWeather,
     armory,
     flash,
-    sfx,
+    sfx: foundation.browser.sfx,
     gustLeaves,
     drawPreview,
     settlePresentedScene
-  }))));
+  }))))))));
   // Scene readiness belongs to orchestration, never to a drawing call.
   function settlePresentedScene() { return sceneFlow.settlePresentedScene(); }
   function visitToday() {
-    const next = recordDailyLogin(DAILY_LOGIN);
+    const next = recordDailyLogin(foundation.profile.DAILY_LOGIN);
     if (!store.set('issen.dailyLogin', next)) return;
-    Object.assign(DAILY_LOGIN, next);
+    Object.assign(foundation.profile.DAILY_LOGIN, next);
     if (!next.earned) return;
-    const newlyOwned = !UNL.has(SEVEN_DAWNS_CREST);
-    UNL.add(SEVEN_DAWNS_CREST);
-    store.set('issen.unlocks', [...UNL]);
-    if (newlyOwned && !sessionState.loginCrestRevealed) {
-      sessionState.loginCrestRevealed = true;
+    const newlyOwned = !foundation.profile.UNL.has(SEVEN_DAWNS_CREST);
+    foundation.profile.UNL.add(SEVEN_DAWNS_CREST);
+    store.set('issen.unlocks', [...foundation.profile.UNL]);
+    if (newlyOwned && !foundation.run.sessionState.loginCrestRevealed) {
+      foundation.run.sessionState.loginCrestRevealed = true;
       toast({ k: '暁', msg: 'Unlocked: Seven Dawns crest' });
       refreshArmoryNew();
     }
   }
   bindGraphicsLifecycle(() => ({
-    lifecycle, frameLoop, combatHaptics, audio, G, showPauseScreen, cvs,
-    nativeScene, $, screenAnimation, visitToday,
+    lifecycle: foundation.lifecycle, frameLoop, combatHaptics: foundation.browser.combatHaptics, audio: foundation.browser.audio, G: foundation.run.G, showPauseScreen, cvs: foundation.browser.cvs,
+    nativeScene: foundation.browser.nativeScene, $: foundation.browser.$, screenAnimation, visitToday,
     get artworkReady() { return artworkReady; },
   }));
 
   /* ---------------- boot ---------------- */
-  const { resize } = createViewport(() => ({
-    cvs, lifecycle, layout, buildBG, buildMist, buildGrass, buildLeaves,
-    buildWeather, buildPost, screenAnimation, prepareScene, environmentState,
+  const { resize } = createViewport(() => (stateView(foundation.view.geometry, ["W","H","DPR"], {
+    cvs: foundation.browser.cvs,
+    lifecycle: foundation.lifecycle,
+    layout: foundation.view.layout,
+    buildBG,
+    buildMist,
+    buildGrass,
+    buildLeaves,
+    buildWeather,
+    buildPost,
+    screenAnimation,
+    prepareScene,
+    environmentState,
     get artworkReady() { return artworkReady; },
-    get W() { return W; }, set W(value) { W = value; },
-    get H() { return H; }, set H(value) { H = value; },
-    get DPR() { return DPR; }, set DPR(value) { DPR = value; },
     reposition() {
-    for (const e of G.enemies) {
+    for (const e of foundation.run.G.enemies) {
       e.pos = enemyPos(e);
       if (e.state === 'dying') e.deathGround = { ...e.pos };
     }
-    if (G.boss) {
-      G.boss.pos = bossPos(G.boss);
-      if (G.boss.state === 'dying') G.boss.deathGround = { ...G.boss.pos };
+    if (foundation.run.G.boss) {
+      foundation.run.G.boss.pos = bossPos(foundation.run.G.boss);
+      if (foundation.run.G.boss.state === 'dying') foundation.run.G.boss.deathGround = { ...foundation.run.G.boss.pos };
     }
-    },
-  }));
-  startRuntime(() => (stateView(sessionState, ["savedRun"], {
-    lifecycle,
+    }
+  })));
+  startRuntime(() => (stateView(foundation.run.sessionState, ["savedRun"], stateView(foundation.view.geometry, ["W","H","DPR"], stateView(foundation.view.stageState, ["stageSeed"], {
+    lifecycle: foundation.lifecycle,
     frameLoop,
-    G,
+    G: foundation.run.G,
     cinematic,
     setupScreen,
     tutorial,
     armory,
     notifications,
-    guided,
+    guided: foundation.browser.guided,
     runResults,
-    audio,
+    audio: foundation.browser.audio,
     driftRenderer,
-    reducedMotion,
-    reducedFlashes,
-    density,
+    reducedMotion: foundation.browser.reducedMotion,
+    reducedFlashes: foundation.browser.reducedFlashes,
+    density: foundation.browser.density,
     computeMods,
-    applySeal,
+    applySeal: foundation.view.applySeal,
     resize,
     setupAttract,
     restoreCheckpoint,
     showPauseScreen,
     showOver,
     recoverSupportReward,
-    setMuteIcon,
+    setMuteIcon: foundation.browser.setMuteIcon,
     refreshArmoryNew,
     setBestLine,
     updateSavedRunButtons,
     disposePointer,
     disposeKeyboard,
-    inkCharm,
-    inkCompanion,
-    inkEnemy,
-    inkPlayer,
-    inkSword,
-    environmentRenderer,
-    stageSeed,
-    W,
-    H,
-    DPR,
-    presentationState,
+    inkCharm: foundation.browser.inkCharm,
+    inkCompanion: foundation.browser.inkCompanion,
+    inkEnemy: foundation.browser.inkEnemy,
+    inkPlayer: foundation.browser.inkPlayer,
+    inkSword: foundation.browser.inkSword,
+    environmentRenderer: foundation.browser.environmentRenderer,
+    presentationState: foundation.view.presentationState,
     markArtworkReady() {
       artworkReady = true;
       if (pageActive()) frameLoop.start();
     }
-  })));
-  return lifecycle.dispose;
+  })))));
+  return foundation.lifecycle.dispose;
 }

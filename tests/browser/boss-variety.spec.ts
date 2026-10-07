@@ -6,7 +6,7 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__bossVariety = {G,testJump}; artworkReady = true;',
+        'window.__bossVariety = {G: foundation.run.G,testJump}; artworkReady = true;',
       ),
     });
   });

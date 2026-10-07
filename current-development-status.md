@@ -6,6 +6,58 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
+## Active implementation: foundation context and cached live views
+
+Uncommitted src/runtime/foundation.ts constructs plain browser/profile/run/view
+records before domain wiring. Current profile identities remain in their owning
+records; layout/fog, seals, live/preview visit seeds and scene request state now
+have explicit owners. game.ts is still 1403 lines, above the approximately
+200-line target. Existing browser harness fields and assertions are retained.
+
+The first combined foundation browser run completed with 253 passes and one
+eight-trial final-reload timeout (context-foundation-broad.log); the unchanged
+focused rerun also timed out (context-foundation-trials-recheck.log). The original
+immutable baseline passed that same encounter/reload flow
+(foundation-navigation-baseline.log), so the timeout is treated as a regression.
+Phase/kill/frame projections now construct their lifetime views lazily once,
+while selected mutable fields remain forwarding getters. Snapshot providers such
+as environment/scene flow are not cached. This is a context-lifetime change,
+without rule/RNG changes or relaxed browser assertions/timeouts.
+
+Strict checks pass (cached-views-regression-typecheck.log); all 371 units pass
+(cached-views-regression-unit.log). The added actual damage-phase regression
+replaces geometry/profile/trial identities after initial use and proves current
+state writes and frozen event snapshots. The unchanged eight-trial browser case
+passes in 36.0s (cached-views-trials-browser.log; terminal exit 0).
+The new full browser verification passes all 254 cases in 14.1m
+(cached-views-foundation-broad.log; terminal exit 0 confirmed), including the
+unchanged eight-trial encounter/reload case. Foundation ownership and lazy live
+context views are ready for the green checkpoint commit.
+
+The isolated presentation-context-preview draft now composes presentation, UI,
+gameplay, phases, sessions, menus/controls and frames through the foundation.
+Event wiring is in runtime/reactions.ts with eight listener groups in original
+registration order. Its root is 134 lines; profile/equipment rules, combat wiring and scene
+continuation have their own construction modules; the three cached projections are
+preserved in their new owners. Combined strict checks pass
+(domain-composition-preview-typecheck.log). Renderer-dependent frame/startup
+wiring is relocated outside src/game in the draft; only a content comment
+mentions rendering there. Actual browser probes are prepared in
+the isolated tests copy: 24 hooks in 20 files, 89 references, with unchanged
+harness fields/assertions. Helpers used only by probes are imported into the
+instrumented response instead of production source. The draft remains unapplied
+and needs actual browser verification after the foundation checkpoint.
+
+Resume: commit this verified foundation/context lifetime/probe migration
+checkpoint, then apply the
+verified isolated composition and its prepared probes as one cohesive move and
+run focused flows before broad verification. Root import deletion is separate
+from the physical move. Remaining direct wave/boss/knife/standoff-failure feedback
+still requires events. All W2 final gates/version/docs, all W3 and Part 4 remain.
+Generators are non-idempotent; preserve semantic/reference audit files and do not
+rerun original-declaration generators against the reduced root. Preview has
+public/scripts/docs/.github junctions; never recursively delete through them.
+
 ## Latest green checkpoint: Damage and companion event reactions
 
 Damage/death, Tanto/foxfire saves and Daruma/Phoenix/support revival feedback

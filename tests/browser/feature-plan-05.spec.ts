@@ -48,7 +48,7 @@ test('pause lists current blessings and keeps actions visible in short landscape
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__pauseHarness = { G }; artworkReady = true;',
+      'window.__pauseHarness = { G: foundation.run.G }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
@@ -103,7 +103,7 @@ test('item reveals match Armoury copy and cue once when each card appears', asyn
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__revealHarness = { runResults, ITEM_BY, itemPresentation, sfx }; artworkReady = true;',
+      'window.__revealHarness = { runResults, ITEM_BY: foundation.profile.ITEM_BY, itemPresentation, sfx: foundation.browser.sfx }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

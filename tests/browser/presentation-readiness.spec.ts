@@ -11,12 +11,12 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
         'artworkReady = true;',
         `window.__presentationBoundary = {
         frameLoop, drawScene, preparePresentation, render,
-        snapshot: () => JSON.stringify({ G, random: activity.runRandom.state(), saves: Object.entries(localStorage) }),
+        snapshot: () => JSON.stringify({ G: foundation.run.G, random: foundation.run.activity.runRandom.state(), saves: Object.entries(localStorage) }),
         queue() {
-          sceneLoading = true; sceneReadyToPresent = true;
-          sceneContinuation = () => { G.score += 7; };
+          foundation.run.sceneState.sceneLoading = true; foundation.run.sceneState.sceneReadyToPresent = true;
+          foundation.run.sceneState.sceneContinuation = () => { foundation.run.G.score += 7; };
         },
-        score: () => G.score,
+        score: () => foundation.run.G.score,
       }; artworkReady = true;`,
       ),
     });

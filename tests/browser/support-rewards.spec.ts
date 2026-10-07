@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
       'artworkReady = true;',
-      'window.__supportHarness = { G, playerDie, earn, showOver }; artworkReady = true;',
+      'window.__supportHarness = { G: foundation.run.G, playerDie, earn, showOver }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
