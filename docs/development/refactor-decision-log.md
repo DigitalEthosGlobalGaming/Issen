@@ -112,6 +112,8 @@
 
 - 2026-10-08 — W2 run-start move — move normal/daily/trial/rush entry through current-state ports and expose the existing fresh-seed generator as a port — seed test-only copies of resetRun or move cosmetic RNG into rules — production initialization/RNG order is retained; scenario initialization now uses the real API, with four added entry/isolation/retry cases, all units and fifteen browser cases green — revert the run-start move and its scenario-driver migration.
 
+- 2026-10-08 — W2 wave input move — preserve swipe targeting and knife record/reward order through the real wave controller, migrate scenario swipes — replace all router branching in one edit — four controller cases, all 294 units and twenty real browser cases pass; entry/update and router integration remain separate steps — revert the wave input move and scenario migration together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

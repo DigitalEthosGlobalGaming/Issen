@@ -1,3 +1,4 @@
+import { createWavesPhase } from './game/phases/waves.ts';
 import { createRunStart } from './game/session/run-start.ts';
 import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
 import { createRunFlow } from './game/session/run-flow.ts';
@@ -1857,6 +1858,38 @@ export function startGame(
     startSwing(P, dir);
     apparelMotion.kick(dir, reducedMotion(), perfect);
   }
+  const wavesPhase = createWavesPhase<GameContext<PresentationContext>>(() => ({
+    G,
+    W,
+    ST,
+    activeTrial,
+    combatRandom,
+    waveConfiguration,
+    killEnemy,
+    orderSucceeded: () => guided.orderSucceeded(),
+    pop,
+    sfx,
+    swingPlayer,
+    playerDie,
+    enemyPos,
+    earn,
+    addScore,
+    comboMult,
+    sparks,
+    buzz,
+    hud,
+    saveStats,
+    knifeTrail(pos) {
+      presentationState.fx.knives.push({
+        x0: L.player.x,
+        y0: L.player.y - L.player.h * 0.55,
+        x1: pos.x,
+        y1: pos.y - pos.h * 0.55,
+        t: 0,
+        life: 0.18,
+      });
+    },
+  }));
   function onSwipe(dir: Direction) {
     if (sceneLoading) return;
     if (
@@ -1872,27 +1905,8 @@ export function startGame(
       standoffSwipe(dir);
       return;
     }
-    if (G.state === 'playing') {
-      const outcome = targetSwipe(G.enemies, G.attacker, activeTrial?.mirrored ? OPP[dir] : dir, {
-        ordered: waveConfiguration().ordered,
-        centerX: W / 2,
-        mirrorAvailable: !!(G.m.kagami && !G.kagamiUsed),
-        axisOnly: !!G.m.axisCut,
-      });
-      if (outcome.kind === 'cut') {
-        if (outcome.mirror) G.kagamiUsed = true;
-        killEnemy(outcome.target, dir, outcome.mirror);
-        if (waveConfiguration().ordered) guided.orderSucceeded();
-        if (outcome.mirror) {
-          pop(0, 0, '鏡');
-          sfx.glint();
-        }
-      } else if (outcome.kind === 'miss') {
-        swingPlayer(dir);
-        sfx.whoosh();
-        playerDie(outcome.killer, outcome.reason);
-      }
-    } else if (G.state === 'boss') bossSwipe(dir);
+    if (G.state === 'playing') wavesPhase.onSwipe(context, dir);
+    else if (G.state === 'boss') bossSwipe(dir);
   }
 
   /* ---------------- boss ---------------- */
@@ -2015,45 +2029,7 @@ export function startGame(
     if (sceneLoading) return;
     if (guided.tap()) return;
     if (G.state === 'playing') {
-      const target = throwKnife(G, combatRandom);
-      if (!target) return;
-      const pos = enemyPos(target);
-      const wasAttacker = G.attacker === target;
-      target.pos = pos;
-      target.state = 'dying';
-      target.t = 0;
-      target.shadowTime = 0;
-      target.deathGround = { ...pos };
-      target.k = 0;
-      target.deathType = 'stagger';
-      target.fallDir = 1;
-      target.cutAng = -Math.PI / 4;
-      if (wasAttacker) {
-        G.attacker = null;
-        G.gapT = waveConfiguration().gap;
-      }
-      G.kills++;
-      ST.kills++;
-      earn('kill');
-      addScore(
-        Math.round((wasAttacker ? 140 : 120) * comboMult() * G.m.normal),
-        pos.x,
-        pos.y - pos.h,
-        'Knife',
-      );
-      presentationState.fx.knives.push({
-        x0: L.player.x,
-        y0: L.player.y - L.player.h * 0.55,
-        x1: pos.x,
-        y1: pos.y - pos.h * 0.55,
-        t: 0,
-        life: 0.18,
-      });
-      sparks(pos.x, pos.y - pos.h * 0.55, 10);
-      sfx.whoosh();
-      buzz(8);
-      hud(true);
-      saveStats();
+      wavesPhase.onTap(context);
       return;
     }
     if (G.state === 'standoff') {

@@ -40,20 +40,20 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: normal/daily/trial/rush entry and next-step bodies moved to
-`src/game/session/run-start.ts`, retaining record initialization, scene/weather
-reset and rule/cosmetic RNG order. The existing fresh-seed function is an explicit
-port; production still uses newRunSeed, while headless tests provide fixed seeds.
-Cosmetic reset callbacks stay at composition ports; gameplay has no rendering
-imports. Four actual run-start API cases cover seeded normal entry, daily profile
-isolation, disposable trial state/retries and rush/next-step dispatch. Existing
-runtime-scenarios initialization now uses this API; encounter/kill drivers remain
-temporary until their APIs move. All thirteen focused run-start/scenario cases
-passed, strict types passed and all 290 `npm test` cases passed
-(run-start-final-unit.log).
-`npx playwright test tests/browser/trials.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/setup-progression.spec.ts --config playwright.rendering-v2.config.ts`:
-all fifteen passed (run-start-browser.log; terminal confirmed), including all eight
-actual trial encounters, saved records and setup modes. No tolerance was changed.
+Latest checkpoint: wave swipe targeting and knife input now belong to
+`src/game/phases/waves.ts`. Four actual controller API cases cover correct/wrong
+cuts, mirrored trial directions, knife charges/rewards and passive finger-down.
+Seeded wave scenario inputs now call this controller; kill/update drivers remain
+temporary until their rule APIs move. Strict types passed; all 294 units passed
+(waves-input-final-unit.log). The exact browser command:
+`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`
+passed all 20 cases (waves-input-browser.log; terminal confirmed). Wave entry and
+update remain in game.ts. Next move these bodies into the same controller, then
+standoff/boss/shrine/death and live router dispatch. No gameplay change.
+
+Previous run-start checkpoint: 5aee8dd; four actual initialization cases and seeded
+scenario initialization use run-start.ts. Strict, all 290 units and 15 real browser
+trial/recovery/setup cases passed (run-start-*.log).
 
 Previous session checkpoints: run-flow controls 5842908 (284 units, 17 menu/save
 and ten graphics/context cases), checkpoint recovery 05a52ee (286 units, six actual

@@ -1,3 +1,5 @@
+import { createWavesPhase } from '../../src/game/phases/waves.ts';
+import { parseStatistics } from '../../src/platform/saves.ts';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -39,7 +41,8 @@ function session(seed = 123456, options = setup, equipment = DEFAULT_EQUIPMENT) 
 }
 
 // Run entry now uses the production session API. Encounter drivers still use
-// current exported simulations until phase and kill APIs replace their adapters.
+// wave input now uses its phase API; updates and kill ports remain temporary
+// until the remaining phase/rule APIs replace their adapters.
 // Their event handlers represent external inputs/state boundaries still inline in
 // game.ts. Replace those handlers with extracted phase/kill APIs as they appear;
 // assertions concern outcomes and invariants, never a per-tick snapshot.
@@ -59,6 +62,51 @@ function driveWave(seed, options = setup, trial) {
   run.pendingSpawns = initialSpawns(run.cfg.pack, false, random.next);
   let cleared = 0,
     attacked = 0;
+  let cut = null;
+  const inputViews = {
+    G: run,
+    W: 200,
+    ST: parseStatistics({}),
+    activeTrial: trial ?? null,
+    combatRandom: random.next,
+    waveConfiguration: () => run.cfg,
+    // Temporary kill port until the production kill-rule API is extracted.
+    killEnemy(enemy) {
+      cut = enemy;
+      enemy.state = 'dying';
+      enemy.t = 0;
+      run.attacker = null;
+      run.gapT = run.cfg.gap;
+      run.kills++;
+      run.perfects++;
+      run.combo++;
+      run.maxCombo = Math.max(run.maxCombo, run.combo);
+      run.score += scoreGain(Math.round(300 * comboMultiplier(run.combo, run.m)), run);
+      accrueRunReward(ledger, 'kill');
+      if (run.cfg.refill && run.toSpawn > 0) run.pendingSpawns.push({ slot: enemy.slot, t: 0.45 });
+    },
+    orderSucceeded() {},
+    pop() {},
+    sfx: { glint() {}, whoosh() {} },
+    swingPlayer() {},
+    playerDie() {
+      assert.fail('valid phase inputs must hit the selected attacker');
+    },
+    enemyPos: position,
+    earn() {},
+    addScore() {
+      return 0;
+    },
+    comboMult() {
+      return 1;
+    },
+    knifeTrail() {},
+    sparks() {},
+    buzz() {},
+    hud() {},
+    saveStats() {},
+  };
+  const phase = createWavesPhase((ctx) => ctx);
   const spawned = [];
   for (let tick = 0; tick < 6000 && run.state === 'playing'; tick++) {
     updateEnemies(run, 0.02, {
@@ -93,24 +141,9 @@ function driveWave(seed, options = setup, trial) {
     );
     const enemy = run.attacker;
     if (!enemy || enemy.p < 0.8) continue;
-    const outcome = targetSwipe(run.enemies, enemy, enemy.dir, {
-      ordered: run.cfg.ordered,
-      centerX: 100,
-      mirrorAvailable: false,
-    });
-    assert.equal(outcome.kind, 'cut');
-    assert.equal(outcome.target, enemy);
-    enemy.state = 'dying';
-    enemy.t = 0;
-    run.attacker = null;
-    run.gapT = run.cfg.gap;
-    run.kills++;
-    run.perfects++;
-    run.combo++;
-    run.maxCombo = Math.max(run.maxCombo, run.combo);
-    run.score += scoreGain(Math.round(300 * comboMultiplier(run.combo, run.m)), run);
-    accrueRunReward(ledger, 'kill');
-    if (run.cfg.refill && run.toSpawn > 0) run.pendingSpawns.push({ slot: enemy.slot, t: 0.45 });
+    cut = null;
+    phase.onSwipe(inputViews, trial?.mirrored ? OPP[enemy.dir] : enemy.dir);
+    assert.equal(cut, enemy);
   }
   assert.equal(run.state, 'between', 'wave must progress within a bounded simulation');
   assert.equal(cleared, 1);
