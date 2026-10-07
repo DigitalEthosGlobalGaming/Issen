@@ -336,3 +336,7 @@ feedback use explicit ports. Seeded boss-pattern scenarios call this owner.
 
 `game/phases/shrine.ts` owns offer generation, gated rerolls and blessing choices.
 Shrine menu wiring invokes its choice API; checkpoint keys/order remain unchanged.
+
+`game/phases/death.ts` owns damage, fatal checkpoint boundaries, raw-time death
+advancement and revival. Animation/camera/reason-copy feedback are explicit ports.
+Reward offer and results UI orchestration still await their session owner.

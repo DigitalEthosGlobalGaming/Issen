@@ -1,3 +1,4 @@
+import { deathPhaseFixture } from './helpers/runtime-death-phase.mjs';
 import { shrinePhaseFixture } from './helpers/runtime-shrine-phase.mjs';
 import { bossPhaseFixture } from './helpers/runtime-boss-phase.mjs';
 import { standoffPhaseFixture } from './helpers/runtime-standoff-phase.mjs';
@@ -322,8 +323,13 @@ test('standoff, shrine, death and result settlement complete without double rewa
   run.bless.clear();
   run.lives = 1;
   run.runWards = 0;
-  assert.equal(resolveDamage(run, 'wrong').kind, 'death');
+  const death = deathPhaseFixture(runtime);
+  run.state = 'playing';
+  death.phase.playerDie(null, 'wrong');
+  assert.equal(run.state, 'dead');
   assert.equal(run.lives, 0);
+  death.phase.updateDeath(2);
+  assert.equal(run.state, 'over');
   const ledger = createRunRewardLedger(),
     meta = parseMeta(null);
   accrueRunReward(ledger, 'kill');

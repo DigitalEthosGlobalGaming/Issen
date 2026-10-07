@@ -1,3 +1,4 @@
+import { createDeathPhase } from './game/phases/death.ts';
 import { createShrinePhase } from './game/phases/shrine.ts';
 import { createTrialSession } from './game/session/trials.ts';
 import { createBossPhase } from './game/phases/boss.ts';
@@ -636,41 +637,7 @@ export function startGame(
     sfx.glint();
   }
   function reviveDaruma(ph = false, support = false) {
-    if (!support) {
-      if (ph) G.phoenixUsed = true;
-      else G.darumaUsed = true;
-    }
-    timeScale = 1;
-    presentationState.lbT = 0;
-    P.fall = 0;
-    P.pose = { ...PREST };
-    breakCombo();
-    G.pStreak = 0;
-    if (!G.zen && !G.hard)
-      G.lives = support ? Math.max(1, Math.ceil(G.maxLives / 2)) : ph ? G.maxLives : 1;
-    renderLives();
-    setScore();
-    hud(true);
-    presentationState.inkPulse = 0;
-    const inBoss = G.diedInBoss;
-    G.enemies = [];
-    G.attacker = null;
-    G.pendingSpawns = [];
-    G.so = null;
-    if (inBoss) {
-      G.boss = null;
-      G.bossCount--;
-      startBoss();
-    } else startWave(G.wave, true);
-    if (support) {
-      G.lives = Math.max(1, Math.ceil(G.maxLives / 2));
-      renderLives();
-      captureCheckpoint();
-      banner('起', 'Second Wind');
-    } else if (ph) banner('鳳凰', 'Rise from the ashes');
-    else banner('達磨', 'Seven times down, eight times up');
-    stamp(ph ? '鳳' : '起', 0, 0, Math.max(60, 86 * S), true, 1.6);
-    flash(0.5, '255,240,220');
+    deathPhase.reviveDaruma(ph, support);
   }
   function drawPet() {
     const pt = EQ.pet,
@@ -2082,137 +2049,82 @@ export function startGame(
   }
 
   /* ---------------- death & menus ---------------- */
-  function struck(killer: Enemy | Boss | null, keep: boolean, label?: string | null) {
-    G.clean = 0;
-    if (!keep && G.bless.has('zanshin')) {
-      const sk = Math.floor((G.wave - 1) / 3);
-      if (G.zanKey !== sk) {
-        G.zanKey = sk;
-        keep = true;
-        label = label || '残心';
-      }
-    }
-    if (!keep && G.m.kiku && (G.kikuUsed || 0) < G.m.kiku) {
-      G.kikuUsed = (G.kikuUsed || 0) + 1;
-      keep = true;
-      label = label || '菊';
-    }
-    const lost = G.combo;
-    recordBlessingCut(G, false);
-    if (!keep) {
-      breakCombo();
-      G.pStreak = 0;
-    }
-    G.hits++;
-    setScore();
-    const p = L.player;
-    addSlash(
-      p.x + p.h * 0.4,
-      p.y - p.h * 0.98,
-      p.x - p.h * 0.28,
-      p.y - p.h * 0.35,
-      Math.max(4, p.h * 0.018),
-      0.45,
-    );
-    inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 16, p.h / 420);
-    flash(0.35, '150,22,16');
-    presentationState.shake = Math.max(presentationState.shake, 12 * S);
-    hitStop = 0.08;
-    sfx.hurt();
-    combatHaptics.play('damage');
-    pop(
-      W / 2,
-      H * 0.45,
-      label || (lost >= 3 && G.combo < lost ? `${lost} 連 broken` : 'Struck'),
-      Math.max(20, 24 * S),
-    );
-    if (killer && 'def' in killer) {
-      killer.state = 'strike';
-      killer.t = 0;
-      killer.zenBack = true;
-    } else if (killer) {
-      killer.k = killer.state === 'attack' ? Math.pow(clamp(killer.p), 1.6) : killer.k || 0;
-      killer.state = 'strike';
-      killer.t = 0;
-      killer.zen = true;
-      if (G.attacker === killer) {
-        G.attacker = null;
-        G.gapT = waveConfiguration().gap + 0.5;
-      }
-      if (waveConfiguration().refill && G.toSpawn > 0)
-        G.pendingSpawns.push({ slot: killer.slot, t: 1.0 });
-    }
-  }
+  const deathPhase = createDeathPhase<GameContext<PresentationContext>>(() => ({
+    G,
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(value) {
+      timeScale = value;
+    },
+    breakCombo,
+    renderLives,
+    setScore,
+    hud,
+    startBoss,
+    startWave,
+    captureCheckpoint,
+    banner,
+    stamp,
+    S,
+    flash,
+    L,
+    addSlash,
+    inkBurst,
+    get hitStop() {
+      return hitStop;
+    },
+    set hitStop(value) {
+      hitStop = value;
+    },
+    sfx,
+    combatHaptics,
+    pop,
+    W,
+    H,
+    waveConfiguration,
+    activeTrial,
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+    bossSwipe,
+    killEnemy,
+    ST,
+    saveStats,
+    checkUnlocks,
+    scraps,
+    letterbox,
+    clearHints,
+    clearLetterbox: () => {
+      presentationState.lbT = 0;
+    },
+    resetPlayer: () => {
+      P.fall = 0;
+      P.pose = { ...PREST };
+    },
+    inkPulse: (value) => {
+      presentationState.inkPulse = value;
+    },
+    shake: (amount) => {
+      presentationState.shake = Math.max(presentationState.shake, amount);
+    },
+    hideBossBar: () => {
+      $('bossbar').classList.remove('on');
+    },
+    reasonMessage: (reason) => DEATH_REASONS[reason] || '',
+    get rewardFlowBusy() {
+      return rewardFlowBusy;
+    },
+    fallPlayer: (fall) => {
+      P.fall = fall;
+    },
+    showOver,
+  }));
   function playerDie(killer: Enemy | Boss | null, reason: string) {
-    if (activeTrial) {
-      trialFailure = DEATH_REASONS[reason] || 'A mistake ended the trial.';
-      return;
-    }
-    if (G.state === 'dead' || G.state === 'over') return;
-    if (interceptWithTanto(G, killer) && killer) {
-      if ('def' in killer) {
-        killer.failed = true;
-        killer.state = 'stagger';
-        killer.chainLeft = 1;
-        bossSwipe(killer.sdir, true);
-      } else {
-        if (G.so?.e === killer) {
-          G.so.done = true;
-          G.so.doneT = 0;
-          killer.glint = 0;
-        }
-        killEnemy(killer, killer.dir, true, false, true);
-      }
-      pop(killer.pos.x, killer.pos.y - killer.pos.h * 1.15, 'Tanto');
-      hud(true);
-      captureCheckpoint();
-      return;
-    }
-    if (reason === 'feint') {
-      recordSecretEvent(ST, { kind: 'feintMistake' });
-      saveStats();
-      checkUnlocks();
-    }
-    const outcome = resolveDamage(G, reason);
-    renderLives();
-    if (outcome.kind === 'hurt') {
-      if (outcome.lifeLost) presentationState.inkPulse = 1;
-      struck(killer, outcome.keepCombo, outcome.label);
-      return;
-    }
-    G.diedInBoss = !!(G.boss && G.boss.state !== 'dying');
-    G.state = 'dead';
-    G.deathT = 0;
-    G.reviveOfferResolved = false;
-    G.reason = reason;
-    captureCheckpoint('lost');
-    timeScale = 0.3;
-    if (killer && !('def' in killer)) {
-      killer.k = killer.state === 'attack' ? Math.pow(clamp(killer.p), 1.6) : killer.k || 0;
-      killer.state = 'strike';
-      killer.t = 0;
-    } else if (killer) {
-      killer.state = 'strike';
-      killer.t = 0;
-    }
-    const p = L.player;
-    addSlash(
-      p.x + p.h * 0.4,
-      p.y - p.h * 0.98,
-      p.x - p.h * 0.28,
-      p.y - p.h * 0.35,
-      Math.max(5, p.h * 0.022),
-      0.7,
-    );
-    inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 40, p.h / 420);
-    scraps(p.x + p.h * 0.05, p.y - p.h * 0.7, 10, p.h / 300);
-    flash(0.45, '150,22,16');
-    presentationState.shake = Math.max(presentationState.shake, 18 * S);
-    letterbox(2.5);
-    sfx.death();
-    combatHaptics.play('damage');
-    clearHints();
-    $('bossbar').classList.remove('on');
+    deathPhase.playerDie(killer, reason);
   }
   function finishDaily() {
     if (!activeDaily || G.state === 'over') return;
@@ -2960,16 +2872,7 @@ export function startGame(
         } else nextStep();
       }
     }
-    if (G.state === 'dead' && !rewardFlowBusy) {
-      G.deathT += raw;
-      P.fall = clamp((G.deathT - 0.3) / 0.9);
-      timeScale = lerp(0.3, 0.6, clamp(G.deathT / 1.5));
-      if (G.deathT > 1.8) {
-        if (G.bless.has('phoenix') && !G.phoenixUsed) reviveDaruma(true);
-        else if (G.m.daruma && !G.darumaUsed) reviveDaruma();
-        else showOver();
-      }
-    }
+    if (G.state === 'dead') deathPhase.updateDeath(raw);
     updateFx(dt, raw);
     renderTrialObjective();
     updateTransition(raw);
