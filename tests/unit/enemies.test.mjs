@@ -123,11 +123,11 @@ function fixture() {
     time: 1,
     perfectZone: () => 0.78,
     pet: 'nopet',
-    sounds: {
-      bell: () => events.push('bell'),
-      feint: () => events.push('feint'),
-      bark: () => events.push('bark'),
-    },
+    events: { emit(name, event) {
+      assert.equal(name, 'gruntCue');
+      assert.ok(['bell', 'feint', 'bark'].includes(event.kind));
+      events.push(event.kind);
+    } },
     foxSave: () => events.push('save'),
     playerDie: () => {
       events.push('death');

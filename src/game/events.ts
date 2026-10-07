@@ -72,6 +72,7 @@ export interface GameEvents {
   bossReady: Readonly<{ count: number }>;
   bossTraits: Readonly<{ twin: boolean; spear: boolean; mirror: boolean }>;
   bossHealth: Readonly<{ hp: number; maximum: number }>;
+  gruntCue: Readonly<{ kind: 'bell' | 'feint' | 'bark' }>;
   bossCue: Readonly<
     | { kind: 'draw' }
     | { kind: 'recovered' | 'return' | 'afterimage' | 'deflected'; x: number; y: number; height: number }

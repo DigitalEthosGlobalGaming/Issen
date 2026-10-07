@@ -563,3 +563,9 @@ and freezes combat. Counter damage, Breath healing, combo, hit stop, scores,
 victory/profile settlement and combat RNG remain their existing rule owners.
 Actual base/Twin/spear/Mirror fights prove cosmetic listener isolation through
 deferred entry, expired opening, afterimage, deflection, healing and victory.
+
+Grunt feint warning, turn and Shiba sounds emit gruntCue from the behaviour
+table. presentation/grunt-cues.ts owns audio through a disposable subscription.
+The grunt update environment has emission instead of sound ports. The table
+retains its timers, direction switch, Still activation, pet timer and late damage
+callbacks; sound listeners have no run/profile/RNG capability.

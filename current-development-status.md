@@ -82,22 +82,31 @@ Exact focused browser command: trials, feature-plan-06, scene-readiness, tanto,
 game with rendering-v2 configuration and retained failure traces; all 21 pass
 (boss-cues-browser.log). Original assertions/deadlines remain unchanged.
 
-Next: apply the isolated grunt-cues-preview. It is a fresh copy of current source,
-tests, scripts and workflow fixtures (no junctions). Strict/all 380 units pass
-(grunt-cues-preview-typecheck.log / grunt-cues-preview-unit.log). Initial full
-preview run lacked scripts/workflow fixtures; adding these unchanged files made
-the exact unchanged suite pass. Only copy its changed game/events.ts, combat/
-grunt.ts, runtime/combat.ts, runtime/reactions.ts, new presentation/grunt-cues.ts,
-unit grunt-states/enemies/runtime-checkpoints/runtime-scenarios and new grunt-cues
-test. The actual seeded test covers feint warning, Shiba, Still and real damage
-with listener isolation/frozen values/disposal. Do not copy the entire preview.
+Boss cue checkpoint is committed at ed6cc8a. Grunt bell/feint/bark now emit
+frozen values from the behaviour table; presentation/grunt-cues.ts owns sounds.
+Strict/all 380 actual units pass (grunt-cues-typecheck.log / grunt-cues-unit.log).
+Exact browser command: game, new-blessings, runtime-checkpoint-fixtures with
+rendering-v2 configuration and retained traces; all 12 pass in 41.9s
+(grunt-cues-browser.log). Actual seeded feint/Shiba/Still/late damage test proves
+identical run/profile/combat RNG, frozen values and listener disposal.
+Timers, switch-frame pose, pet state and damage remain in the grunt rules.
 
-Then finish the ownership/adapter audit, including direct shrine/trial unlock
-sound and their remaining display/progression ports. Remove obsolete cosmetic
-phase capabilities/imports in a separate cleanup. All W2 final gates/version/
-docs/checklist, all W3 and Part 4 remain required. Develop is unpushed; push once
-only after full completion. No profiling/benchmarks, store builds, real-save edits
-or lit-only changes.
+Next: shrine/trial feedback and progression boundaries, then remove unused phase
+cosmetic capabilities/imports separately. Latest source audit finds no old
+exported updateEnemies/updateBoss/spawnEnemy/bossToIdle adapters in src. Runtime
+methods with those names are real explicit orchestration ports, not old adapters.
+Remaining direct phase drawing: shrine renderLives/offers/HUD/screen/unlock.
+Trial encounter banner/label/objective/HP and reward unlock remain direct session
+ports. Other session screen/display hooks exist in run-start, run-flow, results
+and checkpoint-flow: audit ownership and preserve restore/settlement/order rather
+than treating an import scan alone as proof of full separation.
+The current ignored grunt-cues-preview is a copy with no junctions, already
+applied only for its changed files; its docs are absent and its scripts are
+non-idempotent. Old wave-cues-preview root remains stale. Do not reapply previews.
+
+All W2 final gates/version/docs/checklist, all W3 and Part 4 remain required.
+Develop is unpushed; push once only after full completion. No profiling/benchmarks,
+store builds, real-save edits or lit-only changes.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

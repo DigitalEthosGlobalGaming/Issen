@@ -125,7 +125,7 @@ function driveWave(seed, options = setup, trial, suppliedRuntime) {
       time: tick * 0.02,
       perfectZone: () => 0.78,
       pet: 'none',
-      sounds: noSound,
+      events: runtime.views.events,
       foxSave() {},
       playerDie() {
         assert.fail('valid cuts must avoid a late strike');
@@ -237,7 +237,7 @@ test('wrong cuts lose life and combo while feints expose the true direction', ()
     time: 1,
     perfectZone: () => 0.78,
     pet: 'none',
-    sounds: noSound,
+    events: runtime.views.events,
     foxSave() {},
     playerDie() {
       assert.fail('feint should not expire before its attack');

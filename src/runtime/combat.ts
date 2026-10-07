@@ -112,7 +112,7 @@ export function createRuntimeCombat(
       surge: foundation.run.WX.surge,
       time: foundation.view.presentationState.time,
       perfectZone: pz,
-      sounds: foundation.browser.sfx,
+      events: context.events,
       pet: foundation.profile.profileEquipment.EQ.pet,
       foxSave,
       playerDie: readDamage().playerDie,

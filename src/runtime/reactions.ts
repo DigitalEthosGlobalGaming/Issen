@@ -1,3 +1,4 @@
+import { bindGruntCues } from '../presentation/grunt-cues.ts';
 import { bindBossCues } from '../presentation/boss-cues.ts';
 import { bindStandoffCues } from '../presentation/standoff-cues.ts';
 import { bindWaveFeedback } from '../presentation/wave-feedback.ts';
@@ -190,6 +191,7 @@ export function bindRuntimeReactions(
     dust: presentation.dust,
   })));
 
+  foundation.lifecycle.add(bindGruntCues(events, () => ({ sfx: foundation.browser.sfx })));
   foundation.lifecycle.add(bindBossCues(events, () => ({
     S: foundation.view.geometry.S, banner: ui.banner, renderHp: ui.renderHp,
     setScore: ui.setScore, pop: presentation.pop, flash: presentation.flash,

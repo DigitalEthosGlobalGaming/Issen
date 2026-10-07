@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { clamp } from '../../shared/math.ts';
 import { EPOSE, approachPose } from '../../shared/figure-model.ts';
 import { deathDuration } from '../../shared/character-death.ts';
@@ -23,7 +24,7 @@ export interface EnemyUpdateEnvironment {
   time: number;
   perfectZone: () => number;
   pet: string;
-  sounds: { bell: () => void; feint: () => void; bark: () => void };
+  events: RuleEvents;
   foxSave: (enemy: Enemy) => void;
   playerDie: (enemy: Enemy, reason: 'late') => void;
   position: (enemy: Enemy) => EnemyPosition;
@@ -62,15 +63,15 @@ function feintAttack(e: Enemy, context: GruntContext) {
   e.p = e.t / e.T;
   if (G.m.suzu && !e.switched && !e.rang && e.p >= e.feintAt - 0.12) {
     e.rang = true;
-    env.sounds.bell();
+    env.events.emit('gruntCue', { kind: 'bell' });
   }
   stillOpening(e, context);
   if (!e.switched && e.p >= e.feintAt) {
     e.switched = true;
     e.snap = 0.12;
-    env.sounds.feint();
+    env.events.emit('gruntCue', { kind: 'feint' });
     if (env.pet === 'shiba') {
-      env.sounds.bark();
+      env.events.emit('gruntCue', { kind: 'bark' });
       G.petT = 0.6;
     }
   }

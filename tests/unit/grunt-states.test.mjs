@@ -22,11 +22,11 @@ function fixture() {
     time: 1,
     perfectZone: () => 0.78,
     pet: 'none',
-    sounds: {
-      bell: () => trace.push('bell'),
-      feint: () => trace.push('feint'),
-      bark: () => trace.push('bark'),
-    },
+    events: { emit(name, event) {
+      assert.equal(name, 'gruntCue');
+      assert.ok(['bell', 'feint', 'bark'].includes(event.kind));
+      trace.push(event.kind);
+    } },
     foxSave: () => trace.push('fox'),
     playerDie: death.phase.playerDie,
     position,

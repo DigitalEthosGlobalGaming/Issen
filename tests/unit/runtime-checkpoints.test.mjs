@@ -35,7 +35,7 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
           time: tick * 0.02,
           perfectZone: () => 0.78,
           pet: 'none',
-          sounds: { bell() {}, feint() {}, bark() {} },
+          events: session.views.events,
           foxSave() {},
           playerDie() {
             assert.fail('fixture must offer a playable opening');
