@@ -111,6 +111,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/purchases.ts` owns guarded purchase refresh and supporter controls.
 
+`ui/wiring/cinematic.ts` owns viewer session/grade state and callbacks.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

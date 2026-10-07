@@ -1,3 +1,4 @@
+import { createCinematicWiring } from './ui/wiring/cinematic.ts';
 import { bindPurchaseWiring } from './ui/wiring/purchases.ts';
 import { createInputWiring } from './ui/wiring/input.ts';
 import { createArmoryWiring } from './ui/wiring/armory.ts';
@@ -2798,69 +2799,12 @@ export function startGame(
   });
   const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
   function refreshArmoryNew() { armoryWiring.refreshArmoryNew(); }
-  let cinematicStage = 0;
-  let cinematicStageSeed = stageSeed;
-  let cinematicFilm = EQ.film;
-  function previewStage(stage: number, newVisit = true) {
-    if (newVisit) stageSeed = previewVisits.enter(stage, true);
-    environmentState.previewDemon = stage === STAGES.length;
-    G.stage = environmentState.previewDemon ? 0 : stage;
-    buildLeaves();
-    MIST = environmentState.previewDemon ? [80, 66, 85] : STAGES[stage]!.fog;
-    palette.clearFog();
-    environmentState.prevBg = null;
-    environmentState.stageFade = 0;
-    buildBG();
-    buildMist();
-    buildGrass();
-    buildWeather(false);
-    Object.assign(
-      environmentState.cinematicWeather,
-      createWeatherState(() => 0.5),
-    );
-    prepareScene();
-    if (newVisit) setupAttract();
-  }
-  const cinematic = createCinematic($('app'), {
-    canOpen: () => G.state === 'title' && !G.panel,
-    stage: () => G.stage,
-    scenes: [...STAGES.map((stage) => stage.n), 'Demon'],
-    bindings: () => settings.bindings,
-    film: () => EQ.film,
-    films: () =>
-      ITEMS.filter((item) => item.type === 'film' && accessible(item.id) && UNL.has(item.id)),
-    enter(stage) {
-      if (recordSecretEvent(ST, { kind: 'cinematic' })) saveStats();
-      if (reconcileCinematicCompanion(ST, UNL)) {
-        store.set('issen.unlocks', [...UNL]);
-        toast({ k: '石', msg: 'Unlocked: Mystic Rock companion' });
-      }
-      cinematicStage = G.stage;
-      cinematicStageSeed = stageSeed;
-      cinematicFilm = EQ.film;
-      previewStage(stage);
-    },
-    scene: previewStage,
-    leave: () => {
-      cvs.dataset.debris = 'sprites';
-      stageSeed = cinematicStageSeed;
-      previewStage(cinematicStage, false);
-      setupAttract();
-    },
-    grade: (value) => {
-      cinematicFilm = value;
-    },
+  const { cinematic, sceneFilm, previewStage } = createCinematicWiring({
+    $, G, previewVisits, environmentState, buildLeaves, palette, buildBG, buildMist, buildGrass, buildWeather, prepareScene, setupAttract, settings, ITEMS, accessible, UNL, saveStats, toast, cvs, lifecycle,
+    get EQ() { return EQ; }, get ST() { return ST; },
+    get stageSeed() { return stageSeed; }, set stageSeed(value) { stageSeed = value; },
+    get MIST() { return MIST; }, set MIST(value) { MIST = value; },
   });
-  lifecycle.add(cinematic.dispose);
-  const logo = document.querySelector<HTMLElement>('#title .t-k')!;
-  lifecycle.listen(logo, 'keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      event.stopPropagation();
-      cinematic.open();
-    }
-  });
-  const sceneFilm = () => (cinematic.active ? cinematicFilm : EQ.film);
   const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
     G, ST, UNL, audioInit, tn, sfx, flash, saveStats, checkUnlocks, toast,
   }));
