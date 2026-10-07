@@ -11,9 +11,6 @@ const PBR_SOURCES = {
   surface: new URL('./assets/player-pbr/player-ronin-simple_surface.png', import.meta.url).href,
   diffuse: new URL('./assets/player-pbr/player-ronin-simple_diffuse.png', import.meta.url).href,
   normal: new URL('./assets/player-pbr/player-ronin-simple_normal.png', import.meta.url).href,
-  roughness: new URL('./assets/player-pbr/player-ronin-simple_roughness.png', import.meta.url).href,
-  metallic: new URL('./assets/player-pbr/player-ronin-simple_metallic.png', import.meta.url).href,
-  ao: new URL('./assets/player-pbr/player-ronin-simple_ao.png', import.meta.url).href,
   emissive: new URL('./assets/player-pbr/player-ronin-simple_emissive.png', import.meta.url).href,
 };
 type Part = 'body' | 'head' | 'arms';

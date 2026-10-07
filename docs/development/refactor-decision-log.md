@@ -9,3 +9,4 @@
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
+- 2026-10-07 — W1 loader — require prepacked surface data and omit scalar URLs from runtime catalogs and player/enemy loaders — retaining main-thread scalar packing — all 86 families have validated packed surfaces; runtime no longer needs separate scalar files — revert the loader preparation commit.

@@ -56,9 +56,6 @@ const PBR_SOURCES = {
     surface: new URL('./assets/enemy-pbr/enemy-ronin-simple_surface.png', import.meta.url).href,
     diffuse: new URL('./assets/enemy-pbr/enemy-ronin-simple_diffuse.png', import.meta.url).href,
     normal: new URL('./assets/enemy-pbr/enemy-ronin-simple_normal.png', import.meta.url).href,
-    roughness: new URL('./assets/enemy-pbr/enemy-ronin-simple_roughness.png', import.meta.url).href,
-    metallic: new URL('./assets/enemy-pbr/enemy-ronin-simple_metallic.png', import.meta.url).href,
-    ao: new URL('./assets/enemy-pbr/enemy-ronin-simple_ao.png', import.meta.url).href,
     emissive: new URL('./assets/enemy-pbr/enemy-ronin-simple_emissive.png', import.meta.url).href,
   },
   clothing: {
@@ -67,11 +64,6 @@ const PBR_SOURCES = {
     diffuse: new URL('./assets/enemy-pbr/enemy-clothing-variants_diffuse.png', import.meta.url)
       .href,
     normal: new URL('./assets/enemy-pbr/enemy-clothing-variants_normal.png', import.meta.url).href,
-    roughness: new URL('./assets/enemy-pbr/enemy-clothing-variants_roughness.png', import.meta.url)
-      .href,
-    metallic: new URL('./assets/enemy-pbr/enemy-clothing-variants_metallic.png', import.meta.url)
-      .href,
-    ao: new URL('./assets/enemy-pbr/enemy-clothing-variants_ao.png', import.meta.url).href,
     emissive: new URL('./assets/enemy-pbr/enemy-clothing-variants_emissive.png', import.meta.url)
       .href,
   },
@@ -79,10 +71,6 @@ const PBR_SOURCES = {
     surface: new URL('./assets/enemy-pbr/enemy-headwear-atlas_surface.png', import.meta.url).href,
     diffuse: new URL('./assets/enemy-pbr/enemy-headwear-atlas_diffuse.png', import.meta.url).href,
     normal: new URL('./assets/enemy-pbr/enemy-headwear-atlas_normal.png', import.meta.url).href,
-    roughness: new URL('./assets/enemy-pbr/enemy-headwear-atlas_roughness.png', import.meta.url)
-      .href,
-    metallic: new URL('./assets/enemy-pbr/enemy-headwear-atlas_metallic.png', import.meta.url).href,
-    ao: new URL('./assets/enemy-pbr/enemy-headwear-atlas_ao.png', import.meta.url).href,
     emissive: new URL('./assets/enemy-pbr/enemy-headwear-atlas_emissive.png', import.meta.url).href,
   },
   variationHeads: {
@@ -91,11 +79,6 @@ const PBR_SOURCES = {
     diffuse: new URL('./assets/enemy-pbr/enemy-headwear-variants_diffuse.png', import.meta.url)
       .href,
     normal: new URL('./assets/enemy-pbr/enemy-headwear-variants_normal.png', import.meta.url).href,
-    roughness: new URL('./assets/enemy-pbr/enemy-headwear-variants_roughness.png', import.meta.url)
-      .href,
-    metallic: new URL('./assets/enemy-pbr/enemy-headwear-variants_metallic.png', import.meta.url)
-      .href,
-    ao: new URL('./assets/enemy-pbr/enemy-headwear-variants_ao.png', import.meta.url).href,
     emissive: new URL('./assets/enemy-pbr/enemy-headwear-variants_emissive.png', import.meta.url)
       .href,
   },
