@@ -427,3 +427,8 @@ Renderer composition/preparation is passed as a plain frame capability; the owne
 retains stale-request suppression, scene identity, presentation acknowledgement,
 paused encounter adoption and frame-clock reset. It imports no renderer/presentation
 implementation.
+
+Parry, boss-victory and standoff profile reactions are owned by
+game/progression/encounter-listeners.ts. Boss events project completion flags and
+counts; listeners resolve current disposable/main statistics and never receive
+run state or gameplay RNG. Rule-owned persistence follows their synchronous updates.

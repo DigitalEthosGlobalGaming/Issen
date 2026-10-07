@@ -177,3 +177,5 @@
 2026-10-08 — W2/profile rules — physically extract root reward/challenge/blade-stat/unlock helpers to progression ownership — leaving profile policy in root considered — explicit current views preserve disposable daily/trial statistics, terminal-only unlock ordering and reveals; strict/357 units and 18 live cases pass — revert this physical move commit.
 
 2026-10-08 — W2/scene flow — physically move preparation/readiness/continuation orchestration to a session owner with renderer ports — resuming encounters from drawing considered — preserve presentation acknowledgement, stale async request guards, paused adoption and clock reset; strict/357 units and ten live cases pass — revert this physical move commit.
+
+2026-10-08 — W2/encounter progression — move parry/boss/standoff profile counter reactions behind value events — retaining profile writes in combat controllers considered — current-view listeners preserve trial/profile isolation; boss/standoff rules commit run mutations then emit before save; strict/359 units and 16 live cases pass — revert this listener split commit.

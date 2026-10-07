@@ -50,7 +50,16 @@ export interface GameEvents {
   waveStarted: Readonly<{ wave: number; stage: number }>;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
   bossStarted: Readonly<{ boss: string; count: number }>;
-  bossDefeated: Readonly<{ boss: string; count: number }>;
+  bossDefeated: Readonly<{
+    boss: string;
+    count: number;
+    clean: boolean;
+    mirror: boolean;
+    mode: string;
+    rush: boolean;
+    blade: boolean;
+    bossesSlain: number;
+  }>;
   standoffResolved: Readonly<{ won: boolean; perfect: boolean }>;
   comboChanged: Readonly<{ combo: number; maximum: number; zen?: boolean }>;
   comboBroken: Readonly<{ previous: number }>;

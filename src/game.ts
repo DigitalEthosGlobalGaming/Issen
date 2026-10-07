@@ -1,3 +1,4 @@
+import { bindEncounterProgression } from './game/progression/encounter-listeners.ts';
 import { createSceneFlow } from './game/session/scene-flow.ts';
 import { createProfileRules } from './game/progression/profile-rules.ts';
 import { createActiveEquipment } from './game/equipment/active.ts';
@@ -1456,6 +1457,7 @@ export function startGame(
   lifecycle.add(
     bindCombatProgression(context.events, () => ({ ST, bst, challenge, checkUnlocks })),
   );
+  lifecycle.add(bindEncounterProgression(context.events, () => ({ ST, bst, challenge })));
   lifecycle.add(bindKillFeedback(context.events, readKillViews));
   lifecycle.add(bindCombatScoreFeedback(context.events, () => ({ setScore, pop, W, H })));
   function killEnemy(

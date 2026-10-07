@@ -236,7 +236,6 @@ export function createBossPhase<Context>(
     letterbox(0.3);
     G.combo++;
     G.parries++;
-    ST.parries++;
     guided.bossParried();
     bumpCombo();
     addScore(Math.round(60 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05);
@@ -434,32 +433,27 @@ export function createBossPhase<Context>(
         G.bossesSlain++;
         earn('boss');
         views.runBossMilestone = Math.max(views.runBossMilestone, G.bossCount);
-        ST.duels++;
-        if (G.rush) {
-          ST.rushBest = Math.max(ST.rushBest || 0, G.bossesSlain);
-          if (G.blade) ST.rushBlade = (ST.rushBlade || 0) + 1;
-        }
-        {
-          const q = bst();
-          if (q) q.d++;
-          challenge('d');
-        }
-        if (G.mode === 'ronin') ST.roninDuels++;
-        if (b.def.mirror) recordSecretEvent(ST, { kind: 'mirrorVictory', clean: !b.failed });
         if (G.bless.has('breath') && !G.zen && !G.hard && G.lives < G.maxLives) {
           G.lives++;
           renderLives();
           pop(W / 2, H * 0.5, '息 +1 life', Math.max(20, 24 * S));
         }
-        if (!b.failed) ST.cleanDuels++;
-        if (G.blade) ST.bladeDuels++;
         G.state = 'between';
         G.afterBoss = true;
         G.nextT = 2.2;
         showBossBar(false);
         inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
         bossStain(p);
-        views.events.emit('bossDefeated', { boss: b.def.v, count: G.bossCount });
+        views.events.emit('bossDefeated', {
+          boss: b.def.v,
+          count: G.bossCount,
+          clean: !b.failed,
+          mirror: !!b.def.mirror,
+          mode: G.mode,
+          rush: G.rush,
+          blade: G.blade,
+          bossesSlain: G.bossesSlain,
+        });
         saveStats();
         checkUnlocks();
       } else {

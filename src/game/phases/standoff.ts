@@ -338,9 +338,6 @@ export function createStandoffPhase<Context>(
       G.combo++;
       bumpCombo();
       G.kills++;
-      ST.kills++;
-      ST.standoffs++;
-      challenge('k');
       earn('kill');
       addScore(
         Math.round(1000 * comboMult() * G.m.standoff),
@@ -349,9 +346,9 @@ export function createStandoffPhase<Context>(
         '挑',
         Math.max(22, 28 * S),
       );
+      views.events.emit('standoffResolved', { won: true, perfect: true });
       saveStats();
       checkUnlocks();
-      views.events.emit('standoffResolved', { won: true, perfect: true });
     } else {
       swingPlayer(dir);
       sfx.whoosh();

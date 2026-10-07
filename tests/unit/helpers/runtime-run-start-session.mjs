@@ -1,3 +1,4 @@
+import { bindEncounterProgression } from '../../../src/game/progression/encounter-listeners.ts';
 import { createEventBus } from '../../../src/game/events.ts';
 import { createRunStart } from '../../../src/game/session/run-start.ts';
 import { createRunState } from '../../../src/game/run-state.ts';
@@ -104,6 +105,7 @@ export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, star
     buildLeaves() {},
     waveCfg: (wave) => waveConfig(wave, G.mode, G.m),
   };
+  bindEncounterProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {} }));
   const flow = createRunStart(views);
   if (start) flow.startRun();
   return { run: G, random: views.runRandom, views, flow, trace, weather };
