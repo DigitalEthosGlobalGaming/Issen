@@ -56,7 +56,8 @@ after drawing; presentation cannot commit pending gameplay continuations.
 projection, with gameplay updates kept in rule owners. `presentation/environment.ts` owns ambient factories, cached grass variants and
 leaf/weather drawing. Hazard simulation remains separate.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
-and drawing, with explicit sound/flash ports and no run record.
+and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and
+weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
 `presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
 separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
 owns cosmetic clocks, effects and camera/flash/letterbox signals; hit-stop and run

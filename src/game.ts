@@ -145,7 +145,6 @@ import {
 import { parseSettings, preferenceEnabled, sensitivityScale } from './platform/settings.ts';
 import { createCinematic } from './ui/screens/cinematic.ts';
 import { createOptions } from './ui/screens/options.ts';
-import { updateEffects } from './rendering/effects/update.ts';
 import { shrineOffers, applyBlessing, crossroadsCurse } from './game/shrine/blessings.ts';
 import {
   startBlessingWave,
@@ -1138,9 +1137,14 @@ export function startGame(
     if (UNL.size !== before) refreshArmoryNew();
   }
   const {
+    flash, letterbox, punch, weatherBurst, killFx, updateFx,
     pop, stamp, effectSpawner, addSlash, inkBurst, scraps, ring, sparks, dust,
     effectRenderer, drawFx, drawFx2, drawStains, drawPops, drawStamps,
-  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite,R,density,flash,sfx,W,H,portrait }));
+  } = createFeedbackPresentation(() => ({ g,fx: presentationState.fx,S,time: presentationState.time,FONT,SEAL,mistSprite,R,density,sfx,W,H,portrait,
+    state: presentationState, reducedFlashes, reducedMotion,
+    weather: STAGES[G.stage]!.weather, newLeaf, leaves,
+    killEffect: () => accessible(EQ.fx) ? EQ.fx : 'ink', clink: () => sfx.clink(),
+  }));
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     pts = gain(pts);
     G.score += pts;
@@ -1150,20 +1154,6 @@ export function startGame(
     } else pop(x, y, (label ? label + ' ' : '') + '+' + pts, size);
     return pts;
   }
-  function flash(a: number, col?: string) {
-    presentationState.flashA = Math.max(presentationState.flashA, reducedFlashes() ? Math.min(a, 0.035) : a);
-    presentationState.flashCol = col || '255,255,255';
-  }
-  function letterbox(d: number) {
-    presentationState.lbT = Math.max(presentationState.lbT, d);
-  }
-  function punch(z: number, x: number, y: number) {
-    if (reducedMotion()) return;
-    presentationState.zoom = Math.max(presentationState.zoom, z);
-    presentationState.zoomX = x;
-    presentationState.zoomY = y;
-  }
-
   /* ---------------- enemies ---------------- */
   function enemyPos(e: Enemy) {
     return enemyPosition(e, L, W, H);
@@ -1858,82 +1848,6 @@ export function startGame(
       }
     }
     checkUnlocks();
-  }
-  function weatherBurst(cx: number, cy: number, sc: number) {
-    const w = STAGES[G.stage]!.weather;
-    if (w === 'rain' || w === 'storm') {
-      for (let i = 0; i < scaledCount(16, density()); i++) {
-        const a = R() * TAU,
-          sp = (120 + R() * 260) * sc;
-        presentationState.fx.splash.push({
-          x: cx,
-          y: cy,
-          vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - 80 * sc,
-          t: 0,
-          life: 0.4 + R() * 0.3,
-          c: '215,220,225',
-        });
-      }
-    } else if (w === 'snow') {
-      for (let i = 0; i < scaledCount(22, density()); i++) {
-        const a = R() * TAU,
-          sp = (60 + R() * 200) * sc;
-        presentationState.fx.splash.push({
-          x: cx,
-          y: cy,
-          vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - 60 * sc,
-          t: 0,
-          life: 0.8 + R() * 0.6,
-          c: '246,244,238',
-          drift: 1,
-        });
-      }
-      dust(cx, cy + 30 * sc, 60 * sc);
-    } else if (w === 'sakura') {
-      for (let i = 0; i < scaledCount(14, density()); i++) {
-        const a = R() * TAU,
-          sp = (60 + R() * 240) * sc;
-        presentationState.fx.petals.push({
-          x: cx,
-          y: cy,
-          vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - 100 * sc,
-          rot: R() * TAU,
-          vr: (R() - 0.5) * 10,
-          s: (2 + R() * 2.5) * sc,
-          t: 0,
-          life: 1.4 + R() * 0.8,
-        });
-      }
-    } else if (w === 'smoke') {
-      for (let i = 0; i < scaledCount(14, density()); i++)
-        presentationState.fx.embers.push({
-          x: cx + (R() - 0.5) * 30 * sc,
-          y: cy,
-          vx: (R() - 0.5) * 140 * sc,
-          vy: -(80 + R() * 200) * sc,
-          t: 0,
-          life: 0.7 + R() * 0.8,
-          ph: R() * TAU,
-        });
-    } else if (w !== 'night') {
-      for (let i = 0; i < scaledCount(8, density()); i++) {
-        const l = newLeaf(false);
-        l.x = cx + (R() - 0.5) * 40 * sc;
-        l.y = cy + (R() - 0.5) * 40 * sc;
-        l.z = 1.3 + R() * 0.6;
-        l.s = (3 + R() * 4) * l.z * S;
-        l.gust = 1;
-        l.col = 'rgba(24,23,21,.85)';
-        leaves.push(l);
-      }
-    }
-  }
-  function killFx(cx: number, cy: number, ang: number, sc: number) {
-    weatherBurst(cx, cy, sc);
-    effectSpawner().killFx(accessible(EQ.fx) ? EQ.fx : 'ink', cx, cy, ang, sc);
   }
   function swingPlayer(dir: Direction | 'block', perfect = false) {
     if (EQ.blade === 'koken' && G.state !== 'title') sfx.hum();
@@ -3854,15 +3768,6 @@ export function startGame(
   }
 
   /* ---------------- update ---------------- */
-  function updateFx(dt: number, raw: number) {
-    updateEffects(presentationState.fx, dt, raw, {
-      scale: S,
-      wind: presentationState.wind,
-      time: presentationState.time,
-      random: R,
-      onSwordStuck: () => sfx.clink(),
-    });
-  }
   function updatePlayer(dt: number) {
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }

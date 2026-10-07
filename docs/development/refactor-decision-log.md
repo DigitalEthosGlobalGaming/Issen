@@ -66,6 +66,8 @@
 
 - 2026-10-08 — W2 cosmetic state — consolidate twelve cosmetic fields in presentation/state.ts, using symbol-aware reference rewriting and direct context state/camera references — copying values or maintaining closure getter bridges — preserves shared identity, clocks and visual RNG while leaving gameplay hit-stop/time scale and checkpoint records untouched; fourteen affected browser cases pass — revert the cosmetic-state ownership commit.
 
+- 2026-10-08 — W2 feedback actions move — give feedback flash/camera/letterbox actions, effect updates and weather/cut bursts with selected effect/weather values and leaf/sound ports — passing RunState or gameplay RNG — enables rule listeners to request cosmetic reactions without changing rule ownership; actual death/shadow/scattered effects and saves pass — revert the feedback-actions move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
