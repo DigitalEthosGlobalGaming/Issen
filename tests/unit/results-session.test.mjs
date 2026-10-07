@@ -114,3 +114,23 @@ test('disposed async support flow grants no currency or revival after its awaite
   assert.equal(runtime.run.state, 'dead');
   assert.equal(runtime.run.secondWindUsed, false);
 });
+
+test('a failed first support save restores an absent identity marker and remains retryable', async () => {
+  const { views, flow } = fixture();
+  assert.equal(Object.hasOwn(views.META, 'supportRewardClaim'), false);
+  views.rewardScreen.offer = async () => true;
+  const pending = {
+    id: '01234567-0123-4567-89ab-0123456789ab',
+    hundredths: 500,
+    reward: { before: 0, after: 2, gained: 2 },
+  };
+  const before = structuredClone(views.META);
+  views.saveMeta = () => false;
+  assert.equal(await flow.claimEmberBonus(pending), null);
+  assert.deepEqual(views.META, before);
+  views.saveMeta = () => true;
+  assert.equal((await flow.claimEmberBonus(pending)).gained, 7);
+  const balance = views.META.embers;
+  assert.equal(await flow.claimEmberBonus(pending), null);
+  assert.equal(views.META.embers, balance);
+});

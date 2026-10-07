@@ -310,6 +310,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
     if (!bonus) return null;
     if (!saveMeta()) {
       Object.assign(META, before);
+      if (!Object.hasOwn(before, 'supportRewardClaim')) delete META.supportRewardClaim;
       toast({ k: '!', msg: 'Reward could not be saved. Please try again.' });
       return null;
     }
