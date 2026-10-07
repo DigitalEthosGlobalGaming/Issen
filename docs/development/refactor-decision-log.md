@@ -122,6 +122,8 @@
 
 - 2026-10-08 — W2 trial session move — keep disposable trial entry/completion and profile restoration together behind explicit mutable ports — combine it with persistent run rewards or leave closure-based completion — strict, all 306 units and sixteen live trial/mastery cases pass; actual entry/session/boss composition has three focused cases — revert this trial-session physical move.
 
+- 2026-10-08 — W2 shrine move — put offer, reroll and blessing choice rules behind one phase API while retaining menu rendering ports — leave choice mutations in UI callbacks — strict, all 309 units, three API scenarios and seventeen live blessing/mastery/save cases pass; seeded choice driver uses the production API — revert the shrine move and scenario migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

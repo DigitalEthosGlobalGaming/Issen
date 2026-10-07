@@ -40,21 +40,20 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: disposable trial encounter entry and completion now belong to
-`src/game/session/trials.ts`. Actual run-entry/trial/boss APIs are composed in three
-new headless cases covering one persistent completion reward/profile restoration,
-failed seeded retry and twenty-exchange Duel Master initialization. Strict types
-passed; all 306 units passed (trial-session-final-unit.log); the composed helper
-refinement subsequently passed all three focused trial-session cases.
-`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts --config playwright.rendering-v2.config.ts`:
-all sixteen passed (trial-session-browser.log; terminal confirmed).
-Next move shrine/death controllers, then live router dispatch preserving common
-boss dying updates and same-frame between/dead cascades. Full W2/W3/Part 4 remain
-pending; develop stays unpushed. Boss checkpoint f350035: strict, 303 units, three
-actual input/reward cases, four real seeded boss patterns and twenty browser cases
-passed. Initial browser run had a stale injected parry name; migrated it to the
-actual controller and reran unchanged assertions (boss-browser-retry.log).
-Standoff checkpoint fa674bf: strict, 300 units and five browser cases passed.
+Latest checkpoint: shrine offer/reroll/pick/blessing application now belong to
+`src/game/phases/shrine.ts`; menu rendering calls its pick API. Three actual API
+cases cover valid saved offers, one choice/next-step, access/charge-gated reroll
+and no-shrine advance. Seeded shrine choices now use the real controller.
+Strict types passed; all 309 units passed (shrine-final-unit.log).
+`npx playwright test tests/browser/new-blessings.spec.ts tests/browser/editions-mastery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
+all seventeen passed (shrine-browser.log; terminal confirmed). No gameplay change.
+Next move damage/death/revival controller and death update, then live router
+dispatch preserving common boss dying updates and same-frame between/dead
+cascades. Results/reward-screen orchestration remains in the closure for a later
+session/UI owner move. Full W2/W3/Part 4 remain pending; develop stays unpushed.
+Prior checkpoints: trials 523b4fd (306 units, 16 browser cases), boss f350035
+(303 units, 20 browser cases), standoff fa674bf (300 units, five browser cases).
+Logs trial-session-*, boss-browser-retry and standoff-* retain exact results.
 
 Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
 passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave

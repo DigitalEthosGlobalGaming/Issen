@@ -1,3 +1,4 @@
+import { shrinePhaseFixture } from './helpers/runtime-shrine-phase.mjs';
 import { bossPhaseFixture } from './helpers/runtime-boss-phase.mjs';
 import { standoffPhaseFixture } from './helpers/runtime-standoff-phase.mjs';
 import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
@@ -310,19 +311,13 @@ test('standoff, shrine, death and result settlement complete without double rewa
   standoff.phase.update(standoff.views, 1.5);
   assert.equal(nextWave, 1);
   assert.equal(run.so, null);
-  run.state = 'shrine';
   run.bossCount = 2;
-  const before = JSON.stringify({ ...run, bless: [...run.bless] }),
-    offers = shrineOffers(run, random.next);
+  const shrine = shrinePhaseFixture(runtime);
+  shrine.phase.openShrine();
+  const offers = shrine.offers;
   assert.ok(offers.length > 0);
   assert.equal(new Set(offers.map((o) => o.id)).size, offers.length);
-  assert.equal(
-    JSON.stringify({ ...run, bless: [...run.bless] }),
-    before,
-    'offer generation cannot mutate run',
-  );
-  run.bless.add(offers[0].id);
-  applyBlessing(run, offers[0].id, random.next);
+  shrine.phase.pick(offers[0]);
   assert.ok(run.bless.has(offers[0].id));
   run.bless.clear();
   run.lives = 1;

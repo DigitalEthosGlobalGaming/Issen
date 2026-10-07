@@ -333,3 +333,6 @@ resolution, with explicit figure/feedback ports and plain checkpoint records.
 `game/phases/boss.ts` owns duel entry, timed updates, parry/block and cut resolution.
 Raw-time dying cleanup remains callable before phase dispatch; layout, UI and
 feedback use explicit ports. Seeded boss-pattern scenarios call this owner.
+
+`game/phases/shrine.ts` owns offer generation, gated rerolls and blessing choices.
+Shrine menu wiring invokes its choice API; checkpoint keys/order remain unchanged.

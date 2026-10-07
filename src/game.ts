@@ -1,3 +1,4 @@
+import { createShrinePhase } from './game/phases/shrine.ts';
 import { createTrialSession } from './game/session/trials.ts';
 import { createBossPhase } from './game/phases/boss.ts';
 import { createStandoffPhase } from './game/phases/standoff.ts';
@@ -2016,18 +2017,34 @@ export function startGame(
     G.combo = G.bless && G.bless.has('banner') && G.combo >= 10 ? 10 : 0;
     if (G.combo < previous) recordComboBreak(G, previous);
   }
+  const shrinePhase = createShrinePhase<GameContext<PresentationContext>>(() => ({
+    G,
+    ST,
+    combatRandom,
+    renderLives,
+    toast,
+    nextStep,
+    captureCheckpoint,
+    showShrineOffers,
+    premiumAccess,
+    saveStats,
+    computeMods,
+    checkUnlocks,
+    hud,
+    showScreen,
+    sfx,
+    resetKnocks: () => {
+      knocks = 0;
+    },
+    get shrineOfferIds() {
+      return shrineOfferIds;
+    },
+    set shrineOfferIds(value) {
+      shrineOfferIds = value;
+    },
+  }));
   function applyPick(id: string) {
-    const extras = applyBlessing(G, id, combatRandom);
-    if (id === 'crossroads') {
-      const curse = crossroadsCurse(G, combatRandom);
-      if (curse) {
-        ST.curses++;
-        toast({ k: curse.k, msg: `Crossroads curse: ${curse.n}` });
-      }
-    }
-    renderLives();
-    if (extras.length)
-      toast({ k: '双', msg: 'Twin blessing: ' + extras.map((b) => b.n).join(' and ') });
+    shrinePhase.applyPick(id);
   }
   lifecycle.listen($('oScore'), 'click', (e) => {
     e.stopPropagation();
@@ -2052,47 +2069,13 @@ export function startGame(
     }
   });
   function openShrine() {
-    knocks = 0;
-    if (G.m.noShrine) {
-      nextStep();
-      return;
-    }
-    const opts = shrineOffers(G, combatRandom);
-    if (!opts.length) {
-      nextStep();
-      return;
-    }
-    G.state = 'shrine';
-    shrineOfferIds = opts.map((bl) => bl.id);
-    captureCheckpoint();
-    showShrineOffers(opts);
+    shrinePhase.openShrine();
   }
-  lifecycle.listen($('bRerollShrine'), 'click', () => {
-    if (G.state !== 'shrine' || G.shrineRerolls < 1 || !premiumAccess()) return;
-    const opts = shrineOffers(G, combatRandom);
-    if (!opts.length) return;
-    G.shrineRerolls--;
-    shrineOfferIds = opts.map((bl) => bl.id);
-    captureCheckpoint();
-    showShrineOffers(opts);
-  });
+  lifecycle.listen($('bRerollShrine'), 'click', () => shrinePhase.reroll());
   function showShrineOffers(opts: (typeof BLESS)[number][]) {
     ($('bRerollShrine') as HTMLButtonElement).hidden = G.shrineRerolls < 1 || !premiumAccess();
     renderShrine($('blessList'), opts, (bl) => {
-      if (G.state !== 'shrine') return;
-      G.bless.add(bl.id);
-      applyPick(bl.id);
-      if (bl.t === 1) ST.rares++;
-      if (bl.t === 2) ST.curses++;
-      ST.shrines++;
-      saveStats();
-      computeMods();
-      checkUnlocks();
-      hud(true);
-      showScreen(null);
-      sfx.unlock();
-      shrineOfferIds = null;
-      nextStep();
+      shrinePhase.pick(bl);
     });
     showScreen('shrine');
     sfx.drum();
