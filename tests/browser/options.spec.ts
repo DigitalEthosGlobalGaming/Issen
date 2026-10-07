@@ -60,6 +60,10 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  // Freeze an established encounter; pending scene entry intentionally commits
+  // its wave/checkpoint while preserving pause (covered by scene-readiness).
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready');
+  await expect.poll(() => page.evaluate(() => !!(window as any).__optionsHarness.G.cfg)).toBe(true);
   await page.keyboard.press('p');
   await page.locator('#bPauseOptions').click();
   const snapshot = () =>

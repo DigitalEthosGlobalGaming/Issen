@@ -20,6 +20,23 @@ Latest combined broad: `npx playwright test --config playwright.rendering-v2.con
 all 254 passed in 13.5m (phase-bindings-broad.log; terminal exit 0 confirmed),
 covering seven-phase binding plus the checkpoint continuation fix.
 
+## Subsequent combined verification and corrected fixture
+
+`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+253 pass and one paused Options snapshot failure in 14.0m
+(standoff-bindings-broad.log; terminal exit 1). The scene continuation completed
+initial wave entry after pause, producing a checkpoint and advancing RNG.
+Controlled actual renderer completion on unchanged pre-refactor reproduces that
+exact snapshot failure (paused-options-baseline.log; exit 1 at equality assertion).
+The fixture now awaits scene ready and a wave configuration before freezing an
+established encounter. Original invariance assertions and timing remain unchanged;
+intentional paused scene adoption remains covered by scene-readiness.
+`npm run typecheck`: pass (options-fixture-typecheck.log).
+`npx playwright test tests/browser/options.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 14 pass in 1.2m (options-fixture-browser.log; terminal exit 0 confirmed).
+Next: apply strictly verified frame/startup ownership draft, run strict/full units
+and affected live browser checks, then actual-API scenario draft and new broad run.
+
 ## Completed ownership and important evidence
 
 W1 is complete and committed (5406e90). Layout-preserving compact planes,
@@ -51,7 +68,7 @@ report: reaction ordering, first support retry, same-scene continue bug fix.
 
 ## Resume here; all remaining work is required
 
-Run the combined broad browser suite for all recent bindings and feedback changes, then consolidate remaining composition owners and scenario API coverage.
+Apply the strictly verified frame/startup ownership draft, then strict/full units and affected browser checks. Apply the verified actual-API scenario draft separately and run new combined broad verification.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. Except owners described above,
 they are unapplied and have no live coverage. Regenerate each from current source
