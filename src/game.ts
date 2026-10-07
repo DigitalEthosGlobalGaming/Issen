@@ -1,3 +1,4 @@
+import { createSceneFlow } from './game/session/scene-flow.ts';
 import { createProfileRules } from './game/progression/profile-rules.ts';
 import { createActiveEquipment } from './game/equipment/active.ts';
 import { createPlayerFigures } from './presentation/player-figures.ts';
@@ -829,50 +830,34 @@ export function startGame(
   let requestedSceneKey = '';
   let requestedSceneIdentity = '';
   let sceneContinuation: (() => void) | undefined;
-  function prepareScene() {
-    const frame = {
-      stageSeed,
-      width: W,
-      height: H,
-      dpr: DPR,
-      time: presentationState.time,
-      stage: G.stage,
-      reducedMotion: reducedMotion(),
-      reducedFlashes: reducedFlashes(),
-      lowQuality: density() <= 0.3,
-    };
-    const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
-    const key = `${demon}:${compositionKey(frame)}`;
-    if (key === requestedSceneKey) return;
-    requestedSceneKey = key;
-    const request = ++sceneRequest;
-    const identity = `${demon}:${G.stage}:${stageSeed}`;
-    if (identity !== requestedSceneIdentity) sceneContinuation = undefined;
-    requestedSceneIdentity = identity;
-    sceneLoading = true;
-    sceneReadyToPresent = false;
-    cvs.dataset.sceneState = 'loading';
-    screenAnimation.invalidate();
-    const pending = demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame);
-    void pending
-      .then((ready) => {
-        if (lifecycle.disposed || request !== sceneRequest) return;
-        if (!ready) {
-          cvs.dataset.sceneState = 'unavailable';
-          return;
-        }
-        sceneReadyToPresent = true;
-        screenAnimation.invalidate();
-      })
-      .catch(() => {
-        if (!lifecycle.disposed && request === sceneRequest) cvs.dataset.sceneState = 'unavailable';
-      });
-  }
-  function deferUntilSceneReady(action: () => void) {
-    if (!sceneLoading) return false;
-    sceneContinuation = action;
-    return true;
-  }
+  const sceneFlow = createSceneFlow(() => ({
+    stageSeed,
+    W,
+    H,
+    DPR,
+    presentationState,
+    G,
+    reducedMotion,
+    reducedFlashes,
+    density,
+    activeTrial,
+    environmentState,
+    compositionKey,
+    cvs,
+    screenAnimation,
+    demonRealmRenderer,
+    environmentRenderer,
+    lifecycle,
+    frameLoop,
+    get requestedSceneKey() { return requestedSceneKey; }, set requestedSceneKey(value) { requestedSceneKey = value; },
+    get sceneRequest() { return sceneRequest; }, set sceneRequest(value) { sceneRequest = value; },
+    get requestedSceneIdentity() { return requestedSceneIdentity; }, set requestedSceneIdentity(value) { requestedSceneIdentity = value; },
+    get sceneContinuation() { return sceneContinuation; }, set sceneContinuation(value) { sceneContinuation = value; },
+    get sceneLoading() { return sceneLoading; }, set sceneLoading(value) { sceneLoading = value; },
+    get sceneReadyToPresent() { return sceneReadyToPresent; }, set sceneReadyToPresent(value) { sceneReadyToPresent = value; },
+  }));
+  function prepareScene() { return sceneFlow.prepareScene(); }
+  function deferUntilSceneReady(action: () => void) { return sceneFlow.deferUntilSceneReady(action); }
   const notifications = createNotifications($('hint'), $('toast'), () => sfx.unlock());
   const runResults = createRunResults($('over'), () => sfx.reveal(), reducedMotion);
   function hint(key: string, text: string, dur = 3500) {
@@ -2580,22 +2565,7 @@ export function startGame(
     drawPost,
   }));
   // Scene-ready continuation belongs to orchestration, never to a drawing call.
-  function settlePresentedScene() {
-    if (sceneLoading && sceneReadyToPresent) {
-      sceneLoading = false;
-      sceneReadyToPresent = false;
-      cvs.dataset.sceneState = 'ready';
-      const continuation = sceneContinuation;
-      sceneContinuation = undefined;
-      const paused = G.state === 'paused';
-      continuation?.();
-      if (paused && G.state !== 'paused') {
-        G.pausedFrom = G.state;
-        G.state = 'paused';
-      }
-      frameLoop.resetClock();
-    }
-  }
+  function settlePresentedScene() { return sceneFlow.settlePresentedScene(); }
   const frameLoop = createFrameLoop(
     {
       get hitStop() {

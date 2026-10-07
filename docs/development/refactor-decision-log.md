@@ -175,3 +175,5 @@
 2026-10-08 — W2/active equipment — physically extract awakening eligibility and modifier composition from root — keeping equipment policy in composition considered — narrow current views retain trial isolation and title/run upgrade behavior, without rendering dependencies; strict/357 units and 12 live cases pass — revert this ownership commit.
 
 2026-10-08 — W2/profile rules — physically extract root reward/challenge/blade-stat/unlock helpers to progression ownership — leaving profile policy in root considered — explicit current views preserve disposable daily/trial statistics, terminal-only unlock ordering and reveals; strict/357 units and 18 live cases pass — revert this physical move commit.
+
+2026-10-08 — W2/scene flow — physically move preparation/readiness/continuation orchestration to a session owner with renderer ports — resuming encounters from drawing considered — preserve presentation acknowledgement, stale async request guards, paused adoption and clock reset; strict/357 units and ten live cases pass — revert this physical move commit.

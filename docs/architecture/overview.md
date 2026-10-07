@@ -421,3 +421,9 @@ and the title/over versus running upgrade policy retain their existing semantics
 Reward accrual, awakening challenge updates, blade statistics and terminal item
 unlocks are owned by game/progression/profile-rules.ts. Current profile/run and
 persistence/reveal capabilities preserve daily/trial isolation and unlock ordering.
+
+Scene readiness and continuation adoption are owned by game/session/scene-flow.ts.
+Renderer composition/preparation is passed as a plain frame capability; the owner
+retains stale-request suppression, scene identity, presentation acknowledgement,
+paused encounter adoption and frame-clock reset. It imports no renderer/presentation
+implementation.
