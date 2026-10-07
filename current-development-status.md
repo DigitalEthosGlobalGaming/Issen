@@ -18,7 +18,15 @@ Actual enabled/disabled listener scenarios prove run/profile/combat RNG isolatio
 `node --test tests/unit/*.test.mjs`: all 370 pass (damage-feedback-unit.log).
 `npx playwright test tests/browser/death-presentation.spec.ts tests/browser/support-rewards.spec.ts tests/browser/game.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 17 pass in 1.4m (damage-feedback-browser.log; terminal exit 0 confirmed).
-Combined broad verification follows in damage-feedback-broad.log.
+Combined broad completed: 250 pass, four stale edition-fixture failures in 14.8m
+(damage-feedback-broad.log; terminal exit 1). Both fixtures still replaced the
+removed local edition declaration, so their override silently left Web access.
+The route hooks now assert and replace the actual constructor edition input.
+`npm run typecheck`: pass (edition-hook-typecheck.log).
+`npx playwright test tests/browser/editions-mastery.spec.ts tests/browser/premium.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 11 pass in 1.2m (edition-hook-browser.log; terminal exit 0).
+Original access/purchase/revocation/viewport assertions and timeouts remain.
+Full combined verification must be rerun after the upcoming context move.
 
 ## Previous green checkpoint: Session state and browser service owners
 

@@ -13,10 +13,10 @@ test('Free mobile keeps Support available without billing and shows Premium cata
   });
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = (await response.text()).replace(
-      /const edition = [^;]+;/,
-      'const edition = "free";',
-    );
+    const source = await response.text();
+    const editionInput = /edition: import\.meta\.env\.VITE_GAME_EDITION/;
+    expect(source).toMatch(editionInput);
+    const body = source.replace(editionInput, 'edition: "free"');
     await route.fulfill({ response, body });
   });
   await page.goto('/');

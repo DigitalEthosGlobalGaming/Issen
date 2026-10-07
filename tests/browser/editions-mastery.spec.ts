@@ -31,7 +31,9 @@ async function prepare(page: Page, edition = 'web') {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     let body = await response.text();
-    body = body.replace(/const edition = [^;]+;/, `const edition = ${JSON.stringify(edition)};`);
+    const editionInput = /edition: import\.meta\.env\.VITE_GAME_EDITION/;
+    expect(body).toMatch(editionInput);
+    body = body.replace(editionInput, `edition: ${JSON.stringify(edition)}`);
     body = body.replace(
       'artworkReady = true;',
       `window.__mastery = { G, step: update, swipe: onSwipe, tap: onTap,
