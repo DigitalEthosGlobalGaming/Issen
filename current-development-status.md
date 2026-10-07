@@ -10,7 +10,22 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: native renderer construction/disposal is physically owned by
+Latest checkpoint: equipment appearance and preview-frame construction are
+physically owned by presentation/equipment.ts. Read-only views supply current
+equipment, palettes, awakening eligibility, layout/lighting and companion state.
+Per-game fallback blade and charm palette identities are retained.
+Strict types and all 361 units pass (equipment-presentation-typecheck.log,
+equipment-presentation-unit.log). The rendering browser invocation passed all
+11 cases in 25.3s (equipment-presentation-browser.log). Its two additional file
+filters were mistaken nonexistent names, so they supplied no outfit coverage.
+The corrected `npx playwright test tests/browser/outfit-awakenings.spec.ts tests/browser/armoury-mobile.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+passed all six in 33.9s (equipment-presentation-outfits.log; terminal confirmed).
+Next: frame simulation ordering, remaining binding setup and reaction ownership.
+Baseline checkpoint diagnostic probe is running in the isolated pre-refactor
+checkout; do not classify that diagnostic until its assertion/terminal result.
+W2 remains incomplete. Complete W2/W3/Part 4 before the one develop push.
+
+Previous checkpoint:  native renderer construction/disposal is physically owned by
 presentation/native-services.ts. Prepared lighting retains borrowed ownership;
 existing renderer creation and cleanup order is unchanged. Strict types and all
 361 units pass (native-services-typecheck.log, native-services-unit.log).

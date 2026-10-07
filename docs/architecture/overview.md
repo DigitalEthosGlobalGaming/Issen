@@ -439,3 +439,5 @@ The listener has no gameplay state or gameplay random source. Combat rules retai
 hit stop and plain animation mutation; disposal removes both subscriptions.
 
 Native renderer service construction and disposal are owned by presentation/native-services.ts. Supplied lighting services remain borrowed; per-game services retain the original cleanup order.
+
+Equipment palettes, blade style selection and armoury preview frames are owned by presentation/equipment.ts with read-only current rule selections. Fallback blade/charm colour records retain per-game identity; preview effects remain independent of combat.

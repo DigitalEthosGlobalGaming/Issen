@@ -1,3 +1,4 @@
+import { createEquipmentPresentation } from './presentation/equipment.ts';
 import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
 import { bindDuelFeedback } from './presentation/duel-feedback.ts';
 import { bindEncounterProgression } from './game/progression/encounter-listeners.ts';
@@ -314,36 +315,27 @@ export function startGame(
     ...createItems(() => new Set([...UNL].filter((id) => id !== PREMIUM_FILM))),
     SUPPORTER_FILM_ITEM,
   ];
-  const BASEBLADE = {
-    len: 0.52,
-    d: '#5c5a56',
-    m: '#a8a59f',
-    l: '#f6f3ec',
-    edge: 'rgba(255,253,246,.9)',
-  };
-  const CHARMCOL: Record<string, string> = {
-    'pilgrims-bead': '#7e654c',
-    'first-strike': '#b8322a',
-    suzu: '#b8923a',
-    maneki: '#b0322a',
-    daruma: '#8c1f14',
-    kitsunebi: '#2f5c8a',
-    furin: '#3f7a8c',
-    ofuda: '#7a6a4a',
-    kinun: '#a67c22',
-    kachi: '#1f4a2a',
-    shingan: '#5a2a6a',
-    ryoen: '#a8456a',
-    kagami: '#5f6b75',
-    omikuji: '#6b5a3a',
-    hisshou: '#a3271d',
-    kaiun: '#b8923a',
-    yakuyoke: '#2d3e72',
-    enmei: '#2f6f55',
-    shobai: '#9c7a1f',
-    kotsu: '#7a7466',
-    gakugyo: '#6b3f7a',
-  };
+  const equipmentPresentation = createEquipmentPresentation(() => ({
+    $,
+    EQ,
+    robePal,
+    isRobeSp,
+    isSteelThird,
+    isSp,
+    lightingRig,
+    presentationState,
+    density,
+    reducedMotion,
+    reducedFlashes,
+    G,
+    cols,
+    environmentState,
+    P,
+    petOf,
+    FONT,
+    SEAL,
+  }));
+  const { CHARMCOL } = equipmentPresentation;
   const ITEM_BY: Record<string, Item> = {};
   for (const it of ITEMS) ITEM_BY[it.id] = it;
   const robePal = palette.robe;
@@ -731,34 +723,10 @@ export function startGame(
   function isSp() { return activeEquipment.isSp(); }
   function isSteelThird() { return activeEquipment.isSteelThird(); }
   function isRobeSp() { return activeEquipment.isRobeSp(); }
-  function playerRobePalette() {
-    const base = robePal(EQ.robe);
-    const accent = isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.st?.c : null;
-    return accent
-      ? { ...base, robeL: `rgb(${accent})`, inner: `rgb(${accent})`, obi: `rgb(${accent})` }
-      : base;
-  }
+  function playerRobePalette() { return equipmentPresentation.playerRobePalette(); }
   function challenge(metric: keyof BladeStats, value = 1) { return profileRules.challenge(metric, value); }
   function bladeMods() { return activeEquipment.bladeMods(); }
-  function bladeStyle() {
-    const b = BLADES[EQ.blade];
-    if (isSteelThird())
-      return {
-        ...(b || BASEBLADE),
-        aura: STEEL_THIRD.aura,
-        glow: 'rgba(170,225,255,.62)',
-        edge: 'rgba(225,248,255,.98)',
-        edgeW: 0.008,
-      };
-    return isSp()
-      ? Object.assign(
-          {},
-          b || BASEBLADE,
-          { aura: SPECIAL[EQ.blade]!.aura },
-          SPECIAL[EQ.blade]!.st || {},
-        )
-      : b;
-  }
+  function bladeStyle() { return equipmentPresentation.bladeStyle(); }
   function bst() { return profileRules.bst(); }
   function computeMods() { return activeEquipment.computeMods(); }
   const pz = () => precisionZone(PZ, G.m?.pz ?? 0, G.m?.precision ?? 0);
@@ -2212,43 +2180,7 @@ export function startGame(
       ),
     );
   }
-  function previewFrame(film: string, effectsVisible: boolean, target = $('prevC')): PreviewFrame {
-    const rb = ROBES[EQ.robe] || {};
-    return {
-      lighting: lightingRig.lighting(target.width, target.height),
-      time: presentationState.time,
-      wind: presentationState.wind,
-      effectDensity: density(),
-      reducedMotion: reducedMotion(),
-      reducedFlashes: reducedFlashes(),
-      petActive: G.petT > 0,
-      palette: cols,
-      background: environmentState.bg,
-      appearance: {
-        d: P.d,
-        pal: playerRobePalette(),
-        robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
-        blade: bladeStyle(),
-        bladeId: EQ.blade,
-        robeId: EQ.robe,
-        variant: rb.variant,
-        cape: rb.cape,
-        coat: rb.coat,
-        rf: rb,
-        charm: CHARMCOL[EQ.charm],
-        charmId: EQ.charm,
-        crest: EQ.crest === 'nocrest' ? null : EQ.crest,
-        pet: petOf(),
-      },
-      pet: EQ.pet,
-      film,
-      effectsVisible,
-      font: FONT,
-      seal: SEAL,
-      mistSprite: environmentState.mistSprite,
-    };
-  }
-
+  function previewFrame(film: string, effectsVisible: boolean, target = $('prevC')): PreviewFrame { return equipmentPresentation.previewFrame(film, effectsVisible, target); }
   /* ---------------- input ---------------- */
   const { disposePointer, bindNavigation } = createInputWiring(cvs, {
     $,
