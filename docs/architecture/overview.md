@@ -53,7 +53,8 @@ scene inputs and drawing ports. Its seven named passes use scene-composer.ts
 with explicit before/after neighbours. Runtime orchestration settles scene readiness
 after drawing; presentation cannot commit pending gameplay continuations.
 `presentation/figures.ts` owns frame-specific figure rendering and enemy/boss
-projection, with gameplay updates kept in rule owners. `presentation/environment.ts` owns ambient factories, cached grass variants and
+projection, with gameplay updates kept in rule owners. `presentation/cues.ts` owns read-only wave/boss/standoff glyph projection.
+`presentation/environment.ts` owns ambient factories, cached grass variants and
 leaf/weather drawing. Hazard simulation remains separate.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and

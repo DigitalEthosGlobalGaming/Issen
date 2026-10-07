@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; cosmetic state owned; feedback actions moved; next environment ownership/cues
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; cosmetic state owned; feedback actions moved; cue drawing moved; next environment ownership
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -81,7 +81,13 @@ data, visual RNG and sound ports. Strict types passed; all 274 units passed
 (feedback-actions-unit.log).
 `npx playwright test tests/browser/death-presentation.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/scattered-armour.spec.ts --config playwright.rendering-v2.config.ts`:
 all nine passed (feedback-actions-browser.log; terminal exit confirmed).
-No process remains. Next cached environment/state ownership and cue drawing; broad browser verification at presentation cluster end. Follow ordered
+Encounter cues now belong to src/presentation/cues.ts, including ensō glyphs and
+wave/boss/standoff cue projection. The owner reads explicit encounter views and
+never resolves inputs or mutates rules. Strict types passed; all 274 units passed
+(cues-owner-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/encounter-flow.spec.ts --config playwright.rendering-v2.config.ts`:
+all seven passed (cues-owner-browser.log; terminal exit confirmed).
+No process remains. Next cached environment/state ownership; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 
 Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**

@@ -68,6 +68,8 @@
 
 - 2026-10-08 — W2 feedback actions move — give feedback flash/camera/letterbox actions, effect updates and weather/cut bursts with selected effect/weather values and leaf/sound ports — passing RunState or gameplay RNG — enables rule listeners to request cosmetic reactions without changing rule ownership; actual death/shadow/scattered effects and saves pass — revert the feedback-actions move.
 
+- 2026-10-08 — W2 cues move — move ensō and encounter glyph projection into cues.ts with readonly encounter views — retaining cue composition in rule orchestration — input/target resolution stays in gameplay; rush-shrine and Daruma flows plus all saved encounters pass — revert the cue move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
