@@ -82,6 +82,8 @@
 
 - 2026-10-08 — W2 UI screens — move the existing wiring through explicit current views and action ports — retain the monolithic closure — preserves callback ordering, save keys and current-run reads; strict, unit and focused browser checks pass — revert the UI screens move.
 
+- 2026-10-08 — W2 UI secrets — move the existing wiring through explicit current views and action ports — retain the monolithic closure — preserves callback ordering, save keys and current-run reads; strict, unit and focused browser checks pass — revert the UI secrets move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

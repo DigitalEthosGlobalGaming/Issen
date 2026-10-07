@@ -1,3 +1,4 @@
+import { createTitleSecrets } from './ui/wiring/secrets.ts';
 import { createEnvironmentArtwork } from './presentation/environment-artwork.ts';
 import { createEnvironmentState } from './presentation/environment-state.ts';
 import { createCuePresentation } from './presentation/cues.ts';
@@ -3245,119 +3246,10 @@ export function startGame(
     }
   });
   const sceneFilm = () => (cinematic.active ? cinematicFilm : EQ.film);
-  const KONAMI = 'up,up,down,down,left,right,left,right';
-  let kseq: Direction[] = [];
-  let tapN = 0,
-    tapLast = 0;
-  function titleTap() {
-    if (G.state !== 'title' || G.panel) return;
-    const now = activeNow();
-    tapN = now - tapLast < 1500 ? tapN + 1 : 1;
-    tapLast = now;
-    audioInit();
-    if (tapN < 20) {
-      if (tapN >= 5) tn({ f0: 520 + (tapN - 5) * 55, dur: 0.07, g: 0.05 });
-      return;
-    }
-    const completedTaps = tapN;
-    tapN = 0;
-    sfx.caw();
-    flash(0.3, '230,220,190');
-    if (recordSecretEvent(ST, { kind: 'titleTaps', count: completedTaps })) {
-      saveStats();
-      checkUnlocks();
-    }
-    toast({
-      k: '案山子',
-      msg: UNL.has('scarecrow')
-        ? 'The Scarecrow is already yours'
-        : 'Secret found. End a run to claim Scarecrow.',
-    });
-  }
-  function konamiInput(d: Direction) {
-    tapN = 0;
-    if (G.state !== 'title' || G.panel) return;
-    kseq.push(d);
-    if (kseq.length > 8) kseq.shift();
-    {
-      const K = KONAMI.split(',');
-      let m = 0;
-      for (let n = Math.min(kseq.length, 8); n > 0; n--) {
-        if (kseq.slice(-n).join() === K.slice(0, n).join()) {
-          m = n;
-          break;
-        }
-      }
-      if (m > 0 && m < 8) {
-        audioInit();
-        tn({ f0: 900 + m * 120, dur: 0.08, g: 0.05 });
-      }
-    }
-    if (kseq.join() === KONAMI) {
-      kseq = [];
-      audioInit();
-      sfx.perfect();
-      flash(0.4, '150,200,255');
-      if (recordSecretEvent(ST, { kind: 'konami' })) {
-        saveStats();
-        checkUnlocks();
-      }
-      toast({
-        k: '光剣',
-        msg: UNL.has('koken')
-          ? 'Kōken is already yours'
-          : 'Secret found. End a run to claim Kōken.',
-      });
-    }
-  }
-  (() => {
-    let sx = 0,
-      sy = 0,
-      id: number | null = null,
-      done = false,
-      logoTarget = false;
-    const el = $('title');
-    lifecycle.listen(el, 'pointerdown', (e) => {
-      if (e.target instanceof Element && e.target.closest('button, a')) return;
-      if (id !== null) return;
-      id = e.pointerId;
-      logoTarget = e.target instanceof Element && !!e.target.closest('.t-k, .t-wrap');
-      done = false;
-      sx = e.clientX;
-      sy = e.clientY;
-      try {
-        el.setPointerCapture(e.pointerId);
-      } catch {
-        /* Synthetic events and unavailable capture retain in-element handling. */
-      }
-    });
-    const fire = (e: PointerEvent) => {
-      if (e.pointerId !== id || done) return;
-      const dx = e.clientX - sx,
-        dy = e.clientY - sy;
-      if (dx * dx + dy * dy < 900) return;
-      done = true;
-      konamiInput(
-        Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up',
-      );
-    };
-    lifecycle.listen(el, 'pointermove', fire);
-    lifecycle.listen(el, 'pointerup', (e) => {
-      if (e.pointerId !== id) return;
-      fire(e);
-      if (e.pointerId === id && !done) {
-        if (logoTarget) cinematic.logoTap();
-        else titleTap();
-      }
-      id = null;
-    });
-    lifecycle.listen(el, 'pointercancel', (e) => {
-      if (e.pointerId === id) id = null;
-    });
-    lifecycle.listen(el, 'lostpointercapture', (e) => {
-      if (e.pointerId === id) id = null;
-    });
-  })();
+  const { titleTap, konamiInput, bindTitleGestures } = createTitleSecrets(() => ({
+    G, ST, UNL, audioInit, tn, sfx, flash, saveStats, checkUnlocks, toast,
+  }));
+  bindTitleGestures($('title'), lifecycle, () => cinematic.logoTap());
   function renderStats() {
     renderStatistics($('statGrid'), ST, UNL.size, ITEMS.length, META.earned);
   }

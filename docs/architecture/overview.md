@@ -93,6 +93,9 @@ See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../featu
 `ui/wiring/screens.ts` owns the HUD and animated screen adapters, retaining the
 explicit progression sync port before score display.
 
+`ui/wiring/secrets.ts` owns title tap/sequence counters and pointer gesture binding;
+it reads current statistics through explicit views and invokes progression ports.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
