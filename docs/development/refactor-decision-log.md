@@ -106,6 +106,8 @@
 
 - 2026-10-08 — W2 router foundation — introduce synchronous complete controller dispatch with explicit checkpoint adoption before live wiring — replay entry callbacks after restore or replace all branching at once — restores must preserve playable saved state without repeating cues/rewards; five routing/ordering/paused-input/adoption tests and all units pass; live phase migration is next — revert the router foundation commit.
 
+- 2026-10-08 — W2 run-flow move — move title/pause/resume/quit bodies through current state getters, capability flags and narrow service/presentation ports — capture replaced profile values or replay graphics-dependent resume automatically — five actual API scenarios, all units, seventeen menu/save cases and ten real graphics/context checks pass; records and RNG consumption unchanged — revert this physical run-flow move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

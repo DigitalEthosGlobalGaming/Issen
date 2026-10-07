@@ -1,3 +1,4 @@
+import { createRunFlow } from './game/session/run-flow.ts';
 import { bindProfileWiring } from './ui/wiring/profile.ts';
 import { createCinematicWiring } from './ui/wiring/cinematic.ts';
 import { bindPurchaseWiring } from './ui/wiring/purchases.ts';
@@ -2836,29 +2837,63 @@ export function startGame(
       supportEmberBonusAmount(META, pending.hundredths),
     );
   }
-  function toTitle() {
-    activeDaily = null;
-    ST = playerStats;
-    EQ = playerEquipment;
-    applySeal();
-    G.panel = null;
-    G.state = 'title';
-    G.mode = 'normal';
-    G.blade = false;
-    G.zen = false;
-    clearHints();
-    refreshArmoryNew();
-    showScreen('title');
-    hud(false);
-    $('bossbar').classList.remove('on');
-    timeScale = 1;
-    presentationState.lbT = 0;
-    if (G.stage !== 0) setStage(0, true);
-    setupAttract();
-    P.fall = 0;
-    P.pose = { ...PREST };
-    setBestLine();
-  }
+  const { toTitle, pause, resume, endRun } = createRunFlow({
+    $,
+    G,
+    playerStats,
+    playerEquipment,
+    applySeal,
+    clearHints,
+    refreshArmoryNew,
+    showScreen,
+    hud,
+    presentationState,
+    setStage,
+    setupAttract,
+    P,
+    PREST,
+    saveStats,
+    checkUnlocks,
+    showPauseScreen,
+    audio,
+    guided,
+    showShrineOffers,
+    renderTrialObjective,
+    captureCheckpoint,
+    showOver,
+    setBestLine: () => setBestLine(),
+    resetClock: () => frameLoop.resetClock(),
+    get ST() {
+      return ST;
+    },
+    set ST(value) {
+      ST = value;
+    },
+    get EQ() {
+      return EQ;
+    },
+    set EQ(value) {
+      EQ = value;
+    },
+    get activeDaily() {
+      return activeDaily;
+    },
+    set activeDaily(value) {
+      activeDaily = value;
+    },
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(value) {
+      timeScale = value;
+    },
+    get shrineOfferIds() {
+      return shrineOfferIds;
+    },
+    get contextLost() {
+      return !!nativeScene?.contextLost;
+    },
+  });
   const { setBestLine, openPanel, closePanel, renderStats } = createPanelWiring(() => ({
     $,
     playerStats,
@@ -3248,18 +3283,6 @@ export function startGame(
     },
   });
   const disposeKeyboard = bindNavigation();
-  function pause() {
-    if (['playing', 'boss', 'between', 'standoff'].includes(G.state)) {
-      G.pauseN = (G.pauseN || 0) + 1;
-      if (recordSecretEvent(ST, { kind: 'pauses', count: G.pauseN })) {
-        saveStats();
-        checkUnlocks();
-      }
-      G.pausedFrom = G.state;
-      G.state = 'paused';
-      showPauseScreen();
-    }
-  }
   function showPauseScreen() {
     combatHaptics.stop();
     audio.setPaused(true);
@@ -3271,24 +3294,6 @@ export function startGame(
         : `Seed ${G.seed}`;
     showScreen('paused');
     renderTrialObjective();
-  }
-  function resume() {
-    if (nativeScene?.contextLost) return;
-    if (G.state !== 'paused' || !G.pausedFrom) return;
-    G.state = G.pausedFrom;
-    audio.setPaused(guided.frozen);
-    if (G.state === 'shrine' && shrineOfferIds)
-      showShrineOffers(shrineOfferIds.map((id) => BLESS_BY[id]).filter((bl) => !!bl));
-    else showScreen(null);
-    renderTrialObjective();
-    frameLoop.resetClock();
-  }
-  function endRun() {
-    if (G.state !== 'paused' || !G.pausedFrom) return;
-    G.state = G.pausedFrom;
-    G.reason = 'quit';
-    captureCheckpoint('ended');
-    showOver();
   }
 
   /* ---------------- update ---------------- */

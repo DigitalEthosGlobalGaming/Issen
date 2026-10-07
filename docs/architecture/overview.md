@@ -103,6 +103,10 @@ checkpoint adoption. It is introduced alongside the closure; live input/update
 branching migrates as phase bodies move, so its presence alone does not mean the
 runtime already uses it.
 
+`game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
+profile identity restoration. Run starts and checkpoint orchestration still remain
+in the composition closure pending the next session-owner moves.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

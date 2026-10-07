@@ -40,16 +40,31 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: phase-router contract introduced alongside the runtime.
-`src/game/session/phase-router.ts` implements synchronous enter/update/swipe/tap/
-tap-down/exit dispatch, validated transitions and checkpoint adoption without
-replaying entry effects. Direct record synchronization is a migration bridge.
-It is NOT yet wired into game.ts: no live gameplay events are emitted yet.
-Strict types passed; all five `node --test tests/unit/phase-router.test.mjs` cases
-passed and all 279 `npm test` cases passed (phase-router-foundation-unit.log).
-No production dispatch changed, so browser verification remains the UI checkpoint
-below. Next extract run-flow title/pause/resume/end-run, then replace input/update
-branching with actual phase controllers. Preserve same-frame cascades and RNG order.
+Latest checkpoint: title/pause/resume/end-run bodies moved into
+`src/game/session/run-flow.ts`. Current statistics/equipment/daily/timing getters
+preserve replacement and callback ordering; plain player reset and letterbox slices
+are transitional ports until player/event ownership moves. No rendering imports.
+Five actual run-flow API cases cover pause secrets, graphics restore gating, saved
+shrine offers, profile identities and one-time quit/results entry.
+Strict types passed, the five new cases passed, and all 284 `npm test` cases passed
+(run-flow-final-unit.log).
+`npx playwright test tests/browser/options.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/context-loss.spec.ts --config playwright.rendering-v2.config.ts`:
+17 passed (run-flow-browser.log; terminal confirmed). context-loss.spec.ts does
+not exist and matched no cases, so graphics verification was run against real files:
+`npx playwright test tests/browser/graphics-errors.spec.ts tests/browser/pixi-backend.spec.ts -g 'graphics|context|WebGL' --config playwright.rendering-v2.config.ts`:
+all ten passed (run-flow-graphics-browser.log; terminal confirmed), including main
+loss/restore/explicit-resume, auxiliary deadlines and startup errors. Error stacks
+in this log are expected simulated failures, not failed assertions.
+
+Router foundation (556acb9) remains alongside the closure, NOT yet wired into
+game.ts. It provides synchronous validated controller dispatch and checkpoint
+adoption without replaying enter effects; five tests passed plus all 279 units at
+that checkpoint. No live gameplay events emitted yet.
+Next move checkpoint capture/restore/continue/abandon and remaining run start/
+daily/trial/rush controls into session owners, then actual phase-controller dispatch.
+Remaining rule capture/type audit: tmp/runtime-refactor/rule-port-audit.json.
+Preserve same-frame phase cascades and game/cosmetic RNG consumption order.
+Full W2, W3 and Part 4 remain pending; do not push develop.
 
 UI final cleanup: strict types and all 274 units passed (ui-cleanup-unit.log).
 `npx playwright test tests/browser/ui.spec.ts tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts --config playwright.rendering-v2.config.ts`:
