@@ -40,3 +40,4 @@ PBR installation runs validated surface packing, compaction and catalog refresh.
 
 Do not infer GPU memory or performance improvements from encoded byte savings.
 Data planes keep their original dimensions; fewer omitted planes reduce uploads.
+Encoding uses four read-only workers by default. Set `ISSEN_ASSET_WORKERS` from 1 to 8 to control the bounded prefetch. The parent alone writes validated outputs and sorted manifest entries. Worker count does not change pixel tolerances or output settings.

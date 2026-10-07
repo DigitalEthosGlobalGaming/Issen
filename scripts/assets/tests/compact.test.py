@@ -52,7 +52,12 @@ class CompactionTests(unittest.TestCase):
             catalog = root/'scripts/pbr/asset-packs.json'
             catalog.parent.mkdir(parents=True)
             catalog.write_text(json.dumps({'assets':[{'source':'src/sample.png','output':'src/pbr/sample'}]}))
-            compact.run(root,True)
+            compact.run(root,True,retain_generated_png=True,workers=4)
+            self.assertEqual(len(list(pack.glob("*.png"))),7)
+            staged = (root/"scripts/assets/compaction-manifest.json").read_bytes()
+            compact.run(root,True,retain_generated_png=True,workers=2)
+            self.assertEqual((root/"scripts/assets/compaction-manifest.json").read_bytes(),staged)
+            compact.run(root,True,workers=4)
             self.assertEqual(source.read_bytes(),original)
             self.assertTrue(source.with_suffix('.webp').exists())
             self.assertEqual(sorted(p.name for p in pack.iterdir()), ['sample_diffuse.webp','sample_normal.webp','sample_surface.webp'])

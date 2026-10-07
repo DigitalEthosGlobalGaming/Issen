@@ -3,6 +3,7 @@
 Authoring colour PNGs remain in place; generated map PNGs are backed up under
 ignored tmp before removal. No packing, resizing, or source-art deletion.
 """
+from concurrent.futures import ThreadPoolExecutor
 import argparse
 import hashlib
 import json
@@ -60,7 +61,30 @@ def encode(image, data):
     raise ValueError('No WebP encoding preserves the required decoded values')
 
 
-def run(root, apply, retain_generated_png=False):
+def encode_file(source, data):
+    original = source.read_bytes()
+    with Image.open(BytesIO(original)) as image:
+        encoded, encoding = encode(image, data)
+        return encoded, encoding, list(image.size), digest(original)
+
+
+def pending_encodings(root, files, records, generated, removals, untouched):
+    for source in files:
+        source.resolve().relative_to(root.resolve())
+        if source in removals or source in untouched:
+            continue
+        old = records.get(source.relative_to(root).as_posix())
+        if old and old['originalHash'] == digest(source.read_bytes()) and old.get('newPath'):
+            target = root/old['newPath']
+            target.resolve().relative_to(root.resolve())
+            if target.exists() and digest(target.read_bytes()) == old['newHash']:
+                continue
+        yield source, source in generated and not source.stem.endswith('_diffuse')
+
+
+def run(root, apply, retain_generated_png=False, workers=4):
+    if not isinstance(workers, int) or not 1 <= workers <= 8:
+        raise ValueError("Encoding workers must be between 1 and 8")
     catalog_path = root/'scripts/pbr/asset-packs.json'
     catalog = json.loads(catalog_path.read_text()) if catalog_path.exists() else {'assets': []}
     jobs = catalog['assets'] + catalog.get('installed', [])
@@ -92,50 +116,66 @@ def run(root, apply, retain_generated_png=False):
                 if zero_emission(image): removals[files['emissive']] = 'zero-emission'
     files = sorted({p for folder in ['src', 'public'] for p in (root/folder).rglob('*.png')})
     changed = 0
-    for source in files:
-        if source in untouched: continue
-        rel = source.relative_to(root).as_posix()
-        original = source.read_bytes()
-        original_hash = digest(original)
-        old = records.get(rel)
-        if old and old['originalHash'] == original_hash:
-            if retain_generated_png and source in removals and old['action'] == removals[source]:
-                continue
-            target = root/old['newPath'] if old.get('newPath') else None
-            if target and target.exists() and digest(target.read_bytes()) == old['newHash']:
-                if source in generated and apply and not retain_generated_png:
-                    source.unlink()
-                    changed += 1
-                continue
-        backup = root/'tmp/asset-compaction/originals'/rel
-        if source in removals:
-            record = {'originalPath':rel, 'originalHash':original_hash, 'sizeBefore':len(original),
-                      'sizeAfter':0, 'action':removals[source], 'newPath':None, 'newHash':None, 'encoding':None}
-            encoded = None
-        else:
-            with Image.open(source) as image:
-                encoded, encoding = encode(image, source in generated and not source.stem.endswith('_diffuse'))
-                dimensions = list(image.size)
-            target = source.with_suffix('.webp')
-            if target.exists() and digest(target.read_bytes()) != digest(encoded) and (not old or digest(target.read_bytes()) != old.get('newHash')):
-                raise ValueError(f'Refusing to overwrite an unrelated WebP: {rel}')
-            record = {'originalPath':rel, 'originalHash':original_hash, 'sizeBefore':len(original),
-                      'sizeAfter':len(encoded), 'action':'replace-generated' if source in generated else 'retain-authoring',
-                      'newPath':target.relative_to(root).as_posix(), 'newHash':digest(encoded),
-                      'dimensions':dimensions, 'encoding':encoding}
-        if apply:
-            backup.parent.mkdir(parents=True, exist_ok=True)
-            if backup.exists() and digest(backup.read_bytes()) != original_hash:
-                raise ValueError(f'Original backup already differs: {rel}')
-            if not backup.exists(): backup.write_bytes(original)
-            if encoded is not None: target.write_bytes(encoded)
-            if source in generated and not retain_generated_png: source.unlink()
-        records[rel] = record
-        if apply:
-            manifest_path.parent.mkdir(parents=True, exist_ok=True)
-            manifest_path.write_text(json.dumps({'version':1, 'files':sorted(records.values(), key=lambda r:r['originalPath'])}, indent=2)+'\n')
-        changed += 1
-        print(f'{record["action"]}: {rel} ({len(original)} -> {record["sizeAfter"]})', flush=True)
+    # Workers only encode and validate independent images. The parent commits
+    # outputs and manifest entries in deterministic filename order. Prefetch is
+    # bounded to workers so decoded images and completed buffers stay bounded.
+    work = iter(pending_encodings(root, files, records, generated, removals, untouched))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        active = {}
+        def schedule():
+            while len(active) < workers:
+                task = next(work, None)
+                if task is None:
+                    break
+                source, data = task
+                active[source] = pool.submit(encode_file, source, data)
+        schedule()
+        for source in files:
+            if source in untouched: continue
+            rel = source.relative_to(root).as_posix()
+            original = source.read_bytes()
+            original_hash = digest(original)
+            old = records.get(rel)
+            if old and old['originalHash'] == original_hash:
+                if retain_generated_png and source in removals and old['action'] == removals[source]:
+                    continue
+                target = root/old['newPath'] if old.get('newPath') else None
+                if target and target.exists() and digest(target.read_bytes()) == old['newHash']:
+                    if source in generated and apply and not retain_generated_png:
+                        source.unlink()
+                        changed += 1
+                    continue
+            backup = root/'tmp/asset-compaction/originals'/rel
+            if source in removals:
+                record = {'originalPath':rel, 'originalHash':original_hash, 'sizeBefore':len(original),
+                          'sizeAfter':0, 'action':removals[source], 'newPath':None, 'newHash':None, 'encoding':None}
+                encoded = None
+            else:
+                future = active.pop(source, None)
+                encoded, encoding, dimensions, encoded_hash = (future.result() if future else encode_file(source, source in generated and not source.stem.endswith('_diffuse')))
+                if encoded_hash != original_hash:
+                    raise ValueError(f'Source changed during encoding: {rel}')
+                schedule()
+                target = source.with_suffix('.webp')
+                if target.exists() and digest(target.read_bytes()) != digest(encoded) and (not old or digest(target.read_bytes()) != old.get('newHash')):
+                    raise ValueError(f'Refusing to overwrite an unrelated WebP: {rel}')
+                record = {'originalPath':rel, 'originalHash':original_hash, 'sizeBefore':len(original),
+                          'sizeAfter':len(encoded), 'action':'replace-generated' if source in generated else 'retain-authoring',
+                          'newPath':target.relative_to(root).as_posix(), 'newHash':digest(encoded),
+                          'dimensions':dimensions, 'encoding':encoding}
+            if apply:
+                backup.parent.mkdir(parents=True, exist_ok=True)
+                if backup.exists() and digest(backup.read_bytes()) != original_hash:
+                    raise ValueError(f'Original backup already differs: {rel}')
+                if not backup.exists(): backup.write_bytes(original)
+                if encoded is not None: target.write_bytes(encoded)
+                if source in generated and not retain_generated_png: source.unlink()
+            records[rel] = record
+            if apply:
+                manifest_path.parent.mkdir(parents=True, exist_ok=True)
+                manifest_path.write_text(json.dumps({'version':1, 'files':sorted(records.values(), key=lambda r:r['originalPath'])}, indent=2)+'\n')
+            changed += 1
+            print(f'{record["action"]}: {rel} ({len(original)} -> {record["sizeAfter"]})', flush=True)
     manifest = {'version':1, 'files': sorted(records.values(), key=lambda r:r['originalPath'])}
     if apply and changed:
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -148,6 +188,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--retain-generated-png', action='store_true', help='Stage conversions before URL migration; final apply removes generated PNGs')
     args = parser.parse_args()
-    run(args.root.resolve(), args.apply, args.retain_generated_png)
+    run(args.root.resolve(), args.apply, args.retain_generated_png, args.workers)

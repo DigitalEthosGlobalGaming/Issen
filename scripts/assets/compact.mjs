@@ -8,13 +8,18 @@ export function compact({
   root = path.resolve(import.meta.dirname, '../..'),
   apply = false,
   retainGeneratedPng = false,
+  workers = Number(process.env.ISSEN_ASSET_WORKERS ?? 4),
 } = {}) {
+  if (!Number.isInteger(workers) || workers < 1 || workers > 8)
+    throw new RangeError('Encoding workers must be between 1 and 8');
   const result = spawnSync(
     process.env.ISSEN_PYTHON ?? 'python',
     [
       fileURLToPath(new URL('./compact.py', import.meta.url)),
       '--root',
       root,
+      '--workers',
+      String(workers),
       ...(apply ? ['--apply'] : []),
       ...(retainGeneratedPng ? ['--retain-generated-png'] : []),
     ],
