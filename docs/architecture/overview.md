@@ -388,8 +388,10 @@ feedback use explicit ports. Seeded boss-pattern scenarios call this owner.
 Shrine menu wiring invokes its choice API; checkpoint keys/order remain unchanged.
 
 `game/phases/death.ts` owns damage, fatal checkpoint boundaries, raw-time death
-advancement and revival. Animation/camera/reason-copy feedback are explicit ports.
-Reward offer and results UI orchestration still await their session owner.
+advancement and revival. Immutable struck snapshots carry committed lives, life-loss,
+label and player geometry. presentation/damage-feedback.ts owns damage/death effects,
+sound, haptics and HUD reactions; raw-time falling remains a narrow animation port.
+Reward offer and results orchestration belong to game/session/results.ts.
 
 `game/phases/between.ts` owns the timer selecting the next trial encounter, boss,
 shrine or wave through explicit continuation ports.
@@ -414,7 +416,9 @@ swing lean clock retain their original behavior.
 Companion selection, foxfire rescue and Daruma/Phoenix/support revival are owned
 by game/player/companions.ts with narrow capabilities. Death dispatch retains its
 existing revival priority and timer. Drawing remains presentation work; this
-physical move preserves checkpoint fields and reaction order.
+rule ownership preserves checkpoint fields. companionSaved and revived snapshots
+drive presentation/damage-feedback.ts after committed outcomes; this listener owns
+rescue popups and revival HUD, animation reset, banners and camera feedback.
 
 Terminal daily/main-run results, revive offers, support bonus claims and pending
 support recovery are owned by game/session/results.ts through explicit display,
@@ -490,3 +494,11 @@ bindings without eager service reads or copied replacement identities.
 platform/runtime-preferences.ts owns current browser settings, access and haptic
 capabilities; ui/wiring/audio.ts owns audio/guided/mute controls with current phase
 and settings actions. These owners retain original staged construction and cleanup.
+
+Damage/death and companion rescue/revival feedback belong in `src/presentation/damage-feedback.ts`.
+
+Damage and companion listeners accept cosmetic capabilities only. Actual ward,
+life-loss, fatal and all three revival paths produce identical run/profile/combat
+RNG outcomes when these subscriptions are absent. The event bus freezes snapshots;
+lifetime disposal removes every reaction. Rules retain hit stop, slow motion,
+checkpoint boundaries, trial failure and encounter restart.

@@ -21,6 +21,7 @@ import { createEnvironmentHost } from './presentation/environment-host.ts';
 
 import { createEquipmentPresentation } from './presentation/equipment.ts';
 import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
+import { bindDamageFeedback } from './presentation/damage-feedback.ts';
 import { bindDuelFeedback } from './presentation/duel-feedback.ts';
 import { bindEncounterProgression } from './game/progression/encounter-listeners.ts';
 import { createSceneFlow } from './game/session/scene-flow.ts';
@@ -383,7 +384,7 @@ export function startGame(
   }
   function drawFoxfire() { playerFigures.drawFoxfire(); }
   function foxSave(e: Enemy) {
-    saveWithFoxfire(e, { killEnemy, pop, flash, sfx });
+    saveWithFoxfire(e, { events: context.events, killEnemy });
   }
   function reviveDaruma(ph = false, support = false) {
     deathPhase.reviveDaruma(ph, support);
@@ -923,17 +924,6 @@ export function startGame(
     },
     startBoss,
     bossSwipe,
-    clearHints,
-    resetPlayer: () => {
-      P.fall = 0;
-      P.pose = { ...PREST };
-    },
-    inkPulse: (value) => {
-      presentationState.inkPulse = value;
-    },
-    hideBossBar: () => {
-      $('bossbar').classList.remove('on');
-    },
     reasonMessage: (reason) => DEATH_REASONS[reason] || '',
     fallPlayer: (fall) => {
       P.fall = fall;
@@ -1007,6 +997,16 @@ export function startGame(
   lifecycle.add(bindStandoffFeedback(context.events, () => ({ W, H, S, addSlash, killFx, scraps, ring, stamp, punch, flash, sfx, combatHaptics })));
   lifecycle.add(bindDuelFeedback(context.events, () => ({
     S, sparks, ring, flash, sfx, combatHaptics, letterbox, buzz,
+    shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
+  })));
+  lifecycle.add(bindDamageFeedback(context.events, () => ({
+    W, H, S, addSlash, inkBurst, scraps, flash, pop, sfx, combatHaptics,
+    renderLives, setScore, hud, letterbox,
+    inkPulse: value => { presentationState.inkPulse = value; },
+    clearLetterbox: () => { presentationState.lbT = 0; },
+    resetPlayer: () => { P.fall = 0; P.pose = { ...PREST }; },
+    banner, stamp, clearHints,
+    hideBossBar: () => { $('bossbar').classList.remove('on'); },
     shake: amount => { presentationState.shake = Math.max(presentationState.shake, amount); },
   })));
   lifecycle.add(bindKillFeedback(context.events, readKillViews));

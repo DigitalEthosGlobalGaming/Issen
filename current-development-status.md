@@ -6,7 +6,21 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Session state and browser service owners
+## Latest green checkpoint: Damage and companion event reactions
+
+Damage/death, Tanto/foxfire saves and Daruma/Phoenix/support revival feedback
+now react to immutable value events in presentation/damage-feedback.ts. Rules
+retain lives/combo/attacker mutations, hit stop, slow motion, trial failure,
+checkpoint boundaries and encounter restart. Same-call presentation ordering is
+recorded in tmp/runtime-refactor/behaviour-changes.md and architecture/decision docs.
+Actual enabled/disabled listener scenarios prove run/profile/combat RNG isolation.
+`npm run typecheck`: pass (damage-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 370 pass (damage-feedback-unit.log).
+`npx playwright test tests/browser/death-presentation.spec.ts tests/browser/support-rewards.spec.ts tests/browser/game.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 17 pass in 1.4m (damage-feedback-browser.log; terminal exit 0 confirmed).
+Combined broad verification follows in damage-feedback-broad.log.
+
+## Previous green checkpoint: Session state and browser service owners
 
 game/session/runtime-state.ts owns eleven plain mutable lifetime fields: template,
 ledger, milestones/reveals, checkpoint/offers, clocks, knocks, reward flow and crest
@@ -42,7 +56,7 @@ docs/development/asset-compaction-results.md and preserved verification below.
 W2 WebGL2-only startup/recovery, typed context/events, ordered seven-layer composer,
 UI/session/phase owners, actual grunt/boss/player tables and behaviour registries,
 companions, profile policy/equipment/progress, frame scheduling and artwork startup
-are implemented. Kill/combo/score/parry/block and successful boss/standoff feedback
+are implemented. Damage/companion/kill/combo/score/parry/block and successful boss/standoff feedback
 react to immutable event values. Rules own outcomes and gameplay RNG. Runtime
 dimensions, mutable profile identity and remaining service/action projections still
 need genuine composition reduction. See overview.md and refactor-decision-log.md.
@@ -70,7 +84,7 @@ Finish genuine composition reduction: root is 1606 lines, far from the approxima
 200-line target. Consolidate remaining profile identity, geometry/equipment colour,
 scene loading state and explicit context/service/action projections into their true
 owners. Remaining enemy/player helpers, secret/shrine/result view callbacks and
-damage/wave/boss reactions need owning orchestration/presentation modules. Do not
+wave/boss reactions need owning orchestration/presentation modules. Do not
 rename the remaining monolith. Preserve plain records and both random streams.
 Keep root BLESS_BY/bossShownDirection and artworkReady instrumentation until actual
 browser hooks migrate. Applied drafts are non-idempotent; regenerate isolated

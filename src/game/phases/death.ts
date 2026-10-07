@@ -16,71 +16,22 @@ export interface DeathViews {
   readonly events: RuleEvents;
   readonly G: RunState;
   timeScale: number;
+  hitStop: number;
   readonly breakCombo: () => void;
-  readonly renderLives: () => void;
-  readonly setScore: () => void;
-  readonly hud: (on: boolean) => void;
   readonly startBoss: () => void;
   readonly startWave: (n: number, skipEvent?: boolean) => void;
   readonly captureCheckpoint: (status?: 'active' | 'ended' | 'lost') => void;
-  readonly banner: (glyph: string, label: string) => void;
-  readonly stamp: (
-    text: string,
-    x: number,
-    y: number,
-    size: number,
-    seal: boolean,
-    life?: number | undefined,
-  ) => void;
-  readonly S: number;
-  readonly flash: (a: number, col?: string | undefined) => void;
   readonly L: { player: { x: number; y: number; h: number } };
-  readonly addSlash: (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    w: number,
-    life?: number | undefined,
-    dark?: boolean | undefined,
-  ) => void;
-  readonly inkBurst: (x: number, y: number, ang: number, n: number, sc: number) => void;
-  hitStop: number;
-  readonly sfx: { hurt(): void; death(): void };
-  readonly combatHaptics: { play(event: 'damage'): void };
-  readonly pop: (x: number, y: number, text: string, size?: number | undefined) => void;
-  readonly W: number;
-  readonly H: number;
-  readonly waveConfiguration: () => {
-    pack: number;
-    refill: boolean;
-    total: number;
-    ordered: boolean;
-    feint: number;
-    atk: number;
-    gap: number;
-  };
+  readonly waveConfiguration: () => { pack: number; refill: boolean; total: number;
+    ordered: boolean; feint: number; atk: number; gap: number };
   readonly activeTrial: TrialDefinition | null;
   trialFailure: string;
   readonly bossSwipe: (dir: 'down' | 'left' | 'right' | 'up', automatic?: boolean) => void;
-  readonly killEnemy: (
-    e: Enemy,
-    dir: 'down' | 'left' | 'right' | 'up',
-    chained?: boolean,
-    preserveStreak?: boolean,
-    automatic?: boolean,
-  ) => void;
+  readonly killEnemy: (e: Enemy, dir: 'down' | 'left' | 'right' | 'up',
+    chained?: boolean, preserveStreak?: boolean, automatic?: boolean) => void;
   readonly ST: Statistics;
   readonly saveStats: () => void;
   readonly checkUnlocks: () => void;
-  readonly scraps: (x: number, y: number, n: number, sc: number) => void;
-  readonly letterbox: (d: number) => void;
-  readonly clearHints: () => void;
-  readonly clearLetterbox: () => void;
-  readonly resetPlayer: () => void;
-  readonly inkPulse: (value: number) => void;
-  readonly shake: (amount: number) => void;
-  readonly hideBossBar: () => void;
   readonly reasonMessage: (reason: string) => string;
   readonly rewardFlowBusy: boolean;
   readonly fallPlayer: (fall: number) => void;
@@ -95,25 +46,10 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
     keep: boolean,
     label?: string | null,
     reason = 'struck',
+    lifeLost = false,
   ) {
     const views = readViews();
-    const {
-      G,
-      H,
-      L,
-      S,
-      W,
-      addSlash,
-      breakCombo,
-      combatHaptics,
-      flash,
-      inkBurst,
-      pop,
-      setScore,
-      sfx,
-      waveConfiguration,
-      shake,
-    } = views;
+    const { G, L, breakCombo, waveConfiguration } = views;
     G.clean = 0;
     if (!keep && G.bless.has('zanshin')) {
       const sk = Math.floor((G.wave - 1) / 3);
@@ -135,28 +71,7 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       G.pStreak = 0;
     }
     G.hits++;
-    setScore();
-    const p = L.player;
-    addSlash(
-      p.x + p.h * 0.4,
-      p.y - p.h * 0.98,
-      p.x - p.h * 0.28,
-      p.y - p.h * 0.35,
-      Math.max(4, p.h * 0.018),
-      0.45,
-    );
-    inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 16, p.h / 420);
-    flash(0.35, '150,22,16');
-    shake(12 * S);
     views.hitStop = 0.08;
-    sfx.hurt();
-    combatHaptics.play('damage');
-    pop(
-      W / 2,
-      H * 0.45,
-      label || (lost >= 3 && G.combo < lost ? `${lost} 連 broken` : 'Struck'),
-      Math.max(20, 24 * S),
-    );
     if (killer && 'def' in killer) {
       killer.state = 'strike';
       killer.t = 0;
@@ -173,37 +88,17 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       if (waveConfiguration().refill && G.toSpawn > 0)
         G.pendingSpawns.push({ slot: killer.slot, t: 1.0 });
     }
-    views.events.emit('struck', { reason, lives: G.lives, fatal: false });
+    const p = L.player;
+    views.events.emit('struck', {
+      reason, lives: G.lives, fatal: false, lifeLost,
+      x: p.x, y: p.y, height: p.h,
+      label: label || (lost >= 3 && G.combo < lost ? `${lost} 連 broken` : 'Struck'),
+    });
   }
   function playerDie(killer: Enemy | Boss | null, reason: string) {
     const views = readViews();
-    const {
-      G,
-      L,
-      S,
-      ST,
-      activeTrial,
-      addSlash,
-      bossSwipe,
-      captureCheckpoint,
-      checkUnlocks,
-      clearHints,
-      combatHaptics,
-      flash,
-      hud,
-      inkBurst,
-      killEnemy,
-      letterbox,
-      pop,
-      renderLives,
-      saveStats,
-      scraps,
-      sfx,
-      inkPulse,
-      shake,
-      hideBossBar,
-      reasonMessage,
-    } = views;
+    const { G, L, ST, activeTrial, bossSwipe, captureCheckpoint,
+      checkUnlocks, killEnemy, saveStats, reasonMessage } = views;
     if (activeTrial) {
       views.trialFailure = reasonMessage(reason) || 'A mistake ended the trial.';
       return;
@@ -223,8 +118,9 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
         }
         killEnemy(killer, killer.dir, true, false, true);
       }
-      pop(killer.pos.x, killer.pos.y - killer.pos.h * 1.15, 'Tanto');
-      hud(true);
+      views.events.emit('companionSaved', {
+        kind: 'tanto', x: killer.pos.x, y: killer.pos.y - killer.pos.h * 1.15,
+      });
       captureCheckpoint();
       return;
     }
@@ -234,10 +130,8 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       checkUnlocks();
     }
     const outcome = resolveDamage(G, reason);
-    renderLives();
     if (outcome.kind === 'hurt') {
-      if (outcome.lifeLost) inkPulse(1);
-      struck(killer, outcome.keepCombo, outcome.label, reason);
+      struck(killer, outcome.keepCombo, outcome.label, reason, outcome.lifeLost);
       return;
     }
     G.diedInBoss = !!(G.boss && G.boss.state !== 'dying');
@@ -255,26 +149,13 @@ export function createDeathPhase<Context>(readViews: () => DeathViews) {
       killer.state = 'strike';
       killer.t = 0;
     }
-    views.events.emit('struck', { reason, lives: G.lives, fatal: true });
     const p = L.player;
-    addSlash(
-      p.x + p.h * 0.4,
-      p.y - p.h * 0.98,
-      p.x - p.h * 0.28,
-      p.y - p.h * 0.35,
-      Math.max(5, p.h * 0.022),
-      0.7,
-    );
-    inkBurst(p.x + p.h * 0.05, p.y - p.h * 0.7, -2.2, 40, p.h / 420);
-    scraps(p.x + p.h * 0.05, p.y - p.h * 0.7, 10, p.h / 300);
-    flash(0.45, '150,22,16');
-    shake(18 * S);
-    letterbox(2.5);
-    sfx.death();
-    combatHaptics.play('damage');
-    clearHints();
-    hideBossBar();
+    views.events.emit('struck', {
+      reason, lives: G.lives, fatal: true, lifeLost: true,
+      x: p.x, y: p.y, height: p.h, label: '',
+    });
   }
+
   function updateDeath(raw: number) {
     const views = readViews();
     const { G, rewardFlowBusy, fallPlayer, showOver } = views;

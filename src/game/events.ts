@@ -37,7 +37,12 @@ export interface GameEvents {
     y: number;
     height: number;
   }>;
-  struck: Readonly<{ reason: string; lives: number; fatal: boolean }>;
+  struck: Readonly<{
+    reason: string; lives: number; fatal: boolean; lifeLost: boolean;
+    x: number; y: number; height: number; label: string;
+  }>;
+  companionSaved: Readonly<{ kind: 'tanto' | 'foxfire'; x: number; y: number }>;
+  revived: Readonly<{ kind: 'support' | 'phoenix' | 'daruma'; lives: number }>;
   parry: Readonly<{
     boss: string;
     perfect: boolean;
