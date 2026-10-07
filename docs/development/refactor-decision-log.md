@@ -114,6 +114,8 @@
 
 - 2026-10-08 — W2 wave input move — preserve swipe targeting and knife record/reward order through the real wave controller, migrate scenario swipes — replace all router branching in one edit — four controller cases, all 294 units and twenty real browser cases pass; entry/update and router integration remain separate steps — revert the wave input move and scenario migration together.
 
+- 2026-10-08 — W2 wave lifecycle move — move deferred wave entry and simulation callbacks into the wave owner with fresh readiness-time views — snapshot feedback ports before asynchronous preparation or rewrite entry timing — all 297 units, three new real API cases and thirteen live trial/save/setup cases pass; seeded scenario entry/update use the production API — revert the wave lifecycle move and driver migration.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -1,3 +1,4 @@
+import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
 import { parseStatistics } from '../../src/platform/saves.ts';
 import { runStartSession } from './helpers/runtime-run-start-session.mjs';
@@ -41,7 +42,7 @@ function session(seed = 123456, options = setup, equipment = DEFAULT_EQUIPMENT) 
 }
 
 // Run entry now uses the production session API. Encounter drivers still use
-// wave input now uses its phase API; updates and kill ports remain temporary
+// wave entry/update/input now use their real APIs; kill ports remain temporary
 // until the remaining phase/rule APIs replace their adapters.
 // Their event handlers represent external inputs/state boundaries still inline in
 // game.ts. Replace those handlers with extracted phase/kill APIs as they appear;
@@ -49,17 +50,20 @@ function session(seed = 123456, options = setup, equipment = DEFAULT_EQUIPMENT) 
 function driveWave(seed, options = setup, trial) {
   const { run, random } = session(seed, options),
     ledger = createRunRewardLedger();
-  run.cfg = waveConfig(1, run.mode, run.m);
+  const lifecycleFixture = waveLifecycleFixture({
+    run,
+    random,
+    views: { ST: parseStatistics({}) },
+  });
   if (trial)
-    run.cfg = {
-      ...run.cfg,
+    lifecycleFixture.views.waveCfg = (wave) => ({
+      ...waveConfig(wave, run.mode, run.m),
       total: trial.wave.total,
       feint: trial.wave.feint,
       atk: trial.wave.attack,
       refill: true,
-    };
-  run.toSpawn = run.cfg.total;
-  run.pendingSpawns = initialSpawns(run.cfg.pack, false, random.next);
+    });
+  lifecycleFixture.lifecycle.startWave(1, true);
   let cleared = 0,
     attacked = 0;
   let cut = null;
@@ -108,6 +112,23 @@ function driveWave(seed, options = setup, trial) {
   };
   const phase = createWavesPhase((ctx) => ctx);
   const spawned = [];
+  lifecycleFixture.views.spawnEnemy = (slot) => {
+    spawned.push(spawnEnemy(run, slot, false, position, random.next).dir);
+  };
+  lifecycleFixture.views.sfx.step = () => {
+    attacked++;
+  };
+  lifecycleFixture.views.earn = (event) => {
+    if (event === 'wave') {
+      cleared++;
+      accrueRunReward(ledger, 'wave');
+    }
+  };
+  lifecycleFixture.views.addScore = (points) => {
+    const gained = scoreGain(points, run);
+    run.score += gained;
+    return gained;
+  };
   for (let tick = 0; tick < 6000 && run.state === 'playing'; tick++) {
     updateEnemies(run, 0.02, {
       surge: 0,
@@ -121,24 +142,7 @@ function driveWave(seed, options = setup, trial) {
       },
       position,
     });
-    updateWave(
-      run,
-      0.02,
-      {
-        spawn(slot) {
-          spawned.push(spawnEnemy(run, slot, false, position, random.next).dir);
-        },
-        attack() {
-          attacked++;
-        },
-        cleared(bonus) {
-          cleared++;
-          run.score += scoreGain(bonus, run);
-          accrueRunReward(ledger, 'wave');
-        },
-      },
-      random.next,
-    );
+    lifecycleFixture.lifecycle.updateWave(0.02);
     const enemy = run.attacker;
     if (!enemy || enemy.p < 0.8) continue;
     cut = null;

@@ -40,16 +40,20 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: wave swipe targeting and knife input now belong to
-`src/game/phases/waves.ts`. Four actual controller API cases cover correct/wrong
-cuts, mirrored trial directions, knife charges/rewards and passive finger-down.
-Seeded wave scenario inputs now call this controller; kill/update drivers remain
-temporary until their rule APIs move. Strict types passed; all 294 units passed
-(waves-input-final-unit.log). The exact browser command:
-`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`
-passed all 20 cases (waves-input-browser.log; terminal confirmed). Wave entry and
-update remain in game.ts. Next move these bodies into the same controller, then
-standoff/boss/shrine/death and live router dispatch. No gameplay change.
+Latest checkpoint: wave entry and update now also belong to
+`src/game/phases/waves.ts` through createWaveLifecycle. Deferred scene entry reads
+current ports when ready; regeneration, stage/lap, events, profile rewards, initial
+spawns and attacker blessing feedback retain existing order. Three added actual
+API cases cover deferred readiness/current ports, paused update/one clear reward,
+and the charged storm automatic kill boundary. Seeded scenario wave entry/update
+now use this API; kill rules remain a temporary port until their own move.
+Strict types passed; all 297 units passed (wave-lifecycle-final-unit.log).
+`npx playwright test tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/setup-progression.spec.ts --config playwright.rendering-v2.config.ts`:
+all 13 passed (wave-lifecycle-browser.log; terminal confirmed).
+Wave inputs checkpoint 2b6dfe5 had 294 units and twenty real browser cases green.
+Next move standoff/boss/shrine/death controllers and trial encounter start/finish,
+then live router dispatch. No intentional gameplay changes. Full W2/W3/Part 4
+remain pending; do not push develop.
 
 Previous run-start checkpoint: 5aee8dd; four actual initialization cases and seeded
 scenario initialization use run-start.ts. Strict, all 290 units and 15 real browser

@@ -1,4 +1,4 @@
-import { createWavesPhase } from './game/phases/waves.ts';
+import { createWavesPhase, createWaveLifecycle } from './game/phases/waves.ts';
 import { createRunStart } from './game/session/run-start.ts';
 import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
 import { createRunFlow } from './game/session/run-flow.ts';
@@ -1447,149 +1447,44 @@ export function startGame(
       .querySelector<HTMLButtonElement>('#trialResult button')
       ?.focus({ preventScroll: true });
   }
+  const waveLifecycle = createWaveLifecycle(() => ({
+    G,
+    ST,
+    W,
+    H,
+    S,
+    combatRandom,
+    renderLives,
+    pop,
+    setStage,
+    bst,
+    challenge,
+    saveStats,
+    checkUnlocks,
+    startStandoff,
+    waveCfg,
+    waveConfiguration,
+    banner,
+    setWaveLabel: (label) => {
+      $('waveLbl').textContent = label;
+    },
+    sfx,
+    hint,
+    captureCheckpoint,
+    deferUntilSceneReady,
+    spawnEnemy,
+    lightningFx: (p) =>
+      effectSpawner().killFx('bolt', p.x, p.y - p.h * 0.55, -Math.PI / 2, p.h / 160),
+    killEnemy,
+    dust,
+    earn,
+    addScore,
+  }));
   function startWave(n: number, skipEvent = false) {
-    G.wave = n;
-    startBlessingWave(G);
-    G.event = null;
-    G.wardUsed = false;
-    renderLives();
-    G.kikuUsed = 0;
-    G.foxUsed = false;
-    G.kagamiUsed = false;
-    G.so = null;
-    if (
-      G.m.regen &&
-      n > 1 &&
-      (n - 1) % G.m.regen === 0 &&
-      !G.zen &&
-      !G.hard &&
-      G.lives < G.maxLives
-    ) {
-      G.lives++;
-      renderLives();
-      pop(W / 2, H * 0.5, '延命 +1 life', Math.max(20, 24 * S));
-    }
-    if (n >= 9 && !G.zen && !G.lostLife && !ST.flawless) ST.flawless = 1;
-    const si = Math.floor((n - 1) / 3) % STAGES.length,
-      lap = Math.floor((n - 1) / (3 * STAGES.length)),
-      changed = si !== G.stage || lap !== G.lap;
-    G.lap = lap;
-    if (si !== G.stage) setStage(si, true);
-    const begin = () => {
-      const st = STAGES[si]!;
-      if (!G.zen) {
-        if (G.blade) ST.bladeWave = Math.max(ST.bladeWave || 0, n);
-        if (!G.lostLife) ST.flawlessWave = Math.max(ST.flawlessWave || 0, n);
-        {
-          const q = bst();
-          if (q) {
-            q.w = Math.max(q.w, n);
-            if (G.mode === 'ronin') q.rw = Math.max(q.rw, n);
-          }
-          challenge('w', n);
-          if (G.mode === 'ronin') challenge('rw', n);
-        }
-        ST.bestWave = Math.max(ST.bestWave, n);
-        if (G.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
-        ST.furthestStage = Math.max(ST.furthestStage, Math.floor((n - 1) / 3));
-      }
-      saveStats();
-      checkUnlocks();
-      let ev: 'standoff' | 'blood' | 'fog' | null = null;
-      if (
-        !skipEvent &&
-        n >= 4 &&
-        n - G.lastEv >= 2 &&
-        combatRandom() < 0.3 * (G.m.standoff > 1 ? 1.4 : 1)
-      ) {
-        const q = combatRandom();
-        ev = q < (G.m.standoff > 1 ? 0.7 : 0.4) ? 'standoff' : q < 0.7 ? 'blood' : 'fog';
-        G.lastEv = n;
-      }
-      if (ev === 'standoff') {
-        if (st.hint) hint('stage' + si, st.hint, 5000);
-        startStandoff(n, changed);
-        return;
-      }
-      G.event = ev;
-      G.cfg = waveCfg(n);
-      if (ev === 'blood') waveConfiguration().atk *= 0.82;
-      G.state = 'playing';
-      G.enemies = G.enemies.filter((e) => e.state === 'dying');
-      G.attacker = null;
-      G.toSpawn = waveConfiguration().total;
-      G.gapT = 1.2;
-      G.pendingSpawns = [];
-      G.pendingSpawns = initialSpawns(
-        waveConfiguration().pack,
-        !!((changed && n > 1) || ev),
-        combatRandom,
-      );
-      if (changed && n > 1) {
-        banner(st.k, `${st.n}${lap ? ' ' + roman(lap + 1) : ''}, wave ${n}`);
-        G.gapT = 1.9;
-      } else if (ev === 'blood') {
-        banner('赤月', 'Blood moon. Faster blades, double score.');
-        G.gapT = 1.9;
-      } else if (ev === 'fog') {
-        banner('霧', 'Fog. Only the attacker shows himself.');
-        G.gapT = 1.9;
-      } else banner(`第${kanji(n)}陣`, `Wave ${n}`);
-      $('waveLbl').textContent = ev === 'blood' ? '赤月' : ev === 'fog' ? '霧' : `第${kanji(n)}陣`;
-      sfx.drum();
-      if (n === 1) hint('swipe', 'Swipe the way his blade points.', 7000);
-      if (n === 2 || G.mode === 'ronin')
-        hint(
-          'perfect',
-          'Wait until his ring reaches the red arc, then cut, for a perfect cut.',
-          5000,
-        );
-      if (waveConfiguration().refill)
-        hint('refill', 'The pack no longer thins. Keep cutting.', 4000);
-      if (waveConfiguration().feint)
-        hint('feint', 'A trembling seal may feint. Watch the blade turn.', 5000);
-      if (st.hint) hint('stage' + si, st.hint, 5000);
-      if (ev === 'blood')
-        hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
-      if (ev === 'fog')
-        hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
-      captureCheckpoint();
-    };
-    if (!deferUntilSceneReady(begin)) begin();
+    waveLifecycle.startWave(n, skipEvent);
   }
   function updateWave(dt: number) {
-    simulateWave(
-      G,
-      dt,
-      {
-        spawn: (slot) => spawnEnemy(slot),
-        attack: (c) => {
-          const blessing = nextBlessingAttacker(G);
-          if (blessing === 'lightning') {
-            const p = c.pos;
-            effectSpawner().killFx('bolt', p.x, p.y - p.h * 0.55, -Math.PI / 2, p.h / 160);
-            killEnemy(c, c.dir, true, true);
-            pop(p.x, p.y - p.h, '雷', Math.max(20, 26 * S));
-            return;
-          }
-          if (blessing === 'hesitate') {
-            c.T += 0.75;
-            pop(c.pos.x, c.pos.y - c.pos.h, '間', Math.max(18, 22 * S));
-          }
-          sfx.step();
-          dust(c.pos.x, c.pos.y, c.pos.h * 0.4);
-        },
-        cleared: (bonus) => {
-          earn('wave');
-          if (recoverAfterWave(G)) {
-            renderLives();
-            pop(W / 2, H * 0.4, 'Recovery +1 life');
-          }
-          addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
-        },
-      },
-      combatRandom,
-    );
+    waveLifecycle.updateWave(dt);
   }
   function killEnemy(
     e: Enemy,

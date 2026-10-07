@@ -110,7 +110,8 @@ capture/restore/continue/abandon through explicit persistence ports.
 dispatch; fresh-seed and cosmetic-reset ports preserve existing ordering. Trial
 encounter start/finish still await their phase-owner moves.
 `game/phases/waves.ts` owns swipe targeting and knife input through explicit rule
-and feedback ports; wave entry/update and live router dispatch remain pending.
+and feedback ports. Its createWaveLifecycle owns deferred entry, preparation
+and update/clear boundaries; live router dispatch remains pending.
 
 ## Where changes belong
 
