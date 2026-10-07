@@ -1,3 +1,4 @@
+import { createArmoryWiring } from './ui/wiring/armory.ts';
 import { createSetupWiring } from './ui/wiring/setup.ts';
 import { createSettingsWiring } from './ui/wiring/settings.ts';
 import { createPanelWiring } from './ui/wiring/panels.ts';
@@ -2789,94 +2790,12 @@ export function startGame(
     get savedRun() { return savedRun; },
     get supportPreview() { return supportPreview; },
   });
-  const PRESETS = parsePresets(store.get('issen.presets', null));
-  const presetScreen = createPresetScreen($('armory'), {
-    presets: PRESETS,
-    capacity: () => META.upgrades.presets,
-    current: () => EQ,
-    save: () => {
-      store.set('issen.presets', PRESETS);
-    },
-    equip: (preset) => {
-      Object.assign(
-        EQ,
-        presetEquipment(preset, accessibleUnlocks(), ITEMS, META.upgrades.awakening),
-      );
-      equipArmory(EQ);
-      renderArmory();
-    },
-    temple: () => {
-      $('templateContent').dataset.selectedUpgrade = 'presets';
-      openPanel('template');
-    },
+  const armoryWiring = createArmoryWiring({
+    $, META, ITEMS, accessibleUnlocks, accessible, computeMods, applySeal, G, UNL, premiumAccess, DAILY_LOGIN, COLLECTION_PROGRESS, ARMORY_SEEN, SEALS, CHARMCOL, AWAKENING, SETUP, saveMeta, toast, sfx, demoKill, openPanel, lifecycle,
+    get EQ() { return EQ; }, get ST() { return ST; },
   });
-  lifecycle.add(presetScreen.dispose);
-  function equipArmory(equipment: typeof EQ) {
-    store.set('issen.equip', equipment);
-    computeMods();
-    applySeal();
-    G.runBlade = EQ.blade;
-    G.runRobe = EQ.robe;
-  }
-  const armory = createArmoryScreen($('armory'), {
-    items: ITEMS,
-    equipment: EQ,
-    unlocks: UNL,
-    owns: (id) => accessible(id) && (id === PREMIUM_FILM ? premiumAccess() : UNL.has(id)),
-    accessible,
-    progress: (id) =>
-      id === SEVEN_DAWNS_CREST
-        ? `Consecutive days: ${DAILY_LOGIN.streak}/7`
-        : equipmentPack(id)
-          ? collectionChallengeText(COLLECTION_PROGRESS, META, ST, id)
-          : id === 'falling-leaves'
-            ? `Kills: ${Math.min(ST.kills, 1000)} / 1,000`
-            : id === 'ember-ash'
-              ? `Duels: ${Math.min(ST.duels, 50)} / 50`
-              : id === 'ink-wash'
-                ? `Best run perfect cuts: ${Math.min(ST.bestRunPerfects, 100)} / 100`
-                : id === 'pilgrims-bead'
-                  ? `Duels: ${Math.min(ST.duels, 10)} / 10`
-                  : '',
-    statistics: ST,
-    seen: ARMORY_SEEN,
-    onViewed: () => {
-      store.set('issen.armorySeen', [...ARMORY_SEEN]);
-      refreshArmoryNew();
-    },
-    seals: SEALS,
-    charms: CHARMCOL,
-    awakeningAccess: (type) => META.upgrades.awakening >= (type === 'robe' ? 2 : 1),
-    awakeningProgress: (id, type) =>
-      type === 'blade' ? AWAKENING.blades[id] : AWAKENING.robes[id],
-    awakeningPurchase: (id) => ({
-      ready: accessible(id) && awakeningPurchasable(META, UNL, ITEMS, AWAKENING, id),
-      cost: awakeningCost(id),
-      balance: META.embers,
-    }),
-    buyAwakening: (id) => {
-      if (!accessible(id) || !purchaseAwakening(META, UNL, ITEMS, AWAKENING, id)) return false;
-      saveMeta();
-      store.set('issen.unlocks', [...UNL]);
-      refreshArmoryNew();
-      toast({ k: '真', msg: 'Awakening unlocked' });
-      return true;
-    },
-    powersEnabled: () => SETUP.upgrades !== false,
-    events: {
-      equipped: equipArmory,
-      rendered: presetScreen.refresh,
-      awaken: () => sfx.glint(),
-      preview: demoKill,
-    },
-  });
-  const renderArmory = armory.render;
-  function refreshArmoryNew() {
-    const unread = armory.hasNew();
-    $('bArmory').classList.toggle('arm-unread', unread);
-    if (unread) $('bArmory').setAttribute('aria-description', 'Unviewed equipment');
-    else $('bArmory').removeAttribute('aria-description');
-  }
+  const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
+  function refreshArmoryNew() { armoryWiring.refreshArmoryNew(); }
   let cinematicStage = 0;
   let cinematicStageSeed = stageSeed;
   let cinematicFilm = EQ.film;

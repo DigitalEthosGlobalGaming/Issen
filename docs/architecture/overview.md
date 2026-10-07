@@ -105,6 +105,8 @@ views and explicit runtime action ports.
 
 `ui/wiring/setup.ts` owns setup and isolated tutorial callbacks.
 
+`ui/wiring/armory.ts` owns Armoury/preset callbacks with current equipment/statistics getters.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |
