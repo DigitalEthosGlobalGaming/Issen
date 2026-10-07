@@ -1,3 +1,4 @@
+import { bindKnifeProgression, bindWaveProgression } from '../../../src/game/progression/encounter-listeners.ts';
 import { bindEncounterProgression } from '../../../src/game/progression/encounter-listeners.ts';
 import { createEventBus } from '../../../src/game/events.ts';
 import { createRunStart } from '../../../src/game/session/run-start.ts';
@@ -106,6 +107,9 @@ export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, star
     waveCfg: (wave) => waveConfig(wave, G.mode, G.m),
   };
   bindEncounterProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {} }));
+  bindKnifeProgression(views.events, () => ({ ST: views.ST, saveStats: views.saveStats }));
+  bindWaveProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {},
+    saveStats: views.saveStats, checkUnlocks: views.checkUnlocks }));
   const flow = createRunStart(views);
   if (start) flow.startRun();
   return { run: G, get random() { return views.runRandom; }, views, flow, trace, weather };

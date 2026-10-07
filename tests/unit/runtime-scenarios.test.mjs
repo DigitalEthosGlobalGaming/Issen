@@ -68,6 +68,7 @@ function driveWave(seed, options = setup, trial, suppliedRuntime) {
   let cut = null;
   const inputViews = {
     events: runtime.views.events,
+    events: kill.views.events,
     G: run,
     W: 200,
     ST: parseStatistics({}),
@@ -104,9 +105,9 @@ function driveWave(seed, options = setup, trial, suppliedRuntime) {
   lifecycleFixture.views.spawnEnemy = (slot) => {
     spawned.push(spawnEnemy(run, slot, false, position, random.next).dir);
   };
-  lifecycleFixture.views.sfx.step = () => {
-    attacked++;
-  };
+  runtime.views.events.on('waveAttack', event => {
+    if (event.kind === 'step') attacked++;
+  });
   lifecycleFixture.views.earn = (event) => {
     if (event === 'wave') {
       cleared++;
@@ -220,7 +221,7 @@ test('wrong cuts lose life and combo while feints expose the true direction', ()
   const lives = run.lives;
   run.combo = 5;
   input.onSwipe({
-    G: run, W: 200, activeTrial: null, waveConfiguration: () => run.cfg,
+    events: runtime.views.events, G: run, W: 200, activeTrial: null, waveConfiguration: () => run.cfg,
     playerDie: death.phase.playerDie, swingPlayer() {}, sfx: { whoosh() {} },
   }, OPP[enemy.dir]);
   assert.equal(run.lives, lives - 1);
@@ -246,7 +247,7 @@ test('wrong cuts lose life and combo while feints expose the true direction', ()
   assert.equal(nextEnemy.switched, true);
   let target;
   input.onSwipe({
-    G: run, W: 200, activeTrial: null, waveConfiguration: () => run.cfg,
+    events: runtime.views.events, G: run, W: 200, activeTrial: null, waveConfiguration: () => run.cfg,
     killEnemy: (cut) => { target = cut; }, orderSucceeded() {},
   }, nextEnemy.dir);
   assert.equal(target, nextEnemy);

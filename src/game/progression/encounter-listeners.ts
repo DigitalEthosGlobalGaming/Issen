@@ -42,3 +42,50 @@ export function bindEncounterProgression(
     offParry();
   };
 }
+
+
+/** Knife kills settle their original profile counter and save through value events. */
+export function bindKnifeProgression(
+  events: EventBus<GameEvents>,
+  readViews: () => { readonly ST: Statistics; readonly saveStats: () => void },
+) {
+  return events.on('knifeHit', () => {
+    const { ST, saveStats } = readViews();
+    ST.kills++;
+    saveStats();
+  });
+}
+
+
+/** Wave profile milestones settle at preparation/committed entry without run/RNG access. */
+export function bindWaveProgression(
+  events: EventBus<GameEvents>,
+  readViews: () => EncounterProgressionViews & {
+    readonly saveStats: () => void; readonly checkUnlocks: () => void;
+  },
+) {
+  const offPrepared = events.on('wavePrepared', event => {
+    const { ST } = readViews();
+    if (event.wave >= 9 && !event.zen && !event.lostLife && !ST.flawless) ST.flawless = 1;
+  });
+  const offReached = events.on('waveReached', event => {
+    const { ST, bst, challenge, saveStats, checkUnlocks } = readViews(), n = event.wave;
+    if (!event.zen) {
+      if (event.blade) ST.bladeWave = Math.max(ST.bladeWave || 0, n);
+      if (!event.lostLife) ST.flawlessWave = Math.max(ST.flawlessWave || 0, n);
+      const blade = bst();
+      if (blade) {
+        blade.w = Math.max(blade.w, n);
+        if (event.mode === 'ronin') blade.rw = Math.max(blade.rw, n);
+      }
+      challenge('w', n);
+      if (event.mode === 'ronin') challenge('rw', n);
+      ST.bestWave = Math.max(ST.bestWave, n);
+      if (event.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
+      ST.furthestStage = Math.max(ST.furthestStage, Math.floor((n - 1) / 3));
+    }
+    saveStats();
+    checkUnlocks();
+  });
+  return () => { offReached(); offPrepared(); };
+}

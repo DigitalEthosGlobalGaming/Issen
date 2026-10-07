@@ -1,3 +1,4 @@
+import { bindWaveFeedback } from '../presentation/wave-feedback.ts';
 import { createRuntimeUIBase } from '../runtime/ui-base.ts';
 
 import { createRuntimePresentation } from '../runtime/presentation.ts';
@@ -8,6 +9,8 @@ import { bindStandoffFeedback } from '../presentation/standoff-feedback.ts';
 import { bindBossFeedback } from '../presentation/boss-feedback.ts';
 import { bindDamageFeedback } from '../presentation/damage-feedback.ts';
 import { bindDuelFeedback } from '../presentation/duel-feedback.ts';
+import { bindWaveInputFeedback } from '../presentation/wave-input-feedback.ts';
+import { bindKnifeProgression, bindWaveProgression } from '../game/progression/encounter-listeners.ts';
 import { bindEncounterProgression } from '../game/progression/encounter-listeners.ts';
 
 import { bindCombatScoreFeedback } from '../presentation/combat-score.ts';
@@ -165,4 +168,29 @@ export function bindRuntimeReactions(
       H: foundation.view.geometry.H,
     })),
   );
+  foundation.lifecycle.add(bindKnifeProgression(events, () => ({
+    ST: foundation.profile.profileFoundation.ST, saveStats: foundation.profile.saveStats,
+  })));
+  foundation.lifecycle.add(bindWaveInputFeedback(events, () => ({
+    pop: presentation.pop, sfx: foundation.browser.sfx, sparks: presentation.sparks,
+    buzz: foundation.browser.buzz, hud: ui.hud,
+    knifeTrail: event => { foundation.view.presentationState.fx.knives.push({
+      x0: event.x0, y0: event.y0, x1: event.x, y1: event.y - event.height * 0.55,
+      t: 0, life: 0.18,
+    }); },
+  })));
+
+  foundation.lifecycle.add(bindWaveFeedback(events, () => ({
+    S: foundation.view.geometry.S, renderLives: ui.renderLives, pop: presentation.pop,
+    banner: ui.banner, sfx: foundation.browser.sfx, hint: ui.hint,
+    setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
+    lightningFx: event => presentation.effectSpawner().killFx('bolt', event.x, event.y - event.height * 0.55, -Math.PI / 2, event.height / 160),
+    dust: presentation.dust,
+  })));
+
+  foundation.lifecycle.add(bindWaveProgression(events, () => ({
+    ST: foundation.profile.profileFoundation.ST, bst: rules.bst, challenge: rules.challenge,
+    saveStats: foundation.profile.saveStats, checkUnlocks: rules.checkUnlocks,
+  })));
+
 }

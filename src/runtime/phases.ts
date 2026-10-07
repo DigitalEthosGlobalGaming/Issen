@@ -104,12 +104,7 @@ export function createRuntimePhases(
                 captureCheckpoint: readActions().captureCheckpoint,
                 deferUntilSceneReady: readActions().deferUntilSceneReady,
                 spawnEnemy: readActions().spawnEnemy,
-                lightningFx: (p) =>
-                  presentation
-                    .effectSpawner()
-                    .killFx('bolt', p.x, p.y - p.h * 0.55, -Math.PI / 2, p.h / 160),
                 killEnemy: readActions().killEnemy,
-                dust: presentation.dust,
                 earn: readActions().earn,
                 addScore: readActions().addScore,
                 orderSucceeded: () => foundation.browser.guided.orderSucceeded(),
@@ -120,18 +115,6 @@ export function createRuntimePhases(
                 sparks: presentation.sparks,
                 buzz: foundation.browser.buzz,
                 hud: readActions().hud,
-                knifeTrail(pos) {
-                  foundation.view.presentationState.fx.knives.push({
-                    x0: foundation.view.geometry.L.player.x,
-                    y0:
-                      foundation.view.geometry.L.player.y -
-                      foundation.view.geometry.L.player.h * 0.55,
-                    x1: pos.x,
-                    y1: pos.y - pos.h * 0.55,
-                    t: 0,
-                    life: 0.18,
-                  });
-                },
                 bossPos: readActions().bossPos,
                 renderHp: readActions().renderHp,
                 guided: foundation.browser.guided,

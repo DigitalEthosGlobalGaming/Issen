@@ -57,7 +57,8 @@ test('wave events wait for actual deferred entry and carry its once-only committ
   f.lifecycle.startWave(4, true);
   assert.equal(started.values.length, 0);
   begin();
-  assert.deepEqual(started.values, [{ wave: 4, stage: 1 }]);
+  assert.deepEqual(started.values, [{ wave: 4, stage: 1, lap: 0, changed: true,
+    event: null, ronin: false, refill: G.cfg.refill, feint: !!G.cfg.feint }]);
   G.toSpawn = 0;
   G.pendingSpawns = [];
   G.enemies = [];

@@ -37,6 +37,8 @@ export interface GameEvents {
     y: number;
     height: number;
   }>;
+  swipeCue: Readonly<{ kind: 'mirror' | 'miss' }>;
+  knifeHit: Readonly<{ x0: number; y0: number; x: number; y: number; height: number }>;
   struck: Readonly<{
     reason: string; lives: number; fatal: boolean; lifeLost: boolean;
     x: number; y: number; height: number; label: string;
@@ -52,7 +54,18 @@ export interface GameEvents {
     height: number;
   }>;
   block: Readonly<{ boss: string; perfect: boolean; x: number; y: number; height: number }>;
-  waveStarted: Readonly<{ wave: number; stage: number }>;
+  wavePrepared: Readonly<{ wave: number; zen: boolean; lostLife: boolean }>;
+  waveReached: Readonly<{ wave: number; mode: string; zen: boolean; blade: boolean; lostLife: boolean }>;
+  waveStarted: Readonly<{
+    wave: number; stage: number; lap: number; changed: boolean;
+    event: 'blood' | 'fog' | null; ronin: boolean; refill: boolean; feint: boolean;
+  }>;
+  stageHint: Readonly<{ stage: number }>;
+  waveAttack: Readonly<{ kind: 'lightning' | 'lightningCut' | 'hesitate' | 'step'; x: number; y: number; height: number }>;
+  livesChanged: Readonly<
+    | { cause: 'refresh'; lives: number }
+    | { cause: 'regen' | 'recovery' | 'breath'; lives: number; x: number; y: number }
+  >;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
   bossCut: Readonly<{ boss: string; direction: Direction; automatic: boolean; x: number; y: number; height: number }>;
   bossStarted: Readonly<{ boss: string; count: number }>;

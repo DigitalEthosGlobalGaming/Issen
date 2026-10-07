@@ -3,8 +3,6 @@ import { STAGES } from '../content/stages.ts';
 import { startBlessingWave, nextBlessingAttacker } from '../shrine/triggered.ts';
 import { recoverAfterWave } from '../progression/run-powers.ts';
 import { initialSpawns, updateWave as simulateWave } from '../encounters/waves.ts';
-import { kanji, roman } from '../../shared/format.ts';
-import type { BladeStats } from '../progression/statistics.ts';
 import { definePhase } from '../session/phase-router.ts';
 import { targetSwipe } from '../combat/targeting.ts';
 import { throwKnife } from '../combat/knife.ts';
@@ -13,14 +11,13 @@ import type { Random } from '../../shared/random.ts';
 import type { RunState } from '../run-state.ts';
 import type { Enemy } from '../combat/enemy.ts';
 import type { Boss } from '../encounters/boss.ts';
-import type { Statistics } from '../progression/statistics.ts';
 import type { TrialDefinition } from '../content/trials.ts';
 
 export interface WavesViews {
   readonly events: RuleEvents;
   readonly G: RunState;
   readonly W: number;
-  readonly ST: Statistics;
+  readonly L: { player: { x: number; y: number; h: number } };
   readonly activeTrial: TrialDefinition | null;
   readonly combatRandom: Random;
   readonly waveConfiguration: () => NonNullable<RunState['cfg']>;
@@ -32,8 +29,6 @@ export interface WavesViews {
     automatic?: boolean,
   ) => void;
   readonly orderSucceeded: () => void;
-  readonly pop: (x: number, y: number, text: string, size?: number) => void;
-  readonly sfx: { glint(): void; whoosh(): void };
   readonly swingPlayer: (direction: Direction | 'block', perfect?: boolean) => void;
   readonly playerDie: (killer: Enemy | Boss | null, reason: string) => void;
   readonly enemyPos: (enemy: Enemy) => Enemy['pos'];
@@ -46,11 +41,6 @@ export interface WavesViews {
     size?: number,
   ) => number;
   readonly comboMult: () => number;
-  readonly knifeTrail: (position: Enemy['pos']) => void;
-  readonly sparks: (x: number, y: number, count: number) => void;
-  readonly buzz: (duration: number) => void;
-  readonly hud: (on: boolean) => void;
-  readonly saveStats: () => void;
 }
 
 /** Wave inputs and update dispatch share the owning lifecycle. */
@@ -70,8 +60,7 @@ export function createWavesPhase<Context>(
         waveConfiguration,
         killEnemy,
         orderSucceeded,
-        pop,
-        sfx,
+        events,
         swingPlayer,
         playerDie,
       } = readViews(context);
@@ -86,12 +75,11 @@ export function createWavesPhase<Context>(
         killEnemy(outcome.target, dir, outcome.mirror);
         if (waveConfiguration().ordered) orderSucceeded();
         if (outcome.mirror) {
-          pop(0, 0, '鏡');
-          sfx.glint();
+          events.emit('swipeCue', { kind: 'mirror' });
         }
       } else if (outcome.kind === 'miss') {
         swingPlayer(dir);
-        sfx.whoosh();
+        events.emit('swipeCue', { kind: 'miss' });
         playerDie(outcome.killer, outcome.reason);
       }
     },
@@ -101,16 +89,11 @@ export function createWavesPhase<Context>(
         combatRandom,
         enemyPos,
         waveConfiguration,
-        ST,
+        events,
+        L,
         earn,
         addScore,
         comboMult,
-        knifeTrail,
-        sparks,
-        sfx,
-        buzz,
-        hud,
-        saveStats,
       } = readViews(context);
       const target = throwKnife(G, combatRandom);
       if (!target) return;
@@ -130,7 +113,6 @@ export function createWavesPhase<Context>(
         G.gapT = waveConfiguration().gap;
       }
       G.kills++;
-      ST.kills++;
       earn('kill');
       addScore(
         Math.round((wasAttacker ? 140 : 120) * comboMult() * G.m.normal),
@@ -138,12 +120,10 @@ export function createWavesPhase<Context>(
         pos.y - pos.h,
         'Knife',
       );
-      knifeTrail(pos);
-      sparks(pos.x, pos.y - pos.h * 0.55, 10);
-      sfx.whoosh();
-      buzz(8);
-      hud(true);
-      saveStats();
+      events.emit('knifeHit', {
+        x0: L.player.x, y0: L.player.y - L.player.h * 0.55,
+        x: pos.x, y: pos.y, height: pos.h,
+      });
       return;
     },
   });
@@ -153,10 +133,8 @@ export interface WaveLifecycleViews extends Pick<
   WavesViews,
   | 'events'
   | 'G'
-  | 'ST'
   | 'W'
   | 'combatRandom'
-  | 'pop'
   | 'waveConfiguration'
   | 'killEnemy'
   | 'earn'
@@ -164,23 +142,12 @@ export interface WaveLifecycleViews extends Pick<
 > {
   readonly H: number;
   readonly S: number;
-  readonly renderLives: () => void;
   readonly setStage: (stage: number, transition: boolean) => void;
-  readonly bst: () => BladeStats | null;
-  readonly challenge: (metric: keyof BladeStats, value?: number) => void;
-  readonly saveStats: () => void;
-  readonly checkUnlocks: () => void;
   readonly startStandoff: (wave: number, changed: boolean) => void;
   readonly waveCfg: (wave: number) => NonNullable<RunState['cfg']>;
-  readonly banner: (title: string, subtitle: string) => void;
-  readonly setWaveLabel: (label: string) => void;
-  readonly sfx: { drum(): void; step(): void };
-  readonly hint: (key: string, message: string, duration?: number) => void;
   readonly captureCheckpoint: () => void;
   readonly deferUntilSceneReady: (begin: () => void) => boolean;
   readonly spawnEnemy: (slot: number) => void;
-  readonly lightningFx: (position: Enemy['pos']) => void;
-  readonly dust: (x: number, y: number, height: number) => void;
 }
 
 /** Wave preparation and simulation retain deferred scene entry and clear timing. */
@@ -188,31 +155,18 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
   function startWave(n: number, skipEvent = false) {
     const {
       G,
-      ST,
       W,
       H,
       S,
       combatRandom,
-      renderLives,
-      pop,
       setStage,
-      bst,
-      challenge,
-      saveStats,
-      checkUnlocks,
       startStandoff,
       waveCfg,
       waveConfiguration,
-      banner,
-      setWaveLabel,
-      sfx,
-      hint,
       captureCheckpoint,
       deferUntilSceneReady,
       spawnEnemy,
-      lightningFx,
       killEnemy,
-      dust,
       earn,
       addScore,
     } = readViews();
@@ -220,7 +174,7 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
     startBlessingWave(G);
     G.event = null;
     G.wardUsed = false;
-    renderLives();
+    readViews().events.emit('livesChanged', { cause: 'refresh', lives: G.lives });
     G.kikuUsed = 0;
     G.foxUsed = false;
     G.kagamiUsed = false;
@@ -234,10 +188,9 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
       G.lives < G.maxLives
     ) {
       G.lives++;
-      renderLives();
-      pop(W / 2, H * 0.5, '延命 +1 life', Math.max(20, 24 * S));
+      readViews().events.emit('livesChanged', { cause: 'regen', lives: G.lives, x: W / 2, y: H * 0.5 });
     }
-    if (n >= 9 && !G.zen && !G.lostLife && !ST.flawless) ST.flawless = 1;
+    readViews().events.emit('wavePrepared', { wave: n, zen: G.zen, lostLife: G.lostLife });
     const si = Math.floor((n - 1) / 3) % STAGES.length,
       lap = Math.floor((n - 1) / (3 * STAGES.length)),
       changed = si !== G.stage || lap !== G.lap;
@@ -246,53 +199,25 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
     const begin = () => {
       const {
         G,
-        ST,
         W,
         H,
         S,
         combatRandom,
-        renderLives,
-        pop,
         setStage,
-        bst,
-        challenge,
-        saveStats,
-        checkUnlocks,
         startStandoff,
         waveCfg,
         waveConfiguration,
-        banner,
-        setWaveLabel,
-        sfx,
-        hint,
         captureCheckpoint,
         deferUntilSceneReady,
         spawnEnemy,
-        lightningFx,
         killEnemy,
-        dust,
         earn,
         addScore,
       } = readViews();
       const st = STAGES[si]!;
-      if (!G.zen) {
-        if (G.blade) ST.bladeWave = Math.max(ST.bladeWave || 0, n);
-        if (!G.lostLife) ST.flawlessWave = Math.max(ST.flawlessWave || 0, n);
-        {
-          const q = bst();
-          if (q) {
-            q.w = Math.max(q.w, n);
-            if (G.mode === 'ronin') q.rw = Math.max(q.rw, n);
-          }
-          challenge('w', n);
-          if (G.mode === 'ronin') challenge('rw', n);
-        }
-        ST.bestWave = Math.max(ST.bestWave, n);
-        if (G.mode === 'ronin') ST.roninWave = Math.max(ST.roninWave, n);
-        ST.furthestStage = Math.max(ST.furthestStage, Math.floor((n - 1) / 3));
-      }
-      saveStats();
-      checkUnlocks();
+      readViews().events.emit('waveReached', {
+        wave: n, mode: G.mode, zen: G.zen, blade: G.blade, lostLife: G.lostLife,
+      });
       let ev: 'standoff' | 'blood' | 'fog' | null = null;
       if (
         !skipEvent &&
@@ -305,7 +230,7 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
         G.lastEv = n;
       }
       if (ev === 'standoff') {
-        if (st.hint) hint('stage' + si, st.hint, 5000);
+        if (st.hint) readViews().events.emit('stageHint', { stage: si });
         startStandoff(n, changed);
         return;
       }
@@ -323,35 +248,12 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
         !!((changed && n > 1) || ev),
         combatRandom,
       );
-      if (changed && n > 1) {
-        banner(st.k, `${st.n}${lap ? ' ' + roman(lap + 1) : ''}, wave ${n}`);
-        G.gapT = 1.9;
-      } else if (ev === 'blood') {
-        banner('赤月', 'Blood moon. Faster blades, double score.');
-        G.gapT = 1.9;
-      } else if (ev === 'fog') {
-        banner('霧', 'Fog. Only the attacker shows himself.');
-        G.gapT = 1.9;
-      } else banner(`第${kanji(n)}陣`, `Wave ${n}`);
-      setWaveLabel(ev === 'blood' ? '赤月' : ev === 'fog' ? '霧' : `第${kanji(n)}陣`);
-      sfx.drum();
-      if (n === 1) hint('swipe', 'Swipe the way his blade points.', 7000);
-      if (n === 2 || G.mode === 'ronin')
-        hint(
-          'perfect',
-          'Wait until his ring reaches the red arc, then cut, for a perfect cut.',
-          5000,
-        );
-      if (waveConfiguration().refill)
-        hint('refill', 'The pack no longer thins. Keep cutting.', 4000);
-      if (waveConfiguration().feint)
-        hint('feint', 'A trembling seal may feint. Watch the blade turn.', 5000);
-      if (st.hint) hint('stage' + si, st.hint, 5000);
-      if (ev === 'blood')
-        hint('blood', 'Blood moon. They strike faster, but every cut scores double.', 4500);
-      if (ev === 'fog')
-        hint('fog', 'Fog. The rest of the pack is hidden. Cut whoever steps out.', 4500);
-      readViews().events.emit('waveStarted', { wave: G.wave, stage: G.stage });
+      if ((changed && n > 1) || ev) G.gapT = 1.9;
+      readViews().events.emit('waveStarted', {
+        wave: G.wave, stage: G.stage, lap, changed,
+        event: ev, ronin: G.mode === 'ronin',
+        refill: waveConfiguration().refill, feint: !!waveConfiguration().feint,
+      });
       captureCheckpoint();
     };
     if (!deferUntilSceneReady(begin)) begin();
@@ -359,31 +261,18 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
   function updateWave(dt: number) {
     const {
       G,
-      ST,
       W,
       H,
       S,
       combatRandom,
-      renderLives,
-      pop,
       setStage,
-      bst,
-      challenge,
-      saveStats,
-      checkUnlocks,
       startStandoff,
       waveCfg,
       waveConfiguration,
-      banner,
-      setWaveLabel,
-      sfx,
-      hint,
       captureCheckpoint,
       deferUntilSceneReady,
       spawnEnemy,
-      lightningFx,
       killEnemy,
-      dust,
       earn,
       addScore,
     } = readViews();
@@ -396,23 +285,21 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
           const blessing = nextBlessingAttacker(G);
           if (blessing === 'lightning') {
             const p = c.pos;
-            lightningFx(p);
+            readViews().events.emit('waveAttack', { kind: 'lightning', x: p.x, y: p.y, height: p.h });
             killEnemy(c, c.dir, true, true);
-            pop(p.x, p.y - p.h, '雷', Math.max(20, 26 * S));
+            readViews().events.emit('waveAttack', { kind: 'lightningCut', x: p.x, y: p.y, height: p.h });
             return;
           }
           if (blessing === 'hesitate') {
             c.T += 0.75;
-            pop(c.pos.x, c.pos.y - c.pos.h, '間', Math.max(18, 22 * S));
+            readViews().events.emit('waveAttack', { kind: 'hesitate', x: c.pos.x, y: c.pos.y, height: c.pos.h });
           }
-          sfx.step();
-          dust(c.pos.x, c.pos.y, c.pos.h * 0.4);
+          readViews().events.emit('waveAttack', { kind: 'step', x: c.pos.x, y: c.pos.y, height: c.pos.h });
         },
         cleared: (bonus) => {
           earn('wave');
           if (recoverAfterWave(G)) {
-            renderLives();
-            pop(W / 2, H * 0.4, 'Recovery +1 life');
+            readViews().events.emit('livesChanged', { cause: 'recovery', lives: G.lives, x: W / 2, y: H * 0.4 });
           }
           addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
           readViews().events.emit('waveCleared', { wave: G.wave, stage: G.stage, score: G.score });

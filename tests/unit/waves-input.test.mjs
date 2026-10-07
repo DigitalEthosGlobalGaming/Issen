@@ -1,4 +1,5 @@
 import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
+import { bindWaveInputFeedback } from '../../src/presentation/wave-input-feedback.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
@@ -8,7 +9,7 @@ import { scoreGain, comboMultiplier } from '../../src/game/progression/scoring.t
 
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };
 const position = () => ({ x: 100, y: 200, h: 150, fog: 0, alpha: 1 });
-function fixture() {
+function fixture(enabled = true) {
   const session = runStartSession(7654, setup),
     G = session.run,
     trace = [];
@@ -19,6 +20,8 @@ function fixture() {
   G.attacker = enemy;
   G.cfg.ordered = false;
   const views = {
+    events: session.views.events,
+    L: { player: { x: 100, y: 200, h: 150 } },
     G,
     W: 200,
     ST: session.views.ST,
@@ -65,7 +68,9 @@ function fixture() {
     hud() {},
     saveStats() {},
   };
+  const disposeFeedback = enabled ? bindWaveInputFeedback(session.views.events, () => views) : () => {};
   return {
+    disposeFeedback,
     session,
     views,
     enemy,
@@ -119,4 +124,31 @@ test('wave finger-down stays available for swipes and a zero-charge tap has no f
   f.phase.onTap(f.views);
   assert.deepEqual(f.trace, []);
   assert.equal(f.enemy.state, 'attack');
+});
+
+
+test('actual knife kills preserve run/profile/RNG when cosmetic reactions are absent and snapshots survive replacement', () => {
+  function drive(enabled) {
+    const f = fixture(enabled), snapshots = [];
+    f.session.views.events.on('knifeHit', event => snapshots.push(event));
+    f.views.G.knives = 1; f.views.G.combo = 7;
+    const oldRandom = f.session.random.state();
+    f.phase.onTap(f.views);
+    f.phase.onTap(f.views);
+    assert.equal(snapshots.length, 1);
+    const event = snapshots[0];
+    assert.ok(Object.isFrozen(event));
+    assert.deepEqual(event, { x0: 100, y0: 117.5, x: 100, y: 200, height: 150 });
+    assert.notEqual(f.session.random.state(), oldRandom);
+    const count = f.trace.filter(value => value === 'knife' || value === 'whoosh').length;
+    assert.equal(count, enabled ? 2 : 0);
+    f.disposeFeedback();
+    f.views.L = { player: { x: 900, y: 800, h: 12 } };
+    f.enemy.pos.x = 999;
+    assert.equal(event.x, 100);
+    f.session.views.events.emit('swipeCue', { kind: 'mirror' });
+    assert.equal(f.trace.filter(value => value === 'knife' || value === 'whoosh').length, count);
+    return { run: structuredClone(f.views.G), stats: structuredClone(f.views.ST), random: f.session.random.state() };
+  }
+  assert.deepEqual(drive(true), drive(false));
 });

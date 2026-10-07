@@ -18,7 +18,7 @@ The domain composition is committed at f01fad7. Separate root import cleanup
 removes 127 unused imports and leaves 129 lines. Strict checks, all 371 units and
 all six startup/preview/disposal/scene-continuation browsers pass in 28.2s
 (composition-imports-typecheck.log / composition-imports-unit.log /
-composition-imports-browser.log). Root cleanup is ready for its separate commit.
+composition-imports-browser.log). Root cleanup is committed at 2c03768.
 Runtime owners: foundation, presentation, UI base, profile/equipment rules, combat
 wiring, scene continuation, phases, sessions, menu/controls, frame/viewport and
 synchronous reaction wiring. Renderer-dependent frame-bindings/startup moved
@@ -51,18 +51,29 @@ the fully passing broad W2 checkpoint remains required before lighting.
 
 Original composition/import apply manifests are now stale; preserve current source.
 
-An isolated wave-cues-preview now owns wave/knife/missed-swipe cosmetic feedback
-and wave/knife profile progression through immutable value events. Wave preparation
-and deferred profile settlement keep their original boundaries. Strict and all
-374 units pass (wave-cues-preview-typecheck.log / wave-cues-preview-unit.log).
-Added actual knife/wave/lightning/recovery scenarios compare listeners on/off,
-run/profile/combat RNG, snapshots and disposal. This draft remains unapplied.
+Wave/knife/missed-swipe cosmetics and wave/knife profile progression now use
+immutable value events in actual source. Strict and all 374 units pass
+(wave-events-typecheck.log / wave-events-unit.log). The exact six-file browser
+command passes all 22 cases (wave-events-browser.log): game, new-blessings,
+trials, scene-readiness, scene-continuation and features, with rendering-v2
+configuration and retained failure traces. Assertions/deadlines are unchanged.
+Knife persistence now precedes cosmetics within the same call; wave preparation
+and deferred profile settlement keep their original boundaries. Behavior changes
+are recorded in tmp/runtime-refactor/behaviour-changes.md and architecture docs.
 
-Remaining feedback audit: tmp/runtime-refactor/remaining-feedback-audit.md.
-Wave/boss entry/update, knife and standoff-failure/transition presentation still
-need value-event ownership. All W2 final gates/version/docs/checklist, all W3 and
-Part 4 remain required. Develop is unpushed; push once only after full completion.
-No profiling/benchmarks, store builds, real-save edits or lit-only changes.
+Next: apply the isolated challenger entry/transition cue draft from wave-cues-
+preview. Only its events.ts, standoff.ts, runtime/reactions.ts, new presentation/
+standoff-cues.ts and tests/unit/standoff-cues.test.mjs changed beyond this wave
+checkpoint. Its root is stale: never copy all source. Strict and all 375 isolated
+units pass (standoff-cues-draft-typecheck.log / standoff-cues-draft-unit.log).
+Actual deferred entry/twitch/draw/cut/exit test proves frozen snapshots, disposal,
+and identical run/profile/combat RNG with cosmetic cues disabled.
+
+Remaining: boss entry/update/return/heal/deflect/hints and low-level grunt/boss
+audio/flash callbacks, final ownership/adapter audit, all W2 final gates/version/
+docs/checklist. All W3 and Part 4 remain required. Develop is unpushed; push once
+only after full completion. No profiling/benchmarks, store builds, real-save edits
+or lit-only changes.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

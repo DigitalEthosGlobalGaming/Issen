@@ -540,3 +540,11 @@ allowing eager controller construction without reading uninitialized UI owners.
 Strict/all 371 units and 45 focused cases pass. The combined run has 253 passes
 and one module-request reset during reload; that unchanged case passes on focused
 recheck. A fully passing combined run remains required at the W2 checkpoint.
+
+Wave/knife input and wave lifecycle rules emit immutable values for banners,
+hints, lightning, footsteps, lives and knife trails. Cosmetic ownership is in
+presentation/wave-input-feedback.ts and wave-feedback.ts; profile ownership is in
+game/progression/encounter-listeners.ts. Deferred wave settlement saves once at
+the original entry boundary. Knife profile persistence now precedes cosmetics
+within the same input call. Rules retain charges, score, lives, combat RNG,
+initial spawns, gap timing, scene adoption and checkpoint boundaries.

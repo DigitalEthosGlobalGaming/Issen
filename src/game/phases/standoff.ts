@@ -339,7 +339,7 @@ export function createStandoffPhase<Context>(
       checkUnlocks();
     } else {
       swingPlayer(dir);
-      sfx.whoosh();
+      views.events.emit('swipeCue', { kind: 'miss' });
       playerDie(e, outcome);
       views.events.emit('standoffResolved', { won: false, perfect: false });
     }

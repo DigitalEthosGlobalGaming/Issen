@@ -1,8 +1,9 @@
+import { bindWaveFeedback } from '../../../src/presentation/wave-feedback.ts';
 import { createWaveLifecycle } from '../../../src/game/phases/waves.ts';
 import { waveConfig } from '../../../src/game/encounters/configuration.ts';
 
 /** Narrow test-owned feedback/service ports around the real wave lifecycle. */
-export function waveLifecycleFixture(session) {
+export function waveLifecycleFixture(session, feedback = true) {
   const G = session.run,
     trace = [],
     pending = [];
@@ -71,5 +72,6 @@ export function waveLifecycleFixture(session) {
       return points;
     },
   };
-  return { views, trace, pending, lifecycle: createWaveLifecycle(() => views) };
+  const disposeFeedback = feedback ? bindWaveFeedback(views.events, () => views) : () => {};
+  return { disposeFeedback, views, trace, pending, lifecycle: createWaveLifecycle(() => views) };
 }
