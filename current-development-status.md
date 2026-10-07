@@ -10,7 +10,30 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: boss successful-cut and victory feedback react through
+Latest combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+passes all 253 in 13.4m (boss-feedback-broad.log; terminal exit 0 confirmed),
+covering committed native/equipment/frame/environment/profile/figure ownership,
+boss cut/victory feedback and the separately corrected rush fixture.
+
+The missing-wave recovery diagnostic is now conclusively reproduced on unchanged
+pre-refactor ad353b3. Controlled original recovery actions hold the real renderer
+completion promise after cinematic leave; continued run adopts the same scene,
+then the stale title setup callback clears G.cfg. The baseline logs the identical
+missing-configuration error and fails the valid-wave assertion with null
+(scene-continuation-baseline.log; terminal exit 1). Earlier natural one-run probe
+had zero errors and was inconclusive; this controlled proof supersedes it.
+Next: isolated checkpoint restore fix discarding the prior scene continuation,
+with actual browser/headless regressions. Then apply the isolated phase-binding
+preview, which passes strict types (phase-binding-preview-typecheck.log) and has
+seven factories/101 shared ports/no conflicts. Its preview root is 2,417 lines.
+The separate menu-binding preview also passes strict types, preserving menu order
+and internal callback getters (menu-binding-preview-typecheck.log); it is not
+applied and must be independently browser-verified after the phase step.
+Both previews are under tmp/runtime-refactor; running source was unchanged.
+W2 composition reduction and remaining reactions, all W3, and Part 4 remain
+required. Continue autonomously without review or an early develop push.
+
+Previous checkpoint:  boss successful-cut and victory feedback react through
 presentation/boss-feedback.ts. bossCut carries direction/automatic/position;
 bossDefeated adds flat effect/ground position and crow projection. Rules retain
 HP, animation, death records, hit stop, combo/score/rewards, life recovery and phase.
