@@ -64,10 +64,10 @@ import { compositionKey } from './rendering/environment/worker-types.ts';
 
 import { premium } from './platform/purchases.ts';
 import { SUPPORTER_FILM_ITEM } from './game/content/items.ts';
-import { editionAccess, itemAccessible, type GameEdition } from './platform/editions.ts';
+import { type GameEdition } from './platform/editions.ts';
 import { precisionZone } from './game/progression/mastery.ts';
 import { PREMIUM_FILM } from './platform/premium.ts';
-import { testerPremiumActive, parseTesterPremium } from './platform/tester-premium.ts';
+import { testerPremiumActive } from './platform/tester-premium.ts';
 
 import type { Item, ItemCategory } from './game/content/items.ts';
 import type { Enemy } from './game/combat/enemy.ts';
@@ -93,7 +93,7 @@ import { createRunResults } from './ui/screens/run-results.ts';
 import type { ResultReveal } from './ui/screens/run-results.ts';
 
 import { recordSecretEvent } from './game/progression/secret-events.ts';
-import { createRunRewardLedger } from './game/progression/run-rewards.ts';
+
 
 import { bossPosition } from './rendering/figures/boss-position.ts';
 
@@ -107,9 +107,9 @@ import { createWeatherState } from './rendering/scene/weather-state.ts';
 import { REST_POSE as PREST, createPlayerAnimation, startSwing } from './game/player/player.ts';
 import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 
-import { createEffectQuality, preferredDensity } from './rendering/effects/quality.ts';
+import { createEffectQuality } from './rendering/effects/quality.ts';
 import { BOSS_SHADOW_DURATION } from './rendering/figures/death.ts';
-import { parseSettings, preferenceEnabled } from './platform/settings.ts';
+
 
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
@@ -121,8 +121,8 @@ import type { createBackground } from './rendering/scene/background.ts';
 import { createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 
-import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
-import { templateModifiers } from './game/progression/meta.ts';
+
+
 import { createLayout } from './rendering/layout.ts';
 
 import type { BladeStats } from './game/progression/statistics.ts';
@@ -136,7 +136,7 @@ import { itemPresentation } from './ui/screens/item-presentation.ts';
 
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
 
-import { createAudio } from './audio/audio.ts';
+
 
 import { store, isTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
@@ -148,7 +148,7 @@ import {
   clearRunCheckpoint,
 } from './platform/run-checkpoint.ts';
 
-import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
+
 export function startGame(
   surfaces: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
   lighting?: PreparedLighting,

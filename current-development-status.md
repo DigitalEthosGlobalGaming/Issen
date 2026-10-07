@@ -23,6 +23,10 @@ against the session owner, deferred service reads and capability isolation.
 `npx playwright test tests/browser/options.spec.ts tests/browser/daily.spec.ts tests/browser/trials.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/scene-continuation.spec.ts tests/browser/secrets.spec.ts tests/browser/cinematic.spec.ts tests/browser/support-rewards.spec.ts tests/browser/death-presentation.spec.ts tests/browser/class-lifecycle.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 44 pass in 3.7m (state-services-browser.log; terminal exit 0 confirmed).
 
+Separate import cleanup: twelve unused browser/state constructor imports removed.
+Compiler-symbol audit retained live browser instrumentation. Strict check and all
+368 units pass (state-services-imports-typecheck.log and state-services-imports-unit.log).
+
 Latest passing combined broad:
 `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 254 pass in 14.0m (frame-startup-broad.log; terminal exit 0 confirmed).
