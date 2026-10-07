@@ -13,7 +13,7 @@ import { createFiguresHost } from './presentation/figures-host.ts';
 import { bossShownDirection } from './game/encounters/boss-openings.ts';
 import { createProfileFoundation, createProfileProgress, createProfileEquipment } from './game/progression/profile-state.ts';
 import { createEnvironmentHost } from './presentation/environment-host.ts';
-import { createFrameSimulation } from './game/session/frame-simulation.ts';
+
 import { createEquipmentPresentation } from './presentation/equipment.ts';
 import { createNativeServices, type PreparedLighting } from './presentation/native-services.ts';
 import { bindDuelFeedback } from './presentation/duel-feedback.ts';
@@ -21,8 +21,7 @@ import { bindEncounterProgression } from './game/progression/encounter-listeners
 import { createSceneFlow } from './game/session/scene-flow.ts';
 import { createProfileRules } from './game/progression/profile-rules.ts';
 import { createActiveEquipment } from './game/equipment/active.ts';
-import { createPlayerFigures } from './presentation/player-figures.ts';
-import { createResultsSession } from './game/session/results.ts';
+
 import { visiblePet, saveWithFoxfire } from './game/player/companions.ts';
 import { createCombatScore } from './game/progression/combat-score.ts';
 import { bindCombatScoreFeedback } from './presentation/combat-score.ts';
@@ -30,57 +29,31 @@ import { bindKillFeedback } from './presentation/kill.ts';
 import { bindCombatProgression } from './game/progression/combat-listeners.ts';
 import { createEnemyKill } from './game/combat/kill.ts';
 import { createPhaseRouter, definePhase } from './game/session/phase-router.ts';
-import { createBetweenPhase } from './game/phases/between.ts';
-import { createDeathPhase } from './game/phases/death.ts';
-import { createShrinePhase } from './game/phases/shrine.ts';
-import { createTrialSession } from './game/session/trials.ts';
-import { createBossPhase } from './game/phases/boss.ts';
-import { createStandoffPhase } from './game/phases/standoff.ts';
-import { createWavesPhase, createWaveLifecycle } from './game/phases/waves.ts';
-import { createRunStart } from './game/session/run-start.ts';
-import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
-import { createRunFlow } from './game/session/run-flow.ts';
+
 import { bindProfileWiring } from './ui/wiring/profile.ts';
-import { createCinematicWiring } from './ui/wiring/cinematic.ts';
+
 import { bindPurchaseWiring } from './ui/wiring/purchases.ts';
 import { createInputWiring } from './ui/wiring/input.ts';
-import { createArmoryWiring } from './ui/wiring/armory.ts';
-import { createSetupWiring } from './ui/wiring/setup.ts';
-import { createSettingsWiring } from './ui/wiring/settings.ts';
-import { createPanelWiring } from './ui/wiring/panels.ts';
+
 import { createTitleSecrets } from './ui/wiring/secrets.ts';
 
-
-import { createCuePresentation } from './presentation/cues.ts';
-import {
-  createPresentationState,
-  advancePresentationClock,
-  advancePresentationCamera,
-} from './presentation/state.ts';
+import { createPresentationState } from './presentation/state.ts';
 import { createPostArtwork } from './presentation/post-artwork.ts';
 
 import { createFeedbackPresentation } from './presentation/feedback.ts';
-import { createFiguresPresentation } from './presentation/figures.ts';
-import { createRuntimeScene } from './presentation/scene.ts';
+
 import { createEventBus, type GameEvents } from './game/events.ts';
 import type { GameContext } from './game/session/context.ts';
 import type { PresentationContext } from './presentation/context.ts';
-import { reportGraphicsError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
 
-import {
-  parseDailyLogin,
-  recordDailyLogin,
-  SEVEN_DAWNS_CREST,
-} from './game/progression/daily-login.ts';
+import { recordDailyLogin, SEVEN_DAWNS_CREST } from './game/progression/daily-login.ts';
 
-import { parseCollectionProgress, initializeCollections, syncCollectionProgress } from './game/progression/collection-progress.ts';
+import { syncCollectionProgress } from './game/progression/collection-progress.ts';
 import { type PendingSupportReward } from './platform/pending-support.ts';
 import { createRewardedSupport } from './platform/rewarded-support.ts';
 import { createRewardScreen } from './ui/screens/rewarded-support.ts';
 import { setSealTextures } from './rendering/ui-art.ts';
 
-import { type DailyRun } from './game/progression/daily.ts';
-import { mountStartupLoading } from './ui/startup-loading.ts';
 import { createStageVisitSeeds } from './rendering/environment/stage-variation.ts';
 import { compositionKey } from './rendering/environment/worker-types.ts';
 
@@ -98,12 +71,12 @@ import type { Boss } from './game/encounters/boss.ts';
 import type { Direction } from './shared/directions.ts';
 
 import { createLifecycle } from './platform/lifecycle.ts';
-import { createFrameLoop } from './platform/frame-loop.ts';
+
 import { createRuntimeScreens } from './ui/wiring/screens.ts';
 import { createRunState } from './game/run-state.ts';
 import type { PreviewFrame } from './rendering/armory-preview.ts';
 import { createArmoryPreview } from './rendering/armory-preview.ts';
-import { activeNow, pageActive, onActivityChange } from './platform/activity.ts';
+import { activeNow, pageActive } from './platform/activity.ts';
 import { createSecondaryMotion } from './rendering/figures/secondary-motion.ts';
 
 import {
@@ -114,13 +87,8 @@ import {
 import { createRunResults } from './ui/screens/run-results.ts';
 import type { ResultReveal } from './ui/screens/run-results.ts';
 
-import { recordSecretEvent, reconcileCinematicCompanion } from './game/progression/secret-events.ts';
+import { recordSecretEvent } from './game/progression/secret-events.ts';
 import { createRunRewardLedger } from './game/progression/run-rewards.ts';
-
-
-
-
-
 
 import { bossPosition } from './rendering/figures/boss-position.ts';
 
@@ -130,78 +98,50 @@ import { enemyPosition } from './rendering/figures/enemy-position.ts';
 import { advanceGrunts as simulateEnemies } from './game/combat/grunt.ts';
 
 import { createWeatherState } from './rendering/scene/weather-state.ts';
-import { updateWeather as simulateWeather } from './rendering/scene/weather-update.ts';
-import {
-  REST_POSE as PREST,
-  createPlayerAnimation,
-  startSwing,
-  updatePlayerAnimation,
-} from './game/player/player.ts';
+
+import { REST_POSE as PREST, createPlayerAnimation, startSwing } from './game/player/player.ts';
 import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 
 import { createEffectQuality, preferredDensity } from './rendering/effects/quality.ts';
-import {
-  chooseDeathStyle,
-  BOSS_SHADOW_DURATION,
-  SHADOW_DURATION,
-} from './rendering/figures/death.ts';
+import { BOSS_SHADOW_DURATION } from './rendering/figures/death.ts';
 import { parseSettings, preferenceEnabled } from './platform/settings.ts';
-
-
 
 import { renderShrine } from './ui/screens/shrine.ts';
 import { createNotifications } from './ui/notifications.ts';
 import { modeKey as getModeKey } from './game/progression/modes.ts';
 
-
-import { parseArmorySeen } from './game/progression/armory-seen.ts';
 import { makeFig, EPOSE } from './shared/figure-model.ts';
-import { createPostPresentation } from './presentation/post.ts';
-import { createPostPreparation } from './presentation/post-preparation.ts';
 
 import type { createBackground } from './rendering/scene/background.ts';
 import { createPalette } from './rendering/palette.ts';
 import { waveConfig, bossParameters } from './game/encounters/configuration.ts';
 
-import { createAdminWiring } from './ui/wiring/admin.ts';
-
 import { createGuidedLessons } from './game/onboarding/guided-lessons.ts';
-import { parseMeta, templateModifiers, sanitizeSetup } from './game/progression/meta.ts';
+import { templateModifiers } from './game/progression/meta.ts';
 import { createLayout } from './rendering/layout.ts';
 
-
-
-import { parseAwakeningProgress } from './game/progression/awakening-progress.ts';
 import type { BladeStats } from './game/progression/statistics.ts';
-
-
-
 
 import { BLESS, BLESS_BY } from './game/content/blessings.ts';
 import { loadStatistics, loadSetup, loadUnlocks, loadEquipment } from './platform/saves.ts';
 import { createItems } from './game/content/items.ts';
 
-import type { TrialDefinition } from './game/content/trials.ts';
-import { parseTrialProgress, trialsUnlocked, grantTrialRewards } from './game/progression/trials.ts';
-
 import { renderPauseBlessings } from './ui/screens/pause.ts';
 import { itemPresentation } from './ui/screens/item-presentation.ts';
-import type { TrialResult } from './ui/screens/trials.ts';
+
 import { DEATH_REASONS } from './ui/screens/game-over.ts';
 
 import { createAudio } from './audio/audio.ts';
 
 import { store, isTestProfile } from './platform/storage.ts';
 import { STAGES } from './game/content/stages.ts';
-import { TAU } from './shared/math.ts';
-import { rng, restorableRng, newRunSeed } from './shared/random.ts';
+
+import { rng, newRunSeed } from './shared/random.ts';
 import {
   readRunCheckpoint,
   writeRunCheckpoint,
   clearRunCheckpoint,
 } from './platform/run-checkpoint.ts';
-
-
 
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(
@@ -312,12 +252,7 @@ export function startGame(
   const { SETUP, UNL, DAILY_LOGIN, TRIAL_PROGRESS, playerStats } = profileFoundation;
   let loginCrestRevealed = false;
   const activity = createRunActivity(R, playerStats.roninWave);
-  
-  
-  
-  
-  
-  
+
   const { META, AWAKENING, COLLECTION_PROGRESS, saveAwakening, saveCollections, saveMeta, ARMORY_SEEN } = createProfileProgress(profileServices, () => ST, SETUP, UNL);
   const syncCollections = () => {
     if (!activity.activeTrial && !activity.activeDaily && !['title'].includes(G.state))
@@ -1524,9 +1459,7 @@ export function startGame(
     G.panel = null;
     showScreen(null);
   }
-  
-  
-  
+
   const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
   function refreshArmoryNew() {
     armoryWiring.refreshArmoryNew();
@@ -1694,7 +1627,6 @@ export function startGame(
     renderTrialObjective();
   }
 
-  
   const phaseRouter = createPhaseRouter(
     context,
     {

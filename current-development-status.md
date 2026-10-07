@@ -59,6 +59,17 @@ the fix. Earlier natural probe was inconclusive and is superseded.
 Behaviour changes remain in tmp/runtime-refactor/behaviour-changes.md for final
 report: reaction ordering, first support retry, same-scene continue bug fix.
 
+## Composition import cleanup
+
+Separate deletion step removes 52 unused named imports in 44 declarations,
+identified by TypeScript symbols (including shorthand references). Actual browser
+hook imports BLESS_BY and bossShownDirection are retained. Redundant empty lines
+are collapsed. `npm run typecheck` and all 365 units pass
+(composition-imports-typecheck.log, composition-imports-unit.log).
+Next combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`,
+log frame-startup-broad.log. Preserve runtime source while it runs. Inspect its
+actual execution handle before concluding it stopped or starting another run.
+
 ## Actual-API scenario coverage
 
 Daily/trial entry and completion, wrong wave input and death, and bounded winning/
@@ -75,7 +86,7 @@ Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
 exist under tmp/runtime-refactor with strict logs. All applied owners are listed above; any other isolated drafts have no live coverage. Regenerate each from current source
 before applying; never overwrite the root with a stale preview.
 
-Finish genuine composition reduction: root remains 1791 lines, far from
+Finish genuine composition reduction: root remains 1723 lines, far from
 the approximately 200-line target. Move remaining session state/services and
 presentation/UI/lifecycle bindings into their actual owners, finish remaining
 standoff/damage/wave/boss reactions, and migrate residual scenario adapters to
