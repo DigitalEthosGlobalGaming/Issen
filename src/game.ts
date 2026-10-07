@@ -1,3 +1,4 @@
+import { createPhaseBindings } from './game/session/phase-bindings.ts';
 import { bindBossFeedback } from './presentation/boss-feedback.ts';
 import { createFiguresHost } from './presentation/figures-host.ts';
 import { bossShownDirection } from './game/encounters/boss-openings.ts';
@@ -1103,7 +1104,7 @@ export function startGame(
           ? `${trial.name} · ${trial.waveCount ? `Wave ${G.wave}/${trial.waveCount} · ` : ''}${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
           : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
   }
-  const waveLifecycle = createWaveLifecycle(() => ({
+    const { waveLifecycle, wavesPhase, bossPhase, standoffPhase, shrinePhase, deathPhase, betweenPhase } = createPhaseBindings(() => ({
     events: context.events,
     G,
     ST,
@@ -1136,7 +1137,139 @@ export function startGame(
     dust,
     earn,
     addScore,
-  }));
+    activeTrial,
+    orderSucceeded: () => guided.orderSucceeded(),
+    swingPlayer,
+    playerDie,
+    enemyPos,
+    comboMult,
+    sparks,
+    buzz,
+    hud,
+    knifeTrail(pos) {
+        presentationState.fx.knives.push({
+          x0: L.player.x,
+          y0: L.player.y - L.player.h * 0.55,
+          x1: pos.x,
+          y1: pos.y - pos.h * 0.55,
+          t: 0,
+          life: 0.18,
+        });
+      },
+    bossPos,
+    renderHp,
+    activeDaily,
+    guided,
+    flash,
+    breakCombo,
+    setScore,
+    bossTipWorld,
+    ring,
+    get hitStop() {
+        return hitStop;
+      },
+    set hitStop(value) {
+        hitStop = value;
+      },
+    combatHaptics,
+    letterbox,
+    bumpCombo,
+    notifications,
+    hideHint,
+    addSlash,
+    killFx,
+    scraps,
+    stamp,
+    punch,
+    EQ,
+    get runBossMilestone() {
+        return runBossMilestone;
+      },
+    set runBossMilestone(value) {
+        runBossMilestone = value;
+      },
+    inkBurst,
+    shake: (amount) => {
+        presentationState.shake = Math.max(presentationState.shake, amount);
+      },
+    setBossLabels: (wave, glyph, name) => {
+        $('waveLbl').textContent = wave;
+        $('bossK').textContent = glyph;
+        $('bossN').textContent = name;
+      },
+    showBossBar: (shown) => {
+        $('bossbar').classList.toggle('on', shown);
+      },
+    bossStain: (p) => {
+        presentationState.fx.stains.push({
+          x: p.x,
+          y: p.y + p.h * 0.01,
+          rx: p.h * 0.3,
+          t: 0,
+          life: BOSS_SHADOW_DURATION,
+        });
+      },
+    L,
+    pickLook,
+    startWave,
+    accessible,
+    makeFigure: makeFig,
+    guardPose: EPOSE.guard,
+    clearLetterbox: () => {
+        presentationState.lbT = 0;
+      },
+    toast,
+    nextStep,
+    showShrineOffers,
+    premiumAccess,
+    computeMods,
+    showScreen,
+    resetKnocks: () => {
+      knocks = 0;
+    },
+    get shrineOfferIds() {
+      return shrineOfferIds;
+    },
+    set shrineOfferIds(value) {
+      shrineOfferIds = value;
+    },
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(value) {
+      timeScale = value;
+    },
+    startBoss,
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+    bossSwipe,
+    clearHints,
+    resetPlayer: () => {
+      P.fall = 0;
+      P.pose = { ...PREST };
+    },
+    inkPulse: (value) => {
+      presentationState.inkPulse = value;
+    },
+    hideBossBar: () => {
+      $('bossbar').classList.remove('on');
+    },
+    reasonMessage: (reason) => DEATH_REASONS[reason] || '',
+    get rewardFlowBusy() {
+      return rewardFlowBusy;
+    },
+    fallPlayer: (fall) => {
+      P.fall = fall;
+    },
+    showOver,
+    finishTrial,
+    startTrialEncounter,
+    openShrine
+  }), context);
   function startWave(n: number, skipEvent = false) {
     waveLifecycle.startWave(n, skipEvent);
   }
@@ -1275,42 +1408,7 @@ export function startGame(
     startSwing(P, dir);
     apparelMotion.kick(dir, reducedMotion(), perfect);
   }
-  const wavesPhase = createWavesPhase<GameContext<PresentationContext>>(
-    () => ({
-      events: context.events,
-      G,
-      W,
-      ST,
-      activeTrial,
-      combatRandom,
-      waveConfiguration,
-      killEnemy,
-      orderSucceeded: () => guided.orderSucceeded(),
-      pop,
-      sfx,
-      swingPlayer,
-      playerDie,
-      enemyPos,
-      earn,
-      addScore,
-      comboMult,
-      sparks,
-      buzz,
-      hud,
-      saveStats,
-      knifeTrail(pos) {
-        presentationState.fx.knives.push({
-          x0: L.player.x,
-          y0: L.player.y - L.player.h * 0.55,
-          x1: pos.x,
-          y1: pos.y - pos.h * 0.55,
-          t: 0,
-          life: 0.18,
-        });
-      },
-    }),
-    waveLifecycle,
-  );
+  
   function onSwipe(dir: Direction) {
     if (sceneLoading) return;
     if (
@@ -1326,90 +1424,7 @@ export function startGame(
   }
 
   /* ---------------- boss ---------------- */
-  const bossPhase = createBossPhase<GameContext<PresentationContext>>(
-    () => ({
-      events: context.events,
-      deferUntilSceneReady,
-      G,
-      renderLives,
-      bossPos,
-      banner,
-      renderHp,
-      sfx,
-      activeTrial,
-      activeDaily,
-      guided,
-      hint,
-      captureCheckpoint,
-      combatRandom,
-      flash,
-      playerDie,
-      breakCombo,
-      setScore,
-      pop,
-      bossTipWorld,
-      S,
-      swingPlayer,
-      sparks,
-      ring,
-      get hitStop() {
-        return hitStop;
-      },
-      set hitStop(value) {
-        hitStop = value;
-      },
-      combatHaptics,
-      letterbox,
-      ST,
-      bumpCombo,
-      addScore,
-      comboMult,
-      buzz,
-      notifications,
-      hideHint,
-      addSlash,
-      killFx,
-      scraps,
-      stamp,
-      W,
-      H,
-      punch,
-      EQ,
-      earn,
-      get runBossMilestone() {
-        return runBossMilestone;
-      },
-      set runBossMilestone(value) {
-        runBossMilestone = value;
-      },
-      bst,
-      challenge,
-      inkBurst,
-      saveStats,
-      checkUnlocks,
-      shake: (amount) => {
-        presentationState.shake = Math.max(presentationState.shake, amount);
-      },
-      setBossLabels: (wave, glyph, name) => {
-        $('waveLbl').textContent = wave;
-        $('bossK').textContent = glyph;
-        $('bossN').textContent = name;
-      },
-      showBossBar: (shown) => {
-        $('bossbar').classList.toggle('on', shown);
-      },
-      bossStain: (p) => {
-        presentationState.fx.stains.push({
-          x: p.x,
-          y: p.y + p.h * 0.01,
-          rx: p.h * 0.3,
-          t: 0,
-          life: BOSS_SHADOW_DURATION,
-        });
-      },
-    }),
-    context,
-  );
+  
   function startBoss() {
     bossPhase.startBoss();
   }
@@ -1441,62 +1456,7 @@ export function startGame(
   }
 
   /* ---------------- standoff & shrine ---------------- */
-  const standoffPhase = createStandoffPhase<GameContext<PresentationContext>>(
-    () => ({
-      events: context.events,
-      deferUntilSceneReady,
-      G,
-      waveCfg,
-      L,
-      combatRandom,
-      pickLook,
-      enemyPos,
-      banner,
-      letterbox,
-      sfx,
-      hint,
-      captureCheckpoint,
-      startWave,
-      flash,
-      playerDie,
-      W,
-      H,
-      accessible,
-      EQ,
-      swingPlayer,
-      addSlash,
-      S,
-      killFx,
-      scraps,
-      ring,
-      stamp,
-      punch,
-      get hitStop() {
-        return hitStop;
-      },
-      set hitStop(value) {
-        hitStop = value;
-      },
-      combatHaptics,
-      bumpCombo,
-      ST,
-      challenge,
-      earn,
-      addScore,
-      comboMult,
-      saveStats,
-      checkUnlocks,
-      makeFigure: makeFig,
-      guardPose: EPOSE.guard,
-      setWaveLabel: (label) => {
-        $('waveLbl').textContent = label;
-      },
-      clearLetterbox: () => {
-        presentationState.lbT = 0;
-      },
-    }),
-    context,
-  );
+  
   function startStandoff(n: number, changed: boolean) {
     standoffPhase.startStandoff(n, changed);
   }
@@ -1520,32 +1480,7 @@ export function startGame(
   function breakCombo() {
     combatScore.breakCombo();
   }
-  const shrinePhase = createShrinePhase<GameContext<PresentationContext>>(() => ({
-    G,
-    ST,
-    combatRandom,
-    renderLives,
-    toast,
-    nextStep,
-    captureCheckpoint,
-    showShrineOffers,
-    premiumAccess,
-    saveStats,
-    computeMods,
-    checkUnlocks,
-    hud,
-    showScreen,
-    sfx,
-    resetKnocks: () => {
-      knocks = 0;
-    },
-    get shrineOfferIds() {
-      return shrineOfferIds;
-    },
-    set shrineOfferIds(value) {
-      shrineOfferIds = value;
-    },
-  }));
+  
   function applyPick(id: string) {
     shrinePhase.applyPick(id);
   }
@@ -1585,81 +1520,7 @@ export function startGame(
   }
 
   /* ---------------- death & menus ---------------- */
-  const deathPhase = createDeathPhase<GameContext<PresentationContext>>(() => ({
-    events: context.events,
-    G,
-    get timeScale() {
-      return timeScale;
-    },
-    set timeScale(value) {
-      timeScale = value;
-    },
-    breakCombo,
-    renderLives,
-    setScore,
-    hud,
-    startBoss,
-    startWave,
-    captureCheckpoint,
-    banner,
-    stamp,
-    S,
-    flash,
-    L,
-    addSlash,
-    inkBurst,
-    get hitStop() {
-      return hitStop;
-    },
-    set hitStop(value) {
-      hitStop = value;
-    },
-    sfx,
-    combatHaptics,
-    pop,
-    W,
-    H,
-    waveConfiguration,
-    activeTrial,
-    get trialFailure() {
-      return trialFailure;
-    },
-    set trialFailure(value) {
-      trialFailure = value;
-    },
-    bossSwipe,
-    killEnemy,
-    ST,
-    saveStats,
-    checkUnlocks,
-    scraps,
-    letterbox,
-    clearHints,
-    clearLetterbox: () => {
-      presentationState.lbT = 0;
-    },
-    resetPlayer: () => {
-      P.fall = 0;
-      P.pose = { ...PREST };
-    },
-    inkPulse: (value) => {
-      presentationState.inkPulse = value;
-    },
-    shake: (amount) => {
-      presentationState.shake = Math.max(presentationState.shake, amount);
-    },
-    hideBossBar: () => {
-      $('bossbar').classList.remove('on');
-    },
-    reasonMessage: (reason) => DEATH_REASONS[reason] || '',
-    get rewardFlowBusy() {
-      return rewardFlowBusy;
-    },
-    fallPlayer: (fall) => {
-      P.fall = fall;
-    },
-    showOver,
-  }));
+  
   function playerDie(killer: Enemy | Boss | null, reason: string) {
     deathPhase.playerDie(killer, reason);
   }
@@ -2142,16 +2003,7 @@ export function startGame(
     renderTrialObjective();
   }
 
-  const betweenPhase = createBetweenPhase<GameContext<PresentationContext>>(() => ({
-    G,
-    activeTrial,
-    trialFailure,
-    finishTrial,
-    startTrialEncounter,
-    startBoss,
-    openShrine,
-    nextStep,
-  }));
+  
   const phaseRouter = createPhaseRouter(
     context,
     {

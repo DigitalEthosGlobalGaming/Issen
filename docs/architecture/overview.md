@@ -453,3 +453,5 @@ presentation/figures-host.ts binds figure rendering, player/companion drawing an
 Successful boss cuts emit bossCut with flat direction/automatic/position values. bossDefeated projects grounded position and crow selection as values. presentation/boss-feedback.ts owns their cut/victory effects, audio/haptics, camera and boss-bar reaction; rules retain HP/death records, hit stop, rewards and phases. Synchronous progression listeners precede presentation and subsequent profile persistence.
 
 Checkpoint restore explicitly discards superseded scene continuations before adopting saved run state. This keeps a pending title/cinematic setup callback from clearing a restored encounter when the scene key is unchanged; save records and RNG restoration retain their original shape/order.
+
+game/session/phase-bindings.ts owns ordered construction of seven phase controllers. A shared typed provider supplies each existing narrow contract; the waves controller receives the actual wave lifecycle capability and boss/standoff retain the explicit context.

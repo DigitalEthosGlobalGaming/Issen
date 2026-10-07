@@ -10,7 +10,19 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: isolated restore fix discards the prior scene continuation
+Latest checkpoint: seven phase controllers now share a typed construction provider
+in game/session/phase-bindings.ts. Existing narrow contracts, mutable accessors,
+construction order and wave lifecycle dependency are preserved.
+`npm run typecheck` and `node --test tests/unit/*.test.mjs`: strict types and
+all 364 units pass (phase-bindings-typecheck.log, phase-bindings-unit.log).
+`npx playwright test tests/browser/encounter-flow.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/trials.spec.ts tests/browser/scene-continuation.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 14 pass in 1.8m (phase-bindings-browser.log; terminal exit 0 confirmed).
+Next: run the full 254-case browser suite on this committed source, covering the
+restore fix and phase binding together. Preserve runtime source during that run.
+Then regenerate/apply menu-binding preview and verify actual menu/lifecycle flows.
+W2 composition/reactions, W3 and Part 4 remain required and unpushed.
+
+Previous checkpoint:  isolated restore fix discards the prior scene continuation
 before adopting checkpoint state. This prevents a pending title/cinematic callback
 from clearing a restored wave when both adopt the same scene key.
 Baseline proof is scene-continuation-baseline.log: unchanged pre-refactor ad353b3
