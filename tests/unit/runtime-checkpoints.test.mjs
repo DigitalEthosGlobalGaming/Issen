@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createRunState } from '../../src/game/run-state.ts';
+import { checkpointSession } from './helpers/runtime-checkpoint-session.mjs';
 import { restorableRng } from '../../src/shared/random.ts';
 import { parseRunCheckpoint } from '../../src/platform/run-checkpoint.ts';
 import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
@@ -22,12 +22,9 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
     assert.ok(checkpoint);
     assert.equal(checkpoint.version, 1);
     assert.equal(checkpoint.run.state, phase);
-    const run = Object.assign(createRunState(), checkpoint.run, {
-      bless: new Set(checkpoint.run.bless),
-    });
-    if (run.so) run.so.e = run.enemies.find((e) => e.challenger) ?? run.so.e;
-    const random = restorableRng(checkpoint.seed);
-    random.restore(checkpoint.randomState);
+    const session = checkpointSession(checkpoint, position);
+    const run = session.views.G,
+      random = session.views.runRandom;
     const comparison = restorableRng(checkpoint.seed);
     comparison.restore(checkpoint.randomState);
     assert.equal(random.next(), comparison.next());
@@ -91,12 +88,8 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
       applyBlessing(run, choice, random.next);
       assert.ok(run.bless.has(choice));
     }
-    const written = {
-      ...checkpoint,
-      randomState: random.state(),
-      run: { ...run, bless: [...run.bless], attacker: null, panel: null },
-    };
-    const restored = parseRunCheckpoint(JSON.parse(JSON.stringify(written)));
+    session.flow.captureCheckpoint();
+    const restored = session.read();
     assert.ok(restored);
     assert.equal(restored.version, original.version);
     assert.equal(restored.seed, original.seed);
@@ -104,3 +97,36 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
     assert.deepEqual(Object.keys(restored).sort(), Object.keys(original).sort());
     assert.equal(Object.getPrototypeOf(restored.run), Object.prototype);
   });
+
+function savedWave() {
+  return parseRunCheckpoint(
+    JSON.parse(
+      readFileSync(new URL('../fixtures/runtime-refactor/playing.json', import.meta.url), 'utf8'),
+    ),
+  );
+}
+
+test('actual saved-run continuation restores the saved RNG and keeps later secret discoveries', () => {
+  const checkpoint = savedWave(),
+    session = checkpointSession(checkpoint, position);
+  session.flow.captureCheckpoint();
+  session.views.G.score += 999;
+  session.views.ST.fidget = 1;
+  session.views.runRandom.next();
+  session.flow.continueSavedRun();
+  assert.equal(session.views.G.score, checkpoint.run.score);
+  assert.equal(session.views.ST.fidget, 1);
+  assert.equal(session.views.runRandom.state(), checkpoint.randomState);
+  assert.deepEqual(session.trace, [['screen', null], 'clock']);
+});
+
+test('actual saved-run abandonment checkpoints quit and enters results once', () => {
+  const session = checkpointSession(savedWave(), position);
+  session.flow.captureCheckpoint();
+  session.flow.abandonSavedRun();
+  session.flow.abandonSavedRun();
+  assert.equal(session.views.G.state, 'over');
+  assert.equal(session.read().status, 'ended');
+  assert.equal(session.read().run.reason, 'quit');
+  assert.deepEqual(session.trace, ['over']);
+});

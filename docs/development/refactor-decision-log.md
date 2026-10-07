@@ -108,6 +108,8 @@
 
 - 2026-10-08 — W2 run-flow move — move title/pause/resume/quit bodies through current state getters, capability flags and narrow service/presentation ports — capture replaced profile values or replay graphics-dependent resume automatically — five actual API scenarios, all units, seventeen menu/save cases and ten real graphics/context checks pass; records and RNG consumption unchanged — revert this physical run-flow move.
 
+- 2026-10-08 — W2 checkpoint move — move record capture/recovery through explicit persistence and current-state ports, and migrate old fixture drivers to the real APIs — rewrite records or retain inline test restore/capture — all old records play and round-trip with unchanged keys; seeded RNG resumes after stage setup, later secrets survive, and abandonment enters results once; all units and six real browser fixtures/recovery cases pass — revert the checkpoint-flow move and its fixture-driver migration together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

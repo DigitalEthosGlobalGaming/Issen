@@ -40,28 +40,31 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: title/pause/resume/end-run bodies moved into
-`src/game/session/run-flow.ts`. Current statistics/equipment/daily/timing getters
-preserve replacement and callback ordering; plain player reset and letterbox slices
-are transitional ports until player/event ownership moves. No rendering imports.
-Five actual run-flow API cases cover pause secrets, graphics restore gating, saved
-shrine offers, profile identities and one-time quit/results entry.
-Strict types passed, the five new cases passed, and all 284 `npm test` cases passed
-(run-flow-final-unit.log).
-`npx playwright test tests/browser/options.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/context-loss.spec.ts --config playwright.rendering-v2.config.ts`:
-17 passed (run-flow-browser.log; terminal confirmed). context-loss.spec.ts does
-not exist and matched no cases, so graphics verification was run against real files:
-`npx playwright test tests/browser/graphics-errors.spec.ts tests/browser/pixi-backend.spec.ts -g 'graphics|context|WebGL' --config playwright.rendering-v2.config.ts`:
-all ten passed (run-flow-graphics-browser.log; terminal confirmed), including main
-loss/restore/explicit-resume, auxiliary deadlines and startup errors. Error stacks
-in this log are expected simulated failures, not failed assertions.
+Latest checkpoint: capture/restore/continue/abandon moved to
+`src/game/session/checkpoint-flow.ts`, using explicit persistence, storage and
+current-state ports. Original v1 record fields, profile merge order and rule RNG
+restoration after stage setup remain unchanged. Old playing/boss/standoff/shrine
+unit fixtures now call the real extracted restore/capture APIs, rather than inline
+drivers. Two extra actual-API cases cover continuation preserving later secrets
+and RNG, plus one-time abandonment. All six checkpoint unit cases passed; strict
+types passed and all 286 `npm test` cases passed (checkpoint-flow-final-unit.log).
+`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/run-checkpoint.spec.ts tests/browser/secret-recovery.spec.ts --config playwright.rendering-v2.config.ts`:
+all six passed (checkpoint-flow-browser.log; terminal confirmed). run-checkpoint.spec
+does not exist/matched no cases; the real four runtime fixtures and two secret
+recovery cases supplied the six passing cases. Continue/abandon APIs also have the
+new headless coverage. No tolerance or assertion was weakened.
+
+Previous run-flow controls checkpoint: 5842908; title/pause/resume/quit APIs passed
+five headless cases, all 284 units, 17 menu/save and ten real graphics/context cases.
+Logs run-flow-{final-unit,browser,graphics-browser}.log. Its player/letterbox data
+slices are transitional until player/event ownership moves; no rendering imports.
 
 Router foundation (556acb9) remains alongside the closure, NOT yet wired into
 game.ts. It provides synchronous validated controller dispatch and checkpoint
 adoption without replaying enter effects; five tests passed plus all 279 units at
 that checkpoint. No live gameplay events emitted yet.
-Next move checkpoint capture/restore/continue/abandon and remaining run start/
-daily/trial/rush controls into session owners, then actual phase-controller dispatch.
+Next move remaining run start/daily/trial/rush controls into session owners,
+then actual phase-controller dispatch.
 Remaining rule capture/type audit: tmp/runtime-refactor/rule-port-audit.json.
 Preserve same-frame phase cascades and game/cosmetic RNG consumption order.
 Full W2, W3 and Part 4 remain pending; do not push develop.

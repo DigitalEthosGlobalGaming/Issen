@@ -1,3 +1,4 @@
+import { createCheckpointFlow } from './game/session/checkpoint-flow.ts';
 import { createRunFlow } from './game/session/run-flow.ts';
 import { bindProfileWiring } from './ui/wiring/profile.ts';
 import { createCinematicWiring } from './ui/wiring/cinematic.ts';
@@ -407,45 +408,6 @@ export function startGame(
   let runItemReveals: ResultReveal[] = [];
   let savedRun = readRunCheckpoint();
   let shrineOfferIds: string[] | null = null;
-  function captureCheckpoint(status: RunCheckpoint['status'] = 'active') {
-    if (sceneLoading) {
-      if (status === 'ended') {
-        clearRunCheckpoint();
-        savedRun = null;
-      }
-      return;
-    }
-    if (
-      activeTrial ||
-      !['playing', 'boss', 'standoff', 'between', 'shrine', 'dead'].includes(G.state)
-    )
-      return;
-    syncCollections();
-    saveCollections();
-    const { bless, ...run } = G;
-    const checkpoint: RunCheckpoint = {
-      version: 1,
-      status,
-      seed: G.seed,
-      randomState: runRandom.state(),
-      run: { ...run, bless: [...bless], attacker: null, panel: null },
-      stats: ST,
-      awakening: AWAKENING,
-      collections: COLLECTION_PROGRESS,
-      meta: META,
-      unlocks: [...UNL],
-      equipment: EQ,
-      setup: activeDaily?.setup ?? SETUP,
-      ledger: rewardLedger,
-      weather: WX,
-      bossMilestone: runBossMilestone,
-      offers: shrineOfferIds,
-      dailyDay: activeDaily?.day,
-    };
-    if (writeRunCheckpoint(checkpoint)) savedRun = readRunCheckpoint();
-    else toast({ k: '!', msg: 'Run could not be saved on this device.' });
-    updateSavedRunButtons();
-  }
   function updateSavedRunButtons() {
     const available = savedRun?.status === 'active';
     $('bContinue').hidden = !available;
@@ -458,80 +420,6 @@ export function startGame(
         ? `Daily · ${savedRun!.dailyDay}`
         : `Saved run · seed ${savedRun!.seed}`
       : '';
-  }
-  function restoreCheckpoint(checkpoint: RunCheckpoint) {
-    activeDaily = checkpoint.dailyDay ? dailyRun(checkpoint.dailyDay) : null;
-    ST = activeDaily ? structuredClone(playerStats) : playerStats;
-    EQ = activeDaily ? { ...activeDaily.equipment } : playerEquipment;
-    Object.assign(ST, preserveSecretDiscoveries(parseStatistics(checkpoint.stats), ST));
-    if (!activeDaily) {
-      Object.assign(AWAKENING, parseAwakeningProgress(checkpoint.awakening));
-      Object.assign(META, parseMeta(checkpoint.meta, ST, UNL));
-      Object.assign(
-        COLLECTION_PROGRESS,
-        parseCollectionProgress(checkpoint.collections ?? COLLECTION_PROGRESS, ST),
-      );
-      COLLECTION_PROGRESS.lastStats = structuredClone(ST);
-      UNL.clear();
-      for (const id of checkpoint.unlocks) if (id !== PREMIUM_FILM) UNL.add(id);
-      if (DAILY_LOGIN.earned) UNL.add(SEVEN_DAWNS_CREST);
-      reconcileCinematicCompanion(ST, UNL);
-      if (premiumAccess()) UNL.add(PREMIUM_FILM);
-      Object.assign(SETUP, checkpoint.setup);
-      Object.assign(EQ, parseEquipment(checkpoint.equipment, accessibleUnlocks(), ITEMS));
-    }
-    Object.assign(G, checkpoint.run, { bless: new Set(checkpoint.run.bless) });
-    if (G.so) G.so.e = G.enemies.find((e) => e.challenger) ?? G.so.e;
-    G.attacker = null;
-    G.panel = null;
-    G.shrineRerolls = premiumAccess() ? G.shrineRerolls : 0;
-    shrineOfferIds = checkpoint.offers;
-    rewardLedger = checkpoint.ledger;
-    runBossMilestone = checkpoint.bossMilestone;
-    runTemplate = templateModifiers(META, activeDaily?.setup ?? SETUP, premiumAccess());
-    runRandom = restorableRng(checkpoint.seed);
-    combatRandom = runRandom.next;
-    if (!activeDaily) {
-      saveStats();
-      saveAwakening();
-      saveMeta();
-      store.set('issen.unlocks', [...UNL]);
-      store.set('issen.equip', playerEquipment);
-    }
-    setStage(G.stage, false);
-    Object.assign(WX, checkpoint.weather);
-    runRandom.restore(checkpoint.randomState);
-    for (const enemy of G.enemies) enemy.pos = enemyPos(enemy);
-    if (G.boss) G.boss.pos = bossPos(G.boss);
-    computeMods();
-    renderLives();
-    setScore();
-    applySeal();
-    hud(true);
-    $('waveLbl').textContent =
-      G.state === 'boss' ? '決闘' : G.state === 'standoff' ? '挑' : `第${kanji(G.wave)}陣`;
-    if (G.boss) {
-      $('bossK').textContent = G.boss.def.k;
-      $('bossN').textContent = G.boss.def.n;
-      renderHp();
-      $('bossbar').classList.toggle('on', G.state === 'boss');
-    } else $('bossbar').classList.remove('on');
-  }
-  function continueSavedRun() {
-    if (!savedRun || savedRun.status !== 'active') return;
-    const checkpoint = savedRun;
-    restoreCheckpoint(checkpoint);
-    if (G.state === 'shrine' && shrineOfferIds)
-      showShrineOffers(shrineOfferIds.map((id) => BLESS_BY[id]).filter((bl) => !!bl));
-    else showScreen(null);
-    frameLoop.resetClock();
-  }
-  function abandonSavedRun() {
-    if (!savedRun || savedRun.status !== 'active') return;
-    restoreCheckpoint(savedRun);
-    G.reason = 'quit';
-    captureCheckpoint('ended');
-    showOver();
   }
   function earn(event: 'kill' | 'wave' | 'boss') {
     if (activeTrial || activeDaily) return;
@@ -1159,6 +1047,115 @@ export function startGame(
     killEffect: () => (accessible(EQ.fx) ? EQ.fx : 'ink'),
     clink: () => sfx.clink(),
   }));
+  const { captureCheckpoint, restoreCheckpoint, continueSavedRun, abandonSavedRun } =
+    createCheckpointFlow({
+      $,
+      AWAKENING,
+      COLLECTION_PROGRESS,
+      G,
+      META,
+      SETUP,
+      UNL,
+      WX,
+      DAILY_LOGIN,
+      ITEMS,
+      accessibleUnlocks,
+      applySeal,
+      bossPos,
+      computeMods,
+      enemyPos,
+      hud,
+      playerEquipment,
+      playerStats,
+      premiumAccess,
+      renderHp,
+      renderLives,
+      saveAwakening,
+      saveMeta,
+      saveStats,
+      saveCollections,
+      setScore,
+      setStage,
+      syncCollections,
+      toast,
+      updateSavedRunButtons,
+      showScreen,
+      showShrineOffers,
+      showOver,
+      persistence: {
+        read: readRunCheckpoint,
+        write: writeRunCheckpoint,
+        clear: clearRunCheckpoint,
+      },
+      storage: store,
+      resetClock: () => frameLoop.resetClock(),
+      get activeTrial() {
+        return activeTrial;
+      },
+      get sceneLoading() {
+        return sceneLoading;
+      },
+      get EQ() {
+        return EQ;
+      },
+      set EQ(value) {
+        EQ = value;
+      },
+      get ST() {
+        return ST;
+      },
+      set ST(value) {
+        ST = value;
+      },
+      get activeDaily() {
+        return activeDaily;
+      },
+      set activeDaily(value) {
+        activeDaily = value;
+      },
+      get rewardLedger() {
+        return rewardLedger;
+      },
+      set rewardLedger(value) {
+        rewardLedger = value;
+      },
+      get runBossMilestone() {
+        return runBossMilestone;
+      },
+      set runBossMilestone(value) {
+        runBossMilestone = value;
+      },
+      get runRandom() {
+        return runRandom;
+      },
+      set runRandom(value) {
+        runRandom = value;
+      },
+      get runTemplate() {
+        return runTemplate;
+      },
+      set runTemplate(value) {
+        runTemplate = value;
+      },
+      get combatRandom() {
+        return combatRandom;
+      },
+      set combatRandom(value) {
+        combatRandom = value;
+      },
+      get savedRun() {
+        return savedRun;
+      },
+      set savedRun(value) {
+        savedRun = value;
+      },
+      get shrineOfferIds() {
+        return shrineOfferIds;
+      },
+      set shrineOfferIds(value) {
+        shrineOfferIds = value;
+      },
+    });
   function addScore(pts: number, x: number, y: number, label?: string, size?: number) {
     pts = gain(pts);
     G.score += pts;

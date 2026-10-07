@@ -104,8 +104,9 @@ branching migrates as phase bodies move, so its presence alone does not mean the
 runtime already uses it.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
-profile identity restoration. Run starts and checkpoint orchestration still remain
-in the composition closure pending the next session-owner moves.
+profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
+capture/restore/continue/abandon through explicit persistence ports. Run starts
+still remain in the composition closure pending the next session-owner move.
 
 ## Where changes belong
 
