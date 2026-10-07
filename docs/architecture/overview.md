@@ -409,3 +409,7 @@ support recovery are owned by game/session/results.ts through explicit display,
 persistence and reward capabilities. Its actual API drives seeded death/results
 scenarios and settlement/recovery/disposal tests. Trial settlement remains with
 the trial session owner.
+
+Remaining player/pet/foxfire drawing is owned by presentation/player-figures.ts
+with read-only run, animation, equipment and layout views. Its draw passes preserve
+the existing composer order and figure/companion output.

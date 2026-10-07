@@ -1,3 +1,4 @@
+import { createPlayerFigures } from './presentation/player-figures.ts';
 import { createResultsSession } from './game/session/results.ts';
 import { visiblePet, saveWithFoxfire } from './game/player/companions.ts';
 import { createCombatScore } from './game/progression/combat-score.ts';
@@ -607,46 +608,32 @@ export function startGame(
   function petOf() {
     return visiblePet(EQ);
   }
-  function drawFoxfire() {
-    if (!G.m || !G.m.foxfire) return;
-    const p = L.player,
-      x = p.x + p.h * 0.34 + Math.cos(presentationState.time * 1.4) * p.h * 0.05,
-      y = p.y - p.h * 1.02 + Math.sin(presentationState.time * 2.8) * p.h * 0.025,
-      r = Math.max(6, p.h * 0.035),
-      a = G.foxUsed && G.state !== 'title' ? 0.22 : 0.9;
-    g.save();
-    g.globalCompositeOperation = 'lighter';
-    const rg = g.createRadialGradient(x, y, 0, x, y, r * 2.4);
-    rg.addColorStop(0, `rgba(170,215,255,${a})`);
-    rg.addColorStop(0.4, `rgba(90,150,255,${a * 0.5})`);
-    rg.addColorStop(1, 'rgba(90,150,255,0)');
-    g.fillStyle = rg;
-    g.beginPath();
-    g.arc(x, y, r * 2.4, 0, TAU);
-    g.fill();
-    const tip = y - r * 1.6 - Math.sin(presentationState.time * 9) * r * 0.3;
-    g.fillStyle = `rgba(230,245,255,${a})`;
-    g.beginPath();
-    g.moveTo(x, tip);
-    g.quadraticCurveTo(x + r, y, x, y + r * 0.7);
-    g.quadraticCurveTo(x - r, y, x, tip);
-    g.fill();
-    g.restore();
-  }
+  function drawFoxfire() { playerFigures.drawFoxfire(); }
   function foxSave(e: Enemy) {
     saveWithFoxfire(e, { killEnemy, pop, flash, sfx });
   }
   function reviveDaruma(ph = false, support = false) {
     deathPhase.reviveDaruma(ph, support);
   }
-  function drawPet() {
-    const pt = EQ.pet,
-      p = L.player;
-    if (pt === 'shiba') drawPetAt('shiba', p.x + p.h * 0.47, H - 2, p.h * 0.14);
-    else if (pt === 'mystic-rock')
-      drawPetAt(pt, p.x + p.h * 0.46, H - 2 - p.h * 0.12, Math.min(120, p.h * 0.23));
-    else if (pt === 'cat') drawPetAt('cat', W * 0.85, H * 0.93 - W * 0.045, Math.max(W, H) * 0.045);
-  }
+  function drawPet() { playerFigures.drawPet(); }
+  const playerFigures = createPlayerFigures(() => ({
+    G,
+    L,
+    g,
+    presentationState,
+    EQ,
+    H,
+    W,
+    drawPetAt,
+    P,
+    drawFigure,
+    apparelMotion,
+    playerRobePalette,
+    isRobeSp,
+    bladeStyle,
+    CHARMCOL,
+    petOf,
+  }));
   /* ---------------- ensō glyph ---------------- */
   const { drawEnso, drawGlyphs } = createCuePresentation(() => ({
     g,
@@ -2578,36 +2565,7 @@ export function startGame(
   }
 
   /* ---------------- render ---------------- */
-  function drawPlayer() {
-    const p = L.player;
-    drawFigure({
-      x: p.x + P.lean * p.h,
-      y: p.y + P.fall * p.h * 0.22,
-      h: p.h,
-      back: true,
-      fog: 0,
-      d: P.d,
-      pose: P.pose,
-      secondary: apparelMotion.sample(),
-      waiting: P.swingT > 0.6 && !P.fall,
-      lean: 0,
-      rot: -P.fall * 0.28,
-      noShadow: true,
-      pal: playerRobePalette(),
-      robeAura: isRobeSp() ? ROBE_AWAKENINGS[EQ.robe]?.aura : null,
-      blade: bladeStyle(),
-      bladeId: EQ.blade,
-      robeId: EQ.robe,
-      variant: (ROBES[EQ.robe] || {}).variant,
-      cape: (ROBES[EQ.robe] || {}).cape,
-      coat: (ROBES[EQ.robe] || {}).coat,
-      rf: ROBES[EQ.robe],
-      charm: CHARMCOL[EQ.charm],
-      charmId: EQ.charm,
-      crest: EQ.crest === 'nocrest' ? null : EQ.crest,
-      pet: petOf(),
-    });
-  }
+  function drawPlayer() { playerFigures.drawPlayer(); }
   const postPreparation = createPostPreparation(() => ({
     W,
     H,
