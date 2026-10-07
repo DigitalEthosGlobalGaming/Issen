@@ -159,3 +159,5 @@
 2026-10-08 — W2/boss cleanup — delete boss-update.ts and unused root toIdle/resetBossIdle after consumer migration — leaving dormant exports considered — source/test import audit, strict types and 343 passing units confirm no remaining adapter consumer; actual idle transitions use the validated table machine — revert this cleanup commit.
 
 2026-10-08 — W2/player move — physically move unchanged player animation to game/player/player.ts before replacing pose dispatch — combining the move and table implementation considered — separate green commits distinguish ownership from behavior; retain the rest-pose re-export used by browser coverage — revert this physical move commit.
+
+2026-10-08 — W2/player table — derive idle/swing/block/death table state from original animation fields — adding serialized state/t or inventing a hurt animation considered — createPlayerAnimation has no hurt field; transient clock/state views retain exact save shape, deadline-frame rest selection and fallen pose priority with independent lean — revert this table commit.

@@ -390,3 +390,9 @@ adapters and legacy idle reset have been removed separately. No checkpoint field
 Player animation plain records, construction, swing and update functions are owned
 by game/player/player.ts; the rendering player module only re-exports REST_POSE
 for existing rendering coverage. Gameplay has no rendering import.
+
+Player animation dispatch uses a typed idle/swing/block/death table. State and
+time are transient views of existing swingDir/swingT/fallen fields, preserving
+checkpoint shape. The existing animation has no distinct hurt field or timer.
+The clock advances before state selection; fallen pose priority and the independent
+swing lean clock retain their original behavior.
