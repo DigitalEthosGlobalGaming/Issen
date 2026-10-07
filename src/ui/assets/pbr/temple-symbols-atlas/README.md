@@ -2,9 +2,19 @@
 
 Generated from [temple-symbols-atlas.png](../../temple-symbols-atlas.png) with `default`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](temple-symbols-atlas_diffuse.png), [normal](temple-symbols-atlas_normal.png), [roughness](temple-symbols-atlas_roughness.png), [metallic](temple-symbols-atlas_metallic.png), [ao](temple-symbols-atlas_ao.png), [emissive](temple-symbols-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| temple-symbols-atlas | [diffuse](temple-symbols-atlas_diffuse.webp), [normal](temple-symbols-atlas_normal.webp), [surface](temple-symbols-atlas_surface.webp), [emissive](temple-symbols-atlas_emissive.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

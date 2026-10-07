@@ -2,9 +2,19 @@
 
 Generated from [woodland-landmarks-atlas.png](../../woodland-landmarks-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](woodland-landmarks-atlas_diffuse.png), [normal](woodland-landmarks-atlas_normal.png), [roughness](woodland-landmarks-atlas_roughness.png), [metallic](woodland-landmarks-atlas_metallic.png), [ao](woodland-landmarks-atlas_ao.png), [emissive](woodland-landmarks-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| woodland-landmarks-atlas | [diffuse](woodland-landmarks-atlas_diffuse.webp), [normal](woodland-landmarks-atlas_normal.webp), [surface](woodland-landmarks-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

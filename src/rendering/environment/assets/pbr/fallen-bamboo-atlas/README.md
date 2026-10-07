@@ -2,9 +2,19 @@
 
 Generated from [fallen-bamboo-atlas.png](../../fallen-bamboo-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](fallen-bamboo-atlas_diffuse.png), [normal](fallen-bamboo-atlas_normal.png), [roughness](fallen-bamboo-atlas_roughness.png), [metallic](fallen-bamboo-atlas_metallic.png), [ao](fallen-bamboo-atlas_ao.png), [emissive](fallen-bamboo-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| fallen-bamboo-atlas | [diffuse](fallen-bamboo-atlas_diffuse.webp), [normal](fallen-bamboo-atlas_normal.webp), [surface](fallen-bamboo-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

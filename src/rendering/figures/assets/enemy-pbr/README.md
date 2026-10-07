@@ -59,3 +59,18 @@ node scripts/pbr/cli.mjs --input src/rendering/figures/assets/enemy-headwear-var
 All five exports passed archive, settings, dimensions and diffuse-alpha checks.
 The composed helmet's warm face and neck pixels were checked against the cloth
 metallic map. Strict TypeScript checks passed; gameplay tests were not run.
+
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| enemy-ronin-simple | [diffuse](enemy-ronin-simple_diffuse.webp), [normal](enemy-ronin-simple_normal.webp), [surface](enemy-ronin-simple_surface.webp) |
+| enemy-clothing-variants | [diffuse](enemy-clothing-variants_diffuse.webp), [normal](enemy-clothing-variants_normal.webp), [surface](enemy-clothing-variants_surface.webp) |
+| enemy-headwear-atlas | [diffuse](enemy-headwear-atlas_diffuse.webp), [normal](enemy-headwear-atlas_normal.webp), [surface](enemy-headwear-atlas_surface.webp) |
+| enemy-headwear-variants | [diffuse](enemy-headwear-variants_diffuse.webp), [normal](enemy-headwear-variants_normal.webp), [surface](enemy-headwear-variants_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->

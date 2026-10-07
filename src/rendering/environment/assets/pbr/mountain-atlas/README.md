@@ -2,9 +2,19 @@
 
 Generated from [mountain-atlas.png](../../mountain-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](mountain-atlas_diffuse.png), [normal](mountain-atlas_normal.png), [roughness](mountain-atlas_roughness.png), [metallic](mountain-atlas_metallic.png), [ao](mountain-atlas_ao.png), [emissive](mountain-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| mountain-atlas | [diffuse](mountain-atlas_diffuse.webp), [normal](mountain-atlas_normal.webp), [surface](mountain-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [trial-symbols-atlas.png](../../trial-symbols-atlas.png) with `default`, Sprite/OpenGL.
 
-Six aligned 1448Ã—1086 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](trial-symbols-atlas_diffuse.png), [normal](trial-symbols-atlas_normal.png), [roughness](trial-symbols-atlas_roughness.png), [metallic](trial-symbols-atlas_metallic.png), [ao](trial-symbols-atlas_ao.png), [emissive](trial-symbols-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| trial-symbols-atlas | [diffuse](trial-symbols-atlas_diffuse.webp), [normal](trial-symbols-atlas_normal.webp), [surface](trial-symbols-atlas_surface.webp), [emissive](trial-symbols-atlas_emissive.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

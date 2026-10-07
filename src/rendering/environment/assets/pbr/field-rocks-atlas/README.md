@@ -2,9 +2,19 @@
 
 Generated from [field-rocks-atlas.png](../../field-rocks-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](field-rocks-atlas_diffuse.png), [normal](field-rocks-atlas_normal.png), [roughness](field-rocks-atlas_roughness.png), [metallic](field-rocks-atlas_metallic.png), [ao](field-rocks-atlas_ao.png), [emissive](field-rocks-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| field-rocks-atlas | [diffuse](field-rocks-atlas_diffuse.webp), [normal](field-rocks-atlas_normal.webp), [surface](field-rocks-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

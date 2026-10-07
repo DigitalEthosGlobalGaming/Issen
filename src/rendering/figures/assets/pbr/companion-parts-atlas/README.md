@@ -2,9 +2,19 @@
 
 Generated from [companion-parts-atlas.png](../../companion-parts-atlas.png) with `cloth`, `stone`, `metal`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](companion-parts-atlas_diffuse.png), [normal](companion-parts-atlas_normal.png), [roughness](companion-parts-atlas_roughness.png), [metallic](companion-parts-atlas_metallic.png), [ao](companion-parts-atlas_ao.png), [emissive](companion-parts-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| companion-parts-atlas | [diffuse](companion-parts-atlas_diffuse.webp), [normal](companion-parts-atlas_normal.webp), [surface](companion-parts-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [armoury-room.png](../../armoury-room.png) with `default`, Texture/OpenGL.
 
-Six aligned 1536Ã—1024 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](armoury-room_diffuse.png), [normal](armoury-room_normal.png), [roughness](armoury-room_roughness.png), [metallic](armoury-room_metallic.png), [ao](armoury-room_ao.png), [emissive](armoury-room_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| armoury-room | [diffuse](armoury-room_diffuse.webp), [normal](armoury-room_normal.webp), [surface](armoury-room_surface.webp), [emissive](armoury-room_emissive.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

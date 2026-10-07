@@ -339,3 +339,25 @@ for focused checks. This configuration keeps verification separate from a live
 preview server. Unit post-frame tests check immutable preparation and haptic
 cadence. Android web tests establish offline bundle behavior, not physical-device
 graphics compatibility or performance.
+
+## Layout-preserving compact assets
+
+Runtime atlases keep their existing dimensions, UV windows, anchors, pivots and
+nine-slice crops. Original authoring PNGs remain checked in; startup globs retain
+compact artwork siblings. Separate base and diffuse consumers remain separate.
+Required planes are diffuse, normal and packed surface (R roughness, G metallic,
+B AO), with optional emissive. Missing emission binds the existing neutral
+texture or procedural zero plane and never loads a black image. Cached coverage
+and blend modes match explicit zero maps, including additive emission.
+
+Encoding belongs to `scripts/assets/compact.mjs` and the hash/byte manifest;
+installation and generated catalog belong to `scripts/pbr`. Runtime loading stays
+in `pbr-atlas.ts`, `asset-materials.ts`, `cached-materials.ts`, UI lighting and the
+existing worker path. Data WebP decodes bit-exactly with alpha/colour conversion
+disabled in the browser comparison. Lossless `.compact.png` exceptions preserve
+pixel and colour interpretation. Every converted plane is verified by
+`tests/browser/compacted-planes.spec.ts`; normal/material/Canvas comparisons use
+the focused rendering suites. No repacking, new loaders or downscaling.
+
+Encoded byte savings reduce download/APK storage. GPU dimensions stay unchanged;
+only removed scalar and zero-emission uploads can reduce texture residency.

@@ -2,9 +2,19 @@
 
 Generated from [charm-atlas.png](../../charm-atlas.png) with `cloth`, `metal`, `bone`, `wood`, `polished-wood`, Sprite/OpenGL.
 
-Six aligned 1536Ã—1024 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](charm-atlas_diffuse.png), [normal](charm-atlas_normal.png), [roughness](charm-atlas_roughness.png), [metallic](charm-atlas_metallic.png), [ao](charm-atlas_ao.png), [emissive](charm-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| charm-atlas | [diffuse](charm-atlas_diffuse.webp), [normal](charm-atlas_normal.webp), [surface](charm-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

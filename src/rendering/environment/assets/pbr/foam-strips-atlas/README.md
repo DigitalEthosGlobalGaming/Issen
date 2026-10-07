@@ -2,9 +2,19 @@
 
 Generated from [foam-strips-atlas.png](../../foam-strips-atlas.png) with `default`, Sprite/OpenGL.
 
-Six aligned 1659Ã—948 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](foam-strips-atlas_diffuse.png), [normal](foam-strips-atlas_normal.png), [roughness](foam-strips-atlas_roughness.png), [metallic](foam-strips-atlas_metallic.png), [ao](foam-strips-atlas_ao.png), [emissive](foam-strips-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| foam-strips-atlas | [diffuse](foam-strips-atlas_diffuse.webp), [normal](foam-strips-atlas_normal.webp), [surface](foam-strips-atlas_surface.webp), [emissive](foam-strips-atlas_emissive.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [handle-guard-atlas.png](../../handle-guard-atlas.png) with `leather`, `metal`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](handle-guard-atlas_diffuse.png), [normal](handle-guard-atlas_normal.png), [roughness](handle-guard-atlas_roughness.png), [metallic](handle-guard-atlas_metallic.png), [ao](handle-guard-atlas_ao.png), [emissive](handle-guard-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| handle-guard-atlas | [diffuse](handle-guard-atlas_diffuse.webp), [normal](handle-guard-atlas_normal.webp), [surface](handle-guard-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

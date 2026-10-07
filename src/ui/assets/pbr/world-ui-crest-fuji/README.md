@@ -2,9 +2,19 @@
 
 Generated from [world-ui-crest-fuji.png](../../world-ui-crest-fuji.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 128Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-crest-fuji_diffuse.png), [normal](world-ui-crest-fuji_normal.png), [roughness](world-ui-crest-fuji_roughness.png), [metallic](world-ui-crest-fuji_metallic.png), [ao](world-ui-crest-fuji_ao.png), [emissive](world-ui-crest-fuji_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-crest-fuji | [diffuse](world-ui-crest-fuji_diffuse.compact.png), [normal](world-ui-crest-fuji_normal.webp), [surface](world-ui-crest-fuji_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

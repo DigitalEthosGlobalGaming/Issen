@@ -1,6 +1,6 @@
 # Game asset and PBR inventory
 
-Last reviewed: 5 October 2026. This is a manually maintained inventory of the
+Last reviewed: 7 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
@@ -14,8 +14,8 @@ Marketing screenshots and native icons are included in separate sections.
 Ignored trials under `tmp/`, generated `dist/`, Android build outputs, dependencies
 and document illustrations are outside this inventory.
 
-- **Yes**: a complete six-map PBR export is installed in the game asset directories.
-- **Generated, unwired**: six validated maps are installed, but the source renderer
+- **Yes**: a validated compact runtime PBR plane set is installed in the game asset directories.
+- **Generated, unwired**: validated compact planes are installed, but the source renderer
   still uses its existing artwork. Pack links lead to provenance and exact settings.
 - **No installed pack**: no matching export is installed here. This does not rule
   out earlier trial exports under `tmp/`.
@@ -25,11 +25,20 @@ and document illustrations are outside this inventory.
 - **Runtime/source** records direct code references or an explicit source role.
   No direct filename reference is not proof that dynamic loading is impossible.
 
-This snapshot covers **757 media files**, including **516 exported PBR maps**
-and **86 packed runtime surface textures**
-across **86 source families**. Renderer wiring is recorded separately from export settings.
-The 80 newly generated packs contain 480 maps: 73 Sprite/OpenGL packs and seven
-Texture/OpenGL packs. Original source artwork is unchanged.
+The installed runtime set contains **266 aligned material planes** across
+**86 source families**: diffuse, normal and packed surface for each, plus eight
+nonzero emissive maps. The 258 redundant scalar and 78 zero-emission maps are
+removed. Base artwork and diffuse remain separate because both have consumers.
+All 86 original authoring PNGs, atlas metadata, recipes and provenance remain.
+Runtime colour artwork uses 86 compact siblings. Eleven small colour planes use
+losslessly recompressed `.compact.png`; the other runtime siblings use WebP.
+No dimensions, frames, pivots, anchors or nine-slice coordinates changed.
+
+Compaction ownership: [the asset tool](../../scripts/assets/README.md), installed
+map catalog: `scripts/pbr/update-runtime-catalog.mjs`, recipe/provenance links:
+the adjacent pack README files. The manifest records original/new hashes,
+encodings and bytes. All 352 conversions passed browser alpha/placement and colour
+tolerances, including 180 bit-exact data planes. Tight repacking remains cancelled.
 
 ## Newly generated packs
 
@@ -38,7 +47,7 @@ Texture/OpenGL packs. Original source artwork is unchanged.
 The player base cloth pack is now selected for all supported outfit recipes.
 The five outfit attachment sheets (armour, cloth, headwear, masks and special
 headwear), charms, companion parts and mystic rock submit aligned normal,
-roughness, metallic, AO and emissive maps to the material shader. Tinted and
+packed surface (roughness, metallic, AO) and optional emissive to the material shader. Tinted and
 cropped colour caches retain their original atlas frames for the other maps.
 Canvas fallback retains colour artwork. Focused browser checks confirm outfit
 and charm alignment, mirrored cached normals, procedural occlusion, shader
@@ -127,12 +136,12 @@ those in the family and mixed-material tables above.
 
 | Source family | PBR | Preset | Installed files |
 | --- | --- | --- | --- |
-| `blade-profile-atlas` | Yes | `metal` + `wood` | [diffuse](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_diffuse.png), [normal](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_normal.png), [roughness](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_roughness.png), [metallic](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_metallic.png), [ao](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_ao.png), [emissive](../../src/rendering/figures/assets/blade-pbr/blade-profile-atlas_emissive.png) |
-| `player-ronin-simple` | Yes | `cloth` | [diffuse](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_diffuse.png), [normal](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_normal.png), [roughness](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_roughness.png), [metallic](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_metallic.png), [ao](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_ao.png), [emissive](../../src/rendering/figures/assets/player-pbr/player-ronin-simple_emissive.png) |
-| `enemy-ronin-simple` | Yes | `cloth` | [diffuse](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_diffuse.png), [normal](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_normal.png), [roughness](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_roughness.png), [metallic](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_metallic.png), [ao](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_ao.png), [emissive](../../src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_emissive.png) |
-| `enemy-clothing-variants` | Yes | `cloth` | [diffuse](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_diffuse.png), [normal](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_normal.png), [roughness](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_roughness.png), [metallic](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_metallic.png), [ao](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_ao.png), [emissive](../../src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_emissive.png) |
-| `enemy-headwear-atlas` | Yes | `cloth` + `metal` + `wood` | [diffuse](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_diffuse.png), [normal](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_normal.png), [roughness](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_roughness.png), [metallic](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_metallic.png), [ao](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_ao.png), [emissive](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_emissive.png) |
-| `enemy-headwear-variants` | Yes | `cloth` + `metal` | [diffuse](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_diffuse.png), [normal](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_normal.png), [roughness](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_roughness.png), [metallic](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_metallic.png), [ao](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_ao.png), [emissive](../../src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_emissive.png) |
+| `blade-profile-atlas` | Yes | `metal` + `wood` | [runtime planes and provenance](../../src/rendering/figures/assets/blade-pbr/README.md) |
+| `player-ronin-simple` | Yes | `cloth` | [runtime planes and provenance](../../src/rendering/figures/assets/player-pbr/README.md) |
+| `enemy-ronin-simple` | Yes | `cloth` | [runtime planes and provenance](../../src/rendering/figures/assets/enemy-pbr/README.md) |
+| `enemy-clothing-variants` | Yes | `cloth` | [runtime planes and provenance](../../src/rendering/figures/assets/enemy-pbr/README.md) |
+| `enemy-headwear-atlas` | Yes | `cloth` + `metal` + `wood` | [runtime planes and provenance](../../src/rendering/figures/assets/enemy-pbr/README.md) |
+| `enemy-headwear-variants` | Yes | `cloth` + `metal` | [runtime planes and provenance](../../src/rendering/figures/assets/enemy-pbr/README.md) |
 
 ## Figure source atlases
 

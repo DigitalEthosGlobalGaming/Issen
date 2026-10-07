@@ -230,3 +230,18 @@ Leather, Painted Metal and Bone also exported in Sprite mode; Polished Wood and
 Rusted Metal exported in Texture mode. All five archives passed integrity checks
 and their manifests confirmed that every requested setting was applied.
 Those exports remain under ignored `tmp/`; game integration is deferred.
+
+## Installed runtime compaction
+
+Raw ZIP exports retain the six authoring maps for validation. Installation packs
+surface RGB, verifies scalar equality, runs `scripts/assets/compact.mjs --apply`,
+regenerates `src/rendering/asset-material-catalog.ts` and refreshes pack README
+links. Installed runtime packs contain aligned diffuse, normal, surface and only
+nonzero emissive; consumers never request scalar or black emission maps.
+Original PNG artwork, recipes and provenance remain regeneration inputs.
+
+WebP method 6 uses exact lossless data/alpha and tolerance-checked colour.
+Eleven small colour assets use lossless `.compact.png` exceptions because valid
+WebP was larger. See [asset tool](../assets/README.md) for dependencies, no-op
+behaviour, PNG metadata handling and the action/hash/byte manifest. Keep source
+keys and frame metadata unchanged when regenerating. No resizing or repacking.

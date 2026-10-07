@@ -5,7 +5,9 @@ Use [docs/index.md](docs/index.md) when unfamiliar with the repository.
 Before starting a future work request, read
 [current development status](current-development-status.md). Asset packing and
 its unfinished performance comparison have been cancelled; use the original
-assets approach. The separate lit-only integration remains unintegrated. Do not
+assets approach with layout-preserving compact WebP planes (lossless compact PNG
+exceptions), packed surface and optional emissive. Tight repacking stays cancelled.
+The separate lit-only integration remains unintegrated. Do not
 resume it or run benchmarks unless the user asks. Update the handoff when that
 work resumes or finishes.
 

@@ -2,9 +2,19 @@
 
 Generated from [world-ui-atlas.png](../../world-ui-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 768Ã—640 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-atlas_diffuse.png), [normal](world-ui-atlas_normal.png), [roughness](world-ui-atlas_roughness.png), [metallic](world-ui-atlas_metallic.png), [ao](world-ui-atlas_ao.png), [emissive](world-ui-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-atlas | [diffuse](world-ui-atlas_diffuse.compact.png), [normal](world-ui-atlas_normal.webp), [surface](world-ui-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [cherry-trees-atlas.png](../../cherry-trees-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](cherry-trees-atlas_diffuse.png), [normal](cherry-trees-atlas_normal.png), [roughness](cherry-trees-atlas_roughness.png), [metallic](cherry-trees-atlas_metallic.png), [ao](cherry-trees-atlas_ao.png), [emissive](cherry-trees-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| cherry-trees-atlas | [diffuse](cherry-trees-atlas_diffuse.webp), [normal](cherry-trees-atlas_normal.webp), [surface](cherry-trees-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

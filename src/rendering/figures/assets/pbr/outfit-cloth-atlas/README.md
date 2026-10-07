@@ -2,9 +2,19 @@
 
 Generated from [outfit-cloth-atlas.png](../../outfit-cloth-atlas.png) with `cloth`, `wood`, `leather`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](outfit-cloth-atlas_diffuse.png), [normal](outfit-cloth-atlas_normal.png), [roughness](outfit-cloth-atlas_roughness.png), [metallic](outfit-cloth-atlas_metallic.png), [ao](outfit-cloth-atlas_ao.png), [emissive](outfit-cloth-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| outfit-cloth-atlas | [diffuse](outfit-cloth-atlas_diffuse.webp), [normal](outfit-cloth-atlas_normal.webp), [surface](outfit-cloth-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

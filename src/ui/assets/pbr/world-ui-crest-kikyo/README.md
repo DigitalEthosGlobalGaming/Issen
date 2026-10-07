@@ -2,9 +2,19 @@
 
 Generated from [world-ui-crest-kikyo.png](../../world-ui-crest-kikyo.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 128Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-crest-kikyo_diffuse.png), [normal](world-ui-crest-kikyo_normal.png), [roughness](world-ui-crest-kikyo_roughness.png), [metallic](world-ui-crest-kikyo_metallic.png), [ao](world-ui-crest-kikyo_ao.png), [emissive](world-ui-crest-kikyo_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-crest-kikyo | [diffuse](world-ui-crest-kikyo_diffuse.compact.png), [normal](world-ui-crest-kikyo_normal.webp), [surface](world-ui-crest-kikyo_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [grass-edges-atlas.png](../../grass-edges-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](grass-edges-atlas_diffuse.png), [normal](grass-edges-atlas_normal.png), [roughness](grass-edges-atlas_roughness.png), [metallic](grass-edges-atlas_metallic.png), [ao](grass-edges-atlas_ao.png), [emissive](grass-edges-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| grass-edges-atlas | [diffuse](grass-edges-atlas_diffuse.webp), [normal](grass-edges-atlas_normal.webp), [surface](grass-edges-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

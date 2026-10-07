@@ -2,9 +2,19 @@
 
 Generated from [landmark-stones-atlas.png](../../landmark-stones-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](landmark-stones-atlas_diffuse.png), [normal](landmark-stones-atlas_normal.png), [roughness](landmark-stones-atlas_roughness.png), [metallic](landmark-stones-atlas_metallic.png), [ao](landmark-stones-atlas_ao.png), [emissive](landmark-stones-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| landmark-stones-atlas | [diffuse](landmark-stones-atlas_diffuse.webp), [normal](landmark-stones-atlas_normal.webp), [surface](landmark-stones-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

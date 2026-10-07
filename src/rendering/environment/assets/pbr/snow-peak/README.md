@@ -2,9 +2,19 @@
 
 Generated from [snow-peak.png](../../snow-peak.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1881Ã—836 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](snow-peak_diffuse.png), [normal](snow-peak_normal.png), [roughness](snow-peak_roughness.png), [metallic](snow-peak_metallic.png), [ao](snow-peak_ao.png), [emissive](snow-peak_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| snow-peak | [diffuse](snow-peak_diffuse.webp), [normal](snow-peak_normal.webp), [surface](snow-peak_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

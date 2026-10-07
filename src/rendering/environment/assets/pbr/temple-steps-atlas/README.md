@@ -2,9 +2,19 @@
 
 Generated from [temple-steps-atlas.png](../../temple-steps-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 2172Ã—724 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](temple-steps-atlas_diffuse.png), [normal](temple-steps-atlas_normal.png), [roughness](temple-steps-atlas_roughness.png), [metallic](temple-steps-atlas_metallic.png), [ao](temple-steps-atlas_ao.png), [emissive](temple-steps-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| temple-steps-atlas | [diffuse](temple-steps-atlas_diffuse.webp), [normal](temple-steps-atlas_normal.webp), [surface](temple-steps-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

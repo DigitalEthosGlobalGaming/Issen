@@ -2,9 +2,19 @@
 
 Generated from [awakening-button-normal.png](../../awakening-button-normal.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 256Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](awakening-button-normal_diffuse.png), [normal](awakening-button-normal_normal.png), [roughness](awakening-button-normal_roughness.png), [metallic](awakening-button-normal_metallic.png), [ao](awakening-button-normal_ao.png), [emissive](awakening-button-normal_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| awakening-button-normal | [diffuse](awakening-button-normal_diffuse.webp), [normal](awakening-button-normal_normal.webp), [surface](awakening-button-normal_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 
