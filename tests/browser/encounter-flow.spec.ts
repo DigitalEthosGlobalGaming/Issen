@@ -78,6 +78,7 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
   await expect(page.locator('#blessList button')).toHaveCount(3);
   await page
     .locator('#blessList button')
+    .filter({ hasNotText: 'Twin blessing' })
     .first()
     .evaluate((button: HTMLButtonElement) => button.click());
   await expect(page.locator('#shrine')).not.toHaveClass(/on/);

@@ -10,7 +10,20 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: figure/player/cue factory bindings are physically owned by
+Latest checkpoint correction: rush-flow fixture now chooses a single blessing
+before asserting one badge. The first random offer could be Twin blessing,
+which intentionally grants two extra blessings and three badges.
+The original one-badge assertion fails on unchanged pre-refactor ad353b3 with
+the observed failing seed 3303660742 (rush-badge-baseline.log; terminal exit 1,
+expected one/received three). The corrected selection passes on that unchanged
+baseline with the same seed (rush-badge-baseline-fixed.log; 1 passed in 15.0s).
+Every original assertion and timeout is retained. The restarted live boss suite
+passes all 11 in 1.6m (boss-feedback-browser-retry.log; terminal confirmed).
+Boss cut/victory event listeners and expanded unit coverage are still uncommitted;
+strict types and all 363 units pass. Commit that next, then run the broad suite.
+W2/W3/Part 4 are unfinished and unpushed; continue the complete authorized goal.
+
+Previous checkpoint:  figure/player/cue factory bindings are physically owned by
 presentation/figures-host.ts. Each owner keeps its existing narrow read-only views;
 the host resolves current drawing state and shares internal figure/pet renderers.
 No combat mutation or drawing/composer order changed. Strict types and all 362
