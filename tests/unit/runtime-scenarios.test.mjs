@@ -1,3 +1,4 @@
+import { bossPhaseFixture } from './helpers/runtime-boss-phase.mjs';
 import { standoffPhaseFixture } from './helpers/runtime-standoff-phase.mjs';
 import { waveLifecycleFixture } from './helpers/runtime-wave-lifecycle.mjs';
 import { createWavesPhase } from '../../src/game/phases/waves.ts';
@@ -227,10 +228,12 @@ for (const [type, count] of [
   ['mirror', 6],
 ])
   test(`seeded ${type} boss/rush duel opens parry and block windows and can end`, () => {
-    const { run, random } = session(9123, { ...setup, mode: 'rush' });
-    run.state = 'boss';
-    run.bossCount = count;
-    run.boss = createBoss(count, run.mode, run.m, position);
+    const runtime = session(9123, { ...setup, mode: 'rush' }),
+      { run, random } = runtime;
+    const duel = bossPhaseFixture(runtime);
+    run.bossCount = count - 1;
+    duel.phase.startBoss();
+    duel.views.playerDie = () => assert.fail('valid boss input must prevent strikes');
     assert.equal(run.rush, true);
     const boss = run.boss,
       states = new Set(),
@@ -251,37 +254,19 @@ for (const [type, count] of [
     for (let tick = 0; tick < 10000 && run.boss; tick++) {
       states.add(boss.state);
       assert.ok(allowed.has(boss.state));
-      updateBoss(run, 0.02, {
-        random: random.next,
-        sounds: { glint() {}, feint() {} },
-        flash() {},
-        playerDie() {
-          assert.fail('parry should happen before flash window closes');
-        },
-        recovered() {},
-        position,
-      });
+      duel.phase.updateBoss(0.02);
       if (!run.boss) break;
       states.add(boss.state);
       if (boss.state === 'flash') {
         assert.ok(boss.t < boss.bp.flash);
-        parryOpening(
-          boss,
-          { count, mode: run.mode, chainModifier: 0, counter: false },
-          random.next,
-        );
+        assert.equal(duel.phase.onTapDown(duel.views), true);
         parries++;
         states.add(boss.state);
       }
       if (boss.state === 'stagger') {
         assert.ok(boss.t < boss.window);
-        while (boss.chainLeft > 1) {
-          boss.chainLeft--;
-          blocks++;
-        }
-        boss.hp--;
-        boss.state = boss.hp === 0 ? 'dying' : 'hurt';
-        boss.t = 0;
+        if (boss.chainLeft > 1) blocks++;
+        duel.phase.onSwipe(duel.views, boss.sdir);
       }
     }
     assert.equal(run.boss, null, 'duel must finish within a bounded simulation');
@@ -297,16 +282,12 @@ for (const [type, count] of [
     missed.state = 'stagger';
     missed.t = missed.window;
     let recovered = 0;
-    updateBoss({ boss: missed, state: 'boss' }, 0.02, {
-      random: random.next,
-      sounds: { glint() {}, feint() {} },
-      flash() {},
-      playerDie() {},
-      recovered() {
-        recovered++;
-      },
-      position,
-    });
+    run.boss = missed;
+    run.state = 'boss';
+    duel.views.breakCombo = () => {
+      recovered++;
+    };
+    duel.phase.updateBoss(0.02);
     assert.equal(missed.state, 'recover');
     assert.equal(recovered, 1);
   });

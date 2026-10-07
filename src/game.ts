@@ -1,3 +1,4 @@
+import { createBossPhase } from './game/phases/boss.ts';
 import { createStandoffPhase } from './game/phases/standoff.ts';
 import { createWavesPhase, createWaveLifecycle } from './game/phases/waves.ts';
 import { createRunStart } from './game/session/run-start.ts';
@@ -1806,38 +1807,97 @@ export function startGame(
   }
 
   /* ---------------- boss ---------------- */
+  const bossPhase = createBossPhase<GameContext<PresentationContext>>(
+    () => ({
+      deferUntilSceneReady,
+      G,
+      renderLives,
+      bossPos,
+      banner,
+      renderHp,
+      sfx,
+      activeTrial,
+      activeDaily,
+      guided,
+      hint,
+      captureCheckpoint,
+      combatRandom,
+      flash,
+      playerDie,
+      breakCombo,
+      setScore,
+      pop,
+      bossTipWorld,
+      S,
+      swingPlayer,
+      sparks,
+      ring,
+      get hitStop() {
+        return hitStop;
+      },
+      set hitStop(value) {
+        hitStop = value;
+      },
+      combatHaptics,
+      letterbox,
+      ST,
+      bumpCombo,
+      addScore,
+      comboMult,
+      buzz,
+      notifications,
+      hideHint,
+      addSlash,
+      killFx,
+      scraps,
+      stamp,
+      W,
+      H,
+      punch,
+      EQ,
+      earn,
+      get runBossMilestone() {
+        return runBossMilestone;
+      },
+      set runBossMilestone(value) {
+        runBossMilestone = value;
+      },
+      bst,
+      challenge,
+      inkBurst,
+      saveStats,
+      checkUnlocks,
+      shake: (amount) => {
+        presentationState.shake = Math.max(presentationState.shake, amount);
+      },
+      setBossLabels: (wave, glyph, name) => {
+        $('waveLbl').textContent = wave;
+        $('bossK').textContent = glyph;
+        $('bossN').textContent = name;
+      },
+      showBossBar: (shown) => {
+        $('bossbar').classList.toggle('on', shown);
+      },
+      bossStain: (p) => {
+        presentationState.fx.stains.push({
+          x: p.x,
+          y: p.y + p.h * 0.01,
+          rx: p.h * 0.3,
+          t: 0,
+          life: BOSS_SHADOW_DURATION,
+        });
+      },
+    }),
+    context,
+  );
   function startBoss() {
-    if (deferUntilSceneReady(startBoss)) return;
-    refillDuelKnives(G);
-    G.blessingTriggers.flourishWard = false;
-    renderLives();
-    G.bossCount++;
-    const b = createBoss(
-        G.bossCount,
-        G.mode,
-        G.m,
-        bossPos,
-        restorableRng((G.seed ^ Math.imul(G.bossCount, 0x9e3779b9)) >>> 0).next,
-      ),
-      { def, lap } = b;
-    G.boss = b;
-    G.state = 'boss';
-    G.attacker = null;
-    G.event = null;
-    const nm = def.n + (lap ? ' ' + roman(lap + 1) : '');
-    banner(def.k, nm);
-    $('waveLbl').textContent = G.rush ? `決闘 ${kanji(G.wave)}` : '決闘';
-    $('bossK').textContent = def.k;
-    $('bossN').textContent = nm;
-    renderHp();
-    $('bossbar').classList.add('on');
-    sfx.drum();
-    if (!activeTrial && !activeDaily) guided.startBoss();
-    if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
-    if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
-    if (def.mirror)
-      hint('mirror', 'The Mirror never feints. Cut opposite to his arrow and blade.', 5000);
-    captureCheckpoint();
+    bossPhase.startBoss();
+  }
+  function updateBoss(dt: number, raw = dt) {
+    bossPhase.updateBoss(dt, raw);
+  }
+  function bossSwipe(dir: Direction, automatic = false) {
+    bossPhase.bossSwipe(dir, automatic);
   }
   function bossPos(b: Boss) {
     return bossPosition(b, L);
@@ -1845,69 +1905,9 @@ export function startGame(
   function toIdle(b: Boss, base: number) {
     bossToIdle(b, base, combatRandom);
   }
-  function updateBoss(dt: number, raw = dt) {
-    simulateBoss(G, dt, {
-      rawDelta: raw,
-      random: combatRandom,
-      sounds: sfx,
-      flash,
-      playerDie,
-      position: bossPos,
-      recovered: (b) => {
-        breakCombo();
-        setScore();
-        pop(b.pos.x, b.pos.y - b.pos.h * 1.05, 'Recovered');
-      },
-    });
-    if (G.boss?.state === 'flash') guided.bossFlash();
-  }
   function bossTipWorld(b: Boss): [number, number] {
     const tp = tipOf(b.pose, b.lean, b.def.spear ? 0.98 : 0.52);
     return [b.pos.x + tp[0] * b.pos.h, b.pos.y + tp[1] * b.pos.h];
-  }
-  function parry() {
-    const b = G.boss;
-    if (!b) return;
-    const tw = bossTipWorld(b);
-    const { second, counterDamage } = parryOpening(
-      b,
-      {
-        count: G.bossCount,
-        mode: G.mode,
-        chainModifier: G.m.chain,
-        counter: G.bless.has('counter'),
-      },
-      combatRandom,
-    );
-    if (activeTrial?.duelMaster) b.chainLeft = b.chainLen = 1;
-    if (!second && G.bless.has('timestop')) G.slowT = Math.max(G.slowT, 1.4);
-    if (counterDamage) {
-      renderHp();
-      pop(b.pos.x, b.pos.y - b.pos.h * 1.25, '返し', Math.max(20, 26 * S));
-    }
-    swingPlayer('block');
-    sparks(tw[0], tw[1], 24);
-    ring(tw[0], tw[1], 4 * S, 90 * S, 0.35, Math.max(2, 2.5 * S));
-    presentationState.shake = Math.max(presentationState.shake, 11 * S);
-    hitStop = 0.09;
-    flash(0.3);
-    sfx.clang();
-    combatHaptics.play('parry');
-    letterbox(0.3);
-    G.combo++;
-    G.parries++;
-    ST.parries++;
-    guided.bossParried();
-    bumpCombo();
-    addScore(Math.round(60 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05);
-    if (!second)
-      hint(
-        'parry',
-        b.def.mirror
-          ? 'An opening. Swipe opposite to his arrow and blade.'
-          : 'An opening. Swipe the way his blade points.',
-        3000,
-      );
   }
   function onTapDown() {
     if (sceneLoading) return false;
@@ -1915,10 +1915,7 @@ export function startGame(
     // practice so the pointer adapter can still recognize the teaching gesture.
     if (guided.phase === 'order-practice') return false;
     if (guided.tap()) return true;
-    if (G.state === 'boss' && G.boss && G.boss.state === 'flash') {
-      parry();
-      return true;
-    }
+    if (G.state === 'boss') return bossPhase.onTapDown(context);
     return false;
   }
   function onTap() {
@@ -1932,185 +1929,7 @@ export function startGame(
       standoffPhase.onTap(context);
       return;
     }
-    if (G.state !== 'boss' || !G.boss) return;
-    const s = G.boss.state;
-    if (s === 'flash') {
-      parry();
-      return;
-    }
-    if (s === 'idle' || s === 'windup' || s === 'feint') {
-      swingPlayer('block');
-      playerDie(G.boss, 'early');
-    }
-  }
-  function blockHit(dir: Direction) {
-    const b = G.boss;
-    if (!b) return;
-    const tw = bossTipWorld(b);
-    b.chainLeft--;
-    let nd;
-    do {
-      nd = DIRS[(combatRandom() * 4) | 0]!;
-    } while (nd === b.sdir);
-    b.sdir = nd;
-    b.t = 0;
-    b.window = Math.max(0.5, b.bp.stag * 0.72);
-    b.blockT = 0.12;
-    swingPlayer(dir);
-    sparks(tw[0], tw[1], 16);
-    ring(tw[0], tw[1], 3 * S, 70 * S, 0.28, Math.max(1.5, 2 * S));
-    presentationState.shake = Math.max(presentationState.shake, 7 * S);
-    hitStop = 0.05;
-    flash(0.12);
-    sfx.block();
-    buzz(12);
-    G.combo++;
-    bumpCombo();
-    addScore(Math.round(40 * comboMult()), b.pos.x, b.pos.y - b.pos.h * 1.05, 'Blocked');
-    if (notifications.activeHint === 'parry') hideHint();
-    hint(
-      'chain',
-      b.def.mirror
-        ? 'He blocked. Keep swiping opposite to his arrow and blade.'
-        : 'He blocked. Keep swiping the way his blade points.',
-      3500,
-    );
-  }
-  function bossSwipe(dir: Direction, automatic = false) {
-    const b = G.boss;
-    if (!b) return;
-    if (b.state !== 'stagger') {
-      if (activeTrial?.duelMaster && b.state !== 'enter' && b.state !== 'dying')
-        playerDie(b, 'early');
-      return;
-    }
-    const p = b.pos,
-      cx = p.x,
-      cy = p.y - p.h * 0.55;
-    if (directionMatches(dir, b.sdir, !!G.m.axisCut) && b.chainLeft > 1) {
-      blockHit(dir);
-      return;
-    }
-    if (directionMatches(dir, b.sdir, !!G.m.axisCut)) {
-      const swiftPoints = !automatic && G.m.swift ? swiftSlashPoints(b.t, b.window) : null;
-      b.hp = Math.max(0, b.hp - (automatic ? 1 : G.m.bossDmg));
-      if (activeTrial?.duelMaster) b.bp = duelMasterTimings(20 - b.hp);
-      renderHp();
-      if (!automatic) swingPlayer(dir);
-      const a = DANG[dir],
-        v: [number, number] = [Math.cos(a), Math.sin(a)],
-        len = p.h * (automatic ? 0.55 : 0.9),
-        sc = p.h / 170;
-      addSlash(
-        cx - (v[0] * len) / 2,
-        cy - (v[1] * len) / 2,
-        cx + (v[0] * len) / 2,
-        cy + (v[1] * len) / 2,
-        Math.max(4, p.h * 0.03),
-        0.35,
-      );
-      killFx(cx, cy, a + Math.PI / 2, sc);
-      scraps(cx, cy, 8, sc);
-      ring(cx, cy, p.h * 0.1, p.h * 0.7, 0.35, Math.max(2, 2.5 * S));
-      presentationState.shake = Math.max(presentationState.shake, 12 * S);
-      hitStop = 0.08;
-      flash(0.15);
-      sfx.slice();
-      combatHaptics.play('slice');
-      G.combo++;
-      bumpCombo();
-      if (notifications.activeHint === 'parry') hideHint();
-      if (b.hp <= 0) {
-        b.state = 'dying';
-        b.t = 0;
-        b.cutAng = a;
-        b.shadowTime = 0;
-        b.deathGround = { ...b.pos };
-        addScore(
-          Math.round((swiftPoints ?? 1500 * G.bossCount) * G.m.bossScore),
-          cx,
-          p.y - p.h * 1.1,
-          '討取',
-          Math.max(22, 28 * S),
-        );
-        stamp('討取', W / 2, H * 0.3, Math.max(56, 80 * S), true, 1.6);
-        letterbox(1.3);
-        punch(1.08, cx, cy);
-        hitStop = 0.25;
-        flash(0.45);
-        addSlash(
-          cx - v[0] * Math.max(W, H) * 1.3,
-          cy - v[1] * Math.max(W, H) * 1.3,
-          cx + v[0] * Math.max(W, H) * 1.3,
-          cy + v[1] * Math.max(W, H) * 1.3,
-          Math.max(3, 3 * S),
-          0.7,
-        );
-        sfx.bossDie();
-        G.petT = 1;
-        if (EQ.pet === 'crow') sfx.caw();
-        G.bossesSlain++;
-        earn('boss');
-        runBossMilestone = Math.max(runBossMilestone, G.bossCount);
-        ST.duels++;
-        if (G.rush) {
-          ST.rushBest = Math.max(ST.rushBest || 0, G.bossesSlain);
-          if (G.blade) ST.rushBlade = (ST.rushBlade || 0) + 1;
-        }
-        {
-          const q = bst();
-          if (q) q.d++;
-          challenge('d');
-        }
-        if (G.mode === 'ronin') ST.roninDuels++;
-        if (b.def.mirror) recordSecretEvent(ST, { kind: 'mirrorVictory', clean: !b.failed });
-        if (G.bless.has('breath') && !G.zen && !G.hard && G.lives < G.maxLives) {
-          G.lives++;
-          renderLives();
-          pop(W / 2, H * 0.5, '息 +1 life', Math.max(20, 24 * S));
-        }
-        if (!b.failed) ST.cleanDuels++;
-        if (G.blade) ST.bladeDuels++;
-        G.state = 'between';
-        G.afterBoss = true;
-        G.nextT = 2.2;
-        $('bossbar').classList.remove('on');
-        inkBurst(cx, cy, a + Math.PI / 2, 30, p.h / 150);
-        presentationState.fx.stains.push({
-          x: p.x,
-          y: p.y + p.h * 0.01,
-          rx: p.h * 0.3,
-          t: 0,
-          life: BOSS_SHADOW_DURATION,
-        });
-        saveStats();
-        checkUnlocks();
-      } else {
-        b.state = 'hurt';
-        b.t = 0;
-        addScore(
-          Math.round((swiftPoints ?? 300) * comboMult() * G.m.bossScore),
-          cx,
-          p.y - p.h * 1.05,
-        );
-      }
-    } else {
-      if (G.m.kage && (b.kageUsed || 0) < G.m.kage) {
-        b.kageUsed = (b.kageUsed || 0) + 1;
-        swingPlayer(dir);
-        sfx.deflect();
-        pop(cx, p.y - p.h * 1.05, 'Afterimage');
-        return;
-      }
-      swingPlayer(dir);
-      b.state = 'recover';
-      b.t = 0;
-      b.failed = true;
-      breakCombo();
-      setScore();
-      sfx.deflect();
-      pop(cx, p.y - p.h * 1.05, 'Deflected');
-    }
+    if (G.state === 'boss') bossPhase.onTap(context);
   }
 
   /* ---------------- standoff & shrine ---------------- */

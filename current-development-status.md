@@ -40,17 +40,22 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: standoff setup, update, swipe and early tap now belong to
-`src/game/phases/standoff.ts`. Challenger records remain plain; figure construction,
-guard pose, layout and feedback are explicit ports without rendering imports.
-Three actual controller cases cover one successful cut/next wave, early swipe/tap,
-wrong/late failures and scene readiness. Seeded standoff scenarios now call this
-controller. Strict types passed; all 300 units passed (standoff-final-unit.log).
-`npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/input.spec.ts --config playwright.rendering-v2.config.ts`:
-all five passed (standoff-browser.log; terminal confirmed). No gameplay change.
-Next move boss/shrine/death controllers and trial encounter start/finish, then
-wire the live router preserving same-frame between/dead cascades. Full W2/W3/
-Part 4 remain pending; develop stays unpushed.
+Latest checkpoint: boss entry, update, parry/tap/down, chained blocks and cuts
+now belong to `src/game/phases/boss.ts`. Position/tip, camera/stain and UI feedback
+are explicit ports, with no rendering imports. Common-frame dying updates still
+use updateBoss(dt, raw), preserving raw shadow time outside active combat.
+Three added actual API cases cover down/release parry, wrong/early input and one
+victory/reward/between boundary. All four seeded boss pattern scenarios now use
+the real entry/update/input APIs, including missed-opening recovery.
+Strict types passed; all 303 units passed (boss-final-unit.log).
+`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
+all twenty passed (boss-browser-retry.log; terminal confirmed). Initial run was
+interrupted after a stale response-injected parry reference failed; that test hook
+now calls bossPhase.onTapDown(context). No assertions or tolerances changed.
+Next move trial encounter start/finish (draft script prepared but NOT executed),
+then shrine/death controllers and live router dispatch. Full W2/W3/Part 4 remain
+pending; develop stays unpushed. Standoff checkpoint fa674bf: strict, 300 units,
+three real API scenarios and five input/save browser cases passed.
 
 Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
 passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave

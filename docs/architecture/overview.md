@@ -328,3 +328,7 @@ See [drifting debris](../features/drifting-debris.md) for atlas extension and co
 
 `game/phases/standoff.ts` owns challenger setup, draw-window updates and swipe/tap
 resolution, with explicit figure/feedback ports and plain checkpoint records.
+
+`game/phases/boss.ts` owns duel entry, timed updates, parry/block and cut resolution.
+Raw-time dying cleanup remains callable before phase dispatch; layout, UI and
+feedback use explicit ports. Seeded boss-pattern scenarios call this owner.

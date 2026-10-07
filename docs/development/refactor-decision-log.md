@@ -118,6 +118,8 @@
 
 - 2026-10-08 — W2 standoff move — retain plain challenger records and existing early/draw/wrong/late windows through explicit construction and feedback ports — import rendering models into gameplay or rewrite standoff timing — all 300 units, three actual controller cases and five real input/save cases pass; seeded standoff driver now calls the phase API — revert the standoff move and scenario migration.
 
+- 2026-10-08 — W2 boss move — preserve duel entry, parry chains, counter/reward and raw-time dying cleanup through explicit ports; migrate seeded fights and stale browser parry hook — leave inline HP drivers or replay phase entry on restore — strict, all 303 units and twenty browser cases pass; no gameplay or tolerance changes — revert the boss move and API-driver migrations together.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
