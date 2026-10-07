@@ -5,7 +5,7 @@ import {
   startSwing,
   updatePlayerAnimation,
   REST_POSE,
-} from '../../src/rendering/figures/player.ts';
+} from '../../src/game/player/player.ts';
 import { comboMultiplier, scoreGain } from '../../src/game/progression/scoring.ts';
 
 test('player swings begin opposite the cut and instances do not share pose state', () => {

@@ -386,3 +386,7 @@ configuration hooks for base, mirror, twin and spear; visual definitions stay pl
 content. boss-simulation.ts advances simulation/lifetime/raw-shadow clocks and
 applies the existing transition-frame pose/lean rules. All consumers now import advanceBoss directly; the unused boss-update.ts
 adapters and legacy idle reset have been removed separately. No checkpoint fields change.
+
+Player animation plain records, construction, swing and update functions are owned
+by game/player/player.ts; the rendering player module only re-exports REST_POSE
+for existing rendering coverage. Gameplay has no rendering import.

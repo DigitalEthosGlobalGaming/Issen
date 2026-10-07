@@ -5,7 +5,7 @@ import { createRunRewardLedger } from '../../../src/game/progression/run-rewards
 import { waveConfig } from '../../../src/game/encounters/configuration.ts';
 import { parseStatistics, DEFAULT_EQUIPMENT } from '../../../src/platform/saves.ts';
 import { restorableRng } from '../../../src/shared/random.ts';
-import { createPlayerAnimation, REST_POSE } from '../../../src/rendering/figures/player.ts';
+import { createPlayerAnimation, REST_POSE } from '../../../src/game/player/player.ts';
 import { createWeatherState } from '../../../src/rendering/scene/weather-state.ts';
 
 /** Fixed input ports drive the production run-start API, with test-owned profile state. */

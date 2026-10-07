@@ -142,7 +142,7 @@ import {
   createPlayerAnimation,
   startSwing,
   updatePlayerAnimation,
-} from './rendering/figures/player.ts';
+} from './game/player/player.ts';
 import { comboMultiplier, scoreGain } from './game/progression/scoring.ts';
 
 import { createEffectQuality, preferredDensity } from './rendering/effects/quality.ts';
