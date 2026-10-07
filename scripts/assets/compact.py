@@ -222,15 +222,14 @@ def run(root, apply, retain_generated_png=False, workers=4):
                 if backup.exists() and digest(backup.read_bytes()) != original_hash:
                     raise ValueError(f'Hash-addressed backup differs: {rel}')
                 if not backup.exists(): backup.write_bytes(original)
-                if encoded is not None:
-                    if old and old.get('newPath') and old['newPath'] != record['newPath']:
-                        superseded = root/old['newPath']
-                        superseded.resolve().relative_to(root.resolve())
-                        if superseded.exists():
-                            if digest(superseded.read_bytes()) != old['newHash']:
-                                raise ValueError(f'Superseded output changed: {rel}')
-                            superseded.unlink()
-                    target.write_bytes(encoded)
+                if old and old.get('newPath') and old['newPath'] != record['newPath']:
+                    superseded = root/old['newPath']
+                    superseded.resolve().relative_to(root.resolve())
+                    if superseded.exists():
+                        if digest(superseded.read_bytes()) != old['newHash']:
+                            raise ValueError(f'Superseded output changed: {rel}')
+                        superseded.unlink()
+                if encoded is not None: target.write_bytes(encoded)
                 if source in generated and not retain_generated_png: source.unlink()
             records[rel] = record
             if apply:

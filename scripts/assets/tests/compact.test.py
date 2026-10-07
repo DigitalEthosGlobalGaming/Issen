@@ -117,6 +117,19 @@ class CompactionTests(unittest.TestCase):
             final = manifest.read_bytes()
             compact.run(root,True,workers=4)
             self.assertEqual(manifest.read_bytes(),final)
+            # A later zero export must remove a prior emitting compact sibling.
+            Image.new('RGBA',(3,3),(0,0,0,255)).save(regenerated)
+            compact.run(root,True,workers=2)
+            latest = json.loads(manifest.read_text())
+            emission = next(record for record in latest['files'] if record['originalPath'].endswith('sample_emissive.png'))
+            self.assertEqual(emission['action'],'zero-emission')
+            self.assertIsNone(emission['newPath'])
+            self.assertFalse((pack/'sample_emissive.webp').exists())
+            self.assertFalse(regenerated.exists())
+            final = manifest.read_bytes()
+            compact.run(root,True)
+            self.assertEqual(manifest.read_bytes(),final)
+
 
     def test_mismatching_family_remains_untouched(self):
         with tempfile.TemporaryDirectory(dir=TEST_TMP) as temp:

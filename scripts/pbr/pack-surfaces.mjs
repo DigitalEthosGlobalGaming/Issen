@@ -22,7 +22,12 @@ try {
       await access(path.join(directory, `${stem}_roughness.png`));
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
-      await access(path.join(directory, `${stem}_surface.webp`));
+      try {
+        await access(path.join(directory, `${stem}_surface.compact.png`));
+      } catch (missing) {
+        if (missing.code !== 'ENOENT') throw missing;
+        await access(path.join(directory, `${stem}_surface.webp`));
+      }
       continue;
     }
     const channels = await Promise.all(

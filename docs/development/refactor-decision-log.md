@@ -25,6 +25,8 @@
 - 2026-10-07 — W1 verification — record Android encounter-reload failure as pre-existing — changing unrelated runtime checkpoint flow during asset work — the original assertion fails on both compact develop and the untouched pre-refactor Android web build; logs in tmp/asset-compaction/android-recovery-{recheck,baseline}.log — investigate checkpoint lifecycle separately; no assertion/tolerance change.
 - 2026-10-07 — W1 APK accounting — report unsigned ZIP container projections using one frozen debug native shell and matched fresh Android web builds — stale APK comparison or a store/native build — honors the no-store-build rule and isolates web-asset savings; projections are neither APK build results nor installable APKs — discard ignored projection ZIPs and JSON.
 
+- 2026-10-07 — W1 regeneration — remove validated superseded compact emission when a later export becomes zero and accept compact PNG surface exceptions — keeping stale emitting siblings or requiring WebP for every family — later installations must preserve current omission and size policies; round-trip emitting-to-zero regression test passes — revert the regeneration cleanup commit.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
