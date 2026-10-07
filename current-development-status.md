@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; next cached post/environment state
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; presentation scene/composer complete; figure/post drawing moved; feedback moved; environment drawing moved; post preparation moved; cached post artwork moved; next environment/feedback state
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
@@ -59,7 +59,13 @@ passed; all 274 units passed (post-preparation-unit.log; initial syntax correcti
 was then verified by strict types).
 `npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-backend.spec.ts -g 'drawing the same|pending gameplay|checkpoint|actual title' --config playwright.rendering-v2.config.ts`:
 all seven passed (post-preparation-browser.log; terminal exit confirmed).
-No process remains. Next cached post artwork and remaining environment/feedback
+Cached post artwork now belongs to src/presentation/post-artwork.ts, owning grain
+canvases/patterns, vignette and ink-edge caches. Original dimensions, fixed ink seed
+and visual random call order are preserved. Strict types passed; all 274 units
+passed (post-artwork-unit.log).
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/pixi-films.spec.ts tests/browser/trial-films.spec.ts --config playwright.rendering-v2.config.ts`:
+all nine passed (post-artwork-browser.log; terminal exit confirmed).
+No process remains. Next remaining environment/feedback
 state ownership; broad browser verification at presentation cluster end. Follow ordered
 UI/phase/kill/state-table/player extraction afterwards.
 

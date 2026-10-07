@@ -1,3 +1,4 @@
+import { createPostArtwork } from './presentation/post-artwork.ts';
 import { createEnvironmentPresentation } from './presentation/environment.ts';
 import { createFeedbackPresentation } from './presentation/feedback.ts';
 import { createFiguresPresentation } from './presentation/figures.ts';
@@ -609,15 +610,12 @@ export function startGame(
   }
 
   /* ---------------- ambient ---------------- */
-  let mistSprite: HTMLCanvasElement | null = null,
-    vig: HTMLCanvasElement | null = null;
+  let mistSprite: HTMLCanvasElement | null = null;
   let mists: { x: number; y: number; w: number; h: number; a: number; v: number }[] = [],
     fg: GrassBlade[] = [],
     mid: GrassBlade[] = [],
     leaves: Leaf[] = [],
     wx: WeatherParticle[] = [];
-  const grainCanv: HTMLCanvasElement[] = [],
-    grainPats: (CanvasPattern | null)[] = [];
   const WX = createWeatherState(() => 0.5);
   const cinematicWeather = createWeatherState(() => 0.5);
   function buildMist() {
@@ -691,76 +689,9 @@ export function startGame(
     else if (wx.length < target.particles.length) wx.push(...target.particles.slice(wx.length));
     weatherDensity = density();
   }
-  function buildPost() {
-    if (!grainCanv.length) {
-      for (let k = 0; k < 3; k++) {
-        const c = document.createElement('canvas');
-        c.width = c.height = 180;
-        const x = context2d(c);
-        const id = x.createImageData(180, 180);
-        for (let i = 0; i < id.data.length; i += 4) {
-          const v = R() < 0.5 ? 0 : 255;
-          id.data[i] = id.data[i + 1] = id.data[i + 2] = v;
-          id.data[i + 3] = R() * 36;
-        }
-        x.putImageData(id, 0, 0);
-        grainCanv.push(c);
-        grainPats.push(mainG.createPattern(c, 'repeat'));
-      }
-    }
-    vig = document.createElement('canvas');
-    vig.width = Math.max(1, Math.round(W));
-    vig.height = Math.max(1, Math.round(H));
-    const v = context2d(vig);
-    const gr = v.createRadialGradient(
-      W / 2,
-      H * 0.46,
-      Math.min(W, H) * 0.25,
-      W / 2,
-      H * 0.46,
-      Math.max(W, H) * 0.78,
-    );
-    gr.addColorStop(0, 'rgba(0,0,0,0)');
-    gr.addColorStop(0.55, 'rgba(0,0,0,.16)');
-    gr.addColorStop(1, 'rgba(0,0,0,.72)');
-    v.fillStyle = gr;
-    v.fillRect(0, 0, W, H);
-    inkEdge = document.createElement('canvas');
-    inkEdge.width = vig.width;
-    inkEdge.height = vig.height;
-    const k = context2d(inkEdge),
-      m = Math.min(W, H),
-      r2 = rng(99);
-    const fr = k.createRadialGradient(
-      W / 2,
-      H / 2,
-      Math.min(W, H) * 0.32,
-      W / 2,
-      H / 2,
-      Math.max(W, H) * 0.72,
-    );
-    fr.addColorStop(0, 'rgba(14,5,4,0)');
-    fr.addColorStop(1, 'rgba(14,5,4,.85)');
-    k.fillStyle = fr;
-    k.fillRect(0, 0, W, H);
-    for (let i = 0; i < 70; i++) {
-      const sd = (r2() * 4) | 0,
-        t = r2(),
-        rad = m * (0.05 + r2() * 0.14);
-      const x = sd === 0 ? t * W : sd === 1 ? W + rad * 0.3 : sd === 2 ? t * W : -rad * 0.3,
-        y = sd === 0 ? -rad * 0.3 : sd === 1 ? t * H : sd === 2 ? H + rad * 0.3 : t * H;
-      const rg = k.createRadialGradient(x, y, 0, x, y, rad);
-      rg.addColorStop(0, 'rgba(12,4,3,.95)');
-      rg.addColorStop(0.6, 'rgba(12,4,3,.6)');
-      rg.addColorStop(1, 'rgba(12,4,3,0)');
-      k.fillStyle = rg;
-      k.beginPath();
-      k.arc(x, y, rad, 0, TAU);
-      k.fill();
-    }
-  }
-  let inkEdge: HTMLCanvasElement | null = null,
-    inkPulse = 0;
+  const postArtwork = createPostArtwork(cvs.ownerDocument, () => ({ W, H, R, mainG, context2d }));
+  const { buildPost } = postArtwork;
+  let inkPulse = 0;
   function setStage(si: number, anim: boolean) {
     stageSeed = stageVisits.enter(si);
     if (anim && bg) {
@@ -4198,7 +4129,7 @@ export function startGame(
     get flashA() { return flashA; }, set flashA(value: number) { flashA = value; },
     get shake() { return shake; }, set shake(value: number) { shake = value; },
   };
-  const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time,reducedMotion,reducedFlashes,grainPats,vig,pz,inkEdge,lb,flashCol }));
+  const drawPost = createPostPresentation(() => ({ G,g,W,H,cvs,sceneFilm,premiumAccess,time,reducedMotion,reducedFlashes,grainPats: postArtwork.grainPats,vig: postArtwork.vig,pz,inkEdge: postArtwork.inkEdge,lb,flashCol }));
   function render(raw: number) {
     // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
     // inspection dialog covers it completely; its independent preview still draws.

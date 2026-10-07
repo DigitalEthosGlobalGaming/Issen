@@ -62,6 +62,8 @@
 
 - 2026-10-08 — W2 post preparation — move camera/post preparation and cosmetic post history into post-preparation.ts, retaining temporary shared signal ports — advancing post inside draws — repeated draw isolation includes the module-owned history and haptics; camera/post cosmetic RNG order is preserved — revert the preparation move independently.
 
+- 2026-10-08 — W2 post artwork — move cached grain, vignette and ink-edge construction/state into post-artwork.ts — retaining texture caches in the runtime — preserves dimensions and RNG order while completing explicit post artwork ownership; native/trial films and saves pass — revert the cache move independently.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
