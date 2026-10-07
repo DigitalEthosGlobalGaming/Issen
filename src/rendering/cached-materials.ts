@@ -236,20 +236,17 @@ export function drawCachedImage(
       Math.abs(normalMatrix[3]! - 1) < 1e-6;
     for (const kind of ['normal', 'surface', 'emissive'] as const) {
       const map = material[kind];
-      if (!map) {
-        if (kind === 'emissive') {
-          const output = destination.emissive.getContext('2d')!;
-          mapContext(ctx, output, () => {
-            output.globalCompositeOperation = 'destination-out';
-            if (colour) output.drawImage(colour, x, y, width, height);
-            else output.drawImage(source, ...frame, x, y, width, height);
-          });
-        }
-        continue;
-      }
+      if (!map && kind !== 'emissive') continue;
       g.clearRect(0, 0, scratch.width, scratch.height);
-      const crop = map.frame ?? frame;
-      g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);
+      if (map) {
+        const crop = map.frame ?? frame;
+        g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);
+      } else {
+        // A missing map is the former opaque zero map. Apply the same source
+        // coverage and blend operation below; additive draws retain emission.
+        g.fillStyle = '#000';
+        g.fillRect(0, 0, scratch.width, scratch.height);
+      }
       if (kind === 'normal' && !alignedNormal) {
         const pixels = g.getImageData(0, 0, scratch.width, scratch.height);
         for (let i = 0; i < pixels.data.length; i += 4) {

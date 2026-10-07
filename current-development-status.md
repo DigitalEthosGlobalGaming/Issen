@@ -1,23 +1,108 @@
 # Rendering, assets and runtime refactor in progress
 
-Goal: complete all three workstreams in `main-goal.md`, in order, then final verification and one push of `develop`. No performance runs or profiles. Preserve `codex/lit-rendering-only`, authoring artwork, recipes, provenance and `issen.*` compatibility.
+Complete all three workstreams in `main-goal.md` in order, then Part 4 verification
+and one push of `develop`. No profiles, benchmarks, store builds or changes to
+`codex/lit-rendering-only`. Preserve authoring artwork, recipes, provenance and
+`issen.*` compatibility.
 
-Restore point: `pre-refactor` at `ad353b3`, pushed successfully. Local `develop` matched `origin/develop` and was clean before work began. Do not modify the restore branch or push develop until Part 4 passes.
+Restore point: `pre-refactor` at `ad353b3`, pushed successfully from clean develop
+after confirming it matched origin. Never modify that branch. Develop has not
+been pushed; runtime version is still 1.66.7.
 
-## Current checkpoint: W1.0 audit and W1.1 conversion tool
+## Current work: W1 staged conversion is live
 
-- Audit completed in `tmp/asset-compaction/audit.md` and `audit.json`: 86 families, all scalar channels exact, 78 zero-emission maps. Exact scalar deletion saves 63,900,172 bytes; zero-emission deletion saves 8,365,453 bytes. These are encoded source savings, not GPU memory measurements.
-- Source PNG inventory totals 271,253,993 bytes excluding Play Store. Existing dist/APK outputs are stale and are not verification evidence.
-- Added `scripts/assets/compact.mjs`, Pillow helper and five tests. Tool preserves atlas dimensions, exact data, alpha and colour tolerances, records hashes/actions/bytes, retains authoring PNGs and backs up generated inputs before deletion. A second run is a no-op.
-- No actual runtime conversions or deletions applied yet. Runtime version remains 1.66.7; bump patch at W1.5.
+- W1.0 audit: `tmp/asset-compaction/audit.md` and `audit.json`. All 86 families
+  have exact scalar-to-surface channel equality; 78 emissive maps are zero.
+  Planned scalar deletion saves 63,900,172 bytes; zero-emission deletion saves
+  8,365,453 bytes. No generated PNGs have been deleted in the real asset tree.
+- Original scoped PNG inventory: 271,253,993 bytes. Existing dist and APK outputs
+  are stale inventory, not matched verification evidence.
+- Conversion tool, generated catalog and optional emissive loaders are implemented.
+  Runtime player/enemy loaders no longer depend on scalar maps. Sword emission is
+  optional, generated maps are excluded from startup retention, and installation
+  compacts validated final packs before refreshing the catalog.
+- The initial serial converter was intentionally stopped after confirming the
+  task-owned process identity. Completed validated outputs and the manifest were
+  retained. Bounded encoding workers are committed in `73562da`; workers only
+  encode/read while the parent writes outputs and manifest entries in filename
+  order. Default worker count is four, configurable with `ISSEN_ASSET_WORKERS`.
+- The resumed converter is running:
+  `node scripts/assets/compact.mjs --apply --retain-generated-png`.
+  It uses a Pillow-enabled `ISSEN_PYTHON`. Log:
+  `tmp/asset-compaction/conversion-workers.log`. Durable conversion records:
+  `scripts/assets/compaction-manifest.json`. Original backups:
+  `tmp/asset-compaction/originals/`. Original authoring PNGs remain checked in.
+- The active execution handle is recorded in ignored
+  `tmp/asset-compaction/conversion-process.json`. Poll that actual handle to prove
+  whether it is live. A log/manifest/process record alone is not proof. Never start
+  a duplicate converter. Only rerun its idempotent command after terminal status
+  has been established. The previous serial execution is terminal.
+- Early colour atlases required lossless WebP to satisfy the unchanged tolerances.
+  No dimensions, alpha or data channels are relaxed. Early byte counts are partial;
+  final source/bundle/APK projections must wait for conversion and verification.
+- Missing emissive now follows the same coverage and blend mode as an explicit
+  opaque zero map. This preserves additive emission and source-over occlusion.
+  The new exact parity test covers seven blend modes. No gameplay changes.
 
-Verification (exact commands):
+## Verification already completed
 
-- `python scripts/assets/tests/compact.test.py` with a Pillow-enabled interpreter: all five tests passed (zero-emission alpha semantics, scalar equality/mismatch, exact data, source retention, deletion and idempotence).
+Before staged asset conversion:
+
 - `npm run typecheck`: passed.
-- `node --check scripts/assets/compact.mjs`: passed.
+- `npm test`: all 251 unit tests passed; log
+  `tmp/asset-compaction/preparation-unit.log`.
+- `npx playwright test --config playwright.rendering-v2.config.ts`: all 242
+  browser tests passed in one uninterrupted run (11.1m); log
+  `tmp/asset-compaction/preparation-browser.log`.
+- `npm run test:production`: all four production tests passed; log
+  `tmp/asset-compaction/baseline-production.log`. Verified baseline production
+  bundle: 204,159,032 bytes total; 202,508,970 PNG/WebP bytes, recorded in
+  `tmp/asset-compaction/baseline-build-bytes.json`.
+- `node --test scripts/pbr/tests/cli.test.mjs`: all six exporter tests passed.
 
-W1.2/W1.3 preparation now includes the generated catalog (only diffuse/normal/surface and optional emissive), optional emissive loader and removal of direct scalar-map dependencies from player/enemy loaders. No runtime conversions applied yet. New loader/catalog unit tests: 3 passed. Focused browser command: npx playwright test tests/browser/asset-materials.spec.ts tests/browser/material-selection.spec.ts tests/browser/material-colour.spec.ts --config playwright.rendering-v2.config.ts: 3 passed. Strict TypeScript passed after these changes. Export/install integration, optional sword emission, startup generated-map exclusions and cached zero-emission occlusion are now implemented. Verification: npm test: all 251 passed; npx playwright test --config playwright.rendering-v2.config.ts: all 242 passed in one uninterrupted run (11.1m); npm run test:production: all four passed. Logs: tmp/asset-compaction/preparation-unit.log, preparation-browser.log and baseline-production.log. Existing PBR CLI tests: all six passed. Five focused material/optional-emission browser cases passed. Verified baseline production bytes: 204,159,032 total, 202,508,970 PNG/WebP image bytes (recorded in baseline-build-bytes.json). The initial serial conversion was intentionally stopped after verifying its process identity, to upgrade the tool with bounded read-only encoding workers. Completed manifest entries and original PNGs are preserved. The worker change passed all five compaction tests (including staged retention, deletion and idempotence with multiple worker counts), all three loader/catalog unit tests and Node syntax checks. An isolated browser check of the completed subset passed raw decoded colour, data, alpha and dimension comparisons. Staged conversion resumes using four workers: node scripts/assets/compact.mjs --apply --retain-generated-png, using a Pillow-enabled ISSEN_PYTHON. Its output is tmp/asset-compaction/conversion.log and its durable progress manifest is scripts/assets/compaction-manifest.json. Original PNGs are retained. The first three colour atlases converted with lossless WebP because lossy encodings failed the unchanged tolerance; together they shrank from 4,286,717 to 3,074,070 bytes. These are partial results, not final totals. Never start a second converter while the first is live. Inspect the active execution session before resuming; only retry the idempotent command if its process is confirmed terminal. Draft URL migration and raw browser-plane verification are saved under tmp/asset-compaction/migrate-urls.py and compacted-planes.spec.ts; review before applying. Next: finish the running staged conversion and run the raw browser-plane check. Then validate every plane in the browser before URL migration and a separate generated-PNG deletion commit. Test the generator and loaders, then apply conversion with `ISSEN_PYTHON` pointing to Python 3 with Pillow >=12. Backups go under ignored `tmp/asset-compaction/originals/`. Redirect existing source and map URLs to aligned WebP outputs while retaining authoring originals outside startup's runtime glob. Keep deletions, URL migration and behaviour changes in separate commits. Validate every converted plane in-browser and run the required W1 focused suites, Canvas comparison, production and Android web checks. Log any tolerance fork. Do not loosen tests.
+Subsequent utility/cache checks:
+
+- `python scripts/assets/tests/compact.test.py` with Pillow-enabled Python: all
+  five tests passed, including multiple-worker staged retention, deletion,
+  exact pixels and idempotence.
+- `node --test tests/unit/asset-compaction.test.mjs`: all three tests passed.
+- `node --check scripts/assets/compact.mjs`: passed.
+- `npm run typecheck`: passed after the blend-mode parity fix.
+- `npx playwright test tests/browser/optional-emissive.spec.ts
+  tests/browser/zero-emission-parity.spec.ts tests/browser/cached-materials.spec.ts
+  tests/browser/cached-material-lighting.spec.ts --config
+  playwright.rendering-v2.config.ts`: all four tests passed.
+- `npx playwright test --config tmp/asset-compaction/raw-probe.config.ts`: the
+  completed conversion subset passed raw WebGL decoded-pixel, alpha and dimension
+  checks, including normal/surface and nonzero emissive data. This is a subset
+  check, not the final every-plane test or a complete W1 checkpoint.
+
+## Next steps
+
+1. Finish the live staged conversion. Inspect the handle and log before taking any
+   action. Then confirm a second staged apply is a no-op.
+2. Review the draft full raw-browser check at
+   `tmp/asset-compaction/compacted-planes.spec.ts`; it checks every converted plane
+   against its saved original, with the goal's exact data/alpha and colour
+   tolerances. The temporary subset probe is separate and does not replace it.
+3. Commit added WebP outputs and the conversion manifest separately from URL
+   migration and generated-PNG deletion. Keep authoring originals.
+4. Review draft `tmp/asset-compaction/migrate-urls.py`. Migrate actual URL consumers
+   and CSS to WebP, retain authoring provenance keys, use catalog maps for player
+   and enemy optional emission, and exclude authoring PNGs from runtime globs.
+   Audit dynamic consumers and test request intercepts; update their image
+   extensions where needed without changing gameplay assertions or tolerances.
+5. Regenerate the catalog through `scripts/pbr/update-runtime-catalog.mjs`, never
+   edit the generated catalog directly. The draft handles staged zero-emission
+   omissions. Verify focused native/material/asset suites and Canvas comparison.
+6. Remove generated PNGs with the final apply in a separate commit. Update pack
+   README links and future installation so omissions stay omitted. Verify all
+   source authoring files/recipes/provenance survive and placement is unchanged.
+7. Complete the W1 broad browser, production and Android web checks; produce
+   honest source/bundle/APK byte reports; update inventory, PBR README, rendering,
+   AGENTS and handoff; bump patch with "Smaller download" notes. Only then start
+   Workstream 2. Its runtime refactor and Workstream 3 lighting remain entirely
+   required; neither has started. Final report and final develop push remain.
 
 Decision log: `docs/development/refactor-decision-log.md`.
 

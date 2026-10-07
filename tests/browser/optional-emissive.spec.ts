@@ -52,6 +52,6 @@ test('an opaque non-emitting sprite occludes cached emission while transparent p
     controller.dispose();
     return result;
   });
-  expect(result.covered).toEqual([0, 0, 0, 0]);
+  expect(result.covered).toEqual([0, 0, 0, 255]);
   expect(result.uncovered).toEqual([200, 80, 40, 255]);
 });
