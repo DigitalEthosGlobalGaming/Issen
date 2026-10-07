@@ -1,3 +1,6 @@
+import { createEventBus, type GameEvents } from './game/events.ts';
+import type { GameContext } from './game/session/context.ts';
+import type { PresentationContext } from './presentation/context.ts';
 import { reportGraphicsError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
 import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
 import {
@@ -1046,6 +1049,73 @@ export function startGame(
   const apparelMotion = createSecondaryMotion();
   let fx = createEffects();
   const effectQuality = createEffectQuality();
+  // Transitional adapters preserve closure ownership while consumers migrate to slices.
+  const context: GameContext<PresentationContext> = {
+    run: {
+      state: G,
+      get random() {
+        return runRandom;
+      },
+      set random(value) {
+        runRandom = value;
+        combatRandom = value.next;
+      },
+      get equipment() {
+        return EQ;
+      },
+      set equipment(value) {
+        EQ = value;
+      },
+      setup: SETUP,
+      get trial() {
+        return activeTrial;
+      },
+      set trial(value) {
+        activeTrial = value;
+      },
+      get daily() {
+        return activeDaily;
+      },
+      set daily(value) {
+        activeDaily = value;
+      },
+    },
+    services: { audio, storage: store, settings, notify: toast },
+    presentation: {
+      random: R,
+      effects: () => effectSpawner(),
+      layout: () => L,
+      viewport: () => ({ width: W, height: H, dpr: DPR, scale: S }),
+      camera: {
+        get shake() {
+          return shake;
+        },
+        set shake(value) {
+          shake = value;
+        },
+        get zoom() {
+          return zoom;
+        },
+        set zoom(value) {
+          zoom = value;
+        },
+        get zoomX() {
+          return zoomX;
+        },
+        set zoomX(value) {
+          zoomX = value;
+        },
+        get zoomY() {
+          return zoomY;
+        },
+        set zoomY(value) {
+          zoomY = value;
+        },
+      },
+    },
+    events: createEventBus<GameEvents>(),
+  };
+  lifecycle.add(context.events.clear);
   function powersEnabled() {
     return G.state === 'title' || G.state === 'over' ? SETUP.upgrades !== false : G.upgradesEnabled;
   }

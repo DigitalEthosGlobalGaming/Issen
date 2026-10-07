@@ -43,6 +43,9 @@
 
 - 2026-10-08 — W2.1 checkpoint — finish Canvas removal before runtime extraction — moving code while alternate rendering paths remained — broad run passed 249 cases; three unmigrated/asynchronous scene fixtures were corrected without changing assertions and all six focused cases passed; strict types and all 265 unit cases green — revert the ordered W2.1 commits; pre-refactor remains immutable. This combined coverage is not an uninterrupted broad-suite pass.
 
+- 2026-10-08 — W2 context/events — use generic GameContext composition with separate gameplay/service and presentation contracts; retain transitional getters before moving owners — copying every closure local into a universal context — gameplay imports no renderer/presentation types and module consumers can receive narrow slices; original RNG/reference ownership remains — revert the foundation commit.
+- 2026-10-08 — W2 events — snapshot subscriptions per synchronous delivery; nested emissions finish immediately, and listener exceptions propagate — deferred or silently isolated listeners — deterministic order is required; duplicate subscriptions and idempotent unsubscribe are tested — revert the event-bus foundation.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

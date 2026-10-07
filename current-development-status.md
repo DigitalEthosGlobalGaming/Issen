@@ -7,14 +7,28 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.1 Canvas removal complete; next W2 context/events
+## W1 complete; W2.1 Canvas removal complete; W2 context/events foundation complete; next presentation extraction
 
 W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
 materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
 deletions `81e3742` and `46030fc`. No runtime functions have been extracted yet.
-GameContext/event and composer drafts remain outside the repository; integrate
-the context/event foundation next, then the ordered presentation/UI/phase/kill/
-state-table/player extraction. W3 remains entirely pending. Do not push develop.
+Context/events foundation is now introduced alongside the closure; no runtime
+functions moved. Contracts: src/game/session/context.ts, src/game/events.ts,
+src/presentation/context.ts. Transitional getters preserve original owner/RNG
+references. Bus listeners run synchronously in registration order, with defined
+reentrant/subscription semantics and readonly value payloads. No gameplay events
+are emitted yet; wire them while extracting rule/phase owners. Composer draft
+remains outside the repository; next implement named seven-layer composition,
+then presentation environment/figures/post/feedback ownership. Follow ordered
+UI/phase/kill/state-table/player extraction afterwards.
+
+Foundation verification: `npm run typecheck` passed. `npm test` all **270 passed**
+(context-event-unit.log), including five event ordering/reentrancy/subscription
+tests and the thirteen seeded scenario/save cases. `npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/game.spec.ts tests/browser/encounter-flow.spec.ts tests/browser/pixi-backend.spec.ts -g 'checkpoint|runtime disposal|same prepared scene|seeded|boss|standoff|shrine|ends|ending a paused' --config playwright.rendering-v2.config.ts`:
+all **nine passed** (context-event-browser.log; terminal exit confirmed). Logs in
+tmp/runtime-refactor. No process remains. Avoid repeating broad checks for this
+foundation alone: it adds contracts, not runtime behaviour. Run broad again after
+the presentation/shared-runtime change. No intentional gameplay changes yet. W3 remains entirely pending. Do not push develop.
 
 W2.1 broad verification: `npx playwright test --config playwright.rendering-v2.config.ts`
 **249 passed, three failed**; log under

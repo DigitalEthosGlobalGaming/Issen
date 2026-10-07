@@ -53,8 +53,20 @@ owns the player profile, current run, scene dimensions, camera effects and servi
 instances. It connects feature callbacks to audio, persistence, effects and UI.
 It still contains encounter transitions, kill/damage presentation, title secrets,
 main scene layer order and post-processing orchestration. These are not separate
-session/renderer services yet; do not assume the proposed migration tree describes
-implemented files.
+fully extracted owners yet; do not assume the proposed migration tree describes
+implemented files. W2 now introduces `game/session/context.ts`: `RunContext`
+holds plain run records and seeded randomness; `ServicesContext` holds browser
+ports. `presentation/context.ts` owns the cosmetic RNG, effects, layout and camera
+contract. The generic `GameContext<Presentation>` composition contract lets gameplay
+accept narrow rule/service slices without importing rendering/presentation types.
+Transitional getters bridge the existing closure until its owners are extracted.
+
+`game/events.ts` is a typed synchronous bus. It delivers in registration order,
+snapshots subscriptions for each emission, completes nested emissions immediately,
+and propagates listener errors. Changes to subscriptions affect the next emission.
+Rule payloads contain readonly values, not run records or RNG generators. Listeners
+react with progression/presentation; rules retain run mutations and gameplay RNG.
+Events are wired into phase/rule owners as extraction proceeds.
 
 The Ink environment is owned by `src/rendering/environment/`. It supplies
 layered image scenery to the shared scene composition and film pass, rendered
