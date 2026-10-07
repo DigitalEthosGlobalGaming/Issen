@@ -103,8 +103,8 @@ Strict types and all 337 units passed (grunt-table-*.log), including seeded scen
 and legacy checkpoint unit fixtures.
 `npx playwright test tests/browser/new-blessings.spec.ts tests/browser/death-presentation.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/trials.spec.ts tests/browser/feature-plan-04.spec.ts --config playwright.rendering-v2.config.ts`:
 all 21 passed (1.6m, grunt-table-browser.log, terminal confirmed).
-Next: migrate old update/spawn callers and retain thin adapters until migration;
-remove unused adapters separately. Then boss tables/registry and player animation
+Runtime and all test update callers now import advanceGrunts directly; legacy checkpoint/scenario checks use the actual owner. Strict types and all 337 units passed (grunt-api-*.log). Source/test/script audit has no enemy-update.ts imports.
+Next: remove the unused update adapter separately, then migrate spawn ownership/callers. Then boss tables/registry and player animation
 states/companions. Results/reward orchestration, remaining phase/run events and
 composition-root reduction remain required. No timing/balance/save changes.
 W2 gates/minor version, all W3 and Part 4 remain pending; develop is unpushed.

@@ -15,7 +15,7 @@ import { DIRS, OPP } from '../../src/shared/directions.ts';
 import { DEFAULT_EQUIPMENT } from '../../src/platform/saves.ts';
 import { waveConfig } from '../../src/game/encounters/configuration.ts';
 import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
-import { updateEnemies } from '../../src/game/combat/enemy-update.ts';
+import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { targetSwipe } from '../../src/game/combat/targeting.ts';
 import { resolveDamage } from '../../src/game/combat/damage.ts';
 import { initialSpawns, updateWave } from '../../src/game/encounters/waves.ts';
@@ -126,7 +126,7 @@ function driveWave(seed, options = setup, trial) {
     return gained;
   };
   for (let tick = 0; tick < 6000 && run.state === 'playing'; tick++) {
-    updateEnemies(run, 0.02, {
+    advanceGrunts(run, 0.02, {
       surge: 0,
       time: tick * 0.02,
       perfectZone: () => 0.78,
@@ -195,7 +195,7 @@ test('wrong cuts lose life and combo while feints expose the true direction', ()
   assert.equal(outcome.kind, 'hurt');
   assert.equal(outcome.keepCombo, false);
   assert.equal(run.lives, lives - 1);
-  updateEnemies(run, enemy.feintAt + 0.01, {
+  advanceGrunts(run, enemy.feintAt + 0.01, {
     surge: 0,
     time: 1,
     perfectZone: () => 0.78,

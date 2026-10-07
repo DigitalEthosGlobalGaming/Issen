@@ -5,7 +5,7 @@ import { checkpointSession } from './helpers/runtime-checkpoint-session.mjs';
 import { restorableRng } from '../../src/shared/random.ts';
 import { parseRunCheckpoint } from '../../src/platform/run-checkpoint.ts';
 import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
-import { updateEnemies } from '../../src/game/combat/enemy-update.ts';
+import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { updateWave } from '../../src/game/encounters/waves.ts';
 import { updateBoss } from '../../src/game/encounters/boss-update.ts';
 import { updateStandoff, resolveStandoffSwipe } from '../../src/game/encounters/standoff.ts';
@@ -30,7 +30,7 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
     assert.equal(random.next(), comparison.next());
     if (phase === 'playing') {
       for (let tick = 0; tick < 100; tick++) {
-        updateEnemies(run, 0.02, {
+        advanceGrunts(run, 0.02, {
           surge: 0,
           time: tick * 0.02,
           perfectZone: () => 0.78,

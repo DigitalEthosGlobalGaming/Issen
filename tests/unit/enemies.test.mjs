@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateEnemies } from '../../src/game/combat/enemy-update.ts';
+import { advanceGrunts } from '../../src/game/combat/grunt.ts';
 import { enemyPosition } from '../../src/rendering/figures/enemy-position.ts';
 import { createLayout } from '../../src/rendering/layout.ts';
 import { EPOSE, makeFig } from '../../src/shared/figure-model.ts';
@@ -139,12 +139,12 @@ function fixture() {
 test('freeze stops attack progression while storm surge accelerates it', () => {
   const { e, state, env } = fixture();
   state.freezeT = 1;
-  updateEnemies(state, 0.1, env);
+  advanceGrunts(state, 0.1, env);
   assert.equal(e.t, 0);
   assert.equal(e.life, 0.1);
   state.freezeT = 0;
   env.surge = 1;
-  updateEnemies(state, 0.1, env);
+  advanceGrunts(state, 0.1, env);
   assert.equal(e.t, 0.12);
   assert.equal(e.p, 0.12);
 });
@@ -154,46 +154,46 @@ test('feint warning, direction switch and pet cue fire once; still mind activate
   state.m.suzu = 1;
   env.pet = 'shiba';
   state.bless.add('still');
-  updateEnemies(state, 0.3, env);
+  advanceGrunts(state, 0.3, env);
   assert.deepEqual(events, ['bell']);
-  updateEnemies(state, 0.15, env);
+  advanceGrunts(state, 0.15, env);
   assert.deepEqual(events, ['bell', 'feint', 'bark']);
   assert.equal(e.switched, true);
   assert.equal(state.petT, 0.6);
-  updateEnemies(state, 0.35, env);
+  advanceGrunts(state, 0.35, env);
   assert.equal(state.slowT, 0.45);
   state.slowT = 0;
-  updateEnemies(state, 0.01, env);
+  advanceGrunts(state, 0.01, env);
   assert.equal(state.slowT, 0);
 });
 test('foxfire prevents the first late strike and death state changes are observed synchronously', () => {
   const { e, state, env, events } = fixture();
   state.m.foxfire = 1;
-  updateEnemies(state, 1, env);
+  advanceGrunts(state, 1, env);
   assert.deepEqual(events, ['save']);
   assert.equal(state.foxUsed, true);
-  updateEnemies(state, 0.1, env);
+  advanceGrunts(state, 0.1, env);
   assert.deepEqual(events, ['save', 'death']);
-  updateEnemies(state, 0.1, env);
+  advanceGrunts(state, 0.1, env);
   assert.deepEqual(events, ['save', 'death']);
 });
 test('entry, fade and death lifetimes preserve transitions and valid projection', () => {
   const { e, state, env } = fixture();
   e.state = 'enter';
-  updateEnemies(state, 0.9, env);
+  advanceGrunts(state, 0.9, env);
   assert.equal(e.state, 'idle');
   assert.equal(e.t, 0);
   assert.ok(Object.values(e.pos).every(Number.isFinite));
   e.state = 'strike';
   e.zen = true;
-  updateEnemies(state, 0.41, env);
+  advanceGrunts(state, 0.41, env);
   assert.equal(e.state, 'fade');
-  updateEnemies(state, 0.51, env);
+  advanceGrunts(state, 0.51, env);
   assert.equal(state.enemies.length, 0);
   e.state = 'dying';
   e.t = 0;
   state.enemies = [e];
-  updateEnemies(state, 1.13, env);
+  advanceGrunts(state, 1.13, env);
   assert.equal(state.enemies.length, 0);
 });
 
@@ -204,20 +204,20 @@ test('rapid deaths expire with their visual effects under small slow-motion step
     state: 'dying',
     deathType,
   }));
-  for (let i = 0; i < 89; i++) updateEnemies(state, 0.01, env);
+  for (let i = 0; i < 89; i++) advanceGrunts(state, 0.01, env);
   assert.equal(state.enemies.length, 4);
   const times = state.enemies.map((e) => e.t);
-  updateEnemies(state, 0, env);
+  advanceGrunts(state, 0, env);
   assert.deepEqual(
     state.enemies.map((e) => e.t),
     times,
   );
-  updateEnemies(state, 0.011, env);
+  advanceGrunts(state, 0.011, env);
   assert.deepEqual(
     state.enemies.map((e) => e.deathType),
     ['kneel', 'disarm', 'stagger'],
   );
-  updateEnemies(state, 0.2, env);
+  advanceGrunts(state, 0.2, env);
   assert.equal(state.enemies.length, 0);
 });
 
@@ -229,15 +229,15 @@ test('new deaths expire and shadows advance on unpaused raw time during slow mot
     deathType,
     shadowTime: 0,
   }));
-  for (let i = 0; i < 8; i++) updateEnemies(state, 0.005, { ...env, rawDelta: 0.05 });
+  for (let i = 0; i < 8; i++) advanceGrunts(state, 0.005, { ...env, rawDelta: 0.05 });
   assert.equal(state.enemies.length, 2);
   assert.ok(state.enemies.every((e) => Math.abs(e.shadowTime - 0.4) < 1e-9 && e.t < 0.05));
   const before = state.enemies.map((e) => e.shadowTime);
-  updateEnemies(state, 0, { ...env, rawDelta: 0 });
+  advanceGrunts(state, 0, { ...env, rawDelta: 0 });
   assert.deepEqual(
     state.enemies.map((e) => e.shadowTime),
     before,
   );
-  updateEnemies(state, 1.1, { ...env, rawDelta: 1.1 });
+  advanceGrunts(state, 1.1, { ...env, rawDelta: 1.1 });
   assert.equal(state.enemies.length, 0);
 });

@@ -138,7 +138,7 @@ import {
   selectAttacker,
 } from './game/combat/enemy-spawn.ts';
 import { enemyPosition } from './rendering/figures/enemy-position.ts';
-import { updateEnemies as simulateEnemies } from './game/combat/enemy-update.ts';
+import { advanceGrunts as simulateEnemies } from './game/combat/grunt.ts';
 import { createDriftRenderer } from './rendering/scene/drift-renderer.ts';
 import { createWeatherState } from './rendering/scene/weather-state.ts';
 import { updateWeather as simulateWeather } from './rendering/scene/weather-update.ts';
