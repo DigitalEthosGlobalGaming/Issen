@@ -14,10 +14,16 @@ export function mountStartupLoading(retry: () => void) {
   const progress = element.querySelector('progress')!;
   const error = element.querySelector<HTMLElement>('[role=alert]')!;
   const button = element.querySelector('button')!;
-  button.addEventListener('click', retry);
+  let action = retry;
+  const activate = () => action();
+  button.addEventListener('click', activate);
   document.body.append(element);
   return {
     update(state: ArtworkProgress) {
+      element.querySelector('h1')!.textContent = 'Preparing Issen';
+      progress.hidden = false;
+      button.textContent = 'Retry loading';
+      action = retry;
       progress.max = Math.max(1, state.total);
       progress.value = state.loaded;
       status.textContent = `${state.loaded} of ${state.total} artwork images ready`;
@@ -31,8 +37,20 @@ export function mountStartupLoading(retry: () => void) {
       error.textContent = message;
       button.hidden = false;
     },
+    graphics(reload = false) {
+      button.addEventListener('click', activate);
+      element.querySelector('h1')!.textContent = 'Graphics not supported';
+      status.textContent = 'This device’s graphics are not supported by Issen.';
+      progress.hidden = true;
+      error.textContent =
+        'Issen requires WebGL2. Try again after closing other apps or updating your browser.';
+      button.textContent = reload ? 'Reload' : 'Retry';
+      button.hidden = false;
+      action = reload ? () => location.reload() : retry;
+      if (!element.isConnected) document.body.append(element);
+    },
     remove() {
-      button.removeEventListener('click', retry);
+      button.removeEventListener('click', activate);
       element.remove();
     },
   };

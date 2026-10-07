@@ -459,7 +459,8 @@ test('unavailable WebGL initializes a playable Canvas surface with the same save
     } as typeof get;
   });
   await page.goto('/');
-  await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'canvas');
+  await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'pixi');
+  await expect(page.getByRole('button', { name: 'Reload', exact: true })).toBeVisible();
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
   await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
@@ -661,7 +662,7 @@ for (const restore of [true, false]) {
   test(
     restore
       ? 'WebGL context restoration keeps combat paused until explicit resume'
-      : 'unrestored WebGL context falls back to Canvas without resetting the run',
+      : 'unrestored WebGL context reports a reload error without resetting the run',
     async ({ page }) => {
       await page.addInitScript(() => {
         localStorage.setItem(
@@ -696,18 +697,22 @@ for (const restore of [true, false]) {
         await extension.evaluate((ext) => ext.restoreContext());
         await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'ready');
       } else {
-        await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'fallback', {
+        await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'unsupported', {
           timeout: 12000,
         });
-        await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'canvas');
+        await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'pixi');
+        await expect(page.getByRole('button', { name: 'Reload', exact: true })).toBeVisible();
       }
       await expect(page.locator('#paused')).toHaveClass(/on/);
-      await expect(page.locator('#bResume')).toBeEnabled();
+      if (restore) await expect(page.locator('#bResume')).toBeEnabled();
+      else await expect(page.locator('#bResume')).toBeDisabled();
       expect(
         await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).seed),
       ).toBe(seed);
-      await page.locator('#bResume').click();
-      await expect(page.locator('#paused')).not.toHaveClass(/on/);
+      if (restore) {
+        await page.locator('#bResume').click();
+        await expect(page.locator('#paused')).not.toHaveClass(/on/);
+      }
     },
   );
 }

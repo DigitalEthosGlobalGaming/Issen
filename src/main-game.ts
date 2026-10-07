@@ -1,3 +1,4 @@
+import { GraphicsUnsupportedError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
 import { mount } from './ui/mount';
 import { startGame } from './game.ts';
 import { createArtworkPreloader } from './platform/artwork-preload.ts';
@@ -37,19 +38,22 @@ export class MainGame {
   private disposed = false;
   private starting: Promise<void> | null = null;
   private readonly surfaces = new Map<string, SceneSurface>();
-  private readonly useWebGL = new URLSearchParams(location.search).get('renderer') !== 'canvas';
   private readonly loading = mountStartupLoading(() => {
     void this.begin();
   });
   private readonly lightingRig = createLightingRig();
-  private readonly uiMaterialLighting = createUiMaterialLighting(
-    document,
-    this.lightingRig,
-    this.useWebGL,
-  );
+  private readonly uiMaterialLighting = createUiMaterialLighting(document, this.lightingRig);
   private readonly preloader = createArtworkPreloader(urls, undefined, this.loading.update, [
     STARTUP_LOGO_URL,
   ]);
+
+  private readonly graphicsError = (event: Event): void => {
+    if (!this.disposed)
+      this.loading.graphics((event as CustomEvent<{ reload: boolean }>).detail.reload);
+  };
+  constructor() {
+    document.addEventListener(GRAPHICS_ERROR_EVENT, this.graphicsError);
+  }
 
   begin(): Promise<void> {
     if (this.disposed) return Promise.resolve();
@@ -67,13 +71,12 @@ export class MainGame {
 
       this.root = mount();
       this.stopChangelog = mountChangelogLink(this.root);
-      // Select before acquiring a context. Canvas remains an explicit comparison
-      // path, and each unsupported WebGL surface falls back during initialization.
+      // Every scene surface requires its own WebGL2 renderer.
       for (const id of ['c', 'prevC', 'supportPreview']) {
         const htmlElement = this.root.querySelector<HTMLCanvasElement>(`#${id}`)!;
         const surface = new SceneSurface(htmlElement, id !== 'c');
         this.surfaces.set(id, surface);
-        await surface.initialize(this.useWebGL);
+        await surface.initialize();
         if (this.disposed) return;
       }
       this.stop = startGame(this.surfaces, { rig: this.lightingRig, ui: this.uiMaterialLighting });
@@ -82,7 +85,8 @@ export class MainGame {
       this.releaseRoot();
       if (!this.disposed) {
         console.error('Issen startup failed:', error);
-        this.loading.fail('Issen could not start. Retry loading to try again.');
+        if (error instanceof GraphicsUnsupportedError) this.loading.graphics();
+        else this.loading.fail('Issen could not start. Retry loading to try again.');
       }
     }
   }
@@ -101,6 +105,7 @@ export class MainGame {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    document.removeEventListener(GRAPHICS_ERROR_EVENT, this.graphicsError);
     this.preloader.dispose();
     this.loading.remove();
     this.releaseRoot();

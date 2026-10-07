@@ -55,7 +55,7 @@ test('a GPU context completing after disposal is released without becoming drawa
   expect(result).toEqual({ releases: 1, drawing: false, native: false });
 });
 
-test('restored auxiliary contexts cancel fallback and disposal cancels a later deadline', async ({
+test('restored auxiliary contexts cancel the graphics error deadline and disposal cancels a later deadline', async ({
   page,
 }) => {
   await page.goto('/privacy/index.html');
@@ -103,14 +103,14 @@ for (const operation of ['dispose', 'retry'] as const) {
       let fail = false;
       let calls = 0;
       const initialize = SceneSurface.prototype.initialize;
-      SceneSurface.prototype.initialize = async function (pixi) {
+      SceneSurface.prototype.initialize = async function () {
         calls++;
         if (!entered) {
           entered = true;
           await gate;
           if (fail) throw new Error('Test initialization failure');
         }
-        return initialize.call(this, pixi);
+        return initialize.call(this);
       };
       const app = new MainGame();
       const pending = app.begin();

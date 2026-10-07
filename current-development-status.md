@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.0 baseline complete; next W2.1 Canvas removal
+## W1 complete; W2.0 baseline complete; W2.1 WebGL2 lifecycle complete; fallback cleanup next
 
 W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
 `tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
@@ -81,7 +81,20 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
    all four passed (old-checkpoint-browser.log; terminal exit confirmed). Logs
    are in tmp/runtime-refactor. Fixture capture itself passed four cases.
    `tmp/runtime-refactor/behaviour-changes.md`: none yet. No W2 process remains.
-2. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
+2. W2.1 first green increment: WebGL2-only scene surface startup, fixed canvas
+   identity, one graphics Retry/Reload screen, main/auxiliary eight-second deadlines,
+   explicit resume on restore, tutorial native-only. UI material painter failures
+   report through the same graphics error event. No production code moved.
+   Strict types passed; `npm test` all 265 passed (webgl-surface-unit.log).
+   `npx playwright test tests/browser/graphics-errors.spec.ts tests/browser/class-lifecycle.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
+   all 13 passed (webgl-surface-browser.log; terminal exit confirmed).
+   `npx playwright test tests/browser/pixi-backend.spec.ts -g 'WebGL context|native Armoury' tests/browser/game.spec.ts -g 'runtime disposal|WebGL context|native Armoury' --config playwright.rendering-v2.config.ts`:
+   four passed (webgl-main-context.log; terminal exit confirmed). Logs under
+   tmp/runtime-refactor. No process remains. Next remove the remaining material
+   Canvas branch/checks and standalone Armoury fallback, migrate scene tests to
+   prepared native surfaces, remove fallback-only comparisons in separate commits,
+   then run the shared-runtime broad suite before extraction. Native blend filters
+   remain because film output depends on them. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
    Require WebGL2, use one graphics error screen, retain eight-second context-loss
    recovery with explicit resume and Reload on failure. Then follow the eight
    ordered extraction phases, green/checkpoint commits, explicit narrow contexts,

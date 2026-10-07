@@ -2,7 +2,7 @@
 
 The [PixiJS migration plan](pixijs-migration-plan.md) records the migration scope
 and the later depth/shadow extensions. The implementation below uses PixiJS
-8.22.0 with WebGL, retaining Canvas for fallback and comparison.
+8.22.0 with WebGL2. Canvas is retained for texture preparation.
 
 Performance measurement lives in `tests/performance/`, outside the application.
 Its runner builds a separate instrumented bundle with source maps; only that
@@ -64,10 +64,13 @@ atlas-isolation browser checks exercise this same painter. The former test-only
 the texture, material, sprite and lighting contracts shared with the shaders.
 
 
-`MainGame` selects WebGL before acquiring contexts for the main scene, Armoury
-and support preview. `?renderer=canvas` selects the retained Canvas path without
-changing saves. `scene-surface.ts` replaces a canvas if WebGL initialization fails,
-then acquires its 2D context. Tutorial scenes own and dispose a separate surface.
+`MainGame` prepares WebGL2 contexts for the main scene, Armoury and support
+preview. Tutorial scenes own and dispose a separate WebGL2 surface. The former
+renderer query selector is removed. `scene-surface.ts` never replaces its canvas.
+The painter explicitly acquires WebGL2, because Pixi's preference alone permits
+WebGL1. Initialization failure shows one graphics error with Retry. Context
+deadlines use the same screen with Reload. `graphics-error.ts` reports failures;
+`MainGame` owns the screen and the runtime suspends updates and haptics.
 
 `pixi/scene-painter.ts` reuses draw slots and renderer-owned texture sources. The
 runtime's existing scheduler calls `begin()` and `flush()`; there is no Pixi ticker.
@@ -108,11 +111,12 @@ See [material studies](../features/material-studies.md) for authoring convention
 the selected artwork and the visual comparison fixture.
 
 Main-context loss stops scene updates and leaves a live run paused. Restoration
-requires explicit resume; an eight-second restoration failure replaces the canvas,
-rebinds input and resumes presentation through Canvas with the run intact.
-Auxiliary surfaces use the same eight-second fallback deadline. Preview effects
-stop updating while their context is lost; tutorial timing and practice input
-pause until restoration or fallback, without affecting the live run.
+requires explicit resume. After eight seconds without restoration, a graphics
+error offers Reload while the run remains paused and its checkpoint remains intact.
+Auxiliary surfaces use the same eight-second deadline. Preview effects and tutorial
+timing/input stop during loss. No canvas replacement or alternate renderer occurs.
+The WebGL2-only surface lifecycle is complete; material/preparation separation and
+remaining fallback comparison test cleanup are in progress during W2.1.
 `SceneSurface` shares repeated initialization calls and owns each auxiliary
 surface's bound listeners and recovery deadline. Restoration cancels that deadline;
 disposal removes listeners, cancels recovery and releases any late-created context.

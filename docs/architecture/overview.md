@@ -1,6 +1,6 @@
 # Implemented architecture
 
-Issen uses a vanilla DOM interface and PixiJS WebGL scenes with a Canvas fallback,
+Issen uses a vanilla DOM interface and PixiJS WebGL2 scenes,
 compiled with TypeScript 7 and served or
 bundled by Vite. All application TypeScript under `src/` is included in strict
 type checking; Vite's transpilation alone is not the build gate.
@@ -58,7 +58,7 @@ implemented files.
 
 The Ink environment is owned by `src/rendering/environment/`. It supplies
 layered image scenery to the shared scene composition and film pass, rendered
-through Pixi by default or the Canvas fallback.
+through Pixi on WebGL2. Canvas remains a texture-preparation tool.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 ## Where changes belong

@@ -1,3 +1,4 @@
+import { GraphicsUnsupportedError } from '../graphics-error.ts';
 import {
   Color,
   Container,
@@ -1040,7 +1041,17 @@ export class PixiScenePainter implements SceneDrawing {
 export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise<PixiScenePainter> {
   const renderer = new WebGLRenderer<HTMLCanvasElement>();
   try {
+    const context = canvas.getContext('webgl2', {
+      alpha: true,
+      antialias: true,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      stencil: true,
+    });
+    if (!context) throw new GraphicsUnsupportedError();
     await renderer.init({
+      context,
+      preferWebGLVersion: 2,
       canvas,
       width: Math.max(1, canvas.width),
       height: Math.max(1, canvas.height),

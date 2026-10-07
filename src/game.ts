@@ -1,3 +1,4 @@
+import { reportGraphicsError, GRAPHICS_ERROR_EVENT } from './rendering/graphics-error.ts';
 import { equipmentPack, collectionBlessings } from './game/content/collections.ts';
 import {
   parseDailyLogin,
@@ -246,7 +247,7 @@ import { DIRS, OPP, DANG, directionMatches } from './shared/directions.ts';
 import { kanji, roman } from './shared/format.ts';
 import { createHaptics, createCombatHaptics } from './platform/haptics.ts';
 export function startGame(
-  surfaces?: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
+  surfaces: ReadonlyMap<string, import('./rendering/scene-surface.ts').SceneSurface>,
   lighting?: {
     rig: ReturnType<typeof createLightingRig>;
     ui: ReturnType<typeof createUiMaterialLighting>;
@@ -254,7 +255,8 @@ export function startGame(
 ): () => void {
   const lifecycle = createLifecycle();
   if (surfaces) for (const surface of surfaces.values()) lifecycle.add(surface.dispose);
-  let nativeScene = surfaces?.get('c')?.native;
+  const nativeScene = surfaces.get('c')?.native;
+  if (!nativeScene) throw new Error('A prepared WebGL2 scene is required');
   ('use strict');
   function $(id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
   function $(id: 'bAgain'): HTMLButtonElement;
@@ -269,8 +271,8 @@ export function startGame(
     if (!context) throw new Error('Canvas 2D unavailable');
     return context;
   }
-  let cvs = $('c'),
-    mainG = surfaces?.get('c')?.drawing ?? context2d(cvs);
+  const cvs = $('c'),
+    mainG = nativeScene;
   let g = mainG;
   const environmentRenderer = createEnvironmentRenderer(cvs.ownerDocument);
   lifecycle.add(environmentRenderer.dispose);
@@ -283,8 +285,7 @@ export function startGame(
   const inkSword = createInkSwordRenderer(cvs.ownerDocument);
   const lightingRig = lighting?.rig ?? createLightingRig();
   const uiMaterialLighting =
-    lighting?.ui ??
-    createUiMaterialLighting(cvs.ownerDocument, lightingRig, !!surfaces?.get('c')?.native);
+    lighting?.ui ?? createUiMaterialLighting(cvs.ownerDocument, lightingRig);
   if (!lighting) lifecycle.add(uiMaterialLighting.dispose);
   lifecycle.add(() => disposeUiArt(cvs.ownerDocument));
   lifecycle.add(inkCharm.dispose);
@@ -3210,7 +3211,6 @@ export function startGame(
       toTitle();
     },
     reducedMotion,
-    !!nativeScene,
   );
   function launchTutorial() {
     toTitle();
@@ -4642,7 +4642,7 @@ export function startGame(
     if (!cinematic.active) drawStamps();
     drawPost(frame.post);
     nativeScene?.flush();
-    cvs.dataset.graphicsBackend = nativeScene ? 'pixi' : 'canvas';
+    cvs.dataset.graphicsBackend = 'pixi';
     if (sceneLoading && sceneReadyToPresent) {
       sceneLoading = false;
       sceneReadyToPresent = false;
@@ -4711,7 +4711,21 @@ export function startGame(
       refreshArmoryNew();
     }
   }
-  const resumeFrames = frameLoop.start;
+  let graphicsFailed = false;
+  lifecycle.listen(document, GRAPHICS_ERROR_EVENT, () => {
+    graphicsFailed = true;
+    frameLoop.stop();
+    combatHaptics.stop();
+    audio.setInactive(true);
+    if (['playing', 'boss', 'between', 'standoff', 'shrine'].includes(G.state)) {
+      G.pausedFrom = G.state;
+      G.state = 'paused';
+      showPauseScreen();
+    }
+  });
+  const resumeFrames = () => {
+    if (!graphicsFailed) frameLoop.start();
+  };
   if (nativeScene) {
     let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
     lifecycle.listen(cvs, 'webglcontextlost', () => {
@@ -4726,26 +4740,7 @@ export function startGame(
       ($('bResume') as HTMLButtonElement).disabled = true;
       recoveryTimer = lifecycle.timeout(() => {
         if (!nativeScene?.contextLost) return;
-        const replacement = cvs.cloneNode(false) as HTMLCanvasElement;
-        disposePointer();
-        nativeScene.dispose();
-        nativeScene = undefined;
-        cvs.replaceWith(replacement);
-        cvs = replacement;
-        g = mainG = context2d(cvs);
-        cvs.dataset.graphicsBackend = 'canvas';
-        cvs.dataset.contextState = 'fallback';
-        grainPats.splice(
-          0,
-          grainPats.length,
-          ...grainCanv.map((canvas) => mainG.createPattern(canvas, 'repeat')),
-        );
-        disposePointer = bindPointer(cvs, pointerActions);
-        viewportPrepared = false;
-        resize();
-        ($('bResume') as HTMLButtonElement).disabled = false;
-        audio.setInactive(!pageActive());
-        if (pageActive()) resumeFrames();
+        reportGraphicsError(cvs);
       }, 8000);
     });
     lifecycle.listen(cvs, 'webglcontextrestored', () => {

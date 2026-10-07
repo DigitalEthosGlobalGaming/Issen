@@ -42,8 +42,15 @@ test('runtime disposal stops animation and detached controls before remounting',
     const inactive = !oldRoot.querySelector('#setup')!.classList.contains('on');
     const { mount } = await import(mountPath),
       { startGame } = await import(gamePath);
-    const root = mount(),
-      stop = startGame();
+    const root = mount();
+    const { SceneSurface } = await import('/src/rendering/scene-surface.ts');
+    const surfaces = new Map();
+    for (const id of ['c', 'prevC', 'supportPreview']) {
+      const surface = new SceneSurface(root.querySelector(`#${id}`), id !== 'c');
+      surfaces.set(id, surface);
+      await surface.initialize();
+    }
+    const stop = startGame(surfaces);
     root.querySelector<HTMLButtonElement>('#bPlay')!.click();
     const restarted = root.querySelector('#setup')!.classList.contains('on');
     stop();

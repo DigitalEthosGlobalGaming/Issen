@@ -31,6 +31,9 @@
 
 - 2026-10-07 — W2.0 harness — capture real version-1 checkpoints before extraction and seed current-export scenario drivers — synthetic checkpoint fixtures or exact per-tick snapshots — preserves actual restore compatibility and outcome invariants; inline input handlers must migrate to new phase/rule APIs as those appear — revert the harness checkpoint, preserving the ignored audit and source snapshot.
 
+- 2026-10-07 — W2.1 surfaces — explicitly acquire WebGL2 and pass its context to Pixi; use graphics Retry/Reload errors with fixed canvas identity — relying on Pixi's preferred-version flag or Canvas substitution — Pixi's installed context system permits WebGL1 fallback; the user requires WebGL2 only — revert the surface lifecycle commit.
+- 2026-10-07 — W2.1 blends — retain the owned blend filters in canvas-blends.ts — removing all Canvas-named code — they implement live Pixi film grading and translucent compositing, rather than an alternate rendering backend; texture-preparation Canvas also remains — restore prior blend definitions if a later rename changes output.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
