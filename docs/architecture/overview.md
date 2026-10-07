@@ -417,3 +417,7 @@ the existing composer order and figure/companion output.
 Active awakening eligibility and modifier composition are owned by
 game/equipment/active.ts with current equipment/profile/run views. Trial modifiers
 and the title/over versus running upgrade policy retain their existing semantics.
+
+Reward accrual, awakening challenge updates, blade statistics and terminal item
+unlocks are owned by game/progression/profile-rules.ts. Current profile/run and
+persistence/reveal capabilities preserve daily/trial isolation and unlock ordering.

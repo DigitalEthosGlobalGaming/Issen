@@ -1,3 +1,4 @@
+import { createProfileRules } from './game/progression/profile-rules.ts';
 import { createActiveEquipment } from './game/equipment/active.ts';
 import { createPlayerFigures } from './presentation/player-figures.ts';
 import { createResultsSession } from './game/session/results.ts';
@@ -434,14 +435,7 @@ export function startGame(
         : `Saved run · seed ${savedRun!.seed}`
       : '';
   }
-  function earn(event: 'kill' | 'wave' | 'boss') {
-    if (activeTrial || activeDaily) return;
-    accrueRunReward(rewardLedger, event, {
-      zen: G.zen,
-      emberBonus: G.m.emberBonus,
-      pilgrim: !!G.m.pilgrim,
-    });
-  }
+  function earn(event: 'kill' | 'wave' | 'boss') { return profileRules.earn(event); }
   const saveStats = () => {
     if (!activeTrial && !activeDaily) {
       syncCollections();
@@ -728,6 +722,27 @@ export function startGame(
     events: createEventBus<GameEvents>(),
   };
   lifecycle.add(context.events.clear);
+  const profileRules = createProfileRules(() => ({
+    G,
+    activeTrial,
+    activeDaily,
+    rewardLedger,
+    AWAKENING,
+    META,
+    saveAwakening,
+    ST,
+    UNL,
+    ITEMS,
+    ITEM_BY,
+    revoked,
+    COLLECTION_PROGRESS,
+    accessible,
+    refreshArmoryNew,
+    runItemReveals,
+    store,
+    itemPresentation,
+    TYPE_WORD,
+  }));
   const activeEquipment = createActiveEquipment(() => ({
     G,
     SETUP,
@@ -750,11 +765,7 @@ export function startGame(
       ? { ...base, robeL: `rgb(${accent})`, inner: `rgb(${accent})`, obi: `rgb(${accent})` }
       : base;
   }
-  function challenge(metric: keyof BladeStats, value = 1) {
-    if (G.zen || activeTrial || activeDaily) return;
-    recordChallenge(AWAKENING, META.upgrades.awakening, G.runBlade, G.runRobe, metric, value);
-    saveAwakening();
-  }
+  function challenge(metric: keyof BladeStats, value = 1) { return profileRules.challenge(metric, value); }
   function bladeMods() { return activeEquipment.bladeMods(); }
   function bladeStyle() {
     const b = BLADES[EQ.blade];
@@ -775,11 +786,7 @@ export function startGame(
         )
       : b;
   }
-  function bst() {
-    const id = G.runBlade;
-    if (!id) return null;
-    return ST.bl[id] || (ST.bl[id] = { k: 0, p: 0, d: 0, w: 0, rw: 0, c: 0, sc: 0 });
-  }
+  function bst() { return profileRules.bst(); }
   function computeMods() { return activeEquipment.computeMods(); }
   const pz = () => precisionZone(PZ, G.m?.pz ?? 0, G.m?.precision ?? 0);
   function pickLook(n: number) {
@@ -883,53 +890,7 @@ export function startGame(
       msg: it.msg || 'Unlocked: ' + it.n + ' ' + (it.type ? TYPE_WORD[it.type] : ''),
     });
   }
-  function checkUnlocks() {
-    if (activeTrial || activeDaily) return;
-    if (G.state !== 'over') return;
-    const before = UNL.size;
-    unlockEligibleItems(
-      ST,
-      UNL,
-      ITEMS,
-      (id, it) => {
-        if (revoked.has(id)) {
-          UNL.delete(id);
-          return;
-        }
-        store.set('issen.unlocks', [...UNL]);
-        G.newUnlocks.push(it);
-        const base = id.replace(/\++$/, '');
-        const source = ITEM_BY[base];
-        const display = source ? itemPresentation(source) : null;
-        const awakened =
-          id === 'steel++'
-            ? STEEL_THIRD
-            : id.endsWith('+')
-              ? (SPECIAL[base] ?? ROBE_AWAKENINGS[base])
-              : null;
-        const perk = awakened?.pk ?? display?.benefit;
-        const tradeoff = awakened?.tr ?? display?.tradeoff;
-        runItemReveals.push({
-          key: it.k,
-          name: it.n,
-          kind: TYPE_WORD[it.type],
-          description:
-            (!accessible(id) ? 'Requires Premium. Challenge earned. ' : '') +
-            (display?.flavor || 'View it in the Armoury.'),
-          benefit: perk,
-          tradeoff,
-          item: true,
-        });
-      },
-      {
-        access: META.upgrades.awakening,
-        progress: AWAKENING,
-        itemStats: (id) => collectionItemStats(COLLECTION_PROGRESS, META, ST, id),
-        paidAwakenings: true,
-      },
-    );
-    if (UNL.size !== before) refreshArmoryNew();
-  }
+  function checkUnlocks() { return profileRules.checkUnlocks(); }
   const {
     flash,
     letterbox,

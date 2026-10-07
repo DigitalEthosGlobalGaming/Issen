@@ -173,3 +173,5 @@
 2026-10-08 — W2/player figures — physically move the three remaining player/pet/foxfire draw functions to a presentation owner — retaining visual ownership in root considered — explicit read-only views keep drawing out of gameplay and retain existing composer order/output; strict/357 units and 17 live cases pass — revert this physical move commit.
 
 2026-10-08 — W2/active equipment — physically extract awakening eligibility and modifier composition from root — keeping equipment policy in composition considered — narrow current views retain trial isolation and title/run upgrade behavior, without rendering dependencies; strict/357 units and 12 live cases pass — revert this ownership commit.
+
+2026-10-08 — W2/profile rules — physically extract root reward/challenge/blade-stat/unlock helpers to progression ownership — leaving profile policy in root considered — explicit current views preserve disposable daily/trial statistics, terminal-only unlock ordering and reveals; strict/357 units and 18 live cases pass — revert this physical move commit.
