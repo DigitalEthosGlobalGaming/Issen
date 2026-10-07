@@ -10,7 +10,19 @@ develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 ## W1 complete; W2 ownership and composition reduction in progress
 
 
-Latest checkpoint: phased profile loading/reconciliation and initial
+Latest checkpoint: figure/player/cue factory bindings are physically owned by
+presentation/figures-host.ts. Each owner keeps its existing narrow read-only views;
+the host resolves current drawing state and shares internal figure/pet renderers.
+No combat mutation or drawing/composer order changed. Strict types and all 362
+units pass (figures-host-typecheck.log, figures-host-unit.log).
+`npx playwright test tests/browser/rendering.spec.ts tests/browser/death-presentation.spec.ts tests/browser/secondary-motion.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 14 pass in 25.7s (figures-host-browser.log; terminal confirmed).
+The composition root is 2,556 lines; reduction is NOT complete.
+Next: remaining boss/standoff/damage/wave feedback reactions, then larger session
+and UI bindings, scenario/test API migration and full W2 gates. W3/Part 4 remain
+required after W2. No develop push until the final complete verification.
+
+Previous checkpoint:  phased profile loading/reconciliation and initial
 persistence are physically owned by game/progression/profile-state.ts. Foundation,
 progression and equipment stages keep original save keys, read/write order and
 base profile identities. saveMeta resolves current statistics through an explicit

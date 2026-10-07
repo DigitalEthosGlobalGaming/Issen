@@ -1,3 +1,4 @@
+import { createFiguresHost } from './presentation/figures-host.ts';
 import { bossShownDirection } from './game/encounters/boss-openings.ts';
 import { createProfileFoundation, createProfileProgress, createProfileEquipment } from './game/progression/profile-state.ts';
 import { createEnvironmentHost } from './presentation/environment-host.ts';
@@ -408,25 +409,14 @@ export function startGame(
     prepareScene();
   }
   /* ---------------- figures ---------------- */
-  const {
-    figureRenderer,
-    drawFigure,
-    drawSplit,
-    drawPetAt,
-    drawSword,
-    drawGlint,
-    tipOf,
-    drawEnemy,
-    drawBoss,
-  } = createFiguresPresentation(() => ({
+  const { figureRenderer, drawFigure, drawSplit, drawPetAt, drawSword, drawGlint, tipOf, drawEnemy, drawBoss, playerFigures, drawEnso, drawGlyphs } = createFiguresHost(() => ({
     g,
     inkCharm,
     inkCompanion,
     inkEnemy,
     inkPlayer,
     inkSword,
-    time: presentationState.time,
-    wind: presentationState.wind,
+    presentationState,
     G,
     W,
     H,
@@ -440,6 +430,19 @@ export function startGame(
     EQ,
     SEAL,
     FONT,
+    L,
+    P,
+    apparelMotion,
+    playerRobePalette,
+    isRobeSp,
+    bladeStyle,
+    CHARMCOL,
+    petOf,
+    SEALARC,
+    pz,
+    waveConfiguration,
+    liveOrdered,
+    WX,
   }));
   function petOf() {
     return visiblePet(EQ);
@@ -452,37 +455,7 @@ export function startGame(
     deathPhase.reviveDaruma(ph, support);
   }
   function drawPet() { playerFigures.drawPet(); }
-  const playerFigures = createPlayerFigures(() => ({
-    G,
-    L,
-    g,
-    presentationState,
-    EQ,
-    H,
-    W,
-    drawPetAt,
-    P,
-    drawFigure,
-    apparelMotion,
-    playerRobePalette,
-    isRobeSp,
-    bladeStyle,
-    CHARMCOL,
-    petOf,
-  }));
   /* ---------------- ensō glyph ---------------- */
-  const { drawEnso, drawGlyphs } = createCuePresentation(() => ({
-    g,
-    time: presentationState.time,
-    SEAL,
-    SEALARC,
-    FONT,
-    pz,
-    G,
-    ordered: () => waveConfiguration().ordered,
-    liveOrdered,
-    veil: WX.veil,
-  }));
   /* ---------------- audio ---------------- */
   const audio = createAudio(settings.muted);
   const audioInit = audio.init,
