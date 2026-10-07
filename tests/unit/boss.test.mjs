@@ -116,8 +116,7 @@ function fixture() {
     layout = createLayout(390, 844);
   const env = {
     random: () => 0.5,
-    sounds: { glint: () => events.push('glint'), feint: () => events.push('feint') },
-    flash: () => events.push('flash'),
+    events: { emit: (name, event) => events.push([name, event]) },
     playerDie: () => {
       events.push('death');
       state.state = 'dead';
@@ -135,11 +134,11 @@ test('boss progresses through entry, windup and glint with one missed-parry outc
   assert.equal(boss.state, 'windup');
   updateBoss(state, boss.dur, env);
   assert.equal(boss.state, 'flash');
-  assert.deepEqual(events, ['glint', 'flash']);
+  assert.deepEqual(events, [['bossCue', { kind: 'draw' }]]);
   updateBoss(state, 0.3, env);
   assert.equal(state.state, 'dead');
   updateBoss(state, 0.1, env);
-  assert.deepEqual(events, ['glint', 'flash', 'death']);
+  assert.deepEqual(events, [['bossCue', { kind: 'draw' }], 'death']);
   assert.ok(Object.values(boss.pos).every(Number.isFinite));
 });
 test('Mirror holds the opposite blade pose throughout each opening and recovers once', () => {

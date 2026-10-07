@@ -68,6 +68,15 @@ export interface GameEvents {
   >;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
   bossCut: Readonly<{ boss: string; direction: Direction; automatic: boolean; x: number; y: number; height: number }>;
+  bossEntered: Readonly<{ glyph: string; name: string; lap: number; wave: number; rush: boolean }>;
+  bossReady: Readonly<{ count: number }>;
+  bossTraits: Readonly<{ twin: boolean; spear: boolean; mirror: boolean }>;
+  bossHealth: Readonly<{ hp: number; maximum: number }>;
+  bossCue: Readonly<
+    | { kind: 'draw' }
+    | { kind: 'recovered' | 'return' | 'afterimage' | 'deflected'; x: number; y: number; height: number }
+  >;
+  bossOpening: Readonly<{ kind: 'parry' | 'chain' | 'cut'; mirror: boolean }>;
   bossStarted: Readonly<{ boss: string; count: number }>;
   bossDefeated: Readonly<{
     boss: string;

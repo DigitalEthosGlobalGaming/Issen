@@ -134,7 +134,7 @@ export function createBossPhase<Context>(
     if (deferUntilSceneReady(startBoss)) return;
     refillDuelKnives(G);
     G.blessingTriggers.flourishWard = false;
-    renderLives();
+    views.events.emit('livesChanged', { cause: 'refresh', lives: G.lives });
     G.bossCount++;
     const b = createBoss(
         G.bossCount,
@@ -148,17 +148,11 @@ export function createBossPhase<Context>(
     G.state = 'boss';
     G.attacker = null;
     G.event = null;
-    const nm = def.n + (lap ? ' ' + roman(lap + 1) : '');
-    banner(def.k, nm);
-    setBossLabels(G.rush ? `決闘 ${kanji(G.wave)}` : '決闘', def.k, nm);
-    renderHp();
-    showBossBar(true);
-    sfx.drum();
+    views.events.emit('bossEntered', { glyph: def.k, name: def.n, lap, wave: G.wave, rush: G.rush });
+    views.events.emit('bossHealth', { hp: b.hp, maximum: b.maxHp });
+    views.events.emit('bossReady', { count: G.bossCount });
     if (!activeTrial && !activeDaily) guided.startBoss();
-    if (def.twin) hint('twin', 'The Twin Fang strikes twice. Parry both glints.', 4500);
-    if (def.spear) hint('spear', 'The spear gives less warning. Watch the tip.', 4500);
-    if (def.mirror)
-      hint('mirror', 'The Mirror never feints. Cut opposite to his arrow and blade.', 5000);
+    views.events.emit('bossTraits', { twin: !!def.twin, spear: !!def.spear, mirror: !!def.mirror });
     views.events.emit('bossStarted', { boss: def.v, count: G.bossCount });
     captureCheckpoint();
   }
@@ -169,14 +163,12 @@ export function createBossPhase<Context>(
     simulateBoss(G, dt, {
       rawDelta: raw,
       random: combatRandom,
-      sounds: sfx,
-      flash,
+      events: views.events,
       playerDie,
       position: bossPos,
       recovered: (b) => {
         breakCombo();
-        setScore();
-        pop(b.pos.x, b.pos.y - b.pos.h * 1.05, 'Recovered');
+        views.events.emit('bossCue', { kind: 'recovered', x: b.pos.x, y: b.pos.y, height: b.pos.h });
       },
     });
     if (G.boss?.state === 'flash') guided.bossFlash();
@@ -222,8 +214,8 @@ export function createBossPhase<Context>(
     if (activeTrial?.duelMaster) b.chainLeft = b.chainLen = 1;
     if (!second && G.bless.has('timestop')) G.slowT = Math.max(G.slowT, 1.4);
     if (counterDamage) {
-      renderHp();
-      pop(b.pos.x, b.pos.y - b.pos.h * 1.25, '返し', Math.max(20, 26 * S));
+      views.events.emit('bossHealth', { hp: b.hp, maximum: b.maxHp });
+      views.events.emit('bossCue', { kind: 'return', x: b.pos.x, y: b.pos.y, height: b.pos.h });
     }
     swingPlayer('block');
     views.hitStop = 0.09;
@@ -240,14 +232,7 @@ export function createBossPhase<Context>(
       y: tw[1],
       height: b.pos.h,
     });
-    if (!second)
-      hint(
-        'parry',
-        b.def.mirror
-          ? 'An opening. Swipe opposite to his arrow and blade.'
-          : 'An opening. Swipe the way his blade points.',
-        3000,
-      );
+    if (!second) views.events.emit('bossOpening', { kind: 'parry', mirror: !!b.def.mirror });
   }
   function blockHit(dir: Direction) {
     const views = current();
@@ -294,14 +279,7 @@ export function createBossPhase<Context>(
       y: tw[1],
       height: b.pos.h,
     });
-    if (notifications.activeHint === 'parry') hideHint();
-    hint(
-      'chain',
-      b.def.mirror
-        ? 'He blocked. Keep swiping opposite to his arrow and blade.'
-        : 'He blocked. Keep swiping the way his blade points.',
-      3500,
-    );
+    views.events.emit('bossOpening', { kind: 'chain', mirror: !!b.def.mirror });
   }
   function bossSwipe(dir: Direction, automatic = false) {
     const views = current();
@@ -363,14 +341,14 @@ export function createBossPhase<Context>(
       const swiftPoints = !automatic && G.m.swift ? swiftSlashPoints(b.t, b.window) : null;
       b.hp = Math.max(0, b.hp - (automatic ? 1 : G.m.bossDmg));
       if (activeTrial?.duelMaster) b.bp = duelMasterTimings(20 - b.hp);
-      renderHp();
+      views.events.emit('bossHealth', { hp: b.hp, maximum: b.maxHp });
       if (!automatic) swingPlayer(dir);
       const a = DANG[dir];
       const cutEvent = { boss: b.def.v, direction: dir, automatic, x: cx, y: cy, height: p.h };
       views.hitStop = 0.08;
       G.combo++;
       bumpCombo();
-      if (notifications.activeHint === 'parry') hideHint();
+      views.events.emit('bossOpening', { kind: 'cut', mirror: !!b.def.mirror });
       if (b.hp <= 0) {
         b.state = 'dying';
         b.t = 0;
@@ -391,8 +369,7 @@ export function createBossPhase<Context>(
         views.runBossMilestone = Math.max(views.runBossMilestone, G.bossCount);
         if (G.bless.has('breath') && !G.zen && !G.hard && G.lives < G.maxLives) {
           G.lives++;
-          renderLives();
-          pop(W / 2, H * 0.5, '息 +1 life', Math.max(20, 24 * S));
+          views.events.emit('livesChanged', { cause: 'breath', lives: G.lives, x: W / 2, y: H * 0.5 });
         }
         G.state = 'between';
         G.afterBoss = true;
@@ -432,8 +409,7 @@ export function createBossPhase<Context>(
       if (G.m.kage && (b.kageUsed || 0) < G.m.kage) {
         b.kageUsed = (b.kageUsed || 0) + 1;
         swingPlayer(dir);
-        sfx.deflect();
-        pop(cx, p.y - p.h * 1.05, 'Afterimage');
+        views.events.emit('bossCue', { kind: 'afterimage', x: cx, y: p.y, height: p.h });
         return;
       }
       swingPlayer(dir);
@@ -441,9 +417,7 @@ export function createBossPhase<Context>(
       b.t = 0;
       b.failed = true;
       breakCombo();
-      setScore();
-      sfx.deflect();
-      pop(cx, p.y - p.h * 1.05, 'Deflected');
+      views.events.emit('bossCue', { kind: 'deflected', x: cx, y: p.y, height: p.h });
     }
   }
   return Object.assign(

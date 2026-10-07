@@ -1,3 +1,4 @@
+import { bindBossCues } from '../presentation/boss-cues.ts';
 import { bindStandoffCues } from '../presentation/standoff-cues.ts';
 import { bindWaveFeedback } from '../presentation/wave-feedback.ts';
 import { createRuntimeUIBase } from '../runtime/ui-base.ts';
@@ -187,6 +188,18 @@ export function bindRuntimeReactions(
     setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
     lightningFx: event => presentation.effectSpawner().killFx('bolt', event.x, event.y - event.height * 0.55, -Math.PI / 2, event.height / 160),
     dust: presentation.dust,
+  })));
+
+  foundation.lifecycle.add(bindBossCues(events, () => ({
+    S: foundation.view.geometry.S, banner: ui.banner, renderHp: ui.renderHp,
+    setScore: ui.setScore, pop: presentation.pop, flash: presentation.flash,
+    sfx: foundation.browser.sfx, hint: ui.hint, notifications: ui.notifications, hideHint: ui.hideHint,
+    setBossLabels: (wave, glyph, name) => {
+      foundation.browser.$('waveLbl').textContent = wave;
+      foundation.browser.$('bossK').textContent = glyph;
+      foundation.browser.$('bossN').textContent = name;
+    },
+    showBossBar: shown => { foundation.browser.$('bossbar').classList.toggle('on', shown); },
   })));
 
   foundation.lifecycle.add(bindStandoffCues(events, () => ({

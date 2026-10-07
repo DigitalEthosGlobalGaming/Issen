@@ -554,3 +554,12 @@ cues.ts. The phase emits frozen stage/change and transition-kind snapshots befor
 its existing checkpoint or wave continuation. Letterbox, banner, label, tutorial,
 step/glint/drum and draw flash remain synchronous cosmetic reactions. The listener
 has no combat/profile/RNG capability; lifecycle disposal removes both subscriptions.
+
+Boss entry/ready/trait, health, draw, recovery/counter/deflection and opening
+hint events feed presentation/boss-cues.ts. The boss state table receives emission
+instead of sound/flash ports. Health/bar/drum/guided lesson ordering and all cue
+values remain synchronous; guided state stays gameplay because it controls input
+and freezes combat. Counter damage, Breath healing, combo, hit stop, scores,
+victory/profile settlement and combat RNG remain their existing rule owners.
+Actual base/Twin/spear/Mirror fights prove cosmetic listener isolation through
+deferred entry, expired opening, afterimage, deflection, healing and victory.

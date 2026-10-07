@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { clamp, easeInOut, easeOut } from '../../shared/math.ts';
 import { EPOSE, mixPose, approachPose } from '../../shared/figure-model.ts';
 import type { Pose } from '../../shared/character.ts';
@@ -9,8 +10,7 @@ import type { BossBehaviour } from './boss-behaviours.ts';
 export interface BossEnvironment {
   rawDelta?: number;
   random: Random;
-  sounds: { glint: () => void; feint: () => void };
-  flash: (amount: number) => void;
+  events: RuleEvents;
   playerDie: (boss: Boss, reason: 'lateBoss') => void;
   recovered: (boss: Boss) => void;
   position: (boss: Boss) => EnemyPosition;
@@ -61,7 +61,7 @@ export const bossStateTable: StateTable<Boss['state'], Boss, BossContext> = {
   windup: {
     update(b, c, dt) {
       const { active, env } = c;
-      const { sounds: sfx, flash } = env;
+      const { events } = env;
       {
         const k = clamp(b.t / b.dur);
         c.target = mixPose(EPOSE.guard, EPOSE.raise, easeInOut(k));
@@ -70,8 +70,7 @@ export const bossStateTable: StateTable<Boss['state'], Boss, BossContext> = {
         if (k >= 1 && active) {
           machine.transition(b, 'flash', c);
           b.glint = 1;
-          sfx.glint();
-          flash(0.14);
+          events.emit('bossCue', { kind: 'draw' });
         }
       }
     },

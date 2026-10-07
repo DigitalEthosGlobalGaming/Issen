@@ -59,8 +59,7 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine'])
       const before = run.boss.t;
       updateBoss(run, 0.02, {
         random: random.next,
-        sounds: { glint() {}, feint() {} },
-        flash() {},
+        events: session.views.events,
         playerDie() {
           assert.fail('boss fixture should not expire');
         },

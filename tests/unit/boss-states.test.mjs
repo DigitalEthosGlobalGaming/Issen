@@ -16,8 +16,7 @@ function fixture(count = 1) {
       calls.push('random');
       return 0.5;
     },
-    sounds: { glint: () => calls.push('glint'), feint: () => calls.push('feint') },
-    flash: (amount) => calls.push(['flash', amount]),
+    events: { emit: (name, event) => calls.push([name, event]) },
     playerDie: () => {
       G.state = 'dead';
       calls.push('death');
@@ -53,7 +52,7 @@ test('boss windup transition retains the raised pose and flash until the next di
   assert.equal(b.state, 'flash');
   assert.equal(b.t, 0);
   assert.equal(b.glint, 1);
-  assert.deepEqual(calls, ['glint', ['flash', 0.14]]);
+  assert.deepEqual(calls, [['bossCue', { kind: 'draw' }]]);
   for (const k of Object.keys(b.pose))
     assert.ok(
       Math.abs(
