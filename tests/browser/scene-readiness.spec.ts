@@ -16,13 +16,13 @@ test.beforeEach(async ({ page }) => {
       { let releaseScene;
       const composeScene = foundation.browser.environmentRenderer.compose.bind(foundation.browser.environmentRenderer);
       window.__sceneReadiness = {
-        G: foundation.run.G, startWave, startRushDuel,
+        G: foundation.run.G, startWave: game.startWave, startRushDuel: game.startRushDuel,
         hold() {
           const blocked = new Promise(resolve => { releaseScene = resolve; });
           foundation.browser.environmentRenderer.compose = async frame => { await blocked; return composeScene(frame); };
         },
         release() { releaseScene(); },
-        freezeMenu() { screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }
+        freezeMenu() { ui.screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }
       };
       artworkReady = true;
       }

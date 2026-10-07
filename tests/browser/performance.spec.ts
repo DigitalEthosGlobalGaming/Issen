@@ -9,8 +9,8 @@ async function observe(page: import('@playwright/test').Page) {
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'if (pageActive()) frameLoop.start();',
-        'window.__performance = { G: foundation.run.G, fx: foundation.view.presentationState.fx, preview, supportPreview, frameLoop, render, state: () => ({ time: foundation.view.presentationState.time, runTime:foundation.run.G.runTime, enemies:JSON.stringify(foundation.run.G.enemies), particles:JSON.stringify(foundation.view.presentationState.fx) }) }; if (pageActive()) frameLoop.start();',
+        'if (pageActive()) frames.frameLoop.start();',
+        'window.__performance = { G: foundation.run.G, fx: foundation.view.presentationState.fx, preview: controls.preview, supportPreview: controls.supportPreview, frameLoop: frames.frameLoop, render: frames.render, state: () => ({ time: foundation.view.presentationState.time, runTime:foundation.run.G.runTime, enemies:JSON.stringify(foundation.run.G.enemies), particles:JSON.stringify(foundation.view.presentationState.fx) }) }; if (pageActive()) frames.frameLoop.start();',
       ),
     });
   });

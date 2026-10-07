@@ -78,8 +78,8 @@ combat-score.ts; presentation/combat-score.ts reacts with HUD/popups. Presentati
 listener registration/removal cannot change combat state or combat RNG.
 `game/session/results.ts` owns result/reward orchestration; `game/player/companions.ts`
 owns companion rules and `presentation/player-figures.ts` owns their projection.
-`game/session/frame-bindings.ts` connects simulation, prepared presentation and
-frame scheduling. `game/session/startup.ts` owns ordered runtime startup,
+`runtime/frame-bindings.ts` connects simulation, prepared presentation and
+frame scheduling. `runtime/startup.ts` owns ordered runtime startup,
 artwork readiness/errors and disposal. Scene continuations settle after drawing
 through `game/session/scene-flow.ts`, including intentional paused phase adoption.
 
@@ -165,7 +165,7 @@ Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Mutable session lifetime and named state projections | `src/game/session/runtime-state.ts`, `state-view.ts` |
 | Browser preferences/access/haptics and audio/guided/mute wiring | `src/platform/runtime-preferences.ts`, `src/ui/wiring/audio.ts` |
-| Runtime frame composition and startup lifetime | `src/game/session/frame-bindings.ts`, `startup.ts` |
+| Runtime frame composition and startup lifetime | `src/runtime/frame-bindings.ts`, `startup.ts` |
 | Run entry, checkpoints, pause/resume, trial and result orchestration | `src/game/session/` |
 | Active phase inputs and encounter lifecycle | `src/game/phases/` |
 | Cosmetic scene, character, post and event feedback | `src/presentation/` |
@@ -488,7 +488,7 @@ presentation/kill-appearance.ts owns death appearance and debris callbacks throu
 
 presentation/standoff-feedback.ts reacts to immutable successful standoff outcomes. Gameplay owns challenger death, swing, hit stop, score and rewards; cosmetic geometry, feedback RNG, sound and haptics belong to the listener.
 
-game/session/frame-bindings.ts wires simulation, prepared post/scene drawing and the scheduler through current narrow views. Scene readiness remains an orchestration action after drawing. game/session/startup.ts owns the ordered startup and artwork/error/disposal lifetime; runtime readiness is published through an explicit callback.
+runtime/frame-bindings.ts wires simulation, prepared post/scene drawing and the scheduler through current narrow views. Scene readiness remains an orchestration action after drawing. runtime/startup.ts owns the ordered startup and artwork/error/disposal lifetime; runtime readiness is published through an explicit callback.
 
 game/session/runtime-state.ts owns plain run lifetime metadata independently of
 serialized combat records. state-view.ts forwards only named fields into typed
@@ -521,3 +521,22 @@ capabilities. Value snapshots (such as scene/environment request inputs) are not
 cached. An actual damage-phase regression replaces those records after initial
 use and checks current writes and frozen geometry events. The unchanged eight-
 trial encounter/reload flow and all 254 combined browser cases pass.
+
+
+Runtime composition uses domain factories under `src/runtime`. `foundation.ts`
+constructs browser/profile/run/view owners; `presentation.ts` wires equipment,
+environment, post, figures and feedback; `ui-base.ts` constructs HUD/screens and
+notifications. `rules.ts` selects profile/equipment capabilities, `combat.ts`
+wires score/kill/character helpers, and `scene.ts` owns stage/adoption coordination.
+`gameplay.ts` connects these owners to phase/session controllers and the router;
+`phases.ts` and `session.ts` adapt only named deferred action ports.
+`menus.ts`/`controls.ts` wire menus, previews, profiles, purchases and navigation.
+`frames.ts` connects simulation/prepared drawing, graphics lifetime and viewport;
+`frame-bindings.ts` and `startup.ts` are runtime orchestration rather than gameplay.
+`reactions.ts` installs progression and cosmetic listeners in their original
+synchronous registration order. The composition root retains ordered startup and
+disposal. Cross-domain menu/clock callbacks resolve later owners when invoked,
+allowing eager controller construction without reading uninitialized UI owners.
+Strict/all 371 units and 45 focused cases pass. The combined run has 253 passes
+and one module-request reset during reload; that unchanged case passes on focused
+recheck. A fully passing combined run remains required at the W2 checkpoint.

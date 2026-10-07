@@ -1,28 +1,28 @@
-import { createFrameSimulation, type FrameSimulationViews } from './frame-simulation.ts';
-import { createFrameLoop } from '../../platform/frame-loop.ts';
+import { createFrameSimulation, type FrameSimulationViews } from '../game/session/frame-simulation.ts';
+import { createFrameLoop } from '../platform/frame-loop.ts';
 import {
   createPostPreparation,
   type PostPreparationViews,
-} from '../../presentation/post-preparation.ts';
-import { createPostPresentation, type PostViews } from '../../presentation/post.ts';
-import { createRuntimeScene, type SceneViews } from '../../presentation/scene.ts';
+} from '../presentation/post-preparation.ts';
+import { createPostPresentation, type PostViews } from '../presentation/post.ts';
+import { createRuntimeScene, type SceneViews } from '../presentation/scene.ts';
 import {
   advancePresentationClock,
   advancePresentationCamera,
   type PresentationState,
-} from '../../presentation/state.ts';
-import { updatePlayerAnimation, type createPlayerAnimation } from '../player/player.ts';
-import { updateWeather as simulateWeather } from '../../rendering/scene/weather-update.ts';
-import { STAGES } from '../content/stages.ts';
-import type { EnvironmentState } from '../../presentation/environment-state.ts';
-import type { createWeatherState } from '../../rendering/scene/weather-state.ts';
-import type { createAudio } from '../../audio/audio.ts';
-import type { createEffectQuality } from '../../rendering/effects/quality.ts';
-import type { createPostArtwork } from '../../presentation/post-artwork.ts';
-import type { createScreenAnimation } from '../../ui/screen-animation.ts';
-import type { createEnvironmentPresentation } from '../../presentation/environment.ts';
-import type { createPlayerFigures } from '../../presentation/player-figures.ts';
-import type { Random } from '../../shared/random.ts';
+} from '../presentation/state.ts';
+import { updatePlayerAnimation, type createPlayerAnimation } from '../game/player/player.ts';
+import { updateWeather as simulateWeather } from '../rendering/scene/weather-update.ts';
+import { STAGES } from '../game/content/stages.ts';
+import type { EnvironmentState } from '../presentation/environment-state.ts';
+import type { createWeatherState } from '../rendering/scene/weather-state.ts';
+import type { createAudio } from '../audio/audio.ts';
+import type { createEffectQuality } from '../rendering/effects/quality.ts';
+import type { createPostArtwork } from '../presentation/post-artwork.ts';
+import type { createScreenAnimation } from '../ui/screen-animation.ts';
+import type { createEnvironmentPresentation } from '../presentation/environment.ts';
+import type { createPlayerFigures } from '../presentation/player-figures.ts';
+import type { Random } from '../shared/random.ts';
 
 type SimulationPorts = Omit<
   FrameSimulationViews,

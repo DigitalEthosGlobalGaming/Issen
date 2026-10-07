@@ -30,17 +30,17 @@ async function prepare(page: Page, edition = 'web') {
   });
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    let body = await response.text();
+    let body = "import { premium } from '/src/platform/purchases.ts';\n" + await response.text();
     const editionInput = /edition: import\.meta\.env\.VITE_GAME_EDITION/;
     expect(body).toMatch(editionInput);
     body = body.replace(editionInput, `edition: ${JSON.stringify(edition)}`);
     body = body.replace(
       'artworkReady = true;',
-      `window.__mastery = { G: foundation.run.G, step: update, swipe: onSwipe, tap: onTap,
-      stop: () => frameLoop.stop(), runFrames: () => frameLoop.start(), shrine: openShrine, checkpoint: captureCheckpoint,
-      settleScene: async () => { while (foundation.run.sceneState.sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },
-      equipment: () => foundation.profile.profileEquipment.EQ, stats: () => foundation.profile.profileFoundation.ST, modifiers: computeMods, parry: () => bossPhase.onTapDown(context), pause, startRun, killEnemy,
-      access: foundation.browser.premiumAccess, premium, title: () => showScreen('title') }; frameLoop.start();`,
+      `window.__mastery = { G: foundation.run.G, step: frames.update, swipe: game.onSwipe, tap: game.onTap,
+      stop: () => frames.frameLoop.stop(), runFrames: () => frames.frameLoop.start(), shrine: game.openShrine, checkpoint: game.captureCheckpoint,
+      settleScene: async () => { while (foundation.run.sceneState.sceneLoading) { frames.render(0); await new Promise(resolve => setTimeout(resolve, 10)); } },
+      equipment: () => foundation.profile.profileEquipment.EQ, stats: () => foundation.profile.profileFoundation.ST, modifiers: game.computeMods, parry: () => game.bossPhase.onTapDown(game.context), pause: game.pause, startRun: game.startRun, killEnemy: game.killEnemy,
+      access: foundation.browser.premiumAccess, premium, title: () => ui.showScreen('title') }; frames.frameLoop.start();`,
     );
     await route.fulfill({ response, body });
   });

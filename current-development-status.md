@@ -6,57 +6,63 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Active implementation: foundation context and cached live views
+## Active implementation: domain runtime composition
 
-Uncommitted src/runtime/foundation.ts constructs plain browser/profile/run/view
-records before domain wiring. Current profile identities remain in their owning
-records; layout/fog, seals, live/preview visit seeds and scene request state now
-have explicit owners. game.ts is still 1403 lines, above the approximately
-200-line target. Existing browser harness fields and assertions are retained.
+Foundation/context lifetime is committed at a47566f. Strict checks, all 371 units
+and all 254 combined browser cases pass in 14.1m; the unchanged eight-trial
+encounter/reload case passes inside the full run. Logs: cached-views-regression-
+typecheck.log, cached-views-regression-unit.log, cached-views-foundation-broad.log
+under tmp/runtime-refactor. This supersedes the earlier foundation reload failure.
 
-The first combined foundation browser run completed with 253 passes and one
-eight-trial final-reload timeout (context-foundation-broad.log); the unchanged
-focused rerun also timed out (context-foundation-trials-recheck.log). The original
-immutable baseline passed that same encounter/reload flow
-(foundation-navigation-baseline.log), so the timeout is treated as a regression.
-Phase/kill/frame projections now construct their lifetime views lazily once,
-while selected mutable fields remain forwarding getters. Snapshot providers such
-as environment/scene flow are not cached. This is a context-lifetime change,
-without rule/RNG changes or relaxed browser assertions/timeouts.
+The prepared composition is now APPLIED and uncommitted. game.ts is
+230 lines with original unused import scaffolding retained for separate cleanup.
+Runtime owners: foundation, presentation, UI base, profile/equipment rules, combat
+wiring, scene continuation, phases, sessions, menu/controls, frame/viewport and
+synchronous reaction wiring. Renderer-dependent frame-bindings/startup moved
+from game/session to runtime; no presentation/rendering imports remain in src/game.
+Plain record shape, rule/RNG ownership and the three cached live projections are
+retained. The isolated draft and semantic/reference audits remain under
+tmp/runtime-refactor; original generators are non-idempotent.
 
-Strict checks pass (cached-views-regression-typecheck.log); all 371 units pass
-(cached-views-regression-unit.log). The added actual damage-phase regression
-replaces geometry/profile/trial identities after initial use and proves current
-state writes and frozen event snapshots. The unchanged eight-trial browser case
-passes in 36.0s (cached-views-trials-browser.log; terminal exit 0).
-The new full browser verification passes all 254 cases in 14.1m
-(cached-views-foundation-broad.log; terminal exit 0 confirmed), including the
-unchanged eight-trial encounter/reload case. Foundation ownership and lazy live
-context views are ready for the green checkpoint commit.
+Parsed probes migrate 24 hooks in 20 files (89 references); harness fields,
+assertions and deadlines stay intact. Utilities needed only by injected probes
+are imported into instrumented responses. The first focused invocation exposed
+an eager run-flow read of refreshArmoryNew before controls existed. That run was
+stopped (domain-composition-browser.log; terminal exit 1). Root menu/clock ports
+now return stable forwarding callbacks, resolving later owners only when invoked.
+Strict checks pass (domain-composition-deferred-typecheck.log). All 371 units
+passed after the physical move (domain-composition-unit.log). Actual title/start/
+pause/resume passes after the deferred callback repair
+(domain-composition-startup-browser.log; terminal exit 0).
 
-The isolated presentation-context-preview draft now composes presentation, UI,
-gameplay, phases, sessions, menus/controls and frames through the foundation.
-Event wiring is in runtime/reactions.ts with eight listener groups in original
-registration order. Its root is 134 lines; profile/equipment rules, combat wiring and scene
-continuation have their own construction modules; the three cached projections are
-preserved in their new owners. Combined strict checks pass
-(domain-composition-preview-typecheck.log). Renderer-dependent frame/startup
-wiring is relocated outside src/game in the draft; only a content comment
-mentions rendering there. Actual browser probes are prepared in
-the isolated tests copy: 24 hooks in 20 files, 89 references, with unchanged
-harness fields/assertions. Helpers used only by probes are imported into the
-instrumented response instead of production source. The draft remains unapplied
-and needs actual browser verification after the foundation checkpoint.
+The unchanged 12-file focused browser invocation passes all 45 cases in 3.5m
+(domain-composition-deferred-browser.log; exit 0). Strict checks and all 371 units
+pass after the callback fix. The combined browser run completed with 253 passes
+and one scene-continuation intercepted module-request ECONNRESET during reload
+(domain-composition-broad.log; exit 1). The unchanged failing case passes in 13.0s
+on focused recheck (domain-composition-scene-continuation-recheck.log; exit 0).
+The failure trace is preserved in composition-scene-continuation-failure-trace.zip.
+This is not a full passing combined-run claim or a proven pre-existing failure.
+Targeted/actual scenario coverage is green for the internal composition checkpoint;
+the fully passing broad W2 checkpoint remains required before lighting.
 
-Resume: commit this verified foundation/context lifetime/probe migration
-checkpoint, then apply the
-verified isolated composition and its prepared probes as one cohesive move and
-run focused flows before broad verification. Root import deletion is separate
-from the physical move. Remaining direct wave/boss/knife/standoff-failure feedback
-still requires events. All W2 final gates/version/docs, all W3 and Part 4 remain.
-Generators are non-idempotent; preserve semantic/reference audit files and do not
-rerun original-declaration generators against the reduced root. Preview has
-public/scripts/docs/.github junctions; never recursively delete through them.
+Unused root imports are retained for a separate deletion. Prepared cleanup/audit
+removes 127 unused imports and leaves 129 lines. The original composition apply
+manifest and generators are stale after the actual callback fix; never overwrite
+current source from those files.
+
+An isolated wave-cues-preview now owns wave/knife/missed-swipe cosmetic feedback
+and wave/knife profile progression through immutable value events. Wave preparation
+and deferred profile settlement keep their original boundaries. Strict and all
+374 units pass (wave-cues-preview-typecheck.log / wave-cues-preview-unit.log).
+Added actual knife/wave/lightning/recovery scenarios compare listeners on/off,
+run/profile/combat RNG, snapshots and disposal. This draft remains unapplied.
+
+Remaining feedback audit: tmp/runtime-refactor/remaining-feedback-audit.md.
+Wave/boss entry/update, knife and standoff-failure/transition presentation still
+need value-event ownership. All W2 final gates/version/docs/checklist, all W3 and
+Part 4 remain required. Develop is unpushed; push once only after full completion.
+No profiling/benchmarks, store builds, real-save edits or lit-only changes.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

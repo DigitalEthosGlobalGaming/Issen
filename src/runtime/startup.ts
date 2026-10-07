@@ -1,10 +1,10 @@
-import { mountStartupLoading } from '../../ui/startup-loading.ts';
-import type { createLifecycle } from '../../platform/lifecycle.ts';
-import type { createFrameLoop } from '../../platform/frame-loop.ts';
-import type { createNativeServices } from '../../presentation/native-services.ts';
-import type { RunState } from '../run-state.ts';
-import type { RunCheckpoint } from '../../platform/run-checkpoint.ts';
-import type { createAudio } from '../../audio/audio.ts';
+import { mountStartupLoading } from '../ui/startup-loading.ts';
+import type { createLifecycle } from '../platform/lifecycle.ts';
+import type { createFrameLoop } from '../platform/frame-loop.ts';
+import type { createNativeServices } from '../presentation/native-services.ts';
+import type { RunState } from '../game/run-state.ts';
+import type { RunCheckpoint } from '../platform/run-checkpoint.ts';
+import type { createAudio } from '../audio/audio.ts';
 type Disposable = { dispose(): void };
 type NativeStartup = Pick<
   ReturnType<typeof createNativeServices>,

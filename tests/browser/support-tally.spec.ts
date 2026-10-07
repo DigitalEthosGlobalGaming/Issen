@@ -24,7 +24,7 @@ test('Ember tally offers a separate Continue, and pending doubling survives relo
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__tally = {G: foundation.run.G,earn}; artworkReady = true;',
+        'window.__tally = {G: foundation.run.G,earn: game.earn}; artworkReady = true;',
       ),
     });
   });

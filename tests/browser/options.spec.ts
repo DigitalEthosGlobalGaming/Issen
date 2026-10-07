@@ -284,7 +284,7 @@ test('explicit motion overrides control result tallies and setup reveal animatio
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__motionHarness = { runResults }; artworkReady = true;',
+        'window.__motionHarness = { runResults: ui.runResults }; artworkReady = true;',
       ),
     });
   });

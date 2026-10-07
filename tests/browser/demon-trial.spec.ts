@@ -18,7 +18,7 @@ test('Demon Mirror plays thirteen four-enemy waves with reversed cuts and unlock
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__demon = { G: foundation.run.G, sceneSeeds: [], step: update, swipe: onSwipe, render, settleScene: async () => { while (foundation.run.sceneState.sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); } }, stop: () => frameLoop.stop() }; const drawRealm = foundation.browser.demonRealmRenderer.draw; foundation.browser.demonRealmRenderer.draw = (...args) => { window.__demon.sceneSeeds.push(args[5]); return drawRealm(...args); }; artworkReady = true;',
+        'window.__demon = { G: foundation.run.G, sceneSeeds: [], step: frames.update, swipe: game.onSwipe, render: frames.render, settleScene: async () => { while (foundation.run.sceneState.sceneLoading) { frames.render(0); await new Promise(resolve => setTimeout(resolve, 10)); } }, stop: () => frames.frameLoop.stop() }; const drawRealm = foundation.browser.demonRealmRenderer.draw; foundation.browser.demonRealmRenderer.draw = (...args) => { window.__demon.sceneSeeds.push(args[5]); return drawRealm(...args); }; artworkReady = true;',
       ),
     });
   });

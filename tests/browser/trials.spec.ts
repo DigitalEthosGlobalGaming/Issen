@@ -47,16 +47,16 @@ async function saves(page: Page) {
 async function instrument(page: Page) {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = (await response.text()).replace(
+    const body = ("import { bossShownDirection } from '/src/game/encounters/boss-openings.ts';\n" + (await response.text())).replace(
       'artworkReady = true;',
       `
-      window.__trialHarness = { G: foundation.run.G, step: update, swipe: onSwipe, tap: onTap,
-        startBoss, shownDirection: bossShownDirection,
-        stop: () => frameLoop.stop(), getEquipment: () => foundation.profile.profileEquipment.EQ,
+      window.__trialHarness = { G: foundation.run.G, step: frames.update, swipe: game.onSwipe, tap: game.onTap,
+        startBoss: game.startBoss, shownDirection: bossShownDirection,
+        stop: () => frames.frameLoop.stop(), getEquipment: () => foundation.profile.profileEquipment.EQ,
         settleScene: async () => {
-          while (foundation.run.sceneState.sceneLoading) { render(0); await new Promise(resolve => setTimeout(resolve, 10)); }
+          while (foundation.run.sceneState.sceneLoading) { frames.render(0); await new Promise(resolve => setTimeout(resolve, 10)); }
         } };
-      frameLoop.start();`,
+      frames.frameLoop.start();`,
     );
     await route.fulfill({ response, body });
   });

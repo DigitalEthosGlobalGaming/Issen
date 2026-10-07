@@ -109,7 +109,7 @@ test('selected Scattered Armour reaches the live kill renderer without duplicate
       response,
       body: (await response.text()).replace(
         'artworkReady = true;',
-        'window.__scatterHarness={G: foundation.run.G,frameLoop,startRun,killEnemy,drawEnemy,updateEnemies}; artworkReady = true;',
+        'window.__scatterHarness={G: foundation.run.G,frameLoop: frames.frameLoop,startRun: game.startRun,killEnemy: game.killEnemy,drawEnemy: presentation.drawEnemy,updateEnemies: game.updateEnemies}; artworkReady = true;',
       ),
     });
   });
