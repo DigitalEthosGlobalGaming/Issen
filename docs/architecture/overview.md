@@ -133,8 +133,8 @@ before dispatch to preserve freeze/hazards and raw shadow timing. The ordered
 game/behaviour-registry.ts matches existing record data, retaining checkpoint
 shapes. game/combat/grunt.ts now dispatches enter/idle/attack/strike/dying/fade through
 the registry's feint/Zen/Still/base tables. Shared finishing preserves pose/timer
-ordering when rule callbacks change state in the same frame. updateEnemies is a
-temporary adapter while callers migrate; boss/player tables remain next.
+ordering when rule callbacks change state in the same frame. Runtime and tests now call advanceGrunts directly; the unused updateEnemies adapter
+has been removed separately. Boss/player tables remain next.
 
 ### Adding an enemy behaviour
 

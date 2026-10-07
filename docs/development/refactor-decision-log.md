@@ -144,6 +144,8 @@
 
 - 2026-10-08 — W2 grunt tables — derive feint/Zen/Still/base behaviours from existing fields and dispatch six states through tables, preserving clocks and shared pose finishing — add serialized type fields or change feint/foxfire frame ordering — strict, all 337 units and twenty-one live browser cases pass, with seven state/API cases; the old update export is temporarily a thin adapter — revert the grunt table integration while retaining the independent foundation/models.
 
+- 2026-10-08 — W2 grunt adapter removal — migrate runtime/scenario/checkpoint callers to advanceGrunts, then delete the unused enemy-update adapter separately — leave an unused legacy export — each step passes strict types and all 337 units; consumer audit has no adapter imports — restore the adapter and prior caller imports.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
