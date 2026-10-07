@@ -108,7 +108,8 @@ profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
 capture/restore/continue/abandon through explicit persistence ports.
 `game/session/run-start.ts` owns normal/daily/trial/rush entry and next-step
 dispatch; fresh-seed and cosmetic-reset ports preserve existing ordering. Trial
-encounter start/finish still await their phase-owner moves.
+encounter start/finish are owned by game/session/trials.ts, with explicit profile
+restoration and result-display ports.
 `game/phases/waves.ts` owns swipe targeting and knife input through explicit rule
 and feedback ports. Its createWaveLifecycle owns deferred entry, preparation
 and update/clear boundaries; live router dispatch remains pending.

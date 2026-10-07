@@ -120,6 +120,8 @@
 
 - 2026-10-08 — W2 boss move — preserve duel entry, parry chains, counter/reward and raw-time dying cleanup through explicit ports; migrate seeded fights and stale browser parry hook — leave inline HP drivers or replay phase entry on restore — strict, all 303 units and twenty browser cases pass; no gameplay or tolerance changes — revert the boss move and API-driver migrations together.
 
+- 2026-10-08 — W2 trial session move — keep disposable trial entry/completion and profile restoration together behind explicit mutable ports — combine it with persistent run rewards or leave closure-based completion — strict, all 306 units and sixteen live trial/mastery cases pass; actual entry/session/boss composition has three focused cases — revert this trial-session physical move.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

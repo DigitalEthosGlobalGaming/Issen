@@ -40,22 +40,21 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: boss entry, update, parry/tap/down, chained blocks and cuts
-now belong to `src/game/phases/boss.ts`. Position/tip, camera/stain and UI feedback
-are explicit ports, with no rendering imports. Common-frame dying updates still
-use updateBoss(dt, raw), preserving raw shadow time outside active combat.
-Three added actual API cases cover down/release parry, wrong/early input and one
-victory/reward/between boundary. All four seeded boss pattern scenarios now use
-the real entry/update/input APIs, including missed-opening recovery.
-Strict types passed; all 303 units passed (boss-final-unit.log).
-`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`:
-all twenty passed (boss-browser-retry.log; terminal confirmed). Initial run was
-interrupted after a stale response-injected parry reference failed; that test hook
-now calls bossPhase.onTapDown(context). No assertions or tolerances changed.
-Next move trial encounter start/finish (draft script prepared but NOT executed),
-then shrine/death controllers and live router dispatch. Full W2/W3/Part 4 remain
-pending; develop stays unpushed. Standoff checkpoint fa674bf: strict, 300 units,
-three real API scenarios and five input/save browser cases passed.
+Latest checkpoint: disposable trial encounter entry and completion now belong to
+`src/game/session/trials.ts`. Actual run-entry/trial/boss APIs are composed in three
+new headless cases covering one persistent completion reward/profile restoration,
+failed seeded retry and twenty-exchange Duel Master initialization. Strict types
+passed; all 306 units passed (trial-session-final-unit.log); the composed helper
+refinement subsequently passed all three focused trial-session cases.
+`npx playwright test tests/browser/trials.spec.ts tests/browser/editions-mastery.spec.ts --config playwright.rendering-v2.config.ts`:
+all sixteen passed (trial-session-browser.log; terminal confirmed).
+Next move shrine/death controllers, then live router dispatch preserving common
+boss dying updates and same-frame between/dead cascades. Full W2/W3/Part 4 remain
+pending; develop stays unpushed. Boss checkpoint f350035: strict, 303 units, three
+actual input/reward cases, four real seeded boss patterns and twenty browser cases
+passed. Initial browser run had a stale injected parry name; migrated it to the
+actual controller and reran unchanged assertions (boss-browser-retry.log).
+Standoff checkpoint fa674bf: strict, 300 units and five browser cases passed.
 
 Wave lifecycle checkpoint a3f32a0: strict, 297 units and thirteen real browser cases
 passed (wave-lifecycle-*.log); seeded entry/update use the production API. Wave

@@ -1,3 +1,4 @@
+import { createTrialSession } from './game/session/trials.ts';
 import { createBossPhase } from './game/phases/boss.ts';
 import { createStandoffPhase } from './game/phases/standoff.ts';
 import { createWavesPhase, createWaveLifecycle } from './game/phases/waves.ts';
@@ -1352,52 +1353,86 @@ export function startGame(
       trialFailure = value;
     },
   });
+  const trialSession = createTrialSession(() => ({
+    G,
+    TRIAL_PROGRESS,
+    UNL,
+    R,
+    playerStats,
+    playerEquipment,
+    deferUntilSceneReady,
+    waveCfg,
+    startBoss,
+    renderHp,
+    banner,
+    setWaveLabel: (label) => {
+      $('waveLbl').textContent = label;
+    },
+    renderTrialObjective,
+    store,
+    sfx,
+    buildLeaves,
+    guided,
+    audio,
+    hideTrialObjective: () => {
+      $('trialObjective').hidden = true;
+    },
+    toTitle,
+    computeMods,
+    openPanel,
+    focusTrialResult: () => {
+      $('trials')
+        .querySelector<HTMLButtonElement>('#trialResult button')
+        ?.focus({ preventScroll: true });
+    },
+    get activeTrial() {
+      return activeTrial;
+    },
+    set activeTrial(value) {
+      activeTrial = value;
+    },
+    get trialFailure() {
+      return trialFailure;
+    },
+    set trialFailure(value) {
+      trialFailure = value;
+    },
+    get trialResult() {
+      return trialResult;
+    },
+    set trialResult(value) {
+      trialResult = value;
+    },
+    get ST() {
+      return ST;
+    },
+    set ST(value) {
+      ST = value;
+    },
+    get EQ() {
+      return EQ;
+    },
+    set EQ(value) {
+      EQ = value;
+    },
+    get combatRandom() {
+      return combatRandom;
+    },
+    set combatRandom(value) {
+      combatRandom = value;
+    },
+    get hitStop() {
+      return hitStop;
+    },
+    set hitStop(value) {
+      hitStop = value;
+    },
+  }));
   function startTrialEncounter() {
-    if (deferUntilSceneReady(startTrialEncounter)) return;
-    const trial = activeTrial;
-    if (!trial) return;
-    G.afterBoss = false;
-    G.enemies = [];
-    G.pendingSpawns = [];
-    G.attacker = null;
-    G.boss = null;
-    G.event = null;
-    G.toSpawn = 0;
-    G.wave = trial.enemiesPerWave ? Math.floor(G.kills / trial.enemiesPerWave) + 1 : 1;
-    G.cfg = waveCfg(1);
-    if (trial.wave) {
-      const pack = trial.enemiesPerWave ?? 5;
-      const total = trial.enemiesPerWave ?? trial.wave.total;
-      Object.assign(G.cfg, {
-        pack,
-        refill: !trial.enemiesPerWave,
-        ordered: true,
-        total,
-        atk: trial.wave.attack,
-        gap: 0.25,
-        feint: trial.wave.feint,
-      });
-      G.toSpawn = total;
-      G.nextOrder = 1;
-      G.gapT = 1.5;
-      G.pendingSpawns = initialSpawns(pack, false, combatRandom);
-      G.state = 'playing';
-    } else {
-      G.bossCount = trial.bosses![G.bossesSlain]! - 1;
-      startBoss();
-      const duelBoss = G.boss as Boss | null;
-      if (trial.duelMaster && duelBoss) {
-        duelBoss.hp = duelBoss.maxHp = 20;
-        duelBoss.bp = duelMasterTimings(0);
-        renderHp();
-      }
-    }
-    banner(
-      '試練',
-      trial.waveCount ? `${trial.name} · Wave ${G.wave}/${trial.waveCount}` : trial.name,
-    );
-    $('waveLbl').textContent = trial.waveCount ? `Wave ${G.wave}/${trial.waveCount}` : 'Trials';
-    renderTrialObjective();
+    trialSession.startTrialEncounter();
+  }
+  function finishTrial(message?: string) {
+    trialSession.finishTrial(message);
   }
   function renderTrialObjective() {
     const trial = activeTrial;
@@ -1410,44 +1445,6 @@ export function startGame(
         : trial.wave
           ? `${trial.name} · ${trial.waveCount ? `Wave ${G.wave}/${trial.waveCount} · ` : ''}${G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
           : `${trial.name} · ${G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
-  }
-  function finishTrial(message?: string) {
-    const trial = activeTrial;
-    if (!trial) return;
-    const passed = trialPassed(trial, { ...G, failed: !!message || !!trialFailure });
-    const newlyCompleted = passed && completeTrial(TRIAL_PROGRESS, trial.id);
-    if (passed) {
-      store.set('issen.trials', TRIAL_PROGRESS);
-      grantTrialRewards(TRIAL_PROGRESS, UNL);
-      store.set('issen.unlocks', [...UNL]);
-      sfx.unlock();
-    }
-    trialResult = {
-      id: trial.id,
-      passed,
-      newlyCompleted,
-      message:
-        message ||
-        trialFailure ||
-        (passed
-          ? ''
-          : `You landed ${G.perfects} perfect cuts; ${trial.wave?.perfects ?? 0} were required.`),
-    };
-    activeTrial = null;
-    buildLeaves();
-    combatRandom = R;
-    ST = playerStats;
-    EQ = playerEquipment;
-    guided.reset();
-    audio.setPaused(false);
-    hitStop = 0;
-    $('trialObjective').hidden = true;
-    toTitle();
-    computeMods();
-    openPanel('trials');
-    $('trials')
-      .querySelector<HTMLButtonElement>('#trialResult button')
-      ?.focus({ preventScroll: true });
   }
   const waveLifecycle = createWaveLifecycle(() => ({
     G,
