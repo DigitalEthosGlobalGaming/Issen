@@ -13,22 +13,15 @@ game/session/frame-bindings.ts owns simulation dispatch, prepared scene/post com
 `node --test tests/unit/*.test.mjs`: all 365 units pass (frame-startup-unit.log).
 `npx playwright test tests/browser/game.spec.ts tests/browser/class-lifecycle.spec.ts tests/browser/cinematic.spec.ts tests/browser/performance.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/pixi-backend.spec.ts tests/browser/secondary-motion.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 50 pass in 2.1m (frame-startup-browser.log; terminal exit 0 confirmed).
-Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
-coverage; the latest broad invocation predates this binding change.
+Logs are under ignored tmp/runtime-refactor. This checkpoint now has combined full browser coverage, including the import cleanup and scenario/Options fixture changes.
 
-Latest passing combined broad: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 254 passed in 13.5m (phase-bindings-broad.log; terminal exit 0 confirmed),
-covering seven-phase binding plus the checkpoint continuation fix.
-
-Latest subsequent combined invocation: same command, 253 passed and one Options
-snapshot failure in 14.0m (standoff-bindings-broad.log; terminal exit 1). A held
-actual renderer completion on unchanged pre-refactor reproduces the same null
-checkpoint becoming a saved wave with advanced RNG while remaining paused
-(paused-options-baseline.log; original snapshot assertion fails). The Options
-fixture now waits for scene ready and a wave configuration before freezing an
-established encounter; all invariance assertions remain unchanged. Options plus
-scene-readiness verification is recorded in options-fixture-browser.log. A new
-combined broad run is still required after the frame/startup moves.
+Latest combined broad: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 254 pass in 14.0m (frame-startup-broad.log; terminal exit 0 confirmed), covering
+frame/startup moves, import cleanup, actual-API scenarios and corrected Options
+fixture. No live state/service ownership changes were applied during this run.
+The earlier Options failure is retained in standoff-bindings-broad.log; controlled
+unchanged-baseline proof is in paused-options-baseline.log. The corrected fixture
+awaits actual scene/wave entry and retains the original snapshot equality/timeouts.
 
 ## Completed ownership and important evidence
 
@@ -66,9 +59,8 @@ identified by TypeScript symbols (including shorthand references). Actual browse
 hook imports BLESS_BY and bossShownDirection are retained. Redundant empty lines
 are collapsed. `npm run typecheck` and all 365 units pass
 (composition-imports-typecheck.log, composition-imports-unit.log).
-Next combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`,
-log frame-startup-broad.log. Preserve runtime source while it runs. Inspect its
-actual execution handle before concluding it stopped or starting another run.
+Completed combined verification: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`,
+log frame-startup-broad.log. All 254 now pass; terminal exit 0 confirmed. Next apply the strictly checked isolated session-state/browser-service batch and its actual run-entry projection tests.
 
 ## Actual-API scenario coverage
 
