@@ -7,7 +7,7 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; next W2.0 audit and validation harness
+## W1 complete; W2.0 baseline complete; next W2.1 Canvas removal
 
 W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
 `tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
@@ -68,9 +68,19 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
 
 ## Next steps (all required)
 
-1. Begin W2.0: read the complete W2 section, audit every game.ts function and its
-   closure/RNG dependencies into `tmp/runtime-refactor/audit.md`; write seeded
-   headless scenario smoke tests and old checkpoint fixtures before moving code.
+1. W2.0 baseline complete: 378 implementation functions audited in
+   `tmp/runtime-refactor/audit.md` and audit.json (335 closure captures, 14 direct
+   RNG functions). Snapshot `pre-extraction-game.ts` and reproduction audit script
+   remain ignored. No production runtime code moved. Thirteen headless scenario
+   and checkpoint tests cover current exports and four real checkpoint fixtures.
+   Inline rule boundaries are temporarily represented by harness input handlers;
+   replace them with extracted phase/kill APIs and extend all state coverage as
+   those APIs appear. Do not claim the harness already tests every inline rule.
+   `npm run typecheck` passed (w2-audit-typecheck.log); `npm test` all 265 passed
+   (w2-audit-unit.log). `npx playwright test tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts`
+   all four passed (old-checkpoint-browser.log; terminal exit confirmed). Logs
+   are in tmp/runtime-refactor. Fixture capture itself passed four cases.
+   `tmp/runtime-refactor/behaviour-changes.md`: none yet. No W2 process remains.
 2. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
    Require WebGL2, use one graphics error screen, retain eight-second context-loss
    recovery with explicit resume and Reload on failure. Then follow the eight

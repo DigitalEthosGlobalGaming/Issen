@@ -29,6 +29,8 @@
 
 - 2026-10-07 — W1 checkpoint — complete asset work with the proven pre-existing Android recovery failure recorded — changing unrelated checkpoint behaviour during asset compaction — all conversion, rendering, strict type, unit and production gates pass; the goal explicitly permits evidenced pre-existing failures — restore W1 from pre-refactor or revert the ordered W1 commits.
 
+- 2026-10-07 — W2.0 harness — capture real version-1 checkpoints before extraction and seed current-export scenario drivers — synthetic checkpoint fixtures or exact per-tick snapshots — preserves actual restore compatibility and outcome invariants; inline input handlers must migrate to new phase/rule APIs as those appear — revert the harness checkpoint, preserving the ignored audit and source snapshot.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
