@@ -1,0 +1,268 @@
+import { createFrameSimulation, type FrameSimulationViews } from './frame-simulation.ts';
+import { createFrameLoop } from '../../platform/frame-loop.ts';
+import {
+  createPostPreparation,
+  type PostPreparationViews,
+} from '../../presentation/post-preparation.ts';
+import { createPostPresentation, type PostViews } from '../../presentation/post.ts';
+import { createRuntimeScene, type SceneViews } from '../../presentation/scene.ts';
+import {
+  advancePresentationClock,
+  advancePresentationCamera,
+  type PresentationState,
+} from '../../presentation/state.ts';
+import { updatePlayerAnimation, type createPlayerAnimation } from '../player/player.ts';
+import { updateWeather as simulateWeather } from '../../rendering/scene/weather-update.ts';
+import { STAGES } from '../content/stages.ts';
+import type { EnvironmentState } from '../../presentation/environment-state.ts';
+import type { createWeatherState } from '../../rendering/scene/weather-state.ts';
+import type { createAudio } from '../../audio/audio.ts';
+import type { createEffectQuality } from '../../rendering/effects/quality.ts';
+import type { createPostArtwork } from '../../presentation/post-artwork.ts';
+import type { createScreenAnimation } from '../../ui/screen-animation.ts';
+import type { createEnvironmentPresentation } from '../../presentation/environment.ts';
+import type { createPlayerFigures } from '../../presentation/player-figures.ts';
+import type { Random } from '../../shared/random.ts';
+
+type SimulationPorts = Omit<
+  FrameSimulationViews,
+  | 'updateWeather'
+  | 'updatePlayer'
+  | 'advanceClock'
+  | 'advanceCamera'
+  | 'presentationState'
+  | 'audio'
+  | 'WX'
+  | 'guided'
+>;
+type ScenePorts = Omit<
+  SceneViews,
+  | 'time'
+  | 'zoom'
+  | 'zoomX'
+  | 'zoomY'
+  | 'previewDemon'
+  | 'mistSprite'
+  | 'mists'
+  | 'mid'
+  | 'fg'
+  | 'drawPlayer'
+  | 'drawPet'
+  | 'drawFoxfire'
+  | 'drawPost'
+>;
+type PostPorts = Omit<PostViews, 'time' | 'grainPats' | 'vig' | 'inkEdge' | 'lb' | 'flashCol'>;
+type PreparationPorts = Omit<PostPreparationViews, 'time' | 'fx' | 'signals'>;
+export type FrameBindingViews = SimulationPorts &
+  ScenePorts &
+  PostPorts &
+  PreparationPorts & {
+    readonly P: ReturnType<typeof createPlayerAnimation>;
+    readonly presentationState: PresentationState;
+    readonly environmentState: EnvironmentState;
+    readonly WX: ReturnType<typeof createWeatherState>;
+    readonly audio: ReturnType<typeof createAudio>;
+    readonly guided: FrameSimulationViews['guided'] & { readonly frozen: boolean };
+    readonly postArtwork: ReturnType<typeof createPostArtwork>;
+    readonly playerFigures: ReturnType<typeof createPlayerFigures>;
+    readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
+    readonly effectQuality: ReturnType<typeof createEffectQuality>;
+    readonly ambient: ReturnType<typeof createEnvironmentPresentation>['ambient'];
+    readonly rebalanceWeather: () => void;
+    readonly armory: { readonly inspectionExpanded: boolean };
+    readonly combatRandom: Random;
+    readonly flash: Parameters<typeof simulateWeather>[3]['flash'];
+    readonly sfx: Parameters<typeof simulateWeather>[3]['sounds'];
+    readonly gustLeaves: Parameters<typeof simulateWeather>[3]['gustLeaves'];
+    readonly drawPreview: () => void;
+    readonly settlePresentedScene: () => void;
+    hitStop: number;
+    readonly timeScale: number;
+  };
+
+/** Owns frame dispatch, prepared drawing and scheduling through current narrow views. */
+export function createFrameBindings(readViews: () => FrameBindingViews) {
+  function updatePlayer(dt: number) {
+    const { P, G } = readViews();
+    updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
+  }
+  function updateWeather(dt: number) {
+    const {
+      G,
+      cinematic,
+      environmentState,
+      WX,
+      W,
+      H,
+      S,
+      presentationState,
+      L,
+      R,
+      combatRandom,
+      flash,
+      sfx,
+      gustLeaves,
+    } = readViews();
+    simulateWeather(
+      cinematic.active ? environmentState.cinematicWeather : WX,
+      environmentState.wx,
+      dt,
+      {
+        weather: STAGES[G.stage]!.weather,
+        phase: G.state,
+        width: W,
+        height: H,
+        scale: S,
+        wind: presentationState.wind,
+        time: presentationState.time,
+        hazard: G.m.hazard,
+        layout: L,
+        random: R,
+        hazardRandom: cinematic.active ? R : combatRandom,
+        flash,
+        sounds: sfx,
+        gustLeaves,
+        onShake: (amount) => {
+          presentationState.shake = Math.max(presentationState.shake, amount);
+        },
+      },
+    );
+  }
+
+  const frameSimulation = createFrameSimulation(() => {
+    const v = readViews();
+    return {
+      ...v,
+      updatePlayer,
+      updateWeather,
+      advanceClock: (dt: number) => advancePresentationClock(v.presentationState, dt),
+      advanceCamera: (raw: number) => advancePresentationCamera(v.presentationState, raw),
+    };
+  });
+  function update(dt: number, raw: number) {
+    frameSimulation.update(dt, raw);
+  }
+  const postPreparation = createPostPreparation(() => {
+    const v = readViews();
+    return {
+      ...v,
+      fx: v.presentationState.fx,
+      time: v.presentationState.time,
+      signals: v.presentationState,
+    };
+  });
+  const { advancePost, preparePresentation } = postPreparation;
+  const drawPost = createPostPresentation(() => {
+    const v = readViews();
+    return {
+      ...v,
+      time: v.presentationState.time,
+      grainPats: v.postArtwork.grainPats,
+      vig: v.postArtwork.vig,
+      inkEdge: v.postArtwork.inkEdge,
+      lb: v.presentationState.lb,
+      flashCol: v.presentationState.flashCol,
+    };
+  });
+  function drawPlayer() {
+    readViews().playerFigures.drawPlayer();
+  }
+  function drawPet() {
+    readViews().playerFigures.drawPet();
+  }
+  function drawFoxfire() {
+    readViews().playerFigures.drawFoxfire();
+  }
+  const drawScene = createRuntimeScene(() => {
+    const v = readViews();
+    return {
+      ...v,
+      time: v.presentationState.time,
+      zoom: v.presentationState.zoom,
+      zoomX: v.presentationState.zoomX,
+      zoomY: v.presentationState.zoomY,
+      previewDemon: v.environmentState.previewDemon,
+      mistSprite: v.environmentState.mistSprite,
+      mists: v.environmentState.mists,
+      mid: v.environmentState.mid,
+      fg: v.environmentState.fg,
+      drawPlayer,
+      drawPet,
+      drawFoxfire,
+      drawPost,
+    };
+  });
+  function render(raw: number) {
+    const { G, armory, settlePresentedScene } = readViews();
+    // Only the opaque inspection dialog covers the scene completely.
+    if (G.panel === 'armory' && armory.inspectionExpanded) return;
+    drawScene(preparePresentation(raw));
+    settlePresentedScene();
+  }
+  const frameLoop = createFrameLoop(
+    {
+      get hitStop() {
+        return readViews().hitStop;
+      },
+      set hitStop(value) {
+        readViews().hitStop = value;
+      },
+      get slowT() {
+        return readViews().G.slowT;
+      },
+      set slowT(value) {
+        readViews().G.slowT = value;
+      },
+      get timeScale() {
+        return readViews().timeScale;
+      },
+    },
+    {
+      maxFps: () => 60,
+      demand: () => {
+        const { cinematic, screenAnimation, G, armory } = readViews();
+        return cinematic.active
+          ? { update: true, render: true, afterRender: false }
+          : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded);
+      },
+      paused: () => {
+        const { G, guided } = readViews();
+        return G.state === 'paused' || guided.frozen;
+      },
+      update,
+      render,
+      afterRender: () => {
+        const { G, drawPreview } = readViews();
+        if (G.panel === 'armory') drawPreview();
+      },
+      sampleFrame: (interval, work) => {
+        const {
+          sceneLoading,
+          G,
+          effectQuality,
+          ambient,
+          environmentState,
+          density,
+          rebalanceWeather,
+        } = readViews();
+        if (sceneLoading) return;
+        if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
+        if (!effectQuality.sample(interval, work)) return;
+        ambient().balanceLeaves(environmentState.leaves);
+        if (Math.abs(environmentState.weatherDensity - density()) >= 0.09) rebalanceWeather();
+      },
+    },
+  );
+  return {
+    frameLoop,
+    update,
+    render,
+    drawScene,
+    postPreparation,
+    advancePost,
+    preparePresentation,
+    updatePlayer,
+    updateWeather,
+    drawPost,
+  };
+}

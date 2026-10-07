@@ -73,16 +73,22 @@ flat frozen kill/cutChain snapshots before chained selection. Profile counters
 listen in game/progression/combat-listeners.ts; cut audio/haptics/FX listen in
 presentation/kill.ts. Shared scoring/combo rules live in game/progression/
 combat-score.ts; presentation/combat-score.ts reacts with HUD/popups. Presentation
-listener registration/removal cannot change combat state or combat RNG. The runtime still contains
-results/reward orchestration,
-player/companion projection and frame preparation orchestration. These are not separate
-fully extracted owners yet; do not assume the proposed migration tree describes
-implemented files. W2 now introduces `game/session/context.ts`: `RunContext`
-holds plain run records and seeded randomness; `ServicesContext` holds browser
-ports. `presentation/context.ts` owns the cosmetic RNG, effects, layout and camera
-contract. The generic `GameContext<Presentation>` composition contract lets gameplay
-accept narrow rule/service slices without importing rendering/presentation types.
-Transitional getters bridge the existing closure until its owners are extracted.
+listener registration/removal cannot change combat state or combat RNG.
+`game/session/results.ts` owns result/reward orchestration; `game/player/companions.ts`
+owns companion rules and `presentation/player-figures.ts` owns their projection.
+`game/session/frame-bindings.ts` connects simulation, prepared presentation and
+frame scheduling. `game/session/startup.ts` owns ordered runtime startup,
+artwork readiness/errors and disposal. Scene continuations settle after drawing
+through `game/session/scene-flow.ts`, including intentional paused phase adoption.
+
+`game/session/context.ts` defines `RunContext` with plain run records and seeded
+randomness, and `ServicesContext` with browser ports. `presentation/context.ts`
+defines cosmetic RNG, effects, layout and camera capabilities. The generic
+`GameContext<Presentation>` contract lets rules accept narrow service slices
+without importing rendering types. The root still retains mutable profile/run
+references, dimensions and repeated view projections; its composition reduction
+is in progress. Current accessors preserve replacement identities and avoid eager
+reads of services constructed later.
 
 `game/events.ts` is a typed synchronous bus. It delivers in registration order,
 snapshots subscriptions for each emission, completes nested emissions immediately,
@@ -155,6 +161,10 @@ Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects
 
 | Concern                                                               | Maintained location                                                              |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Runtime frame composition and startup lifetime | `src/game/session/frame-bindings.ts`, `startup.ts` |
+| Run entry, checkpoints, pause/resume, trial and result orchestration | `src/game/session/` |
+| Active phase inputs and encounter lifecycle | `src/game/phases/` |
+| Cosmetic scene, character, post and event feedback | `src/presentation/` |
 | Run fields and restart initialization                                 | `src/game/run-state.ts`                                                          |
 | Enemy spawn, targeting, damage, simulation                            | `src/game/combat/`                                                               |
 | Plain character types, seed/pose helpers, death timing | `src/shared/character.ts`, `figure-model.ts`, `character-death.ts` |
@@ -189,9 +199,9 @@ Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects
 | Synthesized cues, audio context and ambience                          | `src/audio/audio.ts`                                                             |
 | Save validation, storage, haptics, lifecycle, frame scheduling        | `src/platform/`                                                                  |
 
-`platform/run-checkpoint.ts` validates the active run snapshot. `game.ts`
-captures it after each wave, duel, standoff or Shrine offer is prepared and
-restores it under a pause screen on startup. Continue resumes the saved phase. The gameplay random stream is stored with its
+`platform/run-checkpoint.ts` validates the active run snapshot.
+`game/session/checkpoint-flow.ts` captures it after each wave, duel, standoff or
+Shrine offer is prepared. Runtime startup restores it under a pause screen. Continue resumes the saved phase. The gameplay random stream is stored with its
 state, including weather hazard timers; visual randomness stays separate. Fatal losses write a terminal snapshot
 before the death animation. Completed results clear that snapshot after profile
 rewards and records have been written.
@@ -469,3 +479,5 @@ presentation/viewport.ts owns resize debounce and viewport/scenery rebuilding. C
 presentation/kill-appearance.ts owns death appearance and debris callbacks through current value selections and visual randomness. Gameplay receives only the resulting death-record values; cosmetic listeners own flying swords, coins, stains and shake.
 
 presentation/standoff-feedback.ts reacts to immutable successful standoff outcomes. Gameplay owns challenger death, swing, hit stop, score and rewards; cosmetic geometry, feedback RNG, sound and haptics belong to the listener.
+
+game/session/frame-bindings.ts wires simulation, prepared post/scene drawing and the scheduler through current narrow views. Scene readiness remains an orchestration action after drawing. game/session/startup.ts owns the ordered startup and artwork/error/disposal lifetime; runtime readiness is published through an explicit callback.

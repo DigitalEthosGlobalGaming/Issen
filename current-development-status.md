@@ -6,36 +6,29 @@ benchmarks, store builds, real-save changes or lit-only worktree modifications.
 Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
 develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
 
-## Latest green checkpoint: Standoff success feedback events
+## Latest green checkpoint: Frame composition and runtime startup
 
-Successful standoff cuts emit an immutable position/direction snapshot after committing the rule outcome. presentation/standoff-feedback.ts owns cut debris, rings, stamps, sound and haptics. Actual seeded combat has identical outcomes and gameplay RNG with the listener enabled or disabled.
-`npm run typecheck`: strict types pass (standoff-feedback-typecheck.log).
-`node --test tests/unit/*.test.mjs`: all 365 units pass (standoff-feedback-unit.log).
-`npx playwright test tests/browser/feature-plan-06.spec.ts tests/browser/encounter-flow.spec.ts tests/browser/death-presentation.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 9 pass in 1.0m (standoff-feedback-browser.log; terminal exit 0 confirmed).
+game/session/frame-bindings.ts owns simulation dispatch, prepared scene/post composition and the frame scheduler. game/session/startup.ts owns ordered startup, artwork readiness/error handling and cleanup. Current clocks, geometry, scene continuation, pause gates and draw-isolation hooks remain intact.
+`npm run typecheck`: strict types pass (frame-startup-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 365 units pass (frame-startup-unit.log).
+`npx playwright test tests/browser/game.spec.ts tests/browser/class-lifecycle.spec.ts tests/browser/cinematic.spec.ts tests/browser/performance.spec.ts tests/browser/presentation-readiness.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/secret-recovery.spec.ts tests/browser/pixi-backend.spec.ts tests/browser/secondary-motion.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 50 pass in 2.1m (frame-startup-browser.log; terminal exit 0 confirmed).
 Logs are under ignored tmp/runtime-refactor. This checkpoint has focused live
 coverage; the latest broad invocation predates this binding change.
 
-Latest combined broad: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+Latest passing combined broad: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
 all 254 passed in 13.5m (phase-bindings-broad.log; terminal exit 0 confirmed),
 covering seven-phase binding plus the checkpoint continuation fix.
 
-## Subsequent combined verification and corrected fixture
-
-`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-253 pass and one paused Options snapshot failure in 14.0m
-(standoff-bindings-broad.log; terminal exit 1). The scene continuation completed
-initial wave entry after pause, producing a checkpoint and advancing RNG.
-Controlled actual renderer completion on unchanged pre-refactor reproduces that
-exact snapshot failure (paused-options-baseline.log; exit 1 at equality assertion).
-The fixture now awaits scene ready and a wave configuration before freezing an
-established encounter. Original invariance assertions and timing remain unchanged;
-intentional paused scene adoption remains covered by scene-readiness.
-`npm run typecheck`: pass (options-fixture-typecheck.log).
-`npx playwright test tests/browser/options.spec.ts tests/browser/scene-readiness.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
-all 14 pass in 1.2m (options-fixture-browser.log; terminal exit 0 confirmed).
-Next: apply strictly verified frame/startup ownership draft, run strict/full units
-and affected live browser checks, then actual-API scenario draft and new broad run.
+Latest subsequent combined invocation: same command, 253 passed and one Options
+snapshot failure in 14.0m (standoff-bindings-broad.log; terminal exit 1). A held
+actual renderer completion on unchanged pre-refactor reproduces the same null
+checkpoint becoming a saved wave with advanced RNG while remaining paused
+(paused-options-baseline.log; original snapshot assertion fails). The Options
+fixture now waits for scene ready and a wave configuration before freezing an
+established encounter; all invariance assertions remain unchanged. Options plus
+scene-readiness verification is recorded in options-fixture-browser.log. A new
+combined broad run is still required after the frame/startup moves.
 
 ## Completed ownership and important evidence
 
@@ -49,7 +42,7 @@ owners, kill/score/profile reactions, state-machine/behaviour registries,
 actual grunt/boss/player tables and companion rules are implemented.
 Native/equipment/environment/figure presentation, phased profile state,
 active equipment/profile policy and frame dispatch have explicit owners.
-Kill, combo/score, parry/block and successful boss-cut/victory cosmetics listen
+Kill, combo/score, parry/block and successful boss-cut/victory/standoff cosmetics listen
 to immutable value events. Seven phases share their typed construction provider.
 Implemented binding/state/lifecycle owners: game/session/phase-bindings.ts, ui/wiring/menu-bindings.ts, game/session/session-bindings.ts, game/session/activity.ts, presentation/graphics-lifecycle.ts, presentation/viewport.ts.
 See docs/architecture/overview.md and refactor-decision-log.md for exact ownership,
@@ -66,24 +59,20 @@ the fix. Earlier natural probe was inconclusive and is superseded.
 Behaviour changes remain in tmp/runtime-refactor/behaviour-changes.md for final
 report: reaction ordering, first support retry, same-scene continue bug fix.
 
-## Actual-API scenario migration verified
+## Actual-API scenario coverage
 
-Headless scenarios now call actual daily/trial entry and completion, wave input
-and death for wrong cuts, and bounded winning/missed-parry/recovery paths for
-every reachable boss state (mirror intentionally has no feint). Fixed-date daily
-and repeated trial seed assert outcomes, disposable profile isolation and once-only
-settlement. Fixtures resolve current run RNG and trial boss combat/profile ports.
-`node --test tests/unit/*.test.mjs`: all 365 pass (scenario-api-unit.log).
-The frame/startup physical moves are currently applied but uncommitted, strict
-and 365 units pass; affected browser verification is live (frame-startup-browser.log).
-Preserve runtime source until its execution finishes. Do not reapply stale drafts.
+Daily/trial entry and completion, wrong wave input and death, and bounded winning/
+missed-parry/recovery boss paths now use actual owners. Every reachable boss state
+is visited; mirror intentionally disables feint. Fixed-date daily and repeated
+trial seed verify outcomes, profile isolation and once-only settlement. Fixtures
+resolve current run and trial combat RNG/profile ports. All 365 units pass
+(scenario-api-unit.log). The migration is committed at c55acea.
 
 ## Resume here; all remaining work is required
 
-Apply the strictly verified frame/startup ownership draft, then strict/full units and affected browser checks. Apply the verified actual-API scenario draft separately and run new combined broad verification.
+Finish explicit runtime state/service/context ownership and remaining repeated root projections. The actual-API scenario migration is already applied and all 365 units pass; do not reapply its draft.
 Isolated session/activity/graphics-lifecycle/viewport/standoff-feedback previews
-exist under tmp/runtime-refactor with strict logs. Except owners described above,
-they are unapplied and have no live coverage. Regenerate each from current source
+exist under tmp/runtime-refactor with strict logs. All applied owners are listed above; any other isolated drafts have no live coverage. Regenerate each from current source
 before applying; never overwrite the root with a stale preview.
 
 Finish genuine composition reduction: root remains 1791 lines, far from

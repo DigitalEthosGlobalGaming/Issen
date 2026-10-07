@@ -1,3 +1,5 @@
+import { startRuntime } from './game/session/startup.ts';
+import { createFrameBindings } from './game/session/frame-bindings.ts';
 import { bindStandoffFeedback } from './presentation/standoff-feedback.ts';
 import { createKillAppearance } from './presentation/kill-appearance.ts';
 import { createViewport } from './presentation/viewport.ts';
@@ -1714,197 +1716,25 @@ export function startGame(
       paused: definePhase({}),
     },
   );
-  /* ---------------- update ---------------- */
-  function updatePlayer(dt: number) {
-    updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
-  }
-  function updateWeather(dt: number) {
-    simulateWeather(
-      cinematic.active ? environmentState.cinematicWeather : WX,
-      environmentState.wx,
-      dt,
-      {
-        weather: STAGES[G.stage]!.weather,
-        phase: G.state,
-        width: W,
-        height: H,
-        scale: S,
-        wind: presentationState.wind,
-        time: presentationState.time,
-        hazard: G.m.hazard,
-        layout: L,
-        random: R,
-        hazardRandom: cinematic.active ? R : activity.combatRandom,
-        flash,
-        sounds: sfx,
-        gustLeaves,
-        onShake: (amount) => {
-          presentationState.shake = Math.max(presentationState.shake, amount);
-        },
-      },
-    );
-  }
-  const frameSimulation = createFrameSimulation(() => ({
-    sceneLoading,
-    activeTrial: activity.activeTrial,
-    trialFailure: activity.trialFailure,
-    finishTrial,
-    G,
-    updateAmbient,
-    cinematic,
-    updateWeather,
-    reducedMotion,
-    audio,
-    presentationState,
-    updatePlayer,
-    apparelMotion,
-    updateEnemies,
-    activeDaily: activity.activeDaily,
-    waveConfiguration,
-    liveOrdered,
-    guided,
-    bossPhase,
-    phaseRouter,
-    updateFx,
-    renderTrialObjective,
-    updateTransition,
-    WX,
-    advanceClock: dt => advancePresentationClock(presentationState, dt),
-    advanceCamera: raw => advancePresentationCamera(presentationState, raw),
+  const { frameLoop, update, render, drawScene, postPreparation, advancePost, preparePresentation } = createFrameBindings(() => ({
+    G, P, WX, R, W, H, S, DPR, L, g, cvs, nativeScene,
+    presentationState, environmentState, postArtwork, playerFigures,
+    sceneLoading, activeTrial: activity.activeTrial, trialFailure: activity.trialFailure,
+    activeDaily: activity.activeDaily, combatRandom: activity.combatRandom,
+    finishTrial, updateAmbient, cinematic, reducedMotion, reducedFlashes, audio,
+    apparelMotion, updateEnemies, waveConfiguration, liveOrdered, guided,
+    bossPhase, phaseRouter, updateFx, renderTrialObjective, updateTransition,
+    sceneFilm, pz, buzz, premiumAccess, lightingDebug, lightingRig,
+    stageSeed, demonRealmRenderer, environmentRenderer, density,
+    blades, drawStains, drawLeaves, drawEnemy, drawBoss, drawFx, drawFx2,
+    drawGlyphs, drawSmoke, drawWeather, drawPops, drawStamps,
+    screenAnimation, effectQuality, ambient, rebalanceWeather, armory,
+    flash, sfx, gustLeaves, drawPreview, settlePresentedScene,
+    get hitStop() { return hitStop; }, set hitStop(value) { hitStop = value; },
+    get timeScale() { return timeScale; },
   }));
-  function update(dt: number, raw: number) { frameSimulation.update(dt, raw); }
-
-  /* ---------------- render ---------------- */
-  function drawPlayer() { playerFigures.drawPlayer(); }
-  const postPreparation = createPostPreparation(() => ({
-    W,
-    H,
-    G,
-    R,
-    reducedMotion,
-    reducedFlashes,
-    sceneFilm,
-    pz,
-    fx: presentationState.fx,
-    buzz,
-    S,
-    time: presentationState.time,
-    signals: postSignals,
-  }));
-  const { advancePost, preparePresentation } = postPreparation;
-  const postSignals = presentationState;
-  const drawPost = createPostPresentation(() => ({
-    G,
-    g,
-    W,
-    H,
-    cvs,
-    sceneFilm,
-    premiumAccess,
-    time: presentationState.time,
-    reducedMotion,
-    reducedFlashes,
-    grainPats: postArtwork.grainPats,
-    vig: postArtwork.vig,
-    pz,
-    inkEdge: postArtwork.inkEdge,
-    lb: presentationState.lb,
-    flashCol: presentationState.flashCol,
-  }));
-  function render(raw: number) {
-    // Scroll menus reveal the scene at their edges. Only the opaque, full-viewport
-    // inspection dialog covers it completely; its independent preview still draws.
-    if (G.panel === 'armory' && armory.inspectionExpanded) return;
-    drawScene(preparePresentation(raw));
-    settlePresentedScene();
-  }
-  const drawScene = createRuntimeScene(() => ({
-    nativeScene,
-    lightingDebug,
-    g,
-    lightingRig,
-    W,
-    H,
-    DPR,
-    zoom: presentationState.zoom,
-    zoomX: presentationState.zoomX,
-    zoomY: presentationState.zoomY,
-    reducedMotion,
-    activeTrial: activity.activeTrial,
-    cinematic,
-    previewDemon: environmentState.previewDemon,
-    demonRealmRenderer,
-    time: presentationState.time,
-    stageSeed,
-    environmentRenderer,
-    G,
-    reducedFlashes,
-    density,
-    cvs,
-    mistSprite: environmentState.mistSprite,
-    mists: environmentState.mists,
-    blades,
-    mid: environmentState.mid,
-    drawStains,
-    drawLeaves,
-    sceneLoading,
-    drawEnemy,
-    L,
-    drawBoss,
-    drawPlayer,
-    drawPet,
-    drawFoxfire,
-    drawFx,
-    drawFx2,
-    fg: environmentState.fg,
-    drawGlyphs,
-    drawSmoke,
-    drawWeather,
-    drawPops,
-    drawStamps,
-    drawPost,
-  }));
-  // Scene-ready continuation belongs to orchestration, never to a drawing call.
+  // Scene readiness belongs to orchestration, never to a drawing call.
   function settlePresentedScene() { return sceneFlow.settlePresentedScene(); }
-  const frameLoop = createFrameLoop(
-    {
-      get hitStop() {
-        return hitStop;
-      },
-      set hitStop(value) {
-        hitStop = value;
-      },
-      get slowT() {
-        return G.slowT;
-      },
-      set slowT(value) {
-        G.slowT = value;
-      },
-      get timeScale() {
-        return timeScale;
-      },
-    },
-    {
-      maxFps: () => 60,
-      demand: () =>
-        cinematic.active
-          ? { update: true, render: true, afterRender: false }
-          : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded),
-      paused: () => G.state === 'paused' || guided.frozen,
-      update,
-      render,
-      afterRender: () => {
-        if (G.panel === 'armory') drawPreview();
-      },
-      sampleFrame: (interval, work) => {
-        if (sceneLoading) return;
-        if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
-        if (!effectQuality.sample(interval, work)) return;
-        ambient().balanceLeaves(environmentState.leaves);
-        if (Math.abs(environmentState.weatherDensity - density()) >= 0.09) rebalanceWeather();
-      },
-    },
-  );
   function visitToday() {
     const next = recordDailyLogin(DAILY_LOGIN);
     if (!store.set('issen.dailyLogin', next)) return;
@@ -1944,89 +1774,18 @@ export function startGame(
     }
     },
   }));
-  computeMods();
-  applySeal();
-  resize();
-  if (cinematic.restores) {
-    G.state = 'title';
-    setupAttract();
-    cinematic.restore();
-  } else if (savedRun?.status === 'active') {
-    const active = savedRun;
-    restoreCheckpoint(active);
-    G.pausedFrom = G.state;
-    G.state = 'paused';
-    showPauseScreen();
-  } else if (savedRun) {
-    const terminal = savedRun;
-    restoreCheckpoint(terminal);
-    showOver();
-  } else {
-    setupAttract();
-    recoverSupportReward();
-  }
-  setMuteIcon();
-  refreshArmoryNew();
-  setBestLine();
-  updateSavedRunButtons();
-  if (document.fonts && document.fonts.load)
-    document.fonts.load(`800 20px "Shippori Mincho B1"`, '一二三四五閃').catch(() => {});
-  lifecycle.add(() => {
-    frameLoop.stop();
-    disposePointer();
-    disposeKeyboard();
-    setupScreen.dispose();
-    tutorial.dispose();
-    armory.dispose();
-    notifications.dispose();
-    guided.dispose();
-    runResults.dispose();
-    void audio.dispose()?.catch(() => {});
-  });
-  let artworkDisposed = false;
-  const artworkLoading = mountStartupLoading(() => location.reload());
-  lifecycle.add(() => {
-    artworkDisposed = true;
-    artworkLoading.remove();
-  });
-  void Promise.all([
-    inkCharm.prepare(),
-    inkCompanion.prepare(),
-    inkEnemy.prepare(),
-    inkPlayer.prepare(),
-    inkSword.prepare(),
-    environmentRenderer.compose({
-      stageSeed,
-      width: W,
-      height: H,
-      dpr: DPR,
-      time: presentationState.time,
-      stage: G.stage,
-      reducedMotion: reducedMotion(),
-      reducedFlashes: reducedFlashes(),
-      lowQuality: density() <= 0.3,
-    }),
-    driftRenderer.prepare(),
-  ]).then(() => {
-    if (artworkDisposed) return;
-    const failed = [
-      inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
-      !inkCompanion.ready ? 'companions' : null,
-      !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
-      !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
-        ? 'outfits'
-        : null,
-      !inkSword.ready ? 'weapons' : null,
-      environmentRenderer.backend !== 'layered' ? 'scene' : null,
-      !driftRenderer.ready ? 'drifting debris' : null,
-    ].filter((name): name is string => !!name);
-    if (failed.length) {
-      artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
-      return;
-    }
-    artworkLoading.remove();
-    artworkReady = true;
-    if (pageActive()) frameLoop.start();
-  });
+  startRuntime(() => ({
+    lifecycle, frameLoop, G, cinematic, savedRun, setupScreen, tutorial, armory,
+    notifications, guided, runResults, audio, driftRenderer,
+    reducedMotion, reducedFlashes, density, computeMods, applySeal, resize,
+    setupAttract, restoreCheckpoint, showPauseScreen, showOver, recoverSupportReward,
+    setMuteIcon, refreshArmoryNew, setBestLine, updateSavedRunButtons,
+    disposePointer, disposeKeyboard, inkCharm, inkCompanion, inkEnemy, inkPlayer,
+    inkSword, environmentRenderer, stageSeed, W, H, DPR, presentationState,
+    markArtworkReady() {
+      artworkReady = true;
+      if (pageActive()) frameLoop.start();
+    },
+  }));
   return lifecycle.dispose;
 }
