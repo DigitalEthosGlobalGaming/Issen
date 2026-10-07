@@ -221,60 +221,11 @@ comparisons include the new art direction's lower particle count. The transform 
 not imported by normal builds. These desktop measurements do not measure physical
 phone performance, native GPU execution time, battery consumption or GPU memory.
 
-### Canvas / WebGL renderer comparison
+### Retired Canvas comparisons
 
-```sh
-node tests/performance/benchmarks/compare-renderers.mjs --port=5297
-```
-
-This opt-in timing comparison uses one frozen instrumented production build,
-selecting `?renderer=canvas` or `?renderer=pixi` in fresh browser contexts.
-Renderer order alternates across five repetitions per scenario. Defaults match
-the suite's seed, High quality, Free edition, 390×844 viewport, DPR 2, three-second
-warmup and five-second measurement. Title, combat, Demon Mirror, Glitch, Inferno
-and the 100-enemy stress scene are included. Supported timing options such as
-`--scenario`, `--repeats`, `--warmup`, `--duration`, `--viewport` and `--dpr` can
-override these defaults. The observed backend is checked, so a failed WebGL
-initialization cannot silently become a Canvas result.
-
-The runner writes raw samples, source/instrumentation fingerprints, browser and
-graphics metadata, and a Markdown summary beneath ignored `tmp/performance/`.
-Measurements include the full rendering callback and native command submission;
-they exclude deferred GPU execution. Pixi uses the shipped material lighting,
-while Canvas keeps its painted appearance. Historical reports are context, not
-matched baselines; use the paired current-build comparison for renderer deltas.
-See the [5 October comparison](../../docs/features/webgl-performance-2026-10-05.md)
-for measured results and the separate stress diagnostic.
-
-For a before/after comparison of the rounded-stroke fixes in one build:
-
-```sh
-node tests/performance/benchmarks/compare-renderers.mjs --compare-strokes --scenario=combat,stress-100 --port=5297
-```
-
-This adds `pixi-legacy`, a benchmark-only variant disabling the cached outer
-direction rings and textured straight round strokes. Canvas, legacy Pixi and
-optimized Pixi rotate order between repetitions. The transform is fingerprinted
-and fails if its source seams no longer match. It is absent from normal builds;
-`legacyStrokes` has no effect in the shipped application. This control measures
-these two changes without relying on earlier runs under different background load.
-See the [rounded-stroke follow-up](../../docs/features/webgl-rounded-strokes-2026-10-05.md)
-for implementation and measurement evidence.
-
-To compare a renderer adapter change with preserved source snapshots:
-
-```sh
-node tests/performance/benchmarks/compare-renderers.mjs --adapter-baseline=tmp/webgl-adapter-baseline --port=5297
-```
-
-Before editing, save `src/rendering/pixi/scene-painter.ts` and `texture-store.ts`
-under the supplied baseline directory. This mode compiles those snapshots as
-benchmark-only virtual modules and selects the legacy painter in fresh contexts;
-other scene modules and artwork are shared. Use it for adapter changes whose
-baseline still works with the current scene contract. It cannot restore arbitrary
-gameplay/art changes. The runner copies and fingerprints the snapshots alongside
-the frozen build, rotates Canvas/legacy Pixi/optimized Pixi order, and records
-paired percentage reductions and paired milliseconds saved. Normal builds do not
-include either the snapshots or the `legacyAdapter` switch.
-The [adapter optimization report](../../docs/features/webgl-adapter-performance-2026-10-05.md)
-records the 1.61.2/1.61.3 comparison.
+W2 removed the Canvas scene renderer and its dual-backend comparison runners.
+Historical reports remain as evidence; their commands describe the old implementation.
+Native adapter/stroke controls formerly bundled with the dual-backend runner can
+be recovered from the pre-refactor restore point for a separately authorized
+profiling task. Do not select `renderer=canvas` against the current application.
+No profiling was run during the runtime and lighting refactor.

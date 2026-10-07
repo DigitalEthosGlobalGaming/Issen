@@ -107,22 +107,25 @@ test('Inferno grades the world and animates flames while accessibility freezes m
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     const { applyFilm } = await import('/src/rendering/effects/film.ts');
-    const render = (time: number, reducedMotion = false, film = 'trial-inferno') => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const render = async (time: number, reducedMotion = false, film = 'trial-inferno') => {
       const canvas = document.createElement('canvas');
       canvas.width = 390;
       canvas.height = 240;
-      const g = canvas.getContext('2d')!;
+      const g = await createTestDrawing(canvas);
       g.fillStyle = '#777';
       g.fillRect(0, 0, 390, 240);
       applyFilm(g, 390, 240, canvas, film, time, { reducedMotion });
       if (g.globalAlpha !== 1 || g.globalCompositeOperation !== 'source-over')
         throw new Error('Film leaked state');
-      return canvas.toDataURL();
+      const result = canvas.toDataURL();
+      g.dispose();
+      return result;
     };
     return {
-      graded: render(0) !== render(0, false, 'mono'),
-      animated: render(0) !== render(2),
-      frozen: render(0, true) === render(2, true),
+      graded: (await render(0)) !== (await render(0, false, 'mono')),
+      animated: (await render(0)) !== (await render(2)),
+      frozen: (await render(0, true)) === (await render(2, true)),
     };
   });
   expect(result).toEqual({ graded: true, animated: true, frozen: true });

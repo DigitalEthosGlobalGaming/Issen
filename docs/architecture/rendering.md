@@ -12,12 +12,12 @@ are separated to make instrumentation overhead explicit. See the
 [performance suite](../../tests/performance/README.md) for commands and limits.
 The [initial Canvas/WebGL comparison](../features/webgl-performance-2026-10-05.md)
 and [rounded-stroke follow-up](../features/webgl-rounded-strokes-2026-10-05.md)
-record measured costs and the remaining Canvas/WebGL gap.
+record historical measurements from before Canvas scene rendering was removed.
 
 The rounded-stroke follow-up retains the immutable outer enemy direction ring
 as shared Pixi `GraphicsContext` geometry per paint variant. `glyphs.ts` owns
 the original brush recipe; `scene-brush-ring.ts` offers an optional native sink.
-Canvas and changing timing rings keep their procedural drawing. Rotations,
+Changing timing rings keep their procedural drawing vocabulary. Rotations,
 reflections and uniform scale reuse the ring; nonuniform transforms fall back
 to the original path commands. The painter owns and disposes its cached contexts.
 Overlapping marks retain individual alpha blending instead of flattening into
@@ -286,12 +286,10 @@ Gradients, soft radial blobs, low-saturation palettes and selective `lighter`,
 scene and the armory preview. The final scene pass adds grain, scratches, vignette,
 ink edges and flashes, which helps procedural elements read as one image.
 
-Glitch film snapshots the source once for each of its two disjoint copying passes
-when drawing at aligned integer backing scales. Fractional or transformed rows,
-filters and shadows retain sequential self-copying to preserve edge feedback.
-Each context has at most one reusable full-resolution copy; changing film releases
-its backing storage. See the [performance report](../features/performance-profile-2026-10-04.md)
-for the measured CPU/memory tradeoff.
+Glitch and Noir use Pixi-owned feedback targets and filters at the surface's
+backing resolution. Canvas-only self-copy logic and its copy-storage cache were
+removed in W2. The [earlier performance report](../features/performance-profile-2026-10-04.md)
+describes the retired implementation, not current measurements.
 
 The main scene skips drawing while the opaque fullscreen equipment inspection is
 open; the preview continues on its own canvas. Ordinary Armoury, Stats and Options
@@ -340,8 +338,10 @@ not provide pixel-perfect visual regression coverage.
 
 The native checks are `tests/browser/pixi-backend.spec.ts`, `pixi-scenes.spec.ts`,
 `pixi-catalogue.spec.ts` and `pixi-films.spec.ts`. They exercise real WebGL drawing,
-material maps, tolerant Canvas comparisons, texture invalidation, repeat-draw
-state isolation, initialization fallback and context restoration/fallback. Use
+material maps, isolated native surface comparisons, texture invalidation,
+repeat-draw state isolation, graphics errors and context loss/restoration. Primitive
+drawing checks may use Canvas as a reference for the drawing vocabulary; it is
+never a live scene backend. Canvas-only film parity tests and runners are removed. Use
 `npx playwright test --config playwright.rendering-v2.config.ts` for the broad
 browser suite on its dedicated development server; pass the desired test files
 for focused checks. This configuration keeps verification separate from a live

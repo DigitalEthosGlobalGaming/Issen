@@ -28,13 +28,16 @@ test('Demon cinematic scene has varied scenery and immediate scene changes', asy
     const canvas = document.createElement('canvas');
     canvas.width = 844;
     canvas.height = 390;
-    const g = canvas.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const g = await createTestDrawing(canvas);
     await new Promise((resolve) => setTimeout(resolve, 100));
     const draw = (seed: number) => {
+      g.begin();
       renderer.draw(g, 844, 390, 0, true, seed);
       return canvas.toDataURL();
     };
     const values = [draw(123), draw(123), draw(456)];
+    g.dispose();
     renderer.dispose();
     return values;
   });

@@ -101,6 +101,7 @@ test('isolated tutorial teaches cuts, timing and a boss opening without save wri
     state.tutorial.start();
   });
   const tutorial = page.locator('.tutorial-overlay');
+  await expect(page.locator('.tutorial-canvas')).toHaveAttribute('data-graphics-backend', 'pixi');
   await page.keyboard.press('ArrowLeft');
   await expect(tutorial).toHaveAttribute('data-step', '0');
   await page.keyboard.press('ArrowRight');

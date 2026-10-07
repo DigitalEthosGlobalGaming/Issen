@@ -39,6 +39,10 @@
 
 - 2026-10-07 — W2.1 films — remove Canvas self-copy storage and noir/glitch bodies; require native film and SVG path sinks — retaining dead alternate film code — scene films now run only on WebGL2; timing/accessibility/pixel-region tests migrated and passed — revert the native-film checkpoint.
 
+- 2026-10-08 — W2.1 comparison cleanup — physically delete Canvas-only film parity test/reference and comparison wrappers, then the dual-backend renderer runner in separate deletion commits — keeping commands that select the removed backend — the user explicitly rejects the alternate renderer and its comparison tooling; native film timing, accessibility, pixel-region and isolation coverage passed first — recover tooling from pre-refactor for an explicitly authorized profiling task. Native-only adapter controls formerly bundled with the dual-backend runner are retired with it; no profiling executed.
+
+- 2026-10-08 — W2.1 checkpoint — finish Canvas removal before runtime extraction — moving code while alternate rendering paths remained — broad run passed 249 cases; three unmigrated/asynchronous scene fixtures were corrected without changing assertions and all six focused cases passed; strict types and all 265 unit cases green — revert the ordered W2.1 commits; pre-refactor remains immutable. This combined coverage is not an uninterrupted broad-suite pass.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.

@@ -7,7 +7,40 @@ real-save changes or modifications of `codex/lit-rendering-only`.
 Restore point: immutable pushed `pre-refactor` at `ad353b3`. Work is directly on
 develop, unpushed. Version **1.66.8**, with `Smaller download` release notes.
 
-## W1 complete; W2.0 baseline complete; W2.1 native-only implementation complete; comparison cleanup/broad verification next
+## W1 complete; W2.1 Canvas removal complete; next W2 context/events
+
+W2.0 baseline: `637a4de`. W2.1 commits: surface lifecycle `c05637e`, native
+materials/previews `a8beab0`, native films/paths `838c0de`, obsolete comparison
+deletions `81e3742` and `46030fc`. No runtime functions have been extracted yet.
+GameContext/event and composer drafts remain outside the repository; integrate
+the context/event foundation next, then the ordered presentation/UI/phase/kill/
+state-table/player extraction. W3 remains entirely pending. Do not push develop.
+
+W2.1 broad verification: `npx playwright test --config playwright.rendering-v2.config.ts`
+**249 passed, three failed**; log under
+`tmp/runtime-refactor/w2-webgl-broad-browser.log`, terminal exit confirmed.
+Two failures were remaining Canvas scene fixtures; the isolated tutorial fixture
+sent input before its asynchronous WebGL2 surface was ready. Migrated those scene
+fixtures and awaited the native backend before tutorial input, retaining all
+assertions. `npx playwright test tests/browser/cinematic-refinements.spec.ts tests/browser/demon-trial.spec.ts tests/browser/tutorial.spec.ts --config playwright.rendering-v2.config.ts`
+all **six passed** (webgl-broad-recheck.log; terminal exit confirmed). Every case
+now has a green result across broad/recheck coverage. This is NOT a claim that
+one uninterrupted broad invocation passed; repeat broad at the next shared
+runtime change and at the full W2 gate.
+Strict types and all 265 unit tests passed for the native film implementation;
+focused native/graphics/depth checks are recorded below. No test tolerance was
+relaxed; no scenario was skipped to pass. Canvas-only film parity fixtures/tools
+were explicitly removed after replacement native coverage passed. No profiling
+ran. No converter/browser process remains live. Version remains 1.66.8 until the
+full W2 minor checkpoint; existing Android pre-refactor exception remains.
+
+WebGL2 is acquired explicitly; native surfaces never replace their canvases.
+Startup capability failures show one Retry graphics screen. Context loss pauses
+live play; restore rebuilds through Pixi and requires explicit resume. Eight-second
+unrestored loss shows Reload, with saves intact. Auxiliary surfaces have the same
+deadline. Scene materials, films and vector paths require native sinks. Canvas /
+OffscreenCanvas texture preparation and native film blend definitions remain.
+Current intentional gameplay changes: none (`tmp/runtime-refactor/behaviour-changes.md`).
 
 W1 report: `docs/development/asset-compaction-results.md`. Audit/input evidence:
 `tmp/asset-compaction/audit.md`, audit.json and original backups. All 86 families
@@ -108,7 +141,7 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
    `npx playwright test tests/browser/pixi-backend.spec.ts -g 'same prepared scene|unavailable WebGL' tests/browser/scattered-armour.spec.ts -g 'selected Scattered|same prepared scene|unavailable WebGL' --config playwright.rendering-v2.config.ts`
    all three passed (native-harness-ready-recheck.log). These focused/recheck runs
    are not an uninterrupted broad-suite pass. No process remains. Remaining
-   W2.1: remove Canvas-only film self-copy and path fallback code, migrate film
+   W2.1 (now complete): remove Canvas-only film self-copy and path fallback code, migrate film
    tests to native targets, delete fallback-only film reference/tooling separately,
    refresh related docs, run broad browser tests. Then ordered W2 extraction.
    Film and SVG path native-only implementation now complete. Removed Canvas
@@ -118,7 +151,7 @@ Future oversized normal/surface review and opt-in captures are listed in W1 repo
    all 15 passed (native-film-browser.log, terminal exit confirmed).
    `npx playwright test tests/browser/stage-landmark-visibility.spec.ts tests/browser/scenery-depth.spec.ts --config playwright.rendering-v2.config.ts`:
    all five passed (native-depth-browser.log, terminal exit confirmed). No process
-   remains. Next separately delete Canvas-only film parity test/reference and its
+   remains. Completed separately: delete Canvas-only film parity test/reference and its
    dedicated comparison wrapper/benchmark (do not run profiling), then run broad
    shared-runtime regression. W2 context/events and extraction have not begun. Native blend filters
    remain because film output depends on them. W2.1 removes Canvas fallback first; keep Canvas/OffscreenCanvas texture tools.
