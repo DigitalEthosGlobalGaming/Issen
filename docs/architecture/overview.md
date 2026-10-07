@@ -98,6 +98,11 @@ lighting debug), setup (setup/tutorial), armory (equipment/presets), input
 (pointer/keyboard/navigation), purchases (refresh/edition/supporter controls),
 cinematic (viewer session/grade), and profile (transfer/reset/management).
 
+`game/session/phase-router.ts` supplies synchronous phase-controller dispatch and
+checkpoint adoption. It is introduced alongside the closure; live input/update
+branching migrates as phase bodies move, so its presence alone does not mean the
+runtime already uses it.
+
 ## Where changes belong
 
 | Concern                                                               | Maintained location                                                              |

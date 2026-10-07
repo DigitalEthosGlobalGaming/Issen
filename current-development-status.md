@@ -40,13 +40,22 @@ Scene-ready rule continuation likewise moved outside drawing first (75e8490).
 No intentional gameplay changes (tmp/runtime-refactor/behaviour-changes.md).
 game.ts still has 3762 lines after formatting; composition-root reduction is NOT complete.
 
-Latest checkpoint: UI extraction and root import cleanup complete. Strict types
-passed and all 274 units passed (ui-cleanup-unit.log).
+Latest checkpoint: phase-router contract introduced alongside the runtime.
+`src/game/session/phase-router.ts` implements synchronous enter/update/swipe/tap/
+tap-down/exit dispatch, validated transitions and checkpoint adoption without
+replaying entry effects. Direct record synchronization is a migration bridge.
+It is NOT yet wired into game.ts: no live gameplay events are emitted yet.
+Strict types passed; all five `node --test tests/unit/phase-router.test.mjs` cases
+passed and all 279 `npm test` cases passed (phase-router-foundation-unit.log).
+No production dispatch changed, so browser verification remains the UI checkpoint
+below. Next extract run-flow title/pause/resume/end-run, then replace input/update
+branching with actual phase controllers. Preserve same-frame cascades and RNG order.
+
+UI final cleanup: strict types and all 274 units passed (ui-cleanup-unit.log).
 `npx playwright test tests/browser/ui.spec.ts tests/browser/trials.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/presentation-readiness.spec.ts --config playwright.rendering-v2.config.ts`:
 all 17 passed (ui-cleanup-browser.log; terminal completion confirmed).
-No intentional behavior changes or save-key/record changes. bossShownDirection's
-root import stays until the trial response-instrumentation harness migrates with
-the new phase API; other superseded imports are removed.
+No intentional behavior/save changes. bossShownDirection's root import remains
+for existing trial response instrumentation until that harness migrates.
 
 Implemented UI owners under src/ui/wiring: screens (HUD/animation), panels
 (navigation/statistics/title record), secrets (title taps/swipes), admin (guarded

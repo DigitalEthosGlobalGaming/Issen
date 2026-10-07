@@ -104,6 +104,8 @@
 
 - 2026-10-08 — W2 UI cluster — retain current getters for replaceable equipment/statistics and session flags, remove superseded root imports separately from moves — capture initial values or rewrite rule behavior during UI work — focused UI/save/isolation checks and all units pass; the pure boss direction import remains for existing trial response instrumentation until the phase API migrates — revert the UI cleanup commit or individual owner move.
 
+- 2026-10-08 — W2 router foundation — introduce synchronous complete controller dispatch with explicit checkpoint adoption before live wiring — replay entry callbacks after restore or replace all branching at once — restores must preserve playable saved state without repeating cues/rewards; five routing/ordering/paused-input/adoption tests and all units pass; live phase migration is next — revert the router foundation commit.
+
 ## Future work
 
 - Consider GPU compressed formats only after texture-preparation consumers can support them. No profiling is authorized in this refactor.
