@@ -1,3 +1,4 @@
+import { bindSceneLightSources } from '../presentation/scene-light-sources.ts';
 import { createLightSources } from '../presentation/light-sources.ts';
 import {
   createEquipmentPresentation,
@@ -218,6 +219,18 @@ export function createRuntimePresentation(
   ): PreviewFrame {
     return equipmentPresentation.previewFrame(film, effectsVisible, target);
   }
+  foundation.lifecycle.add(
+    bindSceneLightSources(lightSources, () => ({
+      G: foundation.run.G,
+      fx: foundation.view.presentationState.fx,
+      player: foundation.view.geometry.L.player,
+      scale: foundation.view.geometry.S,
+      sceneLoading: foundation.run.sceneState.sceneLoading,
+      cinematic: readCinematic().active,
+      reducedMotion: foundation.browser.reducedMotion(),
+      reducedFlashes: foundation.browser.reducedFlashes(),
+    })),
+  );
   return {
     lightSources,
     equipmentPresentation,

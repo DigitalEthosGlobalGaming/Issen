@@ -1,3 +1,4 @@
+import { foxfirePose } from './foxfire-pose.ts';
 import type { Palette } from '../rendering/palette.ts';
 import { TAU } from '../shared/math.ts';
 import { ROBES } from '../game/content/cosmetics.ts';
@@ -31,11 +32,8 @@ export function createPlayerFigures(readViews: () => PlayerFigureViews) {
   function drawFoxfire() {
     const { G, L, g, presentationState } = readViews();
     if (!G.m || !G.m.foxfire) return;
-    const p = L.player,
-      x = p.x + p.h * 0.34 + Math.cos(presentationState.time * 1.4) * p.h * 0.05,
-      y = p.y - p.h * 1.02 + Math.sin(presentationState.time * 2.8) * p.h * 0.025,
-      r = Math.max(6, p.h * 0.035),
-      a = G.foxUsed && G.state !== 'title' ? 0.22 : 0.9;
+    const { x, y, radius: r } = foxfirePose(L.player, presentationState.time);
+    const a = G.foxUsed && G.state !== 'title' ? 0.22 : 0.9;
     g.save();
     g.globalCompositeOperation = 'lighter';
     const rg = g.createRadialGradient(x, y, 0, x, y, r * 2.4);

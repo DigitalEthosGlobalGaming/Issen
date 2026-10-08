@@ -1,3 +1,36 @@
+## W3 phase6 persistent lights green — continue half-resolution quality and hooks
+
+Event checkpoint0f407c7 is committed. scene-light-sources.ts registers five sources:
+sword glints, lanterns, embers, foxfire and boss flash auras. They sample existing
+visual records/poses, no rule/particle advancement or RNG. Shared figure-pose.ts
+preserves original native presence/weapon-tip calculations; foxfire-pose.ts keeps
+companion drawing/light coordinates identical. WeakMap IDs remain stable through
+reordering without retaining dead records. Loading/cinematic visibility, lifetime,
+dying figures and Reduced Flashes govern contributions. Runtime presentation owns
+registration/disposal and all sources share the rig/event global16-light budget.
+
+Strict npm run typecheck PASS; npm test all414PASS. Expanded exact11-file native/
+scene/game/Options/checkpoint suite53PASS, exit0. Logs tmp/lighting-refactor/
+phase6-sources-{typecheck,unit,final-browser}.log. Direct persistent/event fixtures
+2PASS18.0s before expanded suite. Initial new fixture lacked boss.def; corrected
+its input without changing assertions. Native five-family proof confirms visible
+illumination, unchanged input, repeatability, isolated removal/disposal and GL0.
+Foxfire screenshot from testInfo.outputPath('foxfire-light.png') inspected: blue
+local native-material contribution. No live browser job or develop push;1.68.0
+version aligned. Release note includes lantern/ember/foxfire illumination.
+
+NEXT half-resolution lighting quality through effects/quality.ts and Options or
+testing tools, with depth/normal-aware upsampling in shared composite. Targets
+must distinguish physical light width/height from full scene dimensions; currently
+material/grass/leaf prepareComposite use targets.width/height. artwork owner already
+has geometry dimensions/guide sampler. light-buffer.ts allocates two full-resolution
+RGBA16F textures; scene-painter owns replacement/restore/disposal. Then read-only
+G/light post hooks, named film/post insertion points and minimal examples. Expose
+native G/light passes as named composer passes without duplicate GPU work while
+preserving auxiliary begin/flush callers (currently flush owns all three passes).
+W3 full gates and every Part4 final verification/report/one final develop push
+remain. Goal active, full scope unchanged. Do not rerun applied integration scripts.
+
 ## W3 phase6 event lights green — continue persistent sources, half-res and hooks
 
 Leaf checkpoint37a9cda is committed. Presentation now owns a shared light-source

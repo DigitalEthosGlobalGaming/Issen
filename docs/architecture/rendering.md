@@ -334,6 +334,8 @@ returning. Leaked drawing state can subtly recolor or displace every later layer
 | Leaf spawn clocks, analytic motion and lifetime metadata | `src/rendering/scene/leaf-motion.ts`, `src/rendering/scene/ambient.ts` |
 | Runtime feedback effect spawning/drawing               | `src/presentation/feedback.ts`                           |
 | Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
+| Persistent glint/lantern/ember/foxfire/boss lights | `src/presentation/scene-light-sources.ts` |
+| Shared visual blade-tip and presence pose | `src/rendering/figures/figure-pose.ts` |
 | Combat event lights and effects-clock decay | `src/presentation/event-lights.ts` |
 | Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
 | HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
@@ -662,3 +664,30 @@ lifecycle.add(unregister);
 
 Persistent scene sources, half-resolution quality/upsampling, named GPU composer
 passes and remaining extension hooks are not complete at this checkpoint.
+
+## W3 persistent scene sources (phase 6)
+
+scene-light-sources.ts registers sword-glints, lanterns, embers, foxfire and
+boss-auras with the presentation registry. It samples existing visual state:
+regular and boss blade glints use the same resolved presence/weapon tip as drawing;
+lanterns use their particle sway and fade; embers use their existing lifetime and
+pulse; foxfire uses a shared companion pose; boss aura follows the current flash
+ring. No particles, rules or random numbers are created or advanced here.
+figure-pose.ts shares presence and blade geometry with the native figure renderer;
+foxfire-pose.ts shares companion coordinates with player-figures.ts. This preserves
+original drawing while attaching illumination. Loading/cinematic visibility,
+expired particles, dying figures and Reduced Flashes govern their contributions.
+
+Per-object IDs live in a WeakMap, so reordering particles does not change ranking
+ties and the source owner does not retain dead game records. The logical scene
+transform is applied through transformSceneLight before the shared16-light budget.
+All sources unregister with lifecycle; previews retain independent registry/target
+owners. The existing rig and event flashes share this same budget and BRDF.
+
+Four units cover all source formulas, pose/transform alignment, no input mutation
+or RNG, stable reordered identities, retirement, accessibility and disposal. Native
+proof isolates each of the five sources on a lit surface, verifies nonzero colour,
+repeatability and removal, and attaches a foxfire capture through testInfo.outputPath.
+The inspected capture shows the blue local contribution on the native material.
+Half-resolution quality, named GPU composer/film/post hooks and W3/final gates still
+remain; this checkpoint completes source registration only.
