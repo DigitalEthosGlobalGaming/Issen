@@ -1,4 +1,4 @@
-import { createFrameSimulation, type FrameSimulationViews } from '../game/session/frame-simulation.ts';
+import { createFrameSimulation, type FrameSimulationViews } from './frame-simulation.ts';
 import { createFrameLoop } from '../platform/frame-loop.ts';
 import {
   createPostPreparation,

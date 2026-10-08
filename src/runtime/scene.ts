@@ -6,7 +6,7 @@ import { createRuntimePresentation } from '../runtime/presentation.ts';
 import { createRuntimeFoundation } from '../runtime/foundation.ts';
 import { stateView } from '../game/session/state-view.ts';
 
-import { createSceneFlow } from '../game/session/scene-flow.ts';
+import { createSceneFlow } from './scene-flow.ts';
 
 import { compositionKey } from '../rendering/environment/worker-types.ts';
 

@@ -81,7 +81,7 @@ owns companion rules and `presentation/player-figures.ts` owns their projection.
 `runtime/frame-bindings.ts` connects simulation, prepared presentation and
 frame scheduling. `runtime/startup.ts` owns ordered runtime startup,
 artwork readiness/errors and disposal. Scene continuations settle after drawing
-through `game/session/scene-flow.ts`, including intentional paused phase adoption.
+through `runtime/scene-flow.ts`, including intentional paused phase adoption.
 
 `game/session/context.ts` defines `RunContext` with plain run records and seeded
 randomness, and `ServicesContext` with browser ports. `presentation/context.ts`
@@ -440,7 +440,7 @@ Reward accrual, awakening challenge updates, blade statistics and terminal item
 unlocks are owned by game/progression/profile-rules.ts. Current profile/run and
 persistence/reveal capabilities preserve daily/trial isolation and unlock ordering.
 
-Scene readiness and continuation adoption are owned by game/session/scene-flow.ts.
+Scene readiness and continuation adoption are owned by runtime/scene-flow.ts.
 Renderer composition/preparation is passed as a plain frame capability; the owner
 retains stale-request suppression, scene identity, presentation acknowledgement,
 paused encounter adoption and frame-clock reset. It imports no renderer/presentation
@@ -602,3 +602,5 @@ Run-flow title/pause/resume display reacts in ui/wiring/run-flow-feedback.ts. Th
 Run-start presentation reacts in ui/wiring/run-start-feedback.ts to frozen runStartCue/runModeHint/runFortune values. The session rule owner retains seeds, gameplay weather RNG, profile and checkpoint transactions, player pose/timers, trial eligibility, scene readiness and encounter entry. Audio initialization still occurs synchronously in the initiating gesture. Cosmetic subscriptions can be removed without changing rule/profile/player/weather outcomes.
 
 Results drawing and tally/reveal presentation react in ui/wiring/results-feedback.ts to immutable rule-owned result-display.ts snapshots. Rules settle rewards, profile records, storage rollback, daily/recovered support and overReady. Sequence events carry values and an ID; completion/bonus user actions call the actual result owner through runtime forwarding. Only the current sequence retains action state. Runtime disposes display listeners. Reward offer/claim ports remain explicit user-interaction services because their outcomes determine rule decisions.
+
+Runtime frame-simulation.ts owns the ordered rule/cosmetic frame dispatch. Runtime scene-flow.ts owns renderer request readiness, DOM loading status and deferred gameplay continuation adoption. These orchestration owners moved intact from game/session; rule modules continue to own their individual state mutations.

@@ -1,7 +1,7 @@
-import { STAGES } from '../content/stages.ts';
-import type { RunState } from '../run-state.ts';
-import type { TrialDefinition } from '../content/trials.ts';
-import type { DailyRun } from '../progression/daily.ts';
+import { STAGES } from '../game/content/stages.ts';
+import type { RunState } from '../game/run-state.ts';
+import type { TrialDefinition } from '../game/content/trials.ts';
+import type { DailyRun } from '../game/progression/daily.ts';
 export interface FrameSimulationViews {
   readonly sceneLoading: boolean;
   readonly activeTrial: TrialDefinition | null;

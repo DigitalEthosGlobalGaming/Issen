@@ -1,5 +1,5 @@
-import type { RunState } from '../run-state.ts';
-import type { TrialDefinition } from '../content/trials.ts';
+import type { RunState } from '../game/run-state.ts';
+import type { TrialDefinition } from '../game/content/trials.ts';
 
 export interface ScenePreparationFrame {
   stageSeed: number;

@@ -1,3 +1,21 @@
+## Latest green checkpoint: runtime frame/scene orchestration relocation
+
+Physically moved frame-simulation.ts and scene-flow.ts from game/session to runtime.
+Only relative imports/callers changed; normalized exact source parity PASS is
+recorded in tmp/runtime-refactor/session-orchestration-move-parity.log. Rule and
+cosmetic dispatch order, renderer readiness, stale requests, pending callbacks,
+paused adoption and post-presentation clock reset are unchanged.
+`npm run typecheck`: PASS (session-orchestration-move-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 401 PASS
+(session-orchestration-move-unit.log); logs under tmp/runtime-refactor.
+`npx playwright test tests/browser/game.spec.ts tests/browser/scene-readiness.spec.ts tests/browser/scene-continuation.spec.ts tests/browser/cinematic.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 18 PASS in 1.1m (session-orchestration-move-browser.log), terminal exit 0.
+No live browser process remains.
+Next: move game/onboarding/guided-lessons.ts DOM/CSS adapter to UI; keep actual
+lesson progress/freezes/input state in game/onboarding/guided-state.ts. Then
+separate stale session adapter cleanup and full W2 requirements/gates/docs/version
+1.67.0. All W3/Part 4 remain required; develop is unpushed.
+
 ## Latest green checkpoint: results presentation ownership
 
 Results rules emit deeply frozen display/sequence snapshots and synchronous
