@@ -162,7 +162,12 @@ the same queue/budget core. Explicit owner leases protect peer previews; release
 unpins without clearing their image, and the last owner disposes the pool. Only
 the pool removes image sources and revokes decode object URLs. Known manifest
 dimensions reserve space first. Local-environment PBR maps use this owner through
-`asset-materials`/`pbr-atlas`; source artwork and figure/UI owners still need migration.
+`asset-materials`/`pbr-atlas`. Local source artwork also uses leases from that pool;
+figure/UI/startup and other environment owners still need migration. Cached
+material bindings are indexed by source and owner. Local composition wraps
+synchronous nested stamps in `withBindings`, restoring the previous owner in
+`finally`; scopes cannot span promises. Disposal removes only its own bindings
+and layers, keeping shared-image previews independent.
 Worker documents keep their existing managed image wrappers and decode semantics.
 `platform/runtime-assets.ts` is generated from the inventory by
 `scripts/assets/runtime-manifest.mjs`, excluding unused diffuse maps and startup-only

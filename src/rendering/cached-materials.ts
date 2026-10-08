@@ -21,8 +21,10 @@ type Owner = {
 };
 const sources = new WeakMap<
   HTMLImageElement,
-  { owner: Owner; material: (frame: Frame) => SceneMaterial | null }
+  Map<Owner, { owner: Owner; material: (frame: Frame) => SceneMaterial | null }>
 >();
+// A synchronous composition owns all nested stamps, including temporary canvases.
+let bindingOwner: Owner | undefined;
 const layers = new WeakMap<HTMLCanvasElement, Layer>();
 // A reused colour canvas must never repeat a previous revision after its maps
 // are rebuilt. Per-layer draw counts can coincide across different stages.
@@ -129,10 +131,27 @@ export function createCachedMaterials(
   return {
     bind(image: HTMLImageElement, material: (frame: Frame) => SceneMaterial | null) {
       owner.images.add(image);
-      sources.set(image, { owner, material });
+      let bindings = sources.get(image);
+      if (!bindings) sources.set(image, (bindings = new Map()));
+      bindings.set(owner, { owner, material });
+    },
+    withBindings<T>(draw: () => T): T {
+      const previous = bindingOwner;
+      bindingOwner = owner;
+      try {
+        const result = draw();
+        if (result instanceof Promise) throw Error('Material binding scopes must be synchronous');
+        return result;
+      } finally {
+        bindingOwner = previous;
+      }
     },
     dispose() {
-      for (const image of owner.images) sources.delete(image);
+      for (const image of owner.images) {
+        const bindings = sources.get(image);
+        bindings?.delete(owner);
+        if (!bindings?.size) sources.delete(image);
+      }
       for (const canvas of owner.layers) clearCachedMaterial(canvas);
       owner.images.clear();
       owner.layers.clear();
@@ -216,7 +235,16 @@ export function drawCachedImage(
   height: number,
   colour?: HTMLCanvasElement,
 ) {
-  const entry = source instanceof HTMLImageElement ? sources.get(source) : undefined;
+  const bindings = source instanceof HTMLImageElement ? sources.get(source) : undefined;
+  const selectedOwner =
+    bindingOwner && bindings?.has(bindingOwner)
+      ? bindingOwner
+      : bindings?.size === 1
+        ? bindings.keys().next().value
+        : undefined;
+  if (bindings && bindings.size > 1 && !selectedOwner)
+    throw Error('Shared material sources require an explicit binding scope');
+  const entry = selectedOwner ? bindings!.get(selectedOwner) : undefined;
   const cached = source instanceof HTMLCanvasElement ? layers.get(source) : undefined;
   const material = entry?.material(frame) ?? (cached ? layerMaterial(cached) : null);
   const texture: SceneTexture = {

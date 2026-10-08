@@ -781,3 +781,51 @@ source/figure/UI owners with independent material bindings, remove lifetime
 startup retention, and validate the combined active set on low memory before
 quiet next-stage decode/seed/scene slots and paced GPU/variant warming. Remaining
 120Hz fidelity/CPU costs, cosmetic loading and Phase5remain required.
+
+## Phase 3.4 — Shared local source artwork and independent bindings
+
+Version1.68.11 routes local-environment colour artwork through the same main
+pool as its PBR maps. Sources pin before queued decode; common stage selections
+retain leases and departed selections unpin. Released owners ignore late
+attachments and never mutate shared image handlers/src. Manifest dimensions
+reserve nominal bytes before decode for all local kit sources.
+
+Cached material bindings are indexed by image and owner. Explicit synchronous
+`withBindings` scopes cover local drawing, compose and foreground preparation,
+including nested temporary canvases. They restore prior ownership in `finally`
+and reject promise-returning callbacks. Ambiguous shared stamps without a scope
+fail instead of selecting arbitrary peer materials. Disposal removes only the
+caller's bindings/layers. No run state, seed or RNG behavior changes.
+
+Strict,12focused units, changed-file formatting and checked production build
+PASS. Four worker browsers PASS for all-nine lit output, local failure fallback,
+coalescing/disposal and hidden owners. Four main-image browsers PASS10.6s in
+`tmp/performance-phase3-main-source-final-browser.log`: simultaneous previews have
+byte-identical colour/normal/surface/emissive planes, surviving planes remain alive
+and rebuild after disposal; pending disposal preserves peer decode; leased native
+colour/data planes match original direct-image decode exactly; all9local kits
+cycle3times inside the low-memory pool.
+
+Local source+map peak264,275,504bytes≤268,435,456budget; final264,252,032bytes,
+42decoded/25current pinned,245evictions. Last owner disposal clears all bytes.
+Preserve27samples at `tmp/performance-main-source-budget/results.json`, copied
+before later browser runs clear test output. This bounds local source+map nominal
+retention/reservations, not other image owners, decoder overhead, composed
+canvases, JS heap or GPU residency.
+
+`tmp/performance-compose-phase3-main-sources` PASS45repetitions/116raw planes,
+byte-identical to prefetch reference. Compose median/p95 stage0–8:
+709.7/793.2,293.2/326.4,354.2/410.3,464.6/481.4,441.1/466.1,295.9/374.6,
+383.4/398.1,318.3/360.8,308.9/334.6ms. Stage0remains>500; previous native transfer
+profile explains its largest remaining cost. No speedup/cold-start claim.
+Logs include `tmp/performance-phase3-main-sources-browser.log`,
+`tmp/performance-phase3-main-shared-sources.log` and
+`tmp/performance-phase3-main-sources-build.log`. All processes terminal, including
+90873/31945/86121browsers and4516compose; no active capture.
+
+Continue lazy figure/UI/source ownership and remove startup lifetime retention;
+demon realm, live fog and Armoury room also require integration. Validate combined
+active pins on low memory rather than pinning all menus/variants permanently.
+Runtime budget/background wiring, quiet next decode/seed/scene slots, paced GPU/
+variant warming, cosmetic loading,120Hz fidelity/CPU budgets and final full
+Phase5measurements remain required.

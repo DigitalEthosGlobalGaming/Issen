@@ -54,6 +54,7 @@ export interface EnvironmentFrame {
 export function createLocalEnvironmentRenderer(doc: Document) {
   // Worker documents supply their own managed image wrappers.
   const mapImages = doc.defaultView ? createMainImageOwner(doc) : undefined;
+  const sourceLeases = new Map<number, ReturnType<NonNullable<typeof mapImages>['acquire']>>();
   const cachedMaterials = createCachedMaterials();
   let materials: ReturnType<typeof createAssetMaterials<string>> | undefined;
   const foreground = createBambooForegroundRenderer(doc);
@@ -90,58 +91,74 @@ export function createLocalEnvironmentRenderer(doc: Document) {
     const materialPending = requestedMaterials.prepare();
     for (const settle of settleLoads.splice(0)) settle();
     images.forEach((image, index) => {
-      image.onload = image.onerror = null;
+      if (!mapImages) image.onload = image.onerror = null;
       if (!required.includes(index)) {
         releaseSceneryCutouts([image]);
-        image.removeAttribute('src');
+        if (!mapImages) image.removeAttribute('src');
         delete images[index];
       }
     });
+    for (const [index, lease] of sourceLeases)
+      if (!required.includes(index)) {
+        lease.release();
+        sourceLeases.delete(index);
+      }
     status = 'loading';
     pending = Promise.all(
-      required.map(
-        (index) =>
-          new Promise<void>((resolve) => {
-            const existing = images[index];
-            if (existing?.complete && existing.naturalWidth) {
-              if (
-                index >= 25 &&
-                (existing.naturalWidth !== 1254 || existing.naturalHeight !== 1254)
-              )
+      required.map((index) => {
+        if (mapImages) {
+          let lease = sourceLeases.get(index);
+          if (!lease) sourceLeases.set(index, (lease = mapImages.acquire(ASSET_URLS[index]!)));
+          return lease.ready.then(
+            (image) => {
+              if (disposed || request !== generation) return;
+              images[index] = image;
+              if (index >= 25 && (image.naturalWidth !== 1254 || image.naturalHeight !== 1254))
                 failed = true;
+            },
+            () => {
+              if (!disposed && request === generation) failed = true;
+            },
+          );
+        }
+        return new Promise<void>((resolve) => {
+          const existing = images[index];
+          if (existing?.complete && existing.naturalWidth) {
+            if (index >= 25 && (existing.naturalWidth !== 1254 || existing.naturalHeight !== 1254))
+              failed = true;
+            resolve();
+            return;
+          }
+          settleLoads.push(resolve);
+          const image = existing ?? doc.createElement('img');
+          images[index] = image;
+          image.decoding = 'async';
+          image.onload = () => {
+            if (request !== generation) {
               resolve();
               return;
             }
-            settleLoads.push(resolve);
-            const image = existing ?? doc.createElement('img');
-            images[index] = image;
-            image.decoding = 'async';
-            image.onload = () => {
-              if (request !== generation) {
-                resolve();
-                return;
-              }
-              if (
-                !image.naturalWidth ||
-                !image.naturalHeight ||
-                (index >= 25 && (image.naturalWidth !== 1254 || image.naturalHeight !== 1254))
-              )
-                failed = true;
-              image.onload = image.onerror = null;
-              resolve();
-            };
-            image.onerror = () => {
-              if (request !== generation) {
-                resolve();
-                return;
-              }
+            if (
+              !image.naturalWidth ||
+              !image.naturalHeight ||
+              (index >= 25 && (image.naturalWidth !== 1254 || image.naturalHeight !== 1254))
+            )
               failed = true;
-              image.onload = image.onerror = null;
+            image.onload = image.onerror = null;
+            resolve();
+          };
+          image.onerror = () => {
+            if (request !== generation) {
               resolve();
-            };
-            image.src = ASSET_URLS[index]!;
-          }),
-      ),
+              return;
+            }
+            failed = true;
+            image.onload = image.onerror = null;
+            resolve();
+          };
+          image.src = ASSET_URLS[index]!;
+        });
+      }),
     ).then(async () => {
       const mapResults = await materialPending;
       if (!disposed && request === generation) {
@@ -564,11 +581,14 @@ export function createLocalEnvironmentRenderer(doc: Document) {
     status = 'loading';
     for (const image of images) {
       if (!image) continue;
-      image.onload = image.onerror = null;
-      image.removeAttribute('src');
+      if (!mapImages) {
+        image.onload = image.onerror = null;
+        image.removeAttribute('src');
+      }
     }
     releaseSceneryCutouts(images.filter(Boolean));
     images = [];
+    sourceLeases.clear();
     for (const settle of settleLoads.splice(0)) settle();
     for (const layer of [cached, distant, nearby]) {
       if (layer) {
@@ -583,7 +603,8 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   }
 
   return {
-    draw,
+    draw: (ctx: SceneDrawing, frame: EnvironmentFrame) =>
+      cachedMaterials.withBindings(() => draw(ctx, frame)),
     async compose(frame: EnvironmentFrame, assetsReady?: () => void): Promise<boolean> {
       const timingKey = 'false:' + compositionKey(frame);
       // Worker timing crosses the message boundary; local fallback records its own phases.
@@ -610,10 +631,11 @@ export function createLocalEnvironmentRenderer(doc: Document) {
         frame.lowQuality,
       ]);
       if (cacheKey !== key) {
-        if (!build(frame)) return false;
+        if (!cachedMaterials.withBindings(() => build(frame))) return false;
         cacheKey = key;
       }
-      if (frame.stage === 4 && images[0]) foreground.prepare(images[0], frame);
+      if (frame.stage === 4 && images[0])
+        cachedMaterials.withBindings(() => foreground.prepare(images[0]!, frame));
       if (!assetsReady) {
         markScenePhase('compose-received', timingKey, { backend: 'local' });
         measureScenePhase(
@@ -643,7 +665,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
         status === 'layered' &&
         frame.stage === 4 &&
         !!images[0] &&
-        foreground.draw(ctx, images[0], frame)
+        cachedMaterials.withBindings(() => foreground.draw(ctx, images[0]!, frame))
       );
     },
     prepare,

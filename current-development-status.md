@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 main local map pool verified
+# Performance, assets and seamless transitions — Phase 3 local source pool verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -232,3 +232,20 @@ next-slot/loading-state tests, final report and any final push are outstanding.
    wire runtime quality/density/policy and validate combined low-memory pins.
    Then quiet next decode, deterministic seeds/next slots, paced GPU/variant
    warming/cosmetic loading,120Hz fidelity/CPU budgets and full Phase5verification.
+
+7. Local colour sources share the map pool at1.68.11. Current sources/maps pin
+   with manifest reservations; departed source leases unpin. Bindings are per
+   image+owner; synchronous withBindings scopes restore nested ownership and
+   disposal removes only its own bindings/layers. Strict,12units, formatting,
+   checked build PASS;4worker and4main browsers PASS. Concurrent previews have
+   exact colour/data planes and surviving layers rebuild after disposal; native
+   colour/data decode matches original exactly. Main local9stages×3at256MiB:
+   peak264,275,504bytes,245evictions,25current pins, disposal0bytes. Stable27samples:
+   tmp/performance-main-source-budget/results.json. Compose
+   tmp/performance-compose-phase3-main-sources PASS45/116byte-identical raw planes,
+   stage0median709.7ms remains>500; others293–465ms. No speedup/startup claim.
+   Processes90873/31945/86121and4516terminal; no active capture. Version/package/
+   lock/title/changelog1.68.11. Figure/UI/startup, demon realm/live fog/Armoury room
+   owners remain outside the pool. Next migrate lazy active selections, remove
+   startup retention, wire runtime budget/policy and validate combined low-memory
+   pins before Phase4and final checks. Whole-app memory/GPU retirement unproven.

@@ -2,6 +2,67 @@ import { expect, test } from '@playwright/test';
 import type { Route } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('shared scenery sources retain independent material layers and survive peer disposal', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createLocalEnvironmentRenderer } =
+      await import('/src/rendering/environment/local-renderer.ts');
+    const a = createLocalEnvironmentRenderer(document),
+      b = createLocalEnvironmentRenderer(document);
+    const frame = {
+      width: 220,
+      height: 140,
+      dpr: 1,
+      time: 0,
+      stage: 0,
+      stageSeed: 424242,
+      reducedMotion: true,
+      reducedFlashes: true,
+      lowQuality: true,
+    };
+    const ready = await Promise.all([a.compose(frame), b.compose(frame)]);
+    const first = a.exportLayers().layers,
+      second = b.exportLayers().layers;
+    const pixels = (canvas: HTMLCanvasElement) =>
+      canvas
+        .getContext('2d', { willReadFrequently: true })!
+        .getImageData(0, 0, canvas.width, canvas.height).data;
+    let max = 0;
+    for (let index = 0; index < first.length; index++) {
+      const planes = (layer: any) => [
+        layer.colour,
+        ...['normal', 'surface', 'emissive'].map((kind) => layer.material[kind].source),
+      ];
+      const before = planes(first[index]),
+        after = planes(second[index]);
+      for (let plane = 0; plane < before.length; plane++) {
+        const expected = pixels(before[plane]),
+          actual = pixels(after[plane]);
+        for (let pixel = 0; pixel < expected.length; pixel++)
+          max = Math.max(max, Math.abs(expected[pixel]! - actual[pixel]!));
+      }
+    }
+    const snapshot = b.snapshot();
+    const normal = second[0]!.material!.normal!.source as HTMLCanvasElement;
+    const width = normal.width;
+    a.dispose();
+    const peer = { width: normal.width, snapshot: b.snapshot() };
+    const rebuilt = await b.compose({ ...frame, stageSeed: 424243 });
+    b.dispose();
+    return { ready, max, snapshot, width, peer, rebuilt, disposed: b.snapshot() };
+  });
+  expect(result.ready).toEqual([true, true]);
+  expect(result.max).toBe(0);
+  expect(result.width).toBeGreaterThan(0);
+  expect(result.peer.width).toBe(result.width);
+  expect(result.peer.snapshot.decodedLoader!.bytes).toBe(result.snapshot.decodedLoader!.bytes);
+  expect(result.peer.snapshot.decodedLoader!.pinned).toBe(result.snapshot.decodedLoader!.decoded);
+  expect(result.rebuilt).toBe(true);
+  expect(result.disposed.decodedLoader!.bytes).toBe(0);
+});
+
 test('disposing a pending owner cancels its lease without cancelling the shared peer', async ({
   page,
 }) => {
@@ -70,9 +131,6 @@ test('main image leases share native decode and retain a peer atlas after dispos
     const frame = [0, 0, ...pack.dimensions] as const;
     const source = second.material(frame)!.normal!.source as HTMLImageElement;
     const identity = first.material(frame)!.normal!.source === source;
-    const original = document.createElement('img');
-    original.src = pack.maps.normal;
-    await original.decode();
     const pixels = (image: HTMLImageElement) => {
       const canvas = document.createElement('canvas');
       canvas.width = image.naturalWidth;
@@ -81,16 +139,31 @@ test('main image leases share native decode and retain a peer atlas after dispos
       g.drawImage(image, 0, 0);
       return g.getImageData(0, 0, canvas.width, canvas.height).data;
     };
-    const actual = pixels(source),
-      expected = pixels(original);
     let max = 0;
-    for (let index = 0; index < actual.length; index++)
-      max = Math.max(max, Math.abs(actual[index]! - expected[index]!));
+    const colourLease = b.acquire(pack.source);
+    const colour = await colourLease.ready;
+    const material = second.material(frame)!;
+    for (const [url, decoded] of [
+      [pack.source, colour],
+      [pack.maps.normal, source],
+      [pack.maps.surface, material.surface!.source],
+      ...(pack.maps.emissive ? [[pack.maps.emissive, material.emissive!.source]] : []),
+    ] as Array<[string, HTMLImageElement]>) {
+      const original = document.createElement('img');
+      original.src = url;
+      await original.decode();
+      const actual = pixels(decoded),
+        expected = pixels(original);
+      for (let index = 0; index < actual.length; index++)
+        max = Math.max(max, Math.abs(actual[index]! - expected[index]!));
+      original.removeAttribute('src');
+    }
     const before = a.snapshot();
     first.dispose();
     a.dispose();
     const peer = { snapshot: b.snapshot(), width: source.naturalWidth, ready: second.ready };
     second.dispose();
+    colourLease.release();
     const unpinned = b.snapshot();
     b.dispose();
     return {
