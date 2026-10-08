@@ -1,3 +1,22 @@
+## Live W2 final broad gate — resume this exact process
+
+Committed verification source: d87e344 (1.67.0). Final all 401 units PASS; two
+focused draw-isolation/changelog cases PASS before final formatting. The complete
+254-case browser run is NOW LIVE in unified exec session 36134, last confirmed
+by write_stdin returning that live session ID. Latest log observation: 60 passing
+cases and zero failures reported; this is progress, not a completed suite claim.
+Command: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`.
+Log: tmp/runtime-refactor/w2-final-broad-browser.log.
+Poll session 36134; do not restart because a wait/observation times out. If the
+handle is missing, inspect actual process/log terminal state before rerunning.
+Keep application/test source unchanged until the browser process is terminal.
+Only this handoff documentation changes during the live run.
+On terminal completion: fix failures without weakening assertions; obtain a fully
+passing combined broad run, then run npm run test:production (includes strict and
+verification build) and the Android-web gate with isolated output. Update final
+report/audit/status with exact results and commit W2 checkpoint. Only then begin
+W3. All W3 and Part 4 remain required; no develop push until full completion.
+
 ## W2 final gate preparation: version 1.67.0
 
 Requirement-by-requirement audit is in tmp/runtime-refactor/w2-final-requirement-audit.md
