@@ -45,9 +45,9 @@ void main() {
   float flag = uMaterial.x > 0.0 ? 1.0 : 0.0;
   if (uHasSurface < 0.5 && uHasMask > 0.5) {
     vec3 mask = texture(uMask,uMaskRect.xy + vUV * uMaskRect.zw).rgb;
-    // Phase 4 finalizes legacy response; phase 1 records its source distinction.
+    // Convert legacy gloss to GGX roughness and specular strength to metallic response.
+    // Emission remains an own-albedo term in the ordered composite; AO defaults to 1.
     surface.rgb = vec3(sqrt(sqrt(2.0 / (mix(8.0,96.0,mask.g) + 2.0))),mask.r,1.0);
-    if (flag > 0.0) flag = 2.0;
   }
   float amount = clamp(uMaterial.x * (uHasSurface > 1.5 ? surface.a : 1.0),0.0,1.0);
   if (amount <= 0.0) flag = 0.0;

@@ -67,6 +67,7 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
       materialUniforms,
       compositeUniforms,
       uDiffuse: Texture.WHITE.source,
+      uNormal: Texture.WHITE.source,
       uMask: Texture.WHITE.source,
       uSurface: Texture.WHITE.source,
       uEmissive: Texture.WHITE.source,

@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
-test('lookup composite matches forward PBR studies within existing scene tolerance', async ({
+test('lookup composite matches preserved forward PBR references within existing scene tolerance', async ({
   page,
 }, testInfo) => {
   await page.route('**/favicon.ico', (route) => route.fulfill({ status: 204 }));
@@ -46,7 +46,6 @@ test('lookup composite matches forward PBR studies within existing scene toleran
     document.body.replaceChildren();
     document.body.style.cssText = 'margin:0;padding:0;max-width:none;background:#151515';
     const capture = (mode: string, scenario: number) => {
-      canvas.dataset.lightingComparison = mode;
       painter.begin();
       setSceneLighting(painter, {
         materialLighting: scenario === 3 ? 0 : 1,
@@ -102,8 +101,13 @@ test('lookup composite matches forward PBR studies within existing scene toleran
       return pixels;
     };
     for (let scenario = 0; scenario < 4; scenario++) {
-      const old = capture('forward', scenario),
-        next = capture('lookup', scenario);
+      const image = new Image();
+      image.src = `/tests/browser/fixtures/lighting-forward/scenario-${scenario}.png`;
+      await image.decode();
+      read.clearRect(0, 0, 600, 280);
+      read.drawImage(image, 0, 0);
+      const old = read.getImageData(0, 0, 600, 280).data;
+      const next = capture('lookup', scenario);
       let difference = 0,
         coverageMismatch = 0,
         covered = 0;
@@ -138,9 +142,6 @@ test('lookup composite matches forward PBR studies within existing scene toleran
     expect(result.coverageMismatch).toBe(0);
     expect(result.meanDifference, JSON.stringify(result)).toBeLessThan(9);
   }
-  await page
-    .locator('[data-comparison="forward-0"]')
-    .screenshot({ path: testInfo.outputPath('forward-studies.png') });
   await page
     .locator('[data-comparison="lookup-0"]')
     .screenshot({ path: testInfo.outputPath('lookup-studies.png') });

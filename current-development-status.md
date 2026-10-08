@@ -1,3 +1,42 @@
+## W3 phase4 material cleanup green — all-scene routes still need work
+
+Old forward fragment, four-light uniforms/selection and temporary
+lightingComparison flag are DELETED. material.ts owns shared geometry data and
+one cheap composite shader; all BRDF evaluation lives in light-buffer.ts.
+Legacy masks map gloss to fourth-root(2/(shininess+2)) roughness, specular strength
+to metallic response, AO1, and own-albedo blue emission in the same composite.
+G1 now flags all lit PBR/converted masks1; there is no legacy BRDF distinction.
+Native legacy/explicit-PBR fixture proves identical G1 and diffuse/specular/
+composite outputs, plus emission remaining local and preserving opaque alpha.
+
+Old shader is recoverable at phase3 commit472f60aa71787adec717adbf8f982109790925f6.
+Before removal, all4 genuine old-forward RGBA references were captured while the
+comparison still passed. They are committed under tests/browser/fixtures/
+lighting-forward with provenance; light-composite.spec.ts loads these images,
+not a runtime forward switch, so it cannot silently compare lookup to itself.
+References preserve the unchanged scene tolerance9 and exact alpha equality.
+Final strict PASS; all404 units PASS; complete17-file affected native/material/
+startup/context/game/reference suite all56PASS2.0m exit0; session76370 TERMINAL.
+Logs tmp/lighting-refactor/phase4-{typecheck,unit,native-browser}.log. Earlier
+11-case removal and independent legacy case also pass; final combined includes
+both. Comparison differences remain0.03855/0.04166/0.04091/0, alpha mismatches0.
+Exact JSON/lookup capture copied to tmp/lighting-refactor/phase4-evidence.
+No browser job remains live. Version1.68.0 aligned; no develop push.
+
+NEXT: finish the all-scene contract, not just material stamps. Audit confirms
+stock paths remain for ordinary drawImage sprites/cached text and procedural
+Graphics/round-stroke/brush-ring/ellipse/glyph-arrow. They currently render in
+the same flush after G/light passes but bypass the material lookup shader. Do
+not claim all-scene pipeline completion from the native material tests alone.
+Route these through the common pipeline while preserving transforms, clips,
+alpha/fog/native films and retained texture lifetimes, then verify affected tests.
+Also replace the absent-emissive WHITE binding with a shared zero/neutral source
+as required by W1/W3 (hasEmissive currently guards it, so no emission bug claimed).
+Then required phase5 instanced grass/leaves, phase6 gameplay sources/half-res/
+hooks/named G-light composer passes/docs and all W3/Part4 final gates/report/one
+final develop push remain pending. Full goal stays active and unchanged.
+Applied staging scripts are non-idempotent; do not rerun. Use committed repo source.
+
 ## W3 phase 3 green — phase 4 must remove the old shader
 
 Default ordinary sprite material now uses composite-material.ts: own linear

@@ -406,7 +406,7 @@ it; no light pre-pass completion is claimed here.
 Each PixiScenePainter owns three native MRT attachments in geometry-buffer.ts.
 G0 stores octahedral world normal XY, signed depth normalized into a scene-sized
 range, and effective coverage. G1 stores roughness/metallic/AO and a byte material
-flag (0 unlit, 1 PBR, 2 legacy mask during migration). G2 stores linear albedo and
+flag (0 neutral/unlit, 1 PBR including converted legacy masks). G2 stores linear albedo and
 material lighting amount. All are 8-bit normalized data; zero-depth ties round
 explicitly to the upper representable neighbour. Geometry alpha cutoff defaults
 to 0.5 and is configurable per SceneMaterial. Last covered writer wins in painter
@@ -502,3 +502,28 @@ ignored checkpoint copies preserve evidence across later test-result cleanup.
 This is still migration work. Legacy mapping/old-shader removal, complete scene
 route audit, instanced foliage, half-res quality, event light sources and named
 GPU composer passes remain required before the lighting workstream is complete.
+
+## W3 single material model and old-shader removal (phase 4 checkpoint)
+
+The old forward fragment, per-sprite four-point selection, its uniforms and the
+temporary runtime comparison flag have been removed. The recoverable reference
+is commit472f60aa71787adec717adbf8f982109790925f6. geometry-material.ts converts
+legacy gloss to GGX roughness using (2/(mix(8,96,gloss)+2))^(1/4), maps legacy
+specular strength to metallic response, and supplies AO1. Both legacy and authored
+PBR surfaces carry flag1 and use the same light-pass GGX equations. This mapping
+is an approximation of legacy authored response, not another BRDF. Legacy blue
+emission remains an own-albedo term in the ordered composite; it never enters
+shared diffuse/specular targets. Native equivalent-map/emission checks pass.
+
+Regression references under tests/browser/fixtures/lighting-forward are actual
+RGBA captures from the old shader before removal. Provenance records the source
+commit and four controlled scenes. The browser compares native lookup output
+against those images at unchanged mean scene tolerance9 and exact alpha equality.
+It no longer sets a runtime shader flag. Current differences remain below0.042.
+
+This checkpoint proves unified material stamps, not the complete all-scene
+contract. Ordinary drawImage/cached text and procedural Graphics/round strokes/
+brush rings/ellipses/glyph arrows still use stock native colour drawing. Routing
+these through the common pipeline and shared neutral-emissive binding remains
+required before this migration can be called complete. Instancing, event sources,
+half-resolution lighting and named GPU composer passes also remain pending.

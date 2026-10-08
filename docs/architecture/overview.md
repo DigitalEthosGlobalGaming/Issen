@@ -504,4 +504,4 @@ progress, freeze and practice input decisions stay in `game/onboarding/guided-st
 See [runtime refactor results](../development/runtime-refactor-results.md) for
 verification, intentional ordering changes and the manual phone checklist.
 
-W3 phase 1 adds painter-owned native G-buffer targets and geometry-material output shaders under rendering/pixi/. The ordered forward composite remains during migration; light accumulation, instancing and final extension hooks are pending. See rendering.md for target layout, debug controls and ownership.
+W3 adds painter-owned native G-buffer and HDR diffuse/specular targets under rendering/pixi/, with a presentation-owned deterministic16-light registry. Material stamps use one cheap lookup composite; legacy maps convert to the same PBR model and the old forward shader is removed. Ordinary stock draw routes, foliage instancing and final quality/event/extension hooks remain migration work. See rendering.md for target layout, evidence, remaining scope and ownership.

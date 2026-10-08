@@ -407,18 +407,9 @@ export class PixiScenePainter implements SceneDrawing {
         ? this.lightBuffer.renderDebug(lightView)
         : this.geometryBuffer.renderDebug(geometryView))
     ) {
-      const restore: (() => void)[] = [];
-      try {
-        // Temporary phase3 comparison only; phase4 removes this and the old shader.
-        if (this.canvas.dataset.lightingComparison !== 'forward')
-          for (let i = 0; i < this.cursor; i++) {
-            const material = this.slots[i]!.material;
-            if (material) restore.push(material.beginComposite(this.lightBuffer.targets!));
-          }
-        this.renderer.render({ container: this.root, clear: true });
-      } finally {
-        for (let i = restore.length - 1; i >= 0; i--) restore[i]!();
-      }
+      for (let i = 0; i < this.cursor; i++)
+        this.slots[i]!.material?.prepareComposite(this.lightBuffer.targets!);
+      this.renderer.render({ container: this.root, clear: true });
     }
     this.canvas.dataset.lightingFrameView = view;
     // Filter targets return to Pixi's pool after rendering. Drop the shared
