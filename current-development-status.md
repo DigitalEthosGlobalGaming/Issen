@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Main decoded queue pacing verified
+# Performance, assets and seamless transitions — Pinned memory measured; retirement rejected
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -350,4 +350,23 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     migrate both as permanent pins; implement active selection and startup/preview
     readiness together. Companion code unchanged this step. Whole-memory budgets,
     remaining main ownership/startup, mode prediction/next slots, paced uploads/
+    variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.
+
+15. Pinned decoded-byte diagnostics at1.68.19 count each resident pinned URL once,
+    regardless of lease reference count. Six loader units,9main-pool/worker browsers
+    PASS17.3s; strict/format/checked production build PASS. Logs:
+    tmp/performance-pinned-bytes-browser.log/-build.log; session79229terminal.
+    Local stage0 retains213,952,112mandatory decoded bytes; stage4 retains132,140,400.
+    Attempted post-compose input retirement failed the unchanged-pixel guardrail
+    and is fully reverted. Even the unchanged renderer compared with itself under
+    decode pressure differs at stages7/8: normal/surface alpha max28, opaque RGB
+    max21, live-view max3. Stages0–6 are exact in both tested variants. Peak pool
+    bytes264,282,368 remain below256MiB; no shader/feedback warnings. These are
+    unresolved cache/raster reload differences, not a confirmed causal diagnosis.
+    Stable evidence tmp/performance-local-input-release/unchanged-control.json;
+    rejected patch and reproducible probes tmp/probes/local-input-release/README.md.
+    No input-retirement optimization is accepted. Version/package/lock/title/
+    changelog1.68.19. Next isolate pressure/rebuild pixel stability before retiring
+    inputs; then companion active selection/startup/preview readiness together.
+    Whole-memory budgets, remaining owners/startup, prediction/next slots, uploads/
     variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.

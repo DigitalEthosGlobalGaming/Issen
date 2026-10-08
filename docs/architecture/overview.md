@@ -155,7 +155,8 @@ dimensions reserve space before decoding; admitted and reserved bytes are
 bounded, while native decoder overhead is outside the nominal estimate. Worker
 image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
-residency, pins, bytes, peak, budget and evictions. Main figure/startup owners
+residency, pins, uniquely pinned decoded bytes, total bytes, peak, budget and
+evictions. Main figure/startup owners
 are not yet routed through this loader; whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the budgeted loader. One pool-level quiet-frame/visibility subscription pauses

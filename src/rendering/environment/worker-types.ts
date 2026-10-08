@@ -29,6 +29,7 @@ export type EnvironmentSnapshot = {
     queued: number;
     decoded: number;
     pinned: number;
+    pinnedBytes: number;
     bytes: number;
     peakBytes: number;
     budget: number;

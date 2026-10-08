@@ -1029,3 +1029,42 @@ active selection and startup/preview readiness together; companion code remains
 unchanged here. Whole-memory budgets and remaining main ownership/startup,
 prediction/next slots, uploads/variants,120Hz fidelity/CPU budget and full
 Phase5requirements remain outstanding.
+
+## Phase3 — Pinned-byte diagnostics and rejected input retirement (1.68.19)
+
+Loader snapshots now report uniquely pinned resident decoded bytes. Multiple
+owners of one URL count once; released warm entries remain in total bytes but
+leave pinned bytes. Unit assertions cover two owners and both releases. Six loader
+units and9main-pool/worker browsers PASS17.3s; strict/formatting/checked production
+build PASS. Logs `tmp/performance-pinned-bytes-browser.log` and
+`tmp/performance-pinned-bytes-build.log`; session79229terminal.
+
+Measured local mandatory input bytes for stages0–8 are213,952,112;132,128,136;
+151,000,920;169,880,784;132,140,400;113,257,944;150,986,640;176,174,304;157,292,768.
+This reproduces the inventory; it is not a new memory reduction.
+
+An experiment released non-live raw inputs after composing while retaining fog/
+bamboo inputs and completed material planes. The pixel comparison failed. Clearing
+independent colour cutouts initially changed stage0colour by32; retaining those
+cutouts removed that mismatch but normal/surface differences remained, including
+alpha changes. Software Canvas preparation also failed the candidate comparison.
+All rendering/test changes for retirement were reverted; only diagnostics remain.
+No tolerance was loosened and no input-retirement saving is accepted.
+
+An unchanged-renderer control repeats all9stages across two seed/resize/DPR/quality/
+reduced-motion/flash variants, inserting unrelated figure decodes between compose
+and draw in its second pass. Stages0–6 are exact. Stage7raw max127/255 and live
+max2/3; stage8raw max255/26 and live max3/2. Across the differing normal/surface
+planes, alpha max28 and opaque RGB max21. No shader/feedback warnings; pool peak
+264,282,368bytes stays below268,435,456. This proves an unresolved existing repeat/
+pressure pixel-stability issue, not its cause. Cache identity, canvas raster mode
+and source reload remain hypotheses requiring isolation.
+
+Stable results: `tmp/performance-local-input-release/unchanged-control.json`;
+earlier candidate/control/software JSON and logs use the same prefix. Rejected
+patch and runnable unchanged-control probe are preserved under
+`tmp/probes/local-input-release/README.md`. These are ignored investigation artifacts,
+not a passing regression test. Next isolate reload/raster stability before retiring
+inputs, then implement companion selection/startup/preview readiness together.
+Whole-memory budgets, remaining source owners/startup, prediction/next slots,
+uploads/variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.

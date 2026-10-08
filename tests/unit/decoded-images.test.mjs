@@ -59,10 +59,21 @@ test('LRU closes unpinned images, repeated pin leases protect live owners and un
   await loader.load('c');
   assert.deepEqual(closed, ['b']);
   assert.equal(loader.snapshot().bytes, 800);
+  assert.equal(
+    loader.snapshot().pinnedBytes,
+    400,
+    'shared pin leases count the decoded image once',
+  );
   releaseA();
   releaseA();
   assert.equal(loader.snapshot().pinned, 1);
+  assert.equal(loader.snapshot().pinnedBytes, 400);
   releasePeer();
+  assert.equal(
+    loader.snapshot().pinnedBytes,
+    0,
+    'warm unpinned images are not mandatory residency',
+  );
   assert.deepEqual(closed, ['b'], 'unpin does not eagerly evict');
   await loader.load('d');
   assert.deepEqual(closed, ['b', 'a']);

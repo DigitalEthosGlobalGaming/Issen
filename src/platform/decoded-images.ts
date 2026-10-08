@@ -149,6 +149,10 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         decoded: [...entries.values()].filter((entry) => entry.resource).length,
         pinned: [...entries.values()].filter((entry) => entry.resource && pins.has(entry.url))
           .length,
+        pinnedBytes: [...entries.values()].reduce(
+          (total, entry) => total + (entry.resource && pins.has(entry.url) ? entry.bytes : 0),
+          0,
+        ),
         bytes: bytes + reservedBytes,
         peakBytes,
         budget: options.budget,
