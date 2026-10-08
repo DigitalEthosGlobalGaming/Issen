@@ -1,6 +1,22 @@
-# Performance, assets and seamless transitions — Worker release trial rejected
+# Performance, assets and seamless transitions — Enemy admission lifetime verified
 
-Latest checkpoint35: worker compose-input release rejected and reverted exactly
+Latest checkpoint36: test-only ordered shared enemy admission/native parity PASS.
+Original/shared54visits total41.7s; shared12maps75,489,120bytes with two owners,
+accounted peak264,280,976 below256MiB; all14appearance/peer/after-peer-disposal
+native comparisons exact. Persistent owners release/reacquire around27high/low/high
+stage visitsPASS18.6s, preserving bounded colour/tone caches; peer after one release
+stays ready/pinned, final loader0/no GL warnings. Incoming stage1→0 while enemies
+remain pinned deliberately reproduces admission failure (original succeeds outside
+pool),2fixturesPASS4.9s. Integrating unconditional sharing remains unsafe. Existing
+loading presentation suppresses combat figures; integrate explicit lease release
+before composition/reacquisition before readiness, including startup's parallel
+prepare and eager shared preview calls, stale requests and pending disposal.
+Production unchanged1.68.31/source-test diff empty. Evidence under
+tmp/performance-enemy-admission/ and tmp/probes/enemy-admission/. All handles
+terminal. Player/outfit/sword/startup ownership, next slots,120Hz/CPU budgets and
+full Phase5 remain required. Goal active; no push/deploy/native build/saves.
+
+Previous checkpoint35: worker compose-input release rejected and reverted exactly
 to1.68.31; main-thread local release from checkpoint34 remains integrated.
 Baseline54visits/256and512MiB PASS; candidate72cases meet loader bounds/zero pins
 but one revisited stage0low colour plane changes. Two unchanged worker controls

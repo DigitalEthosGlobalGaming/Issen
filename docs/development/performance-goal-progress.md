@@ -2005,3 +2005,48 @@ Next selected figure ownership/incoming pin admission still requires full native
 parity and coordinated headroom; worker release needs a separate proven fix.
 Next slots,120Hz/CPU budgets and full Phase5 remain required. Goal active at full
 scope; no push/deploy/native build/player saves.
+
+## Checkpoint 36 — Ordered shared enemy admission diagnostic
+
+Production remains1.68.31. Compare original direct maps and a test-only shared
+main-image owner after local composition finishes, then release both enemy owners
+before the next compose. Both three-cycle/all9stage fixturesPASS41.7s total
+(original22.2s/shared17.6s). These are diagnostic durations, not a compose speedup.
+At390x844 DPR2, all27visits per fixture admit all12enemy maps with two owners;
+shared pins add75,489,120bytes once. Maximum accounted loader bytes264,280,976
+below268,435,456; pinned peak100,665,728 including live fog. Every14appearance
+native comparison, peer comparison and peer-after-disposal comparison is exact
+on all27visits; original repeat exact, no GL warnings. Final loader0. Original
+fixture peak264,275,216 excludes direct enemy maps outside the pool; it is not a
+whole-app resident-memory baseline. Original duplicated enemy maps150,978,240bytes
+versus shared75,489,120 are already measured at checkpoint32.
+
+Holding shared enemy inputs during the next local stage1→0 compose still fails
+admission: composefalse/backendunavailable while enemy stays ready,42decoded pins
+264,264,624bytes; four required inputs cannot fit. Original direct-enemy control
+composes successfully because those maps remain outside its loader. Both fixtures
+confirm this predicted differencePASS4.9s. This is evidence against unconditional
+shared-owner integration, not a changed production test or accepted failure.
+Existing presentation suppresses enemies/boss/player/pet while sceneLoading;
+runtime must release their compose-conflicting leases before incoming preparation
+and reacquire required artwork before presentation. Startup prepares all figures
+and scene together, while two preview constructors also eagerly prepare the same
+runtime artwork; those calls need coordinated admission, including stale requests
+and preview ownership, before integration. No new rendering backend or budget raise.
+
+Evidence under tmp/performance-enemy-admission/: ordered original/shared samples,
+incoming original/shared samples, original source, logs and isolated probes under
+tmp/probes/enemy-admission/. Persistent-owner test-only port then releases PBR
+leases/material bindings, reconstructs atlases and resets readiness/pending while
+preserving bounded colour/tone caches. Same two enemy owners survive all27visits
+with high-DPR/low-quality/high-DPR cycles and new visit seeds; each owner releases
+before compose and reacquires afterward. Native14appearance/peer/peer-after-release
+comparisons are exact every visit; one owner releasing keeps the peer's12maps
+pinned/ready, both releasing leaves only local live inputs. No GL warnings;
+PASS18.6s. This tests settled ownership boundaries, not concurrent pending release,
+runtime startup/preview gates, complete context restore or first-present scheduling.
+Production unchanged/source-test diff empty. Next integrate the proven lifetime
+with runtime admission/stale-generation guards and startup/preview readiness,
+then strict/unit/browser/build verification and version notes. Remaining player/
+outfit/sword/startup ownership, next slots,120Hz/CPU budgets and Phase5 still
+required. All handles terminal; goal active, no push/deploy/native build/saves.
