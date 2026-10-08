@@ -13,7 +13,7 @@ export interface FrameSimulationViews {
   readonly G: RunState;
   readonly updateAmbient: (dt: number) => void;
   readonly cinematic: { readonly active: boolean };
-  readonly updateWeather: (dt: number) => void;
+  readonly updateWeather: (dt: number, cosmeticOnly?: boolean) => void;
   readonly reducedMotion: () => boolean;
   readonly audio: {
     update(
@@ -73,7 +73,15 @@ export function createFrameSimulation(readViews: () => FrameSimulationViews) {
       advanceClock,
       advanceCamera,
     } = views;
-    if (sceneLoading) return;
+    if (sceneLoading) {
+      advanceClock(raw);
+      updateAmbient(raw);
+      updateTransition(raw);
+      updateWeather(reducedMotion() ? 0 : raw, true);
+      advanceCamera(raw);
+      apparelMotion.update(raw, reducedMotion());
+      return;
+    }
     const request = views.sceneRequest;
     if (
       request !== undefined &&

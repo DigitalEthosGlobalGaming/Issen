@@ -32,6 +32,7 @@ export interface RuntimeStartupViews extends NativeStartup {
   reducedMotion(): boolean;
   reducedFlashes(): boolean;
   density(): number;
+  petOf(): string;
   computeMods(): unknown;
   applySeal(): void;
   resize(): void;
@@ -135,6 +136,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
     artworkLoading.remove();
   });
   const { stageSeed, W, H, DPR, presentationState } = readViews();
+  inkCompanion.select(readViews().petOf());
   void Promise.all([
     inkCharm.prepare(),
     inkCompanion.prepare(),

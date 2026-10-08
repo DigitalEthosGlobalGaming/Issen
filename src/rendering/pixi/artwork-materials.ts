@@ -11,7 +11,7 @@ import {
   roundPixelsBitGl,
   textureBitGl,
 } from 'pixi.js';
-import type { Graphics, WebGLRenderer } from 'pixi.js';
+import type { Graphics, WebGLRenderer, TextureSource } from 'pixi.js';
 import type { GeometryTargets } from './geometry-buffer.ts';
 import type { LightTargets } from './light-buffer.ts';
 import { lightingCompositeFunctions } from './lighting-composite-glsl.ts';
@@ -91,6 +91,9 @@ export class ArtworkMaterials {
       throw new GraphicsUnsupportedError('The scene texture budget is unavailable after restore.');
     this.renderer.limits.maxBatchableTextures = this.batchTextures;
   }
+  get programs() {
+    return [this.graphicsShader.glProgram, this.meshProgram] as const;
+  }
   attach(graphics: Graphics): void {
     const context = graphics.context;
     if (context.customShader === this.graphicsShader) return;
@@ -121,8 +124,9 @@ export class ArtworkMaterials {
         textureUniforms.uniforms.uTextureMatrix = texture.textureMatrix.mapCoord;
         textureUniforms.update();
       },
-      releaseTexture() {
-        setShaderResource(shader.resources, 'uTexture', Texture.EMPTY.source);
+      releaseTexture(source?: TextureSource) {
+        if (!source || shader.resources.uTexture === source)
+          setShaderResource(shader.resources, 'uTexture', Texture.EMPTY.source);
       },
       dispose: () => {
         shader.destroy();

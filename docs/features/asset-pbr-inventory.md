@@ -1,6 +1,6 @@
 # Game asset and PBR inventory
 
-Last reviewed: 7 October 2026. This is a manually maintained inventory of the
+Last reviewed: 8 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
@@ -28,8 +28,42 @@ and document illustrations are outside this inventory.
 The installed runtime set contains **266 aligned material planes** across
 **86 source families**: diffuse, normal and packed surface for each, plus eight
 nonzero emissive maps. The 258 redundant scalar and 78 zero-emission maps are
-removed. Base artwork and diffuse remain separate because both have consumers.
+removed. Base artwork and diffuse remain separate for the explicit figure
+colour/tone consumers and retained conversion validation. Material-only
+environment, outfit, charm, companion and UI owners use plain colour plus
+normal/surface/optional emissive; they no longer decode the unused diffuse sibling.
 All 86 original authoring PNGs, atlas metadata, recipes and provenance remain.
+Enemy colour/tone painting uses the PBR diffuse atlases. Its four plain colour
+counterparts remain available to material debugging, but are excluded from enemy
+preparation and eager startup decoding as of1.68.27. The enemy catalogue now
+decodes12planes75,489,120nominal RGBA bytes, saving25,163,040bytes. This is source
+accounting, not whole-game or resident GPU memory proof.
+As of1.68.28, directly owned PBR images notify native GPU consumers before source
+disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
+entries survive until the shared loader evicts or closes them. This covers atlas
+planes; prepared figure cutout/tone canvases and selected-kit ownership remain
+separate performance-goal work.
+Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
+(1.68.29). Current-frame textures survive replay until that painter's next begin,
+context loss or disposal; older-frame entries retire immediately. Diagnostics
+account pending count/nominal bytes. This does not establish a whole-game GPU or
+decoded-memory budget; selected ownership remains required.
+Player/outfit tone and tint canvases, base images and weapon cutouts/raw maps now
+retire native textures before source closure (1.68.30). Weapon LRU eviction uses
+the same frame-preserving boundary as enemy caches. All20outfits and20weapons
+match the saved original exactly; owner disposal returns native counts to zero.
+These owners still prepare their catalogues outside the shared decoded budget.
+Local main-thread scenery now unpins non-live inputs after compose (1.68.31).
+Stage0 retains four fog planes25,176,608nominal bytes, stage4 three bamboo planes
+18,870,192; other stages retain no raw compose inputs. Output canvases/cutouts
+remain separately owned. Composition-key changes reacquire inputs. This permits
+eviction after presentation; incoming figure/scene admission still needs scheduling.
+The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
+records actual source/catalog/startup-glob references, dimensions, bytes and
+stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.
+It separately flags unused diffuse decodes (340,955,484nominal RGBA bytes across
+all material-only families) and startup-only vectors pending loader exclusion.
+It includes retained catalog inputs, so its total is not a live-residency budget.
 Runtime colour artwork uses 86 compact siblings. Eleven small colour planes use
 losslessly recompressed `.compact.png`; the other runtime siblings use WebP.
 No dimensions, frames, pivots, anchors or nine-slice coordinates changed.
@@ -54,6 +88,35 @@ and charm alignment, mirrored cached normals, procedural occlusion, shader
 coverage and all nine stage caches. Visual approval is pending.
 
 Shared loading belongs to [asset-materials.ts](../../src/rendering/asset-materials.ts).
+Worker decoded resources now share the priority/pin/LRU loader in
+`src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
+device-class budgets. Main figure/UI/startup loader migration remains pending;
+the inventory total is not a configured whole-application residency budget.
+Local-fallback PBR maps now use the shared native main-image pool through explicit
+leases; old-stage maps unpin, warm maps remain until LRU pressure, and independent
+previews do not clear peer images. Local source artwork now uses the same pool;
+scoped material bindings keep each preview's composed maps independent.
+Final main-pool eviction/disposal notifies every native texture consumer before
+clearing source pixels. Releasing a lease alone preserves warm images and peers.
+UI lighting now leases one source/data pack per export and releases pins and GPU
+source textures afterwards. Lit CSS outputs remain available for redraw, while
+background export dispatch yields to busy/loading/hidden frames. The managed
+budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
+Charm renderers now share their18,874,368-byte colour/normal/surface kit through
+main-pool leases; separate previews retain independent tint caches and pins.
+Companions now lease only the equipped kit plus visible preview selections:
+parts18,870,192bytes (crow/cat/shiba), rock18,865,020bytes. No companion needs no
+kit, including startup. The scarecrow robe selects crow through the existing
+equipment rule. Preview closure releases its pins/native textures; full-catalogue
+preparation remains explicit for standalone callers. Other figure/startup inputs
+still need migration; this is not a whole-application memory guarantee.
+The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
+for compressed prefetch and startup filtering; regenerate with
+`node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.
+It excludes the80unused diffuse maps and6startup-only vector files. Prefetch
+holds compressed responses only, starts after startup, and yields to combat,
+loading, hidden pages, saveData and native offline assets. Worker decoding reads
+its base-path-scoped cache with HTTP fallback. Main decoded ownership is pending.
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
 Only packs selected by a renderer are decoded. Generated maps are excluded from

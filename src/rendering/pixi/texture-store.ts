@@ -1,11 +1,14 @@
 import { Rectangle, Texture } from 'pixi.js';
+import type { TextureSource } from 'pixi.js';
 import type { SceneTexture } from '../scene-frame.ts';
+import { observeSceneTextureRetirement } from '../texture-revision.ts';
 
 interface PreparedSource {
   texture: Texture;
   frames: Map<string, Texture>;
   revision: number;
   lastFrame: number;
+  stopRetirement: () => void;
 }
 
 /** Renderer-owned GPU resources. Never takes ownership of decoded source pixels. */
@@ -13,9 +16,32 @@ export class SceneTextureStore {
   private readonly sources = new Map<SceneTexture['source'], PreparedSource>();
   private readonly dataSources = new Map<SceneTexture['source'], PreparedSource>();
   private frame = 0;
+  private readonly retained = new Map<SceneTexture['source'], number>();
+  private readonly retired = new Set<SceneTexture['source']>();
+  private frameStarted = false;
+
+  constructor(private readonly beforeRelease?: (source: TextureSource) => void) {}
 
   beginFrame(): void {
+    this.releaseRetired();
+    this.frameStarted = true;
     this.frame++;
+  }
+
+  /** Pending uploads survive ordinary frame collection until publication or cancellation. */
+  retainSources(inputs: Iterable<SceneTexture['source']>): () => void {
+    const sources = new Set(inputs);
+    for (const source of sources) this.retained.set(source, (this.retained.get(source) ?? 0) + 1);
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      for (const source of sources) {
+        const count = this.retained.get(source) ?? 0;
+        if (count <= 1) this.retained.delete(source);
+        else this.retained.set(source, count - 1);
+      }
+    };
   }
 
   private prepare(source: SceneTexture['source'], revision: number, data = false): PreparedSource {
@@ -27,6 +53,16 @@ export class SceneTextureStore {
         frames: new Map(),
         revision,
         lastFrame: this.frame,
+        stopRetirement: observeSceneTextureRetirement(source, (preserveFrame) => {
+          if (
+            preserveFrame &&
+            this.frameStarted &&
+            (this.sources.get(source)?.lastFrame === this.frame ||
+              this.dataSources.get(source)?.lastFrame === this.frame)
+          )
+            this.retired.add(source);
+          else this.releaseSources([source]);
+        }),
       };
       if (data) prepared.texture.source.alphaMode = 'no-premultiply-alpha';
       store.set(source, prepared);
@@ -81,7 +117,7 @@ export class SceneTextureStore {
   collect(): void {
     for (const store of [this.sources, this.dataSources])
       for (const [source, prepared] of store) {
-        if (this.frame - prepared.lastFrame <= 120) continue;
+        if (this.retained.has(source) || this.frame - prepared.lastFrame <= 120) continue;
         this.release(prepared);
         store.delete(source);
       }
@@ -91,7 +127,39 @@ export class SceneTextureStore {
     return this.sources.size + this.dataSources.size;
   }
 
+  /** Queued/replay sources retire when that frame ends or is abandoned. */
+  releaseRetired(): void {
+    this.releaseSources(this.retired);
+    this.retired.clear();
+  }
+
+  get retirementSnapshot(): { sources: number; bytes: number } {
+    let bytes = 0;
+    for (const source of this.retired)
+      for (const store of [this.sources, this.dataSources]) {
+        const prepared = store.get(source);
+        if (prepared)
+          bytes += prepared.texture.source.pixelWidth * prepared.texture.source.pixelHeight * 4;
+      }
+    return { sources: this.retired.size, bytes };
+  }
+
+  /** A completed offscreen export no longer needs its source textures. */
+  releaseSources(inputs: Iterable<SceneTexture['source']>): void {
+    for (const source of inputs) {
+      this.retired.delete(source);
+      for (const store of [this.sources, this.dataSources]) {
+        const prepared = store.get(source);
+        if (!prepared) continue;
+        this.release(prepared);
+        store.delete(source);
+      }
+    }
+  }
+
   private release(prepared: PreparedSource): void {
+    prepared.stopRetirement();
+    this.beforeRelease?.(prepared.texture.source);
     for (const texture of prepared.frames.values()) texture.destroy(false);
     prepared.texture.destroy(true);
   }
@@ -101,5 +169,7 @@ export class SceneTextureStore {
     for (const prepared of this.dataSources.values()) this.release(prepared);
     this.sources.clear();
     this.dataSources.clear();
+    this.retained.clear();
+    this.retired.clear();
   }
 }

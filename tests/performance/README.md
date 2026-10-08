@@ -224,6 +224,23 @@ not implemented in this first tooling batch.
 
 ## Earlier investigations
 
+For the explicitly requested seamless-stage goal, isolated worker tools use
+predecoded assets, fixed seed424242 and900x600 DPR1:
+
+```sh
+node tests/performance/benchmarks/measure-compose.mjs tmp/compose [tmp/raw-baseline]
+node tests/performance/benchmarks/profile-compose.mjs tmp/compose-profile 0,4
+```
+
+The first records five fresh workers per stage and saves raw colour/map planes
+for parity. An optional `ISSEN_COMPOSE_MATERIAL_SOURCE` pointing to a compatible
+saved implementation under ignored `tmp/` supplies a benchmark-only control;
+normal builds never use it. The profiler records three workers per requested
+stage, native drawing/readback wall times and worker CPU profiles. Native times
+include blocking graphics work and instrumentation overhead; do not compare
+them directly with uninstrumented headline timings. These tools do not measure
+physical mobile performance or resident GPU memory. Never overlap captures.
+
 `benchmarks/` contains the existing isolated artwork benchmarks and film/opaque
 pixel comparisons. `legacy/` retains the earlier development-server runtime
 profiler and historical report summarizer. The old `scripts/` entry points remain

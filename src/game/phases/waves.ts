@@ -1,5 +1,6 @@
 import type { RuleEvents } from '../events.ts';
 import { STAGES } from '../content/stages.ts';
+import { encounterScenery } from '../session/stage-progression.ts';
 import { startBlessingWave, nextBlessingAttacker } from '../shrine/triggered.ts';
 import { recoverAfterWave } from '../progression/run-powers.ts';
 import { initialSpawns, updateWave as simulateWave } from '../encounters/waves.ts';
@@ -167,8 +168,7 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
       });
     }
     readViews().events.emit('wavePrepared', { wave: n, zen: G.zen, lostLife: G.lostLife });
-    const si = Math.floor((n - 1) / 3) % STAGES.length,
-      lap = Math.floor((n - 1) / (3 * STAGES.length)),
+    const { stage: si, lap } = encounterScenery(n),
       changed = si !== G.stage || lap !== G.lap;
     G.lap = lap;
     if (si !== G.stage) setStage(si, true);

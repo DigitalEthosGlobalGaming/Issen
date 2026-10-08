@@ -14,7 +14,7 @@ import { collectionBlessings } from '../content/collections.ts';
 import { dailyRun, type DailyRun } from '../progression/daily.ts';
 import { TRIALS, type TrialDefinition } from '../content/trials.ts';
 import { BLESS } from '../content/blessings.ts';
-import { STAGES } from '../content/stages.ts';
+import { encounterScenery } from './stage-progression.ts';
 import { trialAccessible } from '../../platform/editions.ts';
 import { DEFAULT_EQUIPMENT, type Equipment, type Setup } from '../../platform/saves.ts';
 import {
@@ -242,8 +242,8 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
     G.foxUsed = false;
     G.kagamiUsed = false;
     G.so = null;
-    const si = (n - 1) % STAGES.length;
-    G.lap = Math.floor((n - 1) / STAGES.length);
+    const { stage: si, lap } = encounterScenery(n, true);
+    G.lap = lap;
     if (si !== G.stage) setStage(si, true);
     G.cfg = waveCfg(Math.min(30, n * 3));
     G.enemies = G.enemies.filter((e) => e.state === 'dying');

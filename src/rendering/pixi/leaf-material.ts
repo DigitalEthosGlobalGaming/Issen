@@ -8,7 +8,7 @@ import {
   Texture,
   UniformGroup,
 } from 'pixi.js';
-import type { Matrix } from 'pixi.js';
+import type { Matrix, TextureSource } from 'pixi.js';
 import type { LeafFrame } from '../scene-leaves.ts';
 import type { LightTargets } from './light-buffer.ts';
 import type { SceneTextureStore } from './texture-store.ts';
@@ -187,16 +187,18 @@ export function createLeafMesh(sharedLights?: BindGroup) {
     disposed = false;
   const lightBinding = createLightTargetBinding(shader.resources, Texture.EMPTY.source);
   const releaseLightTargets = lightBinding.detach;
-  const releaseTextures = () => {
+  const releaseTextures = (source?: TextureSource) => {
     for (let i = 0; i < 4; i++) {
       for (const name of compositeTextureNames)
-        setShaderResource(
-          shader.resources,
-          name + i,
-          (name === 'uEmissive' ? Texture.EMPTY : Texture.WHITE).source,
-        );
+        if (!source || shader.resources[name + i] === source)
+          setShaderResource(
+            shader.resources,
+            name + i,
+            (name === 'uEmissive' ? Texture.EMPTY : Texture.WHITE).source,
+          );
       for (const name of geometryTextureNames)
-        setShaderResource(gShader.resources, name + i, Texture.WHITE.source);
+        if (!source || gShader.resources[name + i] === source)
+          setShaderResource(gShader.resources, name + i, Texture.WHITE.source);
     }
   };
   return {

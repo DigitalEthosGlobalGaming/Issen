@@ -86,7 +86,7 @@ export function createRuntimeFoundation(
     inkSword,
     lightingRig,
     uiMaterialLighting,
-  } = createNativeServices(cvs.ownerDocument, lifecycle, lighting);
+  } = createNativeServices(cvs.ownerDocument, lifecycle, lighting, nativeScene);
   const R = Math.random;
   const browserPreferences = createRuntimePreferences({
     lifecycle,

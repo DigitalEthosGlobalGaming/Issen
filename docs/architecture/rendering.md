@@ -752,6 +752,69 @@ are correctness checks, not performance captures. Current named composer and
 film/post/target extension hooks are described below.
 
 
+## Shared main-image retirement
+
+Companion selection owns the equipped parts or rock kit and unions it with
+explicit preview borrows. The parts atlas serves crow, cat and shiba. Runtime
+selection uses the existing visible-pet rule, including scarecrow's crow, after
+restoring equipment and through live drawing views. Companion colour sources are
+excluded from the broad startup preloader; their owner leases aligned colour,
+normal and surface inputs through the shared main pool. Standalone `prepare()`
+still prepares the full catalogue unless a managed selection was supplied.
+
+Each Armoury/support preview borrows its frame's companion kit. Selection changes
+and panel closure release that painter's companion textures and update the
+borrow; other canvases retain their own sources. A pending selected load redraws
+the last preview frame only while its selection and lifetime still match.
+The readiness repaint preserves its clock and effects simulation;
+suspension/disposal invalidates that callback. The companion renderer owns and
+disposes its source owner, including an explicitly supplied owner for embedding
+or transport tests.
+
+The native HTML image pool owns final source lifetime. LRU eviction and final
+pool disposal call `retireSceneTexture` before clearing the image URL and revoking
+its blob URL. Every observing painter/store releases colour, data and frame
+textures through the existing native binding cleanup. Unpinning an image keeps
+its decoded pixels and textures available until ordinary collection or eviction;
+disposing one owner does not invalidate another owner's lease.
+
+## Worker scenery texture readiness
+
+The main native services pass the scene painter's `warmScene` port to the
+worker environment owner. Before replacing completed layers or settling scene
+readiness, the owner initializes all incoming composed planes and stage 0's live
+fog maps through the existing `SceneTextureStore`. Colour/emissive use colour
+textures; normal/mask/surface use data textures. The previous layers remain
+drawable until the requested composition key is still valid and warming succeeds.
+
+Uploads yield through visible animation frames with a 4 ms batch target. A native
+upload cannot be interrupted and may exceed that target. Pending sources are
+retained against ordinary frame collection. Hidden documents suspend requests;
+context generation changes restart uploads after restoration. Stale requests,
+worker failure and disposal abort waits; rejected responses close their bitmaps
+and retire GPU consumers through the existing ownership path. Painter disposal
+also aborts its outstanding uploads. Preparation does not flush an incoming scene
+to the displayed canvas or introduce a second texture cache.
+
+The main port uses `warmScene`, which retains incoming sources across both source
+and shader preparation. It repeats both steps if the context generation changes
+between them. `warmSceneShaders` binds the material geometry/composite, vector/
+artwork lookup, light, default batch and back-buffer copy programs through Pixi's
+shader system with resource synchronization disabled. This compiles the existing
+renderer-owned programs without submitting a scene, changing targets or binding
+incoming texture resources. Completed shader warming is remembered per context
+generation. The final copy shader uses a guarded Pixi 8.22 `_bigTriangleShader`
+adapter because that system has no public preparation port; native cold-surface
+and restoration checks assert zero first-draw links and unchanged pixels.
+
+`textures-warmed` records `paced-source-init` before scene settlement for this
+path. It includes ordinary scenery program preparation through the main port,
+but proves neither completed GPU execution nor figure/filter shader readiness.
+Native compilation can exceed the pacing target. Local composition fallback,
+demon scenery and independent preview owners retain their existing readiness
+behavior. Next-scene slots, figure warming and remaining first-use drawing work
+remain required for seamless transitions.
+
 ## Current extension hooks (W3 phase 6)
 
 The seven recording layers above retain their drawing order. Geometry, lights and

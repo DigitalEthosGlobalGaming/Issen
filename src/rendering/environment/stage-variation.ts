@@ -109,6 +109,13 @@ export function createStageVisitSeeds(initialSeed: number) {
   let visit = 0;
   let seed = initialSeed >>> 0;
   return {
+    /** Predict entry without advancing the ledger or consuming any randomness. */
+    peek(stage: number, forceNewVisit = false): number {
+      if (stage === currentStage && !forceNewVisit) return seed;
+      return (
+        (initialSeed + Math.imul(visit + 1, 0x9e3779b9) + Math.imul(stage + 1, 0x85ebca6b)) >>> 0
+      );
+    },
     enter(stage: number, forceNewVisit = false): number {
       if (stage !== currentStage || forceNewVisit) {
         currentStage = stage;

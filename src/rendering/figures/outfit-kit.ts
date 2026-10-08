@@ -2,6 +2,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import type { Figure } from './types.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
 type Frame = readonly [number, number, number, number];
@@ -365,12 +366,14 @@ export function createOutfitKit(doc: Document) {
       materials.dispose();
       disposed = true;
       for (const im of images.values()) {
+        retireSceneTexture(im);
         im.onload = null;
         im.onerror = null;
         im.removeAttribute('src');
       }
       for (const fn of [...finish]) fn();
       for (const c of tinted.values()) {
+        retireSceneTexture(c);
         c.width = 0;
         c.height = 0;
       }

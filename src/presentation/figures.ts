@@ -1,4 +1,5 @@
 import { createFigureRenderer } from '../rendering/figures/figure.ts';
+import { visiblePet } from '../game/player/companions.ts';
 import {
   applyDeathPose,
   deathDuration,
@@ -36,7 +37,7 @@ export interface FigureViews {
   readonly reducedFlashes: () => boolean;
   readonly robePal: ReturnType<typeof createPalette>['robe'];
   readonly accessible: (id: string) => boolean;
-  readonly EQ: Readonly<{ fx: string }>;
+  readonly EQ: Readonly<{ fx: string; pet: string; robe: string }>;
   readonly SEAL: string;
   readonly FONT: string;
 }
@@ -69,7 +70,7 @@ export function createFiguresPresentation(readViews: () => FigureViews) {
     } = readViews();
     {
       void inkCharm.prepare();
-      void inkCompanion.prepare();
+      inkCompanion.select(visiblePet(EQ));
       void inkEnemy.prepare();
       void inkPlayer.prepare();
       void inkSword.prepare();

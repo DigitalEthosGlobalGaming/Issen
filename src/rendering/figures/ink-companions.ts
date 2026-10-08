@@ -1,8 +1,11 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-const COMPANION_URL = new URL('./assets/companion-parts-atlas.webp', import.meta.url).href;
-const ROCK_URL = new URL('./assets/mystic-rock.webp', import.meta.url).href;
+import { createMainImageOwner } from '../../platform/main-images.ts';
+export const INK_COMPANION_SOURCES = {
+  parts: new URL('./assets/companion-parts-atlas.webp', import.meta.url).href,
+  rock: new URL('./assets/mystic-rock.webp', import.meta.url).href,
+} as const;
 
 /** Verified packed windows, with source-pixel joints and native aspect ratios. */
 export const INK_COMPANION_FRAMES = [
@@ -24,60 +27,140 @@ export const INK_COMPANION_FRAMES = [
   [940, 990, 314, 264],
 ] as const;
 
-/** Companion rigs share one loader; each joint animates without moving the ground anchor. */
-export function createInkCompanionRenderer(doc: Document) {
-  const materials = createAssetMaterials(doc, { parts: COMPANION_URL, rock: ROCK_URL });
-  let image: HTMLImageElement | null = null;
-  let pending: Promise<void> | null = null;
-  let finishLoad: (() => void) | null = null;
-  let ready = false;
-  let disposed = false;
-  let rock: HTMLImageElement | null = null;
-  let rockReady = false;
-  let finishRock: (() => void) | null = null;
-
-  function prepare(): Promise<void> {
-    if (pending) return pending;
-    if (disposed) return Promise.resolve();
-    const rockPending = new Promise<void>((resolve) => {
-      rock = doc.createElement('img');
-      const sprite = rock;
-      sprite.decoding = 'async';
-      const finish = () => {
-        sprite.onload = sprite.onerror = null;
-        finishRock = null;
-        resolve();
-      };
-      finishRock = finish;
-      sprite.onload = () => {
-        rockReady = !disposed && sprite.naturalWidth === 1145 && sprite.naturalHeight === 1373;
-        finish();
-      };
-      sprite.onerror = finish;
-      sprite.src = ROCK_URL;
-    });
-    pending = new Promise<void>((resolve) => {
-      const sprite = doc.createElement('img');
-      image = sprite;
-      sprite.decoding = 'async';
-      const finish = () => {
-        sprite.onload = sprite.onerror = null;
-        finishLoad = null;
-        resolve();
-      };
-      finishLoad = finish;
-      sprite.onload = () => {
-        ready = !disposed && sprite.naturalWidth === 1254 && sprite.naturalHeight === 1254;
-        finish();
-      };
-      sprite.onerror = finish;
-      sprite.src = COMPANION_URL;
-    });
-    pending = Promise.all([pending, rockPending, materials.prepare()]).then(() => {
-      ready = ready && materials.ready('parts');
-      rockReady = rockReady && materials.ready('rock');
-    });
-    return pending;
+/** Owns its source owner; each joint animates without moving the ground anchor. */
+export function createInkCompanionRenderer(doc: Document, images = createMainImageOwner(doc)) {
+  type Key = 'parts' | 'rock';
+  type Kit = {
+    image?: HTMLImageElement;
+    ready: boolean;
+    pending: Promise<boolean>;
+    materials: ReturnType<typeof createAssetMaterials<'atlas'>>;
+    lease: ReturnType<typeof images.acquire>;
+  };
+  const kits = new Map<Key, Kit>();
+  const borrowers = new Map<symbol, number>();
+  let primary = 0,
+    managed = false,
+    disposed = false;
+  const mask = (type: string) =>
+    type === 'mystic-rock' ? 2 : type === 'crow' || type === 'shiba' || type === 'cat' ? 1 : 0;
+  const keys = (selection: number): Key[] => [
+    ...(selection & 1 ? ['parts' as const] : []),
+    ...(selection & 2 ? ['rock' as const] : []),
+  ];
+  const dimensions = (key: Key) =>
+    key === 'parts' ? ([1254, 1254] as const) : ([1145, 1373] as const);
+  function sync() {
+    if (disposed) return;
+    let selection = primary;
+    for (const borrowed of borrowers.values()) selection |= borrowed;
+    const required = keys(selection);
+    for (const [key, kit] of kits)
+      if (!required.includes(key)) {
+        kit.materials.dispose();
+        kit.lease.release();
+        kits.delete(key);
+      }
+    for (const key of required) {
+      if (kits.has(key)) continue;
+      const url = INK_COMPANION_SOURCES[key];
+      const materials = createAssetMaterials(doc, { atlas: url }, images);
+      const lease = images.acquire(url);
+      const kit: Kit = { materials, lease, ready: false, pending: Promise.resolve(false) };
+      kits.set(key, kit);
+      kit.pending = Promise.all([lease.ready, materials.prepare()]).then(
+        ([image]) => {
+          if (disposed || kits.get(key) !== kit) return false;
+          kit.image = image;
+          const [width, height] = dimensions(key);
+          kit.ready =
+            image.naturalWidth === width &&
+            image.naturalHeight === height &&
+            materials.ready('atlas');
+          return kit.ready;
+        },
+        () => false,
+      );
+    }
+  }
+  function ready(selection: number) {
+    return !disposed && keys(selection).every((key) => kits.get(key)?.ready === true);
+  }
+  async function prepared(selection: number) {
+    const selected = keys(selection);
+    const requested = selected.map((key) => kits.get(key));
+    const loaded = await Promise.all(requested.map((kit) => kit?.pending ?? false));
+    return (
+      !disposed &&
+      loaded.every(Boolean) &&
+      requested.every((kit, index) => kit === kits.get(selected[index]!))
+    );
+  }
+  function sources(selection: number) {
+    const result: HTMLImageElement[] = [];
+    for (const key of keys(selection)) {
+      const kit = kits.get(key);
+      if (!kit?.ready || !kit.image) continue;
+      result.push(kit.image);
+      const [width, height] = dimensions(key);
+      const material = kit.materials.material('atlas', [0, 0, width, height]);
+      for (const texture of [material?.normal, material?.surface, material?.emissive])
+        if (texture) result.push(texture.source as HTMLImageElement);
+    }
+    return result;
+  }
+  /** Runtime selection owns only the equipped kit; repeated draws do not change pins. */
+  function select(type: string) {
+    if (disposed) return;
+    managed = true;
+    const next = mask(type);
+    if (primary === next) return;
+    primary = next;
+    sync();
+  }
+  /** Explicit standalone preparation retains the whole catalogue until selected/disposed. */
+  function prepare(): Promise<boolean> {
+    if (disposed) return Promise.resolve(false);
+    if (!managed) {
+      primary = 3;
+      sync();
+    }
+    let selection = primary;
+    for (const borrowed of borrowers.values()) selection |= borrowed;
+    return prepared(selection);
+  }
+  function borrow() {
+    managed = true;
+    const id = Symbol('companion preview');
+    let selection = 0,
+      released = false;
+    borrowers.set(id, selection);
+    return {
+      select(type: string, other = '') {
+        if (released || disposed) return false;
+        const next = mask(type) | mask(other);
+        if (selection === next) return false;
+        selection = next;
+        borrowers.set(id, selection);
+        sync();
+        return true;
+      },
+      async prepare() {
+        if (released) return false;
+        const expected = selection;
+        return (await prepared(expected)) && !released && expected === selection;
+      },
+      sources: () => sources(selection),
+      get ready() {
+        return !released && ready(selection);
+      },
+      dispose() {
+        if (released) return;
+        released = true;
+        borrowers.delete(id);
+        sync();
+      },
+    };
   }
 
   function draw(
@@ -97,14 +180,18 @@ export function createInkCompanionRenderer(doc: Document) {
       ![x, y, size, time].every(Number.isFinite)
     )
       return false;
-    void prepare();
+    if (!managed) void prepare();
+    const parts = kits.get('parts'),
+      rockKit = kits.get('rock');
+    const image = parts?.image,
+      rock = rockKit?.image;
     if (type === 'mystic-rock') {
-      if (!rockReady || !rock) return false;
+      if (!rockKit?.ready || !rock) return false;
       const factor = size / 1157;
       const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
       g.save();
       try {
-        const material = materials.material('rock', [0, 0, 1145, 1373]);
+        const material = rockKit.materials.material('atlas', [0, 0, 1145, 1373]);
         if (material)
           drawMaterialStamp(g, {
             texture: { source: rock, revision: 0 },
@@ -127,7 +214,7 @@ export function createInkCompanionRenderer(doc: Document) {
       }
       return true;
     }
-    if (!ready || !image) return false;
+    if (!parts?.ready || !image) return false;
     const t = reducedMotion ? 0 : time;
     const reaction = active && !reducedMotion;
     const sine = (speed: number, phase = 0) => (reducedMotion ? 0 : Math.sin(t * speed + phase));
@@ -149,7 +236,7 @@ export function createInkCompanionRenderer(doc: Document) {
         g.translate(ax, ay);
         g.rotate(angle);
         g.scale(scale, scale * stretch);
-        const material = materials.material('parts', INK_COMPANION_FRAMES[index]!);
+        const material = parts!.materials.material('atlas', INK_COMPANION_FRAMES[index]!);
         if (material)
           drawMaterialStamp(g, {
             texture: { source: image!, revision: 0, frame: INK_COMPANION_FRAMES[index]! },
@@ -196,28 +283,33 @@ export function createInkCompanionRenderer(doc: Document) {
   function dispose() {
     if (disposed) return;
     disposed = true;
-    materials.dispose();
-    ready = false;
-    if (image) {
-      image.onload = image.onerror = null;
-      image.removeAttribute('src');
+    for (const kit of kits.values()) {
+      kit.materials.dispose();
+      kit.lease.release();
     }
-    finishLoad?.();
-    rockReady = false;
-    if (rock) {
-      rock.onload = rock.onerror = null;
-      rock.removeAttribute('src');
-    }
-    finishRock?.();
-    rock = null;
-    image = null;
+    kits.clear();
+    borrowers.clear();
+    primary = 0;
+    images.dispose();
   }
   return {
     prepare,
+    select,
+    borrow,
     draw,
     dispose,
+    snapshot: () => ({
+      selected: [...kits.keys()],
+      equipped: keys(primary),
+      borrowed: [...borrowers.values()].filter(Boolean).length,
+      ready:
+        !disposed && (managed || primary !== 0) && [...kits.values()].every((kit) => kit.ready),
+      decodedLoader: images.snapshot(),
+    }),
     get ready() {
-      return ready && rockReady;
+      return (
+        !disposed && (managed || primary !== 0) && [...kits.values()].every((kit) => kit.ready)
+      );
     },
   };
 }

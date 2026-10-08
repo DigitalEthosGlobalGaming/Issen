@@ -13,7 +13,10 @@ import {
   type PresentationState,
 } from '../presentation/state.ts';
 import { updatePlayerAnimation, type createPlayerAnimation } from '../game/player/player.ts';
-import { updateWeather as simulateWeather } from '../rendering/scene/weather-update.ts';
+import {
+  updateWeather as simulateWeather,
+  updateCosmeticWeather,
+} from '../rendering/scene/weather-update.ts';
 import { STAGES } from '../game/content/stages.ts';
 import type { EnvironmentState } from '../presentation/environment-state.ts';
 import type { createWeatherState } from '../rendering/scene/weather-state.ts';
@@ -25,8 +28,11 @@ import type { createEnvironmentPresentation } from '../presentation/environment.
 import type { createPlayerFigures } from '../presentation/player-figures.ts';
 import type { Random } from '../shared/random.ts';
 import { cacheView, stateView } from '../game/session/state-view.ts';
+import { sampleAssetBackground } from '../platform/asset-background.ts';
+import { predictNextStage } from '../game/session/stage-progression.ts';
 
 const gameplayStates = ['playing', 'boss', 'between', 'standoff', 'shrine', 'dead'];
+const backgroundQuietStates = ['title', 'over', 'between', 'shrine', 'paused'];
 
 type SimulationPorts = Omit<
   FrameSimulationViews,
@@ -103,7 +109,7 @@ export function createFrameBindings(
     const { P, G } = readViews();
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }
-  function updateWeather(dt: number) {
+  function updateWeather(dt: number, cosmeticOnly = false) {
     const {
       G,
       cinematic,
@@ -120,7 +126,7 @@ export function createFrameBindings(
       sfx,
       gustLeaves,
     } = readViews();
-    simulateWeather(
+    (cosmeticOnly ? updateCosmeticWeather : simulateWeather)(
       cinematic.active ? environmentState.cinematicWeather : WX,
       environmentState.wx,
       dt,
@@ -257,14 +263,17 @@ export function createFrameBindings(
   }
   const frameLoop = createFrameLoop(
     {
+      // Loading consumes presentation elapsed time without spending combat timing.
       get hitStop() {
-        return readViews().hitStop;
+        const views = readViews();
+        return views.sceneLoading ? 0 : views.hitStop;
       },
       set hitStop(value) {
         readViews().hitStop = value;
       },
       get slowT() {
-        return readViews().G.slowT;
+        const views = readViews();
+        return views.sceneLoading ? 0 : views.G.slowT;
       },
       set slowT(value) {
         readViews().G.slowT = value;
@@ -282,14 +291,15 @@ export function createFrameBindings(
         preparedFrame = undefined;
       },
       demand: () => {
-        const { cinematic, screenAnimation, G, armory } = readViews();
+        const { sceneLoading, cinematic, screenAnimation, G, armory } = readViews();
+        if (sceneLoading) return { update: true, render: true, afterRender: false };
         return cinematic.active
           ? { update: true, render: true, afterRender: false }
           : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded);
       },
       paused: () => {
-        const { G, guided } = readViews();
-        return G.state === 'paused' || guided.frozen;
+        const { sceneLoading, G, guided } = readViews();
+        return !sceneLoading && (G.state === 'paused' || guided.frozen);
       },
       update,
       render,
@@ -306,7 +316,16 @@ export function createFrameBindings(
           environmentState,
           density,
           rebalanceWeather,
+          activeTrial,
+          cinematic,
         } = readViews();
+        sampleAssetBackground(
+          G.stage,
+          !sceneLoading && !G.panel && backgroundQuietStates.includes(G.state),
+          work,
+          1000 / frameRate(),
+          predictNextStage(G, !!activeTrial, cinematic.active),
+        );
         if (sceneLoading) return;
         if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
         if (!effectQuality.sample(interval, work)) return;

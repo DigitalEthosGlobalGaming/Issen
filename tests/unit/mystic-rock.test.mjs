@@ -9,7 +9,7 @@ import { assetMaterialCatalog } from '../../src/rendering/asset-material-catalog
 
 function fixture() {
   const images = [];
-  const renderer = createInkCompanionRenderer({
+  const doc = {
     createElement(tag) {
       if (tag === 'canvas') return { width: 0, height: 0 };
       const image = {
@@ -31,7 +31,47 @@ function fixture() {
       images.push(image);
       return image;
     },
-  });
+  };
+  const pending = new Set();
+  let disposed = false;
+  const owner = {
+    acquire(url) {
+      const image = doc.createElement('img');
+      image.src = url;
+      let released = false;
+      const ready = new Promise((resolve, reject) => {
+        const finish = (error) => {
+          pending.delete(cancel);
+          image.onload = image.onerror = null;
+          if (error || released || disposed) reject(error ?? Error('Lease released'));
+          else resolve(image);
+        };
+        const cancel = () => finish(Error('Owner disposed'));
+        pending.add(cancel);
+        image.onload = () => finish();
+        image.onerror = () => finish(Error('Decode failed'));
+        if (url.includes('/pbr/'))
+          queueMicrotask(async () => {
+            if (disposed) return;
+            await image.decode();
+            image.onload?.();
+          });
+      });
+      return {
+        ready,
+        release: () => {
+          released = true;
+        },
+      };
+    },
+    snapshot: () => ({}),
+    dispose() {
+      disposed = true;
+      for (const cancel of [...pending]) cancel();
+      for (const image of images) image.removeAttribute('src');
+    },
+  };
+  const renderer = createInkCompanionRenderer(doc, owner);
   return { renderer, images };
 }
 function context() {

@@ -182,6 +182,11 @@ test('All eight encounters complete through combat and persist exclusive rewards
   page,
 }, testInfo) => {
   test.setTimeout(90000);
+  const bindingWarnings: string[] = [];
+  page.on('console', (message) => {
+    if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+      bindingWarnings.push(message.text());
+  });
   await seed(page);
   await instrument(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -269,11 +274,17 @@ test('All eight encounters complete through combat and persist exclusive rewards
       return [eq.fx, eq.seal, eq.film];
     }),
   ).toEqual(['trial-comet', 'trial-copper', 'trial-dawn']);
+  expect(bindingWarnings).toEqual([]);
 });
 
 test('A perfect-cut trial ends when its target becomes impossible and seeded retries reproduce the encounter', async ({
   page,
 }) => {
+  const bindingWarnings: string[] = [];
+  page.on('console', (message) => {
+    if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+      bindingWarnings.push(message.text());
+  });
   await seed(page);
   await instrument(page);
   await page.goto('/');
@@ -307,6 +318,7 @@ test('A perfect-cut trial ends when its target becomes impossible and seeded ret
   expect(sequences[0]).toHaveLength(3);
   expect(sequences[0]).toEqual(sequences[1]);
   expect(await page.evaluate(() => localStorage.getItem('issen.trials'))).toBeNull();
+  expect(bindingWarnings).toEqual([]);
 });
 
 test('Broken Reality ends on the first ordinary cut', async ({ page }) => {

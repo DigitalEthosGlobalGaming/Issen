@@ -1,4 +1,5 @@
 import type { EnvironmentFrame } from './local-renderer.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 
 export type ComposedLayer = {
   colour: ImageBitmap;
@@ -7,6 +8,15 @@ export type ComposedLayer = {
   emissive?: ImageBitmap;
 };
 export type EnvironmentSnapshot = {
+  materialCutouts?: {
+    entries: number;
+    pixels: number;
+    pixelBudget: number;
+    scratchPixels: number;
+    hits: number;
+    misses: number;
+    evictions: number;
+  };
   foreground: { layers: number; pixels: number };
   backend: 'loading' | 'layered' | 'unavailable';
   builds: number;
@@ -16,7 +26,18 @@ export type EnvironmentSnapshot = {
   layers: number;
   pixels: number;
   decodedBytes?: number;
+  decodedLoader?: {
+    queued: number;
+    decoded: number;
+    pinned: number;
+    pinnedBytes: number;
+    bytes: number;
+    peakBytes: number;
+    budget: number;
+    evictions: number;
+  };
   timings?: { assets: number; compose: number; transfer: number };
+  texturesWarmed?: boolean;
 };
 export type ComposeRequest =
   | { id: number; kind: 'prepare'; stage: number }
@@ -44,5 +65,8 @@ export function compositionKey(frame: EnvironmentFrame) {
 export function closeLayers(layers: readonly ComposedLayer[]) {
   for (const layer of layers)
     for (const bitmap of [layer.colour, layer.normal, layer.surface, layer.emissive])
-      bitmap?.close();
+      if (bitmap) {
+        retireSceneTexture(bitmap);
+        bitmap.close();
+      }
 }

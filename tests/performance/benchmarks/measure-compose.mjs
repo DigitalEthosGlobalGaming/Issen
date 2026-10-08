@@ -6,7 +6,28 @@ const output = process.argv[2];
 const baseline = process.argv[3];
 if (!output) throw Error('Usage: node measure-compose.mjs tmp/output [tmp/baseline]');
 await mkdir(output, { recursive: true });
-const server = await createServer({ server: { host: '127.0.0.1', port: 5297, strictPort: true } });
+// Optional saved implementation for a contemporaneous control, without changing
+// application files during a capture. Keep the ordinary comparison path intact.
+const sourcePath = process.env.ISSEN_COMPOSE_MATERIAL_SOURCE;
+if (sourcePath && !sourcePath.replaceAll('\\', '/').startsWith('tmp/'))
+  throw Error('ISSEN_COMPOSE_MATERIAL_SOURCE must reference an ignored tmp/ fixture');
+const source = sourcePath ? await readFile(sourcePath, 'utf8') : undefined;
+const server = await createServer({
+  plugins:
+    source === undefined
+      ? []
+      : [
+          {
+            name: 'compose-material-control',
+            enforce: 'pre',
+            load(id) {
+              if (id.replaceAll('\\', '/').endsWith('/src/rendering/cached-materials.ts'))
+                return source;
+            },
+          },
+        ],
+  server: { host: '127.0.0.1', port: 5297, strictPort: true },
+});
 await server.listen();
 const browser = await chromium.launch({ channel: 'msedge' });
 const rows = [];
@@ -98,8 +119,13 @@ try {
             throw Error('Compose pixels changed: ' + JSON.stringify(differences.at(-1)));
         }
       }
-      rows.push({ stage, repetition, milliseconds: result.milliseconds,
-        snapshot: result.snapshot, differences });
+      rows.push({
+        stage,
+        repetition,
+        milliseconds: result.milliseconds,
+        snapshot: result.snapshot,
+        differences,
+      });
       console.log(JSON.stringify(rows.at(-1)));
       await page.close();
     }

@@ -29,7 +29,10 @@ export interface SceneFlowViews {
   readonly cvs: { readonly dataset: DOMStringMap };
   readonly screenAnimation: { invalidate(): void };
   readonly demonRealmRenderer: { prepare(): Promise<boolean> };
-  readonly environmentRenderer: { compose(frame: ScenePreparationFrame): Promise<boolean> };
+  readonly environmentRenderer: {
+    compose(frame: ScenePreparationFrame): Promise<boolean>;
+    snapshot?(): { texturesWarmed?: boolean; backend?: string };
+  };
   readonly lifecycle: { readonly disposed: boolean };
   readonly frameLoop: { resetClock(): void };
   requestedSceneKey: string;
@@ -114,11 +117,11 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const { cvs, G, frameLoop } = views;
     if (views.sceneLoading && views.sceneReadyToPresent) {
       const key = views.requestedSceneKey;
-      // Baseline uploads happen in the first draw; this marks submission, not a GPU fence.
-      markScenePhase('textures-warmed', key, {
-        mode: 'first-present-submission',
-        prewarmed: false,
-      });
+      if (!views.environmentRenderer.snapshot?.().texturesWarmed || key.startsWith('true:'))
+        markScenePhase('textures-warmed', key, {
+          mode: 'first-present-submission',
+          prewarmed: false,
+        });
       markScenePhase('settle-presented-scene', key);
       measureScenePhase(
         'scene-load',

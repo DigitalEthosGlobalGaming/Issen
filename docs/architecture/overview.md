@@ -134,6 +134,111 @@ Worker context proxies cache bound native methods and adapt image arguments only
 for drawing/patterns. `layer-transfer.ts` copies composed colour/material planes
 concurrently; failures wait for pending copies and close every acquired bitmap
 before the worker reports failure. Completed response ownership remains unchanged.
+Before composed bitmaps close, `texture-revision.ts` notifies GPU consumers of
+final source retirement. Texture stores detach matching bindings in all pooled
+shader slots and immediately destroy their own colour/data/crop textures. Peer
+stores own independent GPU resources; the source owner still closes its pixels.
+Temporary disuse keeps the existing120-frame grace period. This retirement path
+also detaches matching source/sampler resources in Pixi's cached native mesh and
+graphics batch BindGroups before GPU destruction. `pixi/source-bindings.ts` uses a
+guarded Pixi8.22 EventEmitter listener-context adapter; unrelated resources and
+non-BindGroup observers remain intact. Native mesh/pattern expiry and trial retry
+tests cover the adapter, which must be revalidated when Pixi changes.
+This retirement path does not change source decoding or scene baking.
+`pbr-atlas.ts` uses the same hook before closing directly owned HTML maps.
+Disposing an atlas backed by `MainImageOwner` only releases its leases; warm
+images and peer textures remain alive until actual loader eviction/final disposal.
+Prepared figure cutout/tone canvases have separate ownership and are not closed
+by atlas retirement.
+Enemy variant/tone and weapon cutout LRU eviction request frame-preserving retirement. A texture
+store releases obsolete earlier-frame sources immediately, but keeps sources used
+by its current queued/replay frame until the next begin, context loss or disposal.
+Each painter controls its own boundary; repeated flushes and peer replay survive.
+Final cache disposal requests ordinary immediate retirement. Pending source count
+and nominal RGBA bytes are exposed through sourceRetirementSnapshot; this excludes
+render targets, wrappers and driver allocations. CPU cache budgets are unchanged.
+Player/outfit tones and tints, base atlas images, and weapon raw maps/cached parts
+notify ordinary immediate retirement before final source clearing. Independent
+renderer owners do not retire a peer's separate images or canvases. Catalogue
+selection and shared decoded-budget integration remain separate work.
+`cached-materials.ts` owns per-document masked map cutouts through
+`material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
+reused scratch for oversized entries. Source/map revisions, crop, mask, output
+size and normal basis identify entries. Normal rotation uses two-degree bins,
+preserving reflection, anisotropy and shear; surface/emissive values stay exact.
+Owner disposal clears cutouts and scratch alongside layer maps. Software
+rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
+downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
+hits, misses and evictions separately from decoded assets.
+Local main-thread composition releases non-live colour/material image leases after
+building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
+colour/data canvases and the bounded independent cutouts keep their own pixels.
+Repeated draws/compose calls with the same composition key reuse that output.
+A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
+pending requests cannot publish over a newer generation. Source binding release
+preserves output maps, including unchanged bamboo foreground planes; final owner
+disposal closes them. Worker-document input ownership remains managed by its loader.
+`environment/asset-sources.ts` supplies the unchanged URL/index selections for
+local compose and the generated runtime inventory. Generic material owners and
+UI lighting request data maps only; direct player/enemy PBR owners retain their
+explicit diffuse colour path. Inventory generation lives in
+`scripts/assets/runtime-inventory.mjs`, including startup-only and redundant
+diffuse roles separately from actual on-screen selections.
+`platform/decoded-images.ts` owns a serial priority decode queue with shared
+promises, reference-counted live pins and pixel-byte LRU eviction. Known atlas
+dimensions reserve space before decoding; admitted and reserved bytes are
+bounded, while native decoder overhead is outside the nominal estimate. Worker
+image wrappers share loader-owned ImageBitmaps and release pins when cleared;
+only the loader closes cached bitmaps. Snapshot diagnostics include queues,
+residency, pins, uniquely pinned decoded bytes, total bytes, peak, budget and
+evictions. Main figure/startup owners
+are not yet routed through this loader; whole-application memory remains unbounded.
+`platform/main-images.ts` shares native HTML image decoding per Document through
+the budgeted loader. One pool-level quiet-frame/visibility subscription pauses
+soon/idle requests until a visible settled frame uses at most75% of its budget.
+Required requests bypass this gate. Visibility restoration requires a new quiet
+frame; change-only policy updates avoid scanning the queue on every frame. The
+last owner removes scheduling subscriptions before disposing the pool. Explicit
+owner leases protect peer previews; release unpins without clearing their image. Only
+the pool removes image sources and revokes decode object URLs. Known manifest
+dimensions reserve space first. Local-environment PBR maps use this owner through
+`asset-materials`/`pbr-atlas`. Local source artwork also uses leases from that pool;
+figure/startup and other environment owners still need migration. Cached
+material bindings are indexed by source and owner. Local composition wraps
+synchronous nested stamps in `withBindings`, restoring the previous owner in
+`finally`; scopes cannot span promises. Disposal removes only its own bindings
+and layers, keeping shared-image previews independent.
+Worker documents keep their existing managed image wrappers and decode semantics.
+`platform/runtime-assets.ts` is generated from the inventory by
+`scripts/assets/runtime-manifest.mjs`, excluding unused diffuse maps and startup-only
+source art. Main startup filters its existing artwork selection through this manifest.
+Glob and manifest URLs are canonicalized against the document base before comparison.
+Startup retains its existing load/decode/retry gate, then disposes preload images
+after successful mounting. This ends preload ownership; replacing the broad initial
+decode with required active selections remains pending.
+`platform/compressed-assets.ts` owns base-path-scoped CacheStorage responses with HTTP
+fallback; worker decoding reads these unchanged compressed responses. MainGame starts
+`platform/background-assets.ts` after removing the loading overlay and disposes it
+with the root. Runtime frame sampling grants quiet background time through
+`platform/asset-background.ts`; visibility, saveData, native mode and frame work
+gate at most two low-priority requests. Required worker reads remain available.
+`game/session/stage-progression.ts` shares encounter stage/lap rules with background
+prediction. Normal and daily waves predict the next three-wave visit; rush predicts
+the next duel's visit. Trials retain their scenery, cinematic choices are unknown,
+and inactive or mismatched run/stage state has no prediction. Frame samples carry
+the optional next stage so compressed priority updates when modes change at the
+same stage. Prediction neither enters a visit nor consumes combat randomness.
+UI material jobs retain pack metadata and exported CSS textures. They lease source
+and map images from the main pool for one export at a time, then unpin them and
+release uploaded sources through the painter's existing texture store. Shader
+bindings detach before source destruction. Background exports wait for quiet
+visible frame grants before decode and upload; explicit prepare/custom texture
+requests bypass that wait. `asset-background` supports independent subscribers
+for UI exports and compressed prefetch. Exported DOM/CSS images and other figure
+owners remain outside the decoded-input estimate.
+`figures/ink-charms.ts` leases its colour atlas and selected data maps from the
+shared main pool. Charm previews share decode residency while retaining separate
+tint caches; disposal releases only their own pins and ignores late attachment.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and
@@ -148,6 +253,17 @@ cinematic (viewer session/grade), and profile (transfer/reset/management).
 checkpoint adoption. Live input uses the active controller; updateFrame preserves
 the existing boss/playing/standoff/between/dead order and later-phase same-frame
 cascades. Checkpoint adoption is silent and does not replay entry or rewards.
+
+During scene loading, `runtime/frame-simulation.ts` advances only presentation
+clock, ambient/transition motion, cosmetic weather particles, camera and apparel.
+It uses unscaled presentation elapsed time without advancing run timers, players,
+enemies, encounters, trial completion or run RNG. Loading weather uses a temporary
+copy of hazard state with the cosmetic RNG; live hazard fields remain unchanged.
+`runtime/frame-bindings.ts` keeps cosmetic scheduling awake during loading even
+when paused, and masks hit-stop/slow-motion inputs so the scheduler cannot decrement
+combat timers. The static status veil in `ui/scene-loading.css` follows the canvas
+scene-state attribute after150ms, cancelling immediately on presentation. It adds
+no movement or flashing under either accessibility setting.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
 profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record

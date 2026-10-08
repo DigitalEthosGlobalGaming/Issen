@@ -1,3 +1,7 @@
+import { createDecodedImageLoader, decodedImageBudget } from '../../platform/decoded-images.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+import { readCompressedAsset } from '../../platform/compressed-assets.ts';
+
 /** Cache native bindings; only image consumers need decoded-source adaptation. */
 export function createWorkerContextProxy(
   native: OffscreenCanvasRenderingContext2D,
@@ -27,9 +31,33 @@ export function createWorkerContextProxy(
 
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
 export function createWorkerDocument(): Document & {
-  decodedSnapshot(): { images: number; bytes: number };
+  decodedSnapshot(): ReturnType<
+    ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['snapshot']
+  > & { images: number };
 } {
-  const decoded = new Set<WeakRef<DecodedImage>>();
+  const expectedBytes = new Map(
+    assetMaterialCatalog.flatMap((pack) =>
+      [pack.source, ...Object.values(pack.maps)].map(
+        (url) => [url, pack.dimensions[0] * pack.dimensions[1] * 4] as const,
+      ),
+    ),
+  );
+  const loader = createDecodedImageLoader({
+    expectedBytes: (url) => expectedBytes.get(url),
+    budget: decodedImageBudget({
+      mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
+      deviceMemory:
+        typeof navigator === 'undefined'
+          ? 8
+          : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
+    }),
+    async decode(url, signal) {
+      const response = await readCompressedAsset(url, signal);
+      // Preserve the existing worker decode interpretation. Data-map options
+      // must change only after the complete material-plane parity check.
+      return createImageBitmap(await response.blob());
+    },
+  });
   class DecodedImage {
     bitmap?: ImageBitmap;
     onload: (() => void) | null = null;
@@ -39,7 +67,7 @@ export function createWorkerDocument(): Document & {
     width = 0;
     height = 0;
     private source = '';
-    private readonly diagnosticRef = new WeakRef(this);
+    private releasePin?: () => void;
     private controller?: AbortController;
     private pending: Promise<void> = Promise.resolve();
     get naturalWidth() {
@@ -57,17 +85,14 @@ export function createWorkerDocument(): Document & {
       if (!value) return;
       const controller = new AbortController();
       this.controller = controller;
+      this.releasePin = loader.pin(value);
       this.pending = (async () => {
         try {
-          const response = await fetch(value, { signal: controller.signal });
-          if (!response.ok) throw Error(`HTTP ${response.status}: ${value}`);
-          const bitmap = await createImageBitmap(await response.blob());
+          const bitmap = await loader.load(value, 'now');
           if (controller.signal.aborted) {
-            bitmap.close();
             return;
           }
           this.bitmap = bitmap;
-          decoded.add(this.diagnosticRef);
           this.width = bitmap.width;
           this.height = bitmap.height;
           this.complete = true;
@@ -88,9 +113,9 @@ export function createWorkerDocument(): Document & {
     }
     private clear() {
       this.controller?.abort();
-      this.bitmap?.close();
+      this.releasePin?.();
+      this.releasePin = undefined;
       this.bitmap = undefined;
-      decoded.delete(this.diagnosticRef);
       this.complete = false;
       this.width = this.height = 0;
     }
@@ -108,18 +133,8 @@ export function createWorkerDocument(): Document & {
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
     decodedSnapshot() {
-      let images = 0,
-        bytes = 0;
-      for (const reference of decoded) {
-        const image = reference.deref();
-        if (!image) {
-          decoded.delete(reference);
-          continue;
-        }
-        images++;
-        bytes += image.naturalWidth * image.naturalHeight * 4;
-      }
-      return { images, bytes };
+      const snapshot = loader.snapshot();
+      return { ...snapshot, images: snapshot.decoded };
     },
     createElement(kind: string) {
       if (kind === 'img') return new DecodedImage();
@@ -147,5 +162,7 @@ export function createWorkerDocument(): Document & {
     HTMLImageElement: { value: DecodedImage },
     HTMLCanvasElement: { value: OffscreenCanvas },
   });
-  return doc as unknown as Document & { decodedSnapshot(): { images: number; bytes: number } };
+  return doc as unknown as Document & {
+    decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };
+  };
 }

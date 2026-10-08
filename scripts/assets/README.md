@@ -1,5 +1,12 @@
 # Layout-preserving texture compaction
 
+Generate the runtime loading inventory with
+`node scripts/assets/runtime-inventory.mjs`. The committed JSON records intrinsic
+dimensions, encoded/nominal decoded bytes, consumers and stage usage from source,
+the installed pack catalog and the shared stage asset selections. It flags
+unused material-only diffuse maps and startup-only sources separately; the total
+includes retained conversion inputs and does not describe live browser memory.
+
 Requires Node.js and Python 3 with Pillow >=12 (`python -m pip install 'Pillow>=12'`).
 Set `ISSEN_PYTHON` to a Pillow-enabled interpreter if it is not `python` on PATH.
 No network service is used for compaction.

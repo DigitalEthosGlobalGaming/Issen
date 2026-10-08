@@ -77,7 +77,11 @@ export function createArmoryPreview(
     inkSword: createInkSwordRenderer(canvas.ownerDocument),
   };
   void inkCharm.prepare();
-  void inkCompanion.prepare();
+  const companionSelection = inkCompanion.borrow();
+  let companionGeneration = 0;
+  let lastFrame: PreviewFrame | undefined;
+  let companionPet = '',
+    companionAppearance = '';
   void inkEnemy.prepare();
   void inkPlayer.prepare();
   void inkSword.prepare();
@@ -136,14 +140,30 @@ export function createArmoryPreview(
     else services.sounds.slice();
   }
 
-  function draw(frame: PreviewFrame): void {
+  function draw(frame: PreviewFrame, repaint = false): void {
+    if (roomDisposed) return;
+    lastFrame = frame;
+    const appearancePet = frame.appearance.pet ?? '';
+    if (companionPet !== frame.pet || companionAppearance !== appearancePet) {
+      companionPet = frame.pet;
+      companionAppearance = appearancePet;
+      const previousSources = companionSelection.sources();
+      if (companionSelection.select(appearancePet, frame.pet)) {
+        surface?.native?.releaseTextureSources(previousSources);
+        const generation = ++companionGeneration;
+        void companionSelection.prepare().then((ready) => {
+          if (ready && !roomDisposed && generation === companionGeneration && lastFrame)
+            draw(lastFrame, true);
+        });
+      }
+    }
     const now = services.now();
     if (surface?.native?.contextLost) {
-      last = now;
+      if (!repaint) last = now;
       return;
     }
-    dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
-    last = now;
+    dt = repaint ? 0 : Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
+    if (!repaint) last = now;
     if (!frame.reducedMotion) roomTime += dt;
     frame = {
       ...frame,
@@ -250,13 +270,14 @@ export function createArmoryPreview(
     else if (frame.pet === 'mystic-rock')
       figures.drawPetAt('mystic-rock', width * 0.84, height * 0.94, petHeight * 0.3);
     if (frame.effectsVisible) {
-      updateEffects(fx, dt || 0.016, dt || 0.016, {
-        scale: scale(),
-        wind: frame.wind,
-        time: frame.time,
-        random: services.random,
-        onSwordStuck: services.sounds.clink,
-      });
+      if (!repaint)
+        updateEffects(fx, dt || 0.016, dt || 0.016, {
+          scale: scale(),
+          wind: frame.wind,
+          time: frame.time,
+          random: services.random,
+          onSwordStuck: services.sounds.clink,
+        });
       const renderer = createEffectRenderer(g, fx, {
         scale: scale(),
         time: frame.time,
@@ -280,15 +301,26 @@ export function createArmoryPreview(
         room.decode().catch(() => {}),
         roomMaterials.prepare(),
         inkCharm.prepare(),
-        inkCompanion.prepare(),
+        companionSelection.prepare(),
         inkEnemy.prepare(),
         inkPlayer.prepare(),
         inkSword.prepare(),
       ]),
     demo,
     draw,
+    suspend() {
+      lastFrame = undefined;
+      companionPet = companionAppearance = '';
+      companionGeneration++;
+      surface?.native?.releaseTextureSources(companionSelection.sources());
+      companionSelection.select('');
+    },
     dispose() {
       roomDisposed = true;
+      lastFrame = undefined;
+      companionGeneration++;
+      surface?.native?.releaseTextureSources(companionSelection.sources());
+      companionSelection.dispose();
       roomMaterials.dispose();
       cachedMaterials.dispose();
       room.onload = null;
