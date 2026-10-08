@@ -227,7 +227,14 @@ prediction. Normal and daily waves predict the next three-wave visit; rush predi
 the next duel's visit. Trials retain their scenery, cinematic choices are unknown,
 and inactive or mismatched run/stage state has no prediction. Frame samples carry
 the optional next stage so compressed priority updates when modes change at the
-same stage. Prediction neither enters a visit nor consumes combat randomness.
+same stage. `runtime/scene-prediction.ts` reads the live visit ledger's non-mutating
+`peek` and geometry/quality getters to publish the exact upcoming composition
+identity (stage, seed, width, height, DPR and low quality). It caches a frozen
+identity until one of those fields changes, clearing it for unknown visits or
+invalid geometry. Background diagnostics write `assetNextScene` only when that
+reference changes. Prediction neither enters a visit nor consumes combat randomness.
+Decoded prefetch and worker/local next-scene slots remain pending; this identity
+does not itself compose or promote a scene.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader

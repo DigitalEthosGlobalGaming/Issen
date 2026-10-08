@@ -1,4 +1,24 @@
-# Performance, assets and seamless transitions — Preview admission guard rejected integration
+# Performance, assets and seamless transitions — Exact upcoming scene identities
+
+Latest checkpoint38: integrated1.68.32 publishes the exact upcoming composition
+identity from live stageVisits.peek and geometry/quality ports. Immutable cached
+identity changes only with stage/seed/size/DPR/quality; diagnostics write only on
+reference changes. Normal/daily next three-wave visit and rush next duel preserve
+seed sequence; fixed trials, unknown cinematic choices and inactive/mismatched
+runs skip prediction. No visit/RNG mutation, decode, composition or slot promotion.
+All466unitsPASS1876.3ms; related27browsersPASS1.9m; checked production build and
+all4bundle testsPASS20.9s, including offline resize. Live normal/daily seeds match
+later entries; settled RNG/ledger/current seed unchanged. Initial live test RNG
+sampling preceded legitimate encounter continuation; corrected settlement sampling,
+assertion retained, failed evidence preserved. Evidence under
+tmp/performance-next-scene-identity/; architecture/progress/version/changelog updated.
+Next decoded-soon work and worker/local next slots require shared budget admission,
+exact promotion/invalidation and visual parity. Enemy/startup ownership, whole-game
+memory,120Hz/CPU budgets and final Phase5 remain required. Full goal active;
+no push/deploy/native build/player saves. Earlier rejected ownership trials below
+remain rejected; no performance latency claim or repeated benchmark for this port.
+
+## Previous handoff — Preview admission guard rejected integration
 
 Latest checkpoint37: shared enemy/runtime gate trial rejected and reverted exactly
 to1.68.31. Strict TypeScript/all467unitsPASS; saved-original native27visitsPASS18.9s

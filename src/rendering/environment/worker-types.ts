@@ -52,7 +52,11 @@ export type ComposeResponse = {
   error?: string;
   phase?: 'assets-ready';
 };
-export function compositionKey(frame: EnvironmentFrame) {
+export type CompositionIdentity = Pick<
+  EnvironmentFrame,
+  'width' | 'height' | 'dpr' | 'stage' | 'stageSeed' | 'lowQuality'
+>;
+export function compositionKey(frame: CompositionIdentity) {
   return JSON.stringify([
     frame.width,
     frame.height,

@@ -29,7 +29,7 @@ import type { createPlayerFigures } from '../presentation/player-figures.ts';
 import type { Random } from '../shared/random.ts';
 import { cacheView, stateView } from '../game/session/state-view.ts';
 import { sampleAssetBackground } from '../platform/asset-background.ts';
-import { predictNextStage } from '../game/session/stage-progression.ts';
+import { createScenePrediction } from './scene-prediction.ts';
 
 const gameplayStates = ['playing', 'boss', 'between', 'standoff', 'shrine', 'dead'];
 const backgroundQuietStates = ['title', 'over', 'between', 'shrine', 'paused'];
@@ -86,6 +86,7 @@ export type FrameBindingViews = SimulationPorts &
     readonly gustLeaves: Parameters<typeof simulateWeather>[3]['gustLeaves'];
     readonly drawPreview: () => void;
     readonly settlePresentedScene: () => void;
+    readonly stageVisits: { peek(stage: number): number };
     hitStop: number;
     readonly timeScale: number;
   };
@@ -95,6 +96,7 @@ export function createFrameBindings(
   readViews: () => FrameBindingViews,
   lightSources = createLightSources(),
 ) {
+  const predictScene = createScenePrediction(readViews);
   // The parent is a lifetime live view. Overrides keep dynamic selections as getters.
   function frameView<Ports extends object>(ports: Ports) {
     return cacheView(() => {
@@ -316,15 +318,15 @@ export function createFrameBindings(
           environmentState,
           density,
           rebalanceWeather,
-          activeTrial,
-          cinematic,
         } = readViews();
+        const nextScene = predictScene();
         sampleAssetBackground(
           G.stage,
           !sceneLoading && !G.panel && backgroundQuietStates.includes(G.state),
           work,
           1000 / frameRate(),
-          predictNextStage(G, !!activeTrial, cinematic.active),
+          nextScene?.stage,
+          nextScene,
         );
         if (sceneLoading) return;
         if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;

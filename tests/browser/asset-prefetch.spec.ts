@@ -24,18 +24,39 @@ test('changing next-stage prediction at the same stage reprioritizes compressed 
     const { startBackgroundAssets } = await import('/src/platform/background-assets.ts');
     const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
     const stop = startBackgroundAssets(document);
-    sampleAssetBackground(0, false, 0, 8.3, 1);
-    sampleAssetBackground(0, false, 0, 8.3, 8);
-    sampleAssetBackground(0, true, 0, 8.3, 8);
+    const first = Object.freeze({
+      stage: 1,
+      stageSeed: 42,
+      width: 390,
+      height: 844,
+      dpr: 2,
+      lowQuality: false,
+    });
+    const next = Object.freeze({ ...first, stage: 8, stageSeed: 43 });
+    sampleAssetBackground(0, false, 0, 8.3, 1, first);
+    sampleAssetBackground(0, false, 0, 8.3, 8, next);
+    sampleAssetBackground(0, true, 0, 8.3, 8, next);
+    const predicted = JSON.parse(document.body.dataset.assetNextScene!);
     const deadline = performance.now() + 2000;
     while (calls.length < 2) {
       if (performance.now() > deadline) throw Error('prefetch dispatch timed out');
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
+    sampleAssetBackground(0, false, 0, 8.3);
+    const invalidated = !document.body.dataset.assetNextScene;
     stop();
-    return calls;
+    return { calls, predicted, invalidated, disposed: !document.body.dataset.assetNextScene };
   });
-  expect(result).toEqual(['/current.webp', '/eight.webp']);
+  expect(result.calls).toEqual(['/current.webp', '/eight.webp']);
+  expect(result.predicted).toEqual({
+    stage: 8,
+    stageSeed: 43,
+    width: 390,
+    height: 844,
+    dpr: 2,
+    lowQuality: false,
+  });
+  expect(result.invalidated && result.disposed).toBe(true);
 });
 
 test('prefetched runtime files let fresh workers prepare every stage without atlas network access', async ({

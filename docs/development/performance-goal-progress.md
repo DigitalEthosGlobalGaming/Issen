@@ -2096,3 +2096,44 @@ raising/splitting budgets. Settled lease release/reacquisition remains proven at
 checkpoint36; applying it indiscriminately is unsafe. All handles terminal; full
 goal active, no push/deploy/native build/player saves. Selected figure/startup
 ownership, next slots,120Hz/CPU budgets and Phase5 still required.
+
+## Checkpoint 38 — Exact live upcoming scene identities, 1.68.32
+
+Baseline on checkpoint37/1.68.31: existing stage progression, visit seeds and
+compressed-loader units13PASS703.9ms. The visit ledger already exposes a pure
+peek; frame sampling previously sent only a numeric next stage to compressed
+prefetch. No next-slot loading or latency improvement is claimed here.
+
+The runtime now reads that same live ledger and geometry/quality ports to publish
+an immutable six-field upcoming composition identity: stage, stage seed, width,
+height, DPR and low quality. Unchanged fields reuse the object, so background
+metadata serializes/writes only on identity changes. Existing compressed queue
+ordering and quiet/visible/frame-budget/native/saveData gates are retained.
+Normal and daily progression predicts the next three-wave visit; rush predicts
+the next duel. Trials retain fixed scenery; cinematic choices are unknown.
+Inactive/mismatched runs and invalid geometry clear the prediction. No entry,
+checkpoint, layout, gameplay random draw or decoder operation is added.
+
+New3unit checks cover720normal/rush wave entries across two initial seeds and ten
+laps, unchanged ledger/state, exact eventual entry/key,100same-reference reads,
+all six identity invalidations, every trial, unknown cinematic choices and invalid
+geometry/inactive runs. Existing actual wave/RNG replay remains included.
+All466unitsPASS1876.3ms. Strict TypeScript passed during focused iteration.
+New actual normal/daily browser samples follow waves1/4/7/10, compare future peek
+to eventual entry, and preserve settled combat RNG/current seed/visit count.
+Initial5prefetch browsers passed but both new live tests compared RNG before the
+legitimate pending encounter continuation; fixed the test sampling point to scene
+settlement, retaining the RNG assertion. Corrected2live testsPASS17.2s.
+Failed evidence is preserved; production behavior was not changed for that failure.
+
+Evidence under tmp/performance-next-scene-identity/: baseline/units/browser logs
+and normal/daily visit JSON. Decoded soon requests and worker/local next slots,
+slot admission/promotion/invalidation, enemy/startup ownership, whole-game memory,
+120Hz/CPU budgets and final Phase5 remain required. No latency benchmark repeated
+for a prediction-only change; the standard performance harness remains unchanged.
+
+Related27browser checksPASS1.9m, including compressed ordering/policy, cinematic
+restoration and saved-run isolation, daily presets, held loading and all trials.
+Checked production build (strict TypeScript) and all4bundle testsPASS20.9s:
+startup, Armoury/gameplay/landscape, edition gates and offline resize. Rendering, seed-entry, layout and decode paths retain their existing behavior. Full goal active;
+no push/deploy/native build/player saves.

@@ -1,6 +1,7 @@
 import { runtimeAssets } from './runtime-assets.ts';
 import { createAssetPrefetch, createCompressedAssetStore } from './compressed-assets.ts';
 import { observeAssetBackground } from './asset-background.ts';
+import type { CompositionIdentity } from '../rendering/environment/worker-types.ts';
 
 /** Start only after the loading overlay leaves; frames grant background work time. */
 export function startBackgroundAssets(doc: Document, native = false) {
@@ -24,14 +25,20 @@ export function startBackgroundAssets(doc: Document, native = false) {
     allowed = false,
     disposed = false;
   let lastNextStage: number | undefined;
+  let lastNextScene: Readonly<CompositionIdentity> | undefined;
   const policy = () => {
     const next = !native && !connection?.saveData && !doc.hidden && quiet;
     if (next === allowed) return;
     allowed = next;
     prefetch.pause(!allowed);
   };
-  const stop = observeAssetBackground((stage, settled, work, budget, nextStage) => {
+  const stop = observeAssetBackground((stage, settled, work, budget, nextStage, nextScene) => {
     quiet = settled && work <= budget * 0.75;
+    if (nextScene !== lastNextScene) {
+      lastNextScene = nextScene;
+      if (nextScene) doc.body.dataset.assetNextScene = JSON.stringify(nextScene);
+      else delete doc.body.dataset.assetNextScene;
+    }
     if (stage !== lastStage || nextStage !== lastNextStage) {
       lastStage = stage;
       lastNextStage = nextStage;
@@ -58,5 +65,6 @@ export function startBackgroundAssets(doc: Document, native = false) {
     doc.removeEventListener('visibilitychange', policy);
     connection?.removeEventListener('change', policy);
     delete doc.body.dataset.assetPrefetch;
+    delete doc.body.dataset.assetNextScene;
   };
 }
