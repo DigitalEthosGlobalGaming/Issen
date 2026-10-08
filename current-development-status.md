@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Cached native GPU bindings detach on retirement
+# Performance, assets and seamless transitions — Upload pacing measured before integration
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -464,3 +464,29 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     next slots, paced uploads/variants,120Hz fidelity/CPU budget and full Phase5
     verification remain required. Covered warnings are resolved; no whole-game
     source-lifetime or resident-GPU peak claim is made.
+
+21. Upload pacing investigation on unchanged1.68.22: ignored worker response hook
+    initializes composed colour/emissive and data normal/surface through the same
+    painter texture store, in rAF batches targeting4ms. Separate fresh-worker
+    comparison differs atstage5(max33); cannot use it as parity proof. Sharing
+    identical composed bitmaps between two painters gives exact pixels across9
+    stages (fresh-painter PASS21.4s, corrected persistent-painter PASS13.7s).
+    Persistent-painter first-draw baseline→paced ms bystage0–8:
+    115.3→56.3,12.3→1.2,18.3→1.4,57.1→12.6,30.4→3.6,10.8→1.2,
+    12.7→0.6,21.6→6.0,19.5→0.5. Static composed uploads leave first draw, but
+    stage0 still uploads4live-fog1774x887 planes. CPU profile samples45.5ms in
+    texImage2D atstage0; stage3 fresh-painter profile samples9.9ms in program
+    parameter checks. Persistent stage1–8 draws fall below16ms in this sample.
+    This is one diagnostic sample, not framep95/cold-load/resident-memory proof.
+    Corrected warm wall durations10.5–35.9ms (incl rAF); batches4.8–8.7ms. Another
+    run has a single22.6ms upload: a4ms batch target cannot split native uploads.
+    Next integrate cancellation/hidden/context-restore-safe warming before worker
+    publication/settlement, preserving old layers; include live fog, then shader/
+    variant warming and next-slot/local ownership. Do not just add waits to cold
+    loading or claim near-instant transitions. Initial persistent probe retained
+    nested instrumentation wrappers; corrected probe restores texImage2D eachrun,
+    original evidence preserved separately. Stable tmp/performance-scene-upload/
+    and runnable index tmp/probes/scene-upload/README.md. All processes terminal.
+    No production code, tests, version, assets or standard harness changed this
+    checkpoint. Whole-memory/startup/local budgets, native pressure stability,
+    next slots, uploads/variants,120Hz and full Phase5requirements remain required.

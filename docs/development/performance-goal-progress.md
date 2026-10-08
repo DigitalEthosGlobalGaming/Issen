@@ -1241,3 +1241,70 @@ terminal; no new performance capture ran. This resolves the covered expiry/trial
 warnings; whole-memory/startup owners/budgets, native pressure stability,
 next-slot/decoded warming, paced uploads/variants,120Hz fidelity/CPU budget and
 full Phase5verification/report remain required.
+
+## Phase4.3 baseline — Paced native uploads and residual first draw (no integration)
+
+Ignored probes initialize worker-composed sources through the existing painter's
+SceneTextureStore and renderer.texture.initSource; colour/emissive use colour
+textures, normal/surface use data textures. A4ms batch target yields through rAF.
+Nothing changes production scene readiness, source inputs or texture cache policy.
+The probe uses390x844 DPR2 and780x1688 main canvas, high quality and reduced motion.
+
+Separate fresh workers measured lower first-draw cost but differed atstage5
+(live max33), so that comparison fails the pixel guardrail. It does not isolate
+input composition from upload order. A compose-once comparison shares identical
+completed bitmaps between two fresh painters and matches pixels exactly across
+all9stages (PASS21.4s). A persistent-owner/two-painter comparison also matches all
+9stages exactly (corrected PASS13.7s). It avoids repeated cold shader compilation
+when evaluating sequential transitions. One sample perstage/mode is diagnostic;
+these are not steady-state p95 values or real-device/GPU-residency measurements.
+
+| Stage | First draw baseline ms | Paced first draw ms | Warm wall ms |
+| --- | ---: | ---: | ---: |
+| 0 | 115.3 | 56.3 | 27.7 |
+| 1 | 12.3 | 1.2 | 10.5 |
+| 2 | 18.3 | 1.4 | 17.9 |
+| 3 | 57.1 | 12.6 | 14.1 |
+| 4 | 30.4 | 3.6 | 35.9 |
+| 5 | 10.8 | 1.2 | 27.6 |
+| 6 | 12.7 | 0.6 | 14.9 |
+| 7 | 21.6 | 6.0 | 27.3 |
+| 8 | 19.5 | 0.5 | 21.7 |
+
+Static composed planes upload before the first draw; source counts are unchanged.
+Warm wall includes rAF waits. Corrected persistent batches span4.8–8.7ms despite
+the4ms target; individual uploads cannot be interrupted. Another run observes a
+single22.6ms upload and26ms batch. Moving work into loading alone can increase
+cold-load wall time; earlier/later HTTP-cache ordering also confounds separate
+worker compose times, so none of these proves the cold-load acceptance criterion.
+
+Residual stage0 first draw uploads four live-fog1774x887 sources outside the
+composed planes. A dedicated first-draw CPU profile samples45.5ms in texImage2D;
+recorded upload calls total45.2ms, with individual9.4–12.9ms calls. The stage3
+fresh-painter profile samples9.9ms in getProgramParameter checks. Its persistent
+first draw falls to12.6ms. CPU profile wall durations include exposed-function/CDP
+boundaries; use the direct draw measure, not total profile duration, as draw time.
+Function names and src URLs are visible in the dev CPU profiles; this is not a
+new production cold/warm trace. The initial hook assertion failed due to transformed
+Vite whitespace and was corrected. Initial persistent instrumentation retained
+nested texImage2D wrappers and collected later readback-tagged calls in old rows;
+the corrected run restores the original method after each measurement, preserving
+the first version separately.
+
+Required next work: feed the complete scene source set, including live fog, into
+cancellable paced warming before worker publication/settlement; preserve current
+layers until the warmed key is valid, stop while hidden, restart after context
+generation changes, and close stale partially uploaded responses through existing
+retirement. Then warm shader/figure variants and use the predicted next slot to
+hide preparation time. Local fallback needs explicit current/next canvas ownership
+and input-budget handling before equivalent asynchronous warming; it must not
+mutate displayed layers while awaiting uploads. This evidence supports the upload
+approach, not its integration or completion of transitions.
+
+Stable `tmp/performance-scene-upload/` contains independent-workers-results.json,
+same-output-results.json, persistent-v1-results.json, corrected persistent-results.json,
+profile-results.json and stage0/3 paced-first-draw CPU profiles. Runnable role/index
+`tmp/probes/scene-upload/README.md`. All sessions terminal; no new production code,
+version, assets, committed tests or standard performance harness changes. Whole
+memory/startup budgets, native pressure stability, decoded/next-slot warming,
+uploads/variants,120Hz fidelity/CPU budget and full Phase5verification remain required.
