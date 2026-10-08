@@ -2,8 +2,8 @@
 
 Version 1.67.0 replaces the old closure with explicit domain owners, plain-record
 character behavior and disposable event reactions. `src/game.ts` is a 129-line
-composition root. The final workstream gates below are still pending; this report
-does not claim that Workstream 2, lighting or the full goal is complete.
+composition root. Workstream 2 is complete under the documented pre-existing-failure
+rule. Workstream 3 lighting and Part 4 final verification remain required.
 
 ## Requirement evidence
 
