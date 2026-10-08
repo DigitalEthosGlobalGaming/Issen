@@ -1,5 +1,5 @@
 import type { RuleEvents } from '../events.ts';
-import { resetRun, type RunState, type Screen } from '../run-state.ts';
+import { resetRun, type RunState } from '../run-state.ts';
 import { normalLives } from '../equipment/lives.ts';
 import { recordSecretEvent } from '../progression/secret-events.ts';
 import { createRunRewardLedger, type RunRewardLedger } from '../progression/run-rewards.ts';
@@ -26,20 +26,16 @@ import {
 } from '../../shared/random.ts';
 import type { RunCheckpoint } from '../../platform/run-checkpoint.ts';
 import type { Statistics } from '../progression/statistics.ts';
-import type { ItemCategory } from '../content/items.ts';
 
 export interface RunStartViews<Pose extends object, Reveal> {
   readonly events: RuleEvents;
-  readonly $: (id: string) => HTMLElement;
   readonly G: RunState;
   readonly META: MetaProgress;
   readonly SETUP: Setup;
   readonly P: { fall: number; swingT: number; pose: Pose };
   readonly PREST: Pose;
-  readonly presentationState: { lbT: number };
   readonly playerStats: Statistics;
   readonly playerEquipment: Equipment;
-  readonly apparelMotion: { reset(): void };
   readonly audio: { setPaused(paused: boolean): void };
   readonly guided: { reset(): void };
   readonly stageVisits: { enter(stage: number, newVisit: boolean): number };
@@ -63,67 +59,44 @@ export interface RunStartViews<Pose extends object, Reveal> {
   readonly newRunSeed: () => number;
   readonly clearTrialResult: () => void;
   readonly clearCheckpoint: () => void;
-  readonly clearEffects: () => void;
   readonly resetWeather: (random: Random) => void;
   readonly checkUnlocks: () => void;
-  readonly clearHints: () => void;
   readonly computeMods: () => void;
-  readonly hint: (id: string, text: string, duration: number) => void;
-  readonly hud: (on: boolean) => void;
   readonly premiumAccess: () => boolean;
   readonly prepareScene: () => void;
   readonly saveStats: () => void;
-  readonly setScore: () => void;
   readonly setStage: (stage: number, animate: boolean) => void;
-  readonly showScreen: (id: Screen | null) => void;
   readonly startTrialEncounter: () => void;
   readonly startWave: (wave: number, skipEvent?: boolean) => void;
   readonly startBoss: () => void;
-  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
-  readonly applySeal: () => void;
-  readonly audioInit: () => void;
-  readonly buildLeaves: () => void;
   readonly waveCfg: (wave: number) => NonNullable<RunState['cfg']>;
 }
 
 /** Owns seeded run/daily/trial/rush entry without importing presentation types. */
 export function createRunStart<Pose extends object, Reveal>(views: RunStartViews<Pose, Reveal>) {
   const {
-    $,
     G,
     META,
     P,
     PREST,
     SETUP,
-    apparelMotion,
     audio,
     checkUnlocks,
-    clearHints,
     computeMods,
     guided,
-    hint,
-    hud,
     playerStats,
     playerEquipment,
     premiumAccess,
     prepareScene,
-    presentationState,
     saveStats,
-    setScore,
     setStage,
-    showScreen,
     stageVisits,
     startTrialEncounter,
     startWave,
     startBoss,
-    toast,
-    applySeal,
-    audioInit,
-    buildLeaves,
     waveCfg,
     clearTrialResult,
     clearCheckpoint,
-    clearEffects,
     resetWeather,
   } = views;
   function startRun() {
@@ -173,20 +146,17 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
     G.wardUsed = false;
     P.fall = 0;
     P.swingT = 9;
-    apparelMotion.reset();
+    views.events.emit('runStartCue', { kind: 'motion' });
     P.pose = { ...PREST };
     views.timeScale = 1;
     views.hitStop = 0;
-    presentationState.lbT = 0;
-    clearEffects();
+    views.events.emit('runStartCue', { kind: 'effects' });
     views.ST.runs++;
     saveStats();
-    clearHints();
+    views.events.emit('runStartCue', { kind: 'clearHints' });
     if (G.stage !== 0) setStage(0, true);
     else resetWeather(views.combatRandom);
-    showScreen(null);
-    hud(true);
-    $('bossbar').classList.remove('on');
+    views.events.emit('runStartCue', { kind: 'screen' });
     G.pauseN = 0;
     G.state = 'playing';
     prepareScene();
@@ -196,7 +166,7 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
     });
     if (views.activeTrial) {
       startTrialEncounter();
-      setScore();
+      views.events.emit('runStartCue', { kind: 'score' });
       return;
     }
     {
@@ -206,37 +176,28 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
         checkUnlocks();
       }
     }
-    setScore();
+    views.events.emit('runStartCue', { kind: 'score' });
     if (G.rush) {
       views.ST.rushRuns = (views.ST.rushRuns || 0) + 1;
       startRushDuel();
-      hint(
-        'rush',
-        'Boss rush. Only duels, one after another, with a shrine after every victory.',
-        5500,
-      );
+      views.events.emit('runModeHint', { mode: 'rush' });
     } else startWave(1);
-    if (G.fortune) toast({ k: G.fortune.k, msg: `Omikuji: ${G.fortune.n}. ${G.fortune.d}` });
-    if (G.blade)
-      hint(
-        'blade',
-        'No arrows. Raised high is up, held low is down, held out to a side is that side.',
-        6500,
-      );
-    if (G.zen)
-      hint(
-        'zen',
-        'Endless combo. You cannot die, but every mistake breaks your chain. End the run from pause.',
-        6500,
-      );
+    if (G.fortune)
+      views.events.emit('runFortune', {
+        glyph: G.fortune.k,
+        name: G.fortune.n,
+        description: G.fortune.d,
+      });
+    if (G.blade) views.events.emit('runModeHint', { mode: 'blade' });
+    if (G.zen) views.events.emit('runModeHint', { mode: 'zen' });
   }
   function startDaily() {
     views.activeDaily = dailyRun();
     views.ST = structuredClone(playerStats);
     views.EQ = { ...views.activeDaily.equipment };
-    applySeal();
+    views.events.emit('runStartCue', { kind: 'seal' });
     G.panel = null;
-    audioInit();
+    views.events.emit('runStartCue', { kind: 'audio' });
     startRun();
   }
   function startTrial(id: string) {
@@ -250,7 +211,7 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
     )
       return;
     views.activeTrial = trial;
-    buildLeaves();
+    views.events.emit('runStartCue', { kind: 'leaves' });
     views.trialFailure = '';
     clearTrialResult();
     views.combatRandom = rng(trial.seed);
@@ -264,7 +225,7 @@ export function createRunStart<Pose extends object, Reveal>(views: RunStartViews
       seal: playerEquipment.seal,
     };
     G.panel = null;
-    audioInit();
+    views.events.emit('runStartCue', { kind: 'audio' });
     startRun();
   }
   function nextStep() {

@@ -1,3 +1,7 @@
+import {
+  bindRunStartFeedback,
+  type RunStartFeedbackViews,
+} from '../ui/wiring/run-start-feedback.ts';
 import type { ShrineFeedbackViews } from '../ui/wiring/shrine-feedback.ts';
 import { bindRunFlowFeedback, type RunFlowFeedbackViews } from '../ui/wiring/run-flow-feedback.ts';
 import {
@@ -34,7 +38,6 @@ type ActionPorts = Pick<
   | 'computeMods'
   | 'enemyPos'
   | 'hud'
-  | 'setScore'
   | 'setStage'
   | 'toast'
   | 'updateSavedRunButtons'
@@ -42,7 +45,6 @@ type ActionPorts = Pick<
   | 'showOver'
   | 'checkUnlocks'
   | 'clearHints'
-  | 'hint'
   | 'prepareScene'
   | 'startTrialEncounter'
   | 'startWave'
@@ -64,6 +66,7 @@ type ActionPorts = Pick<
 > &
   Pick<RunFlowFeedbackViews, 'showPauseScreen' | 'refreshArmoryNew' | 'renderTrialObjective'> &
   Pick<ShrineFeedbackViews, 'showShrineOffers'> &
+  Pick<RunStartFeedbackViews, 'hint' | 'setScore'> &
   Pick<TrialFeedbackViews, 'banner' | 'openPanel'> &
   Pick<CheckpointFeedbackViews, 'renderHp' | 'renderLives'> & {
     readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
@@ -318,17 +321,6 @@ export function createRuntimeSession(
                       Object.assign(foundation.run.WX, createWeatherState(random));
                     };
                   },
-                  get clearEffects(): SessionBindingViews<
-                    typeof PREST,
-                    ResultReveal
-                  >['clearEffects'] {
-                    return () => {
-                      for (const [key, particles] of Object.entries(
-                        foundation.view.presentationState.fx,
-                      ))
-                        if (key !== 'scratches') particles.length = 0;
-                    };
-                  },
                   get TRIAL_PROGRESS() {
                     return foundation.profile.TRIAL_PROGRESS;
                   },
@@ -465,6 +457,26 @@ export function createRuntimeSession(
       setBestLine: readActions().setBestLine,
       showPauseScreen: readActions().showPauseScreen,
       renderTrialObjective: readActions().renderTrialObjective,
+    })),
+  );
+  foundation.lifecycle.add(
+    bindRunStartFeedback(context.events, () => ({
+      $: foundation.browser.$,
+      apparelMotion: foundation.view.apparelMotion,
+      presentationState: foundation.view.presentationState,
+      clearEffects: () => {
+        for (const [key, particles] of Object.entries(foundation.view.presentationState.fx))
+          if (key !== 'scratches') particles.length = 0;
+      },
+      clearHints: readActions().clearHints,
+      hint: readActions().hint,
+      hud: readActions().hud,
+      setScore: readActions().setScore,
+      showScreen: readActions().showScreen,
+      toast: readActions().toast,
+      applySeal: foundation.view.applySeal,
+      audioInit: foundation.browser.audioInit,
+      buildLeaves: presentation.buildLeaves,
     })),
   );
   return sessionBindings;

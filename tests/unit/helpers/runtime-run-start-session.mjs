@@ -1,4 +1,8 @@
-import { bindKnifeProgression, bindWaveProgression } from '../../../src/game/progression/encounter-listeners.ts';
+import { bindRunStartFeedback } from '../../../src/ui/wiring/run-start-feedback.ts';
+import {
+  bindKnifeProgression,
+  bindWaveProgression,
+} from '../../../src/game/progression/encounter-listeners.ts';
 import { bindEncounterProgression } from '../../../src/game/progression/encounter-listeners.ts';
 import { createEventBus } from '../../../src/game/events.ts';
 import { createRunStart } from '../../../src/game/session/run-start.ts';
@@ -12,7 +16,13 @@ import { createPlayerAnimation, REST_POSE } from '../../../src/game/player/playe
 import { createWeatherState } from '../../../src/rendering/scene/weather-state.ts';
 
 /** Fixed input ports drive the production run-start API, with test-owned profile state. */
-export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, start = true) {
+export function runStartSession(
+  seed,
+  setup,
+  equipment = DEFAULT_EQUIPMENT,
+  start = true,
+  feedback = true,
+) {
   const G = createRunState(),
     ST = parseStatistics({ roninWave: 10 }),
     EQ = { ...equipment };
@@ -108,9 +118,25 @@ export function runStartSession(seed, setup, equipment = DEFAULT_EQUIPMENT, star
   };
   bindEncounterProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {} }));
   bindKnifeProgression(views.events, () => ({ ST: views.ST, saveStats: views.saveStats }));
-  bindWaveProgression(views.events, () => ({ ST: views.ST, bst: () => null, challenge() {},
-    saveStats: views.saveStats, checkUnlocks: views.checkUnlocks }));
+  bindWaveProgression(views.events, () => ({
+    ST: views.ST,
+    bst: () => null,
+    challenge() {},
+    saveStats: views.saveStats,
+    checkUnlocks: views.checkUnlocks,
+  }));
+  const offFeedback = feedback ? bindRunStartFeedback(views.events, () => views) : () => {};
   const flow = createRunStart(views);
   if (start) flow.startRun();
-  return { run: G, get random() { return views.runRandom; }, views, flow, trace, weather };
+  return {
+    run: G,
+    get random() {
+      return views.runRandom;
+    },
+    views,
+    flow,
+    trace,
+    weather,
+    disposeFeedback: offFeedback,
+  };
 }

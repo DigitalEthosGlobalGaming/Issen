@@ -110,6 +110,11 @@ export interface GameEvents {
     bossShown: boolean;
   }>;
   checkpointChanged: Readonly<{ saved: boolean }>;
+  runStartCue: Readonly<{
+    kind: 'motion' | 'effects' | 'clearHints' | 'screen' | 'score' | 'seal' | 'audio' | 'leaves';
+  }>;
+  runModeHint: Readonly<{ mode: 'rush' | 'blade' | 'zen' }>;
+  runFortune: Readonly<{ glyph: string; name: string; description: string }>;
   runFlowCue: Readonly<{
     kind: 'seal' | 'title' | 'letterboxReset' | 'best' | 'pause' | 'trialObjective';
   }>;

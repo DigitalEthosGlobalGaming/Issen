@@ -1,3 +1,27 @@
+## Latest green checkpoint: run-start presentation ownership
+
+Run-start emits frozen runStartCue/runModeHint/runFortune values; UI-owned
+run-start-feedback.ts reacts to motion/effects/letterbox resets, hints, screen/
+HUD/bossbar/score/seal, audio initialization and trial leaves. Rule controller
+retains player pose/timing reset, seed/combat RNG, weather generation, modifiers,
+profile identity/counters, checkpoint clearing, trial eligibility and scene/
+encounter entry. Cosmetic actions retain original synchronous call boundaries.
+Seven actual normal/Ronin/Blade/Zen/rush/daily/trial scenarios compare run/profile/
+player/weather/ledger/gameplay RNG with listeners enabled/absent and test frozen
+values/disposal. No assertion or timeout was weakened.
+`npm run typecheck`: PASS (tmp/runtime-refactor/run-start-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 396 PASS
+(tmp/runtime-refactor/run-start-feedback-unit.log).
+`npx playwright test tests/browser/game.spec.ts tests/browser/daily.spec.ts tests/browser/trials.spec.ts tests/browser/new-blessings.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 16 PASS in 1.7m (tmp/runtime-refactor/run-start-feedback-browser.log),
+terminal exit 0 confirmed. No live browser process remains.
+Next: results.ts UI/presentation ownership. Its direct DOM/renderGameOver,
+letterbox/hints, screen/HUD/best/buttons and result sequence display must move;
+retain overReady, reward settlement/profile/storage rollback and callbacks as
+rules. Then separately delete stale adapter capabilities and complete W2 audit/
+gates/docs/version 1.67.0. All W3 and Part 4 remain required; develop is unpushed.
+The run-start generation script is non-idempotent and already applied.
+
 ## Latest green checkpoint: title/pause/resume UI ownership
 
 Run-flow rules emit frozen runFlowCue values for seal/title/letterbox/best/pause/
