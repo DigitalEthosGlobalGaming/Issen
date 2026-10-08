@@ -1,22 +1,20 @@
-## LIVE W3 phase 1 broad browser gate — resume exact process
+## W3 phase 1 checkpoint — continue to phase 2
 
-Source under verification is committed 4d4ed49, version 1.68.0. Strict/all401
-units and all47 affected native/startup/restore/game/checkpoint browsers PASS.
-Full command now running:
- npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure
-Unified exec session 14622 is confirmed LIVE by write_stdin returning this handle.
-Log tmp/lighting-refactor/phase1-broad-browser.log; 260 cases, two Edge workers.
-Latest authoritative observation: three passing cases, no reported failure.
-Poll this same handle, do not restart on timeout, and do not edit application/test
-source while live. Documentation-only changes do not change source under test.
-After terminal, fix actual failures without weakening assertions; get a complete
-passing combined invocation. Then record exact broad evidence/commit checkpoint
-and continue immediately to W3 phase 2 fullscreen MRT diffuse/specular lights,
-light-source registry, deterministic 16-light budget, rig integration/debug.
-W3 phases 2–6 and Part 4 are required and pending; goal remains active.
-No develop push until full completion; immutable pre-refactor retained.
-Prior turn made concrete progress (geometry implementation/tests/commit); this
-handle may legitimately span goal continuations. No other browser jobs are live.
+Source 4d4ed49, version 1.68.0: strict/all401 units and all47 affected
+native/startup/restore/game browsers PASS. Full broad session14622 is TERMINAL
+exit1: 259 passed, one material-preview failure, 14.3m; log
+tmp/lighting-refactor/phase1-broad-browser.log. The preview test used the first
+select after the buffer-view select was added. It now explicitly queries
+select[aria-label="Material preview"]; all original assertions are unchanged.
+Exact affected rerun passed 1/1 in4.2s exit0, phase1-preview-selector.log.
+Do not claim a single all260-pass invocation. Application source is unchanged
+between broad and the selector rerun. No browser process remains live.
+The next full broad invocation is required at the W3 checkpoint; repeating all
+260 immediately for this selector-only repair adds no renderer coverage.
+NEXT: apply prepared phase2 native HDR light pass/registry/16-light budget and
+verify strict, units, focused native/restore/debug/material suites. W3 phases2–6
+and Part4 remain mandatory. No develop push until full completion.
+
 ## W3 phase 1 focused checkpoint green — broad browser next
 
 Final 1.68.0 geometry implementation has strict npm run typecheck PASS and all
