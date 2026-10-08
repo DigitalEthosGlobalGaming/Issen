@@ -292,3 +292,94 @@ Evidence: `tmp/performance-phase1-pacing-units.log`,
 `tmp/performance-phase1-corrected-pacing-build.log` and
 `tmp/performance-phase1-tooling-units.log`. Fresh full timings, compose and scene
 measurements remain required before the Phase1 checkpoint and Phase2 work.
+
+## Phase 1 measured checkpoint
+
+Full corrected comparison PASS:105timings and21diagnostics in
+`tmp/performance/2026-10-08T11-13-56.661Z-6cf5fb13`. Captured clean commitc625ce8,
+version1.68.4, same portrait390×844 DPR2 fixture, seed, density and standard
+instrumentation fingerprint as Phase0. Session56608 is terminal with exit0.
+Every scenario's retained metrics and comparison are in its report and
+`frame-budgets.json`; no timing samples were discarded. Pooled raw values below
+differ slightly from the standard report's median-of-repetition medians.
+
+| Workload | Render median before→after ms | Render p95 before→after ms | After render p99 ms | After render >8.3 / >16.7 | Interval p95 before→after ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Combat | 6.1→2.4 | 15.4→3.4 | 4.5 | 5 / 3 of1501 | 19.3→16.9 |
+| Demon | 29.4→6.7 | 39.7→9.7 | 13.9 | 246 / 4 of1505 | 55.7→16.9 |
+| Inferno | 45.9→10.1 | 81.4→18.2 | 31.1 | 1149 / 104 of1486 | 82.4→19.0 |
+| Cinematic cycle | 2.3→1.7 | 11.2→7.5 | 62.9 | 406 / 187 of8606 | 21.0→21.1 |
+
+Gameplay updatep95 is0.2ms in these samples. Stress100 render median/p95/p99 is
+13.9/15.4/16.8ms. Actual callbacks remain approximately60Hz on this measurement
+display despite the120Hz gameplay cap. Physical120Hz/mobile delivery and the
+8.3ms target are not demonstrated. Demon, Inferno and stress CPU still exceed
+that budget; cinematic upload spikes remain. Further main-thread investigation
+will be required for the final goal, even after the listed Phase1 changes.
+
+Weighted listener self-time in separate CPU captures is Combat90.743→5.626ms,
+Demon1030.423→314.242ms, Inferno748.534→539.502ms. Shared light fan-out is removed
+by ownership tests; other resource listener churn remains and is not declared
+resolved. Title startup median3273.1→2712.1ms, p955813.2→2883.4ms. Maximum sampled
+heap319,292,568→191,877,380bytes. Maximum nominal main decoded estimate remains
+928,462,528bytes (878,141,824for the main gameplay scenes), without a budget.
+
+### Compose and visual comparison
+
+`tmp/performance-compose-phase1/results.json`: all45fresh-worker repetitions PASS
+against `tmp/performance-compose-baseline`. All116raw colour/normal/surface/emissive
+planes are byte-identical: maximum, mean and alpha differences are0. This measures
+the unchanged worker composition path, not a Phase2 optimization. Session23676
+is terminal with exit0. The fixture remains900×600 DPR1, predecoded fixed seed.
+
+| Stage | Compose median before→after ms | After compose p95 ms | After round trip median ms |
+| --- | ---: | ---: | ---: |
+| 0 | 678.2→574.0 | 757.8 | 621.5 |
+| 1 | 266.4→265.6 | 271.7 | 304.7 |
+| 2 | 322.4→315.0 | 331.6 | 363.0 |
+| 3 | 436.9→438.5 | 449.8 | 512.4 |
+| 4 | 385.3→377.5 | 387.5 | 460.5 |
+| 5 | 261.8→255.2 | 288.9 | 301.5 |
+| 6 | 337.6→344.5 | 383.4 | 395.7 |
+| 7 | 291.4→297.6 | 339.7 | 348.6 |
+| 8 | 193.6→264.5 | 274.9 | 295.2 |
+
+Worker decoded estimates are unchanged at151–283MB. Stage0still exceeds500ms;
+differences on this unchanged path reflect measurement variance, not a claimed
+compose optimization. Phase2must cache stamps and remeasure/profile remaining cost.
+
+### Production scene comparison
+
+`tmp/performance-scene-phase1/results.json`:18cold/warm scenes and18traces PASS,
+plus separate fresh gameplay. Session72683 is terminal with exit0. Same900×600
+DPR1 fixture and trace task definition as the Phase0 production probe. These
+preview transitions do not establish normal-run next-scene readiness.
+
+| Stage | Cold load before→after ms | Warm load before→after ms | Cold longest task before→after ms | Warm longest task before→after ms | After cold / warm tasks >16 ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0 | 894.2→802.5 | 875.0→808.7 | 64.4→58.0 | 75.4→59.1 | 1 / 1 |
+| 1 | 313.9→306.6 | 373.7→286.0 | 11.3→10.7 | 29.0→11.4 | 0 / 0 |
+| 2 | 423.7→429.5 | 459.6→496.9 | 9.7→8.0 | 51.6→17.5 | 0 / 1 |
+| 3 | 631.8→604.4 | 707.4→542.9 | 35.0→30.7 | 37.1→16.2 | 1 / 1 |
+| 4 | 548.1→515.8 | 577.2→520.5 | 13.6→13.7 | 43.0→14.8 | 0 / 0 |
+| 5 | 405.6→390.5 | 497.8→392.2 | 11.7→9.3 | 35.5→8.7 | 0 / 0 |
+| 6 | 612.8→497.5 | 659.0→513.7 | 28.7→10.9 | 76.8→22.0 | 0 / 1 |
+| 7 | 548.7→424.7 | 547.4→452.1 | 28.5→15.8 | 45.2→23.5 | 0 / 1 |
+| 8 | 368.8→354.1 | 358.8→366.2 | 26.0→10.5 | 71.4→15.4 | 0 / 0 |
+
+Seven of18captures still have a task over16ms; texture uploads are not warmed.
+Stage requests remain0–28atlas requests per transition, including browser-cache
+hits. No compressed prefetch or next-slot promotion exists yet. Loading remains
+286–809ms; some cold/warm samples are slower, so a blanket no-regression claim
+would be unsupported. Phase4must address presentation-time uploads and loading.
+
+Single-probe title ready2897.4→2823.9ms, first gameplay4099.6→4179.3ms including
+gesture/automation, run scene ready753.5→868.7ms. Ten-second gameplay render
+median/p95/p992.3/3.4/4.6ms (baseline2.9/4.2/5.4); intervals16.7/17.0/17.6ms,
+600>8.3 and197>16.7 of601. Scene-cycle sampled heap158,149,468→59,198,100bytes;
+main/worker nominal decoded estimates remain878,141,824/283,171,432bytes.
+These are endpoint samples/nominal sizes, not resident GPU or continuous peaks.
+
+Phase1findings are recorded before continuing. Phase2cutout-cache quantisation
+must retain pixel evidence and its checkpoint; remaining Phase3inventory/budget
+and Phase4seed/promotion/loading invariants remain outstanding.

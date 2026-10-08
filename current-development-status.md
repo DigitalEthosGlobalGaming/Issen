@@ -98,18 +98,26 @@ Continue:
 2. Focused strict/unit/browser checks, then measured Phase1 comparison against
    frozen baselines. Record findings and commit before Phase2 compose.
    Pacing commit c625ce8 and architecture follow-up b82c05c are complete.
-   Fresh FULL comparison is LIVE: exec session56608, log
+   Fresh FULL comparison PASS: terminal exec session56608, log
    tmp/performance-phase1-corrected-measured.log, results
-   tmp/performance/2026-10-08T11-13-56.661Z-6cf5fb13. Last snapshot:20timings,
-   4diagnostics, running, no errors; captured clean c625ce8, version1.68.4 and
-   unchanged standard harness fingerprint. Continue waiting on this exact session;
-   do not restart, cancel or overlap browser/compose/scene captures while it runs.
-   After all105timings/21diagnostics PASS, summarize-frame-budgets.mjs with120cap,
-   summarize-listener-profile.mjs against Phase0, then sequential compose parity
-   against tmp/performance-compose-baseline and production scene-flow captures.
-   Record every Phase1 metric before starting Phase2 implementation. New architecture
-   documentation after capture changes no runtime behavior. Physical120Hz delivery
-   and all final goal targets remain unproven.
+   tmp/performance/2026-10-08T11-13-56.661Z-6cf5fb13:105timings/21diagnostics,
+   no errors, clean c625ce8, version1.68.4 and unchanged harness fingerprint.
+   Derived frame-budgets.json uses120cap; listener-profile.json compares Phase0.
+   Combat renderp9515.4→3.4ms, Demon39.7→9.7ms, Inferno81.4→18.2ms. Actual
+   measurement callbacks remain60Hz; physical120Hz/mobile remains unproven.
+   Remaining Demon/Inferno/stress CPU budget violations need further work.
+   Compose tmp/performance-compose-phase1 PASS45repetitions,116planes byte-identical
+   to Phase0, worker decoded unchanged151–283MB; stage0median574ms remains>500.
+   Production tmp/performance-scene-phase1 PASS18cold/warm traces plus gameplay.
+   Loading286–809ms;7captures retain tasks>16ms (maximum59.1ms), atlas requests
+   remain0–28per transition. Main decoded budget still absent; nominal878–928MB.
+   Compose session23676 and scene session72683 are TERMINAL exit0. No live captures.
+   Full Phase1measured checkpoint is recorded in progress notes. Continue Phase2:
+   bounded masked material cutout cache, visual-checked2degree normal rotation,
+   scratch reuse/readback-only CPU contexts, cached worker native methods and
+   parallel bitmap copies with complete close-on-failure ownership. Focused tests,
+   remeasure every stage against raw baseline, profile/explain stages>500ms and
+   record the quantisation visual checkpoint before Phase3.
 3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas
    checkpoint and WebP/quantisation visual checks remain required. Existing W1
    already compacted runtime WebP planes; inventory actual files before converting
