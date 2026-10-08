@@ -1,3 +1,24 @@
+## W3 audit checkpoint — native MRT verified, G-buffer next
+
+W1/W2 complete under the explicit pre-existing Android failure exception below.
+W3 audit started in tmp/lighting-refactor/audit.md: actual seven composer passes,
+material/light producers, painter/surface ownership, CPU foliage and migration plan.
+No application lighting implementation has changed yet; version remains 1.67.0.
+Native Pixi 8.22 MRT is verified in real Edge with one RenderTarget and three GLSL
+layout outputs: complete framebuffer, exact red/green/blue attachment pixels,
+three attachments, adequate queried limits and zero GL error. Final test command:
+ npx playwright test tests/browser/lighting-mrt.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure
+PASS one case in 2.4s, exit 0; tmp/lighting-refactor/mrt-capability.log. No live process.
+Test helper tests/helpers/pixi-mrt.ts lets Vite resolve installed package imports.
+Use explicit #version 300 es in vertex/fragment; Pixi detects GLSL mode from the
+fragment header. Non-destructive target binds require clear:false. No raw helper
+or alternate backend is required. Initial probe authoring errors were corrected;
+no exact pixel/assertion/error/completeness check was relaxed.
+NEXT: complete W3 pre-reading/producer lifetime audit, then phase 1 painter-owned
+G0/G1/G2 geometry targets and testing-tools debug views with alpha cutoff,
+normal transform/depth/material flags and full resize/restore/disposal tests.
+Do not jump to light budget in place of G-buffer. All W3 phases and Part 4 remain.
+Keep develop unpushed until complete; no profiling/native/store/real-save work.
 ## W2 complete — begin W3 lighting audit
 
 Final implementation source d87e344, version 1.67.0. No live verification process
