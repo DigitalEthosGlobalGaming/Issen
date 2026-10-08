@@ -40,8 +40,14 @@ export interface GameEvents {
   swipeCue: Readonly<{ kind: 'mirror' | 'miss' }>;
   knifeHit: Readonly<{ x0: number; y0: number; x: number; y: number; height: number }>;
   struck: Readonly<{
-    reason: string; lives: number; fatal: boolean; lifeLost: boolean;
-    x: number; y: number; height: number; label: string;
+    reason: string;
+    lives: number;
+    fatal: boolean;
+    lifeLost: boolean;
+    x: number;
+    y: number;
+    height: number;
+    label: string;
   }>;
   companionSaved: Readonly<{ kind: 'tanto' | 'foxfire'; x: number; y: number }>;
   revived: Readonly<{ kind: 'support' | 'phoenix' | 'daruma'; lives: number }>;
@@ -55,23 +61,57 @@ export interface GameEvents {
   }>;
   block: Readonly<{ boss: string; perfect: boolean; x: number; y: number; height: number }>;
   wavePrepared: Readonly<{ wave: number; zen: boolean; lostLife: boolean }>;
-  waveReached: Readonly<{ wave: number; mode: string; zen: boolean; blade: boolean; lostLife: boolean }>;
+  waveReached: Readonly<{
+    wave: number;
+    mode: string;
+    zen: boolean;
+    blade: boolean;
+    lostLife: boolean;
+  }>;
   waveStarted: Readonly<{
-    wave: number; stage: number; lap: number; changed: boolean;
-    event: 'blood' | 'fog' | null; ronin: boolean; refill: boolean; feint: boolean;
+    wave: number;
+    stage: number;
+    lap: number;
+    changed: boolean;
+    event: 'blood' | 'fog' | null;
+    ronin: boolean;
+    refill: boolean;
+    feint: boolean;
   }>;
   stageHint: Readonly<{ stage: number }>;
-  waveAttack: Readonly<{ kind: 'lightning' | 'lightningCut' | 'hesitate' | 'step'; x: number; y: number; height: number }>;
+  waveAttack: Readonly<{
+    kind: 'lightning' | 'lightningCut' | 'hesitate' | 'step';
+    x: number;
+    y: number;
+    height: number;
+  }>;
   livesChanged: Readonly<
     | { cause: 'refresh'; lives: number }
     | { cause: 'regen' | 'recovery' | 'breath'; lives: number; x: number; y: number }
   >;
   waveCleared: Readonly<{ wave: number; stage: number; score: number }>;
-  bossCut: Readonly<{ boss: string; direction: Direction; automatic: boolean; x: number; y: number; height: number }>;
+  bossCut: Readonly<{
+    boss: string;
+    direction: Direction;
+    automatic: boolean;
+    x: number;
+    y: number;
+    height: number;
+  }>;
   bossEntered: Readonly<{ glyph: string; name: string; lap: number; wave: number; rush: boolean }>;
   bossReady: Readonly<{ count: number }>;
   bossTraits: Readonly<{ twin: boolean; spear: boolean; mirror: boolean }>;
   bossHealth: Readonly<{ hp: number; maximum: number }>;
+  checkpointRestored: Readonly<{
+    state: RunPhase;
+    wave: number;
+    bossGlyph: string | null;
+    bossName: string | null;
+    bossShown: boolean;
+  }>;
+  checkpointChanged: Readonly<{ saved: boolean }>;
+  checkpointSaveFailed: Readonly<{ seed: number }>;
+  sessionScreen: Readonly<{ screen: import('./run-state.ts').Screen | null }>;
   trialEncounter: Readonly<{ id: string; wave: number }>;
   trialSettlement: Readonly<{ id: string; passed: boolean }>;
   trialLeavesReset: Readonly<{ id: string }>;
@@ -86,7 +126,12 @@ export interface GameEvents {
   gruntCue: Readonly<{ kind: 'bell' | 'feint' | 'bark' }>;
   bossCue: Readonly<
     | { kind: 'draw' }
-    | { kind: 'recovered' | 'return' | 'afterimage' | 'deflected'; x: number; y: number; height: number }
+    | {
+        kind: 'recovered' | 'return' | 'afterimage' | 'deflected';
+        x: number;
+        y: number;
+        height: number;
+      }
   >;
   bossOpening: Readonly<{ kind: 'parry' | 'chain' | 'cut'; mirror: boolean }>;
   bossStarted: Readonly<{ boss: string; count: number }>;
@@ -108,8 +153,8 @@ export interface GameEvents {
     alpha: number;
     crow: boolean;
   }>;
-  standoffStarted: Readonly<{ stage: number; changed: boolean }> ;
-  standoffCue: Readonly<{ kind: 'step' | 'draw' | 'exit' }> ;
+  standoffStarted: Readonly<{ stage: number; changed: boolean }>;
+  standoffCue: Readonly<{ kind: 'step' | 'draw' | 'exit' }>;
   standoffResolved: Readonly<
     | { won: false; perfect: false }
     | { won: true; perfect: true; direction: Direction; x: number; y: number; height: number }

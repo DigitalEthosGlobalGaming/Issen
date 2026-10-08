@@ -1,3 +1,6 @@
+import { bindCheckpointFeedback } from '../../../src/ui/wiring/checkpoint-feedback.ts';
+import { bindShrineFeedback } from '../../../src/ui/wiring/shrine-feedback.ts';
+import { createEventBus } from '../../../src/game/events.ts';
 import { createCheckpointFlow } from '../../../src/game/session/checkpoint-flow.ts';
 import { createRunState } from '../../../src/game/run-state.ts';
 import { createItems } from '../../../src/game/content/items.ts';
@@ -9,7 +12,7 @@ import { parseRunCheckpoint } from '../../../src/platform/run-checkpoint.ts';
 import { restorableRng } from '../../../src/shared/random.ts';
 
 /** Test-owned storage/UI ports; drives the actual session checkpoint API. */
-export function checkpointSession(checkpoint, position) {
+export function checkpointSession(checkpoint, position, feedback = true) {
   const G = createRunState(),
     playerStats = parseStatistics({}),
     UNL = new Set(checkpoint.unlocks);
@@ -20,6 +23,7 @@ export function checkpointSession(checkpoint, position) {
   let record = null;
   const trace = [];
   const views = {
+    events: createEventBus(),
     $: () => ({ textContent: '', classList: { toggle() {}, remove() {} } }),
     G,
     META,
@@ -104,7 +108,24 @@ export function checkpointSession(checkpoint, position) {
       trace.push('clock');
     },
   };
+  const offCheckpoint = feedback ? bindCheckpointFeedback(views.events, () => views) : () => {};
+  const offShrine = feedback
+    ? bindShrineFeedback(views.events, () => ({ ...views, sfx: { unlock() {} } }))
+    : () => {};
+  const snapshots = [];
+  views.events.on('checkpointRestored', (event) => snapshots.push(event));
   const flow = createCheckpointFlow(views);
   flow.restoreCheckpoint(structuredClone(checkpoint));
-  return { flow, views, saved, trace, read: views.persistence.read };
+  return {
+    flow,
+    views,
+    saved,
+    trace,
+    snapshots,
+    read: views.persistence.read,
+    dispose() {
+      offShrine();
+      offCheckpoint();
+    },
+  };
 }

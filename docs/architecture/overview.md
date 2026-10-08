@@ -594,3 +594,5 @@ feedback declares its own cosmetic view; trial UI actions use TrialFeedbackViews
 instead of masquerading as session rule capabilities. Rule bodies and cached
 current field forwarding remain; obsolete imports/one unused stage lookup are
 deleted separately from the preceding physical ownership move.
+
+Checkpoint persistence/adoption remains in game/session/checkpoint-flow.ts. Frozen checkpointRestored, checkpointChanged, checkpointSaveFailed and sessionScreen values drive ui/wiring/checkpoint-feedback.ts; saved shrine offers reuse the shrine listener. Runtime owns listener disposal. Restore display runs after weather/RNG/geometry/modifier restoration and before phase adoption, retaining the original call boundary. Tests compare actual saved encounters with cosmetics absent.

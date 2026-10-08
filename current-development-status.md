@@ -1,10 +1,23 @@
-# Rendering, assets and runtime refactor in progress
+## Latest green checkpoint: saved-run UI ownership
 
-Complete all three workstreams in main-goal.md strictly in order, then Part 4
-verification/report and one develop push. No approval gates. No profiles,
-benchmarks, store builds, real-save changes or lit-only worktree modifications.
-Restore point: immutable pushed pre-refactor at ad353b3. Work is directly on
-develop, unpushed. Version 1.66.8 with committed W1 Smaller download notes.
+Checkpoint restoration/capture now emits immutable display values; ui/wiring/
+checkpoint-feedback.ts owns labels, boss bar, lives/score/HP, seal, HUD, saved
+buttons, failure toast and continuation screen. Shrine continuation reuses the
+existing shrineOffers listener with frozen filtered IDs. Rule/profile adoption,
+weather-before-RNG restoration, phase adoption, clock reset, record format/save
+keys and loading early returns retain their original boundaries.
+New actual playing/boss/standoff/shrine tests compare run/profile/equipment/
+weather/persistence/gameplay RNG with UI enabled/absent, preserve frozen snapshots
+and verify disposal, failure order and silent loading exit.
+`npm run typecheck`: PASS (tmp/runtime-refactor/checkpoint-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 388 PASS
+(tmp/runtime-refactor/checkpoint-feedback-unit.log).
+`npx playwright test tests/browser/game.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/scene-continuation.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 15 PASS in 1.0m (tmp/runtime-refactor/checkpoint-feedback-browser.log),
+terminal exit 0 confirmed. No live browser process remains.
+Next: remaining run-flow/run-start/results UI ownership, full W2 requirements
+and gates, all W3 and Part 4. Develop remains unpushed; no approval is pending.
+Do not rerun the non-idempotent checkpoint draft/resume scripts.
 
 ## Active implementation: domain runtime composition
 

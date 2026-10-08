@@ -1,3 +1,4 @@
+import type { RuleEvents } from '../events.ts';
 import { dailyRun, type DailyRun } from '../progression/daily.ts';
 import {
   preserveSecretDiscoveries,
@@ -21,20 +22,18 @@ import {
 } from '../../platform/saves.ts';
 import { PREMIUM_FILM } from '../../platform/premium.ts';
 import { BLESS_BY } from '../content/blessings.ts';
-import { kanji } from '../../shared/format.ts';
 import { restorableRng, type RestorableRandom, type Random } from '../../shared/random.ts';
 import type { RunCheckpoint } from '../../platform/run-checkpoint.ts';
-import type { RunState, Screen } from '../run-state.ts';
+import type { RunState } from '../run-state.ts';
 import type { Statistics } from '../progression/statistics.ts';
-import type { Item, ItemCategory } from '../content/items.ts';
+import type { Item } from '../content/items.ts';
 import type { Enemy } from '../combat/enemy.ts';
 import type { Boss } from '../encounters/boss.ts';
 import type { TrialDefinition } from '../content/trials.ts';
 import type { RunRewardLedger } from '../progression/run-rewards.ts';
-import type { BLESS } from '../content/blessings.ts';
 
 export interface CheckpointFlowViews {
-  readonly $: (id: string) => HTMLElement;
+  readonly events: RuleEvents;
   readonly G: RunState;
   readonly AWAKENING: AwakeningProgress;
   readonly COLLECTION_PROGRESS: CollectionProgress;
@@ -65,25 +64,16 @@ export interface CheckpointFlowViews {
   };
   readonly storage: { set(key: string, value: unknown): unknown };
   readonly accessibleUnlocks: () => Set<string>;
-  readonly applySeal: () => void;
   readonly bossPos: (boss: Boss) => Boss['pos'];
   readonly computeMods: () => void;
   readonly enemyPos: (enemy: Enemy) => Enemy['pos'];
-  readonly hud: (on: boolean) => void;
   readonly premiumAccess: () => boolean;
-  readonly renderHp: () => void;
-  readonly renderLives: () => void;
   readonly saveAwakening: () => void;
   readonly saveMeta: () => void;
   readonly saveStats: () => void;
   readonly saveCollections: () => void;
-  readonly setScore: () => void;
   readonly setStage: (stage: number, animate: boolean) => void;
   readonly syncCollections: () => void;
-  readonly toast: (item: { k: string; msg?: string; n?: string; type?: ItemCategory }) => void;
-  readonly updateSavedRunButtons: () => void;
-  readonly showScreen: (id: Screen | null) => void;
-  readonly showShrineOffers: (offers: (typeof BLESS)[number][]) => void;
   readonly showOver: () => void;
   readonly resetClock: () => void;
   readonly adoptPhase: () => void;
@@ -93,7 +83,6 @@ export interface CheckpointFlowViews {
 /** Version-one records and rule RNG restore through explicit persistence/scene ports. */
 export function createCheckpointFlow(views: CheckpointFlowViews) {
   const {
-    $,
     AWAKENING,
     COLLECTION_PROGRESS,
     G,
@@ -104,27 +93,18 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
     DAILY_LOGIN,
     ITEMS,
     accessibleUnlocks,
-    applySeal,
     bossPos,
     computeMods,
     enemyPos,
-    hud,
     playerEquipment,
     playerStats,
     premiumAccess,
-    renderHp,
-    renderLives,
     saveAwakening,
     saveMeta,
     saveStats,
     saveCollections,
-    setScore,
     setStage,
     syncCollections,
-    toast,
-    updateSavedRunButtons,
-    showScreen,
-    showShrineOffers,
     showOver,
     resetClock,
   } = views;
@@ -164,8 +144,8 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
       dailyDay: views.activeDaily?.day,
     };
     if (views.persistence.write(checkpoint)) views.savedRun = views.persistence.read();
-    else toast({ k: '!', msg: 'Run could not be saved on this device.' });
-    updateSavedRunButtons();
+    else views.events.emit('checkpointSaveFailed', { seed: G.seed });
+    views.events.emit('checkpointChanged', { saved: !!views.savedRun });
   }
   function restoreCheckpoint(checkpoint: RunCheckpoint) {
     // A restored encounter supersedes pending title/cinematic scene work, even
@@ -215,18 +195,13 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
     for (const enemy of G.enemies) enemy.pos = enemyPos(enemy);
     if (G.boss) G.boss.pos = bossPos(G.boss);
     computeMods();
-    renderLives();
-    setScore();
-    applySeal();
-    hud(true);
-    $('waveLbl').textContent =
-      G.state === 'boss' ? '決闘' : G.state === 'standoff' ? '挑' : `第${kanji(G.wave)}陣`;
-    if (G.boss) {
-      $('bossK').textContent = G.boss.def.k;
-      $('bossN').textContent = G.boss.def.n;
-      renderHp();
-      $('bossbar').classList.toggle('on', G.state === 'boss');
-    } else $('bossbar').classList.remove('on');
+    views.events.emit('checkpointRestored', {
+      state: G.state,
+      wave: G.wave,
+      bossGlyph: G.boss?.def.k ?? null,
+      bossName: G.boss?.def.n ?? null,
+      bossShown: !!G.boss && G.state === 'boss',
+    });
     views.adoptPhase();
   }
   function continueSavedRun() {
@@ -234,8 +209,10 @@ export function createCheckpointFlow(views: CheckpointFlowViews) {
     const checkpoint = views.savedRun;
     restoreCheckpoint(checkpoint);
     if (G.state === 'shrine' && views.shrineOfferIds)
-      showShrineOffers(views.shrineOfferIds.map((id) => BLESS_BY[id]).filter((bl) => !!bl));
-    else showScreen(null);
+      views.events.emit('shrineOffers', {
+        ids: Object.freeze(views.shrineOfferIds.filter((id) => !!BLESS_BY[id])),
+      });
+    else views.events.emit('sessionScreen', { screen: null });
     resetClock();
   }
   function abandonSavedRun() {

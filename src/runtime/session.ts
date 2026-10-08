@@ -1,3 +1,7 @@
+import {
+  bindCheckpointFeedback,
+  type CheckpointFeedbackViews,
+} from '../ui/wiring/checkpoint-feedback.ts';
 import { bindTrialProgression } from '../game/progression/trial-listeners.ts';
 import { bindTrialFeedback, type TrialFeedbackViews } from '../ui/wiring/trial-feedback.ts';
 import {
@@ -28,8 +32,6 @@ type ActionPorts = Pick<
   | 'computeMods'
   | 'enemyPos'
   | 'hud'
-  | 'renderHp'
-  | 'renderLives'
   | 'setScore'
   | 'setStage'
   | 'toast'
@@ -62,7 +64,8 @@ type ActionPorts = Pick<
   | 'setupAttract'
   | 'showPauseScreen'
 > &
-  Pick<TrialFeedbackViews, 'banner' | 'openPanel'> & {
+  Pick<TrialFeedbackViews, 'banner' | 'openPanel'> &
+  Pick<CheckpointFeedbackViews, 'renderHp' | 'renderLives'> & {
     readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
     readonly frameLoop: Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>;
   };
@@ -435,6 +438,19 @@ export function createRuntimeSession(
           .querySelector<HTMLButtonElement>('#trialResult button')
           ?.focus({ preventScroll: true });
       },
+    })),
+  );
+  foundation.lifecycle.add(
+    bindCheckpointFeedback(context.events, () => ({
+      $: foundation.browser.$,
+      renderLives: readActions().renderLives,
+      setScore: readActions().setScore,
+      applySeal: foundation.view.applySeal,
+      hud: readActions().hud,
+      renderHp: readActions().renderHp,
+      toast: readActions().toast,
+      updateSavedRunButtons: readActions().updateSavedRunButtons,
+      showScreen: readActions().showScreen,
     })),
   );
   return sessionBindings;
