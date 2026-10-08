@@ -117,6 +117,22 @@ test('runtime renders an extra high-refresh frame without advancing simulation o
       if (difference) changed++;
     }
     const gameFps = callbacks.maxFps();
+    const { observeAssetBackground } = await import('/src/platform/asset-background.ts');
+    const { TRIALS } = await import('/src/game/content/trials.ts');
+    const predictions: (number | null)[] = [];
+    const stop = observeAssetBackground((_stage, _quiet, _work, _budget, next) =>
+      predictions.push(next ?? null),
+    );
+    callbacks.sampleFrame(1000 / 120, 0);
+    const trial = f.run.activity.activeTrial;
+    f.run.activity.activeTrial = TRIALS[0];
+    callbacks.sampleFrame(1000 / 120, 0);
+    f.run.activity.activeTrial = trial;
+    const daily = f.run.activity.activeDaily;
+    f.run.activity.activeDaily = { seed: 123 };
+    callbacks.sampleFrame(1000 / 120, 0);
+    f.run.activity.activeDaily = daily;
+    stop();
     f.run.G.state = 'paused';
     return {
       updates,
@@ -128,6 +144,7 @@ test('runtime renders an extra high-refresh frame without advancing simulation o
       gameFps,
       pausedFps: callbacks.maxFps(),
       updateFps: callbacks.maxUpdateFps(),
+      predictions,
     };
   });
   const { maxDifference, fractionChanged, ...counts } = result;
@@ -146,6 +163,7 @@ test('runtime renders an extra high-refresh frame without advancing simulation o
     gameFps: 120,
     pausedFps: 60,
     updateFps: 60,
+    predictions: [1, null, 1],
   });
   expect(errors).toEqual([]);
 });

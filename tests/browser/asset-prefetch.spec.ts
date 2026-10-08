@@ -1,5 +1,43 @@
 import { expect, test } from '@playwright/test';
 
+test('changing next-stage prediction at the same stage reprioritizes compressed requests', async ({
+  page,
+}) => {
+  await page.route('**/src/platform/runtime-assets.ts', (route) =>
+    route.fulfill({
+      contentType: 'application/javascript',
+      body: `export const runtimeAssets = [
+      {url:'/current.webp',group:'environment',stages:[0]},
+      {url:'/one.webp',group:'environment',stages:[1]},
+      {url:'/eight.webp',group:'environment',stages:[8]},
+      {url:'/figure.webp',group:'figure',stages:[]}
+    ];`,
+    }),
+  );
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const calls: string[] = [];
+    window.fetch = async (url) => {
+      calls.push(String(url));
+      return new Promise<Response>(() => {});
+    };
+    const { startBackgroundAssets } = await import('/src/platform/background-assets.ts');
+    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+    const stop = startBackgroundAssets(document);
+    sampleAssetBackground(0, false, 0, 8.3, 1);
+    sampleAssetBackground(0, false, 0, 8.3, 8);
+    sampleAssetBackground(0, true, 0, 8.3, 8);
+    const deadline = performance.now() + 2000;
+    while (calls.length < 2) {
+      if (performance.now() > deadline) throw Error('prefetch dispatch timed out');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    stop();
+    return calls;
+  });
+  expect(result).toEqual(['/current.webp', '/eight.webp']);
+});
+
 test('prefetched runtime files let fresh workers prepare every stage without atlas network access', async ({
   page,
 }) => {

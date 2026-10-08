@@ -1165,3 +1165,36 @@ This covers final composed worker bitmap lifetimes. Other source owners, whole
 decoded/GPU budgets, startup narrowing, native pressure stability, next-mode
 prediction/slots, paced uploads/variants,120Hz fidelity/CPU budget and full
 Phase5measurements/suites/report remain required.
+
+## Phase4 prerequisite — Mode-aware stage prediction and compressed priority (1.68.21)
+
+`game/session/stage-progression.ts` owns the shared encounter stage/lap formula.
+Wave entry and rush duel entry call it at their existing boundaries. Normal/daily
+runs predict the next three-wave visit; rush predicts the next duel. Trials never
+change scenery in their encounter lifecycle, so they have no future stage to warm.
+Cinematic selections are user-directed; inactive and mismatched encounter/stage
+state also skip prediction. Prediction uses primitive arithmetic and a module-owned
+state set without per-frame object/array allocation, visit mutation or randomness.
+The existing pure visit-seed peek remains unchanged and is ready for next-slot use.
+
+Actual runtime frame sampling forwards the optional predicted stage to compressed
+prefetch. The fetcher reprioritizes when either current or predicted stage changes,
+including mode changes at the same stage. Current-stage files remain first; all
+runtime files remain in the broad compressed queue. Native/saveData/hidden/busy-frame
+gates remain in force. This does not start next-stage decoding or precomposition.
+
+Nineteen units PASS, including original entry/trial/visit tests, ten-lap historical
+stage/lap parity, three-cycle wave lifecycle state/RNG/trace parity, next-entry seed
+identity and rush wrap/unknown-mode guards. Ten prefetch/main-pool browsers PASS12.0s,
+including same-stage prediction reprioritization and all-nine-stage cache-only worker
+loads. Seven live runtime/trial browsers PASS; expanded actual frame sampling/replay
+PASS9.0s publishes normal/daily nextstage1 and no trial prediction while preserving
+the existing high-refresh replay checks. Trial checks emit destroyed-source/sampler
+binding warnings; their origin is unresolved and needs follow-up. No claim of fully
+settled GPU lifetimes follows from these functional passes. Checked production
+build/strict TypeScript PASS. Logs `tmp/performance-next-stage-prefetch-browser.log`,
+`tmp/performance-next-stage-prediction-unit.log`, `tmp/performance-next-stage-runtime-browser.log`,
+`tmp/performance-next-stage-runtime-sampling.log`, `tmp/performance-next-stage-build.log`.
+All processes terminal; no performance capture ran. Future decoded warming/next slots,
+paced uploads/variants, whole-memory/startup budgets, native pressure stability,
+120Hz fidelity/CPU budget and full Phase5measurements/suites/report remain required.

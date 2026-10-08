@@ -193,6 +193,12 @@ fallback; worker decoding reads these unchanged compressed responses. MainGame s
 with the root. Runtime frame sampling grants quiet background time through
 `platform/asset-background.ts`; visibility, saveData, native mode and frame work
 gate at most two low-priority requests. Required worker reads remain available.
+`game/session/stage-progression.ts` shares encounter stage/lap rules with background
+prediction. Normal and daily waves predict the next three-wave visit; rush predicts
+the next duel's visit. Trials retain their scenery, cinematic choices are unknown,
+and inactive or mismatched run/stage state has no prediction. Frame samples carry
+the optional next stage so compressed priority updates when modes change at the
+same stage. Prediction neither enters a visit nor consumes combat randomness.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader

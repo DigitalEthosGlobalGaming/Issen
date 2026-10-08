@@ -29,6 +29,7 @@ import type { createPlayerFigures } from '../presentation/player-figures.ts';
 import type { Random } from '../shared/random.ts';
 import { cacheView, stateView } from '../game/session/state-view.ts';
 import { sampleAssetBackground } from '../platform/asset-background.ts';
+import { predictNextStage } from '../game/session/stage-progression.ts';
 
 const gameplayStates = ['playing', 'boss', 'between', 'standoff', 'shrine', 'dead'];
 const backgroundQuietStates = ['title', 'over', 'between', 'shrine', 'paused'];
@@ -315,12 +316,15 @@ export function createFrameBindings(
           environmentState,
           density,
           rebalanceWeather,
+          activeTrial,
+          cinematic,
         } = readViews();
         sampleAssetBackground(
           G.stage,
           !sceneLoading && !G.panel && backgroundQuietStates.includes(G.state),
           work,
           1000 / frameRate(),
+          predictNextStage(G, !!activeTrial, cinematic.active),
         );
         if (sceneLoading) return;
         if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;

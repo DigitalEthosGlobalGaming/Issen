@@ -23,21 +23,26 @@ export function startBackgroundAssets(doc: Document, native = false) {
     lastStage = -1,
     allowed = false,
     disposed = false;
+  let lastNextStage: number | undefined;
   const policy = () => {
     const next = !native && !connection?.saveData && !doc.hidden && quiet;
     if (next === allowed) return;
     allowed = next;
     prefetch.pause(!allowed);
   };
-  const stop = observeAssetBackground((stage, settled, work, budget) => {
+  const stop = observeAssetBackground((stage, settled, work, budget, nextStage) => {
     quiet = settled && work <= budget * 0.75;
-    if (stage !== lastStage) {
+    if (stage !== lastStage || nextStage !== lastNextStage) {
       lastStage = stage;
+      lastNextStage = nextStage;
       const select = (index: number) =>
         runtimeAssets
           .filter((asset) => (asset.stages as readonly number[]).includes(index))
           .map((asset) => asset.url);
-      prefetch.prioritize([...select(stage), ...select((stage + 1) % 9)]);
+      prefetch.prioritize([
+        ...select(stage),
+        ...(nextStage === undefined ? [] : select(nextStage)),
+      ]);
     }
     policy();
   });

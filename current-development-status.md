@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Closed worker GPU sources retire promptly
+# Performance, assets and seamless transitions — Mode-aware compressed prefetch priority
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -419,3 +419,21 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     paced uploads/variants,120Hz fidelity/CPU budget and full Phase5requirements
     remain required. GPU retirement for other source-owner lifecycles still needs
     coverage as they migrate; this is specifically final composed worker bitmaps.
+
+19. Mode-aware next-stage rules at1.68.21: stage-progression.ts shares stage/lap
+    formulas with actual wave/rush entry. Normal/daily predict the next three-wave
+    visit, rush the next duel. Trials retain their scene; cinematic/inactive or
+    mismatched stage state skips prediction. Actual frame samples pass the optional
+    next stage to compressed prefetch; same-stage mode changes refresh priority.
+    Allocation-free prediction does not enter/peek a visit or consume run RNG.
+    Nineteen progression/entry/trial/seed units PASS;10prefetch/main-pool browsers
+    PASS12.0s;7runtime/trial browsers PASS, and the expanded runtime sampling test
+    PASS9.0s (normal/daily1, trialnone). Checked production build/typecheck PASS.
+    Trial checks emit destroyed-source/sampler binding warnings; origin has not
+    been isolated, so broader GPU-lifetime verification remains required. Logs
+    tmp/performance-next-stage-prefetch-browser.log, -prediction-unit.log,
+    -runtime-browser.log, -runtime-sampling.log, -build.log (same next-stage prefix
+    except prefetch). All sessions terminal. Version/package/lock/title/changelog
+    1.68.21. Compressed fetch ordering is now mode-aware; next-slot composition,
+    decoded warming, paced uploads, whole-memory/startup budgets, native pressure
+    stability,120Hz fidelity/CPU budget and full Phase5verification remain required.
