@@ -1,11 +1,11 @@
 type Sample = (stage: number, quiet: boolean, work: number, budget: number) => void;
-let sample: Sample | undefined;
+const samples = new Set<Sample>();
 export function observeAssetBackground(callback: Sample) {
-  sample = callback;
+  samples.add(callback);
   return () => {
-    if (sample === callback) sample = undefined;
+    samples.delete(callback);
   };
 }
 export function sampleAssetBackground(stage: number, quiet: boolean, work: number, budget: number) {
-  sample?.(stage, quiet, work, budget);
+  for (const sample of samples) sample(stage, quiet, work, budget);
 }

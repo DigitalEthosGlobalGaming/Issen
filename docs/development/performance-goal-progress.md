@@ -829,3 +829,52 @@ active pins on low memory rather than pinning all menus/variants permanently.
 Runtime budget/background wiring, quiet next decode/seed/scene slots, paced GPU/
 variant warming, cosmetic loading,120Hz fidelity/CPU budgets and final full
 Phase5measurements remain required.
+
+## Phase 3.4 — UI input leases, upload retirement and quiet export policy
+
+Version1.68.12 changes UI jobs to retain pack metadata and their rendered CSS
+outputs. One job at a time acquires main-pool colour/data leases, exports through
+the same shader and releases its pins afterwards. Warm unpinned inputs remain
+subject to LRU pressure. The painter's existing texture store explicitly retires
+uploaded source textures after the export copies pixels; no parallel GPU cache.
+
+The initial retirement experiment produced Pixi destroyed-while-bound warnings.
+Corrected cleanup detaches prepared material, geometry, lookup and leaf source
+bindings before destroying stored source textures. The warning-sensitive test
+now requires no bound-source/feedback/invalid-operation warning. No warning-bearing
+implementation was committed. Repeated lighting changes reuse the painter and
+reacquire its source textures when needed.
+
+`asset-background` now supports independent subscribers. Background UI exports
+wait for quiet settled work≤75%frame budget and visible pages before decode and
+again before upload. A state change during async decode therefore pauses upload.
+Required explicit prepare/custom texture requests bypass those gates; disposal
+wakes a waiting pass and unregisters observers. No gameplay/RNG changes.
+
+Strict,14focused units, changed-file formatting and checked production build PASS.
+Final6browsers PASS28.9s: quiet/visibility/busy gating and waiting disposal, combined
+low-memory UI/local-stage ownership with warning-sensitive cleanup, all31UIpacks
+plus lit/unlit colour/alpha/slice/custom seal/restoration checks, and3actual
+cinematic/run/boss scene-readiness cases. Earlier4native material/independent light
+owner checks and4prefetch gates/cache-only cases PASS; the first policy run exposed
+the corrected warning. Logs `tmp/performance-phase3-ui-detached-browser.log`,
+`tmp/performance-phase3-ui-budget-browser.log`,
+`tmp/performance-phase3-ui-policy-browser.log`,
+`tmp/performance-phase3-ui-final-browser.log` and
+`tmp/performance-phase3-ui-build.log` preserve the distinction.
+
+Stage0's34images stay pinned while all31UIpacks render, then relight. Actual
+256MiB shared main pool peaks268,383,920/268,422,128bytes≤268,435,456budget;
+final266,450,576bytes/88decoded/34pinned,142evictions. UI completion retains no
+input pins beyond the stage's34, and zero uploaded source textures. Disposing UI
+preserves a valid stage compose; last stage disposal clears all pool bytes.
+Stable evidence: `tmp/performance-ui-stage-budget/results.json`, copied before
+later browser output cleanup. This includes local scene and UI decoded inputs,
+not figures/startup/demon/fog/Armoury, browser-owned exported CSS/DOM images,
+composed canvases/decoder overhead/heap or resident GPU targets. No whole-app
+memory, startup speed or full120Hz completion claim.
+
+All processes terminal:22280/46291/21974/52816, no active captures. Continue figure
+and remaining image-owner migration with active selections, remove lifetime
+startup retention, runtime budget/quiet decode wiring and combined low-memory
+tests, then next seeds/slots, GPU/variant warming, cosmetic loading and Phase5.

@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 local source pool verified
+# Performance, assets and seamless transitions — Phase 3 UI input leases verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -249,3 +249,23 @@ next-slot/loading-state tests, final report and any final push are outstanding.
    owners remain outside the pool. Next migrate lazy active selections, remove
    startup retention, wire runtime budget/policy and validate combined low-memory
    pins before Phase4and final checks. Whole-app memory/GPU retirement unproven.
+
+8. UI input leases verified at1.68.12. Jobs retain metadata/CSS exports; one pack
+   leases shared native colour/data inputs per export, then unpins and retires
+   uploaded sources through the existing texture store. Initial bound-source
+   warnings were fixed by detaching prepared shader bindings before destruction;
+   no warning-bearing version committed. Background exports await quiet visible
+   frames before decode and upload; explicit prepare/custom requests bypass the
+   wait. Multi-subscriber frame policy coexists with prefetch; disposal wakes waits.
+   Strict,14units, formatting, checked build PASS;6final UI/scene-readiness browsers
+   PASS plus earlier native-material/prefetch checks. All31packs retain expected
+   colour/alpha/slices/light changes/custom seal/restoration, with no cleanup warnings.
+   Stage0's34pins +31UIpacks twice at256MiB: peak268,422,128bytes,142evictions;
+   UI completion returns to34pins and0uploaded source textures, stage remains valid,
+   last disposal0bytes. Stable tmp/performance-ui-stage-budget/results.json.
+   Processes22280/46291/21974/52816terminal; no active capture. Version/package/
+   lock/title/changelog1.68.12. Decoded UI inputs are bounded, while exported
+   browser-owned DOM/CSS images and all remaining figure/startup/environment owners
+   remain outside this estimate. Whole-app memory/GPU and startup speed unproven.
+   Next migrate active figure/remaining sources, remove startup retention and wire
+   runtime budget/policy; finish combined memory, Phase4and full Phase5requirements.

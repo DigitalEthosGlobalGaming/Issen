@@ -5,17 +5,13 @@ import type { createLightingRig } from '../rendering/lighting-rig.ts';
 import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
 import { drawMaterialStamp, setSceneLighting } from '../rendering/scene-material.ts';
 import { registerUiTextureRenderer } from './material-textures.ts';
+import { createMainImageOwner } from '../platform/main-images.ts';
+import { observeAssetBackground } from '../platform/asset-background.ts';
 
 type Frame = readonly [number, number, number, number];
 type Pack = (typeof assetMaterialCatalog)[number];
-type Asset = {
-  pack: Pack;
-  image: HTMLImageElement;
-  atlas: ReturnType<typeof createPbrAtlas>;
-  ready: Promise<boolean>;
-};
 type Job = {
-  asset: Asset;
+  asset: Pack;
   colour?: HTMLCanvasElement;
   frame: Frame;
   variable: string;
@@ -27,7 +23,28 @@ type Replacement = { original: string; value: string; priority: string };
 /** CSS keeps its slices, crops and states; only the aligned colour texture is replaced. */
 export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof createLightingRig>) {
   const packs = new Map(assetMaterialCatalog.map((pack) => [pack.source, pack]));
-  const assets = new Map<string, Asset>();
+  const assets = new Map<string, Pack>();
+  const decodedImages = createMainImageOwner(doc);
+  let quiet = false,
+    foregroundRequests = 0,
+    wake: (() => void) | undefined;
+  const allowed = () => foregroundRequests > 0 || (quiet && !doc.hidden);
+  const resume = () => {
+    if (allowed()) wake?.();
+  };
+  const stopBackground = observeAssetBackground((_stage, settled, work, budget) => {
+    quiet = settled && work <= budget * 0.75;
+    resume();
+  });
+  doc.addEventListener('visibilitychange', resume);
+  async function grant() {
+    while (!allowed() && !disposed) {
+      await new Promise<void>((resolve) => {
+        wake = resolve;
+      });
+      wake = undefined;
+    }
+  }
   const jobs = new Map<string, Job>();
   const styles = new Map<CSSStyleDeclaration, Map<string, Replacement>>();
   const images = new Map<HTMLImageElement, { source: string; job: Job; rendered?: string }>();
@@ -57,30 +74,6 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
         if (!disposed) reportGraphicsError(canvas);
         return null;
       }));
-  function asset(pack: Pack): Asset {
-    let value = assets.get(pack.source);
-    if (!value) {
-      const image = doc.createElement('img');
-      image.src = pack.source;
-      const atlas = createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1], {
-        colour: false,
-      });
-      value = {
-        pack,
-        image,
-        atlas,
-        ready: Promise.all([
-          image
-            .decode()
-            .then(() => true)
-            .catch(() => false),
-          atlas.prepare(),
-        ]).then((results) => !disposed && results.every(Boolean)),
-      };
-      assets.set(pack.source, value);
-    }
-    return value;
-  }
   function job(key: string, pack: Pack, colour?: HTMLCanvasElement, frame?: Frame): Job {
     let value = jobs.get(key);
     if (!value) {
@@ -92,7 +85,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
         ownedColour.getContext('2d')!.drawImage(colour, 0, 0);
       }
       value = {
-        asset: asset(pack),
+        asset: pack,
         colour: ownedColour,
         frame: frame ?? [0, 0, ...pack.dimensions],
         variable: `--pbr-ui-${jobs.size}`,
@@ -100,7 +93,8 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
       };
       variables.set(value.variable, doc.documentElement.style.getPropertyValue(value.variable));
       jobs.set(key, value);
-      void value.asset.ready.then(schedule);
+      assets.set(pack.source, pack);
+      schedule();
     }
     return value;
   }
@@ -126,33 +120,64 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     dirty = false;
     try {
       if (!jobs.size) return;
+      await grant();
+      if (disposed) return;
       const target = await preparePainter();
       if (!target || disposed) return;
       for (const value of jobs.values()) {
-        if (value.version === version || !value.asset.atlas.ready) continue;
-        const material = value.asset.atlas.material(value.frame);
-        if (!material) continue;
-        const [, , width, height] = value.frame;
-        canvas.width = width;
-        canvas.height = height;
-        target.begin();
-        setSceneLighting(target, rig.lighting(width, height));
-        drawMaterialStamp(target, {
-          texture: {
-            source: value.colour ?? value.asset.image,
-            revision: 0,
-            frame: value.colour ? undefined : value.frame,
-          },
-          material,
-          x: 0,
-          y: 0,
-          width,
-          height,
+        if (value.version === version) continue;
+        await grant();
+        if (disposed) return;
+        const pack = value.asset;
+        const lease = decodedImages.acquire(pack.source);
+        const atlas = createPbrAtlas(doc, pack.maps, ...pack.dimensions, {
+          colour: false,
+          images: decodedImages,
         });
-        target.flush();
-        value.url = canvas.toDataURL();
-        value.version = version;
-        doc.documentElement.style.setProperty(value.variable, `url("${value.url}")`);
+        try {
+          const [source, maps] = await Promise.allSettled([lease.ready, atlas.prepare()]);
+          if (
+            disposed ||
+            source.status !== 'fulfilled' ||
+            maps.status !== 'fulfilled' ||
+            !maps.value
+          )
+            continue;
+          const material = atlas.material(value.frame);
+          if (!material) continue;
+          await grant();
+          if (disposed) return;
+          const [, , width, height] = value.frame;
+          canvas.width = width;
+          canvas.height = height;
+          target.begin();
+          setSceneLighting(target, rig.lighting(width, height));
+          drawMaterialStamp(target, {
+            texture: {
+              source: value.colour ?? source.value,
+              revision: 0,
+              frame: value.colour ? undefined : value.frame,
+            },
+            material,
+            x: 0,
+            y: 0,
+            width,
+            height,
+          });
+          target.flush();
+          value.url = canvas.toDataURL();
+          value.version = version;
+          doc.documentElement.style.setProperty(value.variable, `url("${value.url}")`);
+          target.releaseTextureSources([
+            value.colour ?? source.value,
+            ...[material.normal, material.surface, material.emissive].flatMap((map) =>
+              map ? [map.source] : [],
+            ),
+          ]);
+        } finally {
+          atlas.dispose();
+          lease.release();
+        }
       }
       for (const [image, entry] of images) {
         if (!image.isConnected) {
@@ -227,8 +252,9 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     const pack = packs.get(source);
     if (!pack || disposed) return null;
     const value = job(`custom:${key}`, pack, colour, frame);
-    if (!(await value.asset.ready) || disposed) return null;
     schedule();
+    await prepare();
+    if (disposed || !value.url) return null;
     return `var(${value.variable}, url("${colour.toDataURL()}"))`;
   });
   const unsubscribe = rig.subscribe(() => {
@@ -250,23 +276,34 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     attributeFilter: ['src', 'style'],
   });
   refresh();
-  return {
-    refresh,
-    async prepare() {
-      await Promise.all([...assets.values()].map((value) => value.ready));
+  async function prepare() {
+    foregroundRequests++;
+    resume();
+    try {
       await render();
       if (dirty) await render();
-    },
+    } finally {
+      foregroundRequests--;
+    }
+  }
+  return {
+    refresh,
+    prepare,
     snapshot: () => ({
       assets: assets.size,
       rendered: [...jobs.values()].filter((value) => value.url).length,
       jobs: jobs.size,
       available: !!painter,
       disposed,
+      decodedLoader: decodedImages.snapshot(),
+      sourceTextures: painter?.sourceTextureCount ?? 0,
     }),
     dispose() {
       if (disposed) return;
       disposed = true;
+      stopBackground();
+      doc.removeEventListener('visibilitychange', resume);
+      wake?.();
       observer.disconnect();
       unsubscribe();
       unregister();
@@ -283,10 +320,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
       painter?.dispose();
       for (const value of jobs.values())
         if (value.colour) value.colour.width = value.colour.height = 0;
-      for (const value of assets.values()) {
-        value.atlas.dispose();
-        value.image.removeAttribute('src');
-      }
+      decodedImages.dispose();
       assets.clear();
       jobs.clear();
       styles.clear();

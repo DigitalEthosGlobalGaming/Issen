@@ -29,7 +29,7 @@ import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
 import { registerMaterialSink } from '../scene-material.ts';
-import type { SceneLighting } from '../scene-frame.ts';
+import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
 import { createGrassMesh } from './grass-material.ts';
@@ -1246,6 +1246,21 @@ export class PixiScenePainter implements SceneDrawing {
     }
     this.drawImage(cached.canvas, x - cached.left, y - cached.top);
   }
+  /** Nominal uploaded-source count for ownership diagnostics. */
+  get sourceTextureCount(): number {
+    return this.textures.size;
+  }
+
+  /** Release uploaded sources after an offscreen export has copied its pixels. */
+  releaseTextureSources(sources: Iterable<SceneTexture['source']>): void {
+    for (let i = 0; i < this.cursor; i++) {
+      this.slots[i]?.material?.releaseTextures();
+      this.slots[i]?.lookup?.releaseTexture();
+      this.slots[i]?.leaf?.releaseTextures();
+    }
+    this.textures.releaseSources(sources);
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;

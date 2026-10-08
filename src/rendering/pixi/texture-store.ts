@@ -91,6 +91,17 @@ export class SceneTextureStore {
     return this.sources.size + this.dataSources.size;
   }
 
+  /** A completed offscreen export no longer needs its source textures. */
+  releaseSources(inputs: Iterable<SceneTexture['source']>): void {
+    for (const source of inputs)
+      for (const store of [this.sources, this.dataSources]) {
+        const prepared = store.get(source);
+        if (!prepared) continue;
+        this.release(prepared);
+        store.delete(source);
+      }
+  }
+
   private release(prepared: PreparedSource): void {
     for (const texture of prepared.frames.values()) texture.destroy(false);
     prepared.texture.destroy(true);

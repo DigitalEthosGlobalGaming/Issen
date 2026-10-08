@@ -71,6 +71,10 @@ Local-fallback PBR maps now use the shared native main-image pool through explic
 leases; old-stage maps unpin, warm maps remain until LRU pressure, and independent
 previews do not clear peer images. Local source artwork now uses the same pool;
 scoped material bindings keep each preview's composed maps independent.
+UI lighting now leases one source/data pack per export and releases pins and GPU
+source textures afterwards. Lit CSS outputs remain available for redraw, while
+background export dispatch yields to busy/loading/hidden frames. The managed
+budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
 The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
 for compressed prefetch and startup filtering; regenerate with
 `node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.

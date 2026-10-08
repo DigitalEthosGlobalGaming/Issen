@@ -155,7 +155,7 @@ dimensions reserve space before decoding; admitted and reserved bytes are
 bounded, while native decoder overhead is outside the nominal estimate. Worker
 image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
-residency, pins, bytes, peak, budget and evictions. Main figure/UI/startup owners
+residency, pins, bytes, peak, budget and evictions. Main figure/startup owners
 are not yet routed through this loader; whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the same queue/budget core. Explicit owner leases protect peer previews; release
@@ -163,7 +163,7 @@ unpins without clearing their image, and the last owner disposes the pool. Only
 the pool removes image sources and revokes decode object URLs. Known manifest
 dimensions reserve space first. Local-environment PBR maps use this owner through
 `asset-materials`/`pbr-atlas`. Local source artwork also uses leases from that pool;
-figure/UI/startup and other environment owners still need migration. Cached
+figure/startup and other environment owners still need migration. Cached
 material bindings are indexed by source and owner. Local composition wraps
 synchronous nested stamps in `withBindings`, restoring the previous owner in
 `finally`; scopes cannot span promises. Disposal removes only its own bindings
@@ -178,6 +178,14 @@ fallback; worker decoding reads these unchanged compressed responses. MainGame s
 with the root. Runtime frame sampling grants quiet background time through
 `platform/asset-background.ts`; visibility, saveData, native mode and frame work
 gate at most two low-priority requests. Required worker reads remain available.
+UI material jobs retain pack metadata and exported CSS textures. They lease source
+and map images from the main pool for one export at a time, then unpin them and
+release uploaded sources through the painter's existing texture store. Shader
+bindings detach before source destruction. Background exports wait for quiet
+visible frame grants before decode and upload; explicit prepare/custom texture
+requests bypass that wait. `asset-background` supports independent subscribers
+for UI exports and compressed prefetch. Exported DOM/CSS images and other figure
+owners remain outside the decoded-input estimate.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and
