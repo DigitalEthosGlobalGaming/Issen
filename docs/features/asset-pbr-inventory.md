@@ -67,6 +67,9 @@ Worker decoded resources now share the priority/pin/LRU loader in
 `src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
 device-class budgets. Main figure/UI/startup loader migration remains pending;
 the inventory total is not a configured whole-application residency budget.
+Local-fallback PBR maps now use the shared native main-image pool through explicit
+leases; old-stage maps unpin, warm maps remain until LRU pressure, and independent
+previews do not clear peer images. Local source artwork remains outside the pool.
 The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
 for compressed prefetch and startup filtering; regenerate with
 `node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.

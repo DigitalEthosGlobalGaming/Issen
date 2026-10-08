@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { createMainImageOwner } from '../../platform/main-images.ts';
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import { compositionKey } from './worker-types.ts';
 import {
@@ -51,6 +52,8 @@ export interface EnvironmentFrame {
 
 /** Instance-owned image loading and caches; safe for independent previews. */
 export function createLocalEnvironmentRenderer(doc: Document) {
+  // Worker documents supply their own managed image wrappers.
+  const mapImages = doc.defaultView ? createMainImageOwner(doc) : undefined;
   const cachedMaterials = createCachedMaterials();
   let materials: ReturnType<typeof createAssetMaterials<string>> | undefined;
   const foreground = createBambooForegroundRenderer(doc);
@@ -79,7 +82,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
     const required = sceneAssets(stage);
     cacheKey = '';
     cachedMaterials.dispose();
-    materials ??= createAssetMaterials<string>(doc, {});
+    materials ??= createAssetMaterials<string>(doc, {}, mapImages);
     materials.select(
       Object.fromEntries(required.map((index) => [String(index), ASSET_URLS[index]!])),
     );
@@ -553,6 +556,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
 
   function dispose() {
     materials?.dispose();
+    mapImages?.dispose();
     cachedMaterials.dispose();
     foreground.dispose();
     disposed = true;
@@ -648,6 +652,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       return status;
     },
     snapshot: () => ({
+      ...(mapImages ? { decodedLoader: mapImages.snapshot() } : {}),
       materialCutouts: cachedMaterials.snapshot(),
       foreground: foreground.snapshot(),
       backend: status,

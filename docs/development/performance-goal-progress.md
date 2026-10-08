@@ -736,3 +736,48 @@ preview/material ownership, and release lifetime startup retention. Whole-app
 memory, runtime budget adaptation, next-stage decode/seed/scene slots, paced GPU
 upload/variant warming, cosmetic loading, high-refresh fidelity/CPU budgets and
 Phase5verification remain unresolved. Goal stays active.
+
+## Phase 3.4 — Main native-image pool and local map ownership
+
+Version1.68.10 adds `platform/main-images.ts`, a shared per-Document native HTML
+image pool using the existing serial priority/pin/LRU queue. Runtime manifest
+dimensions reserve nominal bytes before decode. Compressed responses decode
+through native `HTMLImageElement.decode()` from owned object URLs, retaining
+the previous main browser interpretation. Only the pool clears image sources
+and revokes these URLs. Each caller receives a pin lease and promise; releasing
+or disposing one owner prevents its late attachment without cancelling a peer.
+The last owner disposes the pool, cancels pending work and closes retained images.
+
+Local-environment material atlases now use this owner. Stage selection disposes
+departed atlas leases, leaving warm maps until budget pressure; shared selections
+remain pinned. PBR maps are shared safely because source bindings remain on the
+separately owned colour artwork. Worker documents retain their existing wrapper
+path. Figure/UI/source-artwork/startup owners are still outside the main pool;
+whole-application decoded memory and GPU retirement are not yet bounded.
+Policy/quality/density wiring and lazy active figure/UI selection are pending.
+
+Strict, changed-file formatting,9focused units and checked production build PASS.
+Four existing worker browsers PASS for local constructor/runtime/compose fallback,
+all-nine worker lit output, coalescing/disposal and hidden owners. Three new main
+browser cases PASS5.4s in `tmp/performance-phase3-main-maps-final-browser.log`:
+pending owner disposal preserves a peer request; two atlases share native image
+identity and retain the peer after disposal; native/blob decoded normal pixels
+are exact against the original source image. These are identity/transport/pixel
+checks, not proof of every material or figure pixel after future migrations.
+
+Actual local fallback prepares9stages3times under simulated deviceMemory2,
+using the real256MiB main pool: peak264,266,176bytes≤268,435,456budget,134evictions.
+Final retention42images/264,246,984bytes,17current pinned maps; final owner disposal
+clears all bytes and pins. All27samples are preserved in
+`tmp/test-results/rendering-v2/main-image-budget-local-fa-5fc56-in-the-low-memory-main-pool/main-map-budget-cycle.json`.
+This accounts only managed PBR maps, excluding still-native source images,
+canvases, decoder overhead, JS heap and GPU residency. No cold/startup speed claim.
+
+All check processes terminal, including76631initial browser. Logs also include
+`tmp/performance-phase3-main-maps-browser.log`,
+`tmp/performance-phase3-main-maps-leases.log` and
+`tmp/performance-phase3-main-maps-build.log`. No live capture. Next migrate colour
+source/figure/UI owners with independent material bindings, remove lifetime
+startup retention, and validate the combined active set on low memory before
+quiet next-stage decode/seed/scene slots and paced GPU/variant warming. Remaining
+120Hz fidelity/CPU costs, cosmetic loading and Phase5remain required.

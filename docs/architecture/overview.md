@@ -157,6 +157,13 @@ image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, bytes, peak, budget and evictions. Main figure/UI/startup owners
 are not yet routed through this loader; whole-application memory remains unbounded.
+`platform/main-images.ts` shares native HTML image decoding per Document through
+the same queue/budget core. Explicit owner leases protect peer previews; release
+unpins without clearing their image, and the last owner disposes the pool. Only
+the pool removes image sources and revokes decode object URLs. Known manifest
+dimensions reserve space first. Local-environment PBR maps use this owner through
+`asset-materials`/`pbr-atlas`; source artwork and figure/UI owners still need migration.
+Worker documents keep their existing managed image wrappers and decode semantics.
 `platform/runtime-assets.ts` is generated from the inventory by
 `scripts/assets/runtime-manifest.mjs`, excluding unused diffuse maps and startup-only
 source art. Main startup filters its existing artwork selection through this manifest.

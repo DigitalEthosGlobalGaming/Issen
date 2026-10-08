@@ -1,9 +1,14 @@
 import { createPbrAtlas } from './pbr-atlas.ts';
 import { assetMaterialCatalog } from './asset-material-catalog.ts';
+import type { MainImageOwner } from '../platform/main-images.ts';
 const packs = new Map(assetMaterialCatalog.map((pack) => [pack.source, pack]));
 
 /** Own only the selected packs; atlas frames remain aligned through tint/crop caches. */
-export function createAssetMaterials<K extends string>(doc: Document, sources: Record<K, string>) {
+export function createAssetMaterials<K extends string>(
+  doc: Document,
+  sources: Record<K, string>,
+  images?: MainImageOwner,
+) {
   const atlases = new Map<K, ReturnType<typeof createPbrAtlas>>();
   const selected = new Map<K, string>();
   let disposed = false;
@@ -22,7 +27,10 @@ export function createAssetMaterials<K extends string>(doc: Document, sources: R
       selected.set(key, next[key]);
       atlases.set(
         key,
-        createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1], { colour: false }),
+        createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1], {
+          colour: false,
+          images,
+        }),
       );
     }
   }

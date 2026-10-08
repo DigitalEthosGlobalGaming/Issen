@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 compressed prefetch verified
+# Performance, assets and seamless transitions — Phase 3 main local map pool verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -212,3 +212,23 @@ next-slot/loading-state tests, final report and any final push are outstanding.
    remove lifetime startup retention; wire quality/density budget and quiet decode.
    Then deterministic seed/next slots, paced GPU/variant warming and cosmetic
    loading; finish120Hz fidelity/CPU budget and full Phase5comparisons/suites/report.
+
+6. Main native-image pool/local-map integration verified at1.68.10. Explicit
+   per-Document shared leases use the serial priority/pin/LRU core, manifest-sized
+   reservations, compressed-response native HTML decode and pool-owned URL cleanup.
+   Local fallback PBR maps use it; stage changes release old pins, peer previews
+   keep shared images, last owner disposes resources. Colour source bindings stay
+   independent. Worker documents keep their existing wrappers/options.
+   Strict,9units, formatting, checked build PASS;4worker fallback/all-nine/hidden/
+   disposal cases and3main lease/pixel/budget browsers PASS. Native normal pixels
+   exact against original image. Actual local prepares9stages×3at256MiB: nominal
+   managed-map peak264,266,176bytes,134evictions, final17pinned maps; disposal0bytes.
+   Saved27samples at tmp/test-results/rendering-v2/main-image-budget-local-fa-5fc56-in-the-low-memory-main-pool/main-map-budget-cycle.json.
+   All handles terminal including76631; no live capture. Version/lock/title/
+   changelog1.68.10. Main source/figure/UI/startup owners remain outside the pool;
+   whole-app memory/GPU retirement remain unproven. Source identity binds cached
+   material owners, so sharing colour requires explicit owner binding first.
+   Next migrate those owners/lazy active selections, release startup retention,
+   wire runtime quality/density/policy and validate combined low-memory pins.
+   Then quiet next decode, deterministic seeds/next slots, paced GPU/variant
+   warming/cosmetic loading,120Hz fidelity/CPU budgets and full Phase5verification.

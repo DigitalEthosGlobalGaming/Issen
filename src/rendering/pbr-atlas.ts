@@ -1,4 +1,5 @@
 import type { SceneMaterial } from './scene-frame.ts';
+import type { MainImageOwner } from '../platform/main-images.ts';
 
 type MapKind = 'diffuse' | 'normal' | 'surface' | 'emissive';
 export type PbrAtlasSources = Record<Exclude<MapKind, 'emissive'>, string> & { emissive?: string };
@@ -10,10 +11,11 @@ export function createPbrAtlas(
   sources: PbrAtlasSources,
   width: number,
   height = width,
-  options: { colour?: boolean } = {},
+  options: { colour?: boolean; images?: MainImageOwner } = {},
 ) {
   const images = new Map<MapKind, HTMLImageElement>();
   const materials = new Map<string, SceneMaterial>();
+  const leases: Array<ReturnType<MainImageOwner['acquire']>> = [];
   let ready = false,
     disposed = false,
     pending: Promise<boolean> | undefined;
@@ -23,6 +25,18 @@ export function createPbrAtlas(
       (Object.keys(sources) as MapKind[])
         .filter((kind) => sources[kind] && (kind !== 'diffuse' || options.colour !== false))
         .map(async (kind) => {
+          if (options.images) {
+            const lease = options.images.acquire(sources[kind]!);
+            leases.push(lease);
+            try {
+              const image = await lease.ready;
+              if (disposed) return false;
+              images.set(kind, image);
+              return image.naturalWidth === width && image.naturalHeight === height;
+            } catch {
+              return false;
+            }
+          }
           const image = doc.createElement('img');
           images.set(kind, image);
           image.src = sources[kind]!;
@@ -69,10 +83,12 @@ export function createPbrAtlas(
     dispose() {
       disposed = true;
       ready = false;
-      for (const image of images.values()) {
-        image.removeAttribute('src');
-        image.width = image.height = 0;
-      }
+      for (const lease of leases.splice(0)) lease.release();
+      if (!options.images)
+        for (const image of images.values()) {
+          image.removeAttribute('src');
+          image.width = image.height = 0;
+        }
       images.clear();
       materials.clear();
     },

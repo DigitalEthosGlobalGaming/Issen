@@ -1,0 +1,153 @@
+import { expect, test } from '@playwright/test';
+import type { Route } from '@playwright/test';
+import { writeFile } from 'node:fs/promises';
+
+test('disposing a pending owner cancels its lease without cancelling the shared peer', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  let pending: Route | undefined;
+  await page.route(/pine-atlas_normal\.webp/, (route) => {
+    pending = route;
+  });
+  await page.evaluate(async () => {
+    const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const pack = assetMaterialCatalog.find((pack: any) =>
+      pack.sourcePath.endsWith('/pine-atlas.png'),
+    )!;
+    const a = createMainImageOwner(document),
+      b = createMainImageOwner(document);
+    const first = a.acquire(pack.maps.normal),
+      second = b.acquire(pack.maps.normal);
+    const scope = window as any;
+    scope.firstLeaseResult = first.ready.then(
+      () => 'attached',
+      (error) => error.name,
+    );
+    scope.secondLease = second;
+    scope.firstOwner = a;
+    scope.secondOwner = b;
+  });
+  await expect.poll(() => !!pending).toBe(true);
+  await page.evaluate(() => (window as any).firstOwner.dispose());
+  await pending!.continue();
+  const result = await page.evaluate(async () => {
+    const scope = window as any;
+    const first = await scope.firstLeaseResult;
+    const image = await scope.secondLease.ready;
+    const width = image.naturalWidth;
+    scope.secondOwner.dispose();
+    return { first, width, snapshot: scope.secondOwner.snapshot() };
+  });
+  expect(result.first).toBe('AbortError');
+  expect(result.width).toBeGreaterThan(0);
+  expect(result.snapshot.bytes).toBe(0);
+});
+
+test('main image leases share native decode and retain a peer atlas after disposal', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { createPbrAtlas } = await import('/src/rendering/pbr-atlas.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const pack = assetMaterialCatalog.find((pack: any) =>
+      pack.sourcePath.endsWith('/pine-atlas.png'),
+    )!;
+    const a = createMainImageOwner(document),
+      b = createMainImageOwner(document);
+    const first = createPbrAtlas(document, pack.maps, ...pack.dimensions, {
+      colour: false,
+      images: a,
+    });
+    const second = createPbrAtlas(document, pack.maps, ...pack.dimensions, {
+      colour: false,
+      images: b,
+    });
+    const ready = await Promise.all([first.prepare(), second.prepare()]);
+    const frame = [0, 0, ...pack.dimensions] as const;
+    const source = second.material(frame)!.normal!.source as HTMLImageElement;
+    const identity = first.material(frame)!.normal!.source === source;
+    const original = document.createElement('img');
+    original.src = pack.maps.normal;
+    await original.decode();
+    const pixels = (image: HTMLImageElement) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const g = canvas.getContext('2d', { willReadFrequently: true })!;
+      g.drawImage(image, 0, 0);
+      return g.getImageData(0, 0, canvas.width, canvas.height).data;
+    };
+    const actual = pixels(source),
+      expected = pixels(original);
+    let max = 0;
+    for (let index = 0; index < actual.length; index++)
+      max = Math.max(max, Math.abs(actual[index]! - expected[index]!));
+    const before = a.snapshot();
+    first.dispose();
+    a.dispose();
+    const peer = { snapshot: b.snapshot(), width: source.naturalWidth, ready: second.ready };
+    second.dispose();
+    const unpinned = b.snapshot();
+    b.dispose();
+    return {
+      ready,
+      identity,
+      max,
+      before,
+      peer,
+      unpinned,
+      disposed: b.snapshot(),
+      finalWidth: source.naturalWidth,
+    };
+  });
+  expect(result.ready).toEqual([true, true]);
+  expect(result.identity).toBe(true);
+  expect(result.max).toBe(0);
+  expect(result.peer.ready).toBe(true);
+  expect(result.peer.width).toBeGreaterThan(0);
+  expect(result.peer.snapshot.bytes).toBe(result.before.bytes);
+  expect(result.peer.snapshot.pinned).toBe(result.before.decoded);
+  expect(result.unpinned.pinned).toBe(0);
+  expect(result.unpinned.bytes).toBe(result.before.bytes);
+  expect(result.disposed.bytes).toBe(0);
+  expect(result.finalWidth).toBe(0);
+});
+
+test('local fallback cycles all stage maps within the low-memory main pool', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60_000);
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createLocalEnvironmentRenderer } =
+      await import('/src/rendering/environment/local-renderer.ts');
+    const renderer = createLocalEnvironmentRenderer(document);
+    const snapshots = [];
+    for (let cycle = 0; cycle < 3; cycle++) {
+      for (let stage = 0; stage < 9; stage++) {
+        await renderer.prepare(stage);
+        snapshots.push({ cycle, stage, ...renderer.snapshot() });
+      }
+    }
+    renderer.dispose();
+    return { snapshots, disposed: renderer.snapshot() };
+  });
+  expect(result.snapshots).toHaveLength(27);
+  for (const snapshot of result.snapshots) {
+    expect(snapshot.backend).toBe('layered');
+    expect(snapshot.decodedLoader!.budget).toBe(256 * 1024 * 1024);
+    expect(snapshot.decodedLoader!.bytes).toBeLessThanOrEqual(snapshot.decodedLoader!.budget);
+    expect(snapshot.decodedLoader!.peakBytes).toBeLessThanOrEqual(snapshot.decodedLoader!.budget);
+    expect(snapshot.decodedLoader!.pinned).toBeGreaterThan(0);
+  }
+  expect(result.snapshots.at(-1)!.decodedLoader!.evictions).toBeGreaterThan(0);
+  expect(result.disposed.decodedLoader!.bytes).toBe(0);
+  const path = testInfo.outputPath('main-map-budget-cycle.json');
+  await writeFile(path, JSON.stringify(result, null, 2));
+  await testInfo.attach('main-map-budget-cycle', { path, contentType: 'application/json' });
+});
