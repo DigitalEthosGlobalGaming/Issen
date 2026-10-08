@@ -1,5 +1,6 @@
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import type { TextureUpload, WarmSceneTextures } from '../texture-upload.ts';
 import type { EnvironmentFrame, createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { createCachedMaterials } from '../cached-materials.ts';
@@ -27,7 +28,11 @@ const emptySnapshot = (): EnvironmentSnapshot => ({
 });
 
 /** One worker and one completed scene per owner; queued changes replace older requests. */
-export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () => LocalRenderer) {
+export function createWorkerEnvironmentRenderer(
+  doc: Document,
+  createLocal: () => LocalRenderer,
+  warmWorkerScene?: WarmSceneTextures,
+) {
   const worker = new Worker(new URL('./compose.worker.ts', import.meta.url), {
     type: 'module',
     name: 'issen-scenery',
@@ -54,6 +59,10 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     { resolve: (response: ComposeResponse) => void; timer: ReturnType<typeof setTimeout> }
   >();
   const waiters = new Map<string, Set<(success: boolean) => void>>();
+  const uploads = new Map<AbortController, string>();
+  const cancelUploads = (key?: string) => {
+    for (const [controller, pendingKey] of uploads) if (pendingKey !== key) controller.abort();
+  };
   const settle = (key: string, success: boolean) => {
     for (const resolve of waiters.get(key) ?? []) resolve(success);
     waiters.delete(key);
@@ -68,6 +77,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
   function failWorker(reason: string) {
     if (disposed || fallback) return;
     workerFailure = reason;
+    cancelUploads();
     worker.terminate();
     release();
     fallback = createLocal();
@@ -125,6 +135,54 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
       }
     })());
   }
+  async function warmLayers(
+    frame: EnvironmentFrame,
+    nextLayers: readonly ComposedLayer[],
+    nextForeground: readonly ComposedLayer[],
+  ): Promise<boolean> {
+    if (!warmWorkerScene) return true;
+    const key = compositionKey(frame),
+      controller = new AbortController();
+    uploads.set(controller, key);
+    const sources: TextureUpload[] = [];
+    for (const layer of [...nextLayers, ...nextForeground])
+      for (const kind of ['colour', 'normal', 'surface', 'emissive'] as const) {
+        const source = layer[kind];
+        if (source)
+          sources.push({
+            texture: { source, revision: 0 },
+            data: kind === 'normal' || kind === 'surface',
+          });
+      }
+    if (frame.stage === 0 && fog?.naturalWidth) {
+      sources.push({ texture: { source: fog, revision: 0 } });
+      const material = fogMaps.material('fog', [0, 0, fog.naturalWidth, fog.naturalHeight]);
+      for (const kind of ['normal', 'mask', 'surface', 'emissive'] as const)
+        if (material?.[kind]) sources.push({ texture: material[kind], data: kind !== 'emissive' });
+    }
+    const timingKey = 'false:' + key;
+    markScenePhase('texture-warm-start', timingKey);
+    try {
+      const ready = await warmWorkerScene(sources, controller.signal);
+      if (controller.signal.aborted || disposed || !desired || compositionKey(desired) !== key)
+        return false;
+      if (!ready) throw Error('Scenery texture initialization failed');
+      markScenePhase('textures-warmed', timingKey, {
+        mode: 'paced-source-init',
+        prewarmed: true,
+        sources: sources.length,
+      });
+      measureScenePhase(
+        'texture-warm',
+        'issen:texture-warm-start:' + timingKey,
+        'issen:textures-warmed:' + timingKey,
+        timingKey,
+      );
+      return true;
+    } finally {
+      uploads.delete(controller);
+    }
+  }
   async function pump() {
     if (running || disposed || fallback || doc.hidden || !desired) return;
     const frame = { ...desired },
@@ -132,12 +190,15 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     if (key === currentKey) return;
     running = true;
     snapshot.backend = 'loading';
+    let incoming: ComposeResponse | undefined,
+      accepted = false;
     try {
       if (frame.stage === 0) await prepareFog();
       if (disposed || fallback) return;
       const timingKey = 'false:' + key;
       markScenePhase('compose-sent', timingKey, { stage: frame.stage });
       const response = await send({ kind: 'compose', key, frame });
+      incoming = response;
       markScenePhase('compose-received', timingKey, {
         stage: frame.stage,
         ...response.snapshot.timings,
@@ -149,13 +210,15 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
         timingKey,
       );
       if (disposed || fallback || !desired || compositionKey(desired) !== key) {
-        closeLayers([...response.layers, ...response.foreground]);
         settle(key, false);
         return;
       }
       if (!response.ok) {
-        closeLayers([...response.layers, ...response.foreground]);
         failWorker(response.error || 'Scenery worker could not compose the selected scene');
+        return;
+      }
+      if (!(await warmLayers(frame, response.layers, response.foreground))) {
+        settle(key, false);
         return;
       }
       release();
@@ -163,12 +226,14 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
       foreground = response.foreground;
       completed = frame;
       currentKey = key;
-      snapshot = response.snapshot;
+      snapshot = { ...response.snapshot, texturesWarmed: !!warmWorkerScene };
+      accepted = true;
       settle(key, true);
     } catch (error) {
       failWorker(String(error));
       settle(key, false);
     } finally {
+      if (incoming && !accepted) closeLayers([...incoming.layers, ...incoming.foreground]);
       running = false;
       if (desired && compositionKey(desired) !== key) void pump();
     }
@@ -184,6 +249,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
       return false;
     const nextKey = compositionKey(frame);
     desired = { ...frame };
+    cancelUploads(nextKey);
     for (const key of waiters.keys()) if (key !== nextKey) settle(key, false);
     void pump();
     return true;
@@ -203,7 +269,15 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     if (disposed) return false;
     if (fallback) return fallback.compose(frame);
     const key = compositionKey(frame);
-    if (key === currentKey) return true;
+    if (key === currentKey) {
+      queue(frame);
+      try {
+        return await warmLayers(frame, layers, foreground);
+      } catch (error) {
+        failWorker(String(error));
+        return getFallback()?.compose(frame) ?? false;
+      }
+    }
     const result = new Promise<boolean>((resolve) => {
       const group = waiters.get(key) ?? new Set();
       group.add(resolve);
@@ -304,6 +378,7 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     dispose() {
       if (disposed) return;
       disposed = true;
+      cancelUploads();
       worker.terminate();
       fallback?.dispose();
       doc.removeEventListener('visibilitychange', onVisibility);

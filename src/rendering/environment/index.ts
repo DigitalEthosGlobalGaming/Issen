@@ -1,9 +1,13 @@
 import { createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createWorkerEnvironmentRenderer } from './worker-renderer.ts';
+import type { WarmSceneTextures } from '../texture-upload.ts';
 export type { EnvironmentFrame, EnvironmentBackend } from './local-renderer.ts';
 
 /** Explicit document ownership; unsupported browsers retain the Canvas path. */
-export function createEnvironmentRenderer(doc: Document, options: { worker?: boolean } = {}) {
+export function createEnvironmentRenderer(
+  doc: Document,
+  options: { worker?: boolean; warmWorkerScene?: WarmSceneTextures } = {},
+) {
   const createLocal = () => createLocalEnvironmentRenderer(doc);
   if (
     options.worker !== false &&
@@ -11,7 +15,7 @@ export function createEnvironmentRenderer(doc: Document, options: { worker?: boo
     typeof OffscreenCanvas !== 'undefined'
   ) {
     try {
-      return createWorkerEnvironmentRenderer(doc, createLocal);
+      return createWorkerEnvironmentRenderer(doc, createLocal, options.warmWorkerScene);
     } catch {
       /* Canvas composition remains available when worker creation is denied. */
     }

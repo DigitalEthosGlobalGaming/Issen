@@ -752,6 +752,30 @@ are correctness checks, not performance captures. Current named composer and
 film/post/target extension hooks are described below.
 
 
+## Worker scenery texture readiness
+
+The main native services pass the scene painter's `warmTextures` port to the
+worker environment owner. Before replacing completed layers or settling scene
+readiness, the owner initializes all incoming composed planes and stage 0's live
+fog maps through the existing `SceneTextureStore`. Colour/emissive use colour
+textures; normal/mask/surface use data textures. The previous layers remain
+drawable until the requested composition key is still valid and warming succeeds.
+
+Uploads yield through visible animation frames with a 4 ms batch target. A native
+upload cannot be interrupted and may exceed that target. Pending sources are
+retained against ordinary frame collection. Hidden documents suspend requests;
+context generation changes restart uploads after restoration. Stale requests,
+worker failure and disposal abort waits; rejected responses close their bitmaps
+and retire GPU consumers through the existing ownership path. Painter disposal
+also aborts its outstanding uploads. Preparation does not flush an incoming scene
+to the displayed canvas or introduce a second texture cache.
+
+`textures-warmed` records `paced-source-init` before scene settlement for this
+path; it measures source initialization, not completed GPU execution or shader
+readiness. Local composition fallback, demon scenery and independent preview
+owners retain their existing readiness behavior. Next-scene slots and shader/
+figure warming remain required for seamless transitions.
+
 ## Current extension hooks (W3 phase 6)
 
 The seven recording layers above retain their drawing order. Geometry, lights and

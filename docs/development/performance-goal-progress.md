@@ -1308,3 +1308,76 @@ profile-results.json and stage0/3 paced-first-draw CPU profiles. Runnable role/i
 version, assets, committed tests or standard performance harness changes. Whole
 memory/startup budgets, native pressure stability, decoded/next-slot warming,
 uploads/variants,120Hz fidelity/CPU budget and full Phase5verification remain required.
+
+## Checkpoint 22 — Worker source warming before publication, 1.68.23
+
+The main native scene now supplies the worker owner's upload port. Incoming
+composed colour/emissive and data normal/surface planes, plus live stage 0 fog
+colour/normal/mask/surface/emissive, use the existing painter texture store.
+The owner retains its displayed layers until warming succeeds for the desired
+key, then replaces layers and settles readiness. No parallel texture cache or
+incoming-scene flush is introduced. Sources stay pinned against ordinary frame
+collection while warming; hidden waits retain no rAF, stale/disposed requests
+abort, rejected responses close through existing retirement, and restored
+context generations restart the complete source set. Warming failure settles
+through the local composition fallback. Local/demon readiness stays unchanged.
+
+Same-input native checks preserve exact pixels across nine stages and leave
+zero ImageBitmap/HTMLImageElement uploads on their first draw, including live
+fog. Cancellation retains the old pixels and closes partially uploaded inputs;
+GPU source counts return to the displayed stage. A real context-loss/restore
+check retains pending sources through 125 collection frames and confirms both
+sources draw without reupload after readiness. Disposal cancels hidden waits.
+Actual held-load checks preserve gameplay/hazard/RNG snapshots while presentation
+advances, and confirm the runtime retains the prewarmed mark before settlement.
+Chromium restoration must occur after loss-event dispatch finishes; the initial
+same-event restoration fixture timed out, and a next-task restore fixes it.
+
+One mobile-resolution integrated sample uses one worker and two persistent
+painters sharing identical bitmaps. The warmed painter draws before the control;
+HTTP cache and cross-context driver/shader caches confound timing, so the control
+is a pixel/upload guard, not a controlled cold-load comparison.
+
+| Stage | Control first draw ms | Integrated first draw ms | Warming wall ms |
+| --- | ---: | ---: | ---: |
+| 0 | 70.4 | 61.3 | 125.3 |
+| 1 | 10.1 | 2.5 | 37.5 |
+| 2 | 17.8 | 0.9 | 20.5 |
+| 3 | 34.4 | 66.2 | 63.7 |
+| 4 | 15.3 | 2.9 | 59.0 |
+| 5 | 12.5 | 12.4 | 31.5 |
+| 6 | 9.3 | 0.8 | 35.0 |
+| 7 | 19.3 | 8.5 | 49.1 |
+| 8 | 12.7 | 1.6 | 55.8 |
+
+All pixel maxima are zero; all first-draw scenery uploads are zero. Source counts
+after drawing are 16 except stage 4's 24, including cached live fog. These are
+nominal counts, not peak GPU residency. Native upload maxima reach 17.1 ms;
+the 4 ms pacing target cannot interrupt an individual call. Separate first-draw
+CPU profiles sample 56.7 ms in getProgramParameter at stage 0, and 22.3 ms at
+stage 3, which also samples Graphics path construction and GC. Direct profiled
+draw durations are 61.6/53.7 ms; profile wall includes CDP callback boundaries.
+Moving source uploads before readiness does not establish the no-long-task goal,
+shader readiness, GPU completion, improved cold-load time or near-zero transitions.
+
+Evidence: tmp/performance-scene-upload/integrated-results.json,
+integrated-profile-results.json and stage-0/3-integrated-first-draw.cpuprofile;
+runnable integrated and integrated-profile probes under tmp/probes/scene-upload.
+The frozen standard performance harness and assets remain unchanged. Next work
+must warm shader/figure variants and prepare the deterministic next scene early;
+local ownership, complete figure/startup budgets, native pressure stability,
+120Hz fidelity/CPU budget and full Phase 5 verification remain required.
+
+Verification: all 459 unit tests PASS, strict checked production build PASS,
+format/diff checks PASS. Focused worker/retirement/high-refresh 13 PASS and
+lifecycle/held-readiness 7 PASS. Wider scene/context run passes 10/13; three
+five-second startup assertions fail before their target behavior, then all three
+pass isolated (34.7s) without test timeout changes. Broader native run passes
+39/41 (1.9min); two lighting-control cases fail at the same startup deadline.
+Both still fail in a focused default-two-worker retry and in ignored copies
+with only the new warming port disabled, then pass isolated with warming enabled
+(18.1s). The parallel startup delay remains unresolved; this is not a clean full
+suite or final startup verification. The old charm catalogue unit fixture lacked
+document event methods required by the existing shared image owner; replacing
+its bare stub with an EventTarget fixes that fixture without production changes.
+All measurement/test sessions are terminal.

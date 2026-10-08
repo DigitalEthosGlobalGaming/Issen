@@ -16,11 +16,28 @@ export class SceneTextureStore {
   private readonly sources = new Map<SceneTexture['source'], PreparedSource>();
   private readonly dataSources = new Map<SceneTexture['source'], PreparedSource>();
   private frame = 0;
+  private readonly retained = new Map<SceneTexture['source'], number>();
 
   constructor(private readonly beforeRelease?: (source: TextureSource) => void) {}
 
   beginFrame(): void {
     this.frame++;
+  }
+
+  /** Pending uploads survive ordinary frame collection until publication or cancellation. */
+  retainSources(inputs: Iterable<SceneTexture['source']>): () => void {
+    const sources = new Set(inputs);
+    for (const source of sources) this.retained.set(source, (this.retained.get(source) ?? 0) + 1);
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      for (const source of sources) {
+        const count = this.retained.get(source) ?? 0;
+        if (count <= 1) this.retained.delete(source);
+        else this.retained.set(source, count - 1);
+      }
+    };
   }
 
   private prepare(source: SceneTexture['source'], revision: number, data = false): PreparedSource {
@@ -87,7 +104,7 @@ export class SceneTextureStore {
   collect(): void {
     for (const store of [this.sources, this.dataSources])
       for (const [source, prepared] of store) {
-        if (this.frame - prepared.lastFrame <= 120) continue;
+        if (this.retained.has(source) || this.frame - prepared.lastFrame <= 120) continue;
         this.release(prepared);
         store.delete(source);
       }
@@ -120,5 +137,6 @@ export class SceneTextureStore {
     for (const prepared of this.dataSources.values()) this.release(prepared);
     this.sources.clear();
     this.dataSources.clear();
+    this.retained.clear();
   }
 }

@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Upload pacing measured before integration
+# Performance, assets and seamless transitions — Worker uploads precede readiness
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -490,3 +490,36 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     No production code, tests, version, assets or standard harness changed this
     checkpoint. Whole-memory/startup/local budgets, native pressure stability,
     next slots, uploads/variants,120Hz and full Phase5requirements remain required.
+
+22. Worker source warming at1.68.23: main services pass the existing painter upload
+    port. Incoming composed planes and live stage0fog initialize before replacing
+    displayed layers/settling; colour/data interpretation is unchanged.4ms paced
+    visible rAF batches cannot interrupt a native upload. Pending sources survive
+    ordinary collection, stale/disposed waits abort, rejected bitmaps retire GPU
+    consumers, restored context generations restart uploads. Local/demon paths
+    retain existing readiness; no alternate cache or incoming display flush.
+    Native same-input all9stage pixels exact/first-draw scenery uploads zero;
+    real restore plus125collection frames succeeds, stale partial cleanup returns
+    GPU count to displayed stage, failed warming settles local fallback, and
+    hidden painter disposal cancels uploads. Held runtime loading preserves run/
+    hazard/RNG and keeps prewarmed marks before settlement. Initial same-event
+    context-restore fixture times out; next-task restore passes.
+    Mobile integrated firstdraw stage0–8:61.3,2.5,0.9,66.2,2.9,12.4,0.8,8.5,1.6ms;
+    warm wall20.5–125.3ms; upload max17.1ms. Control draws after warmed painter:
+    cache/driver order confounds timings, not cold-load/near-zero transition proof.
+    Profiles sample getProgramParameter56.7ms(stage0)/22.3ms(stage3); direct
+    profiled draws61.6/53.7ms. Shader/figure/next-scene warming still required.
+    Evidence tmp/performance-scene-upload/integrated-results.json and integrated
+    profiles; probes tmp/probes/scene-upload. Full unit459PASS after updating old
+    charm fixture with document events; checked production verification build
+    PASS. Runtime worker/retirement/high-refresh13PASS and lifecycle/readiness7PASS.
+    Wider scene/context13cases:10PASS/3startup5sdeadline failures before tested
+    behavior, isolated3PASS34.7s without timeout changes. Broader native41cases:
+    39PASS/2same5sstartup failures; default2worker focused retry also fails and
+    both reproduce with only warming port disabled in ignored control probes.
+    Isolated2PASS18.1s with warming enabled/timeouts unchanged. Startup parallel
+    deadline remains unresolved, not an upload-specific failure. All sessions
+    terminal; formatting/diff checksPASS. Version/package/lock/title/changelog1.68.23.
+    Frozen standard harness/assets unchanged. Whole memory/startup/local budgets,
+    native pressure stability, deterministic next slots, shader/figure warming,
+    120Hz fidelity/CPU budget and all Phase5criteria remain required.

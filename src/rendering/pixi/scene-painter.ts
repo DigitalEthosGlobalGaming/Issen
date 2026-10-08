@@ -29,6 +29,8 @@ import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
 import { detachSourceBindings } from './source-bindings.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
+import { paceTextureUploads, nextVisibleFrame } from '../texture-upload.ts';
+import type { TextureUpload } from '../texture-upload.ts';
 import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
@@ -226,9 +228,12 @@ export class PixiScenePainter implements SceneDrawing {
     return geometry && light ? Object.freeze({ geometry, light }) : undefined;
   }
   contextLost = false;
+  private contextGeneration = 0;
+  private readonly uploadLifetime = new AbortController();
   private readonly loseContext = (event: Event) => {
     event.preventDefault();
     this.contextLost = true;
+    this.contextGeneration++;
     this.invalidateLighting();
     this.canvas.dataset.contextState = 'lost';
   };
@@ -242,6 +247,7 @@ export class PixiScenePainter implements SceneDrawing {
       this.lightBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.invalidateLighting();
       this.contextLost = false;
+      this.contextGeneration++;
       this.canvas.dataset.contextState = 'ready';
     } catch {
       reportGraphicsError(this.canvas);
@@ -1269,12 +1275,36 @@ export class PixiScenePainter implements SceneDrawing {
     return this.textures.size;
   }
 
+  /** Initialize the same sources used by drawing, preserving colour/data interpretation. */
+  async warmTextures(uploads: readonly TextureUpload[], signal: AbortSignal): Promise<boolean> {
+    const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
+    if (lifetime.aborted) return false;
+    const release = this.textures.retainSources(uploads.map((upload) => upload.texture.source));
+    try {
+      const sources = [
+        ...new Set(uploads.map((upload) => this.textures.get(upload.texture, upload.data).source)),
+      ];
+      const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
+      if (ready() && sources.every((source) => source._gpuData?.[this.renderer.uid])) return true;
+      return await paceTextureUploads(sources, lifetime, {
+        nextFrame: (abort) => nextVisibleFrame(this.canvas.ownerDocument, abort),
+        ready,
+        generation: () => this.contextGeneration,
+        upload: (source) => this.renderer.texture.initSource(source),
+        now: () => performance.now(),
+      });
+    } finally {
+      release();
+    }
+  }
+
   /** Release uploaded sources after an offscreen export has copied its pixels. */
   releaseTextureSources(sources: Iterable<SceneTexture['source']>): void {
     this.textures.releaseSources(sources);
   }
 
   dispose(): void {
+    this.uploadLifetime.abort();
     if (this.disposed) return;
     this.disposed = true;
     this.canvas.removeEventListener('webglcontextlost', this.loseContext);

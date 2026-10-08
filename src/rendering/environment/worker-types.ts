@@ -37,6 +37,7 @@ export type EnvironmentSnapshot = {
     evictions: number;
   };
   timings?: { assets: number; compose: number; transfer: number };
+  texturesWarmed?: boolean;
 };
 export type ComposeRequest =
   | { id: number; kind: 'prepare'; stage: number }

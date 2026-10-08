@@ -153,6 +153,20 @@ for (const paused of [false, true]) {
     await page.evaluate(() => (window as any).__sceneReadiness.release());
     await expect(canvas).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
     await expect(page.locator('#sceneLoadingTreatment')).toBeHidden();
+    const warming = await page.evaluate(() => {
+      const marks = performance.getEntriesByType('mark') as PerformanceMark[];
+      const settled = marks
+        .filter((mark) => mark.name.startsWith('issen:settle-presented-scene:false:'))
+        .at(-1)!;
+      const key = settled.name.slice('issen:settle-presented-scene:'.length);
+      const warmed = marks.find((mark) => mark.name === 'issen:textures-warmed:' + key)!;
+      return {
+        prewarmed: warmed.detail.prewarmed,
+        mode: warmed.detail.mode,
+        before: warmed.startTime <= settled.startTime,
+      };
+    });
+    expect(warming).toEqual({ prewarmed: true, mode: 'paced-source-init', before: true });
   });
 }
 
