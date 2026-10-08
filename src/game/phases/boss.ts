@@ -5,15 +5,15 @@ import { advanceBoss as simulateBoss } from '../encounters/boss-simulation.ts';
 import { parryOpening } from '../encounters/boss-openings.ts';
 import { refillDuelKnives } from '../combat/knife.ts';
 import { swiftSlashPoints, duelMasterTimings } from '../progression/mastery.ts';
-import { recordSecretEvent } from '../progression/secret-events.ts';
+
 import { restorableRng } from '../../shared/random.ts';
-import { kanji, roman } from '../../shared/format.ts';
+
 import { DIRS, DANG, directionMatches, type Direction } from '../../shared/directions.ts';
 import type { RunState } from '../run-state.ts';
 import type { Enemy } from '../combat/enemy.ts';
 import type { Boss } from '../encounters/boss.ts';
 import type { Equipment } from '../../platform/saves.ts';
-import type { Statistics, BladeStats } from '../progression/statistics.ts';
+
 import type { TrialDefinition } from '../content/trials.ts';
 import type { DailyRun } from '../progression/daily.ts';
 
@@ -21,44 +21,21 @@ export interface BossViews {
   readonly events: RuleEvents;
   readonly deferUntilSceneReady: (action: () => void) => boolean;
   readonly G: RunState;
-  readonly renderLives: () => void;
   readonly bossPos: (b: Boss) => { x: number; y: number; h: number; fog: number; alpha: number };
-  readonly banner: (glyph: string, label: string) => void;
-  readonly renderHp: () => void;
-  readonly sfx: {
-    drum(): void;
-    glint(): void;
-    feint(): void;
-    clang(): void;
-    block(): void;
-    slice(): void;
-    bossDie(): void;
-    caw(): void;
-    deflect(): void;
-  };
   readonly activeTrial: TrialDefinition | null;
   readonly activeDaily: DailyRun | null;
   readonly guided: { startBoss(): boolean; bossFlash(): void; bossParried(): void };
-  readonly hint: (key: string, text: string, dur?: number) => void;
   readonly captureCheckpoint: (status?: 'active' | 'ended' | 'lost') => void;
   readonly combatRandom: () => number;
-  readonly flash: (a: number, col?: string | undefined) => void;
   readonly playerDie: (killer: Boss | Enemy | null, reason: string) => void;
   readonly breakCombo: () => void;
-  readonly setScore: () => void;
-  readonly pop: (x: number, y: number, text: string, size?: number | undefined) => void;
   readonly bossTipWorld: (b: Boss) => [number, number];
   readonly S: number;
   readonly swingPlayer: (
     dir: 'block' | 'down' | 'left' | 'right' | 'up',
     perfect?: boolean,
   ) => void;
-  readonly sparks: (x: number, y: number, n: number) => void;
-  readonly ring: (x: number, y: number, r0: number, r1: number, life: number, w: number) => void;
   hitStop: number;
-  readonly combatHaptics: { play(event: 'slice' | 'parry'): void };
-  readonly letterbox: (d: number) => void;
-  readonly ST: Statistics;
   readonly bumpCombo: () => void;
   readonly addScore: (
     pts: number,
@@ -68,43 +45,13 @@ export interface BossViews {
     size?: number | undefined,
   ) => number;
   readonly comboMult: () => number;
-  readonly buzz: (pattern: number | number[]) => void;
-  readonly notifications: { readonly activeHint: string | null };
-  readonly hideHint: () => void;
-  readonly addSlash: (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    w: number,
-    life?: number | undefined,
-    dark?: boolean | undefined,
-  ) => void;
-  readonly killFx: (cx: number, cy: number, ang: number, sc: number) => void;
-  readonly scraps: (x: number, y: number, n: number, sc: number) => void;
-  readonly stamp: (
-    text: string,
-    x: number,
-    y: number,
-    size: number,
-    seal: boolean,
-    life?: number | undefined,
-  ) => void;
   readonly W: number;
   readonly H: number;
-  readonly punch: (z: number, x: number, y: number) => void;
   readonly EQ: Equipment;
   readonly earn: (event: 'boss' | 'kill' | 'wave') => void;
   runBossMilestone: number;
-  readonly bst: () => BladeStats | null;
-  readonly challenge: (metric: keyof BladeStats, value?: number) => void;
-  readonly inkBurst: (x: number, y: number, ang: number, n: number, sc: number) => void;
   readonly saveStats: () => void;
   readonly checkUnlocks: () => void;
-  readonly shake: (amount: number) => void;
-  readonly setBossLabels: (wave: string, glyph: string, name: string) => void;
-  readonly showBossBar: (shown: boolean) => void;
-  readonly bossStain: (position: Boss['pos']) => void;
 }
 
 /** Duel rules retain plain boss records and explicit feedback ports. */
@@ -119,17 +66,10 @@ export function createBossPhase<Context>(
       G,
       activeDaily,
       activeTrial,
-      banner,
       bossPos,
       captureCheckpoint,
       deferUntilSceneReady,
       guided,
-      hint,
-      renderHp,
-      renderLives,
-      sfx,
-      setBossLabels,
-      showBossBar,
     } = views;
     if (deferUntilSceneReady(startBoss)) return;
     refillDuelKnives(G);
@@ -148,7 +88,13 @@ export function createBossPhase<Context>(
     G.state = 'boss';
     G.attacker = null;
     G.event = null;
-    views.events.emit('bossEntered', { glyph: def.k, name: def.n, lap, wave: G.wave, rush: G.rush });
+    views.events.emit('bossEntered', {
+      glyph: def.k,
+      name: def.n,
+      lap,
+      wave: G.wave,
+      rush: G.rush,
+    });
     views.events.emit('bossHealth', { hp: b.hp, maximum: b.maxHp });
     views.events.emit('bossReady', { count: G.bossCount });
     if (!activeTrial && !activeDaily) guided.startBoss();
@@ -158,8 +104,7 @@ export function createBossPhase<Context>(
   }
   function updateBoss(dt: number, raw = dt) {
     const views = current();
-    const { G, bossPos, breakCombo, combatRandom, flash, guided, playerDie, pop, setScore, sfx } =
-      views;
+    const { G, bossPos, breakCombo, combatRandom, guided, playerDie } = views;
     simulateBoss(G, dt, {
       rawDelta: raw,
       random: combatRandom,
@@ -168,7 +113,12 @@ export function createBossPhase<Context>(
       position: bossPos,
       recovered: (b) => {
         breakCombo();
-        views.events.emit('bossCue', { kind: 'recovered', x: b.pos.x, y: b.pos.y, height: b.pos.h });
+        views.events.emit('bossCue', {
+          kind: 'recovered',
+          x: b.pos.x,
+          y: b.pos.y,
+          height: b.pos.h,
+        });
       },
     });
     if (G.boss?.state === 'flash') guided.bossFlash();
@@ -177,26 +127,14 @@ export function createBossPhase<Context>(
     const views = current();
     const {
       G,
-      S,
-      ST,
       activeTrial,
       addScore,
       bossTipWorld,
       bumpCombo,
-      combatHaptics,
       combatRandom,
       comboMult,
-      flash,
       guided,
-      hint,
-      letterbox,
-      pop,
-      renderHp,
-      ring,
-      sfx,
-      sparks,
       swingPlayer,
-      shake,
     } = views;
     const b = G.boss;
     if (!b) return;
@@ -236,25 +174,7 @@ export function createBossPhase<Context>(
   }
   function blockHit(dir: Direction) {
     const views = current();
-    const {
-      G,
-      S,
-      addScore,
-      bossTipWorld,
-      bumpCombo,
-      buzz,
-      combatRandom,
-      comboMult,
-      flash,
-      hideHint,
-      hint,
-      notifications,
-      ring,
-      sfx,
-      sparks,
-      swingPlayer,
-      shake,
-    } = views;
+    const { G, addScore, bossTipWorld, bumpCombo, combatRandom, comboMult, swingPlayer } = views;
     const b = G.boss;
     if (!b) return;
     const tw = bossTipWorld(b);
@@ -288,40 +208,17 @@ export function createBossPhase<Context>(
       G,
       H,
       S,
-      ST,
       W,
       activeTrial,
       addScore,
-      addSlash,
       breakCombo,
-      bst,
       bumpCombo,
-      challenge,
       checkUnlocks,
-      combatHaptics,
       comboMult,
       earn,
-      flash,
-      hideHint,
-      inkBurst,
-      killFx,
-      letterbox,
-      notifications,
       playerDie,
-      pop,
-      punch,
-      renderHp,
-      renderLives,
-      ring,
       saveStats,
-      scraps,
-      setScore,
-      sfx,
-      stamp,
       swingPlayer,
-      shake,
-      showBossBar,
-      bossStain,
     } = views;
     const b = G.boss;
     if (!b) return;
@@ -369,7 +266,12 @@ export function createBossPhase<Context>(
         views.runBossMilestone = Math.max(views.runBossMilestone, G.bossCount);
         if (G.bless.has('breath') && !G.zen && !G.hard && G.lives < G.maxLives) {
           G.lives++;
-          views.events.emit('livesChanged', { cause: 'breath', lives: G.lives, x: W / 2, y: H * 0.5 });
+          views.events.emit('livesChanged', {
+            cause: 'breath',
+            lives: G.lives,
+            x: W / 2,
+            y: H * 0.5,
+          });
         }
         G.state = 'between';
         G.afterBoss = true;

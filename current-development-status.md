@@ -106,25 +106,37 @@ Exact browser command: trials, feature-plan-06, new-blessings,
 runtime-checkpoint-fixtures, game with rendering-v2 config and retained traces:
 all 23 pass in 2.2m (shrine-trial-events-browser.log). Assertions/timeouts unchanged.
 
-Next: apply the prepared separate capability cleanup under tmp/runtime-refactor/
-phase-capability-cleanup. audit.json contains current source hashes and prepared
-filenames for boss/standoff/waves/trials and standalone standoff-feedback type.
-Compiler symbols identify 209 unused destructured captures and 58 obsolete
-BossViews/StandoffViews/TrialSessionViews fields. Preparation does not mutate
-actual source. Check ALL source hashes before applying; adapt runtime/phases and
-runtime/session to the narrower views, remove now-unused imports separately in
-this deletion-only cleanup, format affected source, and verify. Do not resurrect
-old cosmetic ports to satisfy compilation. No live browser process remains.
+Shrine/trial ownership checkpoint is committed at 6b66d72. Separate capability
+cleanup is now applied: all prepared source hashes matched before mutation.
+Compiler-symbol audit removes 209 unused captures/58 obsolete view fields;
+typed runtime owners lose 35 unused adapters and 13 caller action getters.
+runtime/phases no longer takes presentation; standoff cosmetics have their own
+view and trial UI action ports use TrialFeedbackViews. Twelve unused imports and
+one unused stage lookup are removed. No rule branch, RNG or checkpoint change.
+Final strict/all 383 units pass (phase-capability-cleanup-final-typecheck.log /
+phase-capability-cleanup-final-unit.log). Earlier same-stage strict/383 units and
+all 10 game/scene-continuation/runtime-checkpoint-fixtures browsers pass in 33.0s
+(phase-capability-cleanup-browser.log). The final change after browsers only
+deletes the unused standoff stage lookup/import. No source changed during browsers.
+Audits under phase-capability-cleanup: original field/capture/hash audit.json,
+runtime-audit.json, caller-audit.json and import-audit.json (eleven imports there;
+the last STAGES import was removed afterwards). Original prepared hashes/scripts
+are now stale/non-idempotent; never reapply them.
 
-Then finish W2 requirement audit and final gates: scenarios/checkpoints/full
-units/broad browser/production/Android-web, 1.67.0 version/changelog, final
-architecture/behavior log/phone checklist. Review session display orchestration
-in run-start/run-flow/results/checkpoint-flow against ownership requirements;
-an import scan alone is insufficient. All W3 and Part 4 remain required.
+Next: finish the remaining session/UI ownership against the full W2 requirements.
+Actual inspection still finds direct DOM/screen/cosmetic orchestration in
+run-start, run-flow, results and checkpoint-flow. Results directly updates DOM
+fields and renders game-over; checkpoint adoption writes encounter labels/bar;
+run-start directly clears effects/screens and displays mode hints; run-flow
+directly controls title/resume screens. Do not claim full ownership from the
+129-line root or import scan. Move their UI/presentation work into actual owning
+listeners/adapters while preserving transactions, guided input freezes, player
+animation mutation, scene continuation, RNG, profile settlement and checkpoints.
+Then do the requirement audit and final W2 gates: scenario/checkpoint/full units/
+broad browser/production/Android-web, 1.67.0 version/changelog, architecture/
+behavior log/phone checklist. All W3 and Part 4 remain required.
 Develop is unpushed; push once only after full completion. No profiling/benchmarks,
-store builds, real-save edits or lit-only changes. Old preview sources are stale;
-generation/apply scripts are non-idempotent. Preserve the current authoritative
-source rather than copying whole previews.
+store builds, real-save edits or lit-only changes. No live browser process remains.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

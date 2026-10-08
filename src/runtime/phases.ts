@@ -1,24 +1,19 @@
 import { createPhaseBindings, type PhaseBindingViews } from '../game/session/phase-bindings.ts';
 import { stateView, cacheView } from '../game/session/state-view.ts';
 import type { createRuntimeFoundation } from './foundation.ts';
-import type { createRuntimePresentation } from './presentation.ts';
+
 import type { GameContext } from '../game/session/context.ts';
 import type { PresentationContext } from '../presentation/context.ts';
-import { BOSS_SHADOW_DURATION } from '../rendering/figures/death.ts';
+
 import { DEATH_REASONS } from '../ui/screens/game-over.ts';
 import { makeFig, EPOSE } from '../shared/figure-model.ts';
 type ActionPorts = Pick<
   PhaseBindingViews,
-  | 'renderLives'
   | 'setStage'
-  | 'bst'
-  | 'challenge'
   | 'checkUnlocks'
   | 'startStandoff'
   | 'waveCfg'
   | 'waveConfiguration'
-  | 'banner'
-  | 'hint'
   | 'captureCheckpoint'
   | 'deferUntilSceneReady'
   | 'spawnEnemy'
@@ -30,13 +25,9 @@ type ActionPorts = Pick<
   | 'enemyPos'
   | 'comboMult'
   | 'bossPos'
-  | 'renderHp'
   | 'breakCombo'
-  | 'setScore'
   | 'bossTipWorld'
   | 'bumpCombo'
-  | 'notifications'
-  | 'hideHint'
   | 'pickLook'
   | 'startWave'
   | 'nextStep'
@@ -49,10 +40,9 @@ type ActionPorts = Pick<
   | 'openShrine'
 >;
 
-/** Compose phase controllers with explicit base records, presentation and deferred actions. */
+/** Compose phase controllers with explicit rule records and deferred actions. */
 export function createRuntimePhases(
   foundation: ReturnType<typeof createRuntimeFoundation>,
-  presentation: ReturnType<typeof createRuntimePresentation>,
   context: GameContext<PresentationContext>,
   readActions: () => ActionPorts,
 ) {
@@ -81,22 +71,12 @@ export function createRuntimePhases(
               stateView(foundation.profile.profileFoundation, ['ST'], {
                 events: context.events,
                 G: foundation.run.G,
-                renderLives: readActions().renderLives,
-                pop: presentation.pop,
                 setStage: readActions().setStage,
-                bst: readActions().bst,
-                challenge: readActions().challenge,
                 saveStats: foundation.profile.saveStats,
                 checkUnlocks: readActions().checkUnlocks,
                 startStandoff: readActions().startStandoff,
                 waveCfg: readActions().waveCfg,
                 waveConfiguration: readActions().waveConfiguration,
-                banner: readActions().banner,
-                setWaveLabel: (label) => {
-                  foundation.browser.$('waveLbl').textContent = label;
-                },
-                sfx: foundation.browser.sfx,
-                hint: readActions().hint,
                 captureCheckpoint: readActions().captureCheckpoint,
                 deferUntilSceneReady: readActions().deferUntilSceneReady,
                 spawnEnemy: readActions().spawnEnemy,
@@ -108,58 +88,16 @@ export function createRuntimePhases(
                 playerDie: readActions().playerDie,
                 enemyPos: readActions().enemyPos,
                 comboMult: readActions().comboMult,
-                sparks: presentation.sparks,
-                buzz: foundation.browser.buzz,
                 bossPos: readActions().bossPos,
-                renderHp: readActions().renderHp,
                 guided: foundation.browser.guided,
-                flash: presentation.flash,
                 breakCombo: readActions().breakCombo,
-                setScore: readActions().setScore,
                 bossTipWorld: readActions().bossTipWorld,
-                ring: presentation.ring,
-                combatHaptics: foundation.browser.combatHaptics,
-                letterbox: presentation.letterbox,
                 bumpCombo: readActions().bumpCombo,
-                notifications: readActions().notifications,
-                hideHint: readActions().hideHint,
-                addSlash: presentation.addSlash,
-                killFx: presentation.killFx,
-                scraps: presentation.scraps,
-                stamp: presentation.stamp,
-                punch: presentation.punch,
-                inkBurst: presentation.inkBurst,
-                shake: (amount) => {
-                  foundation.view.presentationState.shake = Math.max(
-                    foundation.view.presentationState.shake,
-                    amount,
-                  );
-                },
-                setBossLabels: (wave, glyph, name) => {
-                  foundation.browser.$('waveLbl').textContent = wave;
-                  foundation.browser.$('bossK').textContent = glyph;
-                  foundation.browser.$('bossN').textContent = name;
-                },
-                showBossBar: (shown) => {
-                  foundation.browser.$('bossbar').classList.toggle('on', shown);
-                },
-                bossStain: (p) => {
-                  foundation.view.presentationState.fx.stains.push({
-                    x: p.x,
-                    y: p.y + p.h * 0.01,
-                    rx: p.h * 0.3,
-                    t: 0,
-                    life: BOSS_SHADOW_DURATION,
-                  });
-                },
                 pickLook: readActions().pickLook,
                 startWave: readActions().startWave,
                 accessible: foundation.browser.accessible,
                 makeFigure: makeFig,
                 guardPose: EPOSE.guard,
-                clearLetterbox: () => {
-                  foundation.view.presentationState.lbT = 0;
-                },
                 nextStep: readActions().nextStep,
                 premiumAccess: foundation.browser.premiumAccess,
                 computeMods: readActions().computeMods,

@@ -585,3 +585,12 @@ guided lesson reset, ordinary RNG restoration and title transition. Runtime
 session construction installs progression before UI, with lazy current action
 views. Actual natural Quiet Blade combat/retry and seeded Crossroads/Twin/reroll
 scenarios preserve outcomes/profile/combat RNG without UI listeners.
+
+Phase rule views no longer advertise unused drawing/audio/UI/profile selector
+capabilities. Compiler-symbol cleanup removes 209 unused captures, 58 obsolete
+boss/standoff/trial view fields, 35 binding adapters and 13 unused phase action
+getters. runtime/phases.ts no longer accepts a presentation owner. Standoff
+feedback declares its own cosmetic view; trial UI actions use TrialFeedbackViews
+instead of masquerading as session rule capabilities. Rule bodies and cached
+current field forwarding remain; obsolete imports/one unused stage lookup are
+deleted separately from the preceding physical ownership move.

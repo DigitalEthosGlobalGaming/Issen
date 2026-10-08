@@ -250,18 +250,9 @@ export function createRuntimeGameplay(
     shrinePhase,
     deathPhase,
     betweenPhase,
-  } = createRuntimePhases(foundation, presentation, context, () => ({
-    get renderLives() {
-      return ui.renderLives;
-    },
+  } = createRuntimePhases(foundation, context, () => ({
     get setStage() {
       return scene.setStage;
-    },
-    get bst() {
-      return rules.bst;
-    },
-    get challenge() {
-      return rules.challenge;
     },
     get checkUnlocks() {
       return rules.checkUnlocks;
@@ -274,12 +265,6 @@ export function createRuntimeGameplay(
     },
     get waveConfiguration() {
       return combat.waveConfiguration;
-    },
-    get banner() {
-      return ui.banner;
-    },
-    get hint() {
-      return ui.hint;
     },
     get captureCheckpoint() {
       return captureCheckpoint;
@@ -311,20 +296,11 @@ export function createRuntimeGameplay(
     get comboMult() {
       return combat.comboMult;
     },
-    get hud() {
-      return ui.hud;
-    },
     get bossPos() {
       return combat.bossPos;
     },
-    get renderHp() {
-      return ui.renderHp;
-    },
     get breakCombo() {
       return combat.breakCombo;
-    },
-    get setScore() {
-      return ui.setScore;
     },
     get bossTipWorld() {
       return combat.bossTipWorld;
@@ -332,32 +308,17 @@ export function createRuntimeGameplay(
     get bumpCombo() {
       return combat.bumpCombo;
     },
-    get notifications() {
-      return ui.notifications;
-    },
-    get hideHint() {
-      return ui.hideHint;
-    },
     get pickLook() {
       return combat.pickLook;
     },
     get startWave() {
       return startWave;
     },
-    get toast() {
-      return ui.toast;
-    },
     get nextStep() {
       return nextStep;
     },
-    get showShrineOffers() {
-      return ui.showShrineOffers;
-    },
     get computeMods() {
       return rules.computeMods;
-    },
-    get showScreen() {
-      return ui.showScreen;
     },
     get startBoss() {
       return startBoss;

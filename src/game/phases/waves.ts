@@ -84,17 +84,8 @@ export function createWavesPhase<Context>(
       }
     },
     onTap(context) {
-      const {
-        G,
-        combatRandom,
-        enemyPos,
-        waveConfiguration,
-        events,
-        L,
-        earn,
-        addScore,
-        comboMult,
-      } = readViews(context);
+      const { G, combatRandom, enemyPos, waveConfiguration, events, L, earn, addScore, comboMult } =
+        readViews(context);
       const target = throwKnife(G, combatRandom);
       if (!target) return;
       const pos = enemyPos(target);
@@ -121,8 +112,11 @@ export function createWavesPhase<Context>(
         'Knife',
       );
       events.emit('knifeHit', {
-        x0: L.player.x, y0: L.player.y - L.player.h * 0.55,
-        x: pos.x, y: pos.y, height: pos.h,
+        x0: L.player.x,
+        y0: L.player.y - L.player.h * 0.55,
+        x: pos.x,
+        y: pos.y,
+        height: pos.h,
       });
       return;
     },
@@ -131,14 +125,7 @@ export function createWavesPhase<Context>(
 
 export interface WaveLifecycleViews extends Pick<
   WavesViews,
-  | 'events'
-  | 'G'
-  | 'W'
-  | 'combatRandom'
-  | 'waveConfiguration'
-  | 'killEnemy'
-  | 'earn'
-  | 'addScore'
+  'events' | 'G' | 'W' | 'combatRandom' | 'waveConfiguration' | 'killEnemy' | 'earn' | 'addScore'
 > {
   readonly H: number;
   readonly S: number;
@@ -153,23 +140,7 @@ export interface WaveLifecycleViews extends Pick<
 /** Wave preparation and simulation retain deferred scene entry and clear timing. */
 export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
   function startWave(n: number, skipEvent = false) {
-    const {
-      G,
-      W,
-      H,
-      S,
-      combatRandom,
-      setStage,
-      startStandoff,
-      waveCfg,
-      waveConfiguration,
-      captureCheckpoint,
-      deferUntilSceneReady,
-      spawnEnemy,
-      killEnemy,
-      earn,
-      addScore,
-    } = readViews();
+    const { G, W, H, setStage, deferUntilSceneReady } = readViews();
     G.wave = n;
     startBlessingWave(G);
     G.event = null;
@@ -188,7 +159,12 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
       G.lives < G.maxLives
     ) {
       G.lives++;
-      readViews().events.emit('livesChanged', { cause: 'regen', lives: G.lives, x: W / 2, y: H * 0.5 });
+      readViews().events.emit('livesChanged', {
+        cause: 'regen',
+        lives: G.lives,
+        x: W / 2,
+        y: H * 0.5,
+      });
     }
     readViews().events.emit('wavePrepared', { wave: n, zen: G.zen, lostLife: G.lostLife });
     const si = Math.floor((n - 1) / 3) % STAGES.length,
@@ -197,26 +173,15 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
     G.lap = lap;
     if (si !== G.stage) setStage(si, true);
     const begin = () => {
-      const {
-        G,
-        W,
-        H,
-        S,
-        combatRandom,
-        setStage,
-        startStandoff,
-        waveCfg,
-        waveConfiguration,
-        captureCheckpoint,
-        deferUntilSceneReady,
-        spawnEnemy,
-        killEnemy,
-        earn,
-        addScore,
-      } = readViews();
+      const { G, combatRandom, startStandoff, waveCfg, waveConfiguration, captureCheckpoint } =
+        readViews();
       const st = STAGES[si]!;
       readViews().events.emit('waveReached', {
-        wave: n, mode: G.mode, zen: G.zen, blade: G.blade, lostLife: G.lostLife,
+        wave: n,
+        mode: G.mode,
+        zen: G.zen,
+        blade: G.blade,
+        lostLife: G.lostLife,
       });
       let ev: 'standoff' | 'blood' | 'fog' | null = null;
       if (
@@ -250,32 +215,21 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
       );
       if ((changed && n > 1) || ev) G.gapT = 1.9;
       readViews().events.emit('waveStarted', {
-        wave: G.wave, stage: G.stage, lap, changed,
-        event: ev, ronin: G.mode === 'ronin',
-        refill: waveConfiguration().refill, feint: !!waveConfiguration().feint,
+        wave: G.wave,
+        stage: G.stage,
+        lap,
+        changed,
+        event: ev,
+        ronin: G.mode === 'ronin',
+        refill: waveConfiguration().refill,
+        feint: !!waveConfiguration().feint,
       });
       captureCheckpoint();
     };
     if (!deferUntilSceneReady(begin)) begin();
   }
   function updateWave(dt: number) {
-    const {
-      G,
-      W,
-      H,
-      S,
-      combatRandom,
-      setStage,
-      startStandoff,
-      waveCfg,
-      waveConfiguration,
-      captureCheckpoint,
-      deferUntilSceneReady,
-      spawnEnemy,
-      killEnemy,
-      earn,
-      addScore,
-    } = readViews();
+    const { G, W, H, S, combatRandom, spawnEnemy, killEnemy, earn, addScore } = readViews();
     simulateWave(
       G,
       dt,
@@ -285,21 +239,46 @@ export function createWaveLifecycle(readViews: () => WaveLifecycleViews) {
           const blessing = nextBlessingAttacker(G);
           if (blessing === 'lightning') {
             const p = c.pos;
-            readViews().events.emit('waveAttack', { kind: 'lightning', x: p.x, y: p.y, height: p.h });
+            readViews().events.emit('waveAttack', {
+              kind: 'lightning',
+              x: p.x,
+              y: p.y,
+              height: p.h,
+            });
             killEnemy(c, c.dir, true, true);
-            readViews().events.emit('waveAttack', { kind: 'lightningCut', x: p.x, y: p.y, height: p.h });
+            readViews().events.emit('waveAttack', {
+              kind: 'lightningCut',
+              x: p.x,
+              y: p.y,
+              height: p.h,
+            });
             return;
           }
           if (blessing === 'hesitate') {
             c.T += 0.75;
-            readViews().events.emit('waveAttack', { kind: 'hesitate', x: c.pos.x, y: c.pos.y, height: c.pos.h });
+            readViews().events.emit('waveAttack', {
+              kind: 'hesitate',
+              x: c.pos.x,
+              y: c.pos.y,
+              height: c.pos.h,
+            });
           }
-          readViews().events.emit('waveAttack', { kind: 'step', x: c.pos.x, y: c.pos.y, height: c.pos.h });
+          readViews().events.emit('waveAttack', {
+            kind: 'step',
+            x: c.pos.x,
+            y: c.pos.y,
+            height: c.pos.h,
+          });
         },
         cleared: (bonus) => {
           earn('wave');
           if (recoverAfterWave(G)) {
-            readViews().events.emit('livesChanged', { cause: 'recovery', lives: G.lives, x: W / 2, y: H * 0.4 });
+            readViews().events.emit('livesChanged', {
+              cause: 'recovery',
+              lives: G.lives,
+              x: W / 2,
+              y: H * 0.4,
+            });
           }
           addScore(bonus, W / 2, H * 0.42, '陣破', Math.max(20, 26 * S));
           readViews().events.emit('waveCleared', { wave: G.wave, stage: G.stage, score: G.score });

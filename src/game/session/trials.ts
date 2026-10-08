@@ -1,12 +1,7 @@
 import type { RuleEvents } from '../events.ts';
 import { initialSpawns } from '../encounters/waves.ts';
 import { duelMasterTimings } from '../progression/mastery.ts';
-import {
-  trialPassed,
-  completeTrial,
-  grantTrialRewards,
-  type TrialProgress,
-} from '../progression/trials.ts';
+import { trialPassed, type TrialProgress } from '../progression/trials.ts';
 import type { RunState } from '../run-state.ts';
 import type { Boss } from '../encounters/boss.ts';
 import type { TrialDefinition } from '../content/trials.ts';
@@ -24,7 +19,6 @@ export interface TrialSessionViews {
   readonly events: RuleEvents;
   readonly G: RunState;
   readonly TRIAL_PROGRESS: TrialProgress;
-  readonly UNL: Set<string>;
   readonly R: Random;
   readonly playerStats: Statistics;
   readonly playerEquipment: Equipment;
@@ -38,51 +32,16 @@ export interface TrialSessionViews {
   readonly deferUntilSceneReady: (action: () => void) => boolean;
   readonly waveCfg: (wave: number) => NonNullable<RunState['cfg']>;
   readonly startBoss: () => void;
-  readonly renderHp: () => void;
-  readonly banner: (glyph: string, text: string) => void;
-  readonly setWaveLabel: (label: string) => void;
-  readonly renderTrialObjective: () => void;
-  readonly store: { set(key: string, value: unknown): boolean };
-  readonly sfx: { unlock(): void };
-  readonly buildLeaves: () => void;
   readonly guided: { reset(): void };
-  readonly audio: { setPaused(paused: boolean): void };
-  readonly hideTrialObjective: () => void;
   readonly toTitle: () => void;
   readonly computeMods: () => void;
-  readonly openPanel: (panel: 'trials') => void;
-  readonly focusTrialResult: () => void;
 }
 
 /** Disposable trial encounters and completion restore the persistent player profile. */
 export function createTrialSession(readViews: () => TrialSessionViews) {
   function startTrialEncounter() {
     const views = readViews();
-    const {
-      G,
-      TRIAL_PROGRESS,
-      UNL,
-      R,
-      playerStats,
-      playerEquipment,
-      deferUntilSceneReady,
-      waveCfg,
-      startBoss,
-      renderHp,
-      banner,
-      setWaveLabel,
-      renderTrialObjective,
-      store,
-      sfx,
-      buildLeaves,
-      guided,
-      audio,
-      hideTrialObjective,
-      toTitle,
-      computeMods,
-      openPanel,
-      focusTrialResult,
-    } = views;
+    const { G, deferUntilSceneReady, waveCfg, startBoss } = views;
     if (deferUntilSceneReady(startTrialEncounter)) return;
     const trial = views.activeTrial;
     if (!trial) return;
@@ -126,31 +85,8 @@ export function createTrialSession(readViews: () => TrialSessionViews) {
   }
   function finishTrial(message?: string) {
     const views = readViews();
-    const {
-      G,
-      TRIAL_PROGRESS,
-      UNL,
-      R,
-      playerStats,
-      playerEquipment,
-      deferUntilSceneReady,
-      waveCfg,
-      startBoss,
-      renderHp,
-      banner,
-      setWaveLabel,
-      renderTrialObjective,
-      store,
-      sfx,
-      buildLeaves,
-      guided,
-      audio,
-      hideTrialObjective,
-      toTitle,
-      computeMods,
-      openPanel,
-      focusTrialResult,
-    } = views;
+    const { G, TRIAL_PROGRESS, R, playerStats, playerEquipment, guided, toTitle, computeMods } =
+      views;
     const trial = views.activeTrial;
     if (!trial) return;
     const passed = trialPassed(trial, { ...G, failed: !!message || !!views.trialFailure });

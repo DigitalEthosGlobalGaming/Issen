@@ -1,5 +1,5 @@
 import { bindTrialProgression } from '../game/progression/trial-listeners.ts';
-import { bindTrialFeedback } from '../ui/wiring/trial-feedback.ts';
+import { bindTrialFeedback, type TrialFeedbackViews } from '../ui/wiring/trial-feedback.ts';
 import {
   createSessionBindings,
   type SessionBindingViews,
@@ -46,10 +46,8 @@ type ActionPorts = Pick<
   | 'startBoss'
   | 'waveCfg'
   | 'deferUntilSceneReady'
-  | 'banner'
   | 'renderTrialObjective'
   | 'toTitle'
-  | 'openPanel'
   | 'rewardScreen'
   | 'supportPremium'
   | 'rewardSupport'
@@ -63,10 +61,11 @@ type ActionPorts = Pick<
   | 'refreshArmoryNew'
   | 'setupAttract'
   | 'showPauseScreen'
-> & {
-  readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
-  readonly frameLoop: Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>;
-};
+> &
+  Pick<TrialFeedbackViews, 'banner' | 'openPanel'> & {
+    readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
+    readonly frameLoop: Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>;
+  };
 
 /** Compose session controllers with explicit base records, presentation and deferred actions. */
 export function createRuntimeSession(
@@ -336,50 +335,14 @@ export function createRuntimeSession(
                   get deferUntilSceneReady() {
                     return readActions().deferUntilSceneReady;
                   },
-                  get banner() {
-                    return readActions().banner;
-                  },
-                  get setWaveLabel(): SessionBindingViews<
-                    typeof PREST,
-                    ResultReveal
-                  >['setWaveLabel'] {
-                    return (label) => {
-                      foundation.browser.$('waveLbl').textContent = label;
-                    };
-                  },
                   get renderTrialObjective() {
                     return readActions().renderTrialObjective;
                   },
                   get store() {
                     return store;
                   },
-                  get sfx() {
-                    return foundation.browser.sfx;
-                  },
-                  get hideTrialObjective(): SessionBindingViews<
-                    typeof PREST,
-                    ResultReveal
-                  >['hideTrialObjective'] {
-                    return () => {
-                      foundation.browser.$('trialObjective').hidden = true;
-                    };
-                  },
                   get toTitle() {
                     return readActions().toTitle;
-                  },
-                  get openPanel() {
-                    return readActions().openPanel;
-                  },
-                  get focusTrialResult(): SessionBindingViews<
-                    typeof PREST,
-                    ResultReveal
-                  >['focusTrialResult'] {
-                    return () => {
-                      foundation.browser
-                        .$('trials')
-                        .querySelector<HTMLButtonElement>('#trialResult button')
-                        ?.focus({ preventScroll: true });
-                    };
                   },
                   get rewardScreen() {
                     return readActions().rewardScreen;
@@ -445,17 +408,34 @@ export function createRuntimeSession(
         ),
       ),
     );
-  foundation.lifecycle.add(bindTrialProgression(context.events, () => ({
-    TRIAL_PROGRESS: foundation.profile.TRIAL_PROGRESS, UNL: foundation.profile.UNL, store,
-  })));
-  foundation.lifecycle.add(bindTrialFeedback(context.events, () => ({
-    banner: readActions().banner,
-    setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
-    renderTrialObjective: readActions().renderTrialObjective, sfx: foundation.browser.sfx,
-    buildLeaves: presentation.buildLeaves, audio: foundation.browser.audio,
-    hideTrialObjective: () => { foundation.browser.$('trialObjective').hidden = true; },
-    openPanel: panel => readActions().openPanel(panel),
-    focusTrialResult: () => { foundation.browser.$('trials').querySelector<HTMLButtonElement>('#trialResult button')?.focus({ preventScroll: true }); },
-  })));
+  foundation.lifecycle.add(
+    bindTrialProgression(context.events, () => ({
+      TRIAL_PROGRESS: foundation.profile.TRIAL_PROGRESS,
+      UNL: foundation.profile.UNL,
+      store,
+    })),
+  );
+  foundation.lifecycle.add(
+    bindTrialFeedback(context.events, () => ({
+      banner: readActions().banner,
+      setWaveLabel: (label) => {
+        foundation.browser.$('waveLbl').textContent = label;
+      },
+      renderTrialObjective: readActions().renderTrialObjective,
+      sfx: foundation.browser.sfx,
+      buildLeaves: presentation.buildLeaves,
+      audio: foundation.browser.audio,
+      hideTrialObjective: () => {
+        foundation.browser.$('trialObjective').hidden = true;
+      },
+      openPanel: (panel) => readActions().openPanel(panel),
+      focusTrialResult: () => {
+        foundation.browser
+          .$('trials')
+          .querySelector<HTMLButtonElement>('#trialResult button')
+          ?.focus({ preventScroll: true });
+      },
+    })),
+  );
   return sessionBindings;
 }

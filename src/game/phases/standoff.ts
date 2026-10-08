@@ -1,6 +1,5 @@
 import type { RuleEvents } from '../events.ts';
 import { definePhase } from '../session/phase-router.ts';
-import { STAGES } from '../content/stages.ts';
 import { DIRS, DANG, type Direction } from '../../shared/directions.ts';
 import {
   createStandoff,
@@ -11,7 +10,6 @@ import type { RunState } from '../run-state.ts';
 import type { Enemy } from '../combat/enemy.ts';
 import type { Boss } from '../encounters/boss.ts';
 import type { Equipment } from '../../platform/saves.ts';
-import type { Statistics, BladeStats } from '../progression/statistics.ts';
 
 export interface StandoffViews {
   readonly events: RuleEvents;
@@ -30,49 +28,18 @@ export interface StandoffViews {
   readonly combatRandom: () => number;
   readonly pickLook: (n: number) => string | null;
   readonly enemyPos: (e: Enemy) => { x: number; y: number; h: number; fog: number; alpha: number };
-  readonly banner: (glyph: string, label: string) => void;
-  readonly letterbox: (d: number) => void;
-  readonly sfx: { drum(): void; step(): void; glint(): void; perfect(): void; whoosh(): void };
-  readonly hint: (key: string, text: string, dur?: number) => void;
   readonly captureCheckpoint: (status?: 'active' | 'ended' | 'lost') => void;
   readonly startWave: (n: number, skipEvent?: boolean) => void;
-  readonly flash: (a: number, col?: string | undefined) => void;
   readonly playerDie: (killer: Boss | Enemy | null, reason: string) => void;
-  readonly W: number;
-  readonly H: number;
   readonly accessible: (id: string) => boolean;
   readonly EQ: Equipment;
   readonly swingPlayer: (
     dir: 'block' | 'down' | 'left' | 'right' | 'up',
     perfect?: boolean,
   ) => void;
-  readonly addSlash: (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    w: number,
-    life?: number | undefined,
-    dark?: boolean | undefined,
-  ) => void;
   readonly S: number;
-  readonly killFx: (cx: number, cy: number, ang: number, sc: number) => void;
-  readonly scraps: (x: number, y: number, n: number, sc: number) => void;
-  readonly ring: (x: number, y: number, r0: number, r1: number, life: number, w: number) => void;
-  readonly stamp: (
-    text: string,
-    x: number,
-    y: number,
-    size: number,
-    seal: boolean,
-    life?: number | undefined,
-  ) => void;
-  readonly punch: (z: number, x: number, y: number) => void;
   hitStop: number;
-  readonly combatHaptics: { play(event: 'slice'): void };
   readonly bumpCombo: () => void;
-  readonly ST: Statistics;
-  readonly challenge: (metric: keyof BladeStats, value?: number) => void;
   readonly earn: (event: 'boss' | 'kill' | 'wave') => void;
   readonly addScore: (
     pts: number,
@@ -86,8 +53,6 @@ export interface StandoffViews {
   readonly checkUnlocks: () => void;
   readonly makeFigure: (seed: number) => Enemy['d'];
   readonly guardPose: Enemy['pose'];
-  readonly setWaveLabel: (label: string) => void;
-  readonly clearLetterbox: () => void;
 }
 
 /** Challenger setup and cut timing own plain records, with explicit feedback ports. */
@@ -107,42 +72,11 @@ export function createStandoffPhase<Context>(
       combatRandom,
       pickLook,
       enemyPos,
-      banner,
-      letterbox,
-      sfx,
-      hint,
       captureCheckpoint,
-      startWave,
-      flash,
-      playerDie,
-      W,
-      H,
-      accessible,
-      EQ,
-      swingPlayer,
-      addSlash,
-      S,
-      killFx,
-      scraps,
-      ring,
-      stamp,
-      punch,
-      combatHaptics,
-      bumpCombo,
-      ST,
-      challenge,
-      earn,
-      addScore,
-      comboMult,
-      saveStats,
-      checkUnlocks,
       makeFigure,
       guardPose,
-      setWaveLabel,
-      clearLetterbox,
     } = views;
     if (deferUntilSceneReady(() => startStandoff(n, changed))) return;
-    const st = STAGES[G.stage]!;
     G.state = 'standoff';
     G.cfg = waveCfg(n);
     G.enemies = G.enemies.filter((e) => e.state === 'dying');
@@ -181,48 +115,7 @@ export function createStandoffPhase<Context>(
   }
   function updateStandoff(dt: number) {
     const views = current();
-    const {
-      deferUntilSceneReady,
-      G,
-      waveCfg,
-      L,
-      combatRandom,
-      pickLook,
-      enemyPos,
-      banner,
-      letterbox,
-      sfx,
-      hint,
-      captureCheckpoint,
-      startWave,
-      flash,
-      playerDie,
-      W,
-      H,
-      accessible,
-      EQ,
-      swingPlayer,
-      addSlash,
-      S,
-      killFx,
-      scraps,
-      ring,
-      stamp,
-      punch,
-      combatHaptics,
-      bumpCombo,
-      ST,
-      challenge,
-      earn,
-      addScore,
-      comboMult,
-      saveStats,
-      checkUnlocks,
-      makeFigure,
-      guardPose,
-      setWaveLabel,
-      clearLetterbox,
-    } = views;
+    const { G, combatRandom, startWave, playerDie } = views;
     simulateStandoff(
       G,
       dt,
@@ -244,46 +137,18 @@ export function createStandoffPhase<Context>(
   function standoffSwipe(dir: Direction) {
     const views = current();
     const {
-      deferUntilSceneReady,
       G,
-      waveCfg,
-      L,
-      combatRandom,
-      pickLook,
-      enemyPos,
-      banner,
-      letterbox,
-      sfx,
-      hint,
-      captureCheckpoint,
-      startWave,
-      flash,
       playerDie,
-      W,
-      H,
       accessible,
       EQ,
       swingPlayer,
-      addSlash,
       S,
-      killFx,
-      scraps,
-      ring,
-      stamp,
-      punch,
-      combatHaptics,
       bumpCombo,
-      ST,
-      challenge,
       earn,
       addScore,
       comboMult,
       saveStats,
       checkUnlocks,
-      makeFigure,
-      guardPose,
-      setWaveLabel,
-      clearLetterbox,
     } = views;
     const so = G.so,
       outcome = resolveStandoffSwipe(so, dir, !!G.m.axisCut);
@@ -320,7 +185,14 @@ export function createStandoffPhase<Context>(
         '挑',
         Math.max(22, 28 * S),
       );
-      views.events.emit('standoffResolved', { won: true, perfect: true, direction: dir, x: cx, y: cy, height: p.h });
+      views.events.emit('standoffResolved', {
+        won: true,
+        perfect: true,
+        direction: dir,
+        x: cx,
+        y: cy,
+        height: p.h,
+      });
       saveStats();
       checkUnlocks();
     } else {
