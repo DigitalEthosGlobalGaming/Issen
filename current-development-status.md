@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Figure texture retirement
+# Performance, assets and seamless transitions — Shared enemy admission constraint
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -713,3 +713,18 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     no push/deployment/native build or real player-save mutation.
     Final bundled app/ink3PASS23.0s/default2workers; diff/formatPASS; synchronized
     package/lock/title/changelog. All check sessions terminal.
+
+32. Shared enemy decode trial rejected; production remains1.68.30. Two direct
+    owners decode24maps150,978,240bytes. Existing document-loader trial shares12maps
+    75,489,120bytes, keeps peer ready and final closure0; native14case differences
+    match unchanged control (max1 in firstcase,13zero). Baseline2PASS3.4s/trial2PASS
+    3.6s. At deviceMemory2, local stage0 pins34inputs213,952,112bytes; full enemy
+    catalogue requires289,441,232combinedbytes, exceeding256MiB by21,005,776bytes,
+    before charms/companions/next scene. Only base/clothing become ready; original
+    preparationPASS/trialFAIL. Reverted exactly; restored4probePASS5.6s/source diff
+    empty. Evidence under tmp/performance-enemy-shared/ and saved original/probes
+    under tmp/probes/enemy-shared/. Next combine selected figure families with local
+    compose-input lifetime/headroom, respecting prior native sampling failures.
+    Do not force all-family sharing or raise/split the budget. No implementation or
+    version change; all measurement handles terminal. Goal remains active at full
+    scope; no push/deploy/native build/player-save mutation.

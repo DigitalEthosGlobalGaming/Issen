@@ -1836,3 +1836,39 @@ startup/local transient headroom/native sampling, deterministic next slots,
 at full scope; no push/deployment/native build or real player-save mutation.
 Final bundled app/ink checks3PASS23.0s/default2workers; diff/formatPASS;
 package/lock/title/changelog synchronized. All check sessions terminal.
+
+## Checkpoint 32 — Enemy shared decoding rejected for low-memory admission
+
+Two independent enemy owners decode24HTML maps150,978,240nominal RGBA bytes;
+disposing one leaves the peer's12maps75,489,120bytes, final closure0. This repeats
+all four families rather than sharing the existing document loader. The saved
+original/current14case native comparison has max1 in its first case, zero in the
+other13, matching prior unchanged native control tolerance. Baseline2testsPASS3.4s
+on a dedicated strict-port server/one worker; stable evidence under
+tmp/performance-enemy-shared/baseline-*.json, saved module/reproducer under
+tmp/probes/enemy-shared/. Trial routed all four PBR families through the existing
+document HTML-image loader. Two owners share12maps75,489,120bytes (half the baseline),
+peer stays ready after first disposal, final closure0. Native14case comparison
+retains exactly the unchanged-control max1/13zero pattern;2testsPASS3.6s.
+After-sharing evidence: tmp/performance-enemy-shared/after-*.json.
+
+Admission gate rejected this change: at deviceMemory2, local stage0 retains
+34inputs213,952,112bytes. Adding the full enemy catalogue needs289,441,232bytes,
+21,005,776over the existing268,435,456budget, even without charms/companions or a
+next scene. Shared loader stops at42pinned sources264,279,584bytes; only base and
+clothing become ready, so enemy preparation returns false. Original direct owner
+prepares successfully alongside the same local inputs. Diagnostic originalPASS/
+trialFAIL3.9s; evidence tmp/performance-enemy-shared/rejected-low-memory-*.json.
+No budget increase, separate pool or weakened readiness assertion.
+
+Reverted the integration exactly; source diff empty. Full isolated control rerun
+4PASS5.6s confirms native pixels, peer lifetime and low-memory readiness restored;
+evidence restored-*.json. This trial demonstrates that all-family sharing alone
+would break the required local fallback. Next work must combine selected figure
+families with local compose-input lifetime/headroom, retaining exact pixels before
+shared admission. The native sampler/release constraint from prior checkpoints
+still applies. All measurements terminal; initial probe-directory creation and a
+copied de-duplication saving assertion were corrected before baseline capture.
+No implementation/version change, assets, gameplay/seeds, frozen harness, real
+player saves, push/deployment or native build. Goal remains active at full scope;
+all remaining Phase3/4/5 requirements remain required.
