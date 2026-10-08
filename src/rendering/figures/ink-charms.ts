@@ -1,6 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
+import { createMainImageOwner } from '../../platform/main-images.ts';
 const ATLAS_URL = new URL('./assets/charm-atlas.webp', import.meta.url).href;
 /** Packed source windows; the generated rows are not equal thirds. */
 const FRAMES = [
@@ -43,34 +44,31 @@ const RECIPES: Record<string, readonly [number, string?]> = {
 
 /** Caller owns position/animation; this renderer only replaces the physical charm. */
 export function createInkCharmRenderer(doc: Document) {
-  const materials = createAssetMaterials(doc, { charms: ATLAS_URL });
+  const images = createMainImageOwner(doc);
+  const materials = createAssetMaterials(doc, { charms: ATLAS_URL }, images);
   let image: HTMLImageElement | undefined;
   let pending: Promise<boolean> | undefined;
-  let settle: ((ready: boolean) => void) | undefined;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
   const cache = new Map<string, HTMLCanvasElement>();
   function prepare(): Promise<boolean> {
     if (state === 'disposed') return Promise.resolve(false);
     if (pending) return pending;
     state = 'loading';
-    image = doc.createElement('img');
-    const img = image;
-    pending = new Promise<boolean>((resolve) => {
-      settle = resolve;
-      const finish = (ok: boolean) => {
-        img.onload = img.onerror = null;
-        if (state !== 'disposed') state = ok ? 'ready' : 'unavailable';
-        settle = undefined;
-        resolve(ok && state !== 'disposed');
-      };
-      img.onload = async () => {
-        const valid = img.naturalWidth === 1536 && img.naturalHeight === 1024;
-        const loaded = valid && (await materials.prepare()).every(Boolean);
-        finish(loaded);
-      };
-      img.onerror = () => finish(false);
-      img.src = ATLAS_URL;
-    });
+    const lease = images.acquire(ATLAS_URL);
+    pending = Promise.all([lease.ready, materials.prepare()]).then(
+      ([img, maps]) => {
+        if (state === 'disposed') return false;
+        image = img;
+        const ready =
+          img.naturalWidth === 1536 && img.naturalHeight === 1024 && maps.every(Boolean);
+        state = ready ? 'ready' : 'unavailable';
+        return ready;
+      },
+      () => {
+        if (state !== 'disposed') state = 'unavailable';
+        return false;
+      },
+    );
     return pending;
   }
   /** x/y is the top suspension point; size is full height in caller coordinates. */
@@ -129,17 +127,17 @@ export function createInkCharmRenderer(doc: Document) {
   return {
     prepare,
     draw,
-    snapshot: () => ({ state, cached: cache.size, supported: Object.keys(RECIPES) }),
+    snapshot: () => ({
+      state,
+      cached: cache.size,
+      supported: Object.keys(RECIPES),
+      decodedLoader: images.snapshot(),
+    }),
     dispose() {
       materials.dispose();
+      images.dispose();
       state = 'disposed';
-      if (image) {
-        image.onload = image.onerror = null;
-        image.removeAttribute('src');
-      }
       image = undefined;
-      settle?.(false);
-      settle = undefined;
       for (const c of cache.values()) c.width = c.height = 0;
       cache.clear();
     },

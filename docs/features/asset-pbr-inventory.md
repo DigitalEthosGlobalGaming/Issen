@@ -75,6 +75,8 @@ UI lighting now leases one source/data pack per export and releases pins and GPU
 source textures afterwards. Lit CSS outputs remain available for redraw, while
 background export dispatch yields to busy/loading/hidden frames. The managed
 budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
+Charm renderers now share their18,874,368-byte colour/normal/surface kit through
+main-pool leases; separate previews retain independent tint caches and pins.
 The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
 for compressed prefetch and startup filtering; regenerate with
 `node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.

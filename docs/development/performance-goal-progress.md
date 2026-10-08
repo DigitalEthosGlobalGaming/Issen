@@ -905,3 +905,25 @@ PASS. Logs `tmp/performance-startup-retention-browser.log` preserve the failures
 Processes12724/72369terminal; no active captures. Next replace broad startup decode
 while migrating required active figure/source owners, preserve cold first-appearance
 readiness, then complete memory/transition/frame-budget requirements and Phase5.
+
+## Phase 3.4 — Charm figure leases
+
+Version1.68.14 routes charm colour and data maps through the shared main pool.
+The18,874,368-byte kit decodes once for peer owners. Each renderer retains its
+own small tint cache, and disposal releases only its pins without clearing a
+peer's image. Preparation validates dimensions/maps before ready; disposal
+prevents late attachment. Larger figure families and active selections remain
+pending, so this is not a whole-figure or whole-app memory claim.
+
+Strict,9focused units, checked production build and4browsers PASS10.7s, including
+existing aligned outfit/charm material stamps, all31UIpacks, quiet export policy
+and combined low-memory ownership. Two charm owners prepare; one disposes, the
+peer stays ready while stage0 and all31UIpacks render and relight. Combined
+mandatory set37images/232,826,480bytes; retained peak268,424,816≤268,435,456budget,
+145evictions, final37pins/266,454,704bytes/88decoded. UI still retires all upload
+sources, stage composes successfully and last owner disposal clears pool bytes.
+Stable evidence `tmp/performance-charm-ui-stage-budget/results.json`. Logs
+`tmp/performance-phase3-charm-leases-browser.log` and
+`tmp/performance-phase3-charm-leases-build.log`. Session57939terminal; no active
+capture. Continue player/outfit/enemy/weapon/companion and remaining environment
+owners, narrow initial startup decode, then combined budgets/Phase4/Phase5.

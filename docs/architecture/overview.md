@@ -190,6 +190,9 @@ visible frame grants before decode and upload; explicit prepare/custom texture
 requests bypass that wait. `asset-background` supports independent subscribers
 for UI exports and compressed prefetch. Exported DOM/CSS images and other figure
 owners remain outside the decoded-input estimate.
+`figures/ink-charms.ts` leases its colour atlas and selected data maps from the
+shared main pool. Charm previews share decode residency while retaining separate
+tint caches; disposal releases only their own pins and ignores late attachment.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and

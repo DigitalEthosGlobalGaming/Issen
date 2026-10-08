@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Startup ownership retired and gate corrected
+# Performance, assets and seamless transitions — Charm input leases verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -284,3 +284,15 @@ next-slot/loading-state tests, final report and any final push are outstanding.
    Final startup measurements must use corrected filtering; no whole-app memory
    or speed claim yet. Continue active figure/remaining sources and narrow startup
    required assets, then combined budgets/Phase4/full Phase5verification.
+
+10. Charm colour/data kit shares main-pool leases at1.68.14 (18,874,368bytes).
+    Independent tint caches/pins survive peer disposal and late attachment is
+    ignored. Strict,9units, checked build and4UI/material browsers PASS. Local
+    stage0 +charm peer +31UIpacks twice at256MiB:37mandatory pins/232,826,480bytes,
+    peak268,424,816bytes,145evictions, no extra UI pins/upload textures afterexport;
+    peer ready, stage valid and last disposal0bytes. Stable evidence
+    tmp/performance-charm-ui-stage-budget/results.json; session57939terminal,
+    no active captures. Version/package/lock/title/changelog1.68.14. Other figure
+    and environment sources remain outside the pool; initial broad startup decode
+    still exceeds the intended eventual budget. Continue their active/lazy lease
+    migration and narrow startup, then finish budgets/Phase4/full Phase5requirements.

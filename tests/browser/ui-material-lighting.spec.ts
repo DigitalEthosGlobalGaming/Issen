@@ -68,6 +68,12 @@ test('UI exports release pins and GPU sources while a low-memory local stage rem
     const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
     const stage = createLocalEnvironmentRenderer(document);
     await stage.prepare(0);
+    const { createInkCharmRenderer } = await import('/src/rendering/figures/ink-charms.ts');
+    const charms = createInkCharmRenderer(document);
+    const charmPeer = createInkCharmRenderer(document);
+    if (!(await charms.prepare()) || !(await charmPeer.prepare()))
+      throw Error('Charm prepare failed');
+    charms.dispose();
     const before = stage.snapshot().decodedLoader!;
     const packs = assetMaterialCatalog.filter((pack: any) => pack.sourcePath.startsWith('src/ui/'));
     const style = document.createElement('style');
@@ -99,8 +105,10 @@ test('UI exports release pins and GPU sources while a low-memory local stage rem
       reducedFlashes: true,
     });
     style.remove();
+    const charmReady = charmPeer.snapshot().state;
+    charmPeer.dispose();
     stage.dispose();
-    return { before, samples, after, live, disposed: stage.snapshot().decodedLoader! };
+    return { before, samples, after, live, charmReady, disposed: stage.snapshot().decodedLoader! };
   });
   expect(result.samples.every((sample) => sample.rendered === 31)).toBe(true);
   for (const sample of result.samples) {
@@ -111,6 +119,7 @@ test('UI exports release pins and GPU sources while a low-memory local stage rem
   expect(result.after.pinned).toBe(result.before.pinned);
   expect(result.after.evictions).toBeGreaterThan(0);
   expect(result.live).toBe(true);
+  expect(result.charmReady).toBe('ready');
   expect(result.disposed.bytes).toBe(0);
   expect(warnings).toEqual([]);
   const path = testInfo.outputPath('ui-and-stage-budget.json');
