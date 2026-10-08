@@ -47,7 +47,12 @@ Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
 (1.68.29). Current-frame textures survive replay until that painter's next begin,
 context loss or disposal; older-frame entries retire immediately. Diagnostics
 account pending count/nominal bytes. This does not establish a whole-game GPU or
-decoded-memory budget; other figure caches and selected ownership remain required.
+decoded-memory budget; selected ownership remains required.
+Player/outfit tone and tint canvases, base images and weapon cutouts/raw maps now
+retire native textures before source closure (1.68.30). Weapon LRU eviction uses
+the same frame-preserving boundary as enemy caches. All20outfits and20weapons
+match the saved original exactly; owner disposal returns native counts to zero.
+These owners still prepare their catalogues outside the shared decoded budget.
 The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
 records actual source/catalog/startup-glob references, dimensions, bytes and
 stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.

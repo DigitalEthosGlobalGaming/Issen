@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Frame-preserving cache retirement
+# Performance, assets and seamless transitions — Figure texture retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -695,3 +695,21 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Final bundled app/ink3PASS23.3s/default2workers; diff/formatPASS and synchronized
     package/lock/title/changelog. All check sessions terminal; no push/deployment,
     native build or real player-save mutation.
+
+31. Player/outfit/weapon GPU lifetime at1.68.30: owned raw images, tone/tint canvases
+    and weapon cutouts notify native consumers before final closure. Weapon LRU
+    eviction preserves queued/repeated frames until the existing painter boundary.
+    All20outfits and20weapons match saved original pixels exactly. Player native61
+    closes to0 (original48remaining); weapon36 closes to0 (original32remaining).
+    Diagnostic100tint aliases exercise80part LRU: queued106native includes22pending
+    sources7,731,680nominal bytes; next begin84/pending0; final0 (original104).
+    Original/current and repeated pixels exact. New peer/catalogue/warmed eviction
+    tests pass; related16browserPASS20.8s/default2workers, final3newtestsPASS5.0s;
+    all463unitsPASS; checkedbuild/strictTypeScriptPASS. Evidence and saved original
+    probes under tmp/performance-figure-retirement/ and tmp/probes/figure-retirement/.
+    This is resource lifetime, not a whole-game GPU/decoded budget. Selected figure
+    ownership/startup/local headroom/native sampling, deterministic next slots,
+    120Hz and full Phase5 measurements remain required. Goal active at full scope;
+    no push/deployment/native build or real player-save mutation.
+    Final bundled app/ink3PASS23.0s/default2workers; diff/formatPASS; synchronized
+    package/lock/title/changelog. All check sessions terminal.

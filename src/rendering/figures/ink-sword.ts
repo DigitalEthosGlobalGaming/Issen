@@ -2,6 +2,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
@@ -122,6 +123,7 @@ export function createInkSwordRenderer(doc: Document) {
     if (cache.size > 80) {
       const first = cache.keys().next().value!,
         old = cache.get(first)!;
+      retireSceneTexture(old, true);
       old.width = old.height = 0;
       cache.delete(first);
     }
@@ -270,14 +272,18 @@ export function createInkSwordRenderer(doc: Document) {
       disposed = true;
       fittings.dispose();
       materials.clear();
-      surface.width = surface.height = 0;
       for (const im of images.values()) {
+        retireSceneTexture(im);
         im.onload = null;
         im.onerror = null;
         im.removeAttribute('src');
       }
+      surface.width = surface.height = 0;
       for (const f of [...finish]) f();
-      for (const c of cache.values()) c.width = c.height = 0;
+      for (const c of cache.values()) {
+        retireSceneTexture(c);
+        c.width = c.height = 0;
+      }
       cache.clear();
       images.clear();
       loaded.clear();

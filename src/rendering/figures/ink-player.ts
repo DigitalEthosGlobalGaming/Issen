@@ -3,6 +3,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
@@ -259,9 +260,13 @@ export function createInkPlayerRenderer(doc: Document) {
       outfits.dispose();
       materials.dispose();
       pbr.dispose();
-      for (const c of tones.values()) c.width = c.height = 0;
+      for (const c of tones.values()) {
+        retireSceneTexture(c);
+        c.width = c.height = 0;
+      }
       tones.clear();
       if (atlas) {
+        retireSceneTexture(atlas);
         atlas.onload = null;
         atlas.onerror = null;
         atlas.removeAttribute('src');

@@ -1796,3 +1796,43 @@ ownership, local transient headroom/native sampling, deterministic next slots,
 at full scope; no push/deployment/native build or player-save mutation.
 Final bundled app/ink checks3PASS23.3s/default2workers; diff/formatPASS;
 version/package/lock/title/changelog synchronized. All check sessions terminal.
+
+## Checkpoint 31 — Player/outfit/weapon retirement baseline
+
+Before editing lifetimes, two unchanged native renderers match exactly across all
+20outfits and20weapon recipes. Player/outfit preparation and painting hold61native
+sources (35tone parts/8outfit tints); owner disposal leaves48sources alive. Sword
+holds36sources/30cached parts; disposal leaves32sources. Baseline evidence:
+tmp/performance-figure-retirement/baseline.json. Saved original player/outfit/sword
+modules and reproducible whole-catalogue probe under tmp/probes/figure-retirement/.
+Keep the same pixels and frame-preserving weapon eviction while retiring owned
+raw images and prepared canvases on final disposal. Decoded source selection and
+shared-budget integration remain required; this is a GPU-lifetime checkpoint.
+
+Implemented at1.68.30: notify existing native consumers before closing player
+tones/base images, outfit raw images/tints and weapon raw images/cached parts.
+Weapon LRU eviction uses the existing explicit frame-preserving retirement mode;
+final owner disposal remains immediate. No decode, art, budget, seed or gameplay
+change. Whole-catalogue original/current comparison is exact across40cases.
+Player native61 now closes to0 (original48); weapon36 closes to0 (original32).
+
+A100tint-alias diagnostic exercises the weapon80part LRU without changing the
+authored catalogue. Original/current and repeated frame pixels are exact. Queued
+native106 includes22pending sources7,731,680nominal RGBA bytes; next begin leaves
+84sources/pending0; final disposal0, versus original104remaining. This measures
+source lifetime rather than establishing a configured whole-game GPU cap.
+New permanent native tests cover all catalogue items, mirrored player artwork,
+reduced effects, exact peer pixels, repeated disposal and a warmed queued weapon
+evicted before replay. Pending weapon textures survive until the next begin.
+Related16browser checks PASS20.8s/default2workers, then all3final new tests
+PASS5.0s. All463unitsPASS; checked build/strict TypeScriptPASS.
+
+Stable evidence: tmp/performance-figure-retirement/{baseline,after,weapon-lru}.json,
+figure-retirement-{player,sword}.json, weapon-cache-retirement.json and units/build
+logs. Saved original modules and isolated reproductions remain under
+tmp/probes/figure-retirement/. Selected player/outfit/weapon/enemy decoded ownership,
+startup/local transient headroom/native sampling, deterministic next slots,
+120Hz/CPU budget and full Phase5 metrics/traces/suites remain required. Goal active
+at full scope; no push/deployment/native build or real player-save mutation.
+Final bundled app/ink checks3PASS23.0s/default2workers; diff/formatPASS;
+package/lock/title/changelog synchronized. All check sessions terminal.
