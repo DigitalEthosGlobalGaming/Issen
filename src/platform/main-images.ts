@@ -6,6 +6,7 @@ import {
 import { readCompressedAsset } from './compressed-assets.ts';
 import { runtimeAssets } from './runtime-assets.ts';
 import { observeAssetBackground } from './asset-background.ts';
+import { retireSceneTexture } from '../rendering/texture-revision.ts';
 
 type Resource = { image: HTMLImageElement; width: number; height: number; close(): void };
 type Pool = {
@@ -29,6 +30,7 @@ async function decode(doc: Document, url: string, signal: AbortSignal): Promise<
   const close = () => {
     if (closed) return;
     closed = true;
+    retireSceneTexture(image);
     image.removeAttribute('src');
     URL.revokeObjectURL(objectUrl);
   };

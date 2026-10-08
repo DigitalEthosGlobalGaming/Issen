@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Ordinary scenery shaders precede readiness
+# Performance, assets and seamless transitions — Shared main-image GPU retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -556,3 +556,21 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     120Hz fidelity/CPUbudget and Phase5allmetrics/traces/suites. Next address broad
     startup/selected figure ownership and remaining first-use scene preparation;
     prediction/nextslots still must be wired, not replaced with loading-only waits.
+
+24. Main-image GPU retirement at1.68.25: companion/startup audit exposed pool
+    eviction/final-disposal clearing pixels without notifying native consumers.
+    Original-code controls fail with GPU counts1/1 after final disposal and2/1
+    colour/data/crop counts after LRU eviction. Existing retirement notification
+    now precedes image clearing/blob revoke; unpin retains warm pixels and peer
+    disposal preserves the shared source. Native after counts0/0, exact peer
+    pixels, uploaded LRU source1→0, callbacks once before width256→0. Accounted
+    pressure peak264,485,456bytes within256MiB; not resident/whole-game proof.
+    Enhanced16browser casesPASS20.2s/default2workers;8focusedunitsPASS. Evidence
+    tmp/performance-main-image-retirement/; all-stage local cycle remains bounded.
+    Companion selection/startup integration remains unimplemented: route active
+    kits plus explicit preview borrowing, avoid both-kit+stage0+charm mandatory
+    pins exceeding256MiB. Complete figures/startup/local budgets, native pressure
+    stability, deterministic nextslots/decode, cold smoothness, complete warming,
+    120Hz fidelity/CPUbudget and all Phase5 metrics/traces/suites remain required.
+    Final checks: all459unitsPASS; checked production verification build/typecheck
+    PASS; assets and the frozen standard performance harness remain unchanged.

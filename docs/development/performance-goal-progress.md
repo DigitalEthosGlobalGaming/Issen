@@ -1452,3 +1452,48 @@ remain unchanged. The single replay difference is unexplained, not demonstrated
 to be caused by shader warming or resolved for the full goal. Startup and native
 pressure stability remain required. All sessions terminal; no full-suite,
 cold/warm production trace or final acceptance claim.
+
+## Checkpoint 24 — Main-image final GPU ownership, 9 October 2026
+
+The companion/startup audit found a shared-pool lifetime gap first. The existing
+HTML-image resource cleared its source URL on LRU eviction or final pool disposal
+without notifying native GPU consumers. Two original-code browser controls fail:
+final disposal clears image pixels but leaves one source texture in each of two
+painters; LRU eviction leaves two colour/data textures and one crop texture.
+This is independent of the still-unintegrated companion/figure selection work.
+
+Version 1.68.25 calls the existing retirement port before clearing pixels and
+revoking the blob URL. Pool ownership remains unchanged: releasing a lease keeps
+warm pixels, and disposing one owner preserves its peer's shared image. No new
+cache, forced eviction or budget increase is introduced. Native stores already
+perform binding detachment and texture destruction when notified.
+
+After: final disposal removes both painters' source textures immediately (1/1
+before, 0/0 after). Peer disposal retains the identical 256-pixel-wide image and
+both source textures, with exact native pixels (maximum difference 0). Low-memory
+LRU pressure releases all three colour/data/crop textures and the uploaded native
+texture before the source width becomes zero; the retirement callback observes
+width 256 and fires exactly once. Sampled loader peak 264,485,456 bytes stays below
+the configured 268,435,456-byte budget; final snapshot 264,354,384 bytes, 42 decoded
+sources, two evictions. These are loader-accounted bytes/source texture counts,
+not resident GPU memory or a whole-application budget guarantee.
+
+The enhanced 16-case browser run passes in 20.2s with default two workers:
+shared image scheduling/cancellation/peers, all-stage local source cycling,
+actual native eviction/final disposal, colour/data/crops, pooled mesh/pattern
+bindings, worker replacement, catalogue figures and all nine native scenes at
+two viewport sizes. No feedback/bound-resource warnings; peer pixels exact.
+Eight focused loader/retirement unit checks pass. Additional final checks are
+recorded in the handoff after completion. Browser JSON evidence is copied to
+`tmp/performance-main-image-retirement/`; tests attach through outputPath.
+
+Companion audit: startup, figure factories and both preview constructors still
+request both kits. A safe selection migration must include active equipment and
+explicit preview borrowing/release. Simply routing both kits through the pool
+can exceed the low-memory budget alongside stage 0 and the pinned charm kit.
+Complete main-figure/startup integration remains required; no claim of a new
+startup bound, faster transitions, frame-p95 improvement or full goal acceptance.
+
+Final checks: all 459 unit tests PASS; checked production verification build and
+strict type checks PASS. Assets and frozen standard performance harness unchanged.
+No push/deployment/native build or player-save mutation. Whole goal remains active.

@@ -752,6 +752,15 @@ are correctness checks, not performance captures. Current named composer and
 film/post/target extension hooks are described below.
 
 
+## Shared main-image retirement
+
+The native HTML image pool owns final source lifetime. LRU eviction and final
+pool disposal call `retireSceneTexture` before clearing the image URL and revoking
+its blob URL. Every observing painter/store releases colour, data and frame
+textures through the existing native binding cleanup. Unpinning an image keeps
+its decoded pixels and textures available until ordinary collection or eviction;
+disposing one owner does not invalidate another owner's lease.
+
 ## Worker scenery texture readiness
 
 The main native services pass the scene painter's `warmScene` port to the
