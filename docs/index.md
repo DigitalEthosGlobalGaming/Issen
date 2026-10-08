@@ -99,3 +99,5 @@
 - [Runtime refactor results](development/runtime-refactor-results.md): Workstream 2 ownership, verification, behavior changes and phone play checklist.
 
 - [Lighting refactor results](development/lighting-refactor-results.md): W3 native pipeline, foliage, light sources, extension hooks, checkpoint verification and accepted approximations.
+
+- [Final asset, runtime and lighting refactor report](development/refactor-final-report.md): all-workstream audit, final verification, byte totals, phone checklist and delivery.
