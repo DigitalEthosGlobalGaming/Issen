@@ -7,6 +7,15 @@ export type ComposedLayer = {
   emissive?: ImageBitmap;
 };
 export type EnvironmentSnapshot = {
+  materialCutouts?: {
+    entries: number;
+    pixels: number;
+    pixelBudget: number;
+    scratchPixels: number;
+    hits: number;
+    misses: number;
+    evictions: number;
+  };
   foreground: { layers: number; pixels: number };
   backend: 'loading' | 'layered' | 'unavailable';
   builds: number;

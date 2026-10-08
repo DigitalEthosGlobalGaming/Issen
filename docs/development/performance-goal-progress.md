@@ -413,3 +413,102 @@ do not establish a uniform speedup on this graphics stack. Round-trip medians
 are625.1/304.6/365.8/520.0/462.5/296.0/399.7/339.5/311.7ms. Do not claim the
 compose target is met. The bounded cutout cache/scratch reuse and visual-checked
 angle quantisation are next; no material quantisation has been introduced yet.
+
+## Phase 2 — Bounded cutouts and quantisation checkpoint
+
+Version1.68.6 adds an owner/document LRU of masked normal/surface/emissive
+cutouts. Default budget is4,000,000pixels (16MB nominal RGBA), separate from
+decoded-image residency. The key includes map/source identity and revisions,
+crop, mask/revision/crop, output pixel size, normalY, reflection and the normal
+basis. Normal rotation uses2degree bins; reflection, anisotropy and shear remain.
+Cache misses bake directly into retained software canvases, recycling the last
+evicted canvas. Oversized entries bypass admission and reuse one scratch.
+Clearing a source invalidates dependent cutouts; disposal zeros all retained
+canvases and scratch. No run RNG or layout selection changes.
+
+The requested GPU-only scratch for maps without readback was investigated and
+reverted: raw stage0normal alpha changed by76levels; medium/high GPU resampling
+changed it by104. Evidence is in `tmp/performance-compose-phase2-cutouts-trial`,
+`tmp/performance-compose-phase2-cutouts-gpu-medium-probe` and the corresponding
+high probe. All map baking therefore retains original software rasterization.
+This is a deliberate deviation from Phase2.2 to preserve the stronger visual
+guardrail, not a relaxed pixel tolerance.
+
+Other rejected trials: sharing faded-mask provenance added no hits; second-use
+admission eliminated stage0hits and measured median rose714ms. Both were removed.
+Initially copying scratch into each immutable cache entry added201native copies
+in stage0and72in stage4. GPU and software entry copies both stalled on pending
+rasterization. Direct baking removes these copies; eviction still reuses canvases.
+Intermediate evidence remains under `tmp/performance-compose-phase2-cutouts-*`,
+`tmp/performance-compose-phase2-final` and `tmp/performance-compose-phase2-software-cache`.
+
+### Raw planes and visible lighting
+
+`tmp/performance-compose-phase2-direct-cache/results.json` PASS45fresh-worker
+repetitions against the original116raw planes at900x600 DPR1, seed424242.
+Colour, surface, emissive and every alpha channel are byte-identical. Only normal
+RGB changes: largest plane mean0.000743levels/channel; opaque pixels differ by
+at most1level, alpha-weighted maximum1.993 and pooled weighted mean0.000101.
+Unpremultiplication at very low alpha can amplify raw RGB maxima to255; alpha
+itself does not change. The separate visible-lighting comparison is necessary.
+
+The browser fixture compares exact normal rotation with2degree bins under native
+Pixi lighting: ten slope/mirror cases, clipping and nonuniform scaling. Lit output
+maximum2levels/channel, maximum mean0.032932, identical alpha; normal-plane
+maximum mean0.044434. Saved reference/candidate grids were visually inspected:
+`tmp/test-results/rendering-v2/material-cutouts-quantised-698b0-clipping-and-cache-lifetime/`
+contains lit/normal PNGs and `cutout-parity.json`. This meets the existing small
+native rendering tolerance; it does not imply bit-identical normal vectors.
+The quantisation finding is recorded here before Phase3.
+
+### Compose measurements and remaining cost
+
+Direct-cache capture/session94785 is terminal exit0. A contemporaneous control
+loads the saved7c98425material implementation through a benchmark-only Vite
+override, with an undefined snapshot adapter solely for diagnostics compatibility.
+`tmp/performance-compose-phase2-contemporary-control-v2` PASS45/116byte-identical
+planes; session86236 is terminal. The first control stalled because the saved
+owner lacked the new snapshot method; session27088 was stopped, exit1, and its
+partial folder is excluded. No application files were replaced for the control.
+
+| Stage | Original median ms | Contemporary control median ms | Cutout median / p95 ms | Cutout round trip median ms |
+| --- | ---: | ---: | ---: | ---: |
+| 0 | 678.2 | 703.2 | 643.8 / 709.3 | 708.3 |
+| 1 | 266.4 | 288.4 | 278.8 / 327.3 | 321.9 |
+| 2 | 322.4 | 351.3 | 366.7 / 383.4 | 419.4 |
+| 3 | 436.9 | 497.5 | 477.1 / 497.2 | 573.6 |
+| 4 | 385.3 | 414.5 | 435.0 / 471.0 | 534.8 |
+| 5 | 261.8 | 253.1 | 284.7 / 358.9 | 334.5 |
+| 6 | 337.6 | 371.6 | 375.9 / 400.3 | 440.0 |
+| 7 | 291.4 | 317.6 | 334.2 / 353.5 | 394.8 |
+| 8 | 193.6 | 303.5 | 294.5 / 307.2 | 331.0 |
+
+Results are mixed; no uniform speedup is established. Stage0remains above500ms,
+others have medians below500. At this fixture, hits by stage0–8 are24/0/0/24/0/0/0/8/0:
+exact mask/output-size keys are predominantly unique. Largest retained cache
+3,964,896pixels stays below4,000,000; oversized scratch is separately reported.
+Worker decoded estimates remain151–283MB; the cutout budget is not the missing
+shared decoded-image budget required in Phase3.
+
+`profile-compose.mjs` records separate diagnostic native wall times and worker
+CPU samples. `tmp/performance-compose-phase2-direct-cache-profile` PASS6captures
+(stage0and4, three fresh workers each). Stage0has680drawImage calls; software→GPU
+225calls account for227–519ms of244–536ms draw wall time. Stage4has240draw calls;
+software→GPU72calls account for243–309ms of254–321ms. Normal readback32/9calls
+costs about4/2ms in the prior software-cache profile. Native wall time includes
+blocking graphics/rasterization work, and instrumentation adds overhead; these
+are explanations, not headline timing or resident GPU-memory measurements.
+Dev Vite URLs resolve src functions, but sampled line numbers are transformed;
+the final production source-map trace requirement remains outstanding.
+
+Seven focused units PASS: rotation/key identity, bounded LRU/recycling/oversize/
+invalidation/disposal, and existing worker binding/transfer failure ownership.
+Six focused browsers PASS: cutout lighting/lifetime, material coverage, all-nine
+worker composition, fallback/coalescing/disposal/hidden owners. Additional
+seven browsers PASS for optional emission, zero-map parity, run/boss scene
+readiness and cinematic continuation/selection. Checked production verification
+build PASS at1.68.6. Logs: `tmp/performance-phase2-direct-cache-browser.log`,
+`tmp/performance-phase2-direct-cache-ownership.log`, and
+`tmp/performance-phase2-cutout-build.log`. Sessions16116/81757are terminal exit0.
+No live captures remain. Next: generated runtime inventory and duplicate-atlas
+checkpoint, existing WebP audit, then shared budgeted decoding/prefetch/next slots.

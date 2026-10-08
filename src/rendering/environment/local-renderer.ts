@@ -706,6 +706,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       return status;
     },
     snapshot: () => ({
+      materialCutouts: cachedMaterials.snapshot(),
       foreground: foreground.snapshot(),
       backend: status,
       stage: cacheKey ? preparedStage : undefined,

@@ -134,6 +134,15 @@ Worker context proxies cache bound native methods and adapt image arguments only
 for drawing/patterns. `layer-transfer.ts` copies composed colour/material planes
 concurrently; failures wait for pending copies and close every acquired bitmap
 before the worker reports failure. Completed response ownership remains unchanged.
+`cached-materials.ts` owns per-document masked map cutouts through
+`material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
+reused scratch for oversized entries. Source/map revisions, crop, mask, output
+size and normal basis identify entries. Normal rotation uses two-degree bins,
+preserving reflection, anisotropy and shear; surface/emissive values stay exact.
+Owner disposal clears cutouts and scratch alongside layer maps. Software
+rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
+downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
+hits, misses and evictions separately from decoded assets.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and

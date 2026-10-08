@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 1 in progress
+# Performance, assets and seamless transitions — Phase 2 checkpoint complete
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -118,16 +118,29 @@ Continue:
    tmp/performance-compose-phase2-transfer PASS45repetitions/116byte-identical
    baseline planes; session78210 TERMINAL exit0. Transfer medians are mixed;
    no uniform speedup claim. Stage0compose median587.2ms remains>500.
-   Continue Phase2:
-   bounded masked material cutout cache, visual-checked2degree normal rotation,
-   scratch reuse/readback-only CPU contexts, cached worker native methods and
-   parallel bitmap copies with complete close-on-failure ownership. Focused tests,
-   remeasure every stage against raw baseline, profile/explain stages>500ms and
-   record the quantisation visual checkpoint before Phase3.
+   Phase2cutouts are verified at1.68.6:4Mpixel/16MB per-document LRU with direct
+   software baking, recycled evicted canvases and oversized reusable scratch.
+   Two-degree normal rotation preserves reflection/shear/anisotropy. GPU scratch
+   was reverted because raw map/mask alpha differed by76–104levels; retain CPU
+   rasterization even on maps without readback. Intermediate copy/sharing/second-
+   use admission experiments were rejected; reasons and evidence are recorded.
+   tmp/performance-compose-phase2-direct-cache PASS45/116planes: colour/surface/
+   emissive and all alpha exact, opaque normal RGBmax1. Native lit fixturemax2.
+   Stage0compose median643.8ms vs678.2original/703.2contemporaneous control;
+   other stage medians279–477ms. Results mixed, no uniform speedup claim.
+   tmp/performance-compose-phase2-direct-cache-profile PASS6: remaining native
+   software→GPU transfers dominate draw wall time; mostly unique stamp keys
+   limit cache reuse. Cache maximum3,964,896pixels stays bounded. Shared decoded
+   image budget remains absent. Seven units,13focused browsers and checked build
+   PASS. Quantisation checkpoint is recorded before Phase3.
+   All measurement/check processes are terminal:94785direct cache,78378software
+   copy trial,86236contemporary control,16116and81757browsers. Failed first control
+   27088was stopped (old snapshot diagnostics incompatible); use only corrected
+   v2control. No active captures. Current version/package/lock/title/changelog1.68.6.
    High-refresh submissions alone do not prove smooth120Hz visual motion; prepared
    poses remain60Hz. Address that fidelity/per-frame waste concern while retaining
    run determinism before final completion, alongside remaining CPU budget costs.
-3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas
+3. Continue bounded loading and next scenes through Phases3–5. Duplicate-atlas
    checkpoint and WebP/quantisation visual checks remain required. Existing W1
    already compacted runtime WebP planes; inventory actual files before converting
    anything again. Seed determinism risk is the only explicit user-decision gate.
