@@ -174,9 +174,12 @@ Local main-thread composition releases non-live colour/material image leases aft
 building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
 colour/data canvases keep their own pixels. Completed composition clears baked
 map cutouts/scratch and non-live colour cutouts (1.68.33), preserving source
-bindings and layer maps. Main composition clears before releasing input leases;
-the worker clears after bitmap copies settle. Fog and bamboo retain their live
-colour cutouts. Worker raw image pins and decode semantics remain unchanged.
+bindings and layer maps. Main composition clears before releasing input leases
+and retains live fog/bamboo colour cutouts. The worker clears all stamp cutouts
+before parallel bitmap copies (1.68.34); live motion uses transferred planes and
+main-thread inputs. Completed worker planes remain cached for exact-key requests.
+Retiring those planes and rebuilding on demand failed the colour parity guard.
+Worker raw image pins and decode semantics remain unchanged.
 Repeated draws/compose calls with the same composition key reuse that output.
 A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
 pending requests cannot publish over a newer generation. Source binding release

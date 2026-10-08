@@ -2205,3 +2205,69 @@ Goal active; no push/deploy/native build/player saves.
 
 Warming/context restoration and loading-readiness browsers: 11 PASS in 38.8s.
 All handles terminal; metadata and architecture notes are synchronized.
+
+## Checkpoint 40 — Worker copy overlap and preserved exact-key output, 1.68.34
+
+Baseline is checkpoint39/1.68.33. Saved original source modules precede the trial;
+original transfer/context units pass (four tests,47.8 ms). A serial destructive-copy
+trial keeps the accepted alpha/colour-space options, retires each copied backing
+canvas, clears output metadata and rebuilds subsequent requests. Strict TypeScript
+and seven focused units pass, including one-at-a-time ordering and synchronous/
+asynchronous failure cleanup. Saved-original/candidate native WebGL output over
+27 visits is exact, with exact frame replay and no GL warnings (PASS18.3 s).
+
+The stronger full-size repeated-key guard fails. Held transferred bitmaps remain
+exact, and every data-map hash matches, but rebuilt colour differs: Shore's far
+plane changes in all three geometry modes (max255,37071/2312/51684 changed channel
+values); low-quality stage0's base colour changes by21 across7910 values. These
+390×844 high/low and900×600 high comparisons expose a regression missed by the
+smaller native fixture. Kept the strict assertion; quantified and preserved both
+failed runs. Rejected and restored all five tracked source/unit files exactly to
+1.68.33; new trial browser test moved to ignored evidence. Restored control covers
+27 unchanged keys/three geometry modes, all hashes exact, PASS21.2 s. The cause of
+rebuild colour history remains unresolved. Completed-plane retirement is not
+integrated, and repeating cached keys must preserve original planes.
+
+Accepted change releases completed stamp intermediates before the existing
+parallel bitmap copies. Worker clears all baked-map/scratch and colour cutouts;
+its live motion belongs to transferred planes and main-thread inputs. Main local
+owners retain their existing fog/bamboo colour inputs/cutouts. Completed planes,
+raw wrappers/pins, decode interpretation, resolution, layouts and seed sequence
+remain unchanged. No regeneration is introduced for exact-key requests.
+
+Read-only copy-entry diagnostics compare saved original and accepted worker over
+27 visits. All native pixels and replay are exact, no GL warnings; every candidate
+copy starts with zero map/scratch/colour cutout pixels (PASS18.1 s). Original copy
+entry holds up to33,849,316 nominal cutout bytes in this small-geometry fixture;
+those intermediates are now absent during copying. This measures a copy-phase
+reduction, not whole-app resident memory or the earlier compose peak. Full geometry
+probe30scenesPASS20.7 s; all 348 held raw plane hashes match checkpoint39, covering
+all nine stages, portrait high/low and landscape high. All final worker colour
+cutouts are zero, including bamboo. Earlier original/accepted transfer sums are
+487.6→372.4 ms over27 visits; one ordered run is not a statistical latency claim.
+
+The new permanent retained-plane test exercises every stage in three geometry/
+quality modes: prepare retains completed dimensions/pixels, repeated keys do not
+rebuild, original and repeated/held plane hashes match, and original image pins
+remain within256 MiB. Focused original-retention variantPASS20.9 s; final related
+21browsersPASS1.1m, including retained planes, native materials, local pressure/
+live effects, stale requests, worker fallback/coalescing/hidden handling,256/512 MiB
+cycles, texture warming/context restore and cosmetic loading/RNG preservation.
+All 466unitsPASS1937.2 ms. Checked production verification follows below.
+
+Evidence under tmp/performance-worker-plane-transfer/: original/trial source,
+rejected tests, native and copy-entry JSON, raw comparisons, failed rebuild pixel
+counts and all logs. Isolated probes under tmp/probes/worker-plane-transfer/;
+full-size inventory probe remains under tmp/probes/next-scene-admission/.
+Next-slot admission still needs transient build/copy and current/next plane
+accounting, including decoded LRU headroom. Existing parallel copies can still
+exceed the low-memory total when combined with pinned images/output; cutout
+retirement does not by itself make slots safe. Do not reapply destructive plane
+retirement without a proven repeated-key colour fix. Selected figure/startup
+ownership, whole-game decoded/GPU bounds, quiet soon work, exact next-slot
+promotion/invalidation,120Hz/CPU budgets and full Phase5 remain required.
+Goal active; no push/deploy/native build/player saves.
+
+Checked production build (strict TypeScript) and all four bundle checks PASS21.6s,
+including startup, Armoury/gameplay/landscape, edition gates and offline resize.
+All handles terminal; architecture, metadata and release notes synchronized.

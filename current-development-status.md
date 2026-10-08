@@ -1,4 +1,37 @@
-# Performance, assets and seamless transitions — Completed compose cutout release
+# Performance, assets and seamless transitions — Worker cutouts retire before copy
+
+Latest checkpoint 40: integrated 1.68.34 clears all worker stamp cutouts/scratch
+before parallel bitmap copies; completed planes and raw image pins remain cached.
+Main local owners retain their existing live fog/bamboo colour inputs/cutouts.
+Saved-original native comparison across 27 visits is exact, including replay;
+copy-entry diagnostics show zero candidate cutout pixels versus up to 33,849,316
+nominal bytes in the small original fixture. Full-size 30-scene probe matches all
+348 compared original raw plane hashes across nine stages and three geometries.
+This reduces copy-phase overlap; whole-game memory/compose peaks remain unresolved.
+
+Destructive plane retirement trial was rejected. Native small-frame/cleanup tests
+passed, but repeated-key full-size rebuild changes Shore colour by up to 255 and
+low-quality stage-zero colour by 21. Held bitmaps and data maps stay exact. Restored
+all five tracked trial files, moved new trial test to ignored evidence, and verified
+27 unchanged-key restored copies exact (21.2s). Rebuild colour history remains
+unresolved. Do not reapply plane retirement without passing that stronger guard.
+
+Accepted verification: strict TypeScript, all 466 units (1.94s), 21 related browser
+checks (1.1m), checked production build and four bundle tests (21.6s), including
+offline resize. New permanent test covers retained dimensions, no unchanged-key
+rebuild, exact repeated/held planes and original pinned images through all stages
+with portrait high/low and landscape high geometry. Visual tolerances are unchanged.
+
+Evidence under tmp/performance-worker-plane-transfer/; probes under
+tmp/probes/worker-plane-transfer/ and tmp/probes/next-scene-admission/.
+Next reconcile transient build/copy and current/next output accounting with shared
+admission/LRU headroom, then integrate quiet soon requests and exact slot promotion/
+invalidation. Parallel copies can still exceed the low-memory total with pinned
+images/outputs. Figure/startup ownership, whole-game decoded/GPU bounds, 120 Hz/CPU
+budgets and full Phase 5 remain required. Full goal active;
+no push/deploy/native build/player saves. Earlier rejected ownership trials remain
+rejected; no latency or frame-budget completion is claimed.
+## Previous handoff — Completed compose cutout release
 
 Latest checkpoint 39: integrated 1.68.33 clears baked map cutouts/scratch and
 non-live colour cutouts after composition. Completed planes and source bindings

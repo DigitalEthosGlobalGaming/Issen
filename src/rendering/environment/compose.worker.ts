@@ -40,11 +40,12 @@ scope.onmessage = ({ data }) => {
         })
       ) {
         composedAt = performance.now();
+        // Live motion uses transferred planes and the main thread's own raw inputs.
+        renderer.releaseCompletedCutouts(false);
         const completed = renderer.exportLayers();
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
-        renderer.releaseCompletedCutouts();
       }
       const snapshot = {
         ...renderer.snapshot(),
