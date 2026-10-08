@@ -61,6 +61,8 @@ test('startup waits for load and decode, deduplicating sources', async () => {
   assert.equal(await loader.run(), true);
   assert.equal(images.length, 2);
   loader.dispose();
+  assert.ok(images.every((image) => image.removed));
+  assert.equal(await loader.run(), false);
 });
 test('load/decode failures block completion and retry only failed images', async () => {
   const { images, loader } = harness();

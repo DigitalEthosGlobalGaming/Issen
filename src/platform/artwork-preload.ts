@@ -5,7 +5,7 @@ export interface ArtworkProgress {
   pending: number;
 }
 
-/** Owns decoded images for the application lifetime; failed URLs alone are retried. */
+/** Retain startup images through successful mounting; failed URLs alone are retried. */
 export function createArtworkPreloader(
   urls: readonly string[],
   createImage: () => HTMLImageElement = () => new Image(),
@@ -77,8 +77,10 @@ export function createArtworkPreloader(
     return running;
   }
   function dispose() {
+    if (disposed) return;
     disposed = true;
     for (const cancel of [...cancellations]) cancel();
+    for (const image of retained.values()) image.removeAttribute('src');
     retained.clear();
   }
   return { run, dispose };

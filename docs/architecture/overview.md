@@ -172,6 +172,10 @@ Worker documents keep their existing managed image wrappers and decode semantics
 `platform/runtime-assets.ts` is generated from the inventory by
 `scripts/assets/runtime-manifest.mjs`, excluding unused diffuse maps and startup-only
 source art. Main startup filters its existing artwork selection through this manifest.
+Glob and manifest URLs are canonicalized against the document base before comparison.
+Startup retains its existing load/decode/retry gate, then disposes preload images
+after successful mounting. This ends preload ownership; replacing the broad initial
+decode with required active selections remains pending.
 `platform/compressed-assets.ts` owns base-path-scoped CacheStorage responses with HTTP
 fallback; worker decoding reads these unchanged compressed responses. MainGame starts
 `platform/background-assets.ts` after removing the loading overlay and disposes it

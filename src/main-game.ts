@@ -33,7 +33,10 @@ const urls = [
   ...Object.keys(publicArtwork).map(
     (path) => `${import.meta.env.BASE_URL}${path.slice('/public/'.length)}`,
   ),
-].filter((url) => !materialMaps.has(url) && runtimeUrlSet.has(url));
+].filter((url) => {
+  const canonical = new URL(url, document.baseURI).href;
+  return !materialMaps.has(canonical) && runtimeUrlSet.has(canonical);
+});
 
 export class MainGame {
   private root: HTMLElement | null = null;
@@ -86,6 +89,7 @@ export class MainGame {
       }
       this.stop = startGame(this.surfaces, { rig: this.lightingRig, ui: this.uiMaterialLighting });
       this.loading.remove();
+      this.preloader.dispose();
       this.stopAssets = startBackgroundAssets(
         document,
         Capacitor.isNativePlatform() || import.meta.env.MODE === 'android',

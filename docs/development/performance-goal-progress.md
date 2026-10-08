@@ -878,3 +878,30 @@ All processes terminal:22280/46291/21974/52816, no active captures. Continue fig
 and remaining image-owner migration with active selections, remove lifetime
 startup retention, runtime budget/quiet decode wiring and combined low-memory
 tests, then next seeds/slots, GPU/variant warming, cosmetic loading and Phase5.
+
+## Startup retirement and URL-filter correction
+
+Version1.68.13 clears every retained preload image's src after successful startup
+mounting and overlay removal. Disposal is idempotent and still settles pending
+loads without late mounting. Failed startup keeps successful preloads for retry.
+This releases the startup owner's lifetime references; it does not yet remove
+the initial broad source decode or bound browser decoder caches/other owners.
+
+Focused startup browsers found a prior Phase3prefetch integration bug: Vite glob
+URLs were relative but manifest URLs absolute, so direct Set matching filtered
+out the preload list. Canonicalizing against document.baseURI restores the
+intended runtime selection and startup load/decode/failure gate. The initial
+browser run failed2existing loading/retry cases and passed4others; corrected
+run PASS6in34.3s, including delayed load, failed/retry, pending disposal and
+3cinematic/run/boss scene-readiness cases. No test expectations were loosened.
+Prior scene-readiness passes did not cover this gate and cannot establish
+startup no-regression. Final startup measurements must use this corrected path.
+
+Four preload units PASS, including successful-source cleanup, priority ordering,
+deduplicated decode/retry and pending disposal. Strict/formatting/checked build
+PASS. Logs `tmp/performance-startup-retention-browser.log` preserve the failures;
+`tmp/performance-startup-retention-corrected-browser.log` and
+`tmp/performance-startup-retention-corrected-build.log` preserve final checks.
+Processes12724/72369terminal; no active captures. Next replace broad startup decode
+while migrating required active figure/source owners, preserve cold first-appearance
+readiness, then complete memory/transition/frame-budget requirements and Phase5.

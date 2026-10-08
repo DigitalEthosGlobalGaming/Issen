@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 UI input leases verified
+# Performance, assets and seamless transitions — Startup ownership retired and gate corrected
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -269,3 +269,18 @@ next-slot/loading-state tests, final report and any final push are outstanding.
    remain outside this estimate. Whole-app memory/GPU and startup speed unproven.
    Next migrate active figure/remaining sources, remove startup retention and wire
    runtime budget/policy; finish combined memory, Phase4and full Phase5requirements.
+
+9. Startup ownership retired at1.68.13: successful mount/overlay removal disposes
+   preloader and clears every retained src; failed startup preserves successes for
+   retry, pending disposal remains safe. Startup's initial broad decode is still
+   outside the budget and must be replaced during active figure/source migration.
+   Existing startup browsers exposed a prior manifest filter bug: relative Vite
+   glob URLs never matched absolute manifest URLs. Canonical document-base matching
+   restores intended filtering/load/decode/retry gate. Initial2failures preserved;
+   corrected6startup/scene browsers PASS34.3s,4units, formatting and checked build
+   PASS. No test loosening; prior scene-readiness passes did not prove this gate.
+   Logs tmp/performance-startup-retention-corrected-browser.log/build.log; sessions
+   12724/72369terminal, no active captures. Version/package/lock/title/changelog1.68.13.
+   Final startup measurements must use corrected filtering; no whole-app memory
+   or speed claim yet. Continue active figure/remaining sources and narrow startup
+   required assets, then combined budgets/Phase4/full Phase5verification.
