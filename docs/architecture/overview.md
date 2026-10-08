@@ -205,14 +205,14 @@ cinematic (viewer session/grade), and profile (transfer/reset/management).
 
 `game/session/phase-router.ts` supplies synchronous phase-controller dispatch and
 checkpoint adoption. Live input uses the active controller; updateFrame preserves
+the existing boss/playing/standoff/between/dead order and later-phase same-frame
+cascades. Checkpoint adoption is silent and does not replay entry or rewards.
 
 During scene loading, `runtime/frame-simulation.ts` advances only presentation
 clock, ambient/transition motion, cosmetic weather particles, camera and apparel.
 It uses unscaled presentation elapsed time without advancing run timers, players,
 enemies, encounters, trial completion or run RNG. Loading weather uses a temporary
 copy of hazard state with the cosmetic RNG; live hazard fields remain unchanged.
-the existing boss/playing/standoff/between/dead order and later-phase same-frame
-cascades. Checkpoint adoption is silent and does not replay entry or rewards.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
 profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
