@@ -1198,3 +1198,46 @@ build/strict TypeScript PASS. Logs `tmp/performance-next-stage-prefetch-browser.
 All processes terminal; no performance capture ran. Future decoded warming/next slots,
 paced uploads/variants, whole-memory/startup budgets, native pressure stability,
 120Hz fidelity/CPU budget and full Phase5measurements/suites/report remain required.
+
+## Phase3 — Detach cached native source/sampler bindings (1.68.22)
+
+The trial warnings recorded at1.68.21 reproduce in the unchanged120-frame expiry
+path, `SceneTextureStore.collect`. Test-only creation/destruction stacks identify
+Pixi's default mesh shader and cached graphics texture batch BindGroups. They can
+retain sources beyond the lifetime of the currently pooled scene shaders. The
+first targeted default-mesh-only change removed one reproducer's warnings, but
+all-eight-trial traversal still warned from groups created by
+GraphicsContextSystem/getTextureBatchBindGroup. That partial adapter was replaced.
+
+`pixi/source-bindings.ts` now snapshots the source and sampler's change observers
+before GPU destruction, restricts detachment to actual BindGroups, and replaces
+only resource slots matching the retiring GPU source/style through public
+setResource. Other resource slots and non-BindGroup observers are untouched.
+Pixi's EventEmitter exposes no public listener-context inventory, so this small
+guarded adapter reads its private event/context structure; revalidate it when
+changing Pixi8.22. Existing owned texture destruction and temporary120-frame grace
+remain unchanged. It runs on release, not every frame, and changes no decoding,
+baking, rendering inputs, seeds or gameplay rules.
+
+An initial isolated draw used batching and passed with cleanup disabled, so it
+was insufficient. Revised native unbatched mesh and graphics pattern expiry
+controls both FAIL on source/sampler warnings when final detachment is disabled.
+Both PASS enabled, with uploaded source counts1/0/1/0 after draw/expiry/reuse/
+disposal. Actual all-eight trial traversal and seeded retry now assert no destroyed
+binding/feedback/GL warnings; final4focused browsers PASS50.1s. Final29native
+rendering/lighting/UI/worker/lifetime/resize/context browsers PASS1.6m. Earlier
+broad/recovery runs timed out at the unchanged5s startup wait before the #prevC
+context-loss action; isolated PASS16.1s and final broad passes without wait changes.
+Do not infer cold-start improvement from recovery. Four retirement/resource units,
+strict TypeScript, targeted formatting and checked production build PASS.
+
+Evidence: `tmp/performance-source-bindings-control.log` (expected2FAIL), `-final.log`,
+`-browser.log`, `-build.log`; first trace/owner stacks in
+`tmp/performance-binding-warning-trace.log` and `-owners.log`. Initial partial
+implementation/probe and startup recovery logs use
+`tmp/performance-mesh-retirement-*`. Ignored runnable probes are under
+`tmp/probes/binding-warning/` and `tmp/probes/mesh-retirement/`. All processes
+terminal; no new performance capture ran. This resolves the covered expiry/trial
+warnings; whole-memory/startup owners/budgets, native pressure stability,
+next-slot/decoded warming, paced uploads/variants,120Hz fidelity/CPU budget and
+full Phase5verification/report remain required.

@@ -1,5 +1,53 @@
 import { expect, test } from '@playwright/test';
 
+for (const kind of ['mesh', 'pattern'])
+  test(`expiry detaches Pixi cached ${kind} source and sampler before destruction`, async ({
+    page,
+  }) => {
+    const warnings: string[] = [];
+    page.on('console', (message) => {
+      if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+        warnings.push(message.text());
+    });
+    await page.goto('/privacy/index.html');
+    const counts = await page.evaluate(async (kind) => {
+      const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 32;
+      const source = document.createElement('canvas');
+      source.width = source.height = 16;
+      source.getContext('2d')!.fillRect(0, 0, 16, 16);
+      const painter = await createPixiScenePainter(canvas);
+      painter.begin();
+      if (kind === 'mesh') {
+        painter.drawImage(source, 0, 0);
+        // Exercise Pixi's native default mesh adaptor, separate from the custom lookup shader.
+        Reflect.set(painter.root.children[0]!, 'shader', null);
+        Reflect.set(Reflect.get(painter.root.children[0]!, 'geometry'), 'batchMode', 'no-batch');
+      } else {
+        painter.fillStyle = painter.createPattern(source, 'repeat')!;
+        painter.fillRect(0, 0, 32, 32);
+      }
+      painter.flush();
+      const before = painter.sourceTextureCount;
+      for (let frame = 0; frame < 121; frame++) {
+        painter.begin();
+        painter.fillStyle = '#fff';
+        painter.fillRect(0, 0, 32, 32);
+        painter.flush();
+      }
+      const expired = painter.sourceTextureCount;
+      painter.begin();
+      painter.drawImage(source, 0, 0);
+      painter.flush();
+      const reused = painter.sourceTextureCount;
+      painter.dispose();
+      return { before, expired, reused, disposed: painter.sourceTextureCount };
+    }, kind);
+    expect(counts).toEqual({ before: 1, expired: 0, reused: 1, disposed: 0 });
+    expect(warnings).toEqual([]);
+  });
+
 test('closing composed pixels immediately releases colour/data/crop GPU consumers independently', async ({
   page,
 }) => {

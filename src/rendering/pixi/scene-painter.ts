@@ -27,6 +27,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
+import { detachSourceBindings } from './source-bindings.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
 import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
@@ -158,6 +159,7 @@ export class PixiScenePainter implements SceneDrawing {
   readonly root = new Container();
   private readonly textures = new SceneTextureStore((source) => {
     if (this.disposed) return;
+    detachSourceBindings(source);
     // Inactive pooled slots can still hold shader bindings from an earlier scene.
     for (const slot of this.slots) {
       slot.material?.releaseTextures(source);

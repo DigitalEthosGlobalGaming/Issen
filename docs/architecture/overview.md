@@ -139,7 +139,12 @@ final source retirement. Texture stores detach matching bindings in all pooled
 shader slots and immediately destroy their own colour/data/crop textures. Peer
 stores own independent GPU resources; the source owner still closes its pixels.
 Temporary disuse keeps the existing120-frame grace period. This retirement path
-does not change source decoding or scene baking.
+also detaches matching source/sampler resources in Pixi's cached native mesh and
+graphics batch BindGroups before GPU destruction. `pixi/source-bindings.ts` uses a
+guarded Pixi8.22 EventEmitter listener-context adapter; unrelated resources and
+non-BindGroup observers remain intact. Native mesh/pattern expiry and trial retry
+tests cover the adapter, which must be revalidated when Pixi changes.
+This retirement path does not change source decoding or scene baking.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output

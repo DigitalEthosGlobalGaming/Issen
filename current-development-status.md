@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Mode-aware compressed prefetch priority
+# Performance, assets and seamless transitions — Cached native GPU bindings detach on retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -437,3 +437,30 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     1.68.21. Compressed fetch ordering is now mode-aware; next-slot composition,
     decoded warming, paced uploads, whole-memory/startup budgets, native pressure
     stability,120Hz fidelity/CPU budget and full Phase5verification remain required.
+
+20. Cached source binding cleanup at1.68.22: warning traces locate120-frame source
+    destruction in SceneTextureStore.collect. Pixi default mesh bindings and cached
+    GraphicsContext texture batch groups outlive their submitted draws. Before
+    destroying an owned GPU source, source-bindings.ts snapshots its source/style
+    change observers, detaches only matching BindGroup resources with public
+    setResource, and leaves unrelated observers/resources intact. Guarded private
+    EventEmitter context inventory is Pixi8.22-specific. No per-frame scan added;
+    existing texture destruction and120-frame grace stay unchanged.
+    An initial batched isolated test missed the default mesh path; native unbatched
+    and pattern controls now both FAIL with cleanup disabled (source/sampler
+    warnings), and both PASS enabled with counts1→0→1→0 across draw/expiry/reuse/
+    disposal. All-eight-encounters and seeded retry tests add warning assertions.
+    Final29rendering/lighting/UI/worker/lifetime/context browsers PASS1.6m;4focused
+    native/trial browsers PASS50.1s;4retirement/resource units PASS; strict/format/
+    checked production build PASS. Earlier broad/recovery runs hit the unchanged
+    5s startup wait in #prevC; isolated check PASS16.1s and final broad check passes
+    without changing test waits. This is not evidence of cold-start optimization.
+    Stable logs tmp/performance-source-bindings-control.log (expected2FAIL),
+    -final.log, -browser.log, -build.log; tracing/rejected default-mesh-only attempts
+    under tmp/performance-binding-warning* and tmp/performance-mesh-retirement*.
+    Ignored probes tmp/probes/binding-warning/ and tmp/probes/mesh-retirement/.
+    All processes terminal. Version/package/lock/title/changelog1.68.22. Remaining
+    whole-memory/startup owners/budgets, native pressure stability, decoded warming/
+    next slots, paced uploads/variants,120Hz fidelity/CPU budget and full Phase5
+    verification remain required. Covered warnings are resolved; no whole-game
+    source-lifetime or resident-GPU peak claim is made.
