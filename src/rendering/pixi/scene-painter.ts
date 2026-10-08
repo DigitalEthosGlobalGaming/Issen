@@ -1,3 +1,4 @@
+import { preferredLightResolution } from '../effects/quality.ts';
 import { GeometryBuffer, requireGeometryBuffers } from './geometry-buffer.ts';
 import type { GeometryDebugView } from './geometry-buffer.ts';
 import { LightBuffer, requireLightBuffers } from './light-buffer.ts';
@@ -441,7 +442,14 @@ export class PixiScenePainter implements SceneDrawing {
     this.artworkMaterials.detachTargets();
     this.lightBuffer.detachGeometry();
     this.drawGeometry();
-    this.lightBuffer.render(this.geometryBuffer.targets!, this.lighting);
+    this.lightBuffer.render(this.geometryBuffer.targets!, {
+      ...this.lighting,
+      lightResolution: preferredLightResolution(
+        this.canvas.dataset.lightResolution,
+        this.lighting.lightResolution ?? 1,
+      ),
+    });
+    this.canvas.dataset.lightBufferSize = `${this.lightBuffer.targets!.width}x${this.lightBuffer.targets!.height}`;
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
     // browser task do not accumulate (captures, previews and restoration).

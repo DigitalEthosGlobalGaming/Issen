@@ -21,6 +21,8 @@ function createLookupUniforms(batchTextures: number) {
   return new UniformGroup({
     uLightDiffuse: { value: batchTextures, type: 'i32' },
     uLightSpecular: { value: batchTextures + 1, type: 'i32' },
+    uLightGuide: { value: batchTextures + 2, type: 'i32' },
+    uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
     uArtworkLighting: { value: 0, type: 'f32' },
   });
@@ -130,6 +132,7 @@ export class ArtworkMaterials {
   }
   prepare(geometry: Readonly<GeometryTargets>, light: Readonly<LightTargets>): void {
     this.uniforms.uniforms.uLightSize.set([geometry.width, geometry.height]);
+    this.uniforms.uniforms.uLightResolution.set([light.width, light.height]);
     this.uniforms.update();
     this.renderer.texture.bind(light.diffuse.source, this.batchTextures);
     this.renderer.texture.bind(light.specular.source, this.batchTextures + 1);

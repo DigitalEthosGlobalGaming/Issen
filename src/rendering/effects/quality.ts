@@ -38,3 +38,8 @@ export function preferredDensity(
   const density = quality === 'low' ? 0.3 : quality === 'high' ? 1 : adaptive;
   return reducedMotion ? Math.min(0.3, density) : density;
 }
+
+/** Session lighting tools override a caller's quality choice without changing saved settings. */
+export function preferredLightResolution(mode: unknown, authored: 1 | 0.5 = 1): 1 | 0.5 {
+  return mode === 'half' ? 0.5 : mode === 'full' ? 1 : authored;
+}

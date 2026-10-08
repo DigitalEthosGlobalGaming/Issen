@@ -148,6 +148,7 @@ export function createLeafMesh() {
     uGeometry: { value: new Float32Array([1, 0.5, 1]), type: 'vec3<f32>' },
     uNormalMatrix: { value: new Float32Array([1, 0, 0, 1]), type: 'mat2x2<f32>' },
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
+    uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
   });
   const resources = (names: string[]) =>
     Object.fromEntries(
@@ -165,6 +166,7 @@ export function createLeafMesh() {
       ...resources(['uDiffuse', 'uEmissive']),
       uLightDiffuse: Texture.EMPTY.source,
       uLightSpecular: Texture.EMPTY.source,
+      uLightGuide: Texture.EMPTY.source,
     },
   });
   const gShader = Shader.from({
@@ -179,7 +181,10 @@ export function createLeafMesh() {
     spriteMotion = false,
     disposed = false;
   const releaseLightTargets = () => {
-    shader.resources.uLightDiffuse = shader.resources.uLightSpecular = Texture.EMPTY.source;
+    shader.resources.uLightDiffuse =
+      shader.resources.uLightSpecular =
+      shader.resources.uLightGuide =
+        Texture.EMPTY.source;
   };
   const releaseTextures = () => {
     for (let i = 0; i < 4; i++) {
@@ -295,7 +300,9 @@ export function createLeafMesh() {
     prepareComposite(targets: Readonly<LightTargets>) {
       shader.resources.uLightDiffuse = targets.diffuse.source;
       shader.resources.uLightSpecular = targets.specular.source;
-      uniforms.uniforms.uLightSize.set([targets.width, targets.height]);
+      shader.resources.uLightGuide = targets.guide.source;
+      uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
+      uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       uniforms.update();
     },
     dispose() {

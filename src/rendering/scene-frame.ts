@@ -58,6 +58,8 @@ export interface SceneLight {
 }
 
 export interface SceneLighting {
+  /** Full or half resolution HDR accumulation; geometry remains full resolution. */
+  lightResolution?: 1 | 0.5;
   /** Debug comparison; omitted means authored material lighting. */
   materialLighting?: number;
   /** Linear RGB radiance, shared by PBR and mask materials. */

@@ -45,6 +45,7 @@ void main() {
 export function createCompositeMaterial(vertex: string, materialUniforms: UniformGroup) {
   const compositeUniforms = new UniformGroup({
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
+    uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
   });
   const shader = Shader.from({
     gl: { vertex: '#version 300 es\n' + vertex, fragment, name: 'issen-light-composite' },
@@ -58,6 +59,7 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
       uEmissive: Texture.EMPTY.source,
       uLightDiffuse: Texture.EMPTY.source,
       uLightSpecular: Texture.EMPTY.source,
+      uLightGuide: Texture.EMPTY.source,
     },
   });
   return {
@@ -67,11 +69,16 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
         shader.resources[name] = source.resources[name];
       shader.resources.uLightDiffuse = targets.diffuse.source;
       shader.resources.uLightSpecular = targets.specular.source;
-      compositeUniforms.uniforms.uLightSize.set([targets.width, targets.height]);
+      shader.resources.uLightGuide = targets.guide.source;
+      compositeUniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
+      compositeUniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       compositeUniforms.update();
     },
     releaseLightTargets() {
-      shader.resources.uLightDiffuse = shader.resources.uLightSpecular = Texture.EMPTY.source;
+      shader.resources.uLightDiffuse =
+        shader.resources.uLightSpecular =
+        shader.resources.uLightGuide =
+          Texture.EMPTY.source;
     },
     releaseTextures() {
       for (const name of ['uDiffuse', 'uMask', 'uSurface', 'uEmissive'])

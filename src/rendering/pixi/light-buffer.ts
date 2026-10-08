@@ -21,6 +21,11 @@ export interface LightTargets {
   readonly width: number;
   readonly height: number;
   readonly generation: number;
+  readonly sceneWidth: number;
+  readonly sceneHeight: number;
+  readonly resolution: 1 | 0.5;
+  /** Borrowed full-resolution normal/depth/coverage guide; the geometry owner releases it. */
+  readonly guide: Texture;
 }
 
 /** Both extensions enable the same required RGBA16F format; no degraded format path. */
@@ -168,11 +173,21 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
       this.shader.resources.uG2 =
         Texture.EMPTY.source;
   }
-  resize(width: number, height: number, force = false): void {
+  resize(width: number, height: number, force = false, resolution: 1 | 0.5 = 1): void {
     if (this.disposed) return;
     width = Math.max(1, Math.round(width));
     height = Math.max(1, Math.round(height));
-    if (!force && this.snapshot?.width === width && this.snapshot.height === height) return;
+    const sceneWidth = width,
+      sceneHeight = height;
+    width = Math.max(1, Math.ceil(sceneWidth * resolution));
+    height = Math.max(1, Math.ceil(sceneHeight * resolution));
+    if (
+      !force &&
+      this.snapshot?.sceneWidth === sceneWidth &&
+      this.snapshot.sceneHeight === sceneHeight &&
+      this.snapshot.resolution === resolution
+    )
+      return;
     this.releaseTarget();
     const sources = [0, 1].map(
       () =>
@@ -197,6 +212,10 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
       width,
       height,
       generation: ++this.generation,
+      sceneWidth,
+      sceneHeight,
+      resolution,
+      guide: Texture.EMPTY,
     });
     this.renderer.renderTarget.bind({ target: this.target, clear: true, clearColor: [0, 0, 0, 0] });
     const gl = this.renderer.gl as WebGL2RenderingContext;
@@ -209,7 +228,9 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
   }
   render(geometry: Readonly<GeometryTargets>, lighting: SceneLighting): void {
     if (this.disposed) return;
-    this.resize(geometry.width, geometry.height);
+    this.resize(geometry.width, geometry.height, false, lighting.lightResolution ?? 1);
+    if (this.snapshot!.guide !== geometry.g0)
+      this.snapshot = Object.freeze({ ...this.snapshot!, guide: geometry.g0 });
     this.shader.resources.uG0 = geometry.g0.source;
     this.shader.resources.uG1 = geometry.g1.source;
     this.shader.resources.uG2 = geometry.g2.source;

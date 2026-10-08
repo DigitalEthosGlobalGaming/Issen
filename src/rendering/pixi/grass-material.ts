@@ -126,6 +126,7 @@ export function createGrassMesh() {
     uLighting: { value: 1, type: 'f32' },
     uGeometry: { value: new Float32Array([1, 1, 1]), type: 'vec3<f32>' },
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
+    uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
   });
   const shader = Shader.from({
     gl: { vertex, fragment: compositeFragment, name: 'issen-instanced-grass-composite' },
@@ -134,6 +135,7 @@ export function createGrassMesh() {
       uPalette: Texture.EMPTY.source,
       uLightDiffuse: Texture.EMPTY.source,
       uLightSpecular: Texture.EMPTY.source,
+      uLightGuide: Texture.EMPTY.source,
     },
   });
   const gShader = Shader.from({
@@ -157,6 +159,7 @@ export function createGrassMesh() {
   const releaseLightTargets = () => {
     shader.resources.uLightDiffuse = Texture.EMPTY.source;
     shader.resources.uLightSpecular = Texture.EMPTY.source;
+    shader.resources.uLightGuide = Texture.EMPTY.source;
   };
   return {
     mesh,
@@ -242,10 +245,12 @@ export function createGrassMesh() {
       };
     },
     prepareComposite(targets: Readonly<LightTargets>) {
-      uniforms.uniforms.uLightSize.set([targets.width, targets.height]);
+      uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
+      uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       uniforms.update();
       shader.resources.uLightDiffuse = targets.diffuse.source;
       shader.resources.uLightSpecular = targets.specular.source;
+      shader.resources.uLightGuide = targets.guide.source;
     },
     dispose() {
       if (disposed) return;

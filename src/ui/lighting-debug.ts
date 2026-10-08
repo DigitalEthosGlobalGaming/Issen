@@ -56,6 +56,29 @@ export function createLightingDebug(
     },
     { signal: events.signal },
   );
+  const resolutionLabel = doc.createElement('label');
+  resolutionLabel.textContent = 'Light resolution';
+  const resolutionSelect = doc.createElement('select');
+  resolutionSelect.setAttribute('aria-label', 'Light resolution');
+  for (const [value, title] of [
+    ['full', 'Full'],
+    ['half', 'Half'],
+  ]) {
+    const option = doc.createElement('option');
+    option.value = value!;
+    option.textContent = title!;
+    resolutionSelect.append(option);
+  }
+  resolutionLabel.append(resolutionSelect);
+  root.append(resolutionLabel);
+  resolutionSelect.addEventListener(
+    'change',
+    () => {
+      canvas().dataset.lightResolution = resolutionSelect.value;
+      invalidate();
+    },
+    { signal: events.signal },
+  );
   const previewLabel = doc.createElement('label');
   previewLabel.textContent = 'Material preview';
   const previewSelect = doc.createElement('select');
@@ -109,6 +132,7 @@ export function createLightingDebug(
     root.querySelector('p')!.textContent = 'Drag the light marker or adjust its position.';
   };
   function sync() {
+    resolutionSelect.value = canvas().dataset.lightResolution ?? 'full';
     for (const input of inputs) {
       const key = input.dataset.setting as Numeric | 'enabled' | undefined;
       if (!key) {
@@ -133,6 +157,7 @@ export function createLightingDebug(
     'click',
     () => {
       rig.reset();
+      delete canvas().dataset.lightResolution;
       sync();
       invalidate();
     },
@@ -229,6 +254,7 @@ export function createLightingDebug(
     dispose() {
       events.abort();
       delete canvas().dataset.lightingView;
+      delete canvas().dataset.lightResolution;
       root.remove();
       marker.remove();
     },

@@ -1,3 +1,40 @@
+## W3 phase6 half resolution green — continue named passes and extension hooks
+
+Persistent sources11369f2 is committed. SceneLighting.lightResolution1/0.5 controls
+native RGBA16F L accumulation; G stays full resolution. Session testing selector
+Full/Half uses effects/quality preferredLightResolution and never saves preferences.
+Reset/dispose/reload clears its override. LightTargets physicalwidth/height differ
+from sceneWidth/sceneHeight; guide borrows current G0. Shared composite four-tap
+normal/depth/coverage-aware upsampling serves materials/artwork/grass/leaves. Default
+full lookup remains direct. All guide/L bindings detach before replacement/disposal.
+Small features absent from every coarse sample use a compatible neighbour, documented.
+Pixi generated native high shaders need float mod/floor (not integer remainder);
+initial warning-sensitive probe caught compile failure, fixed without relaxing tests.
+
+Final npm run typecheck PASS; npm test all415PASS; exact20-file native/runtime/
+material/foliage/source/Options/context/checkpoint affected suite72PASS exit0.
+Logs tmp/lighting-refactor/phase6-half-final-{typecheck,unit,browser}.log. Direct3
+half tests PASS10.0s before expanded run: depth/normal guide ablation, exact full/
+half constant-ambient pixels across five colour providers, unchanged G on quality
+switch, odd-size rounding, independent owner/resize/restore/disposal, session-only
+UI and GL0/no Pixi warnings. RGB/coverage restoration uses existing tolerance9/exact
+alpha; no existing assertion weakened. Depth-edge screenshot inspected. Version
+1.68.0 aligned, no live browser job or develop push. Release note names quality tools.
+
+NEXT finish phase6: read-only G/light post hooks, named insertion points for film
+and post chains, minimal examples; expose native G/light as named composer passes
+without duplicate GPU work. scene-painter.flush currently trims/resizes/detaches,
+draws G/light, then ordered composite; auxiliary begin/flush callers must continue
+working. scene.ts owns named layer composer (seven passes) and calls flush after
+recording. Add explicit pass methods and invalidation/preparation state with native
+verification; maintain layer/film/clip order and target lifecycle. Post targets
+remain borrowed and generation-scoped; no future rim/ray/shadow/outline effects.
+Then W3 broad/native/startup/context/production/Android gates and allPart4 strict/
+unit/both broad configs/production/Android/startup/context/report/one final develop
+push. Proven pre-existing Android offline.spec.ts:55 reload failure may be accepted
+only with original baseline evidence and honest final reporting. Goal active.
+Do not rerun applied non-idempotent integration scripts.
+
 ## W3 phase6 persistent lights green — continue half-resolution quality and hooks
 
 Event checkpoint0f407c7 is committed. scene-light-sources.ts registers five sources:

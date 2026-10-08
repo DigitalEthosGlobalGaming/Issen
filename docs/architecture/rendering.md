@@ -336,6 +336,7 @@ returning. Leaked drawing state can subtly recolor or displace every later layer
 | Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
 | Persistent glint/lantern/ember/foxfire/boss lights | `src/presentation/scene-light-sources.ts` |
 | Shared visual blade-tip and presence pose | `src/rendering/figures/figure-pose.ts` |
+| Half-resolution light accumulation / guided lookup | `src/rendering/pixi/light-buffer.ts` / `src/rendering/pixi/lighting-composite-glsl.ts` |
 | Combat event lights and effects-clock decay | `src/presentation/event-lights.ts` |
 | Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
 | HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
@@ -691,3 +692,45 @@ repeatability and removal, and attaches a foxfire capture through testInfo.outpu
 The inspected capture shows the blue local contribution on the native material.
 Half-resolution quality, named GPU composer/film/post hooks and W3/final gates still
 remain; this checkpoint completes source registration only.
+
+## W3 half-resolution lighting (phase 6)
+
+SceneLighting.lightResolution accepts1 or0.5; default1 preserves the full-resolution
+lookup. The session-only Light resolution selector in testing tools offers Full
+and Half. effects/quality.ts resolves its override without changing saved settings.
+Reset light returns to Full, and disposal/reload removes the override. The painter
+reports completed target dimensions as data-light-buffer-size for native checks.
+
+G0/G1/G2 remain full resolution. light-buffer.ts allocates the same two required
+RGBA16F attachments at ceil(scene size × resolution); there is no format or backend
+fallback. LightTargets.width/height describe physical accumulation dimensions;
+sceneWidth/sceneHeight describe the physical full scene. The borrowed guide is the
+current full-resolution G0 texture, owned by GeometryBuffer, not LightBuffer.
+Reacquire all borrowed target wrappers after generation changes. Switching quality
+replaces only L targets; resize/restore recreates both sets and guide bindings.
+All providers detach guide/L samplers before resource replacement or disposal.
+
+The shared composite GLSL uses a direct lookup at Full. At Half it samples four
+coarse light texels, combines bilinear spatial weights with decoded normal/depth
+compatibility and coverage, and normalizes the weights. This rejects light from
+incompatible adjacent surfaces. If no coarse texel captures a feature, its most
+compatible neighbour supplies the approximation; features smaller than a coarse
+texel cannot recover unsampled lighting. Thin translucent sprites retain the
+accepted lookup from the surface behind them. The same BRDF, emission, fog, alpha,
+blend and film rules apply. Grass/leaf/native image/vector/material routes all use
+this lookup. Leaf composite now uses11 samplers; G uses12. Artwork retains13 colour
+slots plus diffuse/specular/guide, within the required16 fragment samplers.
+
+Shared lookup arithmetic also compiles through Pixi's generated native high shaders,
+which emit compatible GLSL syntax: float mod/floor replaces integer remainder, and
+lookup calculations request high precision. This does not add a WebGL1 backend.
+The initial warning-sensitive native fixture caught this compile error and it was
+fixed with all original assertions retained.
+
+Native checks compare depth/normal boundaries against the same accumulation with
+the guide ablated (plain bilinear), preserve exact coverage at existing RGB tolerance9,
+and prove all five colour providers/odd dimensions/independent owners/resize/restore/
+disposal. The testing-control check proves target sizes and unchanged saved settings.
+Captures use testInfo.outputPath; the depth-boundary capture was inspected. These
+are correctness checks, not performance captures. Named composer GPU passes and
+remaining film/post/target extension hooks, W3 and final gates still remain.
