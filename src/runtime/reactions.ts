@@ -1,3 +1,5 @@
+import { bindShrineProgression } from '../game/progression/shrine-listeners.ts';
+import { bindShrineFeedback } from '../ui/wiring/shrine-feedback.ts';
 import { bindGruntCues } from '../presentation/grunt-cues.ts';
 import { bindBossCues } from '../presentation/boss-cues.ts';
 import { bindStandoffCues } from '../presentation/standoff-cues.ts';
@@ -191,6 +193,12 @@ export function bindRuntimeReactions(
     dust: presentation.dust,
   })));
 
+  foundation.lifecycle.add(bindShrineProgression(events, () => ({
+    ST: foundation.profile.profileFoundation.ST, saveStats: foundation.profile.saveStats, checkUnlocks: rules.checkUnlocks,
+  })));
+  foundation.lifecycle.add(bindShrineFeedback(events, () => ({
+    toast: ui.toast, showShrineOffers: ui.showShrineOffers, hud: ui.hud, showScreen: ui.showScreen, sfx: foundation.browser.sfx,
+  })));
   foundation.lifecycle.add(bindGruntCues(events, () => ({ sfx: foundation.browser.sfx })));
   foundation.lifecycle.add(bindBossCues(events, () => ({
     S: foundation.view.geometry.S, banner: ui.banner, renderHp: ui.renderHp,

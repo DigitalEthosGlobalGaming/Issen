@@ -1,3 +1,5 @@
+import { bindTrialProgression } from '../game/progression/trial-listeners.ts';
+import { bindTrialFeedback } from '../ui/wiring/trial-feedback.ts';
 import {
   createSessionBindings,
   type SessionBindingViews,
@@ -443,5 +445,17 @@ export function createRuntimeSession(
         ),
       ),
     );
+  foundation.lifecycle.add(bindTrialProgression(context.events, () => ({
+    TRIAL_PROGRESS: foundation.profile.TRIAL_PROGRESS, UNL: foundation.profile.UNL, store,
+  })));
+  foundation.lifecycle.add(bindTrialFeedback(context.events, () => ({
+    banner: readActions().banner,
+    setWaveLabel: label => { foundation.browser.$('waveLbl').textContent = label; },
+    renderTrialObjective: readActions().renderTrialObjective, sfx: foundation.browser.sfx,
+    buildLeaves: presentation.buildLeaves, audio: foundation.browser.audio,
+    hideTrialObjective: () => { foundation.browser.$('trialObjective').hidden = true; },
+    openPanel: panel => readActions().openPanel(panel),
+    focusTrialResult: () => { foundation.browser.$('trials').querySelector<HTMLButtonElement>('#trialResult button')?.focus({ preventScroll: true }); },
+  })));
   return sessionBindings;
 }

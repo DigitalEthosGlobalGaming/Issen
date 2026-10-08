@@ -569,3 +569,19 @@ table. presentation/grunt-cues.ts owns audio through a disposable subscription.
 The grunt update environment has emission instead of sound ports. The table
 retains its timers, direction switch, Still activation, pet timer and late damage
 callbacks; sound listeners have no run/profile/RNG capability.
+
+Shrine rules own seeded offers/rerolls, immediate blessings, modifiers and next
+encounter actions through a narrow view. Frozen catalog-ID arrays and choice
+events feed ui/wiring/shrine-feedback.ts; game/progression/shrine-listeners.ts
+owns curse/rare/shrine counters, the original pre-modifier save and post-modifier
+unlock check. Arrays are frozen separately before emission, retaining arbitrary
+offer counts without publishing mutable catalogs or run-owned arrays.
+
+Trial encounter/settlement and cosmetic reset/menu events feed ui/wiring/trial-
+feedback.ts. game/progression/trial-listeners.ts owns persistent completion and
+unlock records plus their existing storage writes. Session rules retain outcome
+calculation, seeded encounter setup, disposable profile adoption/restoration,
+guided lesson reset, ordinary RNG restoration and title transition. Runtime
+session construction installs progression before UI, with lazy current action
+views. Actual natural Quiet Blade combat/retry and seeded Crossroads/Twin/reroll
+scenarios preserve outcomes/profile/combat RNG without UI listeners.

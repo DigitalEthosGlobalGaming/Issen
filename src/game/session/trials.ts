@@ -119,15 +119,10 @@ export function createTrialSession(readViews: () => TrialSessionViews) {
       if (trial.duelMaster && duelBoss) {
         duelBoss.hp = duelBoss.maxHp = 20;
         duelBoss.bp = duelMasterTimings(0);
-        renderHp();
+        views.events.emit('bossHealth', { hp: duelBoss.hp, maximum: duelBoss.maxHp });
       }
     }
-    banner(
-      '試練',
-      trial.waveCount ? `${trial.name} · Wave ${G.wave}/${trial.waveCount}` : trial.name,
-    );
-    setWaveLabel(trial.waveCount ? `Wave ${G.wave}/${trial.waveCount}` : 'Trials');
-    renderTrialObjective();
+    views.events.emit('trialEncounter', { id: trial.id, wave: G.wave });
   }
   function finishTrial(message?: string) {
     const views = readViews();
@@ -159,13 +154,8 @@ export function createTrialSession(readViews: () => TrialSessionViews) {
     const trial = views.activeTrial;
     if (!trial) return;
     const passed = trialPassed(trial, { ...G, failed: !!message || !!views.trialFailure });
-    const newlyCompleted = passed && completeTrial(TRIAL_PROGRESS, trial.id);
-    if (passed) {
-      store.set('issen.trials', TRIAL_PROGRESS);
-      grantTrialRewards(TRIAL_PROGRESS, UNL);
-      store.set('issen.unlocks', [...UNL]);
-      sfx.unlock();
-    }
+    const newlyCompleted = passed && !TRIAL_PROGRESS.completed.includes(trial.id);
+    views.events.emit('trialSettlement', { id: trial.id, passed });
     views.trialResult = {
       id: trial.id,
       passed,
@@ -183,18 +173,17 @@ export function createTrialSession(readViews: () => TrialSessionViews) {
       reason: passed ? 'completed' : message || views.trialFailure || 'failed',
     });
     views.activeTrial = null;
-    buildLeaves();
+    views.events.emit('trialLeavesReset', { id: trial.id });
     views.combatRandom = R;
     views.ST = playerStats;
     views.EQ = playerEquipment;
     guided.reset();
-    audio.setPaused(false);
+    views.events.emit('trialAudioReset', { id: trial.id });
     views.hitStop = 0;
-    hideTrialObjective();
+    views.events.emit('trialObjectiveHidden', { id: trial.id });
     toTitle();
     computeMods();
-    openPanel('trials');
-    focusTrialResult();
+    views.events.emit('trialMenuReady', { id: trial.id });
   }
   return { startTrialEncounter, finishTrial };
 }

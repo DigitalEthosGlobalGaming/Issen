@@ -1,10 +1,12 @@
+import { bindTrialProgression } from '../../../src/game/progression/trial-listeners.ts';
+import { bindTrialFeedback } from '../../../src/ui/wiring/trial-feedback.ts';
 import { createRunStart } from '../../../src/game/session/run-start.ts';
 import { createTrialSession } from '../../../src/game/session/trials.ts';
 import { bossPhaseFixture } from './runtime-boss-phase.mjs';
 import { runStartSession } from './runtime-run-start-session.mjs';
 
 const setup = { mode: 'waves', diff: 'normal', arrows: true, lives: '3', upgrades: false };
-export function trialSessionFixture() {
+export function trialSessionFixture(feedback = true) {
   const runtime = runStartSession(3344, setup, undefined, false),
     source = runtime.views;
   const duel = bossPhaseFixture(runtime),
@@ -67,6 +69,8 @@ export function trialSessionFixture() {
       },
       enumerable: true,
     });
+  const offProgression = bindTrialProgression(source.events, () => views);
+  const offFeedback = feedback ? bindTrialFeedback(source.events, () => views) : () => {};
   const session = createTrialSession(() => views);
   source.startTrialEncounter = session.startTrialEncounter;
   // Compose run entry with the real trial encounter callback before starting.
@@ -75,5 +79,5 @@ export function trialSessionFixture() {
     runtime.run.state = 'title';
     runtime.flow.startTrial(id);
   };
-  return { runtime, views, trace, records, session, start, duel };
+  return { runtime, views, trace, records, session, start, duel, dispose() { offFeedback(); offProgression(); } };
 }

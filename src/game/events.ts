@@ -72,6 +72,17 @@ export interface GameEvents {
   bossReady: Readonly<{ count: number }>;
   bossTraits: Readonly<{ twin: boolean; spear: boolean; mirror: boolean }>;
   bossHealth: Readonly<{ hp: number; maximum: number }>;
+  trialEncounter: Readonly<{ id: string; wave: number }>;
+  trialSettlement: Readonly<{ id: string; passed: boolean }>;
+  trialLeavesReset: Readonly<{ id: string }>;
+  trialAudioReset: Readonly<{ id: string }>;
+  trialObjectiveHidden: Readonly<{ id: string }>;
+  trialMenuReady: Readonly<{ id: string }>;
+  shrineOffers: Readonly<{ ids: readonly string[] }>;
+  shrineCurse: Readonly<{ id: string }>;
+  shrineTwin: Readonly<{ ids: readonly string[] }>;
+  shrineRecorded: Readonly<{ tier: number }>;
+  shrineChosen: Readonly<{ id: string }>;
   gruntCue: Readonly<{ kind: 'bell' | 'feint' | 'bark' }>;
   bossCue: Readonly<
     | { kind: 'draw' }

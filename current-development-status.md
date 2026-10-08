@@ -91,22 +91,40 @@ rendering-v2 configuration and retained traces; all 12 pass in 41.9s
 identical run/profile/combat RNG, frozen values and listener disposal.
 Timers, switch-frame pose, pet state and damage remain in the grunt rules.
 
-Next: shrine/trial feedback and progression boundaries, then remove unused phase
-cosmetic capabilities/imports separately. Latest source audit finds no old
-exported updateEnemies/updateBoss/spawnEnemy/bossToIdle adapters in src. Runtime
-methods with those names are real explicit orchestration ports, not old adapters.
-Remaining direct phase drawing: shrine renderLives/offers/HUD/screen/unlock.
-Trial encounter banner/label/objective/HP and reward unlock remain direct session
-ports. Other session screen/display hooks exist in run-start, run-flow, results
-and checkpoint-flow: audit ownership and preserve restore/settlement/order rather
-than treating an import scan alone as proof of full separation.
-The current ignored grunt-cues-preview is a copy with no junctions, already
-applied only for its changed files; its docs are absent and its scripts are
-non-idempotent. Old wave-cues-preview root remains stale. Do not reapply previews.
+Grunt event checkpoint is committed at 3a389ee. Shrine/trial rule phases now emit
+frozen values; profile progression and UI feedback have dedicated listeners.
+Shrine rule view is narrowed; obsolete shrine HUD/screen/toast/offers adapters
+were removed from runtime phase binding as required by that typed contract.
+Rule RNG, modifiers, checkpoints, continuation and trial profile/RNG restoration
+retain their original boundaries. Trial progression installs before UI during
+runtime session construction and resolves current owners lazily.
+Strict/all 383 units pass (shrine-trial-events-typecheck.log /
+shrine-trial-events-unit.log). Actual seeded Crossroads/Twin/reroll and natural
+Quiet Blade combat/completion/failed retry prove profile/UI isolation, frozen
+snapshots, once-only settlement, original save order and listener disposal.
+Exact browser command: trials, feature-plan-06, new-blessings,
+runtime-checkpoint-fixtures, game with rendering-v2 config and retained traces:
+all 23 pass in 2.2m (shrine-trial-events-browser.log). Assertions/timeouts unchanged.
 
-All W2 final gates/version/docs/checklist, all W3 and Part 4 remain required.
+Next: apply the prepared separate capability cleanup under tmp/runtime-refactor/
+phase-capability-cleanup. audit.json contains current source hashes and prepared
+filenames for boss/standoff/waves/trials and standalone standoff-feedback type.
+Compiler symbols identify 209 unused destructured captures and 58 obsolete
+BossViews/StandoffViews/TrialSessionViews fields. Preparation does not mutate
+actual source. Check ALL source hashes before applying; adapt runtime/phases and
+runtime/session to the narrower views, remove now-unused imports separately in
+this deletion-only cleanup, format affected source, and verify. Do not resurrect
+old cosmetic ports to satisfy compilation. No live browser process remains.
+
+Then finish W2 requirement audit and final gates: scenarios/checkpoints/full
+units/broad browser/production/Android-web, 1.67.0 version/changelog, final
+architecture/behavior log/phone checklist. Review session display orchestration
+in run-start/run-flow/results/checkpoint-flow against ownership requirements;
+an import scan alone is insufficient. All W3 and Part 4 remain required.
 Develop is unpushed; push once only after full completion. No profiling/benchmarks,
-store builds, real-save edits or lit-only changes.
+store builds, real-save edits or lit-only changes. Old preview sources are stale;
+generation/apply scripts are non-idempotent. Preserve the current authoritative
+source rather than copying whole previews.
 
 ## Latest green checkpoint: Damage and companion event reactions
 

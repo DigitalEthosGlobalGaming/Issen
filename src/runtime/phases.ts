@@ -29,7 +29,6 @@ type ActionPorts = Pick<
   | 'playerDie'
   | 'enemyPos'
   | 'comboMult'
-  | 'hud'
   | 'bossPos'
   | 'renderHp'
   | 'breakCombo'
@@ -40,11 +39,8 @@ type ActionPorts = Pick<
   | 'hideHint'
   | 'pickLook'
   | 'startWave'
-  | 'toast'
   | 'nextStep'
-  | 'showShrineOffers'
   | 'computeMods'
-  | 'showScreen'
   | 'startBoss'
   | 'bossSwipe'
   | 'showOver'
@@ -114,7 +110,6 @@ export function createRuntimePhases(
                 comboMult: readActions().comboMult,
                 sparks: presentation.sparks,
                 buzz: foundation.browser.buzz,
-                hud: readActions().hud,
                 bossPos: readActions().bossPos,
                 renderHp: readActions().renderHp,
                 guided: foundation.browser.guided,
@@ -165,12 +160,9 @@ export function createRuntimePhases(
                 clearLetterbox: () => {
                   foundation.view.presentationState.lbT = 0;
                 },
-                toast: readActions().toast,
                 nextStep: readActions().nextStep,
-                showShrineOffers: readActions().showShrineOffers,
                 premiumAccess: foundation.browser.premiumAccess,
                 computeMods: readActions().computeMods,
-                showScreen: readActions().showScreen,
                 resetKnocks: () => {
                   foundation.run.sessionState.knocks = 0;
                 },
