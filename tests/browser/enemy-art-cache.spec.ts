@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { writeFile } from 'node:fs/promises';
 
 test('new enemy families stay isolated from authored bosses and share bounded caches', async ({
   page,
@@ -243,4 +244,89 @@ test('runtime artwork becomes ready with redundant enemy colours blocked', async
   });
   expect(await page.evaluate(() => (window as any).__enemyArtworkReady.ready)).toBe(true);
   expect(errors).toEqual([]);
+});
+
+test('enemy cache pressure retires stale GPU colours at the frame boundary', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { createPalette } = await import('/src/rendering/palette.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
+    const renderer = createInkEnemyRenderer(document);
+    if (!(await renderer.prepare())) throw Error('Enemy load failed');
+    const canvas = document.createElement('canvas');
+    canvas.width = 240;
+    canvas.height = 200;
+    const g = await createTestDrawing(canvas);
+    const palette = createPalette();
+    const env = {
+      time: 0,
+      wind: 0,
+      width: 240,
+      height: 200,
+      palette: (fog: number) => palette.fog(fog, [100, 110, 120]),
+    };
+    const draw = (i: number) => {
+      const f = {
+        back: false,
+        d: makeFig(1),
+        pose: EPOSE.left,
+        fog: 0,
+        pal: {
+          ...palette.robe('hai'),
+          robeD: `rgb(${i % 256},20,30)`,
+          robeL: `rgb(200,${i % 256},180)`,
+        },
+      };
+      g.save();
+      g.translate(12 + (i % 10) * 24, 22 + Math.floor((i % 80) / 10) * 24);
+      g.scale(22, 22);
+      renderer.drawPart(g, 'body', f, env);
+      g.restore();
+    };
+    draw(0);
+    g.getImageData(0, 0, 240, 200);
+    g.begin();
+    for (let i = 0; i < 80; i++) draw(i);
+    const first = g.getImageData(0, 0, 240, 200).data;
+    const second = g.getImageData(0, 0, 240, 200).data;
+    const replayMax = first.reduce(
+      (max, value, i) => Math.max(max, Math.abs(value - second[i])),
+      0,
+    );
+    const queued = {
+      native: g.sourceTextureCount,
+      pending: g.sourceRetirementSnapshot,
+      cache: renderer.snapshot(),
+    };
+    g.begin();
+    const boundary = { native: g.sourceTextureCount, pending: g.sourceRetirementSnapshot };
+    let peak = 0;
+    for (let i = 80; i < 200; i++) {
+      g.begin();
+      draw(i);
+      g.getImageData(0, 0, 240, 200);
+      peak = Math.max(peak, g.sourceTextureCount);
+      if (g.sourceRetirementSnapshot.sources !== 0)
+        throw Error('Prior-frame eviction incorrectly retained');
+    }
+    renderer.dispose();
+    const final = { native: g.sourceTextureCount, pending: g.sourceRetirementSnapshot };
+    g.dispose();
+    return { replayMax, queued, boundary, peak, final };
+  });
+  await writeFile(
+    testInfo.outputPath('enemy-cache-frame-retirement.json'),
+    JSON.stringify(result, null, 2),
+  );
+  expect(result.replayMax).toBe(0);
+  expect(result.queued.pending.sources).toBeGreaterThan(0);
+  expect(result.queued.pending.bytes).toBeGreaterThan(0);
+  expect(result.boundary.native).toBe(result.queued.cache.cachedParts + 2);
+  expect(result.boundary.pending).toEqual({ sources: 0, bytes: 0 });
+  expect(result.peak).toBeLessThanOrEqual(100);
+  expect(result.final).toEqual({ native: 0, pending: { sources: 0, bytes: 0 } });
 });

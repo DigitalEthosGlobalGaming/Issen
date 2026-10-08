@@ -236,6 +236,7 @@ export class PixiScenePainter implements SceneDrawing {
   private readonly loseContext = (event: Event) => {
     event.preventDefault();
     this.contextLost = true;
+    this.textures.releaseRetired();
     this.contextGeneration++;
     this.invalidateLighting();
     this.canvas.dataset.contextState = 'lost';
@@ -1276,6 +1277,10 @@ export class PixiScenePainter implements SceneDrawing {
   /** Nominal uploaded-source count for ownership diagnostics. */
   get sourceTextureCount(): number {
     return this.textures.size;
+  }
+
+  get sourceRetirementSnapshot(): { sources: number; bytes: number } {
+    return this.textures.retirementSnapshot;
   }
 
   /** Initialize the same sources used by drawing, preserving colour/data interpretation. */

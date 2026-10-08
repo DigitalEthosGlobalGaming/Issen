@@ -34,3 +34,15 @@ test('a reused canvas can register a new GPU lifetime after its previous pixels 
   retireSceneTexture(canvas);
   assert.equal(calls, 2);
 });
+
+test('cache retirement passes frame preservation explicitly while final retirement remains immediate', () => {
+  const modes = [];
+  const a = {},
+    b = {};
+  observeSceneTextureRetirement(a, (mode) => modes.push(mode));
+  observeSceneTextureRetirement(b, (mode) => modes.push(mode));
+  retireSceneTexture(a, true);
+  retireSceneTexture(a, true);
+  retireSceneTexture(b);
+  assert.deepEqual(modes, [true, false]);
+});

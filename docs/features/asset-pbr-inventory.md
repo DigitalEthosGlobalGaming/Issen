@@ -43,6 +43,11 @@ disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
 entries survive until the shared loader evicts or closes them. This covers atlas
 planes; prepared figure cutout/tone canvases and selected-kit ownership remain
 separate performance-goal work.
+Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
+(1.68.29). Current-frame textures survive replay until that painter's next begin,
+context loss or disposal; older-frame entries retire immediately. Diagnostics
+account pending count/nominal bytes. This does not establish a whole-game GPU or
+decoded-memory budget; other figure caches and selected ownership remain required.
 The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
 records actual source/catalog/startup-glob references, dimensions, bytes and
 stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.

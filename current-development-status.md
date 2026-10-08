@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Queued cache retirement
+# Performance, assets and seamless transitions — Frame-preserving cache retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -673,3 +673,25 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Full selected figure/startup/local ownership, native sampling, next slots,
     120Hz and Phase5 measurements remain required. No assets/harness/seed changes.
     Restored control rerunPASS3.7s, exact pixels; implementation diff empty.
+
+30. Enemy cache retirement at1.68.29 preserves queued/repeated frames. Explicit
+    eviction mode retains only current-frame GPU sources until that painter's next
+    begin/context loss/disposal; older/standalone entries release immediately.
+    Final cache disposal stays immediate. No timers/extra renders or CPU-budget/
+    pixel/simulation/seed changes.80palette original/current comparison exact:
+    native242, pending145sources36,271,104nominal bytes; next begin97sources and
+    pending0; final owner disposal0.120later frames peak97 with no pending buildup.
+    This is source accounting, not a whole-game GPU cap: the synthetic live frame
+    temporarily exceeds the CPU cache's8million-pixel budget on the GPU. Add pending
+    resources/other owners/targets/driver overhead to full memory verification.
+    Native peer/repeated pixels exact; unflushed cancellation/context restore/
+    disposal pass. Final22relatedbrowserPASS22.3s/default2workers, all463unitsPASS,
+    checkedbuild/strictTypeScriptPASS. Initial fixtures missed fog fields and loss
+    dispatch ordering; corrected. First broad failure was evidence-writer import;
+    assertions unchanged. Evidence tmp/performance-enemy-cache-retirement/ includes
+    before/rejected/frame-retirement/real-cache/peer JSON and units/build logs.
+    Other figure caches/selected ownership/startup/local headroom/native sampling,
+    next slots,120Hz and full Phase5 measurements remain required; goal active.
+    Final bundled app/ink3PASS23.3s/default2workers; diff/formatPASS and synchronized
+    package/lock/title/changelog. All check sessions terminal; no push/deployment,
+    native build or real player-save mutation.

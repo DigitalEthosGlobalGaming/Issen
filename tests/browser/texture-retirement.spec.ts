@@ -517,3 +517,188 @@ test('disposing a leased PBR atlas preserves shared native peer pixels until fin
   expect(result.final).toEqual({ counts: [0, 0], widths: [0, 0, 0, 0], bytes: 0 });
   expect(warnings).toEqual([]);
 });
+
+for (const ending of ['next-frame', 'context-loss', 'dispose'] as const)
+  test(`queued cache retirement preserves peer replay until ${ending}`, async ({
+    page,
+  }, testInfo) => {
+    const warnings: string[] = [];
+    page.on('console', (message) => {
+      if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+        warnings.push(message.text());
+    });
+    await page.goto('/privacy/index.html');
+    const result = await page.evaluate(async (ending) => {
+      const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+      const { SceneTextureStore } = await import('/src/rendering/pixi/texture-store.ts');
+      const { drawMaterialStamp } = await import('/src/rendering/scene-material.ts');
+      const { retireSceneTexture } = await import('/src/rendering/texture-revision.ts');
+      const sources = ['#807060', 'rgb(128,128,255)', 'rgb(128,0,255)', '#050000'].map((colour) => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 8;
+        const g = c.getContext('2d')!;
+        g.fillStyle = colour;
+        g.fillRect(0, 0, 8, 8);
+        return c;
+      });
+      const canvases = [0, 1].map(() => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 32;
+        return c;
+      });
+      const painters = await Promise.all(canvases.map((c) => createPixiScenePainter(c)));
+      const stamp = {
+        texture: { source: sources[0], revision: 0 },
+        material: {
+          normal: { source: sources[1], revision: 0 },
+          surface: { source: sources[2], revision: 0 },
+          emissive: { source: sources[3], revision: 0 },
+          normalY: -1,
+          lighting: 1,
+          depth: 0,
+          fog: 0,
+          fogColor: [0.53, 0.51, 0.47],
+        },
+        x: 0,
+        y: 0,
+        width: 32,
+        height: 32,
+      };
+      const pixels = (index: number) => {
+        const gl = canvases[index].getContext('webgl2')!;
+        const bytes = new Uint8Array(32 * 32 * 4);
+        gl.readPixels(0, 0, 32, 32, gl.RGBA, gl.UNSIGNED_BYTE, bytes);
+        return bytes;
+      };
+      const difference = (a: Uint8Array, b: Uint8Array) =>
+        a.reduce((max, value, i) => Math.max(max, Math.abs(value - b[i])), 0);
+      for (const p of painters) {
+        p.begin();
+        drawMaterialStamp(p, stamp);
+        p.flush();
+      }
+      const baseline = canvases.map((_, i) => pixels(i));
+      for (const p of painters) {
+        p.begin();
+        drawMaterialStamp(p, stamp);
+      }
+      const store = new SceneTextureStore();
+      const auxiliary = store.getData({ source: sources[1], revision: 0 });
+      for (const source of sources) {
+        retireSceneTexture(source, true);
+        source.width = source.height = 0;
+      }
+      const queued = painters.map((p) => ({
+        count: p.sourceTextureCount,
+        pending: p.sourceRetirementSnapshot,
+      }));
+      const standalone = { count: store.size, destroyed: auxiliary.destroyed };
+      const max = painters.map((p, i) => {
+        p.flush();
+        const first = pixels(i);
+        p.flush();
+        return Math.max(difference(baseline[i], first), difference(first, pixels(i)));
+      });
+      painters[0].begin();
+      painters[0].fillRect(0, 0, 32, 32);
+      painters[0].flush();
+      painters[1].flush();
+      const peerMax = difference(baseline[1], pixels(1));
+      const boundary = painters.map((p) => ({
+        count: p.sourceTextureCount,
+        pending: p.sourceRetirementSnapshot,
+      }));
+      if (ending === 'next-frame') painters[1].begin();
+      else if (ending === 'dispose') painters[1].dispose();
+      else {
+        const gl = canvases[1].getContext('webgl2')!;
+        const extension = gl.getExtension('WEBGL_lose_context')!;
+        await new Promise<void>((resolve) => {
+          canvases[1].addEventListener('webglcontextlost', () => resolve(), { once: true });
+          extension.loseContext();
+        });
+        // Restore only after Chromium finishes dispatching the loss event.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await new Promise<void>((resolve) => {
+          canvases[1].addEventListener('webglcontextrestored', () => resolve(), { once: true });
+          extension.restoreContext();
+        });
+        painters[1].begin();
+        painters[1].fillRect(0, 0, 32, 32);
+        painters[1].flush();
+      }
+      const final = painters.map((p) => ({
+        count: p.sourceTextureCount,
+        pending: p.sourceRetirementSnapshot,
+      }));
+      painters.forEach((p) => p.dispose());
+      store.dispose();
+      return { queued, standalone, max, boundary, peerMax, final };
+    }, ending);
+    await writeFile(
+      testInfo.outputPath(`queued-retirement-${ending}.json`),
+      JSON.stringify(result, null, 2),
+    );
+    expect(result.queued).toEqual([
+      { count: 4, pending: { sources: 4, bytes: 1024 } },
+      { count: 4, pending: { sources: 4, bytes: 1024 } },
+    ]);
+    expect(result.standalone).toEqual({ count: 0, destroyed: true });
+    expect(result.max).toEqual([0, 0]);
+    expect(result.peerMax).toBe(0);
+    expect(result.boundary).toEqual([
+      { count: 0, pending: { sources: 0, bytes: 0 } },
+      { count: 4, pending: { sources: 4, bytes: 1024 } },
+    ]);
+    expect(result.final).toEqual([
+      { count: 0, pending: { sources: 0, bytes: 0 } },
+      { count: 0, pending: { sources: 0, bytes: 0 } },
+    ]);
+    expect(warnings).toEqual([]);
+  });
+
+test('abandoning an unflushed cache frame retires sources before fresh drawing', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { retireSceneTexture } = await import('/src/rendering/texture-revision.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 32;
+    const p = await createPixiScenePainter(canvas);
+    const read = () => {
+      const gl = canvas.getContext('webgl2')!;
+      const data = new Uint8Array(32 * 32 * 4);
+      gl.readPixels(0, 0, 32, 32, gl.RGBA, gl.UNSIGNED_BYTE, data);
+      return data;
+    };
+    p.begin();
+    p.fillStyle = '#fff';
+    p.fillRect(0, 0, 32, 32);
+    p.flush();
+    const baseline = read();
+    const source = document.createElement('canvas');
+    source.width = source.height = 8;
+    source.getContext('2d')!.fillRect(0, 0, 8, 8);
+    p.begin();
+    p.drawImage(source, 0, 0, 32, 32);
+    retireSceneTexture(source, true);
+    source.width = source.height = 0;
+    const pending = p.sourceRetirementSnapshot;
+    p.begin();
+    const abandoned = p.sourceRetirementSnapshot;
+    p.fillStyle = '#fff';
+    p.fillRect(0, 0, 32, 32);
+    p.flush();
+    const current = read();
+    const max = current.reduce((n, value, i) => Math.max(n, Math.abs(value - baseline[i])), 0);
+    const count = p.sourceTextureCount;
+    p.dispose();
+    return { pending, abandoned, max, count };
+  });
+  expect(result.pending).toEqual({ sources: 1, bytes: 256 });
+  expect(result.abandoned).toEqual({ sources: 0, bytes: 0 });
+  expect(result.max).toBe(0);
+  expect(result.count).toBe(0);
+});

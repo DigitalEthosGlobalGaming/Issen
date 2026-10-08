@@ -1749,3 +1749,50 @@ original module and reproducible80palette grid. Production assets, decoding,
 simulation, seeds and frozen standard performance harness remain unchanged. Goal
 remains active at full scope; no push/deploy/native build or player-save mutation.
 Restored renderer/control rerun PASS3.7s, exact queued pixels; source diff empty.
+
+## Checkpoint 30 — Enemy cache retirement preserves queued frames
+
+Implemented at1.68.29. Enemy variant/tone eviction notifies the existing texture
+retirement hook with explicit frame preservation. Native texture stores keep only
+retired sources used in their current frame; prior-frame or standalone store
+entries release immediately. The next begin retires them before new drawing,
+including an abandoned unflushed frame. Repeated flushes retain the same bindings.
+Context loss and painter disposal also release the pending set. Each native
+consumer keeps its own boundary; clearing one painter does not invalidate peers.
+Final cache/source disposal keeps the original immediate retirement mode. CPU
+canvas clearing, pixel budgets, art/material sampling and gameplay/seeds unchanged.
+No timers, extra renders, per-frame source-map scan or deferred pixel-close queue.
+
+The rejected queued80palette probe now matches the saved original exactly,
+including repeated flush/readback. Native sources242 while that frame remains
+replayable;145retired sources36,271,104nominal RGBA bytes are accounted explicitly.
+Next begin clears that set and leaves97sources (95live variants plus2material
+maps). Final enemy disposal after the boundary returns source count/pending bytes
+to zero.120subsequent palette frames peak97 and never accumulate pending sources.
+This accounts a live frame's resources, not a configured whole-game GPU cap:
+the synthetic80body frame temporarily exceeds the CPU cache's live8million-pixel
+budget on the GPU. Pending figures, render targets/driver overhead and other
+source owners still need whole-game peak/budget verification. No budget increase.
+
+New native checks preserve exact peer/repeated pixels, independent boundaries,
+actual context restoration and painter disposal. An abandoned unflushed source
+releases before fresh drawing, whose pixels match a fresh frame exactly. A new
+unit proves explicit preservation and unchanged default immediate notification.
+Existing direct/shared PBR, main-image eviction, worker/fallback/hidden warming,
+all-stage warm pixels and enemy family/cache tests pass. Final22related browsers
+PASS22.3s/default2workers; all463unitsPASS; checked build/strict TypeScriptPASS.
+Initial synthetic material omitted required fog fields; corrected fixture.
+Restoration initially ran before loss dispatch finished; zero-delay dispatch
+boundary matches existing Chromium fixture practice. First broad run21PASS/1FAIL
+was the new evidence writer's missing import; corrected without assertion changes.
+
+Stable evidence: tmp/performance-enemy-cache-retirement/frame-retirement.json,
+enemy-cache-frame-retirement.json, queued-retirement-{next-frame,context-loss,
+dispose}.json, units.log and build.log. Prior baseline/rejected evidence preserved.
+Final bundled checks recorded once terminal. Assets/frozen standard performance
+harness unchanged. Other figure caches, selected enemy/player/outfit/sword/startup
+ownership, local transient headroom/native sampling, deterministic next slots,
+120Hz/CPUbudget and full Phase5 metrics/traces/suites remain required. Goal active
+at full scope; no push/deployment/native build or player-save mutation.
+Final bundled app/ink checks3PASS23.3s/default2workers; diff/formatPASS;
+version/package/lock/title/changelog synchronized. All check sessions terminal.

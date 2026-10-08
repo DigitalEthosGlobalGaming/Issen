@@ -150,6 +150,13 @@ Disposing an atlas backed by `MainImageOwner` only releases its leases; warm
 images and peer textures remain alive until actual loader eviction/final disposal.
 Prepared figure cutout/tone canvases have separate ownership and are not closed
 by atlas retirement.
+Enemy variant/tone LRU eviction requests frame-preserving retirement. A texture
+store releases obsolete earlier-frame sources immediately, but keeps sources used
+by its current queued/replay frame until the next begin, context loss or disposal.
+Each painter controls its own boundary; repeated flushes and peer replay survive.
+Final cache disposal requests ordinary immediate retirement. Pending source count
+and nominal RGBA bytes are exposed through sourceRetirementSnapshot; this excludes
+render targets, wrappers and driver allocations. CPU cache budgets are unchanged.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output

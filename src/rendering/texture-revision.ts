@@ -1,8 +1,11 @@
 const revisions = new WeakMap<HTMLCanvasElement, number>();
-const retirements = new WeakMap<object, Set<() => void>>();
+const retirements = new WeakMap<object, Set<(preserveFrame: boolean) => void>>();
 
-/** GPU consumers release their own textures before an owner closes source pixels. */
-export function observeSceneTextureRetirement(source: object, release: () => void): () => void {
+/** Notify GPU consumers before an owner closes pixels; cache eviction can preserve frame replay. */
+export function observeSceneTextureRetirement(
+  source: object,
+  release: (preserveFrame: boolean) => void,
+): () => void {
   let observers = retirements.get(source);
   if (!observers) retirements.set(source, (observers = new Set()));
   observers.add(release);
@@ -12,12 +15,12 @@ export function observeSceneTextureRetirement(source: object, release: () => voi
   };
 }
 
-/** Final source disposal is immediate; temporary disuse still uses the renderer's grace period. */
-export function retireSceneTexture(source: object): void {
+/** Cache eviction may preserve a queued frame; final disposal remains immediate. */
+export function retireSceneTexture(source: object, preserveFrame = false): void {
   const observers = retirements.get(source);
   if (!observers) return;
   retirements.delete(source);
-  for (const release of [...observers]) release();
+  for (const release of [...observers]) release(preserveFrame);
 }
 
 /** Call after rebuilding a reusable prepared bitmap; GPU uploads then happen once. */

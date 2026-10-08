@@ -3,6 +3,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
 
 type Part = EnemyPart;
@@ -104,6 +105,7 @@ export function createInkEnemyRenderer(doc: Document) {
       const image = store.get(oldest)!;
       if (isTone) tonePixels -= image.width * image.height;
       else variantPixels -= image.width * image.height;
+      retireSceneTexture(image, true);
       image.width = image.height = 0;
       store.delete(oldest);
     }
@@ -437,8 +439,10 @@ export function createInkEnemyRenderer(doc: Document) {
     dispose() {
       disposed = true;
       for (const atlas of Object.values(pbr)) atlas.dispose();
-      for (const c of cache.values()) c.width = c.height = 0;
-      for (const c of tones.values()) c.width = c.height = 0;
+      for (const c of [...cache.values(), ...tones.values()]) {
+        retireSceneTexture(c);
+        c.width = c.height = 0;
+      }
       cache.clear();
       tones.clear();
       variantPixels = tonePixels = 0;
