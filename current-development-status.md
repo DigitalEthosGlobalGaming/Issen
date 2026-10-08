@@ -1,3 +1,71 @@
+## W3 cinematic mist repair green — rerun full workstream gates
+
+Hook source b78870f remains committed. Initial full rendering-v2 gate terminated
+session46478 exit1:277PASS/1FAIL14.7m, solely cinematic-refinements.spec.ts:3 exact
+same-seed PNG equality. Captures/trace/error preserved under ignored tmp/lighting-
+refactor/w3-gate-cinematic-evidence before focused runs replaced test output.
+Diagnostic server session69379 terminated exit1 via Ctrl-C; no live browser jobs
+at this checkpoint. Source now rounds only Demon mist clipping strips to logical
+pixels; original centres/radial gradients/seed/motion and all assertions remain.
+No shader workaround, extra composite, old model, fallback or tolerance change.
+
+Native diagnostics reproduce548 one-byte RGB differences on two fractional strip
+edges (alpha exact), including repeated flush without G/L work. All vertex/index/
+uniform/gradient pixels/G/HDR inputs match. Minimal mist alone reproduces579.
+Readiness, dithering, precision/centroid/derivatives, sampler initialization and
+state-reset ablations do not fix it; they were diagnostics only, no production
+changes. Clip alignment gives exact repeated pixels. Its original-to-aligned
+maxRGB3, meanRGBA0.0094498, alpha exact. New native fixture covers844x390/390x844
+at DPR1/2, exact first/repeat pixels, distinct seed and GL0. Screenshot inspected.
+
+npm run typecheck PASS; npm test all415PASS; focused command
+`npx playwright test tests/browser/cinematic-refinements.spec.ts tests/browser/demon-mist-repeat.spec.ts tests/browser/pixi-scenes.spec.ts tests/browser/pixi-films.spec.ts tests/browser/trial-films.spec.ts tests/browser/composer-light-passes.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+all11PASS25.0s exit0 session60113 TERMINAL. Logs demon-mist-fix-{typecheck,unit,browser}.log.
+
+Before this bounds repair, W3 `npm run test:production` strict/build and4PASS23.0s
+exit0 session88093 terminal; Android `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android npm run test:android-web`
+strict/build and4PASS/1FAIL25.3s exit1 session67719 terminal. Same pre-existing
+Android offline.spec.ts:55 immediate pause/reload expects#paused/on, receives
+screen, matching immutable pre-refactor proof android-recovery-baseline.log.
+These runs are evidence on b78870f, not final verification of the bounds repair.
+
+NEXT rerun complete W3 broad rendering-v2 gate (now279 cases), then production/
+Android on repaired source; full broad includes required startup/graphics/context
+and native suites. Preserve exact terminal evidence. Then allPart4 independent
+strict/unit/both broad configs/production/Android/startup/context, completion
+requirement audit, final module/byte/behavior/manual-phone/perf-opt-in/future-work/
+preexisting-failure report, complete status/report commit and one final develop
+push verified against origin. Version1.68.0 aligned; no develop push. Goal active.
+Do not rerun applied integration scripts; no source edits during live browser runs.
+
+## W3 full browser gate LIVE — poll session46478 before source edits
+
+Hook checkpoint committed b78870f; previous goal turn made progress (hook cleanup,
+strict/all415unit/expanded73-browser verification, docs and commit). Full command
+`npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
+is currently LIVE session46478, all278 selected; log tmp/lighting-refactor/
+w3-gate-broad-browser.log. Last poll confirmed live; do not restart on observation
+timeout. No source edits during this run. Overview ownership docs changed only.
+
+One observed failure so far: cinematic-refinements.spec.ts:3 exact same-seed Demon
+PNG equality. Its two captured PNGs decoded with a native Node/zlib diagnostic:
+844x390,548 changed RGB channels, max1, mean0.00041621 acrossRGBA, alpha exact.
+First mismatch x0,y248 expected[43,27,48,255], received[42,27,47,255]. This is NOT
+accepted as passing and the existing exact assertion must not be weakened.
+Finish full run, retain its error-context/trace/captures, then diagnose/fix repeat
+rendering at production ownership (or prove a wrong fixture under goal rules).
+Fixture uses createDemonRealmRenderer/createTestDrawing, synchronous seeds123,
+123,456 after100ms; native-drawing.toDataURL flushes each. No source workaround or
+test assertion was changed. Direct focused reproduction/correctness probes should
+compare actual G/L targets and retained scene data to identify the cause before
+editing; no performance profiling. Preserve captured comparison artifacts before
+another rendering-v2 run replaces output. Other failures may appear later; inspect
+terminal full log before deciding next action. Broad suite has not passed.
+
+W3 audit recorded tmp/lighting-refactor/w3-requirements-audit.md and exact focused
+commands in phase6-hooks-verification.md. W3 production/Android and allPart4
+independent final gates/report/one final develop push still required. Goal active.
+
 ## W3 phase6 hooks green — continue workstream gates
 
 Half-resolution checkpoint cdd7a52 is committed. Named geometry, lights and

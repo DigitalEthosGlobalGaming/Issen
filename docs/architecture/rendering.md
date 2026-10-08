@@ -808,3 +808,14 @@ insertion chains and verify draws leave rules, RNG, saves and haptics unchanged.
 Future rim lighting, rays, shadows and outlines are hooks only; none is implemented.
 Earlier phase sections record intermediate checkpoints; this section describes
 current hook ownership. Workstream and Part4 verification remain separate gates.
+
+
+Demon scenery keeps its very low-alpha mist clipping strips on logical pixel
+bounds. The radial gradient centres, seed variation and visual motion retain their
+original coordinates. Fractional strip edges produced one-byte differences on the
+first native MSAA composite despite identical vertex/index/uniform/texture/G/light
+inputs. Aligning only the clip bounds preserves exact repeat rendering; native
+checks cover both orientations and DPR1/2. Original-to-aligned meanRGBA is0.00945,
+maximum RGB3 and alpha unchanged, within existing scene tolerance9. The original
+cinematic exact-image assertion remains unchanged; no shader quantization,
+precision change, extra composite or comparison tolerance was introduced.

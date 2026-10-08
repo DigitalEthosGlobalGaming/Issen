@@ -238,7 +238,11 @@ export function createDemonRealmRenderer(doc: Document) {
         mist.addColorStop(0, 'rgba(146,96,153,.045)');
         mist.addColorStop(1, 'rgba(146,96,153,0)');
         g.fillStyle = mist;
-        g.fillRect(0, y - height * 0.06, width, height * 0.12);
+        // Keep the mist's clipping edges on logical pixels. Fractional strip
+        // edges can resolve differently on the first native MSAA composite.
+        const top = Math.round(y - height * 0.06),
+          bottom = Math.round(y + height * 0.06);
+        g.fillRect(0, top, width, bottom - top);
       }
       for (let i = 0; i < 18; i++) {
         const rise = (t * 0.04 + i / 18) % 1;
