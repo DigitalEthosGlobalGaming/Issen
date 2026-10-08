@@ -18,23 +18,33 @@ architecture ownership documentation (`d6c3b5e`). Version is 1.68.0.
   depth/normal-aware sampling, named composer/post/film hooks.
   Contracts/examples are in docs/architecture/rendering.md.
 
-## Verification and open run
+## Final verification LIVE — poll session23280
 
-The repaired W3 broad gate is TERMINAL, exit 0: all 279 PASS.
-Command: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`.
-Log: tmp/lighting-refactor/w3-gate-repaired-broad-retry.log.
-No browser/build jobs remain live. W3 checkpoint is complete under the explicit
-pre-existing-failure rule; see docs/development/lighting-refactor-results.md.
+W3 checkpoint is committed95fd1e3. Full repaired W3 retry TERMINAL exit0:
+279PASS14.6m, w3-gate-repaired-broad-retry.log. Workstream source is complete
+under the two baseline-proven Android exceptions below. Report:
+docs/development/lighting-refactor-results.md.
 
-- `npm run typecheck`: PASS; `npm test`: all 415 PASS.
-  Logs: tmp/lighting-refactor/demon-mist-fix-{typecheck,unit}.log.
-- Native six-file mist/composer/scene/film command: all 11 PASS, exit 0;
-  exact command in tmp/lighting-refactor/demon-mist-fix-browser.log.
-- `npm run test:production`: repaired source strict/build and 4 PASS,
-  30.2s, exit 0; w3-gate-repaired-production.log.
-- `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android` with
-  `npm run test:android-web`: strict/build PASS; 3 PASS/2 FAIL, 34.2s,
-  exit 1; w3-gate-repaired-android.log. This is not a passing Android suite.
+Part4 final sequence is LIVE, session23280. Poll that exact handle; no source
+edits/restarts while it runs. Invoked tmp/lighting-refactor/run-final-gates.ps1
+from repo root. It runs sequentially: strict, full units, full rendering-v2,
+full default browser config, production, Android web. Two workers per browser
+config. Stops on any unexpected nonzero; Android nonzero must be inspected and
+classified against the two existing baseline proofs, never assumed passing.
+Logs: tmp/lighting-refactor/final-{typecheck,unit,rendering-v2,default-browser,production,android}.log.
+Terminal command ledger: tmp/lighting-refactor/final-gates.json (currently2 entries).
+
+Confirmed final strict exit0 and all415units PASS/exit0. Full rendering-v2 is
+currently running. Default/production/Android have not yet run in this sequence.
+No other live browser/build jobs remain. All final browser configs include the
+required startup graphics errors and main/auxiliary loss/restore/deadline cases.
+No develop push yet; allPart4 report/audit/bytes/delivery work remains.
+
+Earlier W3 repaired production4PASS30.2s and Android3PASS/2FAIL34.2s are checkpoint
+results, not this final sequence. An earlier repaired broad run278PASS/1FAIL15.1m
+was an Edge ERR_NO_BUFFER_SPACE request for src/main-game.ts before title/gameplay;
+unchanged focused repeats3PASS27.9s and complete retry279PASS above supersede it.
+Trace retained in w3-modes-startup-evidence. No source/assertion/timeout change.
 
 ## Proven pre-existing Android exceptions
 
@@ -55,25 +65,22 @@ These failures use the goal's explicit pre-existing-failure exception.
 
 ## Next steps — all required
 
-1. W3 checkpoint is green except the two proven baseline Android failures.
-   Commit this checkpoint, then continue Part 4 without a review gate.
-2. Part 4 independent final strict/full units, both complete browser configs,
-   production and Android web, startup graphics-error and context-loss coverage.
-   Preserve terminal results; any new failure must be fixed or baseline-proven.
-3. Recompute final byte totals from fresh verification builds, preserving W1
-   historical evidence; write docs/development/refactor-final-report.md with
-   requirement audit, module map, behavior changes, phone checklist, exact
-   verification, exceptions/reverts/approximations, opt-in captures/future work.
-4. Commit final report and complete status, then ONE `git push origin develop`.
-   Verify pushed hash and clean tree. No early push or completion claim.
+1. Poll session23280 to terminal. Inspect final-gates.json and every exact log;
+   if a gate failed unexpectedly, diagnose it without restarting passed gates.
+   Preserve failed trace evidence before new browser output replaces it.
+2. Once all final commands are terminal/accepted, run write-final-bytes.py on
+   fresh production/Android builds, preserving W1 historical evidence.
+3. Review/apply write-final-report.py; its guards require all final gate scopes,
+   hashes, version/restore/import-boundary/artifact proof. Inspect every report
+   claim against actual output, including Android exception lines/counts.
+4. Commit the final report/status then ONE git push origin develop. Verify
+   clean status/local HEAD/origin hash, immutable restore; only then complete goal.
 
 ## Prepared final helpers (not yet applied)
 
 Ignored tmp/lighting-refactor/ contains guarded, syntax-checked helpers:
 
-- write-w3-checkpoint.py: requires full retry279PASS and recorded production4;
-  writes W3 results/current checkpoint and fixes stale rendering-doc language.
-  Run only after session22478 exits0, then inspect and commit the documentation.
+- write-w3-checkpoint.py was APPLIED and committed95fd1e3; do not rerun.
 - run-final-gates.ps1: sequential final strict/unit/rendering-v2/default/production/
   Android commands, two workers per browser config; stops on unexpected nonzero,
   writes final-gates.json. Android output must be classified, never assumed green.
