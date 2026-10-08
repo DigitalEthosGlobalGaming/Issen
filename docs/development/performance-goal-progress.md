@@ -1872,3 +1872,45 @@ copied de-duplication saving assertion were corrected before baseline capture.
 No implementation/version change, assets, gameplay/seeds, frozen harness, real
 player saves, push/deployment or native build. Goal remains active at full scope;
 all remaining Phase3/4/5 requirements remain required.
+
+## Checkpoint 33 — Completed local scenes survive input eviction
+
+Isolated diagnostic separates final composition lifetime from the previously
+unstable native rebuild comparison. Test-only module interception releases raw
+colour leases and material selections after compose, retaining stage0 fog and
+stage4 bamboo. It does not reset foreground, alter source decoding, dispose the
+composed material canvases or change production code. Each case prepares once,
+captures its current scene, releases inputs, admits all12enemy maps, then applies
+actual figure decode pressure and redraws the same frame. Nine stages at two
+seed/size/DPR/quality/motion variants:18cases, one worker/dedicated strict port.
+
+First capture failed exact raw-plane assertion: max1 in every case; live max0/1,
+replay0. Added an unchanged immediate readback/draw control before release. That
+control reproduces rawmax1 in all18 and livemax1 in the same three cases (stage3
+high,4low,6high); this is initial readback/upload warmup, not input eviction.
+After that control, post-eviction raw/live/replay maxima are all0 across18cases.
+Assertions compare eviction against measured per-case control, without changing
+production tolerances; actual final differences are exact. Captured decode-image
+references prove all non-live inputs have naturalWidth0 after pressure. Fog keeps
+four inputs (including emissive), bamboo three; all other stages retain none.
+No feedback/invalid-operation/bound-source warnings. Final diagnosticPASS50.0s.
+
+Stage0 pins fall34/213,952,112bytes to4/25,176,608bytes; bamboo21/132,140,400 to
+3/18,870,192. Other stage pins21/24/27/18/24/28/25 fall to0. All12enemy maps admit
+successfully: combined live pins100,665,728bytes with fog,94,359,312 with bamboo,
+75,489,120 elsewhere. Actual LRU evictions39–55/case; maximum accounted peak
+264,280,976bytes below268,435,456budget. Every case's final owner closure returns
+loader bytes0. These are decoded-source accounting and same-scene pixel results,
+not resident GPU/whole-game memory, consecutive stage cycling or next-slot proof.
+
+Evidence: tmp/performance-local-live-release/{first-capture,completed-scene-release}.json
+and probe/control-probe logs; isolated route/probe/config under
+tmp/probes/local-live-release/. Production diff empty/version1.68.30 unchanged.
+This establishes that completed output planes are independent of non-live inputs.
+Next implement release and reacquisition on resize/DPR/quality/seed/stage changes,
+preserving output ownership and live sources. Rebuild sampling remains unresolved;
+incoming compose plus existing figure/live pins still needs admission scheduling.
+Do not treat these fresh-owner cases as a whole-run budget or enable all-family
+startup sharing concurrently with local compose. Full selected figure loading,
+next slots,120Hz and Phase5 remain required. All measurement handles terminal;
+goal active at full scope; assets/harness/gameplay/seeds/saves unchanged, no release.

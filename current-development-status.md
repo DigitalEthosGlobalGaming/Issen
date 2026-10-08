@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Shared enemy admission constraint
+# Performance, assets and seamless transitions — Completed local input lifetime
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -728,3 +728,20 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Do not force all-family sharing or raise/split the budget. No implementation or
     version change; all measurement handles terminal. Goal remains active at full
     scope; no push/deploy/native build/player-save mutation.
+
+33. Completed local input lifetime diagnosticPASS50.0s across9stages/two variants.
+    Test-only post-compose release retains fog4inputs or bamboo3; real LRU pressure
+    closes every other captured decoded image. All12enemy maps then admit below
+    256MiB. After unchanged readback/upload warmup, all18raw/live/replay comparisons
+    are exact; no GL warnings. First rawmax1/live0–1 failure was reproduced by the
+    immediate unchanged control, not caused by eviction. Stage0 pins34/213,952,112
+    bytes fall4/25,176,608; bamboo21/132,140,400 fall3/18,870,192; other stages0.
+    Maximum accounted peak264,280,976bytes;39–55evictions/case; final loader0.
+    Evidence under tmp/performance-local-live-release/; probe/config/route under
+    tmp/probes/local-live-release/. Production unchanged1.68.30/source diff empty.
+    Next implement output-preserving release/reacquisition for every composition
+    key change. Prior native rebuild sampling remains unresolved. Fresh-owner cases
+    do not prove consecutive stage/incoming pin admission or whole-game budgets.
+    Do not enable concurrent all-family enemy/startup plus local compose. Selected
+    figure ownership, incoming headroom, next slots,120Hz and Phase5 remain required.
+    All measurement handles terminal; goal active, no push/deploy/native build/saves.
