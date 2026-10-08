@@ -1,3 +1,5 @@
+import { bindResultsFeedback, type ResultsFeedbackViews } from '../ui/wiring/results-feedback.ts';
+import type { createResultsSession } from '../game/session/results.ts';
 import {
   bindRunStartFeedback,
   type RunStartFeedbackViews,
@@ -37,14 +39,9 @@ type ActionPorts = Pick<
   | 'bossPos'
   | 'computeMods'
   | 'enemyPos'
-  | 'hud'
   | 'setStage'
-  | 'toast'
-  | 'updateSavedRunButtons'
-  | 'showScreen'
   | 'showOver'
   | 'checkUnlocks'
-  | 'clearHints'
   | 'prepareScene'
   | 'startTrialEncounter'
   | 'startWave'
@@ -59,16 +56,20 @@ type ActionPorts = Pick<
   | 'reviveDaruma'
   | 'finishTrial'
   | 'challenge'
-  | 'runResults'
-  | 'setBestLine'
   | 'modeKey'
   | 'setupAttract'
 > &
   Pick<RunFlowFeedbackViews, 'showPauseScreen' | 'refreshArmoryNew' | 'renderTrialObjective'> &
   Pick<ShrineFeedbackViews, 'showShrineOffers'> &
   Pick<RunStartFeedbackViews, 'hint' | 'setScore'> &
+  Pick<ResultsFeedbackViews, 'hud' | 'toast' | 'clearHints' | 'runResults' | 'setBestLine'> &
+  Pick<CheckpointFeedbackViews, 'updateSavedRunButtons' | 'showScreen'> &
   Pick<TrialFeedbackViews, 'banner' | 'openPanel'> &
   Pick<CheckpointFeedbackViews, 'renderHp' | 'renderLives'> & {
+    readonly resultsSession: Pick<
+      ReturnType<typeof createResultsSession>,
+      'completeResultSequence' | 'claimResultSequenceBonus'
+    >;
     readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
     readonly frameLoop: Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>;
   };
@@ -369,10 +370,7 @@ export function createRuntimeSession(
                   get runResults() {
                     return readActions().runResults;
                   },
-                  get setBestLine(): SessionBindingViews<
-                    typeof PREST,
-                    ResultReveal
-                  >['setBestLine'] {
+                  get setBestLine(): ResultsFeedbackViews['setBestLine'] {
                     return () => readActions().setBestLine();
                   },
                   get modeKey() {
@@ -477,6 +475,21 @@ export function createRuntimeSession(
       applySeal: foundation.view.applySeal,
       audioInit: foundation.browser.audioInit,
       buildLeaves: presentation.buildLeaves,
+    })),
+  );
+  foundation.lifecycle.add(
+    bindResultsFeedback(context.events, () => ({
+      $: foundation.browser.$,
+      presentationState: foundation.view.presentationState,
+      clearHints: readActions().clearHints,
+      showScreen: readActions().showScreen,
+      hud: readActions().hud,
+      setBestLine: readActions().setBestLine,
+      toast: readActions().toast,
+      renderGameOver,
+      runResults: readActions().runResults,
+      completeResultSequence: (id) => readActions().resultsSession.completeResultSequence(id),
+      claimResultSequenceBonus: (id) => readActions().resultsSession.claimResultSequenceBonus(id),
     })),
   );
   return sessionBindings;

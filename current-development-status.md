@@ -1,3 +1,31 @@
+## Latest green checkpoint: results presentation ownership
+
+Results rules emit deeply frozen display/sequence snapshots and synchronous
+resultCue/resultReady values. ui/wiring/results-feedback.ts owns DOM/game-over,
+letterbox/hints, screen/HUD/best/buttons and sequence presentation. UI completion
+and bonus actions forward sequence IDs to the actual result rule owner; rewards,
+profile/store settlement, overReady, support rollback/claims and recovery remain
+rules. Sequence action storage retains only the current sequence; stale callbacks
+from a replaced result screen no longer enable the newer screen (intentional
+lifetime correction recorded in the behavior log). Save keys/records unchanged.
+Actual normal/daily/recovery/bonus tests prove listener isolation, deep snapshots,
+disposal, rollback/once-only currency and current sequence readiness.
+`npm run typecheck`: PASS (tmp/runtime-refactor/results-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 401 PASS
+(tmp/runtime-refactor/results-feedback-unit.log).
+Initial affected browser run: 15 PASS/one daily-label encoding failure; fixed UTF-8
+middle dot without changing the existing assertion.
+`npx playwright test tests/browser/game.spec.ts tests/browser/daily.spec.ts tests/browser/support-rewards.spec.ts tests/browser/death-presentation.spec.ts tests/browser/feature-plan-06.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+final all 16 PASS in 1.2m (tmp/runtime-refactor/results-feedback-browser-fixed.log),
+terminal exit 0 confirmed. No live browser process remains.
+Next actual source audit: game/session/frame-simulation.ts combines rule/cosmetic
+frame dispatch; game/session/scene-flow.ts orchestrates renderer requests/DOM
+readiness and rule continuations. Move these runtime orchestration owners to
+runtime in a separate physical-move commit, preserving every statement/order.
+Then separate stale session capability/adapter cleanup and full W2 requirements/
+gates/docs/1.67.0. All W3/Part 4 remain required; develop is unpushed.
+Result generation/fix/lifetime scripts are non-idempotent and already applied.
+
 ## Latest green checkpoint: run-start presentation ownership
 
 Run-start emits frozen runStartCue/runModeHint/runFortune values; UI-owned

@@ -1,3 +1,4 @@
+import { resultDisplay } from './result-display.ts';
 import type { RuleEvents } from '../events.ts';
 import { STAGES } from '../content/stages.ts';
 import { dailyResult, type DailyRun } from '../progression/daily.ts';
@@ -7,6 +8,7 @@ import {
   supportEmberBonusAmount,
   grantSupportEmberBonus,
   type RunRewardLedger,
+  type RewardSettlement,
 } from '../progression/run-rewards.ts';
 import {
   markModeRevealsSeen,
@@ -17,15 +19,13 @@ import {
 import { trialsUnlocked } from '../progression/trials.ts';
 import { testerPremiumActive } from '../../platform/tester-premium.ts';
 import { parsePendingSupport, type PendingSupportReward } from '../../platform/pending-support.ts';
-import type { RunState, Screen } from '../run-state.ts';
+import type { RunState } from '../run-state.ts';
 import type { RunCheckpoint } from '../../platform/run-checkpoint.ts';
 import type { Statistics, BladeStats } from '../progression/statistics.ts';
 import type { TrialDefinition } from '../content/trials.ts';
-import type { ItemCategory } from '../content/items.ts';
 import type { Setup } from '../../platform/saves.ts';
 import type { SupportBenefit } from '../../platform/rewarded-support.ts';
-import type { ResultReveal, RunResults } from '../../ui/screens/run-results.ts';
-import type { renderGameOver } from '../../ui/screens/game-over.ts';
+import type { ResultReveal } from '../../ui/screens/run-results.ts';
 
 export interface ResultsViews {
   readonly events: RuleEvents;
@@ -34,18 +34,8 @@ export interface ResultsViews {
   readonly guided: { reset(): void };
   readonly audio: { setPaused(paused: boolean): void };
   timeScale: number;
-  readonly presentationState: { lbT: number };
-  readonly clearHints: () => void;
-  readonly $: {
-    (id: 'c' | 'prevC' | 'supportPreview'): HTMLCanvasElement;
-    (id: 'bAgain'): HTMLButtonElement;
-    (id: string): HTMLElement;
-  };
   readonly META: MetaProgress;
-  readonly showScreen: (id: Screen | null) => void;
-  readonly hud: (on: boolean) => void;
   savedRun: RunCheckpoint | null;
-  readonly updateSavedRunButtons: () => void;
   sceneContinuation: (() => void) | undefined;
   rewardFlowBusy: boolean;
   readonly activeTrial: TrialDefinition | null;
@@ -75,15 +65,7 @@ export interface ResultsViews {
   readonly rewardLedger: RunRewardLedger;
   readonly runTrialsWasUnlocked: boolean;
   readonly saveMeta: () => boolean;
-  readonly runResults: RunResults;
   readonly runItemReveals: ResultReveal[];
-  readonly setBestLine: () => void;
-  readonly toast: (it: {
-    k: string;
-    msg?: string | undefined;
-    n?: string | undefined;
-    type?: ItemCategory | undefined;
-  }) => void;
   readonly modeKey: () => string;
   readonly store: {
     get(key: string, fallback: null): unknown;
@@ -91,29 +73,51 @@ export interface ResultsViews {
     remove(key: string): void;
   };
   readonly clearRunCheckpoint: () => void;
-  readonly renderGameOver: typeof renderGameOver;
 }
 
 /** Owns terminal settlement/recovery; display and persistent capabilities are ports. */
 export function createResultsSession(readViews: () => ResultsViews) {
+  let nextSequence = 0;
+  const sequences = new Map<
+    number,
+    { pending: PendingSupportReward | null; complete: () => void }
+  >();
+  function startSequence(
+    reward: RewardSettlement,
+    reveals: readonly ResultReveal[],
+    pending: PendingSupportReward | null,
+  ) {
+    const { G, META, store } = readViews();
+    const id = ++nextSequence;
+    // The UI has one result sequence; discard actions from a replaced sequence.
+    sequences.clear();
+    sequences.set(id, {
+      pending,
+      complete: () => {
+        store.remove('issen.supportReward');
+        G.overReady = true;
+        readViews().events.emit('resultReady', { ready: true });
+      },
+    });
+    readViews().events.emit('resultSequence', {
+      id,
+      reward: Object.freeze({ ...reward }),
+      reveals: Object.freeze(reveals.map((x) => Object.freeze({ ...x }))),
+      bonus: !!pending,
+      extraEmbers: pending ? supportEmberBonusAmount(META, pending.hundredths) : 0,
+    });
+  }
+  function completeResultSequence(id: number) {
+    sequences.get(id)?.complete();
+  }
+  function claimResultSequenceBonus(id: number) {
+    const pending = sequences.get(id)?.pending;
+    return pending ? claimEmberBonus(pending) : Promise.resolve(null);
+  }
+
   function finishDaily() {
     const views = readViews();
-    const {
-      $,
-      activeDaily,
-      G,
-      guided,
-      audio,
-      presentationState,
-      clearHints,
-      META,
-      showScreen,
-      hud,
-      updateSavedRunButtons,
-      store,
-      clearRunCheckpoint,
-      renderGameOver,
-    } = views;
+    const { activeDaily, G, guided, audio, META, store, clearRunCheckpoint } = views;
     if (!activeDaily || G.state === 'over') return;
     G.state = 'over';
     const result = dailyResult(store.get('issen.daily', null), activeDaily.day, G);
@@ -122,38 +126,28 @@ export function createResultsSession(readViews: () => ResultsViews) {
     guided.reset();
     audio.setPaused(false);
     views.timeScale = 1;
-    presentationState.lbT = 0;
-    clearHints();
-    $('bossbar').classList.remove('on');
+    views.events.emit('resultCue', { kind: 'reset' });
     const reward = { before: META.embers, after: META.embers, gained: 0 };
-    renderGameOver($('over'), G, result.record, result.newBest, STAGES[G.stage]!.n, reward, true);
-    $('overSeed').textContent = `Daily · ${activeDaily.day}`;
-    $('oModifier').hidden = true;
-    $('runResultSequence').hidden = true;
-    $('overSummary').hidden = false;
-    $('over').dataset.daily = 'true';
-    showScreen('over');
-    hud(false);
+    views.events.emit(
+      'resultRendered',
+      resultDisplay(G, result.record, result.newBest, STAGES[G.stage]!.n, reward, true),
+    );
+    views.events.emit('resultCue', { kind: 'daily', day: activeDaily.day });
+    views.events.emit('resultCue', { kind: 'screen' });
     G.overReady = true;
-    $('bAgain').disabled = false;
+    views.events.emit('resultReady', { ready: true });
     clearRunCheckpoint();
     views.savedRun = null;
-    updateSavedRunButtons();
+    views.events.emit('checkpointChanged', { saved: !!views.savedRun });
   }
   function showOver() {
     const views = readViews();
     const {
-      $,
       activeDaily,
       G,
       guided,
       audio,
-      presentationState,
-      clearHints,
       META,
-      showScreen,
-      hud,
-      updateSavedRunButtons,
       activeTrial,
       rewardScreen,
       supportPremium,
@@ -172,12 +166,9 @@ export function createResultsSession(readViews: () => ResultsViews) {
       rewardLedger,
       runTrialsWasUnlocked,
       saveMeta,
-      runResults,
       runItemReveals,
-      setBestLine,
       store,
       clearRunCheckpoint,
-      renderGameOver,
     } = views;
     views.sceneContinuation = undefined;
     if (views.rewardFlowBusy) return;
@@ -215,7 +206,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
       finishDaily();
       return;
     }
-    delete $('over').dataset.daily;
+    views.events.emit('resultCue', { kind: 'normal' });
     if (activeTrial) {
       finishTrial(G.reason === 'quit' ? 'You ended the attempt.' : 'A mistake ended the trial.');
       return;
@@ -226,9 +217,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
     guided.reset();
     audio.setPaused(false);
     views.timeScale = 1;
-    presentationState.lbT = 0;
-    clearHints();
-    $('bossbar').classList.remove('on');
+    views.events.emit('resultCue', { kind: 'reset' });
     const { record: rec, newBest: nb } = recordRun(ST, G);
     challenge('sc', G.score);
     if (!G.zen) store.set('issen.best', ST.bestScore);
@@ -267,44 +256,23 @@ export function createResultsSession(readViews: () => ResultsViews) {
     markModeRevealsSeen(META);
     saveMeta();
     G.claps = 0;
-    renderGameOver($('over'), G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled);
-    $('overSeed').textContent = `Seed ${G.seed}`;
-    showScreen('over');
-    hud(false);
-    G.overReady = false;
-    $('bAgain').disabled = true;
-    runResults.start(
-      reward,
-      [...modeReveals, ...runItemReveals],
-      () => {
-        store.remove('issen.supportReward');
-        G.overReady = true;
-        $('bAgain').disabled = false;
-      },
-      pending ? () => claimEmberBonus(pending) : undefined,
-      pending ? supportEmberBonusAmount(META, pending.hundredths) : 0,
+    views.events.emit(
+      'resultRendered',
+      resultDisplay(G, rec, nb, STAGES[G.stage]!.n, reward, G.upgradesEnabled),
     );
-    setBestLine();
+    views.events.emit('resultCue', { kind: 'seed', seed: G.seed });
+    views.events.emit('resultCue', { kind: 'screen' });
+    G.overReady = false;
+    views.events.emit('resultReady', { ready: false });
+    startSequence(reward, [...modeReveals, ...runItemReveals], pending);
+    views.events.emit('resultCue', { kind: 'best' });
     clearRunCheckpoint();
     views.savedRun = null;
-    updateSavedRunButtons();
+    views.events.emit('checkpointChanged', { saved: !!views.savedRun });
   }
   async function claimEmberBonus(pending: PendingSupportReward) {
     const views = readViews();
-    const {
-      $,
-      G,
-      META,
-      rewardScreen,
-      lifecycle,
-      rewardSupport,
-      ST,
-      saveMeta,
-      toast,
-      modeKey,
-      store,
-      renderGameOver,
-    } = views;
+    const { G, META, rewardScreen, lifecycle, rewardSupport, ST, saveMeta, modeKey, store } = views;
     const completed = await rewardScreen.offer('embers', false, false, 0);
     if (lifecycle.disposed || !completed || !(await rewardSupport.claim('embers', false)))
       return null;
@@ -315,7 +283,7 @@ export function createResultsSession(readViews: () => ResultsViews) {
     if (!saveMeta()) {
       Object.assign(META, before);
       if (!Object.hasOwn(before, 'supportRewardClaim')) delete META.supportRewardClaim;
-      toast({ k: '!', msg: 'Reward could not be saved. Please try again.' });
+      views.events.emit('resultCue', { kind: 'saveFailed' });
       return null;
     }
     store.remove('issen.supportReward');
@@ -324,20 +292,22 @@ export function createResultsSession(readViews: () => ResultsViews) {
       gained: pending.reward.gained + bonus.gained,
       after: bonus.after,
     };
-    renderGameOver(
-      $('over'),
-      G,
-      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
-      false,
-      STAGES[G.stage]!.n,
-      total,
-      G.upgradesEnabled,
+    views.events.emit(
+      'resultRendered',
+      resultDisplay(
+        G,
+        ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
+        false,
+        STAGES[G.stage]!.n,
+        total,
+        G.upgradesEnabled,
+      ),
     );
     return total;
   }
   function recoverSupportReward() {
     const views = readViews();
-    const { $, G, META, showScreen, hud, ST, runResults, modeKey, store, renderGameOver } = views;
+    const { G, META, ST, modeKey, store } = views;
     const pending = parsePendingSupport(store.get('issen.supportReward', null));
     if (!pending || pending.id === META.supportRewardClaim) {
       store.remove('issen.supportReward');
@@ -348,30 +318,28 @@ export function createResultsSession(readViews: () => ResultsViews) {
       state: 'over',
       panel: null,
     });
-    renderGameOver(
-      $('over'),
-      G,
-      ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
-      false,
-      STAGES[G.stage]!.n,
-      pending.reward,
-      G.upgradesEnabled,
+    views.events.emit(
+      'resultRendered',
+      resultDisplay(
+        G,
+        ST.rec[modeKey()] ?? { score: G.score, combo: G.maxCombo, wave: G.wave },
+        false,
+        STAGES[G.stage]!.n,
+        pending.reward,
+        G.upgradesEnabled,
+      ),
     );
-    showScreen('over');
-    hud(false);
+    views.events.emit('resultCue', { kind: 'screen' });
     G.overReady = false;
-    $('bAgain').disabled = true;
-    runResults.start(
-      pending.reward,
-      [],
-      () => {
-        store.remove('issen.supportReward');
-        G.overReady = true;
-        $('bAgain').disabled = false;
-      },
-      () => claimEmberBonus(pending),
-      supportEmberBonusAmount(META, pending.hundredths),
-    );
+    views.events.emit('resultReady', { ready: false });
+    startSequence(pending.reward, [], pending);
   }
-  return { finishDaily, showOver, claimEmberBonus, recoverSupportReward };
+  return {
+    finishDaily,
+    showOver,
+    claimEmberBonus,
+    recoverSupportReward,
+    completeResultSequence,
+    claimResultSequenceBonus,
+  };
 }

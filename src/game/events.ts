@@ -110,6 +110,15 @@ export interface GameEvents {
     bossShown: boolean;
   }>;
   checkpointChanged: Readonly<{ saved: boolean }>;
+  resultRendered: import('./session/result-display.ts').ResultDisplay;
+  resultSequence: import('./session/result-display.ts').ResultSequence;
+  resultReady: Readonly<{ ready: boolean }>;
+  resultCue: Readonly<
+    | { kind: 'reset' | 'normal' | 'screen' | 'best' | 'saveFailed' }
+    | { kind: 'daily'; day: string }
+    | { kind: 'seed'; seed: number }
+  >;
+
   runStartCue: Readonly<{
     kind: 'motion' | 'effects' | 'clearHints' | 'screen' | 'score' | 'seal' | 'audio' | 'leaves';
   }>;

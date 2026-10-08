@@ -107,6 +107,9 @@ export function createRuntimeGameplay(
   const scene = createRuntimeSceneCoordination(foundation, presentation, ui, combat, readClock);
 
   const sessionBindings = createRuntimeSession(foundation, presentation, context, () => ({
+    get resultsSession() {
+      return resultsSession;
+    },
     get phaseRouter() {
       return phaseRouter;
     },

@@ -1,6 +1,8 @@
+import { bindResultsFeedback } from '../../../src/ui/wiring/results-feedback.ts';
+import { bindCheckpointFeedback } from '../../../src/ui/wiring/checkpoint-feedback.ts';
 import { createResultsSession } from '../../../src/game/session/results.ts';
 /** Actual results orchestration with in-memory profile and display capabilities. */
-export function resultsSessionFixture(runtime) {
+export function resultsSessionFixture(runtime, feedback = true) {
   const nodes = new Map(),
     saved = new Map(),
     trace = [],
@@ -53,5 +55,25 @@ export function resultsSessionFixture(runtime) {
     updateSavedRunButtons() {},
     renderGameOver: (...args) => trace.push(['render', ...args.slice(2)]),
   });
-  return { views, saved, trace, sequences, flow: createResultsSession(() => views) };
+  const flow = createResultsSession(() => views);
+  const off = feedback
+    ? [
+        bindResultsFeedback(views.events, () => ({
+          ...views,
+          completeResultSequence: flow.completeResultSequence,
+          claimResultSequenceBonus: flow.claimResultSequenceBonus,
+        })),
+        bindCheckpointFeedback(views.events, () => views),
+      ]
+    : [];
+  return {
+    views,
+    saved,
+    trace,
+    sequences,
+    flow,
+    disposeFeedback() {
+      off.forEach((fn) => fn());
+    },
+  };
 }
