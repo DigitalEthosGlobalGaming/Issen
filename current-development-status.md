@@ -76,6 +76,27 @@ These failures use the goal's explicit pre-existing-failure exception.
 4. Commit final report and complete status, then ONE `git push origin develop`.
    Verify pushed hash and clean tree. No early push or completion claim.
 
+## Prepared final helpers (not yet applied)
+
+Ignored tmp/lighting-refactor/ contains guarded, syntax-checked helpers:
+
+- write-w3-checkpoint.py: requires full retry279PASS and recorded production4;
+  writes W3 results/current checkpoint and fixes stale rendering-doc language.
+  Run only after session22478 exits0, then inspect and commit the documentation.
+- run-final-gates.ps1: sequential final strict/unit/rendering-v2/default/production/
+  Android commands, two workers per browser config; stops on unexpected nonzero,
+  writes final-gates.json. Android output must be classified, never assumed green.
+- write-final-bytes.py: checks all compact/authoring hashes and frozen shell hash,
+  measures fresh final builds and separate unsigned ZIP projections without a
+  native build; preserves historical W1 evidence. Run after final builds complete.
+- write-final-report.py: guards all terminal final gate counts/artifacts, rule import
+  boundary, versions and restore hash; writes requirement audit, final report,
+  index and complete handoff. Inspect actual Android failures and all report claims
+  before applying; commit/push/remote verification still follow, never automated.
+
+Run helpers from repository root with authorized sandbox escalation. These helper
+drafts are disposable; repair them rather than rerun older integration scripts.
+
 ## Execution rules
 
 No profiling/benchmarks/native/store builds, real-save changes, history rewrites,
