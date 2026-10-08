@@ -1,3 +1,20 @@
+## W3 phase4 neutral emission green — continue whole-scene routing
+
+Material cleanup commit66ba4ec removed the old forward shader/flag and unified
+masks; all404 units/all56 affected browsers/strict passed on that source.
+Subsequent neutral binding cleanup uses shared Texture.EMPTY for absent emissive
+maps in material/composite initialization and release, instead of WHITE guarded
+by hasEmissive. Final strict PASS and all5 focused optional-emissive/material/
+legacy/reference browsers PASS3.8s exit0. Logs tmp/lighting-refactor/
+phase4-neutral-{typecheck,browser}.log. No live process remains.
+NEXT: ordinary drawImage/cached-text and procedural Graphics/round-stroke/brush-ring/
+ellipse/glyph-arrow stock colour routes must use the common pipeline. This is
+still incomplete; do not substitute the material-only success for whole-scene
+compliance. Preserve ordered fog/alpha/blends/films/clips and target lifetimes.
+Then instanced grass/leaves, event sources, half-resolution quality, named GPU
+composer passes/hooks/docs, W3 gates and every Part4 deliverable remain required.
+No develop push until full completion. Goal active; version1.68.0 aligned.
+
 ## W3 phase4 material cleanup green — all-scene routes still need work
 
 Old forward fragment, four-light uniforms/selection and temporary

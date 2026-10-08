@@ -70,7 +70,7 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
       uNormal: Texture.WHITE.source,
       uMask: Texture.WHITE.source,
       uSurface: Texture.WHITE.source,
-      uEmissive: Texture.WHITE.source,
+      uEmissive: Texture.EMPTY.source,
       uLightDiffuse: Texture.EMPTY.source,
       uLightSpecular: Texture.EMPTY.source,
     },
@@ -90,7 +90,7 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
     },
     releaseTextures() {
       for (const name of ['uDiffuse', 'uMask', 'uSurface', 'uEmissive'])
-        shader.resources[name] = Texture.WHITE.source;
+        shader.resources[name] = name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source;
     },
     dispose() {
       shader.destroy();

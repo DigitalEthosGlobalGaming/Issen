@@ -88,7 +88,7 @@ export function createMaterialMesh() {
     releaseTextures(): void {
       if (!texturesBound) return;
       for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'])
-        shader.resources[name] = Texture.WHITE.source;
+        shader.resources[name] = name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source;
       geometryMaterial.releaseTextures();
       texturesBound = false;
     },
@@ -99,7 +99,7 @@ export function createMaterialMesh() {
       const normal = material.normal ? textures.getData(material.normal) : Texture.WHITE;
       const mask = material.mask ? textures.getData(material.mask) : Texture.WHITE;
       const surface = material.surface ? textures.getData(material.surface) : Texture.WHITE;
-      const emissive = material.emissive ? textures.get(material.emissive) : Texture.WHITE;
+      const emissive = material.emissive ? textures.get(material.emissive) : Texture.EMPTY;
       shader.resources.uDiffuse = diffuse.source;
       shader.resources.uNormal = normal.source;
       shader.resources.uMask = mask.source;

@@ -527,3 +527,4 @@ brush rings/ellipses/glyph arrows still use stock native colour drawing. Routing
 these through the common pipeline and shared neutral-emissive binding remains
 required before this migration can be called complete. Instancing, event sources,
 half-resolution lighting and named GPU composer passes also remain pending.
+`nAbsent emissive maps now bind the shared zero Texture.EMPTY source, including initialization and release. No per-material neutral image is allocated and no absent map is requested. The five focused omission/colour/legacy/reference browser checks pass; whole-scene stock-route integration remains pending.
