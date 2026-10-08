@@ -547,3 +547,36 @@ Absent emissive maps bind shared zero Texture.EMPTY, including initialization
 and release, with no per-material image allocation or absent-map request.
 Instancing, event sources, half-resolution lighting and named GPU composer
 passes remain pending before the lighting workstream can be called complete.
+
+## W3 instanced grass (phase 5 in progress)
+
+scene-grass.ts is the native drawing port. ambient.ts submits a complete layer
+instead of constructing a path per blade. presentation/environment.ts keeps the
+cached snow/demon variants and submits midground depth-12 and foreground depth12
+at the original composer positions, with effects/quality density. Random blade
+placement is unchanged; drawing consumes no random numbers.
+
+pixi/grass-material.ts owns one retained instanced strip per submitted depth
+layer. Instance attributes contain base position, height, width, phase, palette
+colour index, layer depth and a deterministic density-selection seed. They are
+uploaded when the layer list changes. Subsequent frames update only time, wind,
+density, lighting and transform uniforms. Twelve strip segments approximate the
+original paired quadratic curves; sway retains the original frequencies and
+coefficients in the vertex shader. The palette retains float RGBA so authored
+alpha0.5 reaches the exact cutoff. Its nearest-sampled data texture uses up to
+1024 columns and additional rows. No texture renderability extension is needed.
+
+Curved approximate normals write the same G0/G1/G2 layout, with matte roughness
+0.85, metallic0 and AO1. Cutoff uses exact source and ancestor alpha before
+canonical eight-bit coverage encoding. Thin blades use the accepted surface
+behind them in the shared lookup. The colour pass uses the common linear light
+composite; GPU density selection preserves original instance ordering. Clip,
+film, resize, restore and disposal ownership remain with the native painter.
+
+The native grass fixture proves actual1000-instance draws, no blade property
+reads after upload, repeatable frames, GPU wind changes, reduced density, curved
+PBR normals and pixel-identical context restore. A second fixture compares the
+authored curves at the unchanged scene tolerance9 (observed mean0.154), accepts
+alpha0.5, rejects below-cutoff geometry and preserves ordered depth layers.
+These are correctness checks, not performance measurements. Instanced catalogue
+leaves are still pending; phase5 is not complete.

@@ -57,7 +57,7 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
   const snowGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
   const demonGrass = new WeakMap<GrassBlade[], GrassBlade[]>();
   function blades(list: GrassBlade[], t: number, snowTips = false, demonic = false) {
-    const { fg, g, reducedMotion, wind } = readViews();
+    const { fg, g, reducedMotion, wind, density } = readViews();
     let visible = list;
     if (snowTips) {
       let cached = snowGrass.get(list);
@@ -94,6 +94,8 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
       visible,
       demonic && reducedMotion() ? 0 : t,
       demonic && reducedMotion() ? 1 : wind,
+      list === fg ? 12 : -12,
+      density(),
     );
   }
   function drawLeaves(front: boolean) {

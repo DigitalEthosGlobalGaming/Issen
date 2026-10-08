@@ -1,3 +1,43 @@
+## W3 phase5 grass green — continue instanced catalogue leaves
+
+Phase4 whole-scene routing is committed1e585d3. Grass now submits one retained
+native instanced strip per original mid/foreground layer through scene-grass.ts.
+grass-material.ts uploads base/height/width/phase/colour-index/layer/density seed
+once per layer-list change. Wind deformation and curved normals execute on GPU;
+subsequent frames read no blade properties. Snow/demon cached variants and sorted
+order stay in presentation/environment.ts; effects/quality density selects blades
+in shader. Draw consumes no RNG. Old per-blade paths are removed from ambient.ts.
+Palette float RGBA preserves exact authored0.5 coverage; cutoff precedes explicit
+canonical eight-bit alpha encoding. Shared G/light/composite, clips/film/target
+replacement and context restore/disposal are native painter owned.
+
+Final npm run typecheck PASS; npm test all404PASS; exact13-file affected native/
+scene/catalogue/film/G/light/runtime suite all50PASS1.8m exit0 session98813 TERMINAL.
+Logs tmp/lighting-refactor/phase5-grass-final-typecheck.log,
+phase5-grass-unit.log, phase5-grass-final-browser.log.
+Two direct grass fixtures pass: actual1000-instance draws, no post-upload blade
+reads, GPU wind/density/curved PBR normals, repeatability, pixel-identical restore,
+authored curve mean0.154 at unchanged tolerance9, exact0.5 cutoff and thin-front
+last-writer preservation. Capture uses testInfo.outputPath('instanced-grass.png');
+inspected rendered blades. Initial context-restore fixture fetched the extension
+while lost (null); fixed by retaining it before loss, no app workaround.
+Initial midpoint test exposed byte127 storage for0.5; explicit encoding repaired
+it without weakening cutoff/assertions. Changelog now names grass lighting;
+changelog indicator1PASS9.1s exit0 session70100 TERMINAL. No live process remains.
+Version1.68.0 stays aligned, no develop push.
+
+NEXT phase5 leaves: ambient.ts currently CPU-updates and individually draws leaves;
+presentation/environment.ts calls that update and draw path. drift-renderer.ts owns
+prepared catalogue diffuse/material atlases and per-leaf draw; drift-frame.ts is a
+pose adapter. Preserve catalogue frames/pivots/opacity/size and front split z1.25.
+Move spawn/fall/flutter/spin/gust motion to native instanced quads where allowed,
+two-sided normals/G/composite, quality density and effects-clock-only randomness.
+Read current files before changes. Phase5 is incomplete until leaves green.
+Then phase6 event-light listeners/half-res quality/depth-normal upsample/read-only
+hooks/named composer G-light passes/docs, W3 full gates and every Part4 final gate,
+report/one final develop push remain. Goal active and full scope unchanged.
+Do not rerun applied non-idempotent Playground w3-grass-integration.py.
+
 ## W3 phase4 whole-scene routing green — continue phase5 grass then leaves
 
 Ordinary image/cached-text meshes and native procedural graphics now use shared

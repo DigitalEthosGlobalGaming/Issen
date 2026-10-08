@@ -3,6 +3,7 @@ import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import { scaledCount } from '../effects/quality.ts';
 import { chooseDriftSprite } from './drift-catalog.ts';
+import { drawInstancedGrass } from '../scene-grass.ts';
 export interface GrassBlade {
   x: number;
   y: number;
@@ -135,18 +136,15 @@ export function createAmbient(env: AmbientEnvironment) {
       ordinary++;
     }
   }
-  function blades(g: SceneDrawing, list: readonly GrassBlade[], t: number, wind: number) {
-    for (const b of list) {
-      const sw = wind * 0.5 + Math.sin(t * 2.3 + b.ph) * 0.25 + Math.sin(t * 5.1 + b.ph * 2) * 0.06;
-      const tx = b.x + sw * b.h * 0.45,
-        ty = b.y - b.h * (1 - 0.12 * Math.abs(sw));
-      g.fillStyle = b.col;
-      g.beginPath();
-      g.moveTo(b.x - b.w, b.y);
-      g.quadraticCurveTo(b.x + sw * b.h * 0.1, b.y - b.h * 0.5, tx, ty);
-      g.quadraticCurveTo(b.x + sw * b.h * 0.12 + b.w * 0.3, b.y - b.h * 0.5, b.x + b.w, b.y);
-      g.fill();
-    }
+  function blades(
+    g: SceneDrawing,
+    list: readonly GrassBlade[],
+    t: number,
+    wind: number,
+    depth = 0,
+    density = env.density ?? 1,
+  ) {
+    drawInstancedGrass(g, { blades: list, time: t, wind, depth, density });
   }
   function drawLeaves(g: SceneDrawing, leaves: readonly Leaf[], front: boolean) {
     for (const l of leaves) {
