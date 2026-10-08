@@ -110,6 +110,7 @@ export function createRuntimeFrames(
       ),
     ),
   );
+  foundation.lifecycle.add(drawScene.dispose);
   bindGraphicsLifecycle(() => ({
     lifecycle: foundation.lifecycle,
     frameLoop,

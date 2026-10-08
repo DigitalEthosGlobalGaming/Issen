@@ -1,3 +1,30 @@
+## W3 phase 2 green — continue immediately to lookup composite
+
+Version1.68.0: painter-owned native RGBA16F diffuse/specular MRT, fullscreen GGX
+light pass, fixed16 uniform arrays/count, viewport footprint/intensity budget,
+presentation light-source registry and stage-rig integration are implemented.
+Borrowed lightTargets have generation/size metadata, independent surface ownership,
+resize/restore/disposal. Same HDR capability is required at startup/restore;
+missing support shows the existing single graphics Retry error. Session-only
+debug offers diffuse/specular views as well as G0/G1/G2. Actual title debug
+captures were visually inspected; no startup overlay was accepted as evidence.
+Strict typecheck PASS; all404 units PASS (then stronger stable-ID test3/3PASS).
+Focused14-file native/material/startup/recovery/game suite all52PASS1.9m exit0,
+session8275 TERMINAL. Logs tmp/lighting-refactor/phase2-{typecheck,unit,native-browser}.log.
+Analytic front-facing GGX/diffuse, HDR values>1, all16 contribution, AO/metal tint,
+debug-neutral outputs, exact source destruction, actual context restoration and
+all existing gameplay checkpoint cases pass. No browser job remains live.
+The ordinary scene still uses the old forward shader during this migration.
+NEXT phase3: cheap albedo*diffuse+specular+emissive lookup composite, temporary old
+comparison flag and representative tolerant browser comparisons. Then phase4
+legacy unification/remove old shader, phase5 instanced grass/leaves, phase6 event
+lights/half-res/hooks/named G/light composer passes/docs; all remain mandatory.
+W3 full broad/production/Android gates and Part4/default-browser/final report and
+one final develop push remain pending. No early push. Phase1 broad was259pass/1
+stale-selector failure, explicitly repaired1/1pass; no all260 invocation claimed.
+External staging scripts already applied/non-idempotent: do not rerun phase2
+implementation/refinement scripts. Use actual committed sources from now on.
+
 ## W3 phase 1 checkpoint — continue to phase 2
 
 Source 4d4ed49, version 1.68.0: strict/all401 units and all47 affected

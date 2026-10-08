@@ -1,5 +1,6 @@
 import { GeometryBuffer, requireGeometryBuffers } from './geometry-buffer.ts';
 import type { GeometryDebugView } from './geometry-buffer.ts';
+import { LightBuffer, requireLightBuffers } from './light-buffer.ts';
 import { GraphicsUnsupportedError, reportGraphicsError } from '../graphics-error.ts';
 import {
   Color,
@@ -162,7 +163,10 @@ export class PixiScenePainter implements SceneDrawing {
   private readonly restoreContext = () => {
     try {
       requireGeometryBuffers(this.renderer.gl as WebGL2RenderingContext);
+      requireLightBuffers(this.renderer.gl as WebGL2RenderingContext);
+      this.lightBuffer.detachGeometry();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
+      this.lightBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.contextLost = false;
       this.canvas.dataset.contextState = 'ready';
     } catch {
@@ -189,6 +193,10 @@ export class PixiScenePainter implements SceneDrawing {
   };
 
   private readonly geometryBuffer: GeometryBuffer;
+  private readonly lightBuffer: LightBuffer;
+  get lightTargets() {
+    return this.lightBuffer.targets;
+  }
   get geometryTargets() {
     return this.geometryBuffer.targets;
   }
@@ -199,6 +207,8 @@ export class PixiScenePainter implements SceneDrawing {
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
     this.geometryBuffer.resize(canvas.width, canvas.height);
+    this.lightBuffer = new LightBuffer(renderer);
+    this.lightBuffer.resize(canvas.width, canvas.height);
     canvas.addEventListener('webglcontextlost', this.loseContext);
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
@@ -374,7 +384,9 @@ export class PixiScenePainter implements SceneDrawing {
       this.height = this.canvas.height;
       this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
     }
+    this.lightBuffer.detachGeometry();
     this.drawGeometry();
+    this.lightBuffer.render(this.geometryBuffer.targets!, this.lighting);
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
     // browser task do not accumulate (captures, previews and restoration).
@@ -384,9 +396,15 @@ export class PixiScenePainter implements SceneDrawing {
       clearColor: [0, 0, 0, 0],
     });
     const debug = this.canvas.dataset.lightingView;
-    const view: GeometryDebugView =
+    const geometryView: GeometryDebugView =
       debug === 'g0' || debug === 'g1' || debug === 'g2' ? debug : 'none';
-    if (!this.geometryBuffer.renderDebug(view))
+    const lightView = debug === 'diffuse' || debug === 'specular' ? debug : undefined;
+    const view = lightView ?? geometryView;
+    if (
+      !(lightView
+        ? this.lightBuffer.renderDebug(lightView)
+        : this.geometryBuffer.renderDebug(geometryView))
+    )
       this.renderer.render({ container: this.root, clear: true });
     this.canvas.dataset.lightingFrameView = view;
     // Filter targets return to Pixi's pool after rendering. Drop the shared
@@ -1081,6 +1099,7 @@ export class PixiScenePainter implements SceneDrawing {
     // Keep this guarded adapter covered by the warning-sensitive disposal test.
     const filterBindings: unknown = Reflect.get(this.renderer.filter, '_globalFilterBindGroup');
     if (filterBindings instanceof BindGroup) filterBindings.destroy();
+    this.lightBuffer.dispose();
     this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();
     this.renderer.destroy({ removeView: false });
@@ -1110,6 +1129,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
     });
     if (!context) throw new GraphicsUnsupportedError();
     requireGeometryBuffers(context);
+    requireLightBuffers(context);
     await renderer.init({
       context,
       preferWebGLVersion: 2,
@@ -1122,6 +1142,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
       preserveDrawingBuffer: false,
       useBackBuffer: true,
     });
+    return new PixiScenePainter(canvas, renderer);
   } catch (error) {
     try {
       renderer.destroy({ removeView: false });
@@ -1130,5 +1151,4 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
     }
     throw error;
   }
-  return new PixiScenePainter(canvas, renderer);
 }

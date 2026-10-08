@@ -38,6 +38,8 @@ export function createLightingDebug(
     ['g0', 'Normal / depth'],
     ['g1', 'Surface'],
     ['g2', 'Linear albedo'],
+    ['diffuse', 'Diffuse light'],
+    ['specular', 'Specular light'],
   ]) {
     const option = doc.createElement('option');
     option.value = value!;

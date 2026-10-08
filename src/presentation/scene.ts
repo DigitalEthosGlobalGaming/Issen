@@ -1,4 +1,5 @@
 import { createSceneComposer } from './scene-composer.ts';
+import { createLightSources } from './light-sources.ts';
 import { clamp } from '../shared/math.ts';
 import { STAGES } from '../game/content/stages.ts';
 import { setSceneLighting } from '../rendering/scene-material.ts';
@@ -84,6 +85,7 @@ interface ComposedFrame extends PresentationFrame {
 }
 
 export function createRuntimeScene(readViews: () => SceneViews) {
+  const lightSources = createLightSources();
   const composer = createSceneComposer<ComposedFrame, SceneViews>([
     {
       name: 'environment',
@@ -284,7 +286,13 @@ export function createRuntimeScene(readViews: () => SceneViews) {
       } = views;
       nativeScene?.begin();
       lightingDebug.refresh();
-      setSceneLighting(g, lightingRig.lighting(W * DPR, H * DPR));
+      setSceneLighting(
+        g,
+        lightSources.lighting(
+          { width: W * DPR, height: H * DPR, time: views.time },
+          lightingRig.lighting(W * DPR, H * DPR),
+        ),
+      );
       g.setTransform(DPR, 0, 0, DPR, 0, 0);
       g.save();
       g.translate(frame.cameraX, frame.cameraY);
@@ -297,6 +305,6 @@ export function createRuntimeScene(readViews: () => SceneViews) {
       nativeScene?.flush();
       cvs.dataset.graphicsBackend = 'pixi';
     },
-    { composer },
+    { composer, lightSources, dispose: lightSources.dispose },
   );
 }

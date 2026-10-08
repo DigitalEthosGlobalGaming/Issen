@@ -337,7 +337,7 @@ test('missing MRT shows the existing graphics Retry error without an alternate r
   await expect(page.locator('[data-graphics-backend="canvas"]')).toHaveCount(0);
 });
 
-test('lighting debug selects all G-buffer targets without storing settings', async ({
+test('lighting debug selects geometry and HDR light targets without storing settings', async ({
   page,
 }, testInfo) => {
   await page.goto('/');
@@ -346,7 +346,7 @@ test('lighting debug selects all G-buffer targets without storing settings', asy
   await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'ready');
   const before = await page.evaluate(() => JSON.stringify(localStorage));
   await page.keyboard.press('Backquote');
-  for (const value of ['g0', 'g1', 'g2']) {
+  for (const value of ['g0', 'g1', 'g2', 'diffuse', 'specular']) {
     await page.getByRole('combobox', { name: 'Buffer view', exact: true }).selectOption(value);
     await expect(page.locator('#c')).toHaveAttribute('data-lighting-view', value);
     await expect(page.locator('#c')).toHaveAttribute('data-lighting-frame-view', value);

@@ -426,7 +426,7 @@ albedo views. The painter records the completed lightingFrameView separately fro
 the requested lightingView, so tests capture an actual rendered buffer. Borrowed
 readonly geometryTargets expose current g0/g1/g2 textures, dimensions, depth range
 and generation; extensions must reacquire after resize/restore and never destroy
-or mutate these owner resources. Light targets and the final public post hooks
+or mutate these owner resources. Light targets are implemented in phase 2 below; final public post hooks
 remain later W3 work.
 
 This is phase 1, not a completed deferred-lighting pipeline: the current forward
@@ -434,3 +434,39 @@ material shader still renders the ordinary scene while geometry buffers are
 verified. The light pass, 16-light registry, lookup composite, legacy unification,
 instanced foliage and half-resolution option are still required. No performance
 measurement or physical-device verification is claimed.
+
+## W3 light accumulation (phase 2)
+
+The painter runs one fullscreen native MRT pass after geometry. Two RGBA16F
+attachments retain diffuse irradiance and GGX specular radiance above 1 until the
+ordered composite applies the existing highlight roll-off. The light BRDF uses
+the existing Fresnel tint, Smith geometry and Lambert gain. Ambient AO is included
+in diffuse times (1-metallic); the previous albedo-tinted ambient metal energy is
+retained in specular. RGBA16F values are bounded by its finite maximum 65504.
+The [Khronos float extension](https://registry.khronos.org/webgl/extensions/EXT_color_buffer_float/)
+or [half-float extension](https://registry.khronos.org/webgl/extensions/EXT_color_buffer_half_float/)
+must enable that same native format, and actual framebuffer completeness is checked.
+Unsupported HDR reports the normal graphics error; there is no alternate format.
+Depth decode anchors canonical zero at byte128; other depths retain 8-bit error
+within one scene-range quantization step.
+
+presentation/light-sources.ts owns source sampling and the global16 budget. Each
+source supplies stable local IDs and receives explicit target dimensions and the
+presentation clock. Sources are sampled from a snapshot, so registration/removal
+during sampling applies next frame. Ranking uses intensity times exact clipped
+circular viewport area, with code-point source/ID ties. light-budget.ts supplies
+the pure shared calculation; the native backend also applies it to direct preview
+lighting inputs. No per-sprite selection occurs in this light pass and no gameplay
+randomness is consumed. The retained stage rig enters the same budget.
+
+Borrowed painter.lightTargets exposes diffuse/specular Texture wrappers, size and
+generation. Never mutate/destroy these resources; reacquire on resize/restore.
+Each preview has its own attachments. Geometry sampler bindings are detached
+before old G targets are released. Explicit HDR sources are destroyed by their
+owner, because RenderTarget does not manage externally supplied sources.
+The light debug views map radiance to radiance/(1+radiance) for display only;
+production light targets retain HDR. Controls stay session-only.
+
+The ordinary scene still uses the forward shader until phase3 implements lookup.
+Legacy model unification, instanced foliage, half-resolution lighting, event
+sources and named GPU composer passes remain required migration work.

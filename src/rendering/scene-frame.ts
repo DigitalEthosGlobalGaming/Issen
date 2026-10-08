@@ -64,6 +64,7 @@ export interface SceneLighting {
   ambient: readonly [number, number, number];
   directional: readonly [number, number, number];
   direction: readonly [number, number, number];
+  /** Global viewport budget: at most 16 lights, ranked by visible footprint × intensity. */
   points: readonly SceneLight[];
 }
 
