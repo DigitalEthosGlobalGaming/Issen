@@ -278,3 +278,5 @@
 2026-10-08 — W2/runtime orchestration placement — physically move mixed frame dispatch and renderer scene readiness from game/session into runtime — keeping presentation/browser coordination in the rule folder considered — exact normalized source parity, strict/all 401 units/all 18 frame/cinematic/readiness/checkpoint browsers pass; no statement/order behavior changes — revert the two-file relocation and caller imports.
 
 2026-10-08 — W2/guided adapter placement — move existing DOM/CSS teaching adapter to UI while keeping deterministic guided-state rules — leaving UI under gameplay or moving freeze/input rules considered — normalized source parity, strict/all 401 units/all six guided/startup browsers pass; same copy/styles/state/save/freeze boundaries — revert the adapter/CSS relocation and import paths.
+
+2026-10-08 — W2/session capability cleanup — separately delete 22 compiler-audited rule view getters after committed UI/runtime relocations — retaining cosmetic fields for structural compatibility considered — actual owning UI contracts remain; strict/all 401 units/all ten startup/checkpoint/guided browsers pass — revert this deletion-only cleanup.

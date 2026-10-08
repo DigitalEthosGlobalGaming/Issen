@@ -128,9 +128,6 @@ export function createRuntimeSession(
                       foundation.run.sceneState.sceneContinuation = undefined;
                     };
                   },
-                  get $() {
-                    return foundation.browser.$;
-                  },
                   get AWAKENING() {
                     return foundation.profile.AWAKENING;
                   },
@@ -161,9 +158,6 @@ export function createRuntimeSession(
                   get accessibleUnlocks() {
                     return foundation.profile.accessibleUnlocks;
                   },
-                  get applySeal() {
-                    return foundation.view.applySeal;
-                  },
                   get bossPos() {
                     return readActions().bossPos;
                   },
@@ -173,9 +167,6 @@ export function createRuntimeSession(
                   get enemyPos() {
                     return readActions().enemyPos;
                   },
-                  get hud() {
-                    return readActions().hud;
-                  },
                   get playerEquipment() {
                     return foundation.profile.playerEquipment;
                   },
@@ -184,12 +175,6 @@ export function createRuntimeSession(
                   },
                   get premiumAccess() {
                     return foundation.browser.premiumAccess;
-                  },
-                  get renderHp() {
-                    return readActions().renderHp;
-                  },
-                  get renderLives() {
-                    return readActions().renderLives;
                   },
                   get saveAwakening() {
                     return foundation.profile.saveAwakening;
@@ -203,26 +188,11 @@ export function createRuntimeSession(
                   get saveCollections() {
                     return foundation.profile.saveCollections;
                   },
-                  get setScore() {
-                    return readActions().setScore;
-                  },
                   get setStage() {
                     return readActions().setStage;
                   },
                   get syncCollections() {
                     return foundation.profile.syncCollections;
-                  },
-                  get toast() {
-                    return readActions().toast;
-                  },
-                  get updateSavedRunButtons() {
-                    return readActions().updateSavedRunButtons;
-                  },
-                  get showScreen() {
-                    return readActions().showScreen;
-                  },
-                  get showShrineOffers() {
-                    return readActions().showShrineOffers;
                   },
                   get showOver() {
                     return readActions().showOver;
@@ -252,29 +222,17 @@ export function createRuntimeSession(
                   get PREST() {
                     return PREST;
                   },
-                  get apparelMotion() {
-                    return foundation.view.apparelMotion;
-                  },
                   get audio() {
                     return foundation.browser.audio;
                   },
                   get checkUnlocks() {
                     return readActions().checkUnlocks;
                   },
-                  get clearHints() {
-                    return readActions().clearHints;
-                  },
                   get guided() {
                     return foundation.browser.guided;
                   },
-                  get hint() {
-                    return readActions().hint;
-                  },
                   get prepareScene() {
                     return readActions().prepareScene;
-                  },
-                  get presentationState() {
-                    return foundation.view.presentationState;
                   },
                   get stageVisits() {
                     return foundation.view.stageVisits;
@@ -287,12 +245,6 @@ export function createRuntimeSession(
                   },
                   get startBoss() {
                     return readActions().startBoss;
-                  },
-                  get audioInit() {
-                    return foundation.browser.audioInit;
-                  },
-                  get buildLeaves() {
-                    return presentation.buildLeaves;
                   },
                   get waveCfg() {
                     return readActions().waveCfg;
@@ -331,9 +283,6 @@ export function createRuntimeSession(
                   get deferUntilSceneReady() {
                     return readActions().deferUntilSceneReady;
                   },
-                  get renderTrialObjective() {
-                    return readActions().renderTrialObjective;
-                  },
                   get store() {
                     return store;
                   },
@@ -367,29 +316,14 @@ export function createRuntimeSession(
                   get challenge() {
                     return readActions().challenge;
                   },
-                  get runResults() {
-                    return readActions().runResults;
-                  },
-                  get setBestLine(): ResultsFeedbackViews['setBestLine'] {
-                    return () => readActions().setBestLine();
-                  },
                   get modeKey() {
                     return readActions().modeKey;
                   },
                   get clearRunCheckpoint() {
                     return clearRunCheckpoint;
                   },
-                  get renderGameOver() {
-                    return renderGameOver;
-                  },
-                  get refreshArmoryNew() {
-                    return readActions().refreshArmoryNew;
-                  },
                   get setupAttract() {
                     return readActions().setupAttract;
-                  },
-                  get showPauseScreen() {
-                    return readActions().showPauseScreen;
                   },
                   get contextLost() {
                     return !!foundation.browser.nativeScene?.contextLost;

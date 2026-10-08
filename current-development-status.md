@@ -1,3 +1,29 @@
+## Latest green checkpoint: obsolete session adapter cleanup
+
+Separately deleted 22 runtime/session.ts getters absent from the compiler-resolved
+SessionBindingViews intersection after all session UI moves were committed:
+$, applySeal, hud, renderHp/Lives, setScore, toast, saved buttons/screens/shrine,
+apparel motion, hints, presentationState, audioInit, leaves, trial objective,
+runResults, best line, renderGameOver, armory-new and pause screen. Actual UI
+listeners retain their own typed capabilities. Compiler audit is
+ tmp/runtime-refactor/session-capability-cleanup-audit.json.
+`npm run typecheck`: PASS (session-capability-cleanup-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 401 PASS
+(session-capability-cleanup-unit.log); logs under tmp/runtime-refactor.
+`npx playwright test tests/browser/game.spec.ts tests/browser/runtime-checkpoint-fixtures.spec.ts tests/browser/guided-lessons.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 10 PASS in 29.6s (session-capability-cleanup-browser.log), terminal exit 0.
+No live browser process remains. Actual source audit now finds no direct DOM
+writes in game modules; frame/scene runtime orchestration and guided UI adapter
+are relocated. This is not proof of full W2 completion.
+Next: requirement-by-requirement W2 audit against main-goal.md and actual source/
+scenario/checkpoint/isolation/state-machine/registry/composer/renderer evidence;
+fix any gaps, clean the final architecture/rendering ownership map, finalize
+behavior report/manual phone checklist and synchronize 1.67.0 version/lock/title/
+changelog. Run final full units, broad browsers, test:production and Android-web
+before W3 begins. Earlier combined broad runs are stale and are not a final pass.
+All W3 and Part 4 remain required; develop remains unpushed.
+Cleanup script applied once; do not rerun stale non-idempotent generators.
+
 ## Latest green checkpoint: guided lesson UI adapter relocation
 
 Moved guided-lessons.ts and its CSS from game/onboarding into ui/wiring; audio
