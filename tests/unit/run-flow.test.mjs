@@ -1,3 +1,7 @@
+import { createEventBus } from '../../src/game/events.ts';
+import { bindRunFlowFeedback } from '../../src/ui/wiring/run-flow-feedback.ts';
+import { bindCheckpointFeedback } from '../../src/ui/wiring/checkpoint-feedback.ts';
+import { bindShrineFeedback } from '../../src/ui/wiring/shrine-feedback.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRunFlow } from '../../src/game/session/run-flow.ts';
@@ -5,12 +9,13 @@ import { createRunState } from '../../src/game/run-state.ts';
 import { parseStatistics, DEFAULT_EQUIPMENT } from '../../src/platform/saves.ts';
 import { BLESS } from '../../src/game/content/blessings.ts';
 
-function fixture() {
+function fixture(feedback = true) {
   const G = createRunState(),
     trace = [],
     playerStats = parseStatistics({}),
     playerEquipment = { ...DEFAULT_EQUIPMENT };
   const views = {
+    events: createEventBus(),
     $: () => ({
       classList: {
         remove(name) {
@@ -72,7 +77,21 @@ function fixture() {
       G.state = 'over';
     },
   };
-  return { views, trace, flow: createRunFlow(views) };
+  const off = feedback
+    ? [
+        bindRunFlowFeedback(views.events, () => views),
+        bindCheckpointFeedback(views.events, () => views),
+        bindShrineFeedback(views.events, () => views),
+      ]
+    : [];
+  return {
+    views,
+    trace,
+    flow: createRunFlow(views),
+    dispose() {
+      off.forEach((fn) => fn());
+    },
+  };
 }
 
 test('actual run-flow pause counts accepted pauses and records the secret once in current statistics', () => {
@@ -155,4 +174,43 @@ test('actual end-run checkpoints quit before entering results and cannot settle 
   flow.endRun();
   assert.deepEqual(trace, [['checkpoint', 'ended', 'playing', 'quit'], 'over']);
   assert.equal(views.G.state, 'over');
+});
+
+test('actual title/pause/resume/end transitions preserve profile and player rules without display listeners', () => {
+  function drive(enabled) {
+    const f = fixture(enabled),
+      snapshots = [];
+    f.views.events.on('runFlowCue', (event) => {
+      assert.ok(Object.isFrozen(event));
+      snapshots.push(event);
+    });
+    f.views.G.state = 'playing';
+    for (let i = 0; i < 12; i++) {
+      f.flow.pause();
+      f.flow.resume();
+    }
+    f.flow.pause();
+    f.flow.endRun();
+    f.views.ST = parseStatistics({ kills: 999 });
+    f.views.activeDaily = {};
+    f.views.G.stage = 3;
+    f.flow.toTitle();
+    assert.equal(f.views.ST, f.views.playerStats);
+    assert.equal(f.views.EQ, f.views.playerEquipment);
+    const outcome = structuredClone({
+      run: f.views.G,
+      stats: f.views.ST,
+      equipment: f.views.EQ,
+      player: f.views.P,
+      timeScale: f.views.timeScale,
+    });
+    assert.ok(snapshots.some((x) => x.kind === 'pause'));
+    assert.ok(snapshots.some((x) => x.kind === 'title'));
+    f.dispose();
+    const before = f.trace.length;
+    f.views.events.emit('runFlowCue', { kind: 'pause' });
+    assert.equal(f.trace.length, before);
+    return outcome;
+  }
+  assert.deepEqual(drive(true), drive(false));
 });

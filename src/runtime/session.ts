@@ -1,3 +1,5 @@
+import type { ShrineFeedbackViews } from '../ui/wiring/shrine-feedback.ts';
+import { bindRunFlowFeedback, type RunFlowFeedbackViews } from '../ui/wiring/run-flow-feedback.ts';
 import {
   bindCheckpointFeedback,
   type CheckpointFeedbackViews,
@@ -37,7 +39,6 @@ type ActionPorts = Pick<
   | 'toast'
   | 'updateSavedRunButtons'
   | 'showScreen'
-  | 'showShrineOffers'
   | 'showOver'
   | 'checkUnlocks'
   | 'clearHints'
@@ -48,7 +49,6 @@ type ActionPorts = Pick<
   | 'startBoss'
   | 'waveCfg'
   | 'deferUntilSceneReady'
-  | 'renderTrialObjective'
   | 'toTitle'
   | 'rewardScreen'
   | 'supportPremium'
@@ -60,10 +60,10 @@ type ActionPorts = Pick<
   | 'runResults'
   | 'setBestLine'
   | 'modeKey'
-  | 'refreshArmoryNew'
   | 'setupAttract'
-  | 'showPauseScreen'
 > &
+  Pick<RunFlowFeedbackViews, 'showPauseScreen' | 'refreshArmoryNew' | 'renderTrialObjective'> &
+  Pick<ShrineFeedbackViews, 'showShrineOffers'> &
   Pick<TrialFeedbackViews, 'banner' | 'openPanel'> &
   Pick<CheckpointFeedbackViews, 'renderHp' | 'renderLives'> & {
     readonly phaseRouter: Pick<ReturnType<typeof createPhaseRouter>, 'adoptCheckpoint'>;
@@ -451,6 +451,20 @@ export function createRuntimeSession(
       toast: readActions().toast,
       updateSavedRunButtons: readActions().updateSavedRunButtons,
       showScreen: readActions().showScreen,
+    })),
+  );
+  foundation.lifecycle.add(
+    bindRunFlowFeedback(context.events, () => ({
+      $: foundation.browser.$,
+      applySeal: foundation.view.applySeal,
+      clearHints: readActions().clearHints,
+      refreshArmoryNew: readActions().refreshArmoryNew,
+      showScreen: readActions().showScreen,
+      hud: readActions().hud,
+      presentationState: foundation.view.presentationState,
+      setBestLine: readActions().setBestLine,
+      showPauseScreen: readActions().showPauseScreen,
+      renderTrialObjective: readActions().renderTrialObjective,
     })),
   );
   return sessionBindings;

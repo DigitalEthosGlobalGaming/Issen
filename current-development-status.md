@@ -1,3 +1,25 @@
+## Latest green checkpoint: title/pause/resume UI ownership
+
+Run-flow rules emit frozen runFlowCue values for seal/title/letterbox/best/pause/
+trial-objective display and reuse existing sessionScreen/shrineOffers listeners.
+ui/wiring/run-flow-feedback.ts owns actual display actions; runtime owns disposal.
+Profile identity restoration, player animation reset, stage/title attract setup,
+pause counters/secrets, teaching audio freeze, context-loss guard, clock reset,
+quit checkpoint and result entry retain original synchronous boundaries.
+Actual transition tests compare rules/profile/player with UI enabled/absent and
+verify snapshots/disposal. Existing assertions and browser timeouts are unchanged.
+`npm run typecheck`: PASS (tmp/runtime-refactor/run-flow-feedback-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 389 PASS
+(tmp/runtime-refactor/run-flow-feedback-unit.log).
+`npx playwright test tests/browser/game.spec.ts tests/browser/options.spec.ts tests/browser/feature-plan-06.spec.ts tests/browser/trials.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all 27 PASS in 2.3m (tmp/runtime-refactor/run-flow-feedback-browser.log),
+terminal exit 0 confirmed. The final runtime/session formatting-only edit
+followed strict/unit verification and preceded this passing browser run.
+No live browser process remains. Next: run-start and results actual UI/presentation
+ownership; then separate stale adapter/capability cleanup, full W2 audit/gates/docs/
+1.67.0; all W3 and Part 4 remain required. Develop remains unpushed.
+The run-flow generation script is non-idempotent and already applied.
+
 ## Latest green checkpoint: saved-run UI ownership
 
 Checkpoint restoration/capture now emits immutable display values; ui/wiring/

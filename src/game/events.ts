@@ -110,6 +110,9 @@ export interface GameEvents {
     bossShown: boolean;
   }>;
   checkpointChanged: Readonly<{ saved: boolean }>;
+  runFlowCue: Readonly<{
+    kind: 'seal' | 'title' | 'letterboxReset' | 'best' | 'pause' | 'trialObjective';
+  }>;
   checkpointSaveFailed: Readonly<{ seed: number }>;
   sessionScreen: Readonly<{ screen: import('./run-state.ts').Screen | null }>;
   trialEncounter: Readonly<{ id: string; wave: number }>;

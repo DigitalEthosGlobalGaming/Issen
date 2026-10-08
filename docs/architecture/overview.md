@@ -596,3 +596,5 @@ current field forwarding remain; obsolete imports/one unused stage lookup are
 deleted separately from the preceding physical ownership move.
 
 Checkpoint persistence/adoption remains in game/session/checkpoint-flow.ts. Frozen checkpointRestored, checkpointChanged, checkpointSaveFailed and sessionScreen values drive ui/wiring/checkpoint-feedback.ts; saved shrine offers reuse the shrine listener. Runtime owns listener disposal. Restore display runs after weather/RNG/geometry/modifier restoration and before phase adoption, retaining the original call boundary. Tests compare actual saved encounters with cosmetics absent.
+
+Run-flow title/pause/resume display reacts in ui/wiring/run-flow-feedback.ts. The rule owner retains profile identities, player reset, stage/attract orchestration, pause secret counters, graphics recovery guard, teaching freeze and terminal checkpoint/result entry. Frozen cues retain synchronous display boundaries; saved shrine/screen events reuse their existing listeners. Removing these cosmetic subscriptions leaves rule/profile/player outcomes intact.
