@@ -5,9 +5,14 @@ import {
 } from './decoded-images.ts';
 import { readCompressedAsset } from './compressed-assets.ts';
 import { runtimeAssets } from './runtime-assets.ts';
+import { observeAssetBackground } from './asset-background.ts';
 
 type Resource = { image: HTMLImageElement; width: number; height: number; close(): void };
-type Pool = { loader: ReturnType<typeof createDecodedImageLoader<Resource>>; owners: number };
+type Pool = {
+  loader: ReturnType<typeof createDecodedImageLoader<Resource>>;
+  owners: number;
+  stopScheduling(): void;
+};
 const pools = new WeakMap<Document, Pool>();
 const dimensions = new Map<string, number>(
   runtimeAssets.map((asset) => [asset.url, asset.width * asset.height * 4]),
@@ -48,16 +53,38 @@ export function createMainImageOwner(doc: Document) {
   if (!pool) {
     const navigator = doc.defaultView?.navigator as
       (Navigator & { deviceMemory?: number }) | undefined;
+    const loader = createDecodedImageLoader<Resource>({
+      budget: decodedImageBudget({
+        mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
+        deviceMemory: navigator?.deviceMemory,
+      }),
+      expectedBytes: (url) => dimensions.get(url),
+      decode: (url, signal) => decode(doc, url, signal),
+    });
+    // Future/idle requests wait for a visible quiet frame; required artwork bypasses this.
+    let hidden = doc.hidden,
+      busy = true,
+      overFrameBudget = false;
+    loader.policy({ hidden, busy });
+    const policy = (nextHidden: boolean, nextBusy: boolean, nextOverBudget: boolean) => {
+      if (hidden === nextHidden && busy === nextBusy && overFrameBudget === nextOverBudget) return;
+      hidden = nextHidden;
+      busy = nextBusy;
+      overFrameBudget = nextOverBudget;
+      loader.policy({ hidden, busy, overFrameBudget });
+    };
+    const stop = observeAssetBackground((_stage, quiet, work, budget) => {
+      policy(doc.hidden, !quiet || work > budget * 0.75, work > budget);
+    });
+    const visibility = () => policy(doc.hidden, true, overFrameBudget);
+    doc.addEventListener('visibilitychange', visibility);
     pool = {
       owners: 0,
-      loader: createDecodedImageLoader<Resource>({
-        budget: decodedImageBudget({
-          mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
-          deviceMemory: navigator?.deviceMemory,
-        }),
-        expectedBytes: (url) => dimensions.get(url),
-        decode: (url, signal) => decode(doc, url, signal),
-      }),
+      loader,
+      stopScheduling() {
+        stop();
+        doc.removeEventListener('visibilitychange', visibility);
+      },
     };
     pools.set(doc, pool);
   }
@@ -86,13 +113,13 @@ export function createMainImageOwner(doc: Document) {
         release,
       };
     },
-    policy: shared.loader.policy,
     snapshot: shared.loader.snapshot,
     dispose() {
       if (disposed) return;
       disposed = true;
       for (const release of releases) release();
       if (--shared.owners === 0) {
+        shared.stopScheduling();
         shared.loader.dispose();
         pools.delete(doc);
       }

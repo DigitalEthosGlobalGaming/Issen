@@ -999,3 +999,33 @@ This is direct moving-pixel evidence for the tested held request, not proof for
 every cold/warm stage or next-slot promotion. Main figure/other source ownership,
 startup budget narrowing, mode prediction/next slots, paced uploads/variants,
 120Hz fidelity/CPU budget and full Phase5requirements remain outstanding.
+
+## Phase3 — Runtime pacing for the shared main decode pool (1.68.18)
+
+`platform/main-images.ts` owns one background-frame and visibility subscription
+per shared document pool. Soon/idle requests start blocked, then run only after a
+visible settled frame uses<=75% of its budget. Busy/expensive/hidden frames block
+new dispatch; required requests remain immediate. Returning to visibility waits
+for a new quiet frame. Policy updates are change-only so each settled frame does
+not scan the loader's retained entries. Final-owner disposal removes both
+subscriptions; creating a new pool starts blocked again. Callers no longer expose
+an independent policy override that could conflict with the runtime controller.
+
+New native browser evidence covers shared queued priority bump, peer disposal
+without cancellation of the remaining lease, initial/expensive/busy/hidden gates,
+hidden required requests, fresh visible grant and final-owner/fresh-pool lifetime.
+Eight main-pool/UI/27stage-cycle browsers PASS12.9s;6loader units PASS;
+strict/format/checked production build PASS. Logs:
+`tmp/performance-main-queue-policy-browser.log` and
+`tmp/performance-main-queue-policy-build.log`. Session75826terminal; no active capture.
+No automatic next-stage decoded requests are introduced yet.
+
+Companion inspection identifies a prerequisite for further migration: parts and
+mystic-rock each have colour/normal/surface planes, totalling37,735,212bytes.
+Adding both as permanent pins to the measured stage0+charm232,826,480bytes gives
+270,561,692bytes, exceeding256MiB by2,126,236bytes before other figure owners.
+The renderer/callers currently prepare both eagerly. Their migration must handle
+active selection and startup/preview readiness together; companion code remains
+unchanged here. Whole-memory budgets and remaining main ownership/startup,
+prediction/next slots, uploads/variants,120Hz fidelity/CPU budget and full
+Phase5requirements remain outstanding.

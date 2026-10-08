@@ -158,8 +158,12 @@ only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, bytes, peak, budget and evictions. Main figure/startup owners
 are not yet routed through this loader; whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
-the same queue/budget core. Explicit owner leases protect peer previews; release
-unpins without clearing their image, and the last owner disposes the pool. Only
+the budgeted loader. One pool-level quiet-frame/visibility subscription pauses
+soon/idle requests until a visible settled frame uses at most75% of its budget.
+Required requests bypass this gate. Visibility restoration requires a new quiet
+frame; change-only policy updates avoid scanning the queue on every frame. The
+last owner removes scheduling subscriptions before disposing the pool. Explicit
+owner leases protect peer previews; release unpins without clearing their image. Only
 the pool removes image sources and revokes decode object URLs. Known manifest
 dimensions reserve space first. Local-environment PBR maps use this owner through
 `asset-materials`/`pbr-atlas`. Local source artwork also uses leases from that pool;

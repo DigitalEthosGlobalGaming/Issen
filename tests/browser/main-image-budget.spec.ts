@@ -2,6 +2,91 @@ import { expect, test } from '@playwright/test';
 import type { Route } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('shared main decode queue waits for visible quiet frames while required images bypass pacing', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { runtimeAssets } = await import('/src/platform/runtime-assets.ts');
+    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+    const urls = runtimeAssets
+      .filter((asset: any) => asset.width * asset.height < 200000)
+      .slice(0, 4)
+      .map((asset: any) => asset.url);
+    const a = createMainImageOwner(document),
+      b = createMainImageOwner(document);
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 50));
+    const first = a.acquire(urls[0], 'idle');
+    const rejected = first.ready.then(
+      () => 'attached',
+      (error) => error.name,
+    );
+    const peer = b.acquire(urls[0], 'soon');
+    a.dispose();
+    const required = b.acquire(urls[1]);
+    await required.ready;
+    const initially = b.snapshot();
+    sampleAssetBackground(0, true, 9, 10);
+    await settle();
+    const expensive = b.snapshot();
+    sampleAssetBackground(0, true, 0, 10);
+    await peer.ready;
+    const peerResult = await rejected;
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    const idle = b.acquire(urls[2], 'idle');
+    sampleAssetBackground(0, true, 0, 10);
+    await settle();
+    const hidden = b.snapshot();
+    await b.acquire(urls[3]).ready;
+    const hiddenRequired = b.snapshot();
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    await settle();
+    const revealed = b.snapshot();
+    sampleAssetBackground(0, false, 0, 10);
+    await settle();
+    const busy = b.snapshot();
+    sampleAssetBackground(0, true, 0, 10);
+    await idle.ready;
+    const final = b.snapshot();
+    b.dispose();
+    const disposed = b.snapshot();
+    const fresh = createMainImageOwner(document);
+    const future = fresh.acquire(urls[0], 'soon');
+    const cancelled = future.ready.catch((error) => error.message);
+    await settle();
+    const restarted = fresh.snapshot();
+    fresh.dispose();
+    await cancelled;
+    delete (document as any).hidden;
+    return {
+      initially,
+      expensive,
+      peerResult,
+      hidden,
+      hiddenRequired,
+      revealed,
+      busy,
+      final,
+      disposed,
+      restarted,
+    };
+  });
+  for (const snapshot of [result.initially, result.expensive]) {
+    expect(snapshot.queued).toBe(1);
+    expect(snapshot.decoded).toBe(1);
+  }
+  expect(result.peerResult).toBe('AbortError');
+  expect(result.hidden).toMatchObject({ queued: 1, decoded: 2 });
+  for (const snapshot of [result.hiddenRequired, result.revealed, result.busy])
+    expect(snapshot).toMatchObject({ queued: 1, decoded: 3 });
+  expect(result.final).toMatchObject({ queued: 0, decoded: 4, pinned: 4 });
+  expect(result.disposed).toMatchObject({ queued: 0, decoded: 0, bytes: 0 });
+  expect(result.restarted).toMatchObject({ queued: 1, decoded: 0, bytes: 0 });
+});
+
 test('shared scenery sources retain independent material layers and survive peer disposal', async ({
   page,
 }) => {

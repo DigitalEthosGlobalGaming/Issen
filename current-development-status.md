@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Loading veil and visible motion verified
+# Performance, assets and seamless transitions — Main decoded queue pacing verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -333,4 +333,21 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     package/lock/title/changelog1.68.17. This proves the selected held-load flow,
     not all cold/warm scenes or seamless promotion. Remaining main image ownership/
     active selections/startup budget, mode prediction/next slots, paced uploads/
+    variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.
+
+14. Main shared-pool scheduling at1.68.18 now pauses soon/idle until visible quiet
+    frames use<=75%budget. Required requests bypass pacing; visibility restoration
+    requires a fresh quiet grant. One subscription per pool, change-only policy
+    updates and final-owner cleanup avoid recurring queue scans/listener leaks.
+    New browser proves priority bump/peer cancellation, busy/expensive/hidden gates,
+    required hidden loads, visibility restoration and fresh-pool idle state.
+    Eight native-pool/UI/27stage-cycle browsers PASS12.9s,6loader units PASS;
+    strict/format/checked production build PASS. Logs:
+    tmp/performance-main-queue-policy-browser.log/-build.log. Session75826terminal.
+    Version/package/lock/title/changelog1.68.18. No automatic next-image requests
+    yet. Companion inspection found both eager colour/data kits37,735,212bytes:
+    stage0+charms+both=270,561,692bytes, exceeding256MiB by2,126,236bytes. Do not
+    migrate both as permanent pins; implement active selection and startup/preview
+    readiness together. Companion code unchanged this step. Whole-memory budgets,
+    remaining main ownership/startup, mode prediction/next slots, paced uploads/
     variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.
