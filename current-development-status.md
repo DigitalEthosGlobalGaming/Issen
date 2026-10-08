@@ -1,3 +1,23 @@
+# Performance fixes in progress
+
+Requested follow-up to completed refactor at 2d27986, on develop. Preserve the
+existing pre-refactor restore point. Six independently committed issues are
+planned: compose baking, light bindings, live views, objective DOM updates,
+artwork pre-warming, and production source maps.
+
+The standard performance runner needed its test-only anchors updated for the
+modular runtime. Application code is still unchanged. The full baseline is
+running under tmp/performance/2026-10-08T08-52-30.463Z-fe2d6507; logs are under
+tmp/performance-fixes-baseline.log. Wait for baseline completion, then run
+tests/performance/benchmarks/measure-compose.mjs for stages 0/1 before editing.
+The compose benchmark retains raw planes for visual parity checks.
+
+Baseline tooling repair: test:performance-tools passes all seven cases.
+Formatting the plugin after the initial build changed its file fingerprint but
+not its instrumentation; use a fresh matching-tool baseline for automated
+comparison or disclose that distinction in the report. No application changes,
+version bump or deployment have occurred yet.
+
 # Refactor complete
 
 All three workstreams and final implementation, verification and reporting are
