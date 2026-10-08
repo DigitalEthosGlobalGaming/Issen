@@ -1,6 +1,22 @@
-# Performance, assets and seamless transitions — Enemy admission lifetime verified
+# Performance, assets and seamless transitions — Preview admission guard rejected integration
 
-Latest checkpoint36: test-only ordered shared enemy admission/native parity PASS.
+Latest checkpoint37: shared enemy/runtime gate trial rejected and reverted exactly
+to1.68.31. Strict TypeScript/all467unitsPASS; saved-original native27visitsPASS18.9s
+within max1; startup/ordering/cancellation/continuation14browsersPASS47.0s. Actual
+256MiB fallback runtime54visits with empty/crow selectionsPASS39.3s: peaks
+268,183,176/268,245,408bytes, all scene/enemy maps ready; UI exports explain pending
+shared queues. But visible Armoury preview draws8enemy parts before a held scene
+load and0during it: previews share runtime artwork, so scene-wide suspension hides
+another consumer. Rejected despite passing other checks. Restored preview guard
+PASS6.6s/all8parts. Seven tracked files restored, four trial tests moved to ignored
+evidence; no implementation/version change. Full patch/sources/tests/logs under
+tmp/performance-enemy-admission/; probe under tmp/probes/enemy-admission/.
+Next distinguish visible preview requirements from hidden runtime figures and
+coordinate incoming admission without hiding either or raising/splitting budgets.
+Settled ownership proof remains checkpoint36; indiscriminate gating is unsafe.
+All handles terminal; full goal active, no push/deploy/native build/player saves.
+
+Previous checkpoint36: test-only ordered shared enemy admission/native parity PASS.
 Original/shared54visits total41.7s; shared12maps75,489,120bytes with two owners,
 accounted peak264,280,976 below256MiB; all14appearance/peer/after-peer-disposal
 native comparisons exact. Persistent owners release/reacquire around27high/low/high

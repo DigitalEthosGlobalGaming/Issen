@@ -2050,3 +2050,49 @@ with runtime admission/stale-generation guards and startup/preview readiness,
 then strict/unit/browser/build verification and version notes. Remaining player/
 outfit/sword/startup ownership, next slots,120Hz/CPU budgets and Phase5 still
 required. All handles terminal; goal active, no push/deploy/native build/saves.
+
+## Checkpoint 37 — Runtime-wide enemy suspension rejected
+
+Trial routes all enemy maps through the existing main pool and adds deferred
+prepare/suspend/resume/cancel with generation guards. Runtime suspends before
+compose, reacquires before readiness, and startup uses that same readiness path
+instead of duplicate composition. Existing eager preview prepare waits behind
+the gate. Bounded colour/tone caches survive source release. No asset/decoder,
+budget, gameplay or seed changes. Baseline/checkpoint36 preceded this trial.
+
+Strict TypeScriptPASS; all467unitsPASS, including4new ordering/stale/failure/
+disposal checks. Saved-original native comparison across27high/low/high visits
+PASS18.9s with existing max1 tolerance. New pending decode/waiter cancellation
+and source identity checks, startup, cinematic/paused continuation/loading-state
+browsers14PASS47.0s. Native lifetime/real runtime/GPU related first run15PASS/1FAIL
+11.8s: queued0 assertion counted unrelated UI exports. Lease URL diagnostics show
+button/panel/scroll/logo jobs; queued3/4 occurs while all enemy maps are ready.
+All-stage lifetime/runtime2PASS21.1s after recording that shared queue accurately.
+First source fixture also needed requested URLs behind blob URLs; no decode or
+selection assertion removed. Both assertion failures/logs remain preserved.
+
+Real low-memory fallback startup plus27stage visits per selection (empty/crow)
+2PASS39.3s. UI/charm/companion leases stay in the same pool. Samples under
+tmp/performance-enemy-admission/integrated-runtime-{empty,crow}.json record all
+required scene/enemy readiness and peaks268,183,176/268,245,408below268,435,456;
+crow selection holds3companion leases. Other figure/startup/
+canvas/GPU resources remain outside this accounting. This is not whole-game memory
+or latency completion. Preview ownership still required a separate guard check.
+
+That guard fails: a visible Armoury effects preview successfully draws all8enemy
+parts before incoming scene preparation, then0/8 while compose is held. Controls
+pass the same runtime artwork instance to both previews; runtime-wide suspension
+therefore suppresses another visible consumer. Independent preview output cannot
+be sacrificed for compose headroom. Rejected integration despite other passes;
+reverted all7tracked source/test files exactly to1.68.31 and moved4new trial tests
+to ignored evidence. Restored preview guardPASS6.6s/all8parts during held load.
+No version/changelog change. Trial patch/full sources/tests and logs under
+tmp/performance-enemy-admission/rejected-runtime/ and rejected-runtime.patch;
+isolated guard under tmp/probes/enemy-admission/preview-loading.spec.ts.
+
+Next ownership must distinguish visible preview requirements from hidden runtime
+figures and coordinate incoming admission without hiding either consumer or
+raising/splitting budgets. Settled lease release/reacquisition remains proven at
+checkpoint36; applying it indiscriminately is unsafe. All handles terminal; full
+goal active, no push/deploy/native build/player saves. Selected figure/startup
+ownership, next slots,120Hz/CPU budgets and Phase5 still required.
