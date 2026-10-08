@@ -7,6 +7,37 @@ import {
 } from '../../src/rendering/environment/stage-variation.ts';
 import { restorableRng } from '../../src/shared/random.ts';
 
+test('peeking preserves full visit sequences, repeated entries and forced rerolls', () => {
+  for (const initial of [0, 19, 47, 0xffffffff]) {
+    const control = createStageVisitSeeds(initial),
+      predicted = createStageVisitSeeds(initial);
+    const combat = restorableRng(424242),
+      rngBefore = combat.state();
+    const steps = [
+      [0, false],
+      [0, false],
+      [0, true],
+      ...Array.from({ length: 27 }, (_, index) => [index % 9, false]),
+      [5, true],
+      [5, false],
+      [5, true],
+      [2, true],
+      [0, false],
+    ];
+    for (const [stage, force] of steps) {
+      const before = { seed: predicted.seed, visits: predicted.visits };
+      const expected = control.enter(stage, force);
+      assert.equal(predicted.peek(stage, force), expected);
+      predicted.peek((stage + 4) % 9, true);
+      assert.equal(predicted.peek(stage, force), expected);
+      assert.deepEqual({ seed: predicted.seed, visits: predicted.visits }, before);
+      assert.equal(predicted.enter(stage, force), expected);
+      assert.equal(predicted.visits, control.visits);
+    }
+    assert.equal(combat.state(), rngBefore);
+  }
+});
+
 test('visit plans stay stable until an actual entry, separate from combat RNG', () => {
   const combat = restorableRng(42),
     before = combat.state();

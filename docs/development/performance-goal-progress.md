@@ -927,3 +927,22 @@ Stable evidence `tmp/performance-charm-ui-stage-budget/results.json`. Logs
 `tmp/performance-phase3-charm-leases-build.log`. Session57939terminal; no active
 capture. Continue player/outfit/enemy/weapon/companion and remaining environment
 owners, narrow initial startup decode, then combined budgets/Phase4/Phase5.
+
+## Next-stage decode prerequisite — Non-mutating visit seed peek
+
+Version1.68.15 adds `stageVisits.peek(stage, forceNewVisit)` before quiet decode/
+precomposition integration. It returns the current seed for a repeated entry,
+otherwise calculates the existing formula with visit+1. `enter` is unchanged;
+peek never updates stage/visit/seed or consumes randomness. This solves the seed
+identity prerequisite without a sequence change, so Checkpoint3's decision gate
+does not apply. Mode-specific next-stage selection and renderer slots are pending.
+
+Four stage-variation units PASS, including a new full identity comparison across
+initial seeds0/19/47/0xffffffff, repeated entries, forced run/preview-style visits,
+three9-stage cycles and intervening unrelated peeks. Ledger state stays unchanged
+until entry and all subsequent enter results/visit counts match the unpeeked
+control. Strict, formatting and checked production build PASS; log
+`tmp/performance-stage-seed-peek-build.log`. No runtime uses peek yet, so no stage
+change speed or new precompose claim. No active capture. Continue remaining main
+image-owner/active selection work and use this API when wiring quiet next decode,
+normal/trial/daily/cinematic prediction and next-slot promotion/invalidation.

@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Charm input leases verified
+# Performance, assets and seamless transitions — Visit seed peek prerequisite verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -296,3 +296,14 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     and environment sources remain outside the pool; initial broad startup decode
     still exceeds the intended eventual budget. Continue their active/lazy lease
     migration and narrow startup, then finish budgets/Phase4/full Phase5requirements.
+
+11. Next-decode prerequisite at1.68.15: stageVisits.peek(stage, forceNewVisit)
+    predicts the unchanged enter formula without mutating ledger/RNG. Repeated
+    entries retain the current seed; forced visits predict visit+1. Four units PASS
+    including full sequence identity across4initial seeds,3nine-stage cycles,
+    repeat/forced entries and unrelated peeks. Strict/format/build PASS; no runtime
+    use yet and no active captures. Checkpoint3decision gate is not triggered:
+    no seed-sequence change. Mode-specific prediction/next slots remain pending.
+    Version/package/lock/title/changelog1.68.15. Continue remaining main image
+    ownership/active selections and narrow startup; use peek for quiet decode and
+    normal/trial/daily/cinematic prediction, then complete Phase4/Phase5requirements.
