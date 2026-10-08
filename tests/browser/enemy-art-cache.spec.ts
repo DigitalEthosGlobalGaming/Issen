@@ -22,9 +22,11 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
     };
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     const read = CanvasRenderingContext2D.prototype.getImageData;
-    let pixelReads = 0;
+    let pixelReads = 0,
+      gpuBackedReads = 0;
     CanvasRenderingContext2D.prototype.getImageData = function (...args) {
       pixelReads++;
+      if (!this.getContextAttributes().willReadFrequently) gpuBackedReads++;
       return read.apply(this, args);
     };
     const sources = new Set<string>();
@@ -81,6 +83,8 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
         variedSources,
         snapshot,
         repeatedReads,
+        pixelReads,
+        gpuBackedReads,
         disposed: renderer.snapshot(),
       };
     } finally {
@@ -91,6 +95,8 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
   });
   expect(result.ready).toBe(true);
   expect(result.repeatedReads).toBe(0);
+  expect(result.pixelReads).toBeGreaterThan(0);
+  expect(result.gpuBackedReads).toBe(0);
   expect(result.snapshot.loaded.sort()).toEqual(['base', 'clothing', 'heads', 'variationHeads']);
   expect(result.bossSources.sort()).toEqual([
     'enemy-headwear-atlas_diffuse.webp',

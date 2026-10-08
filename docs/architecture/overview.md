@@ -101,6 +101,12 @@ owns companion rules and `presentation/player-figures.ts` owns their projection.
 frame scheduling. `runtime/startup.ts` owns ordered runtime startup,
 artwork readiness/errors and disposal. Scene continuations settle after drawing
 through `runtime/scene-flow.ts`, including intentional paused phase adoption.
+Hot presentation, rule and frame projections use lifetime `cacheView` records:
+mutable equipment, geometry, seal, scene selections and clocks remain forwarded
+getters. Host projections require a lifetime live parent view. Figure renderer
+instances still capture current pose inputs for each draw. `ui/trial-objective.ts`
+owns the retained trial element and change-only writes; trial feedback routes
+hiding through that owner so ending or retrying a trial resets its cache.
 
 `game/session/context.ts` defines `RunContext` with plain run records and seeded
 randomness, and `ServicesContext` with browser ports. `presentation/context.ts`

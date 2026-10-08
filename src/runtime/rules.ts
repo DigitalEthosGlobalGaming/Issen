@@ -1,5 +1,5 @@
 import { createRuntimeFoundation } from '../runtime/foundation.ts';
-import { stateView } from '../game/session/state-view.ts';
+import { cacheView, stateView } from '../game/session/state-view.ts';
 
 import { type MenuBindingViews } from '../ui/wiring/menu-bindings.ts';
 
@@ -20,47 +20,53 @@ export function createRuntimeRules(
   function earn(event: 'kill' | 'wave' | 'boss') {
     return profileRules.earn(event);
   }
-  const profileRules = createProfileRules(() =>
-    stateView(
-      foundation.run.activity,
-      ['activeTrial', 'activeDaily'],
+  const profileRules = createProfileRules(
+    cacheView(() =>
       stateView(
-        foundation.run.sessionState,
-        ['rewardLedger', 'runItemReveals'],
-        stateView(foundation.profile.profileFoundation, ['ST'], {
-          G: foundation.run.G,
-          AWAKENING: foundation.profile.AWAKENING,
-          META: foundation.profile.META,
-          saveAwakening: foundation.profile.saveAwakening,
-          UNL: foundation.profile.UNL,
-          ITEMS: foundation.profile.ITEMS,
-          ITEM_BY: foundation.profile.ITEM_BY,
-          revoked: foundation.profile.revoked,
-          COLLECTION_PROGRESS: foundation.profile.COLLECTION_PROGRESS,
-          accessible: foundation.browser.accessible,
-          refreshArmoryNew: readMenus().refreshArmoryNew,
-          store,
-          itemPresentation,
-          TYPE_WORD,
-        }),
+        foundation.run.activity,
+        ['activeTrial', 'activeDaily'],
+        stateView(
+          foundation.run.sessionState,
+          ['rewardLedger', 'runItemReveals'],
+          stateView(foundation.profile.profileFoundation, ['ST'], {
+            G: foundation.run.G,
+            AWAKENING: foundation.profile.AWAKENING,
+            META: foundation.profile.META,
+            saveAwakening: foundation.profile.saveAwakening,
+            UNL: foundation.profile.UNL,
+            ITEMS: foundation.profile.ITEMS,
+            ITEM_BY: foundation.profile.ITEM_BY,
+            revoked: foundation.profile.revoked,
+            COLLECTION_PROGRESS: foundation.profile.COLLECTION_PROGRESS,
+            accessible: foundation.browser.accessible,
+            get refreshArmoryNew() {
+              return readMenus().refreshArmoryNew;
+            },
+            store,
+            itemPresentation,
+            TYPE_WORD,
+          }),
+        ),
       ),
     ),
   );
-  const activeEquipment = createActiveEquipment(() =>
-    stateView(
-      foundation.run.activity,
-      ['activeTrial'],
+  const activeEquipment = createActiveEquipment(
+    cacheView(() =>
       stateView(
-        foundation.run.sessionState,
-        ['runTemplate'],
-        stateView(foundation.profile.profileEquipment, ['EQ'], {
-          G: foundation.run.G,
-          SETUP: foundation.profile.SETUP,
-          META: foundation.profile.META,
-          UNL: foundation.profile.UNL,
-          ITEM_BY: foundation.profile.ITEM_BY,
-          accessible: foundation.browser.accessible,
-        }),
+        foundation.run.activity,
+        ['activeTrial'],
+        stateView(
+          foundation.run.sessionState,
+          ['runTemplate'],
+          stateView(foundation.profile.profileEquipment, ['EQ'], {
+            G: foundation.run.G,
+            SETUP: foundation.profile.SETUP,
+            META: foundation.profile.META,
+            UNL: foundation.profile.UNL,
+            ITEM_BY: foundation.profile.ITEM_BY,
+            accessible: foundation.browser.accessible,
+          }),
+        ),
       ),
     ),
   );

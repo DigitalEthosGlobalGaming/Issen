@@ -207,7 +207,7 @@ export function createInkEnemyRenderer(doc: Document) {
         tone = doc.createElement('canvas');
         tone.width = c.width;
         tone.height = c.height;
-        const tg = tone.getContext('2d');
+        const tg = tone.getContext('2d', { willReadFrequently: true });
         if (!tg) {
           c.width = c.height = 0;
           return null;

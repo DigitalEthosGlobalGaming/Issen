@@ -2,13 +2,20 @@ import { createEnvironmentState } from './environment-state.ts';
 import { createEnvironmentArtwork, type EnvironmentArtworkViews } from './environment-artwork.ts';
 import { createEnvironmentPresentation, type EnvironmentViews } from './environment.ts';
 import { createDriftRenderer } from '../rendering/scene/drift-renderer.ts';
-export type EnvironmentHostViews =
-  Pick<EnvironmentArtworkViews, 'W' | 'H' | 'DPR' | 'S' | 'L' | 'R' | 'density' | 'context2d'> &
+import { cacheView, stateView } from '../game/session/state-view.ts';
+export type EnvironmentHostViews = Pick<
+  EnvironmentArtworkViews,
+  'W' | 'H' | 'DPR' | 'S' | 'L' | 'R' | 'density' | 'context2d'
+> &
   Pick<EnvironmentViews, 'activeTrial' | 'G' | 'L' | 'reducedMotion' | 'g' | 'cinematic' | 'WX'> & {
     readonly presentationState: { readonly time: number; readonly wind: number };
   };
 /** Per-game scenery state, cached artwork and drawing share one explicit binding owner. */
-export function createEnvironmentHost(ownerDocument: Document, lifecycle: { add(cleanup: () => void): void }, readViews: () => EnvironmentHostViews) {
+export function createEnvironmentHost(
+  ownerDocument: Document,
+  lifecycle: { add(cleanup: () => void): void },
+  readViews: () => EnvironmentHostViews,
+) {
   const environmentState = createEnvironmentState();
   const {
     buildBG,
@@ -19,22 +26,20 @@ export function createEnvironmentHost(ownerDocument: Document, lifecycle: { add(
     gustLeaves,
     buildWeatherArtwork,
     rebalanceWeather,
-  } = createEnvironmentArtwork(ownerDocument, () => {
-    const { W, H, DPR, S, G, L, R, density, context2d } = readViews();
-    return ({
-    W,
-    H,
-    DPR,
-    S,
-    stage: G.stage,
-    environmentState,
-    L,
-    R,
-    density,
-    context2d,
-    ambient,
-  });
-  });
+  } = createEnvironmentArtwork(
+    ownerDocument,
+    cacheView(() =>
+      stateView(readViews(), ['W', 'H', 'DPR', 'S', 'L', 'R', 'density', 'context2d'], {
+        get stage() {
+          return readViews().G.stage;
+        },
+        environmentState,
+        get ambient() {
+          return ambient;
+        },
+      }),
+    ),
+  );
 
   /* ---------------- ambient ---------------- */
 
@@ -50,33 +55,76 @@ export function createEnvironmentHost(ownerDocument: Document, lifecycle: { add(
     drawSmoke,
     updateAmbient,
     updateTransition,
-  } = createEnvironmentPresentation(() => {
-    const { activeTrial, G, W, H, S, L, R, density, reducedMotion, g, presentationState, cinematic, WX } = readViews();
-    return ({
+  } = createEnvironmentPresentation(
+    cacheView(() =>
+      stateView(
+        readViews(),
+        [
+          'activeTrial',
+          'G',
+          'W',
+          'H',
+          'S',
+          'L',
+          'R',
+          'density',
+          'reducedMotion',
+          'g',
+          'cinematic',
+          'WX',
+        ],
+        {
+          environmentState,
+          driftRenderer,
+          get previewDemon() {
+            return environmentState.previewDemon;
+          },
+          get fg() {
+            return environmentState.fg;
+          },
+          get time() {
+            return readViews().presentationState.time;
+          },
+          get wind() {
+            return readViews().presentationState.wind;
+          },
+          get leaves() {
+            return environmentState.leaves;
+          },
+          get wx() {
+            return environmentState.wx;
+          },
+          get bamboo() {
+            return environmentState.bamboo;
+          },
+          get cinematicWeather() {
+            return environmentState.cinematicWeather;
+          },
+          get smokeSprite() {
+            return environmentState.smokeSprite;
+          },
+        },
+      ),
+    ),
+  );
+  return {
     environmentState,
-    activeTrial,
-    previewDemon: environmentState.previewDemon,
-    G,
-    W,
-    H,
-    S,
-    L,
-    R,
-    density,
     driftRenderer,
-    reducedMotion,
-    g,
-    fg: environmentState.fg,
-    time: presentationState.time,
-    wind: presentationState.wind,
-    leaves: environmentState.leaves,
-    wx: environmentState.wx,
-    bamboo: environmentState.bamboo,
-    cinematic,
-    cinematicWeather: environmentState.cinematicWeather,
-    WX,
-    smokeSprite: environmentState.smokeSprite,
-  });
-  });
-  return { environmentState, driftRenderer, buildBG, buildMist, buildGrass, newLeaf, buildLeaves, gustLeaves, buildWeatherArtwork, rebalanceWeather, ambient, blades, drawLeaves, weatherRenderer, drawWeather, drawSmoke, updateAmbient, updateTransition };
+    buildBG,
+    buildMist,
+    buildGrass,
+    newLeaf,
+    buildLeaves,
+    gustLeaves,
+    buildWeatherArtwork,
+    rebalanceWeather,
+    ambient,
+    blades,
+    drawLeaves,
+    weatherRenderer,
+    drawWeather,
+    drawSmoke,
+    updateAmbient,
+    updateTransition,
+  };
 }

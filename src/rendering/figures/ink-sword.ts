@@ -105,7 +105,7 @@ export function createInkSwordRenderer(doc: Document) {
       s = Math.min(1, (family === 'blades' ? 1024 : 512) / Math.max(sw, sh));
     c.width = Math.max(1, Math.round(sw * s));
     c.height = Math.max(1, Math.round(sh * s));
-    const g = c.getContext('2d');
+    const g = c.getContext('2d', { willReadFrequently: true });
     if (!g) return null;
     g.drawImage(im, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const data = g.getImageData(0, 0, c.width, c.height);

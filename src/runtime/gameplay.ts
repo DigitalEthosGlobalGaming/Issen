@@ -188,6 +188,9 @@ export function createRuntimeGameplay(
     get renderTrialObjective() {
       return ui.renderTrialObjective;
     },
+    get hideTrialObjective() {
+      return ui.hideTrialObjective;
+    },
     get toTitle() {
       return toTitle;
     },

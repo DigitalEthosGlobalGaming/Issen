@@ -24,6 +24,7 @@ import type { createScreenAnimation } from '../ui/screen-animation.ts';
 import type { createEnvironmentPresentation } from '../presentation/environment.ts';
 import type { createPlayerFigures } from '../presentation/player-figures.ts';
 import type { Random } from '../shared/random.ts';
+import { cacheView, stateView } from '../game/session/state-view.ts';
 
 type SimulationPorts = Omit<
   FrameSimulationViews,
@@ -86,6 +87,16 @@ export function createFrameBindings(
   readViews: () => FrameBindingViews,
   lightSources = createLightSources(),
 ) {
+  // The parent is a lifetime live view. Overrides keep dynamic selections as getters.
+  function frameView<Ports extends object>(ports: Ports) {
+    return cacheView(() => {
+      const parent = readViews();
+      const keys = (Object.keys(parent) as (keyof FrameBindingViews)[]).filter(
+        (key) => !Object.hasOwn(ports, key),
+      );
+      return stateView(parent, keys, ports);
+    });
+  }
   function updatePlayer(dt: number) {
     const { P, G } = readViews();
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
@@ -133,41 +144,53 @@ export function createFrameBindings(
     );
   }
 
-  const frameSimulation = createFrameSimulation(() => {
-    const v = readViews();
-    return {
-      ...v,
+  const frameSimulation = createFrameSimulation(
+    frameView({
       updatePlayer,
       updateWeather,
-      advanceClock: (dt: number) => advancePresentationClock(v.presentationState, dt),
-      advanceCamera: (raw: number) => advancePresentationCamera(v.presentationState, raw),
-    };
-  });
+      advanceClock: (dt: number) => advancePresentationClock(readViews().presentationState, dt),
+      advanceCamera: (raw: number) => advancePresentationCamera(readViews().presentationState, raw),
+    }),
+  );
   function update(dt: number, raw: number) {
     frameSimulation.update(dt, raw);
   }
-  const postPreparation = createPostPreparation(() => {
-    const v = readViews();
-    return {
-      ...v,
-      fx: v.presentationState.fx,
-      time: v.presentationState.time,
-      signals: v.presentationState,
-    };
-  });
+  const postPreparation = createPostPreparation(
+    frameView({
+      get fx() {
+        return readViews().presentationState.fx;
+      },
+      get time() {
+        return readViews().presentationState.time;
+      },
+      get signals() {
+        return readViews().presentationState;
+      },
+    }),
+  );
   const { advancePost, preparePresentation } = postPreparation;
-  const drawPost = createPostPresentation(() => {
-    const v = readViews();
-    return {
-      ...v,
-      time: v.presentationState.time,
-      grainPats: v.postArtwork.grainPats,
-      vig: v.postArtwork.vig,
-      inkEdge: v.postArtwork.inkEdge,
-      lb: v.presentationState.lb,
-      flashCol: v.presentationState.flashCol,
-    };
-  });
+  const drawPost = createPostPresentation(
+    frameView({
+      get time() {
+        return readViews().presentationState.time;
+      },
+      get grainPats() {
+        return readViews().postArtwork.grainPats;
+      },
+      get vig() {
+        return readViews().postArtwork.vig;
+      },
+      get inkEdge() {
+        return readViews().postArtwork.inkEdge;
+      },
+      get lb() {
+        return readViews().presentationState.lb;
+      },
+      get flashCol() {
+        return readViews().presentationState.flashCol;
+      },
+    }),
+  );
   function drawPlayer() {
     readViews().playerFigures.drawPlayer();
   }
@@ -177,25 +200,42 @@ export function createFrameBindings(
   function drawFoxfire() {
     readViews().playerFigures.drawFoxfire();
   }
-  const drawScene = createRuntimeScene(() => {
-    const v = readViews();
-    return {
-      ...v,
-      time: v.presentationState.time,
-      zoom: v.presentationState.zoom,
-      zoomX: v.presentationState.zoomX,
-      zoomY: v.presentationState.zoomY,
-      previewDemon: v.environmentState.previewDemon,
-      mistSprite: v.environmentState.mistSprite,
-      mists: v.environmentState.mists,
-      mid: v.environmentState.mid,
-      fg: v.environmentState.fg,
+  const drawScene = createRuntimeScene(
+    frameView({
+      get time() {
+        return readViews().presentationState.time;
+      },
+      get zoom() {
+        return readViews().presentationState.zoom;
+      },
+      get zoomX() {
+        return readViews().presentationState.zoomX;
+      },
+      get zoomY() {
+        return readViews().presentationState.zoomY;
+      },
+      get previewDemon() {
+        return readViews().environmentState.previewDemon;
+      },
+      get mistSprite() {
+        return readViews().environmentState.mistSprite;
+      },
+      get mists() {
+        return readViews().environmentState.mists;
+      },
+      get mid() {
+        return readViews().environmentState.mid;
+      },
+      get fg() {
+        return readViews().environmentState.fg;
+      },
       drawPlayer,
       drawPet,
       drawFoxfire,
       drawPost,
-    };
-  }, lightSources);
+    }),
+    lightSources,
+  );
   function render(raw: number) {
     const { G, armory, settlePresentedScene } = readViews();
     // Only the opaque inspection dialog covers the scene completely.

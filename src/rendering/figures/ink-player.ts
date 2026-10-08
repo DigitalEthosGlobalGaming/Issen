@@ -46,7 +46,7 @@ export function createInkPlayerRenderer(doc: Document) {
     // Keep source detail for the large foreground and Armoury crops.
     c.width = sw;
     c.height = sh;
-    const cg = c.getContext('2d');
+    const cg = c.getContext('2d', { willReadFrequently: true });
     if (!cg) return null;
     cg.drawImage(atlas, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const data = cg.getImageData(0, 0, c.width, c.height),

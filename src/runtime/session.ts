@@ -64,7 +64,7 @@ type ActionPorts = Pick<
   Pick<RunStartFeedbackViews, 'hint' | 'setScore'> &
   Pick<ResultsFeedbackViews, 'hud' | 'toast' | 'clearHints' | 'runResults' | 'setBestLine'> &
   Pick<CheckpointFeedbackViews, 'updateSavedRunButtons' | 'showScreen'> &
-  Pick<TrialFeedbackViews, 'banner' | 'openPanel'> &
+  Pick<TrialFeedbackViews, 'banner' | 'openPanel' | 'hideTrialObjective'> &
   Pick<CheckpointFeedbackViews, 'renderHp' | 'renderLives'> & {
     readonly resultsSession: Pick<
       ReturnType<typeof createResultsSession>,
@@ -352,9 +352,7 @@ export function createRuntimeSession(
       sfx: foundation.browser.sfx,
       buildLeaves: presentation.buildLeaves,
       audio: foundation.browser.audio,
-      hideTrialObjective: () => {
-        foundation.browser.$('trialObjective').hidden = true;
-      },
+      hideTrialObjective: () => readActions().hideTrialObjective(),
       openPanel: (panel) => readActions().openPanel(panel),
       focusTrialResult: () => {
         foundation.browser

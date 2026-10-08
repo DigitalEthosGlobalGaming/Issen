@@ -12,6 +12,7 @@ import { BLESS } from '../game/content/blessings.ts';
 import type { ItemCategory } from '../game/content/items.ts';
 import type { createShrinePhase } from '../game/phases/shrine.ts';
 import type { createRuntimeFoundation } from './foundation.ts';
+import { createTrialObjective } from '../ui/trial-objective.ts';
 
 /** Own HUD, notifications, shrine/result display and support screen lifetime. */
 export function createRuntimeUIBase(
@@ -62,17 +63,9 @@ export function createRuntimeUIBase(
       msg: it.msg || 'Unlocked: ' + it.n + ' ' + (it.type ? TYPE_WORD[it.type] : ''),
     });
   }
+  const trialObjective = createTrialObjective(foundation.browser.$('trialObjective'));
   function renderTrialObjective() {
-    const trial = foundation.run.activity.activeTrial;
-    const visible = !!trial && ['playing', 'boss', 'between'].includes(foundation.run.G.state);
-    foundation.browser.$('trialObjective').hidden = !visible;
-    if (!trial || !visible) return;
-    foundation.browser.$('trialObjective').textContent =
-      trial.duelMaster && foundation.run.G.boss
-        ? `Duel Master · ${20 - foundation.run.G.boss.hp}/20 exchanges · No mistakes`
-        : trial.wave
-          ? `${trial.name} · ${trial.waveCount ? `Wave ${foundation.run.G.wave}/${trial.waveCount} · ` : ''}${foundation.run.G.kills}/${trial.wave.total} cuts${trial.wave.perfects ? ` · ${foundation.run.G.perfects}/${trial.wave.perfects} perfect` : ''} · ${trial.mirrored ? 'Cut opposite' : 'No mistakes'}`
-          : `${trial.name} · ${foundation.run.G.bossesSlain}/${trial.bosses!.length} duels · ${trial.cleanOpenings ? 'No hits or missed openings' : 'No hits'}`;
+    trialObjective.render(foundation.run.activity.activeTrial, foundation.run.G);
   }
   function showShrineOffers(opts: (typeof BLESS)[number][]) {
     (foundation.browser.$('bRerollShrine') as HTMLButtonElement).hidden =
@@ -115,6 +108,7 @@ export function createRuntimeUIBase(
     clearHints,
     toast,
     renderTrialObjective,
+    hideTrialObjective: trialObjective.hide,
     showShrineOffers,
     rewardSupport,
     rewardScreen,

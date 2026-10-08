@@ -6,7 +6,7 @@ import { createRuntimeUIBase } from './runtime/ui-base.ts';
 import { createRuntimePresentation } from './runtime/presentation.ts';
 import { createRuntimeFoundation } from './runtime/foundation.ts';
 
-import { stateView } from './game/session/state-view.ts';
+import { cacheView, stateView } from './game/session/state-view.ts';
 
 import { startRuntime } from './runtime/startup.ts';
 
@@ -27,14 +27,14 @@ export function startGame(
 
   const presentation = createRuntimePresentation(
     foundation,
-    () => ({
+    cacheView(() => ({
       isSp: () => game.isSp(),
       isSteelThird: () => game.isSteelThird(),
       isRobeSp: () => game.isRobeSp(),
       pz: () => game.pz(),
       waveConfiguration: () => game.waveConfiguration(),
       liveOrdered: () => game.liveOrdered(),
-    }),
+    })),
     () => controls.cinematic,
   );
 

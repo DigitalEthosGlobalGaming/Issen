@@ -80,8 +80,17 @@ Phase0 commits bc43526 and1aa563d are complete. Phase1.1 is now verified:
 - Measurement session52285 and browser sessions are terminal; do not restart them.
 
 Continue:
-1. Phase1.2 cached live views with getters;1.3 change-only trial DOM;1.4 CPU readback
-   canvases. Include high-refresh gameplay pacing while keeping time/RNG contracts.
+1. Phase1.2–1.4 are implemented at1.68.3: cached live presentation/rule/host/frame
+   views with getters; change-only trial DOM owner with lifecycle reset; CPU
+   readback flags on enemy/player/sword canvases. Strict,19units,22live-view/native
+   browsers,14trial/artwork browsers and2enhanced enemy readback browsers PASS;
+   checked production build PASS. Current evidence is recorded in progress notes.
+   Browser session76210 and all check processes are terminal. The new live-view
+   browser proves12readers keep identity with zero descriptor rebuilds over100reads,
+   including equipment/layout/seal/clocks/scenery replacements and cinematic open.
+   Remaining Phase1: high-refresh gameplay pacing, preserving time/RNG contracts.
+   Do not simply double combat updates: frame-loop currently couples update and
+   rendering; weather hazards and phase transitions consume seeded RNG on timers.
 2. Focused strict/unit/browser checks, then measured Phase1 comparison against
    frozen baselines. Record findings and commit before Phase2 compose.
 3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas

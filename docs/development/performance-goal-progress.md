@@ -210,3 +210,46 @@ are43.9/93.1/192.0MB; nominal main decoded estimates remain878.1MB for each.
 This optimization does not claim a memory budget or near-instant transitions.
 Compose and stage-cycle measurement will be repeated at the full Phase1
 checkpoint; those behavior paths were not optimized here. The60fps cap remains.
+
+## Phase 1.2–1.4 — Live views, DOM and readbacks
+
+Presentation and active-equipment/progression projections now use `cacheView`.
+Mutable rule capabilities, trial/cinematic selection, clocks, geometry, equipment,
+seal and scenery arrays remain getters. Figure/environment hosts retain narrow
+live projections; frame bindings retain simulation/post/scene projections with
+getter overrides. The entry point caches its deferred rule wrappers too, avoiding
+new wrapper objects/functions on every getter read. Renderer construction still
+captures current pose inputs: caching that snapshot would be incorrect.
+
+`ui/trial-objective.ts` owns one element reference and change-only visibility/text
+writes. Trial identity changes and trial-end hiding reset the cache; session
+feedback uses that owner rather than changing the element independently. Other
+HUD score/lives/banner writes were inspected: they run on events, not every frame.
+All four production readback contexts request `willReadFrequently`: enemy tones,
+player tones, sword parts and the existing material normal-transform scratch.
+
+Verification at version1.68.3:
+
+- Strict TypeScript and checked production verification build PASS.
+- All19 focused live-state/trial-feedback/trial-session/run-flow/post-frame units
+  PASS. Three new objective cases cover120unchanged renders, visibility, displayed
+  progress, trial-end/retry reset and Duel Master exchanges.
+- All22 live-view/native Pixi/scene-continuation browsers PASS, including context
+  restoration and repeated-draw visual/state checks.
+- All14 trial/trial-film/enemy-art/artwork-lighting/sword-lighting browsers PASS.
+  Enhanced enemy tests separately PASS2: actual readbacks use CPU-backed contexts
+  and warm poses/fog variants cause no repeated reads.
+- The new browser captures12actual production readers. Each keeps identity across
+  100reads with zero descriptor construction; replaced equipment, layout, seal,
+  scenery, clocks, camera and trial state stay live. Cinematic activation uses its
+  public API. The initial test incorrectly assigned its read-only active getter;
+  that test instrumentation was corrected, with no production workaround.
+
+Evidence logs: `tmp/performance-phase1-live-views-browser.log`,
+`tmp/performance-phase1-dom-readback-browser.log`,
+`tmp/performance-phase1-readback-context-browser.log`,
+`tmp/performance-phase1-hot-path-units.log` and
+`tmp/performance-phase1-hot-path-build.log`.
+Full Phase1 timing/compose/stage-cycle comparison remains due after addressing
+the60fps cap. More rendering callbacks must not silently increase simulation/RNG
+updates. No Phase2 cache/quantisation or loader work has started.
