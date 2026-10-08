@@ -2,9 +2,19 @@
 
 Generated from [world-ui-material-paper.png](../../world-ui-material-paper.png) with `cloth`, Texture/OpenGL.
 
-Six aligned 192Ã—192 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-material-paper_diffuse.png), [normal](world-ui-material-paper_normal.png), [roughness](world-ui-material-paper_roughness.png), [metallic](world-ui-material-paper_metallic.png), [ao](world-ui-material-paper_ao.png), [emissive](world-ui-material-paper_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-material-paper | [diffuse](world-ui-material-paper_diffuse.webp), [normal](world-ui-material-paper_normal.webp), [surface](world-ui-material-paper_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

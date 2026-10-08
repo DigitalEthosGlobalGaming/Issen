@@ -2,9 +2,19 @@
 
 Generated from [panel-normal.png](../../panel-normal.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 192Ã—192 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](panel-normal_diffuse.png), [normal](panel-normal_normal.png), [roughness](panel-normal_roughness.png), [metallic](panel-normal_metallic.png), [ao](panel-normal_ao.png), [emissive](panel-normal_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| panel-normal | [diffuse](panel-normal_diffuse.webp), [normal](panel-normal_normal.webp), [surface](panel-normal_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

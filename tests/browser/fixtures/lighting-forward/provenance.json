@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "472f60a",
+  "version": "1.68.0",
+  "dimensions": [
+    600,
+    280
+  ],
+  "description": "Raw canvas RGBA output of the temporary old-forward PBR shader; captured before removal. Scenarios: warm point, cool point, native noir, material lighting disabled. Real rock/cloth/steel atlas studies, transformed and translucent, with fog.",
+  "comparison": "Displayed RGB contribution over black; established scene mean tolerance 9; exact alpha equality."
+}

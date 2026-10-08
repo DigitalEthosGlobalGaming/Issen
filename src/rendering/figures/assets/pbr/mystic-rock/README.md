@@ -2,9 +2,19 @@
 
 Generated from [mystic-rock.png](../../mystic-rock.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1145Ã—1373 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](mystic-rock_diffuse.png), [normal](mystic-rock_normal.png), [roughness](mystic-rock_roughness.png), [metallic](mystic-rock_metallic.png), [ao](mystic-rock_ao.png), [emissive](mystic-rock_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| mystic-rock | [diffuse](mystic-rock_diffuse.webp), [normal](mystic-rock_normal.webp), [surface](mystic-rock_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

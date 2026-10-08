@@ -15,6 +15,8 @@ export type EnvironmentSnapshot = {
   height: number;
   layers: number;
   pixels: number;
+  decodedBytes?: number;
+  timings?: { assets: number; compose: number; transfer: number };
 };
 export type ComposeRequest =
   | { id: number; kind: 'prepare'; stage: number }
@@ -27,6 +29,7 @@ export type ComposeResponse = {
   foreground: ComposedLayer[];
   snapshot: EnvironmentSnapshot;
   error?: string;
+  phase?: 'assets-ready';
 };
 export function compositionKey(frame: EnvironmentFrame) {
   return JSON.stringify([

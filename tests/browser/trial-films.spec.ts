@@ -4,29 +4,32 @@ test('Broken signal preserves scene regions on high-density canvases', async ({ 
   await page.goto('/');
   const samples = await page.evaluate(async () => {
     const { applyFilm } = await import('/src/rendering/effects/film.ts');
-    return [1, 1.5, 2].map((dpr) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 400 * dpr;
-      canvas.height = 400 * dpr;
-      const g = canvas.getContext('2d')!;
-      g.scale(dpr, dpr);
-      for (let row = 0; row < 2; row++) {
-        for (let col = 0; col < 2; col++) {
-          g.fillStyle = row === col ? '#eeeeee' : '#111111';
-          g.fillRect(col * 200, row * 200, 200, 200);
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    return await Promise.all(
+      [1, 1.5, 2].map(async (dpr) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 400 * dpr;
+        canvas.height = 400 * dpr;
+        const g = await createTestDrawing(canvas);
+        g.scale(dpr, dpr);
+        for (let row = 0; row < 2; row++) {
+          for (let col = 0; col < 2; col++) {
+            g.fillStyle = row === col ? '#eeeeee' : '#111111';
+            g.fillRect(col * 200, row * 200, 200, 200);
+          }
         }
-      }
-      applyFilm(g, 400, 400, canvas, 'trial-glitch', 1.2);
-      return [
-        [100, 100],
-        [300, 100],
-        [100, 300],
-        [300, 300],
-      ].map(([x, y]) => {
-        const p = g.getImageData(x * dpr, y * dpr, 1, 1).data;
-        return (p[0] + p[1] + p[2]) / 3;
-      });
-    });
+        applyFilm(g, 400, 400, canvas, 'trial-glitch', 1.2);
+        return [
+          [100, 100],
+          [300, 100],
+          [100, 300],
+          [300, 300],
+        ].map(([x, y]) => {
+          const p = g.getImageData(x * dpr, y * dpr, 1, 1).data;
+          return (p[0] + p[1] + p[2]) / 3;
+        });
+      }),
+    );
   });
   for (const [topLeft, topRight, bottomLeft, bottomRight] of samples) {
     expect(topLeft).toBeGreaterThan(180);
@@ -42,6 +45,7 @@ test('Broken signal moves with explicit time and preserves its source and canvas
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const { applyFilm } = await import('/src/rendering/effects/film.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const source = document.createElement('canvas');
     source.width = 390;
     source.height = 240;
@@ -53,21 +57,23 @@ test('Broken signal moves with explicit time and preserves its source and canvas
       original.fillRect(x, 0, 5, 240);
     }
     const before = source.toDataURL();
-    const render = (time: number, film = 'trial-glitch') => {
+    const render = async (time: number, film = 'trial-glitch') => {
       const canvas = document.createElement('canvas');
       canvas.width = source.width;
       canvas.height = source.height;
-      const g = canvas.getContext('2d')!;
+      const g = await createTestDrawing(canvas);
       g.drawImage(source, 0, 0);
       applyFilm(g, 390, 240, canvas, film, time);
       if (g.globalAlpha !== 1 || g.globalCompositeOperation !== 'source-over')
         throw new Error('Canvas state leaked');
-      return canvas.toDataURL();
+      const result = canvas.toDataURL();
+      g.dispose();
+      return result;
     };
     return {
-      animated: render(0) !== render(1),
-      deterministic: render(1) === render(1),
-      staticGold: render(0, 'trial-gold') === render(1, 'trial-gold'),
+      animated: (await render(0)) !== (await render(1)),
+      deterministic: (await render(1)) === (await render(1)),
+      staticGold: (await render(0, 'trial-gold')) === (await render(1, 'trial-gold')),
       isolated: source.toDataURL() === before,
     };
   });
@@ -80,6 +86,7 @@ test('Endurance films render distinct gold and broken-screen scenes in both orie
   await page.goto('/');
   const distinct = await page.evaluate(async () => {
     const { applyFilm } = await import('/src/rendering/effects/film.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createBackground } = await import('/src/rendering/scene/background.ts');
     const sheet = document.createElement('div');
     sheet.style.cssText = 'display:flex;gap:12px;background:#171512;padding:12px;color:white';
@@ -91,14 +98,23 @@ test('Endurance films render distinct gold and broken-screen scenes in both orie
         [390, 844],
         [844, 390],
       ]) {
-        const { canvas } = createBackground(w, h, 1, 0);
-        const g = canvas.getContext('2d')!;
+        const background = createBackground(w, h, 1, 0).canvas;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const g = await createTestDrawing(canvas);
+        g.drawImage(background, 0, 0);
         applyFilm(g, w, h, canvas, film);
         if (g.globalAlpha !== 1 || g.globalCompositeOperation !== 'source-over')
           throw new Error('Film leaked canvas state');
-        images.add(canvas.toDataURL());
-        canvas.style.cssText = `display:block;width:300px;height:${(h / w) * 300}px`;
-        column.append(canvas);
+        const result = canvas.toDataURL();
+        images.add(result);
+        const image = new Image();
+        image.src = result;
+        await image.decode();
+        g.dispose();
+        image.style.cssText = `display:block;width:300px;height:${(h / w) * 300}px`;
+        column.append(image);
       }
       sheet.append(column);
     }

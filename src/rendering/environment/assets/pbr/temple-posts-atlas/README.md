@@ -2,9 +2,19 @@
 
 Generated from [temple-posts-atlas.png](../../temple-posts-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 2172Ã—724 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](temple-posts-atlas_diffuse.png), [normal](temple-posts-atlas_normal.png), [roughness](temple-posts-atlas_roughness.png), [metallic](temple-posts-atlas_metallic.png), [ao](temple-posts-atlas_ao.png), [emissive](temple-posts-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| temple-posts-atlas | [diffuse](temple-posts-atlas_diffuse.webp), [normal](temple-posts-atlas_normal.webp), [surface](temple-posts-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -27,7 +27,7 @@
   position: absolute;
   inset: -12px;
   border: 12px solid transparent;
-  border-image: url('/src/ui/assets/world-ui-scroll-paper.png') 36 fill / 12px stretch;
+  border-image: url('/src/ui/assets/world-ui-scroll-paper.webp') 36 fill / 12px stretch;
   filter: sepia(0.4) brightness(0.16);
   pointer-events: none;
   z-index: -1;
@@ -43,7 +43,7 @@
   height: 14px;
   border: 1px solid #78674b;
   border-radius: 5px;
-  background: url('/src/ui/assets/world-ui-scroll-rod.png') center / 100% 100% no-repeat;
+  background: url('/src/ui/assets/world-ui-scroll-rod.webp') center / 100% 100% no-repeat;
   filter: sepia(0.5) brightness(0.7);
   box-shadow: 0 3px 6px #0006;
 }

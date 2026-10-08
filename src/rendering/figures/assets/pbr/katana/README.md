@@ -2,9 +2,19 @@
 
 Generated from [katana.png](../../katana.png) with `metal`, Sprite/OpenGL.
 
-Six aligned 2172Ã—724 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](katana_diffuse.png), [normal](katana_normal.png), [roughness](katana_roughness.png), [metallic](katana_metallic.png), [ao](katana_ao.png), [emissive](katana_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| katana | [diffuse](katana_diffuse.webp), [normal](katana_normal.webp), [surface](katana_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

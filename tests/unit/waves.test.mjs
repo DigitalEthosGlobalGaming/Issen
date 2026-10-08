@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialSpawns, updateWave } from '../../src/game/encounters/waves.ts';
-import { spawnEnemy } from '../../src/game/combat/enemy-spawn.ts';
+import { createGrunt as spawnEnemy } from '../../src/game/combat/grunt-spawn.ts';
 const position = () => ({ x: 20, y: 30, h: 40, fog: 0, alpha: 1 });
 function fixture() {
   const state = {

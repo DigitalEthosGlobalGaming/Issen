@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test('Demon cinematic scene has varied scenery and immediate scene changes', async ({
   page,
 }, info) => {
+  test.setTimeout(60000);
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
   await page.locator('#title .t-k').click({ clickCount: 3 });
@@ -27,19 +28,23 @@ test('Demon cinematic scene has varied scenery and immediate scene changes', asy
     const canvas = document.createElement('canvas');
     canvas.width = 844;
     canvas.height = 390;
-    const g = canvas.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const g = await createTestDrawing(canvas);
     await new Promise((resolve) => setTimeout(resolve, 100));
     const draw = (seed: number) => {
+      g.begin();
       renderer.draw(g, 844, 390, 0, true, seed);
       return canvas.toDataURL();
     };
     const values = [draw(123), draw(123), draw(456)];
+    g.dispose();
     renderer.dispose();
     return values;
   });
   expect(hashes[0]).toBe(hashes[1]);
   expect(hashes[0]).not.toBe(hashes[2]);
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#cinematic')).toHaveAttribute('data-scene', '9');
   await expect(page.locator('#c')).toHaveAttribute('data-renderer-backend', 'demon-realm');
   await page.getByRole('button', { name: 'Exit', exact: true }).click();

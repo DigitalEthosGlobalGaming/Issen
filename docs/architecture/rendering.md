@@ -2,7 +2,7 @@
 
 The [PixiJS migration plan](pixijs-migration-plan.md) records the migration scope
 and the later depth/shadow extensions. The implementation below uses PixiJS
-8.22.0 with WebGL, retaining Canvas for fallback and comparison.
+8.22.0 with WebGL2. Canvas is retained for texture preparation.
 
 Performance measurement lives in `tests/performance/`, outside the application.
 Its runner builds a separate instrumented bundle with source maps; only that
@@ -12,12 +12,12 @@ are separated to make instrumentation overhead explicit. See the
 [performance suite](../../tests/performance/README.md) for commands and limits.
 The [initial Canvas/WebGL comparison](../features/webgl-performance-2026-10-05.md)
 and [rounded-stroke follow-up](../features/webgl-rounded-strokes-2026-10-05.md)
-record measured costs and the remaining Canvas/WebGL gap.
+record historical measurements from before Canvas scene rendering was removed.
 
 The rounded-stroke follow-up retains the immutable outer enemy direction ring
 as shared Pixi `GraphicsContext` geometry per paint variant. `glyphs.ts` owns
 the original brush recipe; `scene-brush-ring.ts` offers an optional native sink.
-Canvas and changing timing rings keep their procedural drawing. Rotations,
+Changing timing rings keep their procedural drawing vocabulary. Rotations,
 reflections and uniform scale reuse the ring; nonuniform transforms fall back
 to the original path commands. The painter owns and disposes its cached contexts.
 Overlapping marks retain individual alpha blending instead of flattening into
@@ -44,11 +44,11 @@ for the preserved-source comparison and measurement limits.
 
 Issen uses two presentation technologies. The duel scene uses PixiJS WebGL, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
-Ink uses layered PNG atlases for environments and modular figure artwork, alongside procedural grass, weather and effects.
+Ink uses aligned compact WebP planes (lossless PNG exceptions) for environments and modular figure artwork, alongside procedural grass, weather and effects.
 
 The only SVG in the application is small inline interface artwork, such as the
 mute control in `src/ui/shell.html` and the alternate mute icons assigned by
-`src/game.ts`. Characters, layered scenery, weather, particles and combat effects are
+`src/ui/wiring/audio.ts`. Characters, layered scenery, weather, particles and combat effects are
 drawn through the bounded `SceneDrawing` vocabulary. Its Canvas-shaped operations
 keep existing pose composition readable; the native backend emits Pixi sprites,
 tessellated geometry and cached text quads. Pixel preparation and readback are
@@ -56,10 +56,20 @@ outside that contract. No live full-scene Canvas bitmap is uploaded each frame.
 
 ## Native backend and materials
 
-`src/main.ts` selects WebGL before acquiring contexts for the main scene, Armoury
-and support preview. `?renderer=canvas` selects the retained Canvas path without
-changing saves. `scene-surface.ts` replaces a canvas if WebGL initialization fails,
-then acquires its 2D context. Tutorial scenes own and dispose a separate surface.
+The active entry path is `main.ts` → `main-game.ts` → `scene-surface.ts` →
+`pixi/scene-painter.ts`. `game.ts` connects the painter to
+`platform/frame-loop.ts`; Pixi does not own scheduling. Material-colour and
+atlas-isolation browser checks exercise this same painter. The former test-only
+`createPixiBackend` implementation has been removed. `scene-frame.ts` retains
+the texture, material, sprite and lighting contracts shared with the shaders.
+
+`MainGame` prepares WebGL2 contexts for the main scene, Armoury and support
+preview. Tutorial scenes own and dispose a separate WebGL2 surface. The former
+renderer query selector is removed. `scene-surface.ts` never replaces its canvas.
+The painter explicitly acquires WebGL2, because Pixi's preference alone permits
+WebGL1. Initialization failure shows one graphics error with Retry. Context
+deadlines use the same screen with Reload. `graphics-error.ts` reports failures;
+`MainGame` owns the screen and the runtime suspends updates and haptics.
 
 `pixi/scene-painter.ts` reuses draw slots and renderer-owned texture sources. The
 runtime's existing scheduler calls `begin()` and `flush()`; there is no Pixi ticker.
@@ -77,6 +87,12 @@ The runtime prepares camera shake and post-effect randomness once per presentati
 frame. Drawing synchronously reads the current poses and effects; it does not yet
 serialize the entire scene into an immutable snapshot. Repeated-draw tests verify
 that this path leaves gameplay, cosmetic state, RNG, haptics and saves unchanged.
+Gameplay can submit120draws per second while retaining60Hz simulation and pose
+updates. Additional draws reuse prepared camera/post data without consuming RNG;
+clock restart invalidates that preparation. Menus/cinematic retain60Hz.
+Scene-ready gameplay continuations run in runtime orchestration immediately after
+presentation. Direct drawScene calls never commit a pending scene transition;
+the readiness isolation test verifies this and exactly-once runtime settlement.
 
 `scene-material.ts` provides explicit material stamps and lighting inputs. The
 material shader accepts aligned colour/normal/mask textures, ambient and directional
@@ -93,18 +109,28 @@ player torso retains its cloth response on non-Sumi outfits; Sumi uses aligned
 PBR maps on all nine parts. Modular sword blades use the supplied
 PBR atlas instead of the generated steel study. The material shader also accepts
 packed roughness/metallic/AO and an emissive texture. OpenGL normal Y is converted
-to the scene's Y-down basis before rotation and mirroring. Canvas draws the colour
-art. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
+to the scene's Y-down basis before rotation and mirroring. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
 renderer, while the small prepared maps belong to their artwork owner.
 See [material studies](../features/material-studies.md) for authoring conventions,
 the selected artwork and the visual comparison fixture.
 
 Main-context loss stops scene updates and leaves a live run paused. Restoration
-requires explicit resume; an eight-second restoration failure replaces the canvas,
-rebinds input and resumes presentation through Canvas with the run intact.
-Auxiliary surfaces use the same eight-second fallback deadline. Preview effects
-stop updating while their context is lost; tutorial timing and practice input
-pause until restoration or fallback, without affecting the live run.
+requires explicit resume. After eight seconds without restoration, a graphics
+error offers Reload while the run remains paused and its checkpoint remains intact.
+Auxiliary surfaces use the same eight-second deadline. Preview effects and tutorial
+timing/input stop during loss. No canvas replacement or alternate renderer occurs.
+Material stamps require a native material sink; posed figures have no Canvas
+material branch. `cachedMaterialContext` explicitly marks Canvas texture
+preparation so aligned normal/surface/emission maps can still be baked there.
+Armoury previews require a prepared WebGL2 surface. Films and SVG scene paths
+also require registered native sinks. Noir and glitch use owned Pixi filters;
+Canvas film self-copies, copy storage and Canvas Path2D fallback are removed.
+Remaining procedural film geometry is drawn by the same native painter.
+Workstream verification is recorded in [runtime refactor results](../development/runtime-refactor-results.md).
+`SceneSurface` shares repeated initialization calls and owns each auxiliary
+surface's bound listeners and recovery deadline. Restoration cancels that deadline;
+disposal removes listeners, cancels recovery and releases any late-created context.
+The runtime retains ownership of combat suspension and main-canvas input rebinding.
 The pinned Pixi version needs a guarded filter bind-group adapter. It detaches
 pooled targets after rendering, before resize can destroy them, and cleans up the
 shared binding group during disposal. Warning-sensitive native and stage-switch
@@ -118,20 +144,31 @@ live switching, shared film grading, and prototype limits.
 ### Main scene
 
 `src/ui/shell.html` provides the full-screen `canvas#c`. `src/game.ts` owns its
-frame composition and delegates individual kinds of drawing to `src/rendering/`.
+frame scheduling. `src/presentation/scene.ts` owns named frame composition and
+delegates individual kinds of drawing to `src/rendering/`.
 The canvas backing store is sized for the device pixel ratio, capped at 2, while
 drawing uses CSS-pixel coordinates. A resize rebuilds layout-dependent cached
 art and reprojects active figures.
 
 The main scene is assembled back to front in a deliberate order:
 
-1. cached stage background and light glows;
-2. stage transition, mist, grass and ground stains;
-3. rear leaves and enemies, including fog between depth groups;
-4. boss, attacking enemies, bamboo, player and pet;
-5. combat particles and foreground grass;
-6. gameplay glyphs, smoke, front leaves, weather and text popups;
-7. stamps and full-frame film, grain, vignette, damage, flash and letterbox effects.
+1. `environment`: cached stage background and light glows;
+2. `midground`: mist, mid grass, ground stains and rear leaves;
+3. `rear-enemies`: boss dimming, rear enemies and fog between depth groups;
+4. `combat`: boss, attacking enemies, player, companions and combat particles;
+5. `foreground`: foreground bamboo and grass;
+6. `atmosphere`: gameplay glyphs, smoke, front leaves, weather and text popups;
+7. `post`: camera restore, stamps, film, grain, vignette, damage, flash and letterbox;
+8. `geometry`: prepare full-resolution G0/G1/G2 from the recorded painter tree;
+9. `lights`: prepare diffuse/specular accumulation;
+10. `forward-composite`: present the same ordered painter tree using those targets.
+
+`presentation/scene-composer.ts` requires an explicit neighbour for extensions,
+for example `scene.composer.insert({ name: 'example', draw(frame, views) {} }, { after: 'combat' })`.
+The returned unsubscribe is idempotent. Installation/removal during a draw affects
+the next frame; pass names are unique and missing/ambiguous neighbours throw.
+The current order preserves the original runtime body, including bamboo after
+combat particles. Scene-ready gameplay settlement stays outside all passes.
 
 The order is part of the presentation contract. Adding a renderer without choosing
 its depth explicitly can make an otherwise correct effect appear behind fog,
@@ -140,7 +177,7 @@ figures or post-processing.
 ### Cached and generated canvases
 
 Static or expensive artwork is drawn once to off-screen canvases and then submitted
-as reusable textures (or copied with `drawImage` on the Canvas backend).
+as reusable textures.
 `src/rendering/scene/background.ts` creates a seeded stage
 background at the current size and device pixel ratio. `src/game.ts` similarly
 generates reusable mist, smoke, grain, vignette and ink-edge material. These are
@@ -158,7 +195,7 @@ buttons, including segmented choices, Armoury tiles and Temple upgrades. The
 normal and highlighted centres remain dark; existing labels, equipped badges,
 rarity indicators, disabled opacity and focus outlines retain their own meaning.
 See the [atlas contract](../../src/ui/assets/button-atlas.md) for slice geometry
-and regeneration. Gameplay Canvas rendering does not consume these UI assets.
+and regeneration. The gameplay painter uses explicit prepared textures for these UI assets.
 
 Bounded panels use the heavier frames in `src/styles/panel-frames.css`, imported
 after button frames. Temple tiles use compact panel corners with selection and
@@ -265,12 +302,10 @@ Gradients, soft radial blobs, low-saturation palettes and selective `lighter`,
 scene and the armory preview. The final scene pass adds grain, scratches, vignette,
 ink edges and flashes, which helps procedural elements read as one image.
 
-Glitch film snapshots the source once for each of its two disjoint copying passes
-when drawing at aligned integer backing scales. Fractional or transformed rows,
-filters and shadows retain sequential self-copying to preserve edge feedback.
-Each context has at most one reusable full-resolution copy; changing film releases
-its backing storage. See the [performance report](../features/performance-profile-2026-10-04.md)
-for the measured CPU/memory tradeoff.
+Glitch and Noir use Pixi-owned feedback targets and filters at the surface's
+backing resolution. Canvas-only self-copy logic and its copy-storage cache were
+removed in W2. The [earlier performance report](../features/performance-profile-2026-10-04.md)
+describes the retired implementation, not current measurements.
 
 The main scene skips drawing while the opaque fullscreen equipment inspection is
 open; the preview continues on its own canvas. Ordinary Armoury, Stats and Options
@@ -285,23 +320,36 @@ letting a preview change gameplay or paint into the wrong surface.
 
 Use `save()` and `restore()` around temporary transforms, alpha or composite modes.
 If state is intentionally set without a save, restore the expected baseline before
-returning. Leaked Canvas state can subtly recolor or displace every later layer.
+returning. Leaked drawing state can subtly recolor or displace every later layer.
 
 ## Where rendering changes belong
 
-| Change                                                 | Owning location                     |
-| ------------------------------------------------------ | ----------------------------------- |
-| Stage palette, weather choice or background theme      | `src/game/content/stages.ts`        |
-| Layered image environments and sprite atlases          | `src/rendering/environment/`        |
-| Static stage scenery and props                         | `src/rendering/scene/background.ts` |
-| Moving weather, leaves, grass or smoke                 | `src/rendering/scene/`              |
-| Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`            |
-| Robe or blade appearance data                          | `src/game/content/cosmetics.ts`     |
-| Combat particles and transient effects                 | `src/rendering/effects/`            |
-| Main scene composition and full-frame post effects     | `src/game.ts`                       |
-| HUD or screen layout and styling                       | `src/ui/` and `src/styles/`         |
-| Armory-only composition                                | `src/rendering/armory-preview.ts`   |
-| Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`               |
+| Change                                                 | Owning location                                          |
+| ------------------------------------------------------ | -------------------------------------------------------- |
+| Stage palette, weather choice or background theme      | `src/game/content/stages.ts`                             |
+| Layered image environments and sprite atlases          | `src/rendering/environment/`                             |
+| Static stage scenery and props                         | `src/rendering/scene/background.ts`                      |
+| Moving weather, leaves, grass or smoke                 | `src/rendering/scene/`                                   |
+| Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`                                 |
+| Robe or blade appearance data                          | `src/game/content/cosmetics.ts`                          |
+| Combat particles and transient effects                 | `src/rendering/effects/`                                 |
+| Runtime cached environment construction                | `src/presentation/environment-artwork.ts`                |
+| Runtime ambient/grass/weather drawing host             | `src/presentation/environment.ts`                        |
+| Instanced grass geometry, GPU wind and curved normals | `src/rendering/pixi/grass-material.ts` |
+| Instanced catalogue leaves and two-sided normals | `src/rendering/pixi/leaf-material.ts` |
+| Leaf spawn clocks, analytic motion and lifetime metadata | `src/rendering/scene/leaf-motion.ts`, `src/rendering/scene/ambient.ts` |
+| Runtime feedback effect spawning/drawing               | `src/presentation/feedback.ts`                           |
+| Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
+| Persistent glint/lantern/ember/foxfire/boss lights | `src/presentation/scene-light-sources.ts` |
+| Shared visual blade-tip and presence pose | `src/rendering/figures/figure-pose.ts` |
+| Half-resolution light accumulation / guided lookup | `src/rendering/pixi/light-buffer.ts` / `src/rendering/pixi/lighting-composite-glsl.ts` |
+| Combat event lights and effects-clock decay | `src/presentation/event-lights.ts` |
+| Named GPU preparation / borrowed target access | `src/rendering/pixi/scene-painter.ts` |
+| Named post and film insertion chains | `src/presentation/post.ts`, exposed by `src/runtime/frames.ts` |
+| Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
+| HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
+| Armory-only composition                                | `src/rendering/armory-preview.ts`                        |
+| Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`                                    |
 
 Keep drawing functions dependent on explicit dimensions, time, state and random
 sources. Reuse the figure/effect/film renderers for alternate views instead of
@@ -319,11 +367,468 @@ not provide pixel-perfect visual regression coverage.
 
 The native checks are `tests/browser/pixi-backend.spec.ts`, `pixi-scenes.spec.ts`,
 `pixi-catalogue.spec.ts` and `pixi-films.spec.ts`. They exercise real WebGL drawing,
-material maps, tolerant Canvas comparisons, texture invalidation, repeat-draw
-state isolation, initialization fallback and context restoration/fallback. Use
+material maps, isolated native surface comparisons, texture invalidation,
+repeat-draw state isolation, graphics errors and context loss/restoration. Primitive
+drawing checks may use Canvas as a reference for the drawing vocabulary; it is
+never a live scene backend. Canvas-only film parity tests and runners are removed. Use
 `npx playwright test --config playwright.rendering-v2.config.ts` for the broad
 browser suite on its dedicated development server; pass the desired test files
 for focused checks. This configuration keeps verification separate from a live
 preview server. Unit post-frame tests check immutable preparation and haptic
 cadence. Android web tests establish offline bundle behavior, not physical-device
 graphics compatibility or performance.
+
+## Layout-preserving compact assets
+
+Runtime atlases keep their existing dimensions, UV windows, anchors, pivots and
+nine-slice crops. Original authoring PNGs remain checked in; startup globs retain
+compact artwork siblings. Separate base and diffuse consumers remain separate.
+Required planes are diffuse, normal and packed surface (R roughness, G metallic,
+B AO), with optional emissive. Missing emission binds the existing neutral
+texture or procedural zero plane and never loads a black image. Cached coverage
+and blend modes match explicit zero maps, including additive emission.
+
+Encoding belongs to `scripts/assets/compact.mjs` and the hash/byte manifest;
+installation and generated catalog belong to `scripts/pbr`. Runtime loading stays
+in `pbr-atlas.ts`, `asset-materials.ts`, `cached-materials.ts`, UI lighting and the
+existing worker path. Data WebP decodes bit-exactly with alpha/colour conversion
+disabled in the browser comparison. Lossless `.compact.png` exceptions preserve
+pixel and colour interpretation. Every converted plane is verified by
+`tests/browser/compacted-planes.spec.ts`; normal/material/Canvas comparisons use
+the focused rendering suites. No repacking, new loaders or downscaling.
+
+Encoded byte savings reduce download/APK storage. GPU dimensions stay unchanged;
+only removed scalar and zero-emission uploads can reduce texture residency.
+
+## Runtime composition ownership
+
+`presentation/scene.ts` records seven named layers: environment, midground,
+rear-enemies, combat, foreground, atmosphere and post, followed by the native
+geometry, lights and forward-composite passes. `scene-composer.ts` requires
+an explicit before/after neighbour for extensions. Figure/environment/post draws
+read current views and cosmetic randomness; rule mutation, saves and haptics are
+not drawing operations. Runtime frame dispatch owns rule/cosmetic update order;
+scene readiness settles after a presented frame in `runtime/scene-flow.ts`.
+
+WebGL2 is the only live renderer. Canvas/OffscreenCanvas preparation and the
+local alternative to worker texture preparation remain authoring/preparation tools.
+The native colour/soft-light/overlay blend filters remain because they implement
+live Pixi grading with correct alpha; they are not an alternate Canvas renderer.
+The native light pre-pass below now replaces the old forward material pipeline.
+Phase sections retain implementation evidence; current extension ownership is
+described in the final hook section.
+
+## W3 geometry buffer (phase 1)
+
+Each PixiScenePainter owns three native MRT attachments in geometry-buffer.ts.
+G0 stores octahedral world normal XY, signed depth normalized into a scene-sized
+range, and effective coverage. G1 stores roughness/metallic/AO and a byte material
+flag (0 neutral/unlit, 1 PBR including converted legacy masks). G2 stores linear albedo and
+material lighting amount. All are 8-bit normalized data; zero-depth ties round
+explicitly to the upper representable neighbour. Geometry alpha cutoff defaults
+to 0.5 and is configurable per SceneMaterial. Last covered writer wins in painter
+order, blending is disabled, and the original clip hierarchy is retained. Fog,
+film and grading filters remain exclusively in the ordered composite.
+
+Geometry shaders share the current material maps, UVs and inverse-transpose normal
+matrix. OpenGL normalY, mirroring, rotation and nonuniform scale are preserved.
+The painter replaces its targets on size/context restoration and releases them on
+disposal. Main geometry remains DPR-capped by viewport.ts; auxiliary surfaces own
+independent targets at their explicit canvas size. A restored context revalidates
+MRT. Fewer than three draw buffers or colour attachments shows the existing
+unsupported-graphics Retry/Reload view; there is no multipass substitute.
+
+The session-only lighting panel offers Scene, Normal/depth, Surface and Linear
+albedo views. The painter records the completed lightingFrameView separately from
+the requested lightingView, so tests capture an actual rendered buffer. Borrowed
+readonly geometryTargets expose current g0/g1/g2 textures, dimensions, depth range
+and generation; extensions must reacquire after resize/restore and never destroy
+or mutate these owner resources. The current lightingTargets hook below combines
+prepared G/light metadata and guards invalid frames.
+
+The initial phase1 checkpoint verified geometry before replacing the forward
+shader. Subsequent sections describe the completed light/lookup migration. No
+performance measurement or physical-device verification is claimed.
+
+## W3 light accumulation (phase 2)
+
+The painter runs one fullscreen native MRT pass after geometry. Two RGBA16F
+attachments retain diffuse irradiance and GGX specular radiance above 1 until the
+ordered composite applies the existing highlight roll-off. The light BRDF uses
+the existing Fresnel tint, Smith geometry and Lambert gain. Ambient AO is included
+in diffuse times (1-metallic); the previous albedo-tinted ambient metal energy is
+retained in specular. RGBA16F values are bounded by its finite maximum 65504.
+The [Khronos float extension](https://registry.khronos.org/webgl/extensions/EXT_color_buffer_float/)
+or [half-float extension](https://registry.khronos.org/webgl/extensions/EXT_color_buffer_half_float/)
+must enable that same native format, and actual framebuffer completeness is checked.
+Unsupported HDR reports the normal graphics error; there is no alternate format.
+Depth decode anchors canonical zero at byte128; other depths retain 8-bit error
+within one scene-range quantization step.
+
+presentation/light-sources.ts owns source sampling and the global16 budget. Each
+source supplies stable local IDs and receives explicit target dimensions and the
+presentation clock. Sources are sampled from a snapshot, so registration/removal
+during sampling applies next frame. Ranking uses intensity times exact clipped
+circular viewport area, with code-point source/ID ties. light-budget.ts supplies
+the pure shared calculation; the native backend also applies it to direct preview
+lighting inputs. No per-sprite selection occurs in this light pass and no gameplay
+randomness is consumed. The retained stage rig enters the same budget.
+
+Borrowed painter.lightTargets exposes diffuse/specular Texture wrappers, size and
+generation. Never mutate/destroy these resources; reacquire on resize/restore.
+Each preview has its own attachments. Geometry sampler bindings are detached
+before old G targets are released. Explicit HDR sources are destroyed by their
+owner, because RenderTarget does not manage externally supplied sources.
+The light debug views map radiance to radiance/(1+radiance) for display only;
+production light targets retain HDR. Controls stay session-only.
+
+Phase2 verified accumulation before phase3 switched ordinary material sprites
+to lookup. Later sections describe the current unified pipeline and extensions.
+
+## W3 lookup composite (phase 3)
+
+Ordinary material sprites now sample the painter's diffuse/specular targets at
+world screen position and combine their own linear albedo and emission. The
+existing highlight roll-off, display encoding, coverage, fog, tint and ordered
+native blend/film passes remain. The sprite shader performs no BRDF evaluation.
+Below-cutoff translucency samples the surface behind it, including its normal,
+depth, roughness, metallic tint and AO. This is the requested accepted
+approximation; overlapping materials can therefore share or tint highlights.
+
+The geometry cutoff uses exact effective mesh/ancestor alpha instead of Pixi's
+byte-packed colour alpha, so authored alpha0.5 is included at default cutoff0.5.
+Composite output preserves Pixi's existing premultiplied-alpha convention.
+Light sampler bindings are detached before light attachments are replaced.
+Material stamps and instanced grass/leaves borrow one painter-owned Pixi light
+bind group; their material uniforms and atlas bindings remain individually owned.
+This keeps light-source listeners independent of the pooled mesh count. Only
+previously prepared slots release their attachment state, and repeated release
+does nothing. The geometry pass retains light bindings unless resizing replaces
+the borrowed guide; the light pass detaches before writing its targets. Context
+restore and disposal release generation-scoped references before replacing or
+destroying targets. Standalone material factories own their own light group.
+
+During phase3 only, canvas.dataset.lightingComparison='forward' selects the old
+forward shader for developer/browser comparison. Phase4 removes both this flag
+and that shader. The native light pass still runs during comparison; this flag
+does not select another renderer. Normal production drawing defaults to lookup.
+
+Native PBR studies cover rock, cloth and steel with mirror/rotation/nonuniform
+scale, translucent coverage, fog, warm/cool point lights, actual noir grading and
+lighting disabled. Mean displayed RGB differences were0.03855/0.04166/0.04091/0
+against the existing native scene tolerance9, with zero alpha mismatches and
+24396 covered pixels per case. Thin edges compare their actual displayed
+contribution over black. Screenshots and numeric JSON use testInfo.outputPath;
+ignored checkpoint copies preserve evidence across later test-result cleanup.
+
+Phase3 was an intermediate comparison checkpoint. Phase4 removed the temporary
+comparison flag and old shader after these native comparisons passed.
+
+## W3 single material model and old-shader removal (phase 4 checkpoint)
+
+The old forward fragment, per-sprite four-point selection, its uniforms and the
+temporary runtime comparison flag have been removed. The recoverable reference
+is commit472f60aa71787adec717adbf8f982109790925f6. geometry-material.ts converts
+legacy gloss to GGX roughness using (2/(mix(8,96,gloss)+2))^(1/4), maps legacy
+specular strength to metallic response, and supplies AO1. Both legacy and authored
+PBR surfaces carry flag1 and use the same light-pass GGX equations. This mapping
+is an approximation of legacy authored response, not another BRDF. Legacy blue
+emission remains an own-albedo term in the ordered composite; it never enters
+shared diffuse/specular targets. Native equivalent-map/emission checks pass.
+
+Regression references under tests/browser/fixtures/lighting-forward are actual
+RGBA captures from the old shader before removal. Provenance records the source
+commit and four controlled scenes. The browser compares native lookup output
+against those images at unchanged mean scene tolerance9 and exact alpha equality.
+It no longer sets a runtime shader flag. Current differences remain below0.042.
+
+Ordinary drawImage/cached text, round strokes and ellipses now use retained
+native meshes. Paths, gradients, brush rings and glyph arrows retain native
+Graphics geometry with a shared lookup shader. artwork-materials.ts owns these
+bindings per painter; lighting-composite-glsl.ts provides the same linear
+albedo/diffuse/specular/display response used by material stamps. Authored
+colour art, text and fog retain neutral lighting amount as material data. They
+use the shared shader and targets while preserving their original colour and
+coverage; they do not add lit geometry to the G-buffer. Stencil masks and native
+film/filter stages retain their separate roles in the same scene pipeline.
+
+The native artwork-lighting fixture sets this shared material parameter to one
+and proves eight content kinds sample ambient0.25 and0.5 light targets (display
+values137 and188), independent owners, resize replacement and disposal. Existing
+native coverage/gradient/clip/film/reference checks retain their assertions.
+Three texture units are reserved for light targets and the geometry guide;
+WebGL2's guaranteed16 fragment samplers leave up to13 native colour textures.
+Graphics contexts share one owned shader; image meshes own sampler bindings.
+Bindings detach before source expiry or target replacement. Pixi's cached
+native graphics batch bind groups outlive renderer disposal, so gradients release
+GPU storage through source.unload(), as retired gradients already do, rather than
+invalidating cached sources. The warning-sensitive film disposal test covers it.
+
+Absent emissive maps bind shared zero Texture.EMPTY, including initialization
+and release, with no per-material image allocation or absent-map request.
+Instancing, event sources, half-resolution lighting and named GPU composer
+passes are implemented below. The complete W3 checkpoint is recorded in
+[lighting results](../development/lighting-refactor-results.md).
+
+## W3 instanced grass (phase 5)
+
+scene-grass.ts is the native drawing port. ambient.ts submits a complete layer
+instead of constructing a path per blade. presentation/environment.ts keeps the
+cached snow/demon variants and submits midground depth-12 and foreground depth12
+at the original composer positions, with effects/quality density. Random blade
+placement is unchanged; drawing consumes no random numbers.
+
+pixi/grass-material.ts owns one retained instanced strip per submitted depth
+layer. Instance attributes contain base position, height, width, phase, palette
+colour index, layer depth and a deterministic density-selection seed. They are
+uploaded when the layer list changes. Subsequent frames update only time, wind,
+density, lighting and transform uniforms. Twelve strip segments approximate the
+original paired quadratic curves; sway retains the original frequencies and
+coefficients in the vertex shader. The palette retains float RGBA so authored
+alpha0.5 reaches the exact cutoff. Its nearest-sampled data texture uses up to
+1024 columns and additional rows. No texture renderability extension is needed.
+
+Curved approximate normals write the same G0/G1/G2 layout, with matte roughness
+0.85, metallic0 and AO1. Cutoff uses exact source and ancestor alpha before
+canonical eight-bit coverage encoding. Thin blades use the accepted surface
+behind them in the shared lookup. The colour pass uses the common linear light
+composite; GPU density selection preserves original instance ordering. Clip,
+film, resize, restore and disposal ownership remain with the native painter.
+
+The native grass fixture proves actual1000-instance draws, no blade property
+reads after upload, repeatable frames, GPU wind changes, reduced density, curved
+PBR normals and pixel-identical context restore. A second fixture compares the
+authored curves at the unchanged scene tolerance9 (observed mean0.154), accepts
+alpha0.5, rejects below-cutoff geometry and preserves ordered depth layers.
+These are correctness checks, not performance measurements. The catalogue leaf
+implementation below completes phase5; phase6 is implemented in the following
+sections. Workstream and final gate evidence is in the development reports.
+
+## W3 instanced catalogue leaves (phase 5)
+
+scene-leaves.ts adds a native layer port using the existing SceneTexture and
+SceneMaterial vocabulary. drift-renderer.ts owns the four prepared diffuse/PBR
+atlas families and supplies full-atlas material planes. leaf-material.ts draws
+one instanced quad mesh per front/rear layer, preserving original instance order
+across atlas families instead of regrouping overlapping particles. G writes use
+12 samplers (four diffuse, normal and surface); ordered composition uses10
+(four diffuse, optional emission, diffuse/specular light). Both fit WebGL2's
+required16 fragment samplers without alternate layouts or renderer paths.
+
+Static instance data retains catalogue frame rounding, pivots, size, opacity,
+normalY, spawn position, depth group, birth clocks, fall speed, phase, spin,
+flutter and gust multiplier. GPU motion integrates the original wind speed and
+sinusoidal fall analytically from the effects clock. Ordinary and gust creation
+still use the independent cosmetic RNG. ambient.ts performs only a lifetime
+sweep every0.125 effects seconds (or an explicit zero-delta validation); it
+respawns ordinary particles and retires gusts. It does not update or upload poses
+per frame. Density continues to size/balance the catalogue population through
+effects/quality.ts. environment-state.ts owns the persistent motion integrals;
+drawing cannot advance them. The analytic fall replaces the old Euler step;
+unit comparison to small-step integration differs by less than0.02 logical pixels.
+
+Folded backs reverse authored slopes while retaining view-facing Z, so both
+faces remain lit. NormalY conversion and inverse-transpose parent transforms
+remain in the G pass. Exact source/ancestor coverage is tested before canonical
+eight-bit encoding. Ordered colour uses the same shared linear light lookup,
+optional zero emission and highlight response; per-instance opacity retains
+Pixi's original byte quantization. Thin coverage samples the surface behind it.
+Map/light bindings detach before expiry, replacement and disposal. Atlas and
+instance resources restore on the original surface; there is no Pixi ticker.
+
+The native fixtures cover32 catalogue frames with exact centre RGBA parity,
+retained buffers while motion changes, actual1000-leaf front/rear layers over
+all four real PBR atlases, independent owners, resize, restore and disposal,
+plus folded normals/raking light and scoped clips. All G-buffer bytes, both HDR
+light target values and coverage are compared exactly across repeat/restore.
+Displayed RGB uses the existing scene tolerance9: the first version of the new
+restore fixture incorrectly demanded bit-identical HDR-to-display conversion.
+Diagnostics proved a single62/63 colour-byte difference also occurred before
+context loss while all five underlying targets remained identical. That test
+assumption was corrected; no production rounding workaround or existing test
+threshold was changed. The dithering hypothesis was tried and reverted.
+
+## W3 event-light sources (phase 6, first checkpoint)
+
+runtime/presentation.ts now owns a shared light-source registry passed to the
+scene by runtime/frame-bindings.ts. runtime/reactions.ts installs event-lights.ts
+listeners for immutable kill/parry/block values; lifecycle disposal unregisters
+both listeners and their source. Run entry clears pending flashes. No rule module
+imports the light registry, and no random stream is consumed. Birth timestamps
+use presentationState.time; paused effects time freezes intensity. Sampling is
+read-only, with quadratic decay over0.14–0.24 effects seconds. Reduced Flashes
+suppresses both event creation and active contributions immediately.
+
+Scene-source positions are logical. LightFrame.transform carries the current
+camera/zoom/DPR matrix; transformSceneLight maps position and radius/depth to the
+physical target before the shared budget. The stage rig remains in target pixels.
+All live flashes enter the global16 ranking, with no earlier per-source cap that
+could drop a stronger light. Expired records retire on event delivery or disposal.
+A native fixture proves actual HDR and composite contribution, frozen redraws,
+quarter radiance at half-life, suppression/expiration/disposal and zero GL errors.
+
+Minimal scene-source extension (the unregister callback belongs to lifecycle):
+
+```ts
+const unregister = sources.register('lantern-example', frame => [{
+  id: 'fixed-lantern',
+  light: transformSceneLight({
+    x: 120, y: 80, z: 20, radius: 60, intensity: 0.5, color: [1, 0.7, 0.4],
+  }, frame),
+}]);
+lifecycle.add(unregister);
+```
+
+This first phase6 checkpoint covered event lights; subsequent sections document
+persistent sources, quality and extension hooks.
+
+## W3 persistent scene sources (phase 6)
+
+scene-light-sources.ts registers sword-glints, lanterns, embers, foxfire and
+boss-auras with the presentation registry. It samples existing visual state:
+regular and boss blade glints use the same resolved presence/weapon tip as drawing;
+lanterns use their particle sway and fade; embers use their existing lifetime and
+pulse; foxfire uses a shared companion pose; boss aura follows the current flash
+ring. No particles, rules or random numbers are created or advanced here.
+figure-pose.ts shares presence and blade geometry with the native figure renderer;
+foxfire-pose.ts shares companion coordinates with player-figures.ts. This preserves
+original drawing while attaching illumination. Loading/cinematic visibility,
+expired particles, dying figures and Reduced Flashes govern their contributions.
+
+Per-object IDs live in a WeakMap, so reordering particles does not change ranking
+ties and the source owner does not retain dead game records. The logical scene
+transform is applied through transformSceneLight before the shared16-light budget.
+All sources unregister with lifecycle; previews retain independent registry/target
+owners. The existing rig and event flashes share this same budget and BRDF.
+
+Four units cover all source formulas, pose/transform alignment, no input mutation
+or RNG, stable reordered identities, retirement, accessibility and disposal. Native
+proof isolates each of the five sources on a lit surface, verifies nonzero colour,
+repeatability and removal, and attaches a foxfire capture through testInfo.outputPath.
+The inspected capture shows the blue local contribution on the native material.
+This checkpoint completed source registration. Subsequent sections cover quality
+and hooks; workstream/final verification are recorded in the handoff.
+
+## W3 half-resolution lighting (phase 6)
+
+SceneLighting.lightResolution accepts1 or0.5; default1 preserves the full-resolution
+lookup. The session-only Light resolution selector in testing tools offers Full
+and Half. effects/quality.ts resolves its override without changing saved settings.
+Reset light returns to Full, and disposal/reload removes the override. The painter
+reports completed target dimensions as data-light-buffer-size for native checks.
+
+G0/G1/G2 remain full resolution. light-buffer.ts allocates the same two required
+RGBA16F attachments at ceil(scene size × resolution); there is no format or backend
+fallback. LightTargets.width/height describe physical accumulation dimensions;
+sceneWidth/sceneHeight describe the physical full scene. The borrowed guide is the
+current full-resolution G0 texture, owned by GeometryBuffer, not LightBuffer.
+Reacquire all borrowed target wrappers after generation changes. Switching quality
+replaces only L targets; resize/restore recreates both sets and guide bindings.
+All providers detach guide/L samplers before resource replacement or disposal.
+
+The shared composite GLSL uses a direct lookup at Full. At Half it samples four
+coarse light texels, combines bilinear spatial weights with decoded normal/depth
+compatibility and coverage, and normalizes the weights. This rejects light from
+incompatible adjacent surfaces. If no coarse texel captures a feature, its most
+compatible neighbour supplies the approximation; features smaller than a coarse
+texel cannot recover unsampled lighting. Thin translucent sprites retain the
+accepted lookup from the surface behind them. The same BRDF, emission, fog, alpha,
+blend and film rules apply. Grass/leaf/native image/vector/material routes all use
+this lookup. Leaf composite now uses11 samplers; G uses12. Artwork retains13 colour
+slots plus diffuse/specular/guide, within the required16 fragment samplers.
+
+Shared lookup arithmetic also compiles through Pixi's generated native high shaders,
+which emit compatible GLSL syntax: float mod/floor replaces integer remainder, and
+lookup calculations request high precision. This does not add a WebGL1 backend.
+The initial warning-sensitive native fixture caught this compile error and it was
+fixed with all original assertions retained.
+
+Native checks compare depth/normal boundaries against the same accumulation with
+the guide ablated (plain bilinear), preserve exact coverage at existing RGB tolerance9,
+and prove all five colour providers/odd dimensions/independent owners/resize/restore/
+disposal. The testing-control check proves target sizes and unchanged saved settings.
+Captures use testInfo.outputPath; the depth-boundary capture was inspected. These
+are correctness checks, not performance captures. Current named composer and
+film/post/target extension hooks are described below.
+
+
+## Current extension hooks (W3 phase 6)
+
+The seven recording layers above retain their drawing order. Geometry, lights and
+forward-composite are now explicit named composer passes. Auxiliary surfaces still
+call begin/flush; flush prepares the same native passes as necessary. Preparation
+is invalidated by begin, new submissions, film grouping, lighting, resize and
+context loss/restore. Repeated explicit preparation followed by flush does not
+repeat G/light GPU work. A quality-only change replaces L while retaining G.
+There is one painter, one light accumulation model and no alternate renderer.
+
+The painter's lightingTargets getter returns undefined until current G and L are
+prepared. Its outer object and both target metadata objects are frozen. Textures
+are borrowed sampler inputs: never mutate, resize, render into, unload or destroy
+them. Read-only access does not freeze Pixi internals. Reacquire inside each pass;
+do not retain wrappers or sampler bindings across begin, resize, quality changes,
+context loss or disposal. Consumers must detach their sampler references before
+owner replacement/disposal and dispose their own resources through lifecycle.
+
+A minimal target reader can be inserted after lights (or before forward-composite):
+
+```ts
+lifecycle.add(frames.drawScene.composer.insert({
+  name: 'inspect-prepared-lighting',
+  draw(_frame, views) {
+    const targets = views.nativeScene.lightingTargets;
+    if (!targets) return;
+    const { g0, g1, g2, generation } = targets.geometry;
+    const { diffuse, specular, guide, resolution } = targets.light;
+    // Read metadata or sample these borrowed textures in an owned extension pass.
+    // Bind only for this draw, then detach; do not change or destroy the targets.
+  },
+}, { after: 'lights' }));
+```
+
+The post recording chain exposes blood-tint, film, grain, blot, scratches, dust,
+vignette, night-vignette, ink-edge, letterbox, flicker and flash, in original order.
+Its film subchain exposes grade, which invokes the existing film renderer. Both
+use the same unique-name/explicit-neighbour/idempotent-removal contract as scene
+composition. Installation or removal during a draw takes effect next frame.
+They record drawing commands before geometry/light preparation; extensions that
+need current-frame targets belong after lights in the scene composer instead.
+
+Minimal post and film insertion (prepared frame inputs stay read-only):
+
+```ts
+lifecycle.add(frames.drawPost.composer.insert({
+  name: 'inspect-post-frame',
+  draw(frame, views) {
+    const { flicker } = frame;
+    const { W, H } = views;
+    // Consume these prepared values without advancing effects or gameplay.
+  },
+}, { before: 'letterbox' }));
+lifecycle.add(frames.drawPost.filmComposer.insert({
+  name: 'inspect-film-frame',
+  draw(_frame, views) {
+    const film = views.sceneFilm();
+    // Observe the selected grade without changing state.
+  },
+}, { after: 'grade' }));
+```
+
+Light registration uses the lifecycle-owned source example above. Native tests
+exercise actual target render calls, late-submission invalidation, quality/resize,
+read-only snapshots, disposal and unchanged pixels. Runtime tests invoke all three
+insertion chains and verify draws leave rules, RNG, saves and haptics unchanged.
+Future rim lighting, rays, shadows and outlines are hooks only; none is implemented.
+Earlier phase sections record intermediate checkpoints; this section describes
+current hook ownership. Workstream and Part4 verification remain separate gates.
+
+
+Demon scenery keeps its very low-alpha mist clipping strips on logical pixel
+bounds. The radial gradient centres, seed variation and visual motion retain their
+original coordinates. Fractional strip edges produced one-byte differences on the
+first native MSAA composite despite identical vertex/index/uniform/texture/G/light
+inputs. Aligning only the clip bounds preserves exact repeat rendering; native
+checks cover both orientations and DPR1/2. Original-to-aligned meanRGBA is0.00945,
+maximum RGB3 and alpha unchanged, within existing scene tolerance9. The original
+cinematic exact-image assertion remains unchanged; no shader quantization,
+precision change, extra composite or comparison tolerance was introduced.

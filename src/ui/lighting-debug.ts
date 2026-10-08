@@ -29,6 +29,56 @@ export function createLightingDebug(
   marker.setAttribute('aria-label', 'Drag light position');
   app.append(root, marker);
   const controls = root.querySelector('.lighting-controls')!;
+  const bufferLabel = doc.createElement('label');
+  bufferLabel.textContent = 'Buffer view';
+  const bufferSelect = doc.createElement('select');
+  bufferSelect.setAttribute('aria-label', 'Buffer view');
+  for (const [value, label] of [
+    ['none', 'Scene'],
+    ['g0', 'Normal / depth'],
+    ['g1', 'Surface'],
+    ['g2', 'Linear albedo'],
+    ['diffuse', 'Diffuse light'],
+    ['specular', 'Specular light'],
+  ]) {
+    const option = doc.createElement('option');
+    option.value = value!;
+    option.textContent = label!;
+    bufferSelect.append(option);
+  }
+  bufferLabel.append(bufferSelect);
+  root.append(bufferLabel);
+  bufferSelect.addEventListener(
+    'change',
+    () => {
+      canvas().dataset.lightingView = bufferSelect.value;
+      invalidate();
+    },
+    { signal: events.signal },
+  );
+  const resolutionLabel = doc.createElement('label');
+  resolutionLabel.textContent = 'Light resolution';
+  const resolutionSelect = doc.createElement('select');
+  resolutionSelect.setAttribute('aria-label', 'Light resolution');
+  for (const [value, title] of [
+    ['full', 'Full'],
+    ['half', 'Half'],
+  ]) {
+    const option = doc.createElement('option');
+    option.value = value!;
+    option.textContent = title!;
+    resolutionSelect.append(option);
+  }
+  resolutionLabel.append(resolutionSelect);
+  root.append(resolutionLabel);
+  resolutionSelect.addEventListener(
+    'change',
+    () => {
+      canvas().dataset.lightResolution = resolutionSelect.value;
+      invalidate();
+    },
+    { signal: events.signal },
+  );
   const previewLabel = doc.createElement('label');
   previewLabel.textContent = 'Material preview';
   const previewSelect = doc.createElement('select');
@@ -79,12 +129,10 @@ export function createLightingDebug(
     marker.style.left = `${bounds.left + rig.state.x * bounds.width}px`;
     marker.style.top = `${bounds.top + rig.state.y * bounds.height}px`;
     marker.style.color = rig.state.color;
-    root.querySelector('p')!.textContent =
-      canvas().dataset.graphicsBackend === 'pixi'
-        ? 'Drag the light marker or adjust its position.'
-        : 'Lighting requires WebGL. This view uses Canvas.';
+    root.querySelector('p')!.textContent = 'Drag the light marker or adjust its position.';
   };
   function sync() {
+    resolutionSelect.value = canvas().dataset.lightResolution ?? 'full';
     for (const input of inputs) {
       const key = input.dataset.setting as Numeric | 'enabled' | undefined;
       if (!key) {
@@ -109,6 +157,7 @@ export function createLightingDebug(
     'click',
     () => {
       rig.reset();
+      delete canvas().dataset.lightResolution;
       sync();
       invalidate();
     },
@@ -204,6 +253,8 @@ export function createLightingDebug(
     refresh: position,
     dispose() {
       events.abort();
+      delete canvas().dataset.lightingView;
+      delete canvas().dataset.lightResolution;
       root.remove();
       marker.remove();
     },

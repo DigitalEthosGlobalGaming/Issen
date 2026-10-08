@@ -52,14 +52,18 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__optionsHarness = { G, randomState: () => runRandom.state() }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__optionsHarness = { G: foundation.run.G, randomState: () => foundation.run.activity.runRandom.state() }; artworkReady = true;',
       ),
     });
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.locator('#bPlay').click();
   await page.locator('#bBegin').click();
+  // Freeze an established encounter; pending scene entry intentionally commits
+  // its wave/checkpoint while preserving pause (covered by scene-readiness).
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready');
+  await expect.poll(() => page.evaluate(() => !!(window as any).__optionsHarness.G.cfg)).toBe(true);
   await page.keyboard.press('p');
   await page.locator('#bPauseOptions').click();
   const snapshot = () =>
@@ -279,8 +283,8 @@ test('explicit motion overrides control result tallies and setup reveal animatio
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__motionHarness = { runResults }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__motionHarness = { runResults: ui.runResults }; artworkReady = true;',
       ),
     });
   });

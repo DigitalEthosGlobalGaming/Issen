@@ -7,7 +7,7 @@ test('startup remains blocked until delayed artwork loads and decodes', async ({
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route('**/companion-parts-atlas.png', async (route) => {
+  await page.route('**/companion-parts-atlas.webp', async (route) => {
     await gate;
     await route.continue();
   });
@@ -29,7 +29,7 @@ test('disposing while artwork is pending prevents a late game mount', async ({ p
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route('**/companion-parts-atlas.png', async (route) => {
+  await page.route('**/companion-parts-atlas.webp', async (route) => {
     await gate;
     await route.continue();
   });
@@ -50,7 +50,7 @@ test('disposing while artwork is pending prevents a late game mount', async ({ p
 
 test('failed artwork offers retry and never starts missing assets', async ({ page }) => {
   let fail = true;
-  await page.route('**/companion-parts-atlas.png', (route) =>
+  await page.route('**/companion-parts-atlas.webp', (route) =>
     fail ? route.abort() : route.continue(),
   );
   await page.goto('/', { waitUntil: 'domcontentloaded' });

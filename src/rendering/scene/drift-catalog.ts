@@ -1,10 +1,10 @@
 import type { Random } from '../../shared/random.ts';
 
 export const DRIFT_ATLASES: Readonly<Record<string, string>> = {
-  leaves: new URL('../environment/assets/drift-leaves-atlas.png', import.meta.url).href,
-  petals: new URL('../environment/assets/drift-petals-atlas.png', import.meta.url).href,
-  debris: new URL('../environment/assets/drift-debris-atlas.png', import.meta.url).href,
-  fire: new URL('../environment/assets/drift-fire-atlas.png', import.meta.url).href,
+  leaves: new URL('../environment/assets/drift-leaves-atlas.webp', import.meta.url).href,
+  petals: new URL('../environment/assets/drift-petals-atlas.webp', import.meta.url).href,
+  debris: new URL('../environment/assets/drift-debris-atlas.webp', import.meta.url).href,
+  fire: new URL('../environment/assets/drift-fire-atlas.webp', import.meta.url).href,
 };
 
 /** Frame rectangles and pivots are normalized to the atlas and frame respectively. */

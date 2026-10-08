@@ -2,9 +2,19 @@
 
 Generated from [pine-atlas.png](../../pine-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](pine-atlas_diffuse.png), [normal](pine-atlas_normal.png), [roughness](pine-atlas_roughness.png), [metallic](pine-atlas_metallic.png), [ao](pine-atlas_ao.png), [emissive](pine-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| pine-atlas | [diffuse](pine-atlas_diffuse.webp), [normal](pine-atlas_normal.webp), [surface](pine-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

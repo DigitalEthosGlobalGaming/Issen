@@ -1,4 +1,4 @@
-import type { BladeStyle } from '../../rendering/figures/types.ts';
+import type { BladeStyle } from '../../shared/character.ts';
 export interface RobeStyle {
   robeD?: number[];
   robe?: number[];

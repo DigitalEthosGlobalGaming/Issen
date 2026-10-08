@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
 
@@ -16,6 +16,20 @@ try {
     if (!directory.startsWith(root + path.sep))
       throw Error('Pack output must stay in the repository');
     const stem = path.basename(job.source, '.png');
+    // Already compacted installations need no scalar inputs. Regeneration writes
+    // all three scalar PNGs before this step, so fresh exports are still verified.
+    try {
+      await access(path.join(directory, `${stem}_roughness.png`));
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      try {
+        await access(path.join(directory, `${stem}_surface.compact.png`));
+      } catch (missing) {
+        if (missing.code !== 'ENOENT') throw missing;
+        await access(path.join(directory, `${stem}_surface.webp`));
+      }
+      continue;
+    }
     const channels = await Promise.all(
       ['roughness', 'metallic', 'ao'].map(
         async (kind) =>

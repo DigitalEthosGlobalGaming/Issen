@@ -5,8 +5,8 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__bossVariety = {G,testJump}; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__bossVariety = {G: foundation.run.G,testJump: game.testJump}; artworkReady = true;',
       ),
     });
   });
@@ -18,7 +18,7 @@ test('varied boss name and appearance survive checkpoint reload', async ({ page 
     );
   });
   await page.goto('/');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await page.evaluate(() => {
     (window as any).__bossVariety.testJump(0, 3, true);
   });

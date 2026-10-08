@@ -4,7 +4,7 @@ import { bladeEffectPoint, supportsInkBlade } from './blade-recipes.ts';
 import { supportsInkOutfit } from './outfit-kit.ts';
 import { scatteredPartMotion } from './death.ts';
 import { enemyPresence } from './enemy-presence.ts';
-import { playerPresence } from './player-presence.ts';
+import { bladeTip, resolveFigurePose } from './figure-pose.ts';
 import { TAU, clamp, easeOut } from '../../shared/math.ts';
 import type { Palette } from '../palette.ts';
 import type {
@@ -205,12 +205,7 @@ export function createFigureRenderer(g: SceneDrawing, env: FigureEnvironment) {
     }
     g.restore();
   }
-  function tipOf(p: Pose, lx: number, Lb = 0.52): Point {
-    Lb = Lb || 0.52;
-    const ca = Math.cos(p.ang),
-      sa = Math.sin(p.ang);
-    return [p.gx + lx + ca * Lb + sa * Lb * 0.05, p.gy + sa * Lb - ca * Lb * 0.05];
-  }
+  const tipOf = bladeTip;
   function drawGlint(x: number, y: number, k: number) {
     g.save();
     g.globalCompositeOperation = 'lighter';
@@ -277,9 +272,7 @@ export function createFigureRenderer(g: SceneDrawing, env: FigureEnvironment) {
     env.inkCompanion?.draw(type, g, x, y, size, time, petActive, env.reducedMotion);
   }
   function drawFigure(f: Figure) {
-    if (env.reducedMotion && f.secondary) f = { ...f, secondary: undefined };
-    f = enemyPresence(f, time, !!env.reducedMotion);
-    f = playerPresence(f, time, !!env.reducedMotion);
+    f = resolveFigurePose(f, time, !!env.reducedMotion);
     const C = f.pal || cols(f.fog),
       lx = f.lean || 0,
       t = time;

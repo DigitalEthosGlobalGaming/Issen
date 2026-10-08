@@ -2,9 +2,19 @@
 
 Generated from [shrubs-atlas.png](../../shrubs-atlas.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](shrubs-atlas_diffuse.png), [normal](shrubs-atlas_normal.png), [roughness](shrubs-atlas_roughness.png), [metallic](shrubs-atlas_metallic.png), [ao](shrubs-atlas_ao.png), [emissive](shrubs-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| shrubs-atlas | [diffuse](shrubs-atlas_diffuse.webp), [normal](shrubs-atlas_normal.webp), [surface](shrubs-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

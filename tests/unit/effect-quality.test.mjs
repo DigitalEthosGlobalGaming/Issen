@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createEffectQuality } from '../../src/rendering/effects/quality.ts';
+import {
+  createEffectQuality,
+  preferredLightResolution,
+} from '../../src/rendering/effects/quality.ts';
 import { createAmbient } from '../../src/rendering/scene/ambient.ts';
 import { createWeatherParticles } from '../../src/rendering/scene/weather-particles.ts';
 import { createEffects } from '../../src/rendering/effects/state.ts';
@@ -45,4 +48,12 @@ test('density scales weather, ambient leaves and combat particles', () => {
     return fx;
   };
   assert.ok(effects(0.3).sparks.length < effects(1).sparks.length);
+});
+
+test('light resolution is an explicit cosmetic choice with a preserved caller default', () => {
+  assert.equal(preferredLightResolution('half'), 0.5);
+  assert.equal(preferredLightResolution('full', 0.5), 1);
+  assert.equal(preferredLightResolution(undefined, 0.5), 0.5);
+  assert.equal(preferredLightResolution('invalid'), 1);
+  assert.equal(preferredLightResolution('invalid', 0.5), 0.5);
 });

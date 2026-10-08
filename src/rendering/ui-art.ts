@@ -4,7 +4,7 @@ import { SEVEN_DAWNS_PATHS } from './crest-art.ts';
 import { renderUiMaterialTexture } from '../ui/material-textures.ts';
 import { createAssetMaterials } from './asset-materials.ts';
 import { drawMaterialStamp } from './scene-material.ts';
-const ATLAS_URL = new URL('../ui/assets/world-ui-atlas.png', import.meta.url).href;
+const ATLAS_URL = new URL('../ui/assets/world-ui-atlas.webp', import.meta.url).href;
 export type SealMaterial = 'paper' | 'wood' | 'metal' | 'silk' | 'stone';
 const frames = {
   paper: [0, 0],

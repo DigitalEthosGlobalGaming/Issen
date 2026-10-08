@@ -6,7 +6,7 @@ test('guided prompts start safe practice directly and fit portrait view', async 
   await page.evaluate(async () => {
     const mainPath = document.querySelector<HTMLScriptElement>('script[src*="/src/main.ts"]')!.src;
     (await import(mainPath)).dispose();
-    const { createGuidedLessons } = await import('/src/game/onboarding/guided-lessons.ts');
+    const { createGuidedLessons } = await import('/src/ui/wiring/guided-lessons.ts');
     const state = window as typeof window & {
       guided?: ReturnType<typeof createGuidedLessons>;
       guidedSaved?: unknown;

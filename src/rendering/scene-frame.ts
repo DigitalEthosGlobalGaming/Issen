@@ -1,4 +1,4 @@
-/** Backend-independent scene data. Coordinates are logical pixels, Y points down. */
+/** Shared scene texture, material and lighting data. Coordinates are logical pixels, Y points down. */
 export interface SceneTransform {
   a: number;
   b: number;
@@ -8,15 +8,6 @@ export interface SceneTransform {
   ty: number;
 }
 
-export const IDENTITY: Readonly<SceneTransform> = Object.freeze({
-  a: 1,
-  b: 0,
-  c: 0,
-  d: 1,
-  tx: 0,
-  ty: 0,
-});
-
 export interface SceneTexture {
   source: HTMLImageElement | HTMLCanvasElement | ImageBitmap;
   /** Increment only when a prepared canvas's pixels change. */
@@ -25,6 +16,8 @@ export interface SceneTexture {
 }
 
 export interface SceneMaterial {
+  /** Minimum effective alpha written to the geometry buffer; default 0.5. */
+  alphaCutoff?: number;
   normal?: SceneTexture;
   /** PBR data: R roughness, G metallic, B ambient occlusion, A opaque by default. */
   surface?: SceneTexture;
@@ -65,33 +58,16 @@ export interface SceneLight {
 }
 
 export interface SceneLighting {
+  /** Full or half resolution HDR accumulation; geometry remains full resolution. */
+  lightResolution?: 1 | 0.5;
   /** Debug comparison; omitted means authored material lighting. */
   materialLighting?: number;
   /** Linear RGB radiance, shared by PBR and mask materials. */
   ambient: readonly [number, number, number];
   directional: readonly [number, number, number];
   direction: readonly [number, number, number];
+  /** Global viewport budget: at most 16 lights, ranked by visible footprint × intensity. */
   points: readonly SceneLight[];
-}
-
-export interface SceneFrame {
-  width: number;
-  height: number;
-  dpr: number;
-  time: number;
-  reducedMotion: boolean;
-  reducedFlashes: boolean;
-  /** Already ordered by the compositor; a backend must not reorder transparency. */
-  sprites: readonly SceneSprite[];
-  lighting: SceneLighting;
-}
-
-export interface SceneBackend {
-  readonly canvas: HTMLCanvasElement;
-  readonly kind: 'canvas' | 'pixi';
-  resize(width: number, height: number, dpr: number): void;
-  render(frame: SceneFrame): void;
-  dispose(): void;
 }
 
 /** Inverse transpose of the 2D linear transform; preserves mirrored normals. */

@@ -1,3 +1,4 @@
+import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { EnvironmentFrame, createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
@@ -13,7 +14,7 @@ import type {
 } from './worker-types.ts';
 
 type LocalRenderer = ReturnType<typeof createLocalEnvironmentRenderer>;
-const FOG_URL = new URL('./assets/fog-wisps-atlas.png', import.meta.url).href;
+const FOG_URL = new URL('./assets/fog-wisps-atlas.webp', import.meta.url).href;
 const emptySnapshot = (): EnvironmentSnapshot => ({
   foreground: { layers: 0, pixels: 0 },
   backend: 'loading',
@@ -82,6 +83,10 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     failWorker(event.message || 'Scenery worker failed');
   });
   worker.addEventListener('message', ({ data }: MessageEvent<ComposeResponse>) => {
+    if (data.phase === 'assets-ready') {
+      if (requests.has(data.id)) markScenePhase('assets-ready', 'false:' + data.key);
+      return;
+    }
     const request = requests.get(data.id);
     if (!request) {
       closeLayers([...data.layers, ...data.foreground]);
@@ -130,7 +135,19 @@ export function createWorkerEnvironmentRenderer(doc: Document, createLocal: () =
     try {
       if (frame.stage === 0) await prepareFog();
       if (disposed || fallback) return;
+      const timingKey = 'false:' + key;
+      markScenePhase('compose-sent', timingKey, { stage: frame.stage });
       const response = await send({ kind: 'compose', key, frame });
+      markScenePhase('compose-received', timingKey, {
+        stage: frame.stage,
+        ...response.snapshot.timings,
+      });
+      measureScenePhase(
+        'compose-roundtrip',
+        'issen:compose-sent:' + timingKey,
+        'issen:compose-received:' + timingKey,
+        timingKey,
+      );
       if (disposed || fallback || !desired || compositionKey(desired) !== key) {
         closeLayers([...response.layers, ...response.foreground]);
         settle(key, false);

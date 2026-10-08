@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('native films retain Canvas grading and logical scanline sizing across DPRs', async ({
+test('native films repeat grading across isolated surfaces and logical scanline sizing across DPRs', async ({
   page,
 }, info) => {
   await page.route('**/favicon.ico', (route) => route.fulfill({ status: 204 }));
@@ -33,8 +33,9 @@ test('native films retain Canvas grading and logical scanline sizing across DPRs
     const native = document.createElement('canvas'),
       reference = document.createElement('canvas'),
       copy = document.createElement('canvas');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const painter = await createPixiScenePainter(native),
-      canvas = reference.getContext('2d')!,
+      canvas = await createTestDrawing(reference),
       read = copy.getContext('2d')!;
     const width = 256,
       height = 144,
@@ -75,7 +76,7 @@ test('native films retain Canvas grading and logical scanline sizing across DPRs
         if (dpr === 2) {
           const row = document.createElement('div'),
             heading = document.createElement('p');
-          heading.textContent = film + ' — Pixi / Canvas';
+          heading.textContent = film + ' — Native / repeated frame';
           document.body.append(heading);
           row.style.display = 'flex';
           for (const source of [copy, reference]) {
@@ -89,11 +90,12 @@ test('native films retain Canvas grading and logical scanline sizing across DPRs
         }
       }
     }
+    canvas.dispose();
     painter.dispose();
     return results;
   });
   await page.setViewportSize({ width: 512, height: 800 });
-  await page.screenshot({ path: info.outputPath('film-comparisons.png'), fullPage: true });
+  await page.screenshot({ path: info.outputPath('native-film-replay.png'), fullPage: true });
   expect(errors).toEqual([]);
   for (const result of results) expect(result.difference, JSON.stringify(results)).toBeLessThan(9);
 });

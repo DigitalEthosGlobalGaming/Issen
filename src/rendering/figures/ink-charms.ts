@@ -1,7 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-const ATLAS_URL = new URL('./assets/charm-atlas.png', import.meta.url).href;
+const ATLAS_URL = new URL('./assets/charm-atlas.webp', import.meta.url).href;
 /** Packed source windows; the generated rows are not equal thirds. */
 const FRAMES = [
   [110, 22, 265, 336],

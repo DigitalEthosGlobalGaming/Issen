@@ -2,9 +2,19 @@
 
 Generated from [armour-plates-atlas.png](../../armour-plates-atlas.png) with `metal`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](armour-plates-atlas_diffuse.png), [normal](armour-plates-atlas_normal.png), [roughness](armour-plates-atlas_roughness.png), [metallic](armour-plates-atlas_metallic.png), [ao](armour-plates-atlas_ao.png), [emissive](armour-plates-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| armour-plates-atlas | [diffuse](armour-plates-atlas_diffuse.webp), [normal](armour-plates-atlas_normal.webp), [surface](armour-plates-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

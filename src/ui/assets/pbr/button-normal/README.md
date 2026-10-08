@@ -2,9 +2,19 @@
 
 Generated from [button-normal.png](../../button-normal.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 128Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](button-normal_diffuse.png), [normal](button-normal_normal.png), [roughness](button-normal_roughness.png), [metallic](button-normal_metallic.png), [ao](button-normal_ao.png), [emissive](button-normal_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| button-normal | [diffuse](button-normal_diffuse.webp), [normal](button-normal_normal.webp), [surface](button-normal_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

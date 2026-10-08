@@ -1,0 +1,650 @@
+{
+  "version": 1,
+  "status": "active",
+  "seed": 123456,
+  "randomState": 4231149555,
+  "run": {
+    "state": "boss",
+    "mode": "normal",
+    "blade": false,
+    "zen": false,
+    "hard": false,
+    "rush": false,
+    "upgradesEnabled": true,
+    "tanto": 0,
+    "knives": 0,
+    "maxKnives": 0,
+    "shrineRerolls": 0,
+    "composure": 0,
+    "recoveryEvery": 0,
+    "wavesCleared": 0,
+    "runRobe": "sumi",
+    "petT": 0,
+    "kikuUsed": 0,
+    "freezeT": 0,
+    "slowT": 0,
+    "zanKey": -1,
+    "maxLives": 2,
+    "lives": 2,
+    "hits": 0,
+    "event": null,
+    "wardUsed": false,
+    "runWards": 0,
+    "blessingTriggers": {
+      "flourishWard": false,
+      "flourishPending": false,
+      "precisionWard": false,
+      "precisionProgress": 0,
+      "knifeProgress": 0,
+      "tempoUsedWave": false,
+      "tempoPending": false,
+      "stormProgress": 0,
+      "stormCharged": false,
+      "rekindleBank": 0,
+      "rekindleUsedWave": false
+    },
+    "m": {
+      "atk": 1,
+      "parry": 1,
+      "stag": 1,
+      "pz": 0,
+      "score": 1,
+      "emberBonus": 0,
+      "pilgrim": 0,
+      "swift": 0,
+      "precision": 0,
+      "perfect": 1,
+      "normal": 1,
+      "feint": 0,
+      "feintMul": 1,
+      "bossHp": 0,
+      "bossScore": 1,
+      "comboStep": 5,
+      "comboCap": 4,
+      "hazard": 1,
+      "shrineN": 3,
+      "runWard": 0,
+      "kage": 0,
+      "noArc": 0,
+      "chain": 0,
+      "blind": 0,
+      "swipe": 1,
+      "axisCut": 0,
+      "bossDmg": 1,
+      "noShrine": 0,
+      "kiku": 0,
+      "freeze": 0,
+      "lives": 0,
+      "standoff": 1,
+      "foxsight": 0,
+      "rareShrine": 0,
+      "rare": 0,
+      "regen": 0,
+      "soWin": 1,
+      "duelBlind": 0,
+      "restore": 0,
+      "serpent": 0,
+      "noPerfect": 0,
+      "bonk": 0,
+      "bladeScore": 1,
+      "scarScore": 0,
+      "comboBonus": 0,
+      "feintSafe": 0,
+      "suzu": 0,
+      "maneki": 0,
+      "daruma": 0,
+      "foxfire": 0,
+      "furin": 0,
+      "ofuda": 0,
+      "waveBonus": 1,
+      "gap": 1,
+      "kagami": 0,
+      "noFade": 0,
+      "noRing": 0
+    },
+    "so": null,
+    "lastEv": -9,
+    "stage": 0,
+    "lap": 0,
+    "score": 0,
+    "wave": 1,
+    "combo": 0,
+    "maxCombo": 0,
+    "kills": 0,
+    "perfects": 0,
+    "pStreak": 0,
+    "parries": 0,
+    "runTime": 0,
+    "enemies": [],
+    "boss": {
+      "varied": true,
+      "def": {
+        "v": "kasa",
+        "k": "影丸",
+        "n": "Kagemaru the Unmoving",
+        "pal": "sumi"
+      },
+      "lap": 0,
+      "hp": 3,
+      "maxHp": 3,
+      "state": "enter",
+      "t": 0,
+      "life": 0,
+      "pose": {
+        "gx": 0.06,
+        "gy": -0.56,
+        "ang": -0.5
+      },
+      "d": {
+        "hem": [
+          0.24553327751345932,
+          0.9548201474826783,
+          0.9980822671204805,
+          0.9694945875089616,
+          0.1660907077603042,
+          0.38162891985848546,
+          0.558540799189359,
+          0.9047366802114993,
+          0.3470729573164135,
+          0.872915624640882,
+          0.4926656202878803,
+          0.9921691506169736,
+          0.019042523112148046
+        ],
+        "sl": [
+          [
+            0.46499869832769036,
+            0.09247021493501961,
+            0.3181159971281886,
+            0.3112789378501475,
+            0.32269366504624486
+          ],
+          [
+            0.6150288141798228,
+            0.3945282883942127,
+            0.645048672799021,
+            0.18423429154790938,
+            0.5049633940216154
+          ]
+        ],
+        "spots": [
+          [
+            0.08128658824134619,
+            -0.6731054608523845,
+            0.02669458268443122,
+            false
+          ],
+          [
+            0.07559009526623413,
+            -0.6781901063770056,
+            0.01886135089676827,
+            false
+          ],
+          [
+            0.06543845442895477,
+            -0.38142493437975644,
+            0.02534750267630443,
+            true
+          ],
+          [
+            -0.0747991861760426,
+            -0.38758668061345813,
+            0.01662998883519322,
+            true
+          ],
+          [
+            -0.08469192797963382,
+            -0.35313500283285976,
+            0.021610315043944867,
+            false
+          ],
+          [
+            -0.030068552536020414,
+            -0.4452529481612146,
+            0.01756847149459645,
+            true
+          ],
+          [
+            -0.02433718719170429,
+            -0.7413121977820992,
+            0.02641197342891246,
+            false
+          ],
+          [
+            0.041244854950346056,
+            -0.6552286780811847,
+            0.03189802169566974,
+            false
+          ],
+          [
+            -0.12602020612287176,
+            -0.052868479881435636,
+            0.030874000610783693,
+            true
+          ],
+          [
+            0.03204157853848301,
+            -0.515982702486217,
+            0.02782827259739861,
+            false
+          ]
+        ],
+        "grass": [
+          [
+            0.12369972690939904,
+            0.1014862859947607,
+            3.6368032663795447,
+            0.012238279464654625
+          ],
+          [
+            0.38400419242680073,
+            0.050881709516979755,
+            5.393916830972398,
+            0.012836724906228484
+          ],
+          [
+            0.37609822303056717,
+            0.04708748090546579,
+            4.460970770389932,
+            0.010738477357663215
+          ],
+          [
+            -0.16997859999537468,
+            0.10762531432323158,
+            2.7415541104244676,
+            0.007411929373629392
+          ],
+          [
+            -0.29444344602525235,
+            0.06258404961321504,
+            5.795280359522969,
+            0.00104581946041435
+          ],
+          [
+            -0.050534524582326414,
+            0.06305775342974812,
+            3.076869633593361,
+            0.006848053149878979
+          ],
+          [
+            -0.19153286088258029,
+            0.06931102910079062,
+            4.089592177780871,
+            0.0014915918000042439
+          ],
+          [
+            0.0661709537729621,
+            0.11158703620079904,
+            0.465577950447565,
+            0.010406470275484025
+          ],
+          [
+            0.14934172201901674,
+            0.09758439258206636,
+            3.665183095919073,
+            0.012005520132370294
+          ],
+          [
+            0.188251356408,
+            0.052901884969323874,
+            3.0634077868191225,
+            0.006206383239477873
+          ],
+          [
+            0.16194876544177533,
+            0.12403933809604498,
+            3.0730936342964053,
+            0.004878058354370296
+          ],
+          [
+            0.1449025768786669,
+            0.07921777158975601,
+            3.9644864533452853,
+            0.018787526767700912
+          ],
+          [
+            0.1952308086678386,
+            0.0986531160864979,
+            3.477552517563782,
+            0.0016189075820147991
+          ],
+          [
+            -0.22832807023078205,
+            0.10385470286477358,
+            5.379491294228033,
+            0.00039831925183534626
+          ]
+        ],
+        "hair": [
+          [
+            0.4718656854238361,
+            0.07985047926194966
+          ],
+          [
+            0.10778508591465652,
+            0.5080884846393019
+          ],
+          [
+            0.9438058256637305,
+            0.6311596371233463
+          ],
+          [
+            0.9621548727154732,
+            0.9317388539202511
+          ]
+        ],
+        "seed": 99.67906165402383
+      },
+      "lean": 0,
+      "glint": 0,
+      "idleT": 1,
+      "dur": 1,
+      "sdir": "up",
+      "lastFeint": false,
+      "bp": {
+        "wind": 0.95,
+        "flash": 0.46,
+        "stag": 1.35,
+        "feint": 0,
+        "idleMin": 0.7200000000000001,
+        "idleMax": 1.58
+      },
+      "cutAng": 0,
+      "chainLen": 1,
+      "chainLeft": 1,
+      "window": 1,
+      "blockT": 0,
+      "twinDone": false,
+      "failed": false,
+      "kageUsed": 0,
+      "pos": {
+        "x": 245.7,
+        "y": 603.0319999999999,
+        "h": 220.66199999999995,
+        "fog": 0.55,
+        "alpha": 0
+      }
+    },
+    "bossCount": 1,
+    "bossesSlain": 0,
+    "cfg": {
+      "pack": 3,
+      "refill": false,
+      "total": 3,
+      "ordered": false,
+      "feint": 0,
+      "atk": 2.3,
+      "gap": 0.51
+    },
+    "toSpawn": 3,
+    "nextOrder": 1,
+    "attacker": null,
+    "gapT": 1.2,
+    "nextT": 0,
+    "deathT": 0,
+    "reason": "",
+    "hints": {
+      "swipe": 1
+    },
+    "pendingSpawns": [
+      {
+        "slot": 2,
+        "t": 0.3
+      },
+      {
+        "slot": 3,
+        "t": 0.5
+      },
+      {
+        "slot": 1,
+        "t": 0.7
+      }
+    ],
+    "afterBoss": false,
+    "overReady": false,
+    "pausedFrom": null,
+    "newUnlocks": [],
+    "panel": null,
+    "panelFrom": "title",
+    "runBlade": "steel",
+    "runBladeThird": false,
+    "seed": 123456,
+    "fortune": null,
+    "darumaUsed": false,
+    "phoenixUsed": false,
+    "foxUsed": false,
+    "kagamiUsed": false,
+    "tempN": 0,
+    "manekiN": 0,
+    "scars": 0,
+    "clean": 0,
+    "lostLife": false,
+    "diedInBoss": false,
+    "reviveOfferResolved": false,
+    "secondWindUsed": false,
+    "pauseN": 0,
+    "claps": 0,
+    "availableBlessings": [
+      "wind",
+      "eye",
+      "ward",
+      "focus",
+      "fortune",
+      "edge",
+      "breath",
+      "swallow",
+      "still",
+      "iron",
+      "patience",
+      "tempest",
+      "timestop",
+      "gold",
+      "stormcall",
+      "rekindle",
+      "crossroads",
+      "twin",
+      "dragon",
+      "mercy",
+      "banner",
+      "glass",
+      "blood"
+    ],
+    "bless": []
+  },
+  "stats": {
+    "cinematicVisits": 0,
+    "midnight": 1,
+    "applause": 0,
+    "fidget": 0,
+    "rushBest": 0,
+    "rushRuns": 0,
+    "rushBlade": 0,
+    "feintKills": 0,
+    "mirrorClean": 0,
+    "omikuji": 0,
+    "bladeWave": 0,
+    "feinted": 0,
+    "scarecrow": 0,
+    "flawlessWave": 1,
+    "konami": 0,
+    "roninDuels": 0,
+    "curses": 0,
+    "flawless": 0,
+    "rares": 0,
+    "mirrorWins": 0,
+    "bestZen": 0,
+    "w1deaths": 0,
+    "standoffs": 0,
+    "shrines": 0,
+    "cleanDuels": 0,
+    "bestPStreak": 0,
+    "bestRunPerfects": 0,
+    "bladeDuels": 0,
+    "runs": 1,
+    "kills": 0,
+    "perfects": 0,
+    "parries": 0,
+    "duels": 0,
+    "bestScore": 0,
+    "bestRonin": 0,
+    "bestWave": 1,
+    "roninWave": 0,
+    "bestCombo": 0,
+    "time": 0,
+    "furthestStage": 0,
+    "bl": {
+      "steel": {
+        "k": 0,
+        "p": 0,
+        "d": 0,
+        "w": 1,
+        "rw": 0,
+        "c": 0,
+        "sc": 0
+      }
+    },
+    "rec": {},
+    "deaths": {}
+  },
+  "awakening": {
+    "version": 1,
+    "blades": {},
+    "robes": {}
+  },
+  "collections": {
+    "version": 1,
+    "records": {},
+    "lastStats": {
+      "cinematicVisits": 0,
+      "midnight": 1,
+      "applause": 0,
+      "fidget": 0,
+      "rushBest": 0,
+      "rushRuns": 0,
+      "rushBlade": 0,
+      "feintKills": 0,
+      "mirrorClean": 0,
+      "omikuji": 0,
+      "bladeWave": 0,
+      "feinted": 0,
+      "scarecrow": 0,
+      "flawlessWave": 1,
+      "konami": 0,
+      "roninDuels": 0,
+      "curses": 0,
+      "flawless": 0,
+      "rares": 0,
+      "mirrorWins": 0,
+      "bestZen": 0,
+      "w1deaths": 0,
+      "standoffs": 0,
+      "shrines": 0,
+      "cleanDuels": 0,
+      "bestPStreak": 0,
+      "bestRunPerfects": 0,
+      "bladeDuels": 0,
+      "runs": 1,
+      "kills": 0,
+      "perfects": 0,
+      "parries": 0,
+      "duels": 0,
+      "bestScore": 0,
+      "bestRonin": 0,
+      "bestWave": 1,
+      "roninWave": 0,
+      "bestCombo": 0,
+      "time": 0,
+      "furthestStage": 0,
+      "bl": {
+        "steel": {
+          "k": 0,
+          "p": 0,
+          "d": 0,
+          "w": 1,
+          "rw": 0,
+          "c": 0,
+          "sc": 0
+        }
+      },
+      "rec": {},
+      "deaths": {}
+    }
+  },
+  "meta": {
+    "schemaVersion": 4,
+    "embers": 0,
+    "earned": 0,
+    "emberRemainder": 0,
+    "upgrades": {
+      "weapons": 0,
+      "presets": 0,
+      "outfits": 0,
+      "blessings": 0,
+      "curses": 0,
+      "vitality": 0,
+      "focus": 0,
+      "offerings": 0,
+      "awakening": 0,
+      "knife": 0,
+      "tanto": 0,
+      "composure": 0,
+      "recovery": 0,
+      "precision": 0,
+      "discernment": 0
+    },
+    "bossMilestone": 0,
+    "revealSeen": 0,
+    "tutorial": "skipped"
+  },
+  "unlocks": [
+    "nocrest",
+    "nopet",
+    "nocharm",
+    "steel",
+    "sumi",
+    "ink",
+    "mono",
+    "verm",
+    "supporter-print"
+  ],
+  "equipment": {
+    "bladeSp": false,
+    "bladeThird": false,
+    "robeSp": false,
+    "crest": "nocrest",
+    "pet": "nopet",
+    "charm": "nocharm",
+    "blade": "steel",
+    "robe": "sumi",
+    "fx": "ink",
+    "film": "mono",
+    "seal": "verm"
+  },
+  "setup": {
+    "mode": "waves",
+    "diff": "normal",
+    "arrows": true,
+    "lives": "3",
+    "upgrades": true
+  },
+  "ledger": {
+    "pending": 0,
+    "settled": null
+  },
+  "weather": {
+    "veil": 0,
+    "veilT": 2,
+    "veilTarget": 0,
+    "wo": 0,
+    "woT": 6.146999130491167,
+    "woPhase": 0,
+    "ltT": 6.391788722481579,
+    "gustT": 6.989590712124482,
+    "smokeT": 3.48003505426459,
+    "banks": [],
+    "surge": 0,
+    "surgeT": 4.625715936534107
+  },
+  "bossMilestone": 0,
+  "offers": null
+}

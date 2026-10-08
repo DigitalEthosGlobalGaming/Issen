@@ -23,7 +23,7 @@ test('the lighting menu can render retained artwork and the six original packs',
       () => canvas,
       () => {},
     );
-    const select = app.querySelector('select')!;
+    const select = app.querySelector<HTMLSelectElement>('select[aria-label="Material preview"]')!;
     const image = app.querySelector<HTMLImageElement>('.lighting-material-preview')!;
     const names = [
       'companion-atlas',

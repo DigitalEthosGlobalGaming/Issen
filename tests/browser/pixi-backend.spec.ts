@@ -391,8 +391,8 @@ test('drawing the same prepared scene twice preserves poses, RNG, post state and
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__preparedScene = { frameLoop, preparePresentation, drawScene, snapshot: () => JSON.stringify({ G, P, fx, postState, shake, rng: runRandom.state(), saves: Object.entries(localStorage), haptics: window.drawHaptics }) }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__preparedScene = { frameLoop: frames.frameLoop, preparePresentation: frames.preparePresentation, drawScene: frames.drawScene, snapshot: () => JSON.stringify({ G: foundation.run.G, P: foundation.run.P, fx: foundation.view.presentationState.fx, postState: frames.postPreparation.state, shake: foundation.view.presentationState.shake, rng: foundation.run.activity.runRandom.state(), saves: Object.entries(localStorage), haptics: window.drawHaptics }) }; artworkReady = true;',
       ),
     });
   });
@@ -447,9 +447,7 @@ test('drawing the same prepared scene twice preserves poses, RNG, post state and
   expect(result.fractionChanged, JSON.stringify(result)).toBeLessThan(0.01);
 });
 
-test('unavailable WebGL initializes a playable Canvas surface with the same saves', async ({
-  page,
-}) => {
+test('unavailable WebGL reports a graphics error and preserves profile saves', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('issen.meta', JSON.stringify({ tutorial: 'skipped' }));
     const get = HTMLCanvasElement.prototype.getContext;
@@ -459,12 +457,11 @@ test('unavailable WebGL initializes a playable Canvas surface with the same save
     } as typeof get;
   });
   await page.goto('/');
-  await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'canvas');
-  await page.locator('#bPlay').click();
-  await page.locator('#bBegin').click();
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
-  await page.keyboard.press('p');
-  await expect(page.locator('#bResume')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Graphics not supported' })).toBeVisible({
+    timeout: 30000,
+  });
+  await expect(page.getByRole('button', { name: 'Retry', exact: true })).toBeVisible();
+  await expect(page.locator('[data-graphics-backend="canvas"]')).toHaveCount(0);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('issen.meta')!).tutorial)).toBe(
     'skipped',
   );
@@ -615,52 +612,43 @@ test('native Armoury and tutorial scenes keep their own targets and clocks', asy
   expect(errors).toEqual([]);
 });
 
-test('lost auxiliary contexts fall back without advancing tutorial or touching saves', async ({
-  page,
-}) => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/?renderer=pixi');
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
-  await page.locator('#bArmory').click();
-  await page
-    .locator('#prevC')
-    .evaluate((canvas: HTMLCanvasElement) =>
-      canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext(),
+for (const selector of ['#prevC', '#supportPreview', '.tutorial-canvas']) {
+  test(`lost auxiliary context ${selector} preserves its canvas and reports Reload`, async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto('/');
+    await expect(page.locator('.startup-loading')).toHaveCount(0);
+    if (selector === '.tutorial-canvas') {
+      await page.locator('#bOptions').click();
+      await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
+    }
+    const canvas = page.locator(selector);
+    const handle = await canvas.elementHandle();
+    const saves = await page.evaluate(() => JSON.stringify(Object.entries(localStorage)));
+    await canvas.evaluate((element: HTMLCanvasElement) =>
+      element.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext(),
     );
-  await expect(page.locator('#prevC')).toHaveAttribute('data-context-state', 'lost');
-  await expect(page.locator('#prevC')).toHaveAttribute('data-graphics-backend', 'canvas', {
-    timeout: 12000,
+    await expect(canvas).toHaveAttribute('data-context-state', 'lost');
+    if (selector === '.tutorial-canvas') {
+      await page.keyboard.press('ArrowRight');
+      await expect(page.locator('.tutorial-overlay')).toHaveAttribute('data-step', '0');
+    }
+    await expect(page.getByRole('button', { name: 'Reload', exact: true })).toBeVisible({
+      timeout: 12000,
+    });
+    await expect(canvas).toHaveAttribute('data-context-state', 'unsupported');
+    await expect(canvas).toHaveAttribute('data-graphics-backend', 'pixi');
+    expect(await handle!.evaluate((element) => element.isConnected)).toBe(true);
+    expect(await page.evaluate(() => JSON.stringify(Object.entries(localStorage)))).toBe(saves);
   });
-  await page.keyboard.press('Escape');
-  await page.locator('#bOptions').click();
-  await page.getByRole('button', { name: 'Tutorial', exact: true }).click();
-  await expect(page.locator('.tutorial-canvas')).toHaveAttribute('data-graphics-backend', 'pixi');
-  const saves = await page.evaluate(() => JSON.stringify(Object.entries(localStorage)));
-  await page
-    .locator('.tutorial-canvas')
-    .evaluate((canvas: HTMLCanvasElement) =>
-      canvas.getContext('webgl2')!.getExtension('WEBGL_lose_context')!.loseContext(),
-    );
-  await expect(page.locator('.tutorial-canvas')).toHaveAttribute('data-context-state', 'lost');
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('.tutorial-overlay')).toHaveAttribute('data-step', '0');
-  await expect(page.locator('.tutorial-canvas')).toHaveAttribute(
-    'data-graphics-backend',
-    'canvas',
-    { timeout: 12000 },
-  );
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('.tutorial-overlay')).toHaveAttribute('data-step', '1');
-  expect(await page.evaluate(() => JSON.stringify(Object.entries(localStorage)))).toBe(saves);
-  expect(errors).toEqual([]);
-});
+}
 
 for (const restore of [true, false]) {
   test(
     restore
       ? 'WebGL context restoration keeps combat paused until explicit resume'
-      : 'unrestored WebGL context falls back to Canvas without resetting the run',
+      : 'unrestored WebGL context reports a reload error without resetting the run',
     async ({ page }) => {
       await page.addInitScript(() => {
         localStorage.setItem(
@@ -695,18 +683,22 @@ for (const restore of [true, false]) {
         await extension.evaluate((ext) => ext.restoreContext());
         await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'ready');
       } else {
-        await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'fallback', {
+        await expect(page.locator('#c')).toHaveAttribute('data-context-state', 'unsupported', {
           timeout: 12000,
         });
-        await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'canvas');
+        await expect(page.locator('#c')).toHaveAttribute('data-graphics-backend', 'pixi');
+        await expect(page.getByRole('button', { name: 'Reload', exact: true })).toBeVisible();
       }
       await expect(page.locator('#paused')).toHaveClass(/on/);
-      await expect(page.locator('#bResume')).toBeEnabled();
+      if (restore) await expect(page.locator('#bResume')).toBeEnabled();
+      else await expect(page.locator('#bResume')).toBeDisabled();
       expect(
         await page.evaluate(() => JSON.parse(localStorage.getItem('issen.runCheckpoint')!).seed),
       ).toBe(seed);
-      await page.locator('#bResume').click();
-      await expect(page.locator('#paused')).not.toHaveClass(/on/);
+      if (restore) {
+        await page.locator('#bResume').click();
+        await expect(page.locator('#paused')).not.toHaveClass(/on/);
+      }
     },
   );
 }
@@ -875,10 +867,13 @@ test('normal materials respond to lights and mirrored normals without changing t
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   const pixels = await page.evaluate(async () => {
-    const { createPixiBackend } = await import('/src/rendering/pixi/backend.ts');
-    const { IDENTITY } = await import('/src/rendering/scene-frame.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { drawMaterialStamp, setSceneLighting } =
+      await import('/src/rendering/scene-material.ts');
+    const IDENTITY = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
     const canvas = document.createElement('canvas');
-    const backend = await createPixiBackend(canvas);
+    canvas.width = canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
     const makeTexture = (color: string) => {
       const source = document.createElement('canvas');
       source.width = source.height = 8;
@@ -917,7 +912,20 @@ test('normal materials respond to lights and mirrored normals without changing t
       },
     };
     const capture = () => {
-      backend.render(frame);
+      painter.begin();
+      setSceneLighting(painter, frame.lighting);
+      const t = sprite.transform;
+      painter.setTransform(t.a, t.b, t.c, t.d, t.tx, t.ty);
+      painter.globalAlpha = sprite.alpha;
+      drawMaterialStamp(painter, {
+        texture: sprite.texture,
+        material: sprite.material,
+        x: 0,
+        y: 0,
+        width: sprite.width,
+        height: sprite.height,
+      });
+      painter.flush();
       const c = document.createElement('canvas');
       c.width = c.height = 32;
       const g = c.getContext('2d')!;
@@ -929,7 +937,7 @@ test('normal materials respond to lights and mirrored normals without changing t
     const mirrored = capture();
     sprite.material = { ...material, lighting: 0, fog: 1, fogColor: [1, 0, 0] };
     const fogged = capture();
-    backend.dispose();
+    painter.dispose();
     return { lit, mirrored, fogged };
   });
   expect(errors).toEqual([]);
@@ -949,8 +957,8 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
-    const { createPixiBackend } = await import('/src/rendering/pixi/backend.ts');
-    const { IDENTITY } = await import('/src/rendering/scene-frame.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const IDENTITY = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
     const target = document.createElement('canvas');
     const preview = document.createElement('canvas');
     const atlas = document.createElement('canvas');
@@ -961,8 +969,38 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
     ink.fillRect(0, 0, 10, 10);
     ink.fillStyle = '#0000ff';
     ink.fillRect(10, 0, 10, 10);
-    const live = await createPixiBackend(target);
-    const isolated = await createPixiBackend(preview);
+    target.width = target.height = preview.width = preview.height = 32;
+    const live = await createPixiScenePainter(target);
+    const isolated = await createPixiScenePainter(preview);
+    const { invalidateSceneTexture } = await import('/src/rendering/texture-revision.ts');
+    const render = (painter: typeof live, frame: any) => {
+      if (painter.canvas.width !== frame.width * frame.dpr)
+        painter.canvas.width = frame.width * frame.dpr;
+      if (painter.canvas.height !== frame.height * frame.dpr)
+        painter.canvas.height = frame.height * frame.dpr;
+      painter.begin();
+      for (const sprite of frame.sprites) {
+        const t = sprite.transform;
+        painter.setTransform(
+          t.a * frame.dpr,
+          t.b * frame.dpr,
+          t.c * frame.dpr,
+          t.d * frame.dpr,
+          t.tx * frame.dpr,
+          t.ty * frame.dpr,
+        );
+        painter.globalAlpha = sprite.alpha;
+        painter.drawImage(
+          sprite.texture.source,
+          ...sprite.texture.frame,
+          0,
+          0,
+          sprite.width,
+          sprite.height,
+        );
+      }
+      painter.flush();
+    };
     const lighting = {
       ambient: [1, 1, 1],
       directional: [0, 0, 0],
@@ -1005,24 +1043,25 @@ test('native Pixi atlas sprites preserve order, transforms, revisions and target
       g.drawImage(canvas, 0, 0);
       return [...g.getImageData(x, y, 1, 1).data];
     };
-    live.render(frame);
+    render(live, frame);
     const border = sample(target, 3, 3);
     const overlap = sample(target, 16, 16);
     const retainedInput = JSON.stringify(frame, (key, value) =>
       key === 'source' ? 'atlas' : value,
     );
-    live.render(frame);
+    render(live, frame);
     const repeat = sample(target, 16, 16);
     const unchanged =
       retainedInput === JSON.stringify(frame, (key, value) => (key === 'source' ? 'atlas' : value));
-    isolated.render({ ...frame, sprites: [back] });
+    render(isolated, { ...frame, sprites: [back] });
     const previewPixel = sample(preview, 16, 16);
     isolated.dispose();
     ink.fillStyle = '#00ff00';
     ink.fillRect(0, 0, 10, 10);
-    live.render({ ...frame, sprites: [{ ...back, texture: { ...back.texture, revision: 1 } }] });
+    invalidateSceneTexture(atlas);
+    render(live, { ...frame, sprites: [back] });
     const updated = sample(target, 16, 16);
-    live.render({ ...frame, width: 64, height: 48, dpr: 2, sprites: [back] });
+    render(live, { ...frame, width: 64, height: 48, dpr: 2, sprites: [back] });
     const dimensions = [target.width, target.height];
     live.dispose();
     live.dispose();

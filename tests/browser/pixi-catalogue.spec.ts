@@ -18,7 +18,7 @@ test('native equipment and death poses retain colour-art coverage and isolated d
     const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
     const { createInkCharmRenderer } = await import('/src/rendering/figures/ink-charms.ts');
     const { createInkCompanionRenderer } = await import('/src/rendering/figures/ink-companions.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const { applyDeathPose } = await import('/src/rendering/figures/death.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
     const { BLADES, ROBES } = await import('/src/game/content/cosmetics.ts');
@@ -34,8 +34,9 @@ test('native equipment and death poses retain colour-art coverage and isolated d
       reference = document.createElement('canvas'),
       copy = document.createElement('canvas');
     for (const canvas of [native, reference, copy]) canvas.width = canvas.height = 320;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const painter = await createPixiScenePainter(native),
-      canvas = reference.getContext('2d')!,
+      canvas = await createTestDrawing(reference),
       read = copy.getContext('2d')!;
     const palette = createPalette();
     const environment = {
@@ -121,6 +122,7 @@ test('native equipment and death poses retain colour-art coverage and isolated d
       }));
     for (const death of ['split', 'scatter', 'kneel', 'stagger', 'disarm', 'fall', 'crumple'])
       draw(death, () => ({ ...figure(), back: false, variant: 'ronin', varied: true }), death);
+    canvas.dispose();
     painter.dispose();
     for (const owner of Object.values(artwork)) owner.dispose();
     return samples;

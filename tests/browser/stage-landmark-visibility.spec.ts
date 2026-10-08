@@ -16,7 +16,8 @@ for (const viewport of [
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      const context = canvas.getContext('2d')!;
+      const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+      const context = await createTestDrawing(canvas);
       const results: number[] = [];
       try {
         for (let stage = 0; stage < 9; stage++) {

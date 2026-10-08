@@ -2,9 +2,19 @@
 
 Generated from [snow-boulders-atlas.png](../../snow-boulders-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](snow-boulders-atlas_diffuse.png), [normal](snow-boulders-atlas_normal.png), [roughness](snow-boulders-atlas_roughness.png), [metallic](snow-boulders-atlas_metallic.png), [ao](snow-boulders-atlas_ao.png), [emissive](snow-boulders-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| snow-boulders-atlas | [diffuse](snow-boulders-atlas_diffuse.webp), [normal](snow-boulders-atlas_normal.webp), [surface](snow-boulders-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

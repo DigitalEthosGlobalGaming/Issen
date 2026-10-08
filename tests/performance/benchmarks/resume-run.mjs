@@ -15,8 +15,12 @@ process.chdir(root);
 
 const input = path.resolve(process.argv[2]);
 const original = JSON.parse(await readFile(path.join(input, 'results.json'), 'utf8'));
-if (original.status !== 'failed' || original.manifest.target !== 'web')
-  throw Error('Expected a failed web run');
+const interrupted = process.argv.includes('--interrupted');
+if (
+  !(original.status === 'failed' || (interrupted && original.status === 'running')) ||
+  original.manifest.target !== 'web'
+)
+  throw Error('Expected a failed web run, or --interrupted after confirming its process stopped');
 const manifest = original.manifest;
 if (
   manifest.platform !== `${platform()} ${release()}` ||
@@ -74,6 +78,7 @@ const results = {
   recovery: {
     originalRun: path.relative(process.cwd(), input).replaceAll('\\', '/'),
     originalErrors: original.errors,
+    interrupted,
     resumedAt: new Date().toISOString(),
     completed: [],
   },

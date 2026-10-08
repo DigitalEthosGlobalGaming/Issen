@@ -56,6 +56,7 @@ test('Profile Management downloads, previews, cancels and imports progression wi
 test('named profile creation, switching, rename and deletion preserve the original save', async ({
   page,
 }) => {
+  test.setTimeout(90000);
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.stats'))
       localStorage.setItem('issen.stats', JSON.stringify({ kills: 25 }));

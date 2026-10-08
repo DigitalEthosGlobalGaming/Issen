@@ -5,13 +5,14 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
 }) => {
   await page.goto('/');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const a = createEnvironmentRenderer(document),
       b = createEnvironmentRenderer(document);
     const canvas = document.createElement('canvas');
     canvas.width = 390;
     canvas.height = 844;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = await createTestDrawing(canvas);
     const classic = document.createElement('canvas');
     classic.width = 2;
     classic.height = 2;
@@ -75,15 +76,16 @@ test('layered scenery resizes, preserves context, caches frames and disposes ind
 });
 
 test('missing sprite assets report unavailable without substituted artwork', async ({ page }) => {
-  await page.route('**/mountain-atlas.png*', (route) => route.abort());
+  await page.route('**/mountain-atlas.webp*', (route) => route.abort());
   await page.goto('/');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const renderer = createEnvironmentRenderer(document);
     const canvas = document.createElement('canvas');
     canvas.width = 10;
     canvas.height = 10;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = await createTestDrawing(canvas);
     const classic = document.createElement('canvas');
     classic.width = 2;
     classic.height = 2;
@@ -118,6 +120,7 @@ test('ink layers retain film grading and freeze decorative motion for accessibil
 }) => {
   await page.goto('/');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const { applyFilm } = await import('/src/rendering/effects/film.ts');
     const renderer = createEnvironmentRenderer(document);
@@ -125,7 +128,7 @@ test('ink layers retain film grading and freeze decorative motion for accessibil
     const canvas = document.createElement('canvas');
     canvas.width = 480;
     canvas.height = 270;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = await createTestDrawing(canvas);
     const frame = {
       width: 480,
       height: 270,

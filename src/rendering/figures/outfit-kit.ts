@@ -142,11 +142,11 @@ export function supportsInkOutfit(id?: string): boolean {
 }
 
 const SOURCES = {
-  masks: new URL('./assets/player-mask-atlas.png', import.meta.url).href,
-  special: new URL('./assets/player-special-headwear-atlas.png', import.meta.url).href,
-  armour: new URL('./assets/armour-plates-atlas.png', import.meta.url).href,
-  headwear: new URL('./assets/outfit-headwear-atlas.png', import.meta.url).href,
-  cloth: new URL('./assets/outfit-cloth-atlas.png', import.meta.url).href,
+  masks: new URL('./assets/player-mask-atlas.webp', import.meta.url).href,
+  special: new URL('./assets/player-special-headwear-atlas.webp', import.meta.url).href,
+  armour: new URL('./assets/armour-plates-atlas.webp', import.meta.url).href,
+  headwear: new URL('./assets/outfit-headwear-atlas.webp', import.meta.url).href,
+  cloth: new URL('./assets/outfit-cloth-atlas.webp', import.meta.url).href,
 };
 // Updated from each atlas's measured alpha bounds, not nominal grid cell bounds.
 const FRAMES: Record<AtlasKey, readonly Frame[]> = {

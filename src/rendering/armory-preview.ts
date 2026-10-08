@@ -6,7 +6,7 @@ import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
 import { createInkSwordRenderer } from './figures/ink-sword.ts';
 import { createFigureRenderer } from './figures/figure.ts';
-import { makeFig, EPOSE } from './figures/model.ts';
+import { makeFig, EPOSE } from '../shared/figure-model.ts';
 import type { Figure, FigureEnvironment } from './figures/types.ts';
 import { createEffects } from './effects/state.ts';
 import { createEffectSpawner } from './effects/spawn.ts';
@@ -16,7 +16,7 @@ import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
-import roomUrl from '../ui/assets/armoury-room.png';
+import roomUrl from '../ui/assets/armoury-room.webp';
 import { createAssetMaterials } from './asset-materials.ts';
 import {
   createCachedMaterials,
@@ -62,8 +62,8 @@ export function createArmoryPreview(
   artwork?: PreviewArtwork,
   surface?: SceneSurface,
 ) {
-  let context = surface?.drawing ?? canvas.getContext('2d');
-  if (!context) throw new Error('Armory preview requires a 2D canvas context');
+  if (!surface?.native) throw new Error('Armory preview requires a prepared WebGL2 surface');
+  let context = surface.drawing;
   const room = canvas.ownerDocument.createElement('img');
   const roomMaterials = createAssetMaterials(canvas.ownerDocument, { room: roomUrl });
   const cachedMaterials = createCachedMaterials();
@@ -141,10 +141,6 @@ export function createArmoryPreview(
     if (surface?.native?.contextLost) {
       last = now;
       return;
-    }
-    if (surface) {
-      canvas = surface.canvas;
-      context = surface.drawing;
     }
     dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;

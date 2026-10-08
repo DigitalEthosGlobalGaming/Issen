@@ -1,6 +1,6 @@
 # Implemented architecture
 
-Issen uses a vanilla DOM interface and PixiJS WebGL scenes with a Canvas fallback,
+Issen uses a vanilla DOM interface and PixiJS WebGL2 scenes,
 compiled with TypeScript 7 and served or
 bundled by Vite. All application TypeScript under `src/` is included in strict
 type checking; Vite's transpilation alone is not the build gate.
@@ -24,71 +24,221 @@ without billing. Catalog locks remain visible while billing is disabled. Runtime
 checks are independent of earned unlocks/ranks. See
 [editions and mastery](../features/editions-and-mastery.md).
 
+## Native lighting ownership
+
+Each PixiScenePainter owns full-resolution G0/G1/G2 and diffuse/specular HDR light
+attachments. Its named geometry/light passes prepare once per recorded frame;
+forward-composite preserves painter order with a shared light lookup. Resize,
+quality changes, context restoration and disposal follow surface ownership.
+The session testing tools offer full/half accumulation with normal/depth-aware
+upsampling; all scene colour providers use the same pipeline. Instanced grass
+and catalogue leaves retain layer positions while computing visual motion on GPU.
+
+Presentation light-sources.ts owns registration and the deterministic global
+16-light budget. Runtime presentation connects existing persistent visual lights
+and effects-clock kill/parry/block flashes, without gameplay RNG or draw mutations.
+Frozen borrowed target metadata and named scene/post/film insertion points are
+extension hooks only. See [rendering](rendering.md) for contracts and examples.
+
 ## Startup and ownership
 
-Root `index.html` loads `src/main.ts`. It imports the ordered styles, mounts the
-shell and screen fragments after source artwork loads and decodes, then calls
-`startGame()` in `src/game.ts`. Startup loading/progress and retry are owned by
-`platform/artwork-preload.ts` and `ui/startup-loading.ts`.
-Generated PBR maps are excluded from this lifetime preloader. Material owners
+Root `index.html` loads `src/main.ts`. It imports the ordered styles, creates one
+`MainGame` instance from `src/main-game.ts` and calls `begin()`. That class owns
+the startup preloader, loading view, lighting services, mounted root and runtime
+disposer. It preloads
+source artwork and the startup logo, mounts the shell and screen fragments,
+prepares scene surfaces, then calls `startGame()` in `src/game.ts`.
+Startup loading/progress and retry use
+`platform/artwork-preload.ts` and `ui/startup-loading.ts`; retry calls the same
+instance's `begin()` without mounting a second root.
+Catalogued runtime PBR maps are excluded from this lifetime preloader. Material
+owners
 decode selected packs, release departed packs, and retain shared scenery packs
 across scene changes. UI textures use a separate owned shader surface and share
 the session lighting rig with startup and gameplay.
-The returned disposer stops the runtime. `main.ts` removes the mounted root and
-registers disposal with Vite HMR before a replacement instance starts.
+`MainGame.dispose()` stops the runtime and releases startup resources and the
+mounted root. `main.ts` exports a forwarding disposer for tests and registers it
+with Vite HMR before a replacement instance starts.
 
-`game.ts` remains the composition and orchestration layer. Its private closure
-owns the player profile, current run, scene dimensions, camera effects and service
-instances. It connects feature callbacks to audio, persistence, effects and UI.
-It still contains encounter transitions, kill/damage presentation, title secrets,
-main scene layer order and post-processing orchestration. These are not separate
-session/renderer services yet; do not assume the proposed migration tree describes
-implemented files.
+Concurrent `begin()` calls share one initialization promise. The class retains
+surfaces as soon as they are created, releases them on failure or disposal, and
+keeps retry available after a failed start. A disposed instance cannot remount.
+
+`presentation/scene.ts` owns the ordered scene draw body, with explicit readonly
+scene inputs and drawing ports. Its seven recording layers are followed by native
+geometry, lights and forward-composite passes, all using scene-composer.ts with
+explicit before/after neighbours. Runtime orchestration settles scene readiness
+after drawing; presentation cannot commit pending gameplay continuations.
+`presentation/figures.ts` owns frame-specific figure rendering and enemy/boss
+projection, with gameplay updates kept in rule owners. `presentation/cues.ts` owns read-only wave/boss/standoff glyph projection.
+`presentation/environment.ts` owns ambient factories, cached grass variants and
+leaf/weather drawing. environment-state.ts owns its caches and cosmetic particle
+buffers. environment-artwork.ts owns cached scenery/mist/grass/drift/weather
+builders; environment.ts advances ambient particles and stage transitions. Live
+weather hazard timers/simulation remain gameplay-owned.
+`presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
+and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and
+weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
+`presentation/post.ts` owns prepared full-frame drawing and named post/film
+insertion chains exposed through runtime/frames.ts; prepared G/light target
+consumers insert after the scene lights pass. post-preparation.ts owns cosmetic post history and camera/post frame preparation,
+separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
+owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signals; hit-stop and run
+time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. runtime/foundation.ts constructs explicit browser/profile/run/view records and
+base services before domain wiring. Current profile identities remain in their
+profile owners; geometry, seals and visit seeds have presentation owners, and
+scene-state.ts owns request/continuation lifetime. game.ts connects narrow selected
+fields and feature actions to audio, persistence, presentation owners and UI.
+game/combat/kill.ts owns cut/blessing/chain run mutations and combat RNG, emitting
+flat frozen kill/cutChain snapshots before chained selection. Profile counters
+listen in game/progression/combat-listeners.ts; cut audio/haptics/FX listen in
+presentation/kill.ts. Shared scoring/combo rules live in game/progression/
+combat-score.ts; presentation/combat-score.ts reacts with HUD/popups. Presentation
+listener registration/removal cannot change combat state or combat RNG.
+`game/session/results.ts` owns result/reward orchestration; `game/player/companions.ts`
+owns companion rules and `presentation/player-figures.ts` owns their projection.
+`runtime/frame-bindings.ts` connects simulation, prepared presentation and
+frame scheduling. `runtime/startup.ts` owns ordered runtime startup,
+artwork readiness/errors and disposal. Scene continuations settle after drawing
+through `runtime/scene-flow.ts`, including intentional paused phase adoption.
+Gameplay permits120Hz draw submissions with independent60Hz simulation timing.
+Extra draws reuse prepared camera/post data; poses remain60Hz without interpolation.
+Menus and cinematic retain60Hz, and clock restart discards pending preparation.
+Hot presentation, rule and frame projections use lifetime `cacheView` records:
+mutable equipment, geometry, seal, scene selections and clocks remain forwarded
+getters. Host projections require a lifetime live parent view. Figure renderer
+instances still capture current pose inputs for each draw. `ui/trial-objective.ts`
+owns the retained trial element and change-only writes; trial feedback routes
+hiding through that owner so ending or retrying a trial resets its cache.
+
+`game/session/context.ts` defines `RunContext` with plain run records and seeded
+randomness, and `ServicesContext` with browser ports. `presentation/context.ts`
+defines cosmetic RNG, effects, layout and camera capabilities. The generic
+`GameContext<Presentation>` contract lets rules accept narrow service slices
+without importing rendering types. The 128-line root constructs domain owners and connects startup/disposal. Runtime
+foundation and named state projections preserve mutable profile/run/layout identity. Current accessors preserve replacement identities and avoid eager
+reads of services constructed later.
+
+`game/events.ts` is a typed synchronous bus. It delivers in registration order,
+snapshots subscriptions for each emission, completes nested emissions immediately,
+and propagates listener errors. Changes to subscriptions affect the next emission.
+Rule payloads contain readonly values, not run records or RNG generators. Listeners
+react with progression/presentation; rules retain run mutations and gameplay RNG.
+Phase and session rules emit values; progression and disposable cosmetic listeners
+react synchronously. Nested result/offer arrays are copied and frozen by their owner.
 
 The Ink environment is owned by `src/rendering/environment/`. It supplies
 layered image scenery to the shared scene composition and film pass, rendered
-through Pixi by default or the Canvas fallback.
+through Pixi on WebGL2. Canvas remains a texture-preparation tool.
+Worker context proxies cache bound native methods and adapt image arguments only
+for drawing/patterns. `layer-transfer.ts` copies composed colour/material planes
+concurrently; failures wait for pending copies and close every acquired bitmap
+before the worker reports failure. Completed response ownership remains unchanged.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
+
+`ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and
+action ports; callbacks preserve the existing save keys and ordering. The owners
+are screens (HUD/animation), panels (navigation/statistics/title records), secrets
+(title taps/swipes), admin (guarded testing controls), settings (preferences/options/
+lighting debug), setup (setup/tutorial), armory (equipment/presets), input
+(pointer/keyboard/navigation), purchases (refresh/edition/supporter controls),
+cinematic (viewer session/grade), and profile (transfer/reset/management).
+
+`game/session/phase-router.ts` supplies synchronous phase-controller dispatch and
+checkpoint adoption. Live input uses the active controller; updateFrame preserves
+the existing boss/playing/standoff/between/dead order and later-phase same-frame
+cascades. Checkpoint adoption is silent and does not replay entry or rewards.
+
+`game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
+profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record
+capture/restore/continue/abandon through explicit persistence ports.
+`game/session/run-start.ts` owns normal/daily/trial/rush entry and next-step
+dispatch; fresh seeds remain rules and cosmetic resets react at the original event boundaries. Trial
+encounter start/finish are owned by game/session/trials.ts, with explicit profile
+restoration and immutable result events.
+`game/phases/waves.ts` owns swipe targeting and knife input through explicit rule
+ports and cosmetic events. Its createWaveLifecycle owns deferred entry, preparation
+and update/clear boundaries. Boss, standoff, shrine, death and between controllers
+own their encounter rules and dispatch through the live router. Gameplay events
+include phaseChanged, kill/cutChain, score/combo, struck, parry/block, wave and
+boss entry/clear, standoff outcome and run entry/terminal settlement. Rule owners
+receive emission-only capabilities; flat frozen parry/block positions are ready
+for presentation light listeners. Checkpoint restore remains silent.
+
+Plain character records use shared/character.ts, seed/pose helpers use
+shared/figure-model.ts, and death style/timing values use shared/character-death.ts.
+Rendering reads these same models; gameplay no longer imports rendering or
+presentation. Rendering types/death modules retain compatibility re-exports.
+game/state-machine.ts supplies typed plain-record table dispatch, transition
+validation and entry/exit/next hooks. Each character owner advances its own clock
+before dispatch to preserve freeze/hazards and raw shadow timing. The ordered
+game/behaviour-registry.ts matches existing record data, retaining checkpoint
+shapes. game/combat/grunt.ts now dispatches enter/idle/attack/strike/dying/fade through
+the registry's feint/Zen/Still/base tables. Shared finishing preserves pose/timer
+ordering when rule callbacks change state in the same frame. Runtime and tests now call advanceGrunts directly; the unused updateEnemies adapter
+has been removed separately. game/combat/grunt-spawn.ts owns plain construction
+and look selection; all construction consumers call createGrunt directly. The
+unused spawn adapter has been removed; enemy-spawn.ts retains ordering/selection.
+Boss tables/registry and derived player animation tables are also live (see below).
+
+### Adding an enemy behaviour
+
+Keep checkpoint-compatible plain records. Register a named behaviour in the
+ordered registry, using a predicate over existing record data and a state machine
+whose table covers every saved state. Put specific matches before the final base
+match. Override only the relevant state handlers (the feint table overrides attack
+and composes its Zen strike handling); shared clocks and finishing remain in the
+owner. New types need a registry entry, without a type branch in the update loop.
+Keep gameplay RNG/run mutations in handlers and emit value snapshots for effects.
 
 ## Where changes belong
 
-| Concern                                                               | Maintained location                                                              |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Run fields and restart initialization                                 | `src/game/run-state.ts`                                                          |
-| Enemy spawn, targeting, damage, simulation                            | `src/game/combat/`                                                               |
-| Wave difficulty, boss factories/openings/updates, standoffs           | `src/game/encounters/`                                                           |
-| Items, stages, cosmetics, bosses, blessings, awakenings               | `src/game/content/`                                                              |
-| Modifier composition and shrine rules                                 | `src/game/equipment/`, `src/game/shrine/`                                        |
-| Scoring, records, statistics, unlocks                                 | `src/game/progression/`                                                          |
-| Secret trigger counters and fixed-point eligibility                   | `src/game/progression/secret-events.ts`, `unlocks.ts`                            |
-| Temple upgrades, tutorial status, mode milestones                     | `src/game/progression/meta.ts`                                                   |
-| Temple collection membership and eligible post-purchase counters      | `src/game/content/collections.ts`, `src/game/progression/collection-progress.ts` |
-| Awakening purchases, login streaks and loadout snapshots              | `src/game/progression/awakening-purchases.ts`, `daily-login.ts`, `presets.ts`    |
-| Tester Premium, rewarded support adapter and recoverable bonus offers | `src/platform/tester-premium.ts`, `rewarded-support.ts`, `pending-support.ts`    |
-| Trial presets, completion and cosmetic grants                         | `src/game/content/trials.ts`, `src/game/progression/trials.ts`                   |
-| Pending Embers and one-time end-run settlement                        | `src/game/progression/run-rewards.ts`                                            |
-| First-encounter teaching state and overlay                            | `src/game/onboarding/`                                                           |
-| Run-end tally/reveal and viewed Armoury gear                          | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts`           |
-| Independent gated blade/outfit challenges                             | `src/game/progression/awakening-progress.ts`, `unlocks.ts`                       |
-| Outfit awakening catalog                                              | `src/game/content/robe-awakenings.ts`                                            |
-| Knife target selection and charge spending                            | `src/game/combat/knife.ts`                                                       |
-| Tutorial practice scene and isolated canvas                           | `src/ui/screens/tutorial.ts`, `tutorial.css`                                     |
-| Temple and testing menu controls                                      | `src/ui/screens/template.ts`, `admin.ts`                                         |
-| Backgrounds, ambient grass/leaves, weather                            | `src/rendering/scene/`                                                           |
-| Figure geometry, poses, player animation, projection                  | `src/rendering/figures/`                                                         |
-| Particle state, spawning, updates, drawing, films                     | `src/rendering/effects/`                                                         |
-| Isolated armory rendering                                             | `src/rendering/armory-preview.ts`                                                |
-| Screen fragments and controllers                                      | `src/ui/screens/`                                                                |
-| HUD/navigation, hints/toasts, scroll menu presentation                | `src/ui/`                                                                        |
-| Pointer and keyboard adapters                                         | `src/input/`                                                                     |
-| Validated profile settings and Options submenus                       | `src/platform/settings.ts`, `src/ui/screens/options.ts`                          |
-| Death style selection, poses, durations and ground-shadow fading      | `src/rendering/figures/death.ts`, `figure.ts`                                    |
-| Synthesized cues, audio context and ambience                          | `src/audio/audio.ts`                                                             |
-| Save validation, storage, haptics, lifecycle, frame scheduling        | `src/platform/`                                                                  |
+| Concern                                                               | Maintained location                                                                   |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Mutable session lifetime and named state projections                  | `src/game/session/runtime-state.ts`, `state-view.ts`                                  |
+| Browser preferences/access/haptics and audio/guided/mute wiring       | `src/platform/runtime-preferences.ts`, `src/ui/wiring/audio.ts`                       |
+| Runtime frame/scene orchestration and startup                         | `src/runtime/frame-bindings.ts`, `frame-simulation.ts`, `scene-flow.ts`, `startup.ts` |
+| Session display, saved encounters, results and teaching adapters      | `src/ui/wiring/*-feedback.ts`, `guided-lessons.ts`                                    |
+| Run entry, checkpoints, pause/resume, trial and result orchestration  | `src/game/session/`                                                                   |
+| Active phase inputs and encounter lifecycle                           | `src/game/phases/`                                                                    |
+| Cosmetic scene, character, post and event feedback                    | `src/presentation/`                                                                   |
+| Run fields and restart initialization                                 | `src/game/run-state.ts`                                                               |
+| Enemy spawn, targeting, damage, simulation                            | `src/game/combat/`                                                                    |
+| Plain character types, seed/pose helpers, death timing                | `src/shared/character.ts`, `figure-model.ts`, `character-death.ts`                    |
+| Wave difficulty, boss factories/openings/updates, standoffs           | `src/game/encounters/`                                                                |
+| Items, stages, cosmetics, bosses, blessings, awakenings               | `src/game/content/`                                                                   |
+| Modifier composition and shrine rules                                 | `src/game/equipment/`, `src/game/shrine/`                                             |
+| Scoring, records, statistics, unlocks                                 | `src/game/progression/`                                                               |
+| Secret trigger counters and fixed-point eligibility                   | `src/game/progression/secret-events.ts`, `unlocks.ts`                                 |
+| Temple upgrades, tutorial status, mode milestones                     | `src/game/progression/meta.ts`                                                        |
+| Temple collection membership and eligible post-purchase counters      | `src/game/content/collections.ts`, `src/game/progression/collection-progress.ts`      |
+| Awakening purchases, login streaks and loadout snapshots              | `src/game/progression/awakening-purchases.ts`, `daily-login.ts`, `presets.ts`         |
+| Tester Premium, rewarded support adapter and recoverable bonus offers | `src/platform/tester-premium.ts`, `rewarded-support.ts`, `pending-support.ts`         |
+| Trial presets, completion and cosmetic grants                         | `src/game/content/trials.ts`, `src/game/progression/trials.ts`                        |
+| Pending Embers and one-time end-run settlement                        | `src/game/progression/run-rewards.ts`                                                 |
+| First-encounter teaching rules and overlay                            | `src/game/onboarding/guided-state.ts`, `src/ui/wiring/guided-lessons.ts`              |
+| Run-end tally/reveal and viewed Armoury gear                          | `src/ui/screens/run-results.ts`, `src/game/progression/armory-seen.ts`                |
+| Independent gated blade/outfit challenges                             | `src/game/progression/awakening-progress.ts`, `unlocks.ts`                            |
+| Outfit awakening catalog                                              | `src/game/content/robe-awakenings.ts`                                                 |
+| Knife target selection and charge spending                            | `src/game/combat/knife.ts`                                                            |
+| Tutorial practice scene and isolated canvas                           | `src/ui/screens/tutorial.ts`, `tutorial.css`                                          |
+| UI runtime wiring                                                     | `src/ui/wiring/`                                                                      |
+| Temple and testing menu controls                                      | `src/ui/screens/template.ts`, `admin.ts`                                              |
+| Backgrounds, ambient grass/leaves, weather                            | `src/rendering/scene/`                                                                |
+| Figure drawing, player animation rules and projection                 | `src/rendering/figures/`, `src/game/player/player.ts`, `src/presentation/figures.ts`  |
+| Particle state, spawning, updates, drawing, films                     | `src/rendering/effects/`                                                              |
+| Isolated armory rendering                                             | `src/rendering/armory-preview.ts`                                                     |
+| Screen fragments and controllers                                      | `src/ui/screens/`                                                                     |
+| HUD/navigation, hints/toasts, scroll menu presentation                | `src/ui/`                                                                             |
+| Pointer and keyboard adapters                                         | `src/input/`                                                                          |
+| Validated profile settings and Options submenus                       | `src/platform/settings.ts`, `src/ui/screens/options.ts`                               |
+| Death style selection, poses, durations and ground-shadow fading      | `src/rendering/figures/death.ts`, `figure.ts`                                         |
+| Synthesized cues, audio context and ambience                          | `src/audio/audio.ts`                                                                  |
+| Save validation, storage, haptics, lifecycle, frame scheduling        | `src/platform/`                                                                       |
 
-`platform/run-checkpoint.ts` validates the active run snapshot. `game.ts`
-captures it after each wave, duel, standoff or Shrine offer is prepared and
-restores it under a pause screen on startup. Continue resumes the saved phase. The gameplay random stream is stored with its
+`platform/run-checkpoint.ts` validates the active run snapshot.
+`game/session/checkpoint-flow.ts` captures it after each wave, duel, standoff or
+Shrine offer is prepared. Runtime startup restores it under a pause screen. Continue resumes the saved phase. The gameplay random stream is stored with its
 state, including weather hazard timers; visual randomness stays separate. Fatal losses write a terminal snapshot
 before the death animation. Completed results clear that snapshot after profile
 rewards and records have been written.
@@ -261,3 +411,129 @@ inactive gate so returning never overrides player pause or mute.
 Drifting particle catalogs and drawing belong to `rendering/scene/drift-catalog.ts`
 and `drift-renderer.ts`; ambient simulation owns particle identity and motion.
 See [drifting debris](../features/drifting-debris.md) for atlas extension and controls.
+
+`game/phases/standoff.ts` owns challenger setup, draw-window updates and swipe/tap
+resolution, with explicit figure/feedback ports and plain checkpoint records.
+
+`game/phases/boss.ts` owns duel entry, timed updates, parry/block and cut resolution.
+Raw-time dying cleanup remains callable before phase dispatch; layout, UI and
+feedback use explicit ports. Seeded boss-pattern scenarios call this owner.
+
+`game/phases/shrine.ts` owns offer generation, gated rerolls and blessing choices.
+Shrine menu wiring invokes its choice API; checkpoint keys/order remain unchanged.
+
+`game/phases/death.ts` owns damage, fatal checkpoint boundaries, raw-time death
+advancement and revival. Immutable struck snapshots carry committed lives, life-loss,
+label and player geometry. presentation/damage-feedback.ts owns damage/death effects,
+sound, haptics and HUD reactions; raw-time falling remains a narrow animation port.
+Reward offer and results orchestration belong to game/session/results.ts.
+
+`game/phases/between.ts` owns the timer selecting the next trial encounter, boss,
+shrine or wave through explicit continuation ports.
+
+Boss simulation now dispatches the ten existing states through game/encounters/boss-states.ts.
+The boss-behaviours registry owns each typed machine and its direction, parry and
+configuration hooks for base, mirror, twin and spear; visual definitions stay plain
+content. boss-simulation.ts advances simulation/lifetime/raw-shadow clocks and
+applies the existing transition-frame pose/lean rules. All consumers now import advanceBoss directly; the unused boss-update.ts
+adapters and legacy idle reset have been removed separately. No checkpoint fields change.
+
+Player animation plain records, construction, swing and update functions are owned
+by game/player/player.ts; the rendering player module only re-exports REST_POSE
+for existing rendering coverage. Gameplay has no rendering import.
+
+Player animation dispatch uses a typed idle/swing/block/death table. State and
+time are transient views of existing swingDir/swingT/fallen fields, preserving
+checkpoint shape. The existing animation has no distinct hurt field or timer.
+The clock advances before state selection; fallen pose priority and the independent
+swing lean clock retain their original behavior.
+
+Companion selection, foxfire rescue and Daruma/Phoenix/support revival are owned
+by game/player/companions.ts with narrow capabilities. Death dispatch retains its
+existing revival priority and timer. Drawing remains presentation work; this
+rule ownership preserves checkpoint fields. companionSaved and revived snapshots
+drive presentation/damage-feedback.ts after committed outcomes; this listener owns
+rescue popups and revival HUD, animation reset, banners and camera feedback.
+
+Terminal daily/main-run results, revive offers, support bonus claims and pending
+support recovery are owned by game/session/results.ts through explicit display,
+persistence and reward capabilities. Its actual API drives seeded death/results
+scenarios and settlement/recovery/disposal tests. Trial settlement remains with
+the trial session owner.
+
+Remaining player/pet/foxfire drawing is owned by presentation/player-figures.ts
+with read-only run, animation, equipment and layout views. Its draw passes preserve
+the existing composer order and figure/companion output.
+
+Active awakening eligibility and modifier composition are owned by
+game/equipment/active.ts with current equipment/profile/run views. Trial modifiers
+and the title/over versus running upgrade policy retain their existing semantics.
+
+Reward accrual, awakening challenge updates, blade statistics and terminal item
+unlocks are owned by game/progression/profile-rules.ts. Current profile/run and
+persistence/reveal capabilities preserve daily/trial isolation and unlock ordering.
+
+Scene readiness and continuation adoption are owned by runtime/scene-flow.ts.
+Renderer composition/preparation is passed as a plain frame capability; the owner
+retains stale-request suppression, scene identity, presentation acknowledgement,
+paused encounter adoption and frame-clock reset. It imports no renderer/presentation
+implementation.
+
+Parry, boss-victory and standoff profile reactions are owned by
+game/progression/encounter-listeners.ts. Boss events project completion flags and
+counts; listeners resolve current disposable/main statistics and never receive
+run state or gameplay RNG. Rule-owned persistence follows their synchronous updates.
+
+Parry/block effects, sounds and haptics are owned by
+presentation/duel-feedback.ts, subscribed to immutable rule-event positions.
+The listener has no gameplay state or gameplay random source. Combat rules retain
+hit stop and plain animation mutation; disposal removes both subscriptions.
+
+## Runtime ownership map
+
+`src/game.ts` constructs foundation, presentation, gameplay, UI/controls and frame
+owners, then connects startup and disposal. Deferred menu/clock actions resolve
+later owners when invoked. No redundant root aliases are required for probes.
+
+| Owner                                                           | Responsibility                                                                  |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `runtime/foundation.ts`                                         | Browser/profile/run/view records and base context construction                  |
+| `runtime/rules.ts`, `combat.ts`                                 | Profile/equipment, score, kill and character rule capabilities                  |
+| `runtime/gameplay.ts`, `phases.ts`, `session.ts`                | Controller/router construction and current narrow action wiring                 |
+| `runtime/scene.ts`, `scene-flow.ts`                             | Stage preparation, renderer readiness and deferred/paused continuation adoption |
+| `runtime/presentation.ts`                                       | Equipment, environment, figures, post and feedback construction                 |
+| `runtime/ui-base.ts`, `menus.ts`, `controls.ts`                 | HUD, menus, previews, purchases, profiles and input navigation                  |
+| `runtime/frames.ts`, `frame-bindings.ts`, `frame-simulation.ts` | Ordered rule/cosmetic dispatch, prepared drawing, scheduling and viewport       |
+| `runtime/reactions.ts`, `startup.ts`                            | Synchronous listener registration and startup/error/disposal lifetime           |
+
+`game/session/runtime-state.ts`, `activity.ts` and `scene-state.ts` hold plain
+lifetime records outside serialized combat state. `state-view.ts` forwards only
+named fields, preserving replacement identities and lazy reads of later services.
+Phase, kill and frame views are cached per lifetime; request snapshots are not.
+
+`presentation/native-services.ts` owns renderer services; supplied lighting is
+borrowed. Geometry, stage visits, seals, equipment previews, environment caches,
+figures and post history have their own presentation owners. Graphics recovery
+and viewport orchestration belong to `graphics-lifecycle.ts` and `viewport.ts`.
+Live weather hazards, hit stop, slow motion and player records remain rule-owned.
+
+Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
+and damage listeners. Progression listeners own profile counters and persistence
+at documented synchronous boundaries. Rule event payloads expose neither mutable
+run records nor gameplay RNG. Removing cosmetics preserves rule/profile/RNG
+outcomes in actual seeded scenarios.
+
+Session display lives in `ui/wiring/checkpoint-feedback.ts`, `run-flow-feedback.ts`,
+`run-start-feedback.ts`, `results-feedback.ts`, `shrine-feedback.ts` and
+`trial-feedback.ts`. Rules retain checkpoint/profile/weather/RNG adoption,
+transitions, rewards, support rollback and result readiness. Result sequence
+snapshots carry IDs; user completion/bonus actions return to the actual rule owner.
+Only the current sequence retains action state. Reward offers remain explicit
+interaction services because their outcomes determine rule decisions.
+
+The guided DOM/CSS adapter is `ui/wiring/guided-lessons.ts`; deterministic lesson
+progress, freeze and practice input decisions stay in `game/onboarding/guided-state.ts`.
+See [runtime refactor results](../development/runtime-refactor-results.md) for
+verification, intentional ordering changes and the manual phone checklist.
+
+W3 uses painter-owned native G-buffer and HDR diffuse/specular targets under rendering/pixi/, with a presentation-owned deterministic 16-light registry. Material stamps, ordinary artwork and instanced grass/leaves use the same lookup composite; legacy maps convert to PBR and the old forward shader is removed. Event/persistent sources, the session half-resolution quality choice and named scene/post/film hooks are implemented. See [rendering](rendering.md) for target layout, lifecycle, accepted approximations and minimal extension examples.

@@ -1,3 +1,4 @@
+import { reportGraphicsError } from '../../rendering/graphics-error.ts';
 import {
   activeNow,
   pageActive,
@@ -6,15 +7,13 @@ import {
 } from '../../platform/activity.ts';
 import './tutorial.css';
 import type { SceneDrawing } from '../../rendering/scene-drawing.ts';
-import type { SceneSurface } from '../../rendering/scene-surface.ts';
-import { createSceneSurface } from '../../rendering/scene-surface.ts';
+import { SceneSurface } from '../../rendering/scene-surface.ts';
 
 /** A practice scene with its own clock, canvas and inputs. It never touches a run or profile. */
 export function createTutorial(
   root: HTMLElement,
   onFinish: (status: 'completed' | 'skipped') => void,
   reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches,
-  pixi = false,
 ) {
   const overlay = document.createElement('section');
   overlay.className = 'tutorial-overlay';
@@ -39,8 +38,8 @@ export function createTutorial(
   </div>`;
   root.append(overlay);
   let canvas = overlay.querySelector<HTMLCanvasElement>('canvas')!;
-  let context: SceneDrawing | null = pixi ? null : canvas.getContext('2d');
-  let surface: SceneSurface | undefined;
+  let context: SceneDrawing | null = null;
+  const surface = new SceneSurface(canvas, true);
   const title = overlay.querySelector<HTMLElement>('.tutorial-title')!;
   const lesson = overlay.querySelector<HTMLElement>('.tutorial-lesson')!;
   const cue = overlay.querySelector<HTMLElement>('.tutorial-cue')!;
@@ -50,15 +49,19 @@ export function createTutorial(
   const listeners = new AbortController();
   let active = false;
   let disposed = false;
-  if (pixi)
-    void createSceneSurface(canvas, true, true).then((prepared) => {
+  surface
+    ?.initialize()
+    .then(() => {
       if (disposed) {
-        prepared.dispose();
+        surface?.dispose();
         return;
       }
-      surface = prepared;
-      canvas = prepared.canvas;
-      context = prepared.drawing;
+      if (!surface) return;
+      canvas = surface.canvas;
+      context = surface.drawing ?? null;
+    })
+    .catch(() => {
+      if (!disposed) reportGraphicsError(canvas);
     });
   let step = 0;
   let started = 0;
@@ -154,7 +157,7 @@ export function createTutorial(
       started += now - contextPausedAt;
       contextPausedAt = undefined;
     }
-    if (surface) {
+    if (surface?.drawing) {
       canvas = surface.canvas;
       context = surface.drawing;
     }

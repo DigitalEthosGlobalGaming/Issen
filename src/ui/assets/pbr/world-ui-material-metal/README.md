@@ -2,9 +2,19 @@
 
 Generated from [world-ui-material-metal.png](../../world-ui-material-metal.png) with `metal`, Texture/OpenGL.
 
-Six aligned 192Ã—192 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-material-metal_diffuse.png), [normal](world-ui-material-metal_normal.png), [roughness](world-ui-material-metal_roughness.png), [metallic](world-ui-material-metal_metallic.png), [ao](world-ui-material-metal_ao.png), [emissive](world-ui-material-metal_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-material-metal | [diffuse](world-ui-material-metal_diffuse.webp), [normal](world-ui-material-metal_normal.webp), [surface](world-ui-material-metal_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

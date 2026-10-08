@@ -2,9 +2,19 @@
 
 Generated from [sea-stacks-atlas.png](../../sea-stacks-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](sea-stacks-atlas_diffuse.png), [normal](sea-stacks-atlas_normal.png), [roughness](sea-stacks-atlas_roughness.png), [metallic](sea-stacks-atlas_metallic.png), [ao](sea-stacks-atlas_ao.png), [emissive](sea-stacks-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| sea-stacks-atlas | [diffuse](sea-stacks-atlas_diffuse.webp), [normal](sea-stacks-atlas_normal.webp), [surface](sea-stacks-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [ui-strokes-atlas.png](../../ui-strokes-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 1536Ã—256 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](ui-strokes-atlas_diffuse.png), [normal](ui-strokes-atlas_normal.png), [roughness](ui-strokes-atlas_roughness.png), [metallic](ui-strokes-atlas_metallic.png), [ao](ui-strokes-atlas_ao.png), [emissive](ui-strokes-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| ui-strokes-atlas | [diffuse](ui-strokes-atlas_diffuse.webp), [normal](ui-strokes-atlas_normal.webp), [surface](ui-strokes-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

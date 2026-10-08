@@ -2,9 +2,19 @@
 
 Generated from [foreground-boulders-atlas.png](../../foreground-boulders-atlas.png) with `stone`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](foreground-boulders-atlas_diffuse.png), [normal](foreground-boulders-atlas_normal.png), [roughness](foreground-boulders-atlas_roughness.png), [metallic](foreground-boulders-atlas_metallic.png), [ao](foreground-boulders-atlas_ao.png), [emissive](foreground-boulders-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| foreground-boulders-atlas | [diffuse](foreground-boulders-atlas_diffuse.webp), [normal](foreground-boulders-atlas_normal.webp), [surface](foreground-boulders-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

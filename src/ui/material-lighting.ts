@@ -1,3 +1,4 @@
+import { reportGraphicsError } from '../rendering/graphics-error.ts';
 import { assetMaterialCatalog } from '../rendering/asset-material-catalog.ts';
 import { createPbrAtlas } from '../rendering/pbr-atlas.ts';
 import type { createLightingRig } from '../rendering/lighting-rig.ts';
@@ -24,11 +25,7 @@ type Job = {
 type Replacement = { original: string; value: string; priority: string };
 
 /** CSS keeps its slices, crops and states; only the aligned colour texture is replaced. */
-export function createUiMaterialLighting(
-  doc: Document,
-  rig: ReturnType<typeof createLightingRig>,
-  allowWebGL = true,
-) {
+export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof createLightingRig>) {
   const packs = new Map(assetMaterialCatalog.map((pack) => [pack.source, pack]));
   const assets = new Map<string, Asset>();
   const jobs = new Map<string, Job>();
@@ -56,7 +53,10 @@ export function createUiMaterialLighting(
         painter = result;
         return result;
       })
-      .catch(() => null));
+      .catch(() => {
+        if (!disposed) reportGraphicsError(canvas);
+        return null;
+      }));
   function asset(pack: Pack): Asset {
     let value = assets.get(pack.source);
     if (!value) {
@@ -123,7 +123,7 @@ export function createUiMaterialLighting(
     rendering = true;
     dirty = false;
     try {
-      if (!allowWebGL || !jobs.size) return;
+      if (!jobs.size) return;
       const target = await preparePainter();
       if (!target || disposed) return;
       for (const value of jobs.values()) {

@@ -49,7 +49,7 @@ for (const back of [true, false]) {
       const order = await page.evaluate(async (back) => {
         const { createFigureRenderer } = await import('/src/rendering/figures/figure.ts');
         const { createPalette } = await import('/src/rendering/palette.ts');
-        const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+        const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
         const { REST_POSE } = await import('/src/rendering/figures/player.ts');
         const context = document.createElement('canvas').getContext('2d')!;
         const order: string[] = [];
@@ -123,7 +123,7 @@ for (const shared of [false, true])
     await page.goto('/');
     const result = await page.evaluate(async (shared) => {
       const previewPath = '/src/rendering/armory-preview.ts';
-      const modelPath = '/src/rendering/figures/model.ts';
+      const modelPath = '/src/shared/figure-model.ts';
       const palettePath = '/src/rendering/palette.ts';
       const { createArmoryPreview } = await import(previewPath);
       const { makeFig } = await import(modelPath);
@@ -176,11 +176,20 @@ for (const shared of [false, true])
         }
         await Promise.all(Object.values(artwork).map((renderer) => renderer.prepare()));
       }
-      const first = createArmoryPreview(canvases[0], services, shared ? artwork : undefined);
+      const { SceneSurface } = await import('/src/rendering/scene-surface.ts');
+      const surfaces = canvases.map((canvas) => new SceneSurface(canvas, true));
+      await Promise.all(surfaces.map((surface) => surface.initialize()));
+      const first = createArmoryPreview(
+        canvases[0],
+        services,
+        shared ? artwork : undefined,
+        surfaces[0],
+      );
       const second = createArmoryPreview(
         canvases[1],
         { ...services, now: () => 1000 },
         shared ? artwork : undefined,
+        surfaces[1],
       );
       await Promise.all([first.prepare(), second.prepare(), document.fonts.ready]);
       first.draw(frame);
@@ -208,6 +217,7 @@ for (const shared of [false, true])
       if (shared && canvases[1].toDataURL() !== before)
         throw new Error('Disposal changed another preview');
       second.dispose();
+      for (const surface of surfaces) surface.dispose();
       for (const renderer of Object.values(artwork)) renderer.dispose();
       return result;
     }, shared);
@@ -361,7 +371,7 @@ test('figure renderer draws every blade and robe without touching another canvas
   await page.goto('/');
   const result = await page.evaluate(async () => {
     const figurePath = '/src/rendering/figures/figure.ts';
-    const modelPath = '/src/rendering/figures/model.ts';
+    const modelPath = '/src/shared/figure-model.ts';
     const palettePath = '/src/rendering/palette.ts';
     const contentPath = '/src/game/content/cosmetics.ts';
     const { createFigureRenderer } = await import(figurePath);
@@ -375,7 +385,8 @@ test('figure renderer draws every blade and robe without touching another canvas
     const preview = document.createElement('canvas');
     preview.width = 390;
     preview.height = 844;
-    const g = preview.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const g = await createTestDrawing(preview);
     const renderer = createFigureRenderer(g, {
       time: 1,
       wind: 0.5,
@@ -492,7 +503,8 @@ test('film effects restore context state and leave other canvases untouched', as
     const live = document.createElement('canvas');
     const preview = document.createElement('canvas');
     const liveContext = live.getContext('2d')!;
-    const previewContext = preview.getContext('2d')!;
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const previewContext = await createTestDrawing(preview);
     liveContext.fillStyle = 'red';
     liveContext.fillRect(0, 0, 30, 30);
     previewContext.fillStyle = 'blue';

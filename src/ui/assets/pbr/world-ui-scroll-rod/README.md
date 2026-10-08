@@ -2,9 +2,19 @@
 
 Generated from [world-ui-scroll-rod.png](../../world-ui-scroll-rod.png) with `wood`, Sprite/OpenGL.
 
-Six aligned 192Ã—48 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-scroll-rod_diffuse.png), [normal](world-ui-scroll-rod_normal.png), [roughness](world-ui-scroll-rod_roughness.png), [metallic](world-ui-scroll-rod_metallic.png), [ao](world-ui-scroll-rod_ao.png), [emissive](world-ui-scroll-rod_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-scroll-rod | [diffuse](world-ui-scroll-rod_diffuse.compact.png), [normal](world-ui-scroll-rod_normal.webp), [surface](world-ui-scroll-rod_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

@@ -2,9 +2,19 @@
 
 Generated from [player-ronin-atlas.png](../../player-ronin-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 1254Ã—1254 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](player-ronin-atlas_diffuse.png), [normal](player-ronin-atlas_normal.png), [roughness](player-ronin-atlas_roughness.png), [metallic](player-ronin-atlas_metallic.png), [ao](player-ronin-atlas_ao.png), [emissive](player-ronin-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| player-ronin-atlas | [diffuse](player-ronin-atlas_diffuse.webp), [normal](player-ronin-atlas_normal.webp), [surface](player-ronin-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

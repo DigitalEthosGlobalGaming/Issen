@@ -5,12 +5,13 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const renderer = createInkEnemyRenderer(document);
     const ready = await renderer.prepare();
-    const g = document.createElement('canvas').getContext('2d')!;
+    const g = await createTestDrawing(document.createElement('canvas'));
     const p = createPalette();
     const env = {
       time: 0,
@@ -21,9 +22,11 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
     };
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     const read = CanvasRenderingContext2D.prototype.getImageData;
-    let pixelReads = 0;
+    let pixelReads = 0,
+      gpuBackedReads = 0;
     CanvasRenderingContext2D.prototype.getImageData = function (...args) {
       pixelReads++;
+      if (!this.getContextAttributes().willReadFrequently) gpuBackedReads++;
       return read.apply(this, args);
     };
     const sources = new Set<string>();
@@ -80,6 +83,8 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
         variedSources,
         snapshot,
         repeatedReads,
+        pixelReads,
+        gpuBackedReads,
         disposed: renderer.snapshot(),
       };
     } finally {
@@ -90,14 +95,16 @@ test('new enemy families stay isolated from authored bosses and share bounded ca
   });
   expect(result.ready).toBe(true);
   expect(result.repeatedReads).toBe(0);
+  expect(result.pixelReads).toBeGreaterThan(0);
+  expect(result.gpuBackedReads).toBe(0);
   expect(result.snapshot.loaded.sort()).toEqual(['base', 'clothing', 'heads', 'variationHeads']);
   expect(result.bossSources.sort()).toEqual([
-    'enemy-headwear-atlas_diffuse.png',
-    'enemy-ronin-simple_diffuse.png',
+    'enemy-headwear-atlas_diffuse.webp',
+    'enemy-ronin-simple_diffuse.webp',
   ]);
-  expect(result.variedSources).toContain('enemy-clothing-variants_diffuse.png');
-  expect(result.variedSources).toContain('enemy-headwear-variants_diffuse.png');
-  expect(result.variedSources).not.toContain('enemy-headwear-atlas_diffuse.png');
+  expect(result.variedSources).toContain('enemy-clothing-variants_diffuse.webp');
+  expect(result.variedSources).toContain('enemy-headwear-variants_diffuse.webp');
+  expect(result.variedSources).not.toContain('enemy-headwear-atlas_diffuse.webp');
   expect(result.snapshot.variantPixels + result.snapshot.tonePixels).toBeLessThanOrEqual(8_000_000);
   expect(result.snapshot.cachedParts).toBeLessThanOrEqual(192);
   expect(result.snapshot.toneParts).toBeLessThanOrEqual(48);
@@ -110,13 +117,14 @@ test('enemy tint cache survives fog variants and stays bounded through arbitrary
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
     const { createPalette } = await import('/src/rendering/palette.ts');
-    const { makeFig, EPOSE } = await import('/src/rendering/figures/model.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const renderer = createInkEnemyRenderer(document);
     await renderer.prepare();
     const canvas = document.createElement('canvas');
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     const palette = createPalette();
     const env = {
       time: 0,

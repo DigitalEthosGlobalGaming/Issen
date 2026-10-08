@@ -3,8 +3,8 @@ test.beforeEach(async ({ page }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
     const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__supportHarness = { G, playerDie, earn, showOver }; frameLoop.start();',
+      'artworkReady = true;',
+      'window.__supportHarness = { G: foundation.run.G, playerDie: game.playerDie, earn: game.earn, showOver: game.showOver }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

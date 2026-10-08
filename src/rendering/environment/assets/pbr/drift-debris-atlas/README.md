@@ -2,9 +2,19 @@
 
 Generated from [drift-debris-atlas.png](../../drift-debris-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](drift-debris-atlas_diffuse.png), [normal](drift-debris-atlas_normal.png), [roughness](drift-debris-atlas_roughness.png), [metallic](drift-debris-atlas_metallic.png), [ao](drift-debris-atlas_ao.png), [emissive](drift-debris-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| drift-debris-atlas | [diffuse](drift-debris-atlas_diffuse.webp), [normal](drift-debris-atlas_normal.webp), [surface](drift-debris-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

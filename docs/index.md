@@ -2,6 +2,8 @@
 
 # Repository documentation
 
+- [Performance and seamless transitions](development/performance-goal-progress.md): active goal checkpoints, measured baselines and verification.
+
 - [Support and progression](features/support-progression.md): implemented support
   screens, Second Wind, Ember rewards, Temple collections, Awakening purchases the Seven Dawns crest and Armoury presets.
 
@@ -93,3 +95,11 @@
 
 - [PBR Forge CLI](../scripts/pbr/README.md): JSON material presets, local batch exports and focused tool tests.
 - [Asset and PBR inventory](features/asset-pbr-inventory.md): living asset register, installed map packs, generation presets, part coverage and remaining conversions.
+
+- [Layout-preserving asset compaction](development/asset-compaction-results.md): W1 changes, invariants, matched byte evidence and verification.
+
+- [Runtime refactor results](development/runtime-refactor-results.md): Workstream 2 ownership, verification, behavior changes and phone play checklist.
+
+- [Lighting refactor results](development/lighting-refactor-results.md): W3 native pipeline, foliage, light sources, extension hooks, checkpoint verification and accepted approximations.
+
+- [Final asset, runtime and lighting refactor report](development/refactor-final-report.md): all-workstream audit, final verification, byte totals, phone checklist and delivery.

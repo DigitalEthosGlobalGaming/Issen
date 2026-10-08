@@ -5,13 +5,14 @@ test('every stage retains aligned material layers, including foreground bamboo',
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const { registerMaterialSink } = await import('/src/rendering/scene-material.ts');
     const renderer = createEnvironmentRenderer(document);
     const canvas = document.createElement('canvas');
     canvas.width = 180;
     canvas.height = 120;
-    const g = canvas.getContext('2d')!;
+    const g = await createTestDrawing(canvas);
     let stamps: any[] = [];
     registerMaterialSink(g, { draw: (stamp) => stamps.push(stamp), lights: () => {} });
     const stages = [];
@@ -41,10 +42,10 @@ test('every stage retains aligned material layers, including foreground bamboo',
           return (
             m.normal.source.width === m.surface.source.width &&
             m.normal.source.height === m.surface.source.height &&
-            m.emissive.source.width === m.surface.source.width &&
+            (!m.emissive || m.emissive.source.width === m.surface.source.width) &&
             (m.surfaceCoverage ||
               (m.normal.frame?.join() === m.surface.frame?.join() &&
-                m.normal.frame?.join() === m.emissive.frame?.join()))
+                (!m.emissive || m.normal.frame?.join() === m.emissive.frame?.join())))
           );
         }),
         coverage: stamps.some((stamp) => {

@@ -1,6 +1,6 @@
 import type { Direction } from '../../shared/directions.ts';
-import type { DeathStyle } from '../../rendering/figures/death.ts';
-import type { FigureSeed, Pose } from '../../rendering/figures/types.ts';
+import type { DeathStyle } from '../../shared/character-death.ts';
+import type { FigureSeed, Pose } from '../../shared/character.ts';
 export interface EnemyPosition {
   x: number;
   y: number;

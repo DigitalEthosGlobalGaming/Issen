@@ -3,6 +3,9 @@ import { TAU } from '../../shared/math.ts';
 import type { Random } from '../../shared/random.ts';
 import { scaledCount } from '../effects/quality.ts';
 import { chooseDriftSprite } from './drift-catalog.ts';
+import { drawInstancedGrass } from '../scene-grass.ts';
+import { createLeafMotion, leafMotionPose } from './leaf-motion.ts';
+import type { LeafMotion } from './leaf-motion.ts';
 export interface GrassBlade {
   x: number;
   y: number;
@@ -32,7 +35,15 @@ export interface Leaf {
 export interface AmbientEnvironment {
   stage?: number;
   spriteMotion?: boolean;
-  drawLeaf?: (g: SceneDrawing, leaf: Leaf) => void;
+  time?: number;
+  motion?: LeafMotion;
+  drawLeaves?: (
+    g: SceneDrawing,
+    leaves: readonly Leaf[],
+    front: boolean,
+    motion: LeafMotion,
+    spriteMotion: boolean,
+  ) => void;
   width: number;
   height: number;
   scale: number;
@@ -42,6 +53,7 @@ export interface AmbientEnvironment {
 }
 export function createAmbient(env: AmbientEnvironment) {
   const { width: W, height: H, scale: S, layout: L, random: R } = env;
+  const motion = env.motion ?? createLeafMotion();
   const count = (n: number) => scaledCount(n, env.density);
   function buildGrass(gl: number) {
     const fg: GrassBlade[] = [];
@@ -86,7 +98,7 @@ export function createAmbient(env: AmbientEnvironment) {
     const z = 0.35 + Math.pow(R(), 1.8) * 1.7,
       c = Math.round(20 + (1 - Math.min(z, 1)) * 95);
     const sprite = chooseDriftSprite(env.stage ?? 0, R);
-    return {
+    const leaf: Leaf = {
       sprite: sprite.id,
       spin: sprite.spin,
       rise: sprite.rise,
@@ -103,6 +115,8 @@ export function createAmbient(env: AmbientEnvironment) {
       ph: R() * TAU,
       col: `rgba(${c},${c - 1},${c - 3},${z > 1.25 ? 0.6 : 0.9})`,
     };
+    motion.register(leaf, env.time ?? motion.clock.time);
+    return leaf;
   }
   function buildLeaves() {
     const leaves: Leaf[] = [];
@@ -128,6 +142,7 @@ export function createAmbient(env: AmbientEnvironment) {
     for (let i = leaves.length - 1; i >= 0 && ordinary > target; i--)
       if (!leaves[i]!.gust) {
         leaves.splice(i, 1);
+        motion.invalidate();
         ordinary--;
       }
     while (ordinary < target) {
@@ -135,44 +150,31 @@ export function createAmbient(env: AmbientEnvironment) {
       ordinary++;
     }
   }
-  function blades(g: SceneDrawing, list: readonly GrassBlade[], t: number, wind: number) {
-    for (const b of list) {
-      const sw = wind * 0.5 + Math.sin(t * 2.3 + b.ph) * 0.25 + Math.sin(t * 5.1 + b.ph * 2) * 0.06;
-      const tx = b.x + sw * b.h * 0.45,
-        ty = b.y - b.h * (1 - 0.12 * Math.abs(sw));
-      g.fillStyle = b.col;
-      g.beginPath();
-      g.moveTo(b.x - b.w, b.y);
-      g.quadraticCurveTo(b.x + sw * b.h * 0.1, b.y - b.h * 0.5, tx, ty);
-      g.quadraticCurveTo(b.x + sw * b.h * 0.12 + b.w * 0.3, b.y - b.h * 0.5, b.x + b.w, b.y);
-      g.fill();
-    }
+  function blades(
+    g: SceneDrawing,
+    list: readonly GrassBlade[],
+    t: number,
+    wind: number,
+    depth = 0,
+    density = env.density ?? 1,
+  ) {
+    drawInstancedGrass(g, { blades: list, time: t, wind, depth, density });
   }
   function drawLeaves(g: SceneDrawing, leaves: readonly Leaf[], front: boolean) {
-    for (const l of leaves) {
-      if (l.z > 1.25 !== front) continue;
-      g.save();
-      g.translate(l.x, l.y);
-      g.rotate(l.rot);
-      const flutter = env.spriteMotion ? (l.flutter ?? 1) : 1;
-      g.scale(1, 1 - flutter + flutter * Math.cos(l.fl));
-      g.fillStyle = l.col;
-      env.drawLeaf?.(g, l);
-      g.restore();
-    }
+    if (!env.drawLeaves) throw new Error('Leaf drawing requires the native catalogue renderer');
+    env.drawLeaves(g, leaves, front, motion, !!env.spriteMotion);
   }
   function updateLeaves(leaves: Leaf[], dt: number, time: number, wind: number) {
+    if (!motion.advance(dt, time, wind)) return;
+    // Low-rate lifetime work only: actual pose and motion are computed by the vertex shader.
     for (let i = leaves.length - 1; i >= 0; i--) {
-      const l = leaves[i]!,
-        sp = l.gust ? 3.2 : 1;
-      l.x += (40 + 95 * wind) * l.z * dt * S * sp;
-      l.y += (l.vy + Math.sin(time * 1.7 + l.ph) * 26) * l.z * dt * 0.6 * S;
-      if (env.spriteMotion) l.y -= (l.rise ?? 0) * dt * S;
-      l.rot += l.vr * dt * (env.spriteMotion ? (l.spin ?? 1) : 1);
-      l.fl += l.vf * dt;
-      if (l.x > W + 40 || l.y > H + 40 || l.y < -60) {
-        if (l.gust) leaves.splice(i, 1);
-        else leaves[i] = newLeaf(false);
+      const leaf = leaves[i]!;
+      const pose = leafMotionPose(leaf, motion.birth(leaf), motion.clock, S, !!env.spriteMotion);
+      if (pose.x > W + 40 || pose.y > H + 40 || pose.y < -60) {
+        if (leaf.gust) {
+          leaves.splice(i, 1);
+          motion.invalidate();
+        } else leaves[i] = newLeaf(false);
       }
     }
   }

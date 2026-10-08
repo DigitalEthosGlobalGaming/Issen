@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { enemyPresence } from '../../src/rendering/figures/enemy-presence.ts';
-import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../src/shared/figure-model.ts';
 import { BLADE_RECIPES } from '../../src/rendering/figures/blade-recipes.ts';
 
 const figure = (seed) => ({

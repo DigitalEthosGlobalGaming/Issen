@@ -10,7 +10,7 @@
     .admin-group,
     .cinematic-toolbar
   ) {
-  --panel-frame: url('/src/ui/assets/panel-normal.png');
+  --panel-frame: url('/src/ui/assets/panel-normal.webp');
   border-image-source: var(--panel-frame);
   border-image-slice: 36 fill;
   border-image-width: 12px;
@@ -26,12 +26,12 @@
 }
 
 #app .upgrade-tile:is([aria-pressed='true'], :focus-visible, :active) {
-  --panel-frame: url('/src/ui/assets/panel-highlighted.png');
+  --panel-frame: url('/src/ui/assets/panel-highlighted.webp');
 }
 
 @media (any-hover: hover) {
   #app .upgrade-tile:not(:disabled):hover {
-    --panel-frame: url('/src/ui/assets/panel-highlighted.png');
+    --panel-frame: url('/src/ui/assets/panel-highlighted.webp');
   }
 }
 

@@ -2,9 +2,19 @@
 
 Generated from [drift-leaves-atlas.png](../../drift-leaves-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 1774Ã—887 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](drift-leaves-atlas_diffuse.png), [normal](drift-leaves-atlas_normal.png), [roughness](drift-leaves-atlas_roughness.png), [metallic](drift-leaves-atlas_metallic.png), [ao](drift-leaves-atlas_ao.png), [emissive](drift-leaves-atlas_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| drift-leaves-atlas | [diffuse](drift-leaves-atlas_diffuse.webp), [normal](drift-leaves-atlas_normal.webp), [surface](drift-leaves-atlas_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

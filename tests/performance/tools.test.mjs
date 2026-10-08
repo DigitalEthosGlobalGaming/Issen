@@ -66,8 +66,16 @@ test('test-only runtime transform fails loudly if application anchors drift', ()
   assert.match(transformed.code, /__profile.openPanel|openPanel, closePanel/);
   assert.ok(transformed.map.mappings.length > 0);
   assert.throws(
-    () => instrumentRuntime(source.replace('if (pageActive()) frameLoop.start();', '')),
+    () => instrumentRuntime(source.replace('if (pageActive()) frames.frameLoop.start();', '')),
     /anchor changed/,
+  );
+  const frames = readFileSync(
+    new URL('../../src/runtime/frame-bindings.ts', import.meta.url),
+    'utf8',
+  ).replaceAll('\r\n', '\n');
+  assert.match(
+    instrumentRuntime(frames, 'src/runtime/frame-bindings.ts').code,
+    /__probe\.run\('updates'/,
   );
   const config = readFileSync(new URL('../../vite.config.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(config, /performancePlugin|tests\/performance/);

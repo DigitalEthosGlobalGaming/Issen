@@ -3,9 +3,9 @@ import { expect, test } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__blessingHarness = { G, ST, BLESS_BY, showShrineOffers, captureCheckpoint, playerDie, renderLives, updateWave, fx, frameLoop }; frameLoop.start();',
+    const body = ("import { BLESS_BY } from '/src/game/content/blessings.ts';\n" + (await response.text())).replace(
+      'artworkReady = true;',
+      'window.__blessingHarness = { G: foundation.run.G, ST: foundation.profile.profileFoundation.ST, BLESS_BY, showShrineOffers: ui.showShrineOffers, captureCheckpoint: game.captureCheckpoint, playerDie: game.playerDie, renderLives: ui.renderLives, updateWave: game.updateWave, fx: foundation.view.presentationState.fx, frameLoop: frames.frameLoop }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

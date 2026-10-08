@@ -1,6 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
@@ -15,13 +16,16 @@ type Family = 'blades' | 'hilts' | 'special';
 type MapKind = 'normal' | 'surface' | 'emissive';
 type SourceKind = Family | MapKind;
 type Frame = readonly [number, number, number, number];
-const SOURCES = {
-  blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.png', import.meta.url).href,
-  normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.png', import.meta.url).href,
-  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.png', import.meta.url).href,
-  emissive: new URL('./assets/blade-pbr/blade-profile-atlas_emissive.png', import.meta.url).href,
-  hilts: new URL('./assets/handle-guard-atlas.png', import.meta.url).href,
-  special: new URL('./assets/special-weapons-atlas.png', import.meta.url).href,
+const bladePack = assetMaterialCatalog.find(
+  (pack) => pack.sourcePath === 'src/rendering/figures/assets/blade-profile-atlas.png',
+)!;
+const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: string } = {
+  blades: new URL('./assets/blade-pbr/blade-profile-atlas_diffuse.webp', import.meta.url).href,
+  normal: new URL('./assets/blade-pbr/blade-profile-atlas_normal.webp', import.meta.url).href,
+  surface: new URL('./assets/blade-pbr/blade-profile-atlas_surface.webp', import.meta.url).href,
+  emissive: bladePack.maps.emissive,
+  hilts: new URL('./assets/handle-guard-atlas.webp', import.meta.url).href,
+  special: new URL('./assets/special-weapons-atlas.webp', import.meta.url).href,
 };
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
@@ -35,32 +39,37 @@ export function createInkSwordRenderer(doc: Document) {
   let disposed = false,
     pending: Promise<void> | undefined;
   const pbrReady = () =>
-    !disposed && ['normal', 'surface', 'emissive'].every((kind) => loaded.has(kind as MapKind));
+    !disposed &&
+    ['normal', 'surface'].every((kind) => loaded.has(kind as MapKind)) &&
+    (!SOURCES.emissive || loaded.has('emissive'));
   function prepare(): Promise<void> {
     if (pending) return pending;
     if (disposed) return Promise.resolve();
     pending = Promise.all(
-      (Object.keys(SOURCES) as SourceKind[]).map(
-        (family) =>
-          new Promise<void>((resolve) => {
-            const im = family === 'surface' ? surface : doc.createElement('img');
-            images.set(family, im);
-            const done = () => {
-              im.onload = null;
-              im.onerror = null;
-              finish.delete(done);
-              resolve();
-            };
-            finish.add(done);
-            im.onload = () => {
-              const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
-              if (!disposed && im.naturalWidth === w && im.naturalHeight === h) loaded.add(family);
-              done();
-            };
-            im.onerror = done;
-            im.src = SOURCES[family];
-          }),
-      ),
+      (Object.keys(SOURCES) as SourceKind[])
+        .filter((kind) => SOURCES[kind])
+        .map(
+          (family) =>
+            new Promise<void>((resolve) => {
+              const im = family === 'surface' ? surface : doc.createElement('img');
+              images.set(family, im);
+              const done = () => {
+                im.onload = null;
+                im.onerror = null;
+                finish.delete(done);
+                resolve();
+              };
+              finish.add(done);
+              im.onload = () => {
+                const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
+                if (!disposed && im.naturalWidth === w && im.naturalHeight === h)
+                  loaded.add(family);
+                done();
+              };
+              im.onerror = done;
+              im.src = SOURCES[family]!;
+            }),
+        ),
     ).then(async () => {
       await fittings.prepare();
     });
@@ -96,7 +105,7 @@ export function createInkSwordRenderer(doc: Document) {
       s = Math.min(1, (family === 'blades' ? 1024 : 512) / Math.max(sw, sh));
     c.width = Math.max(1, Math.round(sw * s));
     c.height = Math.max(1, Math.round(sh * s));
-    const g = c.getContext('2d');
+    const g = c.getContext('2d', { willReadFrequently: true });
     if (!g) return null;
     g.drawImage(im, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const data = g.getImageData(0, 0, c.width, c.height);
@@ -208,13 +217,15 @@ export function createInkSwordRenderer(doc: Document) {
       g.rotate(Math.atan2(ty, tx) - Math.atan2(dy, dx));
       const x = -(profile.root[0] - profile.frame[0]) * s,
         y = -(profile.root[1] - profile.frame[1]) * s;
-      if (pbrReady() && supportsSceneMaterials(g)) {
+      if (pbrReady()) {
         let material = materials.get(recipe.profile);
         if (!material) {
           material = {
             normal: { source: images.get('normal')!, revision: 0, frame: profile.frame },
             surface: { source: surface, revision: 0, frame: profile.frame },
-            emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame },
+            ...(images.has('emissive')
+              ? { emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame } }
+              : {}),
             normalY: -1,
             lighting: 1,
             depth: 0,
@@ -242,7 +253,7 @@ export function createInkSwordRenderer(doc: Document) {
     draw,
     get ready() {
       return (
-        loaded.size === Object.keys(SOURCES).length &&
+        loaded.size === Object.values(SOURCES).filter(Boolean).length &&
         pbrReady() &&
         fittings.ready('hilts') &&
         fittings.ready('special')

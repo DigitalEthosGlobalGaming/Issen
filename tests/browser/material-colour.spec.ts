@@ -7,11 +7,14 @@ test('material lighting preserves midtones, matte cloth, fog colour and light fo
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   const result = await page.evaluate(async () => {
-    const { createPixiBackend } = await import('/src/rendering/pixi/backend.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { drawMaterialStamp, setSceneLighting } =
+      await import('/src/rendering/scene-material.ts');
     const { SceneTextureStore } = await import('/src/rendering/pixi/texture-store.ts');
-    const { IDENTITY } = await import('/src/rendering/scene-frame.ts');
+    const IDENTITY = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
     const canvas = document.createElement('canvas');
-    const backend = await createPixiBackend(canvas);
+    canvas.width = canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
     const texture = (colour: string) => {
       const source = document.createElement('canvas');
       source.width = source.height = 8;
@@ -59,7 +62,20 @@ test('material lighting preserves midtones, matte cloth, fog colour and light fo
     copy.width = copy.height = 32;
     const g = copy.getContext('2d')!;
     const capture = () => {
-      backend.render(frame);
+      painter.begin();
+      setSceneLighting(painter, frame.lighting);
+      const t = sprite.transform;
+      painter.setTransform(t.a, t.b, t.c, t.d, t.tx, t.ty);
+      painter.globalAlpha = sprite.alpha;
+      drawMaterialStamp(painter, {
+        texture: sprite.texture,
+        material: sprite.material,
+        x: 0,
+        y: 0,
+        width: sprite.width,
+        height: sprite.height,
+      });
+      painter.flush();
       g.clearRect(0, 0, 32, 32);
       g.drawImage(canvas, 0, 0);
       return [...g.getImageData(16, 16, 1, 1).data];
@@ -98,7 +114,7 @@ test('material lighting preserves midtones, matte cloth, fog colour and light fo
     const rawMode = dataTexture.source.alphaMode;
     const separateSources = displayTexture.source !== dataTexture.source;
     store.dispose();
-    backend.dispose();
+    painter.dispose();
     return {
       neutral,
       unlit,

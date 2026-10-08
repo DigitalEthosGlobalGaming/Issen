@@ -2,9 +2,19 @@
 
 Generated from [world-ui-crest-aoi.png](../../world-ui-crest-aoi.png) with `cloth`, Sprite/OpenGL.
 
-Six aligned 128Ã—128 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-crest-aoi_diffuse.png), [normal](world-ui-crest-aoi_normal.png), [roughness](world-ui-crest-aoi_roughness.png), [metallic](world-ui-crest-aoi_metallic.png), [ao](world-ui-crest-aoi_ao.png), [emissive](world-ui-crest-aoi_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-crest-aoi | [diffuse](world-ui-crest-aoi_diffuse.compact.png), [normal](world-ui-crest-aoi_normal.webp), [surface](world-ui-crest-aoi_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

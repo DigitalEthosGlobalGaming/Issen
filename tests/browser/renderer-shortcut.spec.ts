@@ -11,8 +11,8 @@ test('backtick leaves Ink artwork and paused encounter unchanged', async ({ page
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__shortcutHarness = { G, randomState: () => runRandom.state() }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__shortcutHarness = { G: foundation.run.G, randomState: () => foundation.run.activity.runRandom.state() }; artworkReady = true;',
       ),
     });
   });

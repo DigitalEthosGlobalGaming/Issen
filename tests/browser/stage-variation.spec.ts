@@ -26,8 +26,8 @@ for (const viewport of [
       await route.fulfill({
         response,
         body: (await response.text()).replace(
-          'frameLoop.start();',
-          'window.__visitAudit = () => ({ seed: stageSeed, originalSeed: cinematicStageSeed, stage: G.stage, enemies: G.enemies.map(e => e.d.seed), random: runRandom.state(), cache: environmentRenderer.snapshot() }); frameLoop.start();',
+          'artworkReady = true;',
+          'window.__visitAudit = () => ({ seed: foundation.view.stageState.stageSeed, originalSeed: controls.cinematicWiring.savedStageSeed, stage: foundation.run.G.stage, enemies: foundation.run.G.enemies.map(e => e.d.seed), random: foundation.run.activity.runRandom.state(), cache: foundation.browser.environmentRenderer.snapshot() }); artworkReady = true;',
         ),
       });
     });

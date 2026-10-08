@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { createFigureRenderer } from '../../src/rendering/figures/figure.ts';
 import { createPalette } from '../../src/rendering/palette.ts';
 import { ROBES } from '../../src/game/content/cosmetics.ts';
-import { makeFig, EPOSE } from '../../src/rendering/figures/model.ts';
+import { makeFig, EPOSE } from '../../src/shared/figure-model.ts';
 
 function render({ body = true, enemy = false, charmInk = false, sword = true, figure = {} } = {}) {
   const calls = {

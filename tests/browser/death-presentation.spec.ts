@@ -8,8 +8,8 @@ test('an actual kill clears both its shadow and dark ground mark during hit-stop
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__deathHarness = { G, g, fx, frameLoop, startRun, killEnemy, drawEnemy, drawStains, updateEnemies, updateFx }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__deathHarness = { G: foundation.run.G, g: foundation.browser.g, fx: foundation.view.presentationState.fx, frameLoop: frames.frameLoop, startRun: game.startRun, killEnemy: game.killEnemy, drawEnemy: presentation.drawEnemy, drawStains: presentation.drawStains, updateEnemies: game.updateEnemies, updateFx: presentation.updateFx }; artworkReady = true;',
       ),
     });
   });
@@ -82,8 +82,8 @@ test('every enemy death shadow stays grounded and disappears in raw time under s
     await route.fulfill({
       response,
       body: (await response.text()).replace(
-        'frameLoop.start();',
-        'window.__deathHarness = { G, g, frameLoop, drawEnemy, updateEnemies }; frameLoop.start();',
+        'artworkReady = true;',
+        'window.__deathHarness = { G: foundation.run.G, g: foundation.browser.g, frameLoop: frames.frameLoop, drawEnemy: presentation.drawEnemy, updateEnemies: game.updateEnemies }; artworkReady = true;',
       ),
     });
   });

@@ -1,7 +1,7 @@
 import type { SceneDrawing } from './scene-drawing.ts';
 import type { SceneMaterial, SceneTexture } from './scene-frame.ts';
 import { normalTransform } from './scene-frame.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from './scene-material.ts';
+import { drawMaterialStamp } from './scene-material.ts';
 
 type Frame = readonly [number, number, number, number];
 type Layer = {
@@ -189,7 +189,7 @@ export function drawCachedImage(
     revision: cached?.revision ?? 0,
     frame: colour ? undefined : frame,
   };
-  if (material && supportsSceneMaterials(ctx)) {
+  if (material && !contextState.has(ctx)) {
     drawMaterialStamp(ctx, { texture, material, x, y, width, height });
     return;
   }
@@ -236,10 +236,17 @@ export function drawCachedImage(
       Math.abs(normalMatrix[3]! - 1) < 1e-6;
     for (const kind of ['normal', 'surface', 'emissive'] as const) {
       const map = material[kind];
-      if (!map) continue;
+      if (!map && kind !== 'emissive') continue;
       g.clearRect(0, 0, scratch.width, scratch.height);
-      const crop = map.frame ?? frame;
-      g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);
+      if (map) {
+        const crop = map.frame ?? frame;
+        g.drawImage(map.source, ...crop, 0, 0, scratch.width, scratch.height);
+      } else {
+        // A missing map is the former opaque zero map. Apply the same source
+        // coverage and blend operation below; additive draws retain emission.
+        g.fillStyle = '#000';
+        g.fillRect(0, 0, scratch.width, scratch.height);
+      }
       if (kind === 'normal' && !alignedNormal) {
         const pixels = g.getImageData(0, 0, scratch.width, scratch.height);
         for (let i = 0; i < pixels.data.length; i += 4) {

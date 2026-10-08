@@ -1,21 +1,16 @@
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { drawMaterialStamp, supportsSceneMaterials } from '../scene-material.ts';
+import { drawMaterialStamp } from '../scene-material.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { createPalette } from '../palette.ts';
 import { createOutfitKit, supportsInkOutfit } from './outfit-kit.ts';
 import type { Figure, FigureEnvironment, Point } from './types.ts';
 
-const ATLAS_URL = new URL('./assets/player-ronin-simple.png', import.meta.url).href;
-const PBR_SOURCES = {
-  surface: new URL('./assets/player-pbr/player-ronin-simple_surface.png', import.meta.url).href,
-  diffuse: new URL('./assets/player-pbr/player-ronin-simple_diffuse.png', import.meta.url).href,
-  normal: new URL('./assets/player-pbr/player-ronin-simple_normal.png', import.meta.url).href,
-  roughness: new URL('./assets/player-pbr/player-ronin-simple_roughness.png', import.meta.url).href,
-  metallic: new URL('./assets/player-pbr/player-ronin-simple_metallic.png', import.meta.url).href,
-  ao: new URL('./assets/player-pbr/player-ronin-simple_ao.png', import.meta.url).href,
-  emissive: new URL('./assets/player-pbr/player-ronin-simple_emissive.png', import.meta.url).href,
-};
+const ATLAS_URL = new URL('./assets/player-ronin-simple.webp', import.meta.url).href;
+const PBR_SOURCES = assetMaterialCatalog.find(
+  (pack) => pack.sourcePath === 'src/rendering/figures/assets/player-ronin-simple.png',
+)!.maps;
 type Part = 'body' | 'head' | 'arms';
 type Frame = readonly [number, number, number, number];
 /** Tight source frames in original 1254² atlas; see adjacent provenance metadata. */
@@ -51,7 +46,7 @@ export function createInkPlayerRenderer(doc: Document) {
     // Keep source detail for the large foreground and Armoury crops.
     c.width = sw;
     c.height = sh;
-    const cg = c.getContext('2d');
+    const cg = c.getContext('2d', { willReadFrequently: true });
     if (!cg) return null;
     cg.drawImage(atlas, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const data = cg.getImageData(0, 0, c.width, c.height),
@@ -119,7 +114,7 @@ export function createInkPlayerRenderer(doc: Document) {
       : key === 'torso'
         ? materials.get('cloth')
         : null;
-    if (material && supportsSceneMaterials(g)) {
+    if (material) {
       drawMaterialStamp(g, {
         texture: {
           source: tinted ?? source,

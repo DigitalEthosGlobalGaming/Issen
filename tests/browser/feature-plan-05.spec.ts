@@ -46,9 +46,9 @@ test('pause lists current blessings and keeps actions visible in short landscape
 }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__pauseHarness = { G }; frameLoop.start();',
+    const body = ("import { itemPresentation } from '/src/ui/screens/item-presentation.ts';\n" + (await response.text())).replace(
+      'artworkReady = true;',
+      'window.__pauseHarness = { G: foundation.run.G }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });
@@ -101,9 +101,9 @@ test('pause lists current blessings and keeps actions visible in short landscape
 test('item reveals match Armoury copy and cue once when each card appears', async ({ page }) => {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = (await response.text()).replace(
-      'frameLoop.start();',
-      'window.__revealHarness = { runResults, ITEM_BY, itemPresentation, sfx }; frameLoop.start();',
+    const body = ("import { itemPresentation } from '/src/ui/screens/item-presentation.ts';\n" + (await response.text())).replace(
+      'artworkReady = true;',
+      'window.__revealHarness = { runResults: ui.runResults, ITEM_BY: foundation.profile.ITEM_BY, itemPresentation, sfx: foundation.browser.sfx }; artworkReady = true;',
     );
     await route.fulfill({ response, body });
   });

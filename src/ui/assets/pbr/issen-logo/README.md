@@ -2,9 +2,19 @@
 
 Generated from [issen-logo.png](../../issen-logo.png) with `default`, Sprite/OpenGL.
 
-Six aligned 600Ã—400 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](issen-logo_diffuse.png), [normal](issen-logo_normal.png), [roughness](issen-logo_roughness.png), [metallic](issen-logo_metallic.png), [ao](issen-logo_ao.png), [emissive](issen-logo_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| issen-logo | [diffuse](issen-logo_diffuse.webp), [normal](issen-logo_normal.webp), [surface](issen-logo_surface.webp), [emissive](issen-logo_emissive.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 

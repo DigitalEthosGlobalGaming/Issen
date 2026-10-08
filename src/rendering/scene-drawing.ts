@@ -53,10 +53,11 @@ export type SceneDrawing = Pick<
   | 'shadowOffsetY'
   | 'imageSmoothingEnabled'
   | 'imageSmoothingQuality'
->;
+> & {
+  dispose?(): void;
+};
 
 const nativePaths = new WeakMap<SceneDrawing, (path: string) => void>();
-const canvasPaths = new Map<string, Path2D>();
 export type SceneFilmPass = (
   film: string,
   width: number,
@@ -69,7 +70,9 @@ export function registerSceneFilmPass(target: SceneDrawing, pass: SceneFilmPass)
   filmPasses.set(target, pass);
 }
 export function applySceneFilm(target: SceneDrawing, ...args: Parameters<SceneFilmPass>): boolean {
-  return filmPasses.get(target)?.(...args) ?? false;
+  const pass = filmPasses.get(target);
+  if (!pass) throw new Error('Film rendering requires a WebGL2 scene painter');
+  return pass(...args);
 }
 export function registerScenePathSink(target: SceneDrawing, fill: (path: string) => void): void {
   nativePaths.set(target, fill);
@@ -81,10 +84,5 @@ export function fillScenePath(target: SceneDrawing, svg: string): void {
     fill(svg);
     return;
   }
-  let path = canvasPaths.get(svg);
-  if (!path) {
-    path = new Path2D(svg);
-    canvasPaths.set(svg, path);
-  }
-  target.fill(path);
+  throw new Error('Scene vector paths require a WebGL2 scene painter');
 }

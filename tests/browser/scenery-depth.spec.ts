@@ -81,6 +81,7 @@ for (const viewport of [
       const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
       const { createDemonRealmRenderer } =
         await import('/src/rendering/environment/demon-realm.ts');
+      const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -89,12 +90,13 @@ for (const viewport of [
       canvas.style.display = 'block';
       const renderer = createEnvironmentRenderer(document);
       const demon = createDemonRealmRenderer(document);
-      (window as any).depthPreview = { renderer, demon, canvas };
+      const drawing = await createTestDrawing(canvas);
+      (window as any).depthPreview = { renderer, demon, canvas, drawing };
     }, viewport);
     for (let stage = 0; stage < 10; stage++) {
       await page.evaluate(async (stage) => {
-        const { renderer, demon, canvas } = (window as any).depthPreview;
-        const g = canvas.getContext('2d');
+        const { renderer, demon, canvas, drawing } = (window as any).depthPreview;
+        const g = drawing;
         if (stage < 9) {
           await renderer.prepare(stage);
           const frame = {

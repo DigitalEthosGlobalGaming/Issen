@@ -2,9 +2,19 @@
 
 Generated from [world-ui-material-wood.png](../../world-ui-material-wood.png) with `wood`, Texture/OpenGL.
 
-Six aligned 192Ã—192 maps: diffuse, normal, roughness, metallic, AO and emissive. Original diffuse alpha is retained.
+Runtime planes retain the original atlas dimensions and diffuse alpha.
 
-Maps: [diffuse](world-ui-material-wood_diffuse.png), [normal](world-ui-material-wood_normal.png), [roughness](world-ui-material-wood_roughness.png), [metallic](world-ui-material-wood_metallic.png), [ao](world-ui-material-wood_ao.png), [emissive](world-ui-material-wood_emissive.png).
+<!-- runtime-planes:start -->
+## Runtime plane set
+
+| Source family | Aligned planes |
+| --- | --- |
+| world-ui-material-wood | [diffuse](world-ui-material-wood_diffuse.compact.png), [normal](world-ui-material-wood_normal.webp), [surface](world-ui-material-wood_surface.webp) |
+
+Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
+Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
+material recipes and generation provenance remain available for regeneration.
+<!-- runtime-planes:end -->
 
 Exact settings and provenance: [generation.json](generation.json).
 
