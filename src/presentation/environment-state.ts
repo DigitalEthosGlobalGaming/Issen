@@ -1,3 +1,4 @@
+import { createLeafMotion } from '../rendering/scene/leaf-motion.ts';
 import { createWeatherState } from '../rendering/scene/weather-state.ts';
 import type { GrassBlade, Leaf } from '../rendering/scene/ambient.ts';
 import type { WeatherParticle, Bamboo } from '../rendering/scene/weather-state.ts';
@@ -22,6 +23,7 @@ export function createEnvironmentState() {
     fg: [] as GrassBlade[],
     mid: [] as GrassBlade[],
     leaves: [] as Leaf[],
+    leafMotion: createLeafMotion(),
     wx: [] as WeatherParticle[],
     cinematicWeather: createWeatherState(() => 0.5),
     previewDemon: false,

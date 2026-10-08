@@ -31,6 +31,8 @@ import type { SceneLighting } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
 import { createGrassMesh } from './grass-material.ts';
+import { createLeafMesh } from './leaf-material.ts';
+import { registerLeafSink } from '../scene-leaves.ts';
 import { registerGrassSink } from '../scene-grass.ts';
 import { createRoundStroke, createRoundStrokeTexture, updateRoundStroke } from './round-stroke.ts';
 import { registerBrushRingSink, registerGlyphArrowSink } from '../scene-brush-ring.ts';
@@ -92,7 +94,12 @@ const styleKeys = [
 type DrawStyle = Pick<SceneDrawing, (typeof styleKeys)[number]>;
 type MaterialMesh = ReturnType<typeof createMaterialMesh>['mesh'];
 type Slot = {
-  item: Graphics | MaterialMesh | MeshSimple | ReturnType<typeof createGrassMesh>['mesh'];
+  item:
+    | Graphics
+    | MaterialMesh
+    | MeshSimple
+    | ReturnType<typeof createGrassMesh>['mesh']
+    | ReturnType<typeof createLeafMesh>['mesh'];
   kind:
     | 'graphics'
     | 'sprite'
@@ -101,10 +108,12 @@ type Slot = {
     | 'brush-ring'
     | 'ellipse'
     | 'glyph-arrow'
-    | 'grass';
+    | 'grass'
+    | 'leaf';
   material?: ReturnType<typeof createMaterialMesh>;
   lookup?: ReturnType<ArtworkMaterials['createMesh']>;
   grass?: ReturnType<typeof createGrassMesh>;
+  leaf?: ReturnType<typeof createLeafMesh>;
   filterKey?: string;
   filters?: (BlurFilter | ColorMatrixFilter)[];
   image?: HTMLImageElement | HTMLCanvasElement;
@@ -180,6 +189,7 @@ export class PixiScenePainter implements SceneDrawing {
       for (const slot of this.slots) {
         slot.material?.releaseLightTargets();
         slot.grass?.releaseLightTargets();
+        slot.leaf?.releaseLightTargets();
       }
       this.lightBuffer.detachGeometry();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
@@ -232,6 +242,12 @@ export class PixiScenePainter implements SceneDrawing {
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
     this.measure = canvas.ownerDocument.createElement('canvas').getContext('2d')!;
+    registerLeafSink(this, (frame) => {
+      const item = this.submit('leaf');
+      const slot = this.slots[this.cursor - 1]!;
+      this.applyTransform(item, this.matrix);
+      slot.leaf!.update(frame, this.textures, this.lighting.materialLighting ?? 1, this.matrix);
+    });
     registerGrassSink(this, (frame) => {
       const item = this.submit('grass');
       const slot = this.slots[this.cursor - 1]!;
@@ -420,6 +436,7 @@ export class PixiScenePainter implements SceneDrawing {
     for (const slot of this.slots) {
       slot.material?.releaseLightTargets();
       slot.grass?.releaseLightTargets();
+      slot.leaf?.releaseLightTargets();
     }
     this.artworkMaterials.detachTargets();
     this.lightBuffer.detachGeometry();
@@ -448,6 +465,7 @@ export class PixiScenePainter implements SceneDrawing {
         const slot = this.slots[i]!;
         slot.material?.prepareComposite(this.lightBuffer.targets!);
         slot.grass?.prepareComposite(this.lightBuffer.targets!);
+        slot.leaf?.prepareComposite(this.lightBuffer.targets!);
         if (slot.item instanceof Graphics) this.artworkMaterials.attach(slot.item);
         if (slot.lookup) slot.lookup.update((slot.item as MeshSimple).texture);
       }
@@ -466,6 +484,7 @@ export class PixiScenePainter implements SceneDrawing {
     for (let i = this.cursor; i < this.slots.length; i++) {
       this.slots[i]?.material?.releaseTextures();
       this.slots[i]?.lookup?.releaseTexture();
+      this.slots[i]?.leaf?.releaseTextures();
     }
     this.textures.collect();
     for (const [key, gradient] of this.gradients) {
@@ -497,9 +516,11 @@ export class PixiScenePainter implements SceneDrawing {
       visit(this.root);
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
-        if (slot.material || slot.grass)
+        if (slot.material || slot.grass || slot.leaf)
           restore.push(
-            (slot.material ?? slot.grass)!.beginGeometry(this.geometryBuffer.targets!.depthRange),
+            (slot.material ?? slot.grass ?? slot.leaf)!.beginGeometry(
+              this.geometryBuffer.targets!.depthRange,
+            ),
           );
         else {
           const renderable = slot.item.renderable;
@@ -749,6 +770,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.trimRetainedTree();
     this.retainTree = false;
   }
+  private submit(kind: 'leaf'): ReturnType<typeof createLeafMesh>['mesh'];
   private submit(kind: 'grass'): ReturnType<typeof createGrassMesh>['mesh'];
   private submit(kind: 'graphics'): Graphics;
   private submit(kind: 'sprite'): MeshSimple;
@@ -759,12 +781,18 @@ export class PixiScenePainter implements SceneDrawing {
   private submit(kind: 'ellipse'): MeshSimple;
   private submit(
     kind: Slot['kind'],
-  ): Graphics | MaterialMesh | MeshSimple | ReturnType<typeof createGrassMesh>['mesh'] {
+  ):
+    | Graphics
+    | MaterialMesh
+    | MeshSimple
+    | ReturnType<typeof createGrassMesh>['mesh']
+    | ReturnType<typeof createLeafMesh>['mesh'] {
     let slot = this.slots[this.cursor];
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();
       slot?.lookup?.dispose();
-      if (slot?.grass) slot.grass.dispose();
+      if (slot?.leaf) slot.leaf.dispose();
+      else if (slot?.grass) slot.grass.dispose();
       else if (slot?.material) slot.material.dispose();
       else {
         if (slot?.item instanceof MeshSimple) slot.item.geometry.destroy();
@@ -772,11 +800,14 @@ export class PixiScenePainter implements SceneDrawing {
       }
       const material = kind === 'material' ? createMaterialMesh() : undefined;
       const grass = kind === 'grass' ? createGrassMesh() : undefined;
+      const leaf = kind === 'leaf' ? createLeafMesh() : undefined;
       slot = {
         kind,
         material,
         grass,
+        leaf,
         item:
+          leaf?.mesh ??
           grass?.mesh ??
           material?.mesh ??
           (kind === 'graphics' || kind === 'brush-ring' || kind === 'glyph-arrow'
@@ -1158,7 +1189,8 @@ export class PixiScenePainter implements SceneDrawing {
     }
     for (const slot of this.slots) {
       slot.lookup?.dispose();
-      if (slot.grass) slot.grass.dispose();
+      if (slot.leaf) slot.leaf.dispose();
+      else if (slot.grass) slot.grass.dispose();
       else if (slot.material) slot.material.dispose();
       else {
         if (slot.item instanceof MeshSimple) slot.item.geometry.destroy();

@@ -34,6 +34,8 @@ test('all 32 stage sprite atlas frames paint', async ({ page }) => {
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createDriftRenderer } = await import('/src/rendering/scene/drift-renderer.ts');
     const { DRIFT_SPRITES } = await import('/src/rendering/scene/drift-catalog.ts');
+    const { createLeafMotion } = await import('/src/rendering/scene/leaf-motion.ts');
+    const motion = createLeafMotion();
     const renderer = createDriftRenderer();
     await renderer.prepare();
     const canvas = document.createElement('canvas');
@@ -53,19 +55,24 @@ test('all 32 stage sprite atlas frames paint', async ({ page }) => {
       col: '#322321',
     };
     function paint(sprite?: string) {
-      g.clearRect(0, 0, 96, 96);
-      g.save();
-      g.translate(48, 48);
-      g.rotate(leaf.rot);
-      g.scale(1, Math.cos(leaf.fl));
-      g.fillStyle = leaf.col;
-      renderer.draw(g, { ...leaf, sprite });
-      g.restore();
+      g.begin();
+      const item = { ...leaf, sprite };
+      motion.register(item);
+      renderer.drawLeaves(g, {
+        leaves: [item],
+        front: false,
+        motion,
+        spriteMotion: true,
+        scale: 1,
+        width: 96,
+        height: 96,
+      });
       return g.getImageData(0, 0, 96, 96).data;
     }
     const coverage = DRIFT_SPRITES.map(
       (sprite) => paint(sprite.id).filter((v, i) => i % 4 === 3 && v > 16).length,
     );
+    g.dispose();
     renderer.dispose();
     return { coverage };
   });

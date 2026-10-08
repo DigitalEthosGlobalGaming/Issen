@@ -1,3 +1,37 @@
+## W3 phase5 leaves green — continue phase6 light sources and hooks
+
+Grass checkpoint b01145e is committed. Leaves now use one ordered native instanced
+quad mesh per front/rear layer with four original catalogue atlas families.
+Static spawn/birth attributes stay retained; GPU wind/fall/spin/flutter/gust and
+two-sided normals use the shared G/light/composite pipeline. Cosmetic clock/RNG
+remain separate from gameplay. CPU lifetime sweeps run every0.125 effects seconds;
+quality population rules, frames/pivots/size/opacity and painter order remain.
+
+Strict npm run typecheck PASS; npm test all407PASS. Expanded exact16-file native
+suite all66PASS, exit0. Logs tmp/lighting-refactor/phase5-leaves-final-typecheck.log,
+phase5-leaves-unit.log, phase5-leaves-final-browser.log. The initial expanded run
+had65PASS/1FAIL because drift.spec.ts still called removed renderer.draw; migrated
+that fixture to native drawLeaves with original all32/minimum50 coverage assertions
+unchanged. Focused drift rerun2PASS15.4s. New direct leaf tests cover actual1000
+instances/four atlases, retained buffers, motion, folded normals, clips, independent
+owners and resize/restore/disposal. Exact G/HDR/alpha restore checks pass; displayed
+RGB uses the existing tolerance9 after proving a one-byte variation before loss.
+No production dither workaround remains. No live browser process or develop push.
+Version1.68.0 stays aligned; changelog includes leaves.
+
+NEXT phase6: event-bus kill/parry/block flashes decaying on effects clock; register
+sword glints/lanterns/embers/foxfire/boss auras through presentation/light-sources.ts.
+Add effects/quality half-resolution option with depth/normal-aware upsampling and
+Options/testing integration. Add borrowed read-only G/light post hooks, named film/
+post insertion points and minimal examples. Native painter G/light passes currently
+run internally in flush: expose named composer passes without duplicate rendering,
+keeping auxiliary begin/flush ownership and ordered composite. Source orientation:
+presentation/scene.ts owns composer/registry, runtime/frame-bindings.ts creates it;
+pixi/scene-painter.ts owns targets, pixi/light-buffer.ts owns HDR accumulation,
+lighting-composite-glsl.ts lookup is shared by materials/artwork/grass/leaves.
+W3 full gates and all Part4 gates/report/one final develop push remain required.
+Do not rerun applied non-idempotent Playground integration scripts. Goal active.
+
 ## W3 phase5 grass green — continue instanced catalogue leaves
 
 Phase4 whole-scene routing is committed1e585d3. Grass now submits one retained

@@ -329,6 +329,9 @@ returning. Leaked drawing state can subtly recolor or displace every later layer
 | Combat particles and transient effects                 | `src/rendering/effects/`                                 |
 | Runtime cached environment construction                | `src/presentation/environment-artwork.ts`                |
 | Runtime ambient/grass/weather drawing host             | `src/presentation/environment.ts`                        |
+| Instanced grass geometry, GPU wind and curved normals | `src/rendering/pixi/grass-material.ts` |
+| Instanced catalogue leaves and two-sided normals | `src/rendering/pixi/leaf-material.ts` |
+| Leaf spawn clocks, analytic motion and lifetime metadata | `src/rendering/scene/leaf-motion.ts`, `src/rendering/scene/ambient.ts` |
 | Runtime feedback effect spawning/drawing               | `src/presentation/feedback.ts`                           |
 | Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
 | Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
@@ -578,5 +581,49 @@ reads after upload, repeatable frames, GPU wind changes, reduced density, curved
 PBR normals and pixel-identical context restore. A second fixture compares the
 authored curves at the unchanged scene tolerance9 (observed mean0.154), accepts
 alpha0.5, rejects below-cutoff geometry and preserves ordered depth layers.
-These are correctness checks, not performance measurements. Instanced catalogue
-leaves are still pending; phase5 is not complete.
+These are correctness checks, not performance measurements. The catalogue leaf
+implementation below completes phase5; phase6 and the final gates remain pending.
+
+## W3 instanced catalogue leaves (phase 5)
+
+scene-leaves.ts adds a native layer port using the existing SceneTexture and
+SceneMaterial vocabulary. drift-renderer.ts owns the four prepared diffuse/PBR
+atlas families and supplies full-atlas material planes. leaf-material.ts draws
+one instanced quad mesh per front/rear layer, preserving original instance order
+across atlas families instead of regrouping overlapping particles. G writes use
+12 samplers (four diffuse, normal and surface); ordered composition uses10
+(four diffuse, optional emission, diffuse/specular light). Both fit WebGL2's
+required16 fragment samplers without alternate layouts or renderer paths.
+
+Static instance data retains catalogue frame rounding, pivots, size, opacity,
+normalY, spawn position, depth group, birth clocks, fall speed, phase, spin,
+flutter and gust multiplier. GPU motion integrates the original wind speed and
+sinusoidal fall analytically from the effects clock. Ordinary and gust creation
+still use the independent cosmetic RNG. ambient.ts performs only a lifetime
+sweep every0.125 effects seconds (or an explicit zero-delta validation); it
+respawns ordinary particles and retires gusts. It does not update or upload poses
+per frame. Density continues to size/balance the catalogue population through
+effects/quality.ts. environment-state.ts owns the persistent motion integrals;
+drawing cannot advance them. The analytic fall replaces the old Euler step;
+unit comparison to small-step integration differs by less than0.02 logical pixels.
+
+Folded backs reverse authored slopes while retaining view-facing Z, so both
+faces remain lit. NormalY conversion and inverse-transpose parent transforms
+remain in the G pass. Exact source/ancestor coverage is tested before canonical
+eight-bit encoding. Ordered colour uses the same shared linear light lookup,
+optional zero emission and highlight response; per-instance opacity retains
+Pixi's original byte quantization. Thin coverage samples the surface behind it.
+Map/light bindings detach before expiry, replacement and disposal. Atlas and
+instance resources restore on the original surface; there is no Pixi ticker.
+
+The native fixtures cover32 catalogue frames with exact centre RGBA parity,
+retained buffers while motion changes, actual1000-leaf front/rear layers over
+all four real PBR atlases, independent owners, resize, restore and disposal,
+plus folded normals/raking light and scoped clips. All G-buffer bytes, both HDR
+light target values and coverage are compared exactly across repeat/restore.
+Displayed RGB uses the existing scene tolerance9: the first version of the new
+restore fixture incorrectly demanded bit-identical HDR-to-display conversion.
+Diagnostics proved a single62/63 colour-byte difference also occurred before
+context loss while all five underlying targets remained identical. That test
+assumption was corrected; no production rounding workaround or existing test
+threshold was changed. The dithering hypothesis was tried and reverted.

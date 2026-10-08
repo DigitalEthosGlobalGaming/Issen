@@ -1,9 +1,10 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import type { Leaf } from './ambient.ts';
 import { DRIFT_ATLASES as urls, DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
+import { drawInstancedLeaves } from '../scene-leaves.ts';
+import type { LeafAtlas, LeafFrame } from '../scene-leaves.ts';
 
 /** One retained path and decoded atlas images per runtime; no per-frame image processing. */
 export function createDriftRenderer(doc: Document = document) {
@@ -11,6 +12,9 @@ export function createDriftRenderer(doc: Document = document) {
   const images = new Map<string, HTMLImageElement>();
   let disposed = false;
   let pending: Promise<void> | undefined;
+  let leafAtlases: readonly LeafAtlas[] | undefined;
+  const ready = () =>
+    images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
   function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
     const sprite = DRIFT_BY_ID.get(id)!;
     const image = images.get(sprite.atlas);
@@ -40,7 +44,7 @@ export function createDriftRenderer(doc: Document = document) {
   }
   return {
     get ready() {
-      return images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
+      return ready();
     },
     prepare() {
       return (pending ??= Promise.all(
@@ -58,8 +62,17 @@ export function createDriftRenderer(doc: Document = document) {
         await materials.prepare();
       }));
     },
-    draw(g: SceneDrawing, leaf: Leaf) {
-      paint(g, leaf.sprite ?? 'leaves.willow', leaf.s * 3, leaf.z > 1.25 ? 0.6 : 0.9);
+    drawLeaves(g: SceneDrawing, frame: Omit<LeafFrame, 'atlases'>) {
+      if (!ready()) return;
+      leafAtlases ??= Object.keys(urls).map((id) => {
+        const source = images.get(id)!,
+          width = source.naturalWidth,
+          height = source.naturalHeight;
+        const material = materials.material(id, [0, 0, width, height]);
+        if (!material) throw new Error('Missing prepared leaf material');
+        return { id, texture: { source, revision: 0 }, material, width, height };
+      });
+      drawInstancedLeaves(g, { ...frame, atlases: leafAtlases });
     },
     drawEmber(g: SceneDrawing, p: WeatherParticle, index: number, scale: number) {
       g.save();
@@ -75,6 +88,7 @@ export function createDriftRenderer(doc: Document = document) {
     },
     dispose() {
       disposed = true;
+      leafAtlases = undefined;
       materials.dispose();
       for (const image of images.values()) image.removeAttribute('src');
       images.clear();

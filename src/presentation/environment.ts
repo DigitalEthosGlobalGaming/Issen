@@ -40,7 +40,20 @@ export interface EnvironmentViews {
 /** Ambient geometry and weather drawing; gameplay weather hazards update separately. */
 export function createEnvironmentPresentation(readViews: () => EnvironmentViews) {
   function ambient() {
-    const { activeTrial, previewDemon, G, W, H, S, L, R, density, driftRenderer } = readViews();
+    const {
+      activeTrial,
+      previewDemon,
+      G,
+      W,
+      H,
+      S,
+      L,
+      R,
+      density,
+      driftRenderer,
+      environmentState,
+      time,
+    } = readViews();
     const stage = activeTrial?.realm === 'demon' || previewDemon ? STAGES.length : G.stage;
     return createAmbient({
       width: W,
@@ -50,7 +63,18 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
       random: R,
       density: density() * (DRIFT_DENSITY[stage] ?? 1),
       stage,
-      drawLeaf: driftRenderer.draw,
+      time,
+      motion: environmentState.leafMotion,
+      drawLeaves: (g, leaves, front, motion, spriteMotion) =>
+        driftRenderer.drawLeaves(g, {
+          leaves,
+          front,
+          motion,
+          spriteMotion,
+          scale: S,
+          width: W,
+          height: H,
+        }),
       spriteMotion: true,
     });
   }
