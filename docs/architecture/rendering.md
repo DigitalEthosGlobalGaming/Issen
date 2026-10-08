@@ -521,11 +521,29 @@ commit and four controlled scenes. The browser compares native lookup output
 against those images at unchanged mean scene tolerance9 and exact alpha equality.
 It no longer sets a runtime shader flag. Current differences remain below0.042.
 
-This checkpoint proves unified material stamps, not the complete all-scene
-contract. Ordinary drawImage/cached text and procedural Graphics/round strokes/
-brush rings/ellipses/glyph arrows still use stock native colour drawing. Routing
-these through the common pipeline and shared neutral-emissive binding remains
-required before this migration can be called complete. Instancing, event sources,
-half-resolution lighting and named GPU composer passes also remain pending.
+Ordinary drawImage/cached text, round strokes and ellipses now use retained
+native meshes. Paths, gradients, brush rings and glyph arrows retain native
+Graphics geometry with a shared lookup shader. artwork-materials.ts owns these
+bindings per painter; lighting-composite-glsl.ts provides the same linear
+albedo/diffuse/specular/display response used by material stamps. Authored
+colour art, text and fog retain neutral lighting amount as material data. They
+use the shared shader and targets while preserving their original colour and
+coverage; they do not add lit geometry to the G-buffer. Stencil masks and native
+film/filter stages retain their separate roles in the same scene pipeline.
 
-Absent emissive maps now bind the shared zero Texture.EMPTY source, including initialization and release. No per-material neutral image is allocated and no absent map is requested. The five focused omission/colour/legacy/reference browser checks pass; whole-scene stock-route integration remains pending.
+The native artwork-lighting fixture sets this shared material parameter to one
+and proves eight content kinds sample ambient0.25 and0.5 light targets (display
+values137 and188), independent owners, resize replacement and disposal. Existing
+native coverage/gradient/clip/film/reference checks retain their assertions.
+Three texture units are reserved for light targets and the geometry guide;
+WebGL2's guaranteed16 fragment samplers leave up to13 native colour textures.
+Graphics contexts share one owned shader; image meshes own sampler bindings.
+Bindings detach before source expiry or target replacement. Pixi's cached
+native graphics batch bind groups outlive renderer disposal, so gradients release
+GPU storage through source.unload(), as retired gradients already do, rather than
+invalidating cached sources. The warning-sensitive film disposal test covers it.
+
+Absent emissive maps bind shared zero Texture.EMPTY, including initialization
+and release, with no per-material image allocation or absent-map request.
+Instancing, event sources, half-resolution lighting and named GPU composer
+passes remain pending before the lighting workstream can be called complete.

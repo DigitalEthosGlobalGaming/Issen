@@ -1,3 +1,29 @@
+## W3 phase4 whole-scene routing green — continue phase5 grass then leaves
+
+Ordinary image/cached-text meshes and native procedural graphics now use shared
+lighting-composite-glsl.ts through per-painter artwork-materials.ts. Authored
+colour art/fog/text preserve neutral lighting amount as material data. Native
+positive-lookup fixture proves eight kinds read shared light buffers, independent
+owners and resize/dispose. No stock scene-colour shader or old forward switch
+remains. Native stencil masks and film/filter passes retain their pipeline roles.
+Initial four-file22PASS/1FAIL disposal warning repaired: Pixi cached native graphic
+batch bind groups outlive renderer disposal; gradients unload GPU storage as the
+existing retired-gradient path does. Original warning assertion stays unchanged.
+
+Final npm run typecheck PASS; npm test all404PASS; exact18-file native/material/
+startup/context/game/reference suite all57PASS2.0m exit0 session85456 TERMINAL.
+Logs tmp/lighting-refactor/phase4-routing-final-typecheck.log,
+phase4-routing-unit.log, phase4-routing-final-browser.log. Earlier corrected
+four-file rerun23PASS1.4m session84810 TERMINAL; positive fixture1PASS2.8s.
+No live browser job. Version1.68.0 aligned; no develop push.
+
+NEXT phase5: replace ambient.ts per-blade paths with native instanced mesh per
+mid/foreground depth layer, GPU wind and curved G-buffer normals; retain cached
+snow/demon variations from presentation/environment.ts and density scaling.
+Then catalogue leaves with GPU spawn/fall/flutter/spin/gust and two-sided normals.
+Phase6 event lights/half-res/hooks/named GPU composer passes, W3 and all Part4
+gates/report and one final develop push remain. Goal active, unchanged.
+
 ## W3 phase4 neutral emission green — continue whole-scene routing
 
 Material cleanup commit66ba4ec removed the old forward shader/flag and unified

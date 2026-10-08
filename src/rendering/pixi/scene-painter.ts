@@ -11,7 +11,6 @@ import {
   GraphicsContext,
   GraphicsPath,
   Matrix,
-  Sprite,
   WebGLRenderer,
   Rectangle,
   BindGroup,
@@ -30,6 +29,7 @@ import { sceneTextureRevision } from '../texture-revision.ts';
 import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
+import { ArtworkMaterials } from './artwork-materials.ts';
 import { createRoundStroke, createRoundStrokeTexture, updateRoundStroke } from './round-stroke.ts';
 import { registerBrushRingSink, registerGlyphArrowSink } from '../scene-brush-ring.ts';
 
@@ -90,10 +90,11 @@ const styleKeys = [
 type DrawStyle = Pick<SceneDrawing, (typeof styleKeys)[number]>;
 type MaterialMesh = ReturnType<typeof createMaterialMesh>['mesh'];
 type Slot = {
-  item: Graphics | Sprite | MaterialMesh | MeshSimple;
+  item: Graphics | MaterialMesh | MeshSimple;
   kind:
     'graphics' | 'sprite' | 'material' | 'round-stroke' | 'brush-ring' | 'ellipse' | 'glyph-arrow';
   material?: ReturnType<typeof createMaterialMesh>;
+  lookup?: ReturnType<ArtworkMaterials['createMesh']>;
   filterKey?: string;
   filters?: (BlurFilter | ColorMatrixFilter)[];
   image?: HTMLImageElement | HTMLCanvasElement;
@@ -164,6 +165,8 @@ export class PixiScenePainter implements SceneDrawing {
     try {
       requireGeometryBuffers(this.renderer.gl as WebGL2RenderingContext);
       requireLightBuffers(this.renderer.gl as WebGL2RenderingContext);
+      this.artworkMaterials.restore();
+      this.artworkMaterials.detachTargets();
       for (const slot of this.slots) slot.material?.releaseLightTargets();
       this.lightBuffer.detachGeometry();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
@@ -195,6 +198,7 @@ export class PixiScenePainter implements SceneDrawing {
 
   private readonly geometryBuffer: GeometryBuffer;
   private readonly lightBuffer: LightBuffer;
+  private readonly artworkMaterials: ArtworkMaterials;
   get lightTargets() {
     return this.lightBuffer.targets;
   }
@@ -208,6 +212,7 @@ export class PixiScenePainter implements SceneDrawing {
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
     this.geometryBuffer.resize(canvas.width, canvas.height);
+    this.artworkMaterials = new ArtworkMaterials(renderer);
     this.lightBuffer = new LightBuffer(renderer);
     this.lightBuffer.resize(canvas.width, canvas.height);
     canvas.addEventListener('webglcontextlost', this.loseContext);
@@ -386,6 +391,7 @@ export class PixiScenePainter implements SceneDrawing {
       this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
     }
     for (const slot of this.slots) slot.material?.releaseLightTargets();
+    this.artworkMaterials.detachTargets();
     this.lightBuffer.detachGeometry();
     this.drawGeometry();
     this.lightBuffer.render(this.geometryBuffer.targets!, this.lighting);
@@ -407,8 +413,13 @@ export class PixiScenePainter implements SceneDrawing {
         ? this.lightBuffer.renderDebug(lightView)
         : this.geometryBuffer.renderDebug(geometryView))
     ) {
-      for (let i = 0; i < this.cursor; i++)
-        this.slots[i]!.material?.prepareComposite(this.lightBuffer.targets!);
+      this.artworkMaterials.prepare(this.geometryBuffer.targets!, this.lightBuffer.targets!);
+      for (let i = 0; i < this.cursor; i++) {
+        const slot = this.slots[i]!;
+        slot.material?.prepareComposite(this.lightBuffer.targets!);
+        if (slot.item instanceof Graphics) this.artworkMaterials.attach(slot.item);
+        if (slot.lookup) slot.lookup.update((slot.item as MeshSimple).texture);
+      }
       this.renderer.render({ container: this.root, clear: true });
     }
     this.canvas.dataset.lightingFrameView = view;
@@ -421,8 +432,10 @@ export class PixiScenePainter implements SceneDrawing {
       filterBindings.setResource(Texture.EMPTY.source, 3);
     }
     // Unused pooled meshes must detach old scene sources before expiry destroys them.
-    for (let i = this.cursor; i < this.slots.length; i++)
+    for (let i = this.cursor; i < this.slots.length; i++) {
       this.slots[i]?.material?.releaseTextures();
+      this.slots[i]?.lookup?.releaseTexture();
+    }
     this.textures.collect();
     for (const [key, gradient] of this.gradients) {
       if (this.usedGradients.has(key)) continue;
@@ -704,19 +717,20 @@ export class PixiScenePainter implements SceneDrawing {
     this.retainTree = false;
   }
   private submit(kind: 'graphics'): Graphics;
-  private submit(kind: 'sprite'): Sprite;
+  private submit(kind: 'sprite'): MeshSimple;
   private submit(kind: 'material'): MaterialMesh;
   private submit(kind: 'round-stroke'): MeshSimple;
   private submit(kind: 'brush-ring'): Graphics;
   private submit(kind: 'glyph-arrow'): Graphics;
-  private submit(kind: 'ellipse'): Sprite;
-  private submit(kind: Slot['kind']): Graphics | Sprite | MaterialMesh | MeshSimple {
+  private submit(kind: 'ellipse'): MeshSimple;
+  private submit(kind: Slot['kind']): Graphics | MaterialMesh | MeshSimple {
     let slot = this.slots[this.cursor];
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();
+      slot?.lookup?.dispose();
       if (slot?.material) slot.material.dispose();
       else {
-        if (slot?.kind === 'round-stroke') (slot.item as MeshSimple).geometry.destroy();
+        if (slot?.item instanceof MeshSimple) slot.item.geometry.destroy();
         slot?.item.destroy();
       }
       const material = kind === 'material' ? createMaterialMesh() : undefined;
@@ -731,15 +745,26 @@ export class PixiScenePainter implements SceneDrawing {
               ? createRoundStroke(
                   (this.roundStrokeTexture ??= createRoundStrokeTexture(this.canvas.ownerDocument)),
                 )
-              : kind === 'ellipse'
-                ? new Sprite({
-                    texture: (this.roundStrokeTexture ??= createRoundStrokeTexture(
-                      this.canvas.ownerDocument,
-                    )),
-                    anchor: 0.5,
-                  })
-                : new Sprite()),
+              : new MeshSimple({
+                  texture:
+                    kind === 'ellipse'
+                      ? (this.roundStrokeTexture ??= createRoundStrokeTexture(
+                          this.canvas.ownerDocument,
+                        ))
+                      : Texture.EMPTY,
+                  vertices: new Float32Array(
+                    kind === 'ellipse'
+                      ? [-64, -64, 64, -64, 64, 64, -64, 64]
+                      : [0, 0, 0, 0, 0, 0, 0, 0],
+                  ),
+                  uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+                  indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+                })),
       };
+      if (!material && slot.item instanceof MeshSimple) {
+        slot.lookup = this.artworkMaterials.createMesh();
+        slot.item.shader = slot.lookup.shader;
+      }
       this.slots[this.cursor] = slot;
     }
     this.cursor++;
@@ -991,6 +1016,7 @@ export class PixiScenePainter implements SceneDrawing {
       !this.textures.touch(image, revision)
     ) {
       sprite.texture = this.textures.getFrame(image, revision, sx, sy, sw, sh);
+      sprite.vertices.set([0, 0, sw, 0, sw, sh, 0, sh]);
       slot.image = image;
       slot.revision = revision;
       slot.sx = sx;
@@ -1091,9 +1117,10 @@ export class PixiScenePainter implements SceneDrawing {
       group.destroy();
     }
     for (const slot of this.slots) {
+      slot.lookup?.dispose();
       if (slot.material) slot.material.dispose();
       else {
-        if (slot.kind === 'round-stroke') (slot.item as MeshSimple).geometry.destroy();
+        if (slot.item instanceof MeshSimple) slot.item.geometry.destroy();
         slot.item.destroy();
       }
       for (const filter of slot.filters ?? []) filter.destroy();
@@ -1104,11 +1131,15 @@ export class PixiScenePainter implements SceneDrawing {
     // Keep this guarded adapter covered by the warning-sensitive disposal test.
     const filterBindings: unknown = Reflect.get(this.renderer.filter, '_globalFilterBindGroup');
     if (filterBindings instanceof BindGroup) filterBindings.destroy();
+    this.artworkMaterials.dispose();
     this.lightBuffer.dispose();
     this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();
     this.renderer.destroy({ removeView: false });
-    for (const gradient of this.gradients.values()) gradient.destroy();
+    // Native graphics retain Pixi cached batch bind groups beyond renderer disposal.
+    // Release GPU storage as for retired gradients without invalidating their sources.
+    for (const gradient of this.gradients.values()) gradient.texture.source.unload();
+    this.gradients.clear();
     this.root.destroy();
     this.roundStrokeTexture?.destroy(true);
     this.textures.dispose();
