@@ -2410,3 +2410,55 @@ original/candidate hashes and expected retained-source deltas. All handles
 terminal. No implementation/version/asset/visual-gate change or headline benchmark
 rerun; full Phase5 and the remaining goal budgets are still required. No
 push/deploy/native build/player saves; full goal active.
+
+## Checkpoint 44 — Matched-history automatic preload trial
+
+Diagnostic only; app remains 1.68.35. Temporarily restored the rejected observer,
+worker preload protocol and local integration from checkpoint 41 to test actual
+renderer behavior. Each original/candidate pair starts with a fresh renderer,
+draws the same current scene, then enters the same next scene. All nine boundaries
+are checked in portrait, low-quality portrait and landscape. This matches prior
+source draw history while preserving actual automatic preload scheduling.
+
+Local256, worker256 and worker512 MiB configurations each pass 27 pairs. The
+archived strict verifier proves 1,044 exact plane comparisons and 81 native frame
+comparisons per configuration: incoming/current original versus candidate,
+unchanged candidate held planes and corresponding held native draws. Total3,132
+plane comparisons and243 native comparisons. Every preload reports ready;
+local entries perform zero new decodes and builds remain unchanged during
+preload. All three loader peaks are251,692,784 bytes. The low-budget worker probe
+sets deviceMemory inside the worker before importing its runtime; all27 responses
+confirm268,435,456 budget and worker backend. High-budget responses confirm
+536,870,912 budget and worker backend. Worker decode counts are not instrumented.
+These are decoded-loader counters, not whole-game or transient memory bounds.
+
+The initial local assertion that its second native draw must equal its first
+fails on eight landscape cases. The disabled original arm has the same changes,
+and original/candidate second draws match exactly in all27 cases. The final
+verifier compares native output at matching draw ordinals and retains exact
+held-plane invariance; it changes no pixel tolerance. Raw/native parity therefore
+passes for these isolated transition pairs. Continuous history remains a separate
+required gate; isolated pairs cannot prove repeated visits safe.
+
+Required prepare starts material maps before colour images; the preload URL
+enumerator originally interleaves them. A temporary maps-first trial tests this
+ordering in the original continuous27-visit fixture. The gate still fails:
+19 normal/surface plane hashes differ on later visits (first at stage0,
+low-quality portrait). All colour plane hashes match, and no feedback-loop or
+bound-texture warnings occur. Ordering alone is not an accepted fix; native/map
+sampling and source lifetime across continuous visits remain unresolved.
+
+All six tracked renderer/protocol/enumerator files restored byte-for-byte to the
+saved production sources; git diff confirms no rendering change. Temporary
+observer removed. No automatic preload, normalization, next slots, assets,
+version or visual tolerance change is integrated. Sources under
+tmp/probes/scene-image-preload/: matched-history, matched-history-expanded,
+verify-matched-history and ordered-history. Archived local-low, worker-low,
+worker-high and ordered-cycle-local-low JSON under
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+
+Next resolve the continuous-cycle data-map difference with matching original
+controls and explicit source lifetime/draw histories before enabling preload.
+Whole-budget next slots, exact promotion/invalidation, quiet pacing, figure/
+startup ownership, 120Hz/CPU budgets and full Phase5 remain required. No headline
+benchmark rerun, push/deploy/native build or player saves; full goal active.

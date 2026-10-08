@@ -1,4 +1,34 @@
-# Performance, assets and seamless transitions — Fresh-decode pixel control established
+# Performance, assets and seamless transitions — Matched-history preload checks
+
+Latest checkpoint 44 is diagnostic only; app remains 1.68.35. Actual automatic
+preload trial passes matched-source-history comparisons for 27 fresh renderer
+transition pairs in each of local256, worker256 and worker512 MiB configurations.
+All nine stage boundaries include portrait, low-quality portrait and landscape.
+Across the three configurations, 3,132 exact plane comparisons and 243 native
+frame comparisons pass. Every future set reports ready; local entries perform
+zero new decodes. Loader peaks are 251,692,784 bytes. Worker budgets and worker
+backend are confirmed in every response; worker decode counts are not measured.
+These are isolated pairs, not a continuous stage-cycle or whole-game memory proof.
+
+Initial local test incorrectly required each second landscape draw to equal its
+first. Eight cases differ in both original and candidate, with exact matching
+second draws. The archived verifier compares the same draw ordinal in both arms
+and still requires every held plane to remain unchanged. No pixel tolerance is
+relaxed. Matching required load order (maps before colours) is insufficient for
+the continuous 27-visit trial: 19 normal/surface plane hashes differ on later
+visits, although every colour plane matches. The continuous visual gate fails.
+
+All six tracked trial files restored exactly; observer removed. No automatic
+preload, source normalization, next-slot implementation, version or asset change
+is integrated. Sources/results under tmp/probes/scene-image-preload/ and
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+Next identify the continuous-cycle map sampling/lifetime difference with matched
+controls before enabling preload. Whole-budget worker/local next slots, exact
+promotion/invalidation, quiet pacing, figure/startup ownership, 120Hz/CPU budgets
+and full Phase5 remain required. Full goal active; no push/deploy/native build or
+player saves.
+
+## Previous handoff — Fresh-decode pixel control established
 
 Latest checkpoint 43 is diagnostic only; app remains 1.68.35. Independently
 decoding the foam atlas before each Shore build resets the native multi-size
