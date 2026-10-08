@@ -101,6 +101,9 @@ owns companion rules and `presentation/player-figures.ts` owns their projection.
 frame scheduling. `runtime/startup.ts` owns ordered runtime startup,
 artwork readiness/errors and disposal. Scene continuations settle after drawing
 through `runtime/scene-flow.ts`, including intentional paused phase adoption.
+Gameplay permits120Hz draw submissions with independent60Hz simulation timing.
+Extra draws reuse prepared camera/post data; poses remain60Hz without interpolation.
+Menus and cinematic retain60Hz, and clock restart discards pending preparation.
 Hot presentation, rule and frame projections use lifetime `cacheView` records:
 mutable equipment, geometry, seal, scene selections and clocks remain forwarded
 getters. Host projections require a lifetime live parent view. Figure renderer

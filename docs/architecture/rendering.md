@@ -87,6 +87,9 @@ The runtime prepares camera shake and post-effect randomness once per presentati
 frame. Drawing synchronously reads the current poses and effects; it does not yet
 serialize the entire scene into an immutable snapshot. Repeated-draw tests verify
 that this path leaves gameplay, cosmetic state, RNG, haptics and saves unchanged.
+Gameplay can submit120draws per second while retaining60Hz simulation and pose
+updates. Additional draws reuse prepared camera/post data without consuming RNG;
+clock restart invalidates that preparation. Menus/cinematic retain60Hz.
 Scene-ready gameplay continuations run in runtime orchestration immediately after
 presentation. Direct drawScene calls never commit a pending scene transition;
 the readiness isolation test verifies this and exactly-once runtime settlement.
