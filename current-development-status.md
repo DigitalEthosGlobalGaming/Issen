@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Completed local input lifetime
+# Performance, assets and seamless transitions — Local input release integrated
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -745,3 +745,27 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Do not enable concurrent all-family enemy/startup plus local compose. Selected
     figure ownership, incoming headroom, next slots,120Hz and Phase5 remain required.
     All measurement handles terminal; goal active, no push/deploy/native build/saves.
+
+34. Local compose-input release at1.68.31. Main-thread output retains its own
+    colour/data planes; only fog4inputs25,176,608bytes or bamboo3/18,870,192 remain
+    pinned. Other stages0. Existing independent cutouts stay bounded. Same-key
+    draw/compose reuses output; changed size/DPR/quality/seed/stage reacquires inputs.
+    Source-binding release preserves completed/foreground maps; obsolete pending
+    generation returnsfalse before wrong-stage publication. Worker decoder/art/
+    gameplay/seeds/budgets unchanged. Integrated18eviction casesPASS49.2s/exact.
+    Final3all-stage lifetime/key/coalescing testsPASS34.7s, including actual native
+    restoration; raw/live/replay exact, restored high-DPR fog/bamboo max1 within
+    the native tolerance, no GL warnings. Two-cycle36case
+    full SHA256 plane/native outputs exactly match
+    saved original actors, confirmed by explicit hash gate. Cross-owner absolute
+    comparator fails in unchanged and trial (stage0high29/15,stage7low255/35);
+    matching complete hashes proves preservation, not root-cause resolution.
+    Related11PASS/1FAIL36.1s was stale all-input peer pin expectation; expected live
+    fog4pins25,176,608bytes nowPASS3.5s/exact peer checks retained. CoalescingPASS3.4s;
+    all463unitsPASS; checkedbuild/strictTypeScriptPASS; bundled app/ink3PASS23.4s.
+    Evidence/provenance/probes under tmp/performance-local-release-integration/
+    and tmp/probes/local-release-integration/. Incoming figure/live pin union still
+    needs scheduling; selected figure/startup ownership, next slots,120Hz and
+    Phase5 remain required. Goal active; no push/deploy/native build/player saves.
+    Final diff/formatPASS; version/package/lock/title/changelog synchronized.
+    All measurement and verification sessions terminal.

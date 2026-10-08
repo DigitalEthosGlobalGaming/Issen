@@ -170,6 +170,14 @@ Owner disposal clears cutouts and scratch alongside layer maps. Software
 rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
 downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
 hits, misses and evictions separately from decoded assets.
+Local main-thread composition releases non-live colour/material image leases after
+building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
+colour/data canvases and the bounded independent cutouts keep their own pixels.
+Repeated draws/compose calls with the same composition key reuse that output.
+A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
+pending requests cannot publish over a newer generation. Source binding release
+preserves output maps, including unchanged bamboo foreground planes; final owner
+disposal closes them. Worker-document input ownership remains managed by its loader.
 `environment/asset-sources.ts` supplies the unchanged URL/index selections for
 local compose and the generated runtime inventory. Generic material owners and
 UI lighting request data maps only; direct player/enemy PBR owners retain their

@@ -1914,3 +1914,57 @@ Do not treat these fresh-owner cases as a whole-run budget or enable all-family
 startup sharing concurrently with local compose. Full selected figure loading,
 next slots,120Hz and Phase5 remain required. All measurement handles terminal;
 goal active at full scope; assets/harness/gameplay/seeds/saves unchanged, no release.
+
+## Checkpoint 34 — Integrated local composition input release
+
+Implemented at1.68.31. Main-thread local compose/draw releases non-live raw colour
+leases and material selections once independent output planes exist. Fog retains
+four inputs; bamboo three; other stages none. Immutable colour cutouts retain
+their existing bounded cache. Source bindings release without destroying completed
+maps; full owner disposal still closes them. This preserves bamboo foreground
+maps through seed-only/DPR changes and explicit preparation. Composition-key
+changes reacquire full inputs; repeated same-key draws/compose do not. Generation
+checks reject an obsolete pending scene before it can build using newer inputs.
+Worker-document ownership/decoder, assets, masks/normal sampling, budgets and
+gameplay/seeds unchanged. No native representation substitution or budget increase.
+
+Integrated18case eviction probePASS49.2s: all9stages/two variants, actual figure
+pressure/all12enemy map admission; warmed raw/live/replay exact. New permanent
+tests exercise all9stages plus high-DPR fog/bamboo, complete source closure/live
+pins, replay, native restoration, resize/DPR/quality/seed/repeated keys, explicit
+prepare and obsolete coalescing. Final3native lifecycle testsPASS34.7s: final
+raw/live/replay differences exact; actual restored fog/bamboo high-DPR frames
+have max1, within the small native tolerance. No GL warnings.
+The source-lifetime counts/bytes remain those measured at checkpoint33.
+
+The two-owner rebuild comparison fails its absolute max1 assertion in both
+unchanged and integrated runs: stage0high raw29/live15 and stage7low raw255/live35,
+twice each over two cycles. Clearing or retaining independent colour cutouts did
+not change that pattern. Matching maxima alone was insufficient, so capture full
+SHA256 hashes for every raw plane and native frame. Across all36cases, both
+original-owner and candidate-owner hash arrays match their corresponding saved
+unchanged-control arrays exactly, including the four failing cross-owner cases.
+Final source-binding/output-preservation version repeats this exact hash result.
+Dedicated hash gate verifies row identity, all hashes and same-key build counts;
+PASS36. This is unchanged output against each original actor's baseline, not a
+relaxed cross-owner tolerance or explanation of the legacy sampling discrepancy.
+The absolute comparator failures remain preserved and explicitly unresolved.
+
+Related browser run11PASS/1FAIL36.1s/default2workers: failure was old peer fixture
+requiring all34decoded inputs pinned after compose. Updated expected live-fog
+contract to4pins/25,176,608bytes, preserving exact peer planes/widths/bytes and
+rebuild checks; targetedPASS3.5s. Obsolete coalescingPASS3.4s. All463unitsPASS;
+checked production build/strict TypeScriptPASS; bundled startup/gameplay/Armoury/
+offline resize3PASS23.4s/default2workers. Evidence under
+tmp/performance-local-release-integration/: original modules, rejected cutout-clear
+patch, baseline/trial/final comparator/hash JSON, verify-hashes.mjs/hash-gate.json,
+completed-scene-release.json, main-map-budget-cycle.json and verification logs.
+Isolated probes/configs under tmp/probes/local-release-integration/.
+
+This releases decoded leases after composition, not all figure/startup artwork,
+composed canvas/GPU resources or driver allocations. Incoming scene plus existing
+figure/live pins still needs admission scheduling. Selected figure ownership,
+next seeds/slots/promotion,120Hz/CPU budget and full Phase5 metrics/traces/suites
+remain required. Goal active at full scope; no push/deploy/native build/saves.
+Final diff/formatPASS; synchronized package/lock/title/changelog. All measurement
+and verification sessions terminal.

@@ -53,6 +53,11 @@ retire native textures before source closure (1.68.30). Weapon LRU eviction uses
 the same frame-preserving boundary as enemy caches. All20outfits and20weapons
 match the saved original exactly; owner disposal returns native counts to zero.
 These owners still prepare their catalogues outside the shared decoded budget.
+Local main-thread scenery now unpins non-live inputs after compose (1.68.31).
+Stage0 retains four fog planes25,176,608nominal bytes, stage4 three bamboo planes
+18,870,192; other stages retain no raw compose inputs. Output canvases/cutouts
+remain separately owned. Composition-key changes reacquire inputs. This permits
+eviction after presentation; incoming figure/scene admission still needs scheduling.
 The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
 records actual source/catalog/startup-glob references, dimensions, bytes and
 stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.

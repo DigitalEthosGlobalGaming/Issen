@@ -143,7 +143,9 @@ test('shared scenery sources retain independent material layers and survive peer
   expect(result.width).toBeGreaterThan(0);
   expect(result.peer.width).toBe(result.width);
   expect(result.peer.snapshot.decodedLoader!.bytes).toBe(result.snapshot.decodedLoader!.bytes);
-  expect(result.peer.snapshot.decodedLoader!.pinned).toBe(result.snapshot.decodedLoader!.decoded);
+  expect(result.peer.snapshot.decodedLoader!.pinned).toBe(4);
+  expect(result.peer.snapshot.decodedLoader!.pinnedBytes).toBe(25176608);
+  expect(result.peer.snapshot.decodedLoader!.pinned).toBe(result.snapshot.decodedLoader!.pinned);
   expect(result.rebuilt).toBe(true);
   expect(result.disposed.decodedLoader!.bytes).toBe(0);
 });

@@ -128,6 +128,17 @@ export function createCachedMaterials(
     pixelBudget: options.pixelBudget ?? 4_000_000,
     normalAngleStep: options.normalAngleStep ?? 2,
   };
+  function unbind(image: HTMLImageElement) {
+    const bindings = sources.get(image);
+    bindings?.delete(owner);
+    if (!bindings?.size) sources.delete(image);
+    owner.images.delete(image);
+  }
+  function releaseSources() {
+    for (const image of owner.images) unbind(image);
+    for (const cache of owner.cutouts.values()) cache.clear();
+    owner.cutouts.clear();
+  }
   return {
     bind(image: HTMLImageElement, material: (frame: Frame) => SceneMaterial | null) {
       owner.images.add(image);
@@ -135,6 +146,8 @@ export function createCachedMaterials(
       if (!bindings) sources.set(image, (bindings = new Map()));
       bindings.set(owner, { owner, material });
     },
+    unbind,
+    releaseSources,
     withBindings<T>(draw: () => T): T {
       const previous = bindingOwner;
       bindingOwner = owner;
@@ -147,16 +160,9 @@ export function createCachedMaterials(
       }
     },
     dispose() {
-      for (const image of owner.images) {
-        const bindings = sources.get(image);
-        bindings?.delete(owner);
-        if (!bindings?.size) sources.delete(image);
-      }
+      releaseSources();
       for (const canvas of owner.layers) clearCachedMaterial(canvas);
-      owner.images.clear();
       owner.layers.clear();
-      for (const cache of owner.cutouts.values()) cache.clear();
-      owner.cutouts.clear();
     },
     snapshot() {
       const rows = [...owner.cutouts.values()].map((cache) => cache.snapshot());

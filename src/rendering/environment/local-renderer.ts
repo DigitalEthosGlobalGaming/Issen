@@ -73,6 +73,22 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   let builds = 0;
   const settleLoads: Array<() => void> = [];
 
+  function releaseCompositionInputs(stage: number) {
+    if (!mapImages) return;
+    // Output planes own their pixels; only live fog and bamboo still need raw inputs.
+    const live = stage === 0 ? [9] : stage === 4 ? [0] : [];
+    materials?.select(Object.fromEntries(live.map((index) => [String(index), ASSET_URLS[index]!])));
+    for (const [index, lease] of sourceLeases) {
+      if (live.includes(index)) continue;
+      const image = images[index];
+      if (image) cachedMaterials.unbind(image);
+      lease.release();
+      sourceLeases.delete(index);
+      delete images[index];
+    }
+    pending = undefined;
+  }
+
   function prepare(stage = 0): Promise<void> {
     if (pending && stage === preparedStage) return pending;
     if (disposed) return Promise.resolve();
@@ -82,7 +98,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
     failed = false;
     const required = sceneAssets(stage);
     cacheKey = '';
-    cachedMaterials.dispose();
+    cachedMaterials.releaseSources();
     materials ??= createAssetMaterials<string>(doc, {}, mapImages);
     materials.select(
       Object.fromEntries(required.map((index) => [String(index), ASSET_URLS[index]!])),
@@ -507,19 +523,14 @@ export function createLocalEnvironmentRenderer(doc: Document) {
         frame.height > 0 &&
         Number.isFinite(frame.dpr);
       if (!disposed && valid) {
-        void prepare(frame.stage);
+        const key = compositionKey(frame);
+        if (key !== cacheKey) void prepare(frame.stage);
         if (ready) {
-          const key = JSON.stringify([
-            frame.width,
-            frame.height,
-            frame.dpr,
-            frame.stage,
-            frame.stageSeed ?? 0,
-            frame.lowQuality,
-          ]);
           if (key !== cacheKey) {
-            if (build(frame)) cacheKey = key;
-            else {
+            if (build(frame)) {
+              cacheKey = key;
+              releaseCompositionInputs(frame.stage);
+            } else {
               failed = true;
               ready = false;
             }
@@ -609,7 +620,13 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       const timingKey = 'false:' + compositionKey(frame);
       // Worker timing crosses the message boundary; local fallback records its own phases.
       if (!assetsReady) markScenePhase('compose-sent', timingKey, { backend: 'local' });
-      await prepare(frame.stage);
+      const key = compositionKey(frame);
+      if (key !== cacheKey) {
+        const preparation = prepare(frame.stage);
+        const request = generation;
+        await preparation;
+        if (request !== generation || frame.stage !== preparedStage) return false;
+      }
       assetsReady?.();
       if (!assetsReady) markScenePhase('assets-ready', timingKey, { backend: 'local' });
       if (
@@ -622,20 +639,13 @@ export function createLocalEnvironmentRenderer(doc: Document) {
         frame.height <= 0
       )
         return false;
-      const key = JSON.stringify([
-        frame.width,
-        frame.height,
-        frame.dpr,
-        frame.stage,
-        frame.stageSeed ?? 0,
-        frame.lowQuality,
-      ]);
       if (cacheKey !== key) {
         if (!cachedMaterials.withBindings(() => build(frame))) return false;
         cacheKey = key;
       }
       if (frame.stage === 4 && images[0])
         cachedMaterials.withBindings(() => foreground.prepare(images[0]!, frame));
+      releaseCompositionInputs(frame.stage);
       if (!assetsReady) {
         markScenePhase('compose-received', timingKey, { backend: 'local' });
         measureScenePhase(
