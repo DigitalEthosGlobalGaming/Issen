@@ -11,6 +11,7 @@ import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
 import { Capacitor } from '@capacitor/core';
 import { startBackgroundAssets } from './platform/background-assets.ts';
 import { runtimeAssets } from './platform/runtime-assets.ts';
+import { INK_COMPANION_SOURCES } from './rendering/figures/ink-companions.ts';
 
 const artwork = import.meta.glob<string>(
   [
@@ -28,6 +29,7 @@ const publicArtwork = import.meta.glob<string>(
 // Material owners decode selected maps separately from source artwork.
 const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
 const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
+const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
 const urls = [
   ...Object.values(artwork),
   ...Object.keys(publicArtwork).map(
@@ -35,7 +37,9 @@ const urls = [
   ),
 ].filter((url) => {
   const canonical = new URL(url, document.baseURI).href;
-  return !materialMaps.has(canonical) && runtimeUrlSet.has(canonical);
+  return (
+    !materialMaps.has(canonical) && !companionSources.has(canonical) && runtimeUrlSet.has(canonical)
+  );
 });
 
 export class MainGame {

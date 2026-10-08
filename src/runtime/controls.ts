@@ -143,6 +143,10 @@ export function createRuntimeControls(
     get supportPreview() {
       return supportPreview;
     },
+    releasePreviewArtwork() {
+      preview.suspend();
+      supportPreview.suspend();
+    },
     get demoKill() {
       return demoKill;
     },
@@ -219,6 +223,7 @@ export function createRuntimeControls(
   }
   function drawPreview() {
     lightingDebug.refresh();
+    foundation.browser.inkCompanion.select(presentation.petOf());
     preview.draw(
       presentation.previewFrame(
         foundation.profile.profileEquipment.EQ.film === PREMIUM_FILM &&

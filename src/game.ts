@@ -95,6 +95,7 @@ export function startGame(
           reducedMotion: foundation.browser.reducedMotion,
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,
+          petOf: presentation.petOf,
           computeMods: game.computeMods,
           applySeal: foundation.view.applySeal,
           resize: frames.resize,

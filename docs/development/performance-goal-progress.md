@@ -1497,3 +1497,84 @@ startup bound, faster transitions, frame-p95 improvement or full goal acceptance
 Final checks: all 459 unit tests PASS; checked production verification build and
 strict type checks PASS. Assets and frozen standard performance harness unchanged.
 No push/deployment/native build or player-save mutation. Whole goal remains active.
+
+## Checkpoint 25 — Selected companion ownership, 9 October 2026
+
+Before changing ownership, the native companion control prepares six HTML images:
+37,735,212 nominal decoded bytes, both parts and rock colour/normal/surface kits.
+All eight animated/reduced-motion native comparisons against directly decoded
+original URLs have exact pixels. This control is retained as the explicit full
+catalogue path; it is not a startup timing or resident-memory measurement.
+
+Version 1.68.26 routes companion inputs through the existing shared HTML-image
+pool. Runtime selection retains only the equipped kit. It uses the existing
+visible-pet rule after startup equipment restoration and through live equipment
+views, including scarecrow's crow. Crow/cat/shiba share the 18,870,192-byte parts
+kit; rock uses 18,865,020 bytes. No pet needs no kit. Companion colour URLs are
+excluded from the broad startup preloader, which would otherwise decode both
+before runtime selection. Aligned raw colour/PBR inputs and rig geometry remain
+unchanged. Explicit standalone preparation can still select the whole catalogue.
+
+Each preview owns an explicit borrow of its frame's kit. Primary and preview
+selections form a union, with one lease per selected source in each renderer.
+Changing the primary does not invalidate a preview still borrowing its old kit.
+Releasing a borrow unpins only kits outside that union; warm resources remain
+LRU-managed. Independent renderer owners share native image identity and retain
+peer pixels after disposal. Obsolete/released pending loads cannot publish old
+readiness; disposal cancels pending publication and releases all owned leases.
+
+Preview selection changes/panel closure release that painter's companion GPU
+textures. Other painters retain their own textures and source leases. A late
+selected load repaints the most recent matching preview, preserving its clock
+and effects simulation. Suspension/disposal invalidates late repaint callbacks.
+Live Armoury draw selection updates the primary before borrowing a changed kit.
+All current runtime previews read the same equipped companion; arbitrary
+cross-kit borrowers remain supported within available loader capacity. A caller
+requesting both kits alongside all stage-0 inputs and the pinned charm kit can
+still exhaust 256 MiB. Whole-figure/source headroom must be addressed; increasing
+the budget or silently dropping required artwork is not the solution.
+
+Measured selected ownership: no selection decodes/pins zero images; one kit
+pins three; both explicitly borrowed kits pin six. Repeated cat/shiba selections
+leave loader counters unchanged. Releasing the parts preview while rock remains
+selected drops pins to three (18,865,020 bytes), retaining warm cached inputs.
+Final peer disposal clears all bytes and native GPU consumers. Exact original
+HTML/native pixels are preserved for every companion and reduced-motion pose.
+Required decoding succeeds hidden; actual WebGL context restoration preserves
+exact pixels, three source textures, and final disposal returns that count to zero.
+
+The combined low-memory preparation test visits all nine scenery stages in
+three scopes: no companion, the parts kit, and rock, while charms remain pinned.
+All 27 visits succeed. Loader-accounted peak 264,278,624 bytes stays below
+268,435,456; final live snapshot 264,242,668 bytes, 42 decoded, 31 pinned,
+195,032,156 pinned bytes, 266 evictions. Final owner disposal returns bytes to
+zero. This covers selected companion/charm/local source inputs, not all startup
+images, other figures, composed canvases or resident GPU/whole-game memory.
+
+Real startup succeeds with unused companion image/fetch requests blocked. Live
+scarecrow and both panel flows select/borrow correctly. Closing each preview
+removes its three companion textures. A previously unloaded rock preview repaints
+on arrival; a suspended pending preview does not repaint or advance effects.
+Initial request blocking also blocked Vite asset modules and caused a fixture
+startup timeout; allowing script requests fixes the fixture. Existing four pose
+units used raw image callbacks; their transport fake now exercises image leases
+without changing their geometry, accessibility, invalid-dimension or disposal
+assertions. Native browser checks retain actual shared loading coverage.
+
+Final related browser run: 27 PASS (33.9s), default two workers; all 459 units
+PASS; checked production build/typecheck PASS. Bundled startup/gameplay/Armoury/
+offline resize checks are recorded in the handoff once terminal. Format/diff
+checks and synchronized package/lock/title/changelog metadata are required before
+commit. Evidence: tmp/performance-companion-selection/baseline.json,
+selected-kits.json, html-parity.json, local-charm-budget.json and runtime.json.
+Assets and frozen standard performance harness unchanged. No push/deployment,
+native build or real player-save mutation.
+
+Next: complete selected enemy/player/outfit/sword and remaining startup ownership,
+including shared preview scopes and transient local-source headroom. Complete
+GPU/variant/local/demon readiness, deterministic next-slot/seed wiring, native
+pressure stability, actual 120Hz fidelity/frame budget and every Phase 5 metric,
+production trace and suite remain required. Goal stays active at full scope.
+
+Final bundled app/ink checks: 3 PASS (23.8s), default two workers, against the
+final checked build. Formatting and diff checks PASS; all sessions terminal.

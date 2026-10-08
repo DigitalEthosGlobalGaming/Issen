@@ -754,6 +754,23 @@ film/post/target extension hooks are described below.
 
 ## Shared main-image retirement
 
+Companion selection owns the equipped parts or rock kit and unions it with
+explicit preview borrows. The parts atlas serves crow, cat and shiba. Runtime
+selection uses the existing visible-pet rule, including scarecrow's crow, after
+restoring equipment and through live drawing views. Companion colour sources are
+excluded from the broad startup preloader; their owner leases aligned colour,
+normal and surface inputs through the shared main pool. Standalone `prepare()`
+still prepares the full catalogue unless a managed selection was supplied.
+
+Each Armoury/support preview borrows its frame's companion kit. Selection changes
+and panel closure release that painter's companion textures and update the
+borrow; other canvases retain their own sources. A pending selected load redraws
+the last preview frame only while its selection and lifetime still match.
+The readiness repaint preserves its clock and effects simulation;
+suspension/disposal invalidates that callback. The companion renderer owns and
+disposes its source owner, including an explicitly supplied owner for embedding
+or transport tests.
+
 The native HTML image pool owns final source lifetime. LRU eviction and final
 pool disposal call `retireSceneTexture` before clearing the image URL and revoking
 its blob URL. Every observing painter/store releases colour, data and frame

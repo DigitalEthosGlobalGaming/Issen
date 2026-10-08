@@ -22,6 +22,7 @@ export interface PanelViews {
   readonly ITEMS: readonly Item[];
   readonly hudView: { readonly activeScreen: Screen | null };
   readonly supportPreview: { draw: (frame: PreviewFrame) => void };
+  releasePreviewArtwork(): void;
   readonly previewFrame: (
     film: string,
     effects: boolean,
@@ -73,6 +74,7 @@ export function createPanelWiring(readViews: () => PanelViews) {
       showScreen,
       clearTrialResult,
     } = readViews();
+    readViews().releasePreviewArtwork();
     G.panelFrom = hudView.activeScreen || 'title';
     G.panel = id;
     if (id === 'support') {
@@ -106,6 +108,7 @@ export function createPanelWiring(readViews: () => PanelViews) {
   }
   function closePanel() {
     const { G, setBestLine, showScreen } = readViews();
+    readViews().releasePreviewArtwork();
     G.panel = null;
     if (G.panelFrom === 'title') setBestLine();
     showScreen(G.panelFrom);

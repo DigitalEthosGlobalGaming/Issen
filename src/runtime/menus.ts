@@ -20,6 +20,7 @@ type MenuActionPorts = Pick<
   | 'prepareScene'
   | 'artworkReady'
   | 'supportPreview'
+  | 'releasePreviewArtwork'
   | 'demoKill'
   | 'buildWeather'
   | 'setupAttract'
@@ -224,6 +225,9 @@ export function createRuntimeMenus(
                 },
                 get supportPreview() {
                   return readActions().supportPreview;
+                },
+                get releasePreviewArtwork() {
+                  return readActions().releasePreviewArtwork;
                 },
                 get accessibleUnlocks(): MenuBindingViews['accessibleUnlocks'] {
                   return foundation.profile.accessibleUnlocks;

@@ -79,6 +79,12 @@ background export dispatch yields to busy/loading/hidden frames. The managed
 budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
 Charm renderers now share their18,874,368-byte colour/normal/surface kit through
 main-pool leases; separate previews retain independent tint caches and pins.
+Companions now lease only the equipped kit plus visible preview selections:
+parts18,870,192bytes (crow/cat/shiba), rock18,865,020bytes. No companion needs no
+kit, including startup. The scarecrow robe selects crow through the existing
+equipment rule. Preview closure releases its pins/native textures; full-catalogue
+preparation remains explicit for standalone callers. Other figure/startup inputs
+still need migration; this is not a whole-application memory guarantee.
 The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
 for compressed prefetch and startup filtering; regenerate with
 `node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.

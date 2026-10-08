@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Shared main-image GPU retirement
+# Performance, assets and seamless transitions — Selected companion ownership
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -574,3 +574,29 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     120Hz fidelity/CPUbudget and all Phase5 metrics/traces/suites remain required.
     Final checks: all459unitsPASS; checked production verification build/typecheck
     PASS; assets and the frozen standard performance harness remain unchanged.
+
+25. Selected companions at1.68.26: native before control6HTMLimages37,735,212bytes;
+    after nopet0, parts18,870,192(crow/cat/shiba), rock18,865,020. Shared main pool
+    leases and primary/preview union; live equipment/scarecrow rule reused after
+    startup restoration. Companion colours excluded from broad startup preloader.
+    Standalone explicit full catalogue retained. Dropped kits unpin; peer scopes
+    survive, stale/released loads cannot publish. Panel close/selection changes
+    release its3native companion textures. Late preview readiness repaints without
+    ticking clock/effects; suspension/disposal cancels callbacks. Repeated same-kit
+    selection causes no pin/loader churn. Combined charm/local scenery visits all9
+    stages with none/parts/rock:27PASS, peak264,278,624bytes<256MiB,266evictions,
+    disposal0bytes. Not whole-figure/startup/resident memory proof. Exact8native
+    HTML pixel comparisons and actual context-restore pixels; hidden loads work.
+    Real startup succeeds with unused companion requests blocked; Armoury/support
+    borrows release correctly. Fixture initially blocked Vite asset modules;
+    script allowance fixes that timeout. Four old pose units now fake source leases
+    without relaxed assertions.27relatedbrowsersPASS33.9s/default2workers;
+    all459unitsPASS/checkedbuild&typecheckPASS. Evidence stable
+    tmp/performance-companion-selection/. Assets/frozen harness unchanged.
+    Arbitrary both-kit+stage0+charm mandatory union can still exhaust256MiB; normal
+    runtime previews share equipped pet. Address shared/local transient headroom
+    and remaining enemy/player/outfit/sword/startup inputs next. Complete warming,
+    native pressure, deterministic next slots/decode,120Hz fidelity/CPUbudget,
+    cold/warm timing/traces and all Phase5 suites remain required; goal active.
+    Final bundled checks3PASS23.8s(default2workers), format/diffPASS. All sessions
+    terminal; no push/deploy/native build or real player-save mutation.
