@@ -6,7 +6,7 @@ import { normalTransform } from '../scene-frame.ts';
 import type { SceneLighting, SceneSprite } from '../scene-frame.ts';
 import type { SceneTextureStore } from './texture-store.ts';
 import { setShaderResource } from './shader-resources.ts';
-import type { BindGroup } from 'pixi.js';
+import type { BindGroup, TextureSource } from 'pixi.js';
 
 const textureNames = ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'] as const;
 
@@ -89,16 +89,17 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
         mesh.state.blend = stateBlend;
       };
     },
-    releaseTextures(): void {
+    releaseTextures(source?: TextureSource): void {
       if (!texturesBound) return;
       for (const name of textureNames)
-        setShaderResource(
-          shader.resources,
-          name,
-          name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source,
-        );
-      geometryMaterial.releaseTextures();
-      texturesBound = false;
+        if (!source || shader.resources[name] === source)
+          setShaderResource(
+            shader.resources,
+            name,
+            name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source,
+          );
+      geometryMaterial.releaseTextures(source);
+      if (!source) texturesBound = false;
     },
     update(sprite: SceneSprite, lights: SceneLighting, textures: SceneTextureStore): void {
       const material = sprite.material!;

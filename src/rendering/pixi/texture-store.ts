@@ -1,11 +1,14 @@
 import { Rectangle, Texture } from 'pixi.js';
+import type { TextureSource } from 'pixi.js';
 import type { SceneTexture } from '../scene-frame.ts';
+import { observeSceneTextureRetirement } from '../texture-revision.ts';
 
 interface PreparedSource {
   texture: Texture;
   frames: Map<string, Texture>;
   revision: number;
   lastFrame: number;
+  stopRetirement: () => void;
 }
 
 /** Renderer-owned GPU resources. Never takes ownership of decoded source pixels. */
@@ -13,6 +16,8 @@ export class SceneTextureStore {
   private readonly sources = new Map<SceneTexture['source'], PreparedSource>();
   private readonly dataSources = new Map<SceneTexture['source'], PreparedSource>();
   private frame = 0;
+
+  constructor(private readonly beforeRelease?: (source: TextureSource) => void) {}
 
   beginFrame(): void {
     this.frame++;
@@ -27,6 +32,7 @@ export class SceneTextureStore {
         frames: new Map(),
         revision,
         lastFrame: this.frame,
+        stopRetirement: observeSceneTextureRetirement(source, () => this.releaseSources([source])),
       };
       if (data) prepared.texture.source.alphaMode = 'no-premultiply-alpha';
       store.set(source, prepared);
@@ -103,6 +109,8 @@ export class SceneTextureStore {
   }
 
   private release(prepared: PreparedSource): void {
+    prepared.stopRetirement();
+    this.beforeRelease?.(prepared.texture.source);
     for (const texture of prepared.frames.values()) texture.destroy(false);
     prepared.texture.destroy(true);
   }

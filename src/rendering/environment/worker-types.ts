@@ -1,4 +1,5 @@
 import type { EnvironmentFrame } from './local-renderer.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 
 export type ComposedLayer = {
   colour: ImageBitmap;
@@ -63,5 +64,8 @@ export function compositionKey(frame: EnvironmentFrame) {
 export function closeLayers(layers: readonly ComposedLayer[]) {
   for (const layer of layers)
     for (const bitmap of [layer.colour, layer.normal, layer.surface, layer.emissive])
-      bitmap?.close();
+      if (bitmap) {
+        retireSceneTexture(bitmap);
+        bitmap.close();
+      }
 }

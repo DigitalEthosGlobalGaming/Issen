@@ -1,4 +1,5 @@
 import { Shader, Texture, UniformGroup } from 'pixi.js';
+import type { TextureSource } from 'pixi.js';
 import { setShaderResource } from './shader-resources.ts';
 
 const textureNames = ['uDiffuse', 'uNormal', 'uMask', 'uSurface'] as const;
@@ -86,9 +87,10 @@ export function createGeometryMaterial(vertex: string, materialUniforms: Uniform
       geometryUniforms.uniforms.uGeometry.set([depthRange, cutoff, alpha]);
       geometryUniforms.update();
     },
-    releaseTextures() {
+    releaseTextures(source?: TextureSource) {
       for (const name of textureNames)
-        setShaderResource(shader.resources, name, Texture.WHITE.source);
+        if (!source || shader.resources[name] === source)
+          setShaderResource(shader.resources, name, Texture.WHITE.source);
     },
     dispose() {
       shader.destroy();

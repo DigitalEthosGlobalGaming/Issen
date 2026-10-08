@@ -134,6 +134,12 @@ Worker context proxies cache bound native methods and adapt image arguments only
 for drawing/patterns. `layer-transfer.ts` copies composed colour/material planes
 concurrently; failures wait for pending copies and close every acquired bitmap
 before the worker reports failure. Completed response ownership remains unchanged.
+Before composed bitmaps close, `texture-revision.ts` notifies GPU consumers of
+final source retirement. Texture stores detach matching bindings in all pooled
+shader slots and immediately destroy their own colour/data/crop textures. Peer
+stores own independent GPU resources; the source owner still closes its pixels.
+Temporary disuse keeps the existing120-frame grace period. This retirement path
+does not change source decoding or scene baking.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output

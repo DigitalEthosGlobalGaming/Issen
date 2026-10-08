@@ -1103,3 +1103,65 @@ roles are recorded in `tmp/probes/local-input-release/README.md`. All sessions
 No captures active. Next capture Canvas attributes/draw state and reduce source
 sampling history at the first divergent draw, before reconsidering input
 retirement. All previously listed goal requirements remain outstanding.
+
+## Phase3 — Native sampling isolation and rejected bitmap map inputs
+
+Draw-state tracing confirms matching transform, alpha, composite, filter,
+smoothing, shadows, srgb/unorm8/software-readback attributes and no context loss
+at divergent samples. Removing WebGL presentation still differs at stages5/7/8.
+Initial no-WebGL probe lacked a required material sink and failed before comparison;
+the corrected diagnostic sink produces raw-plane evidence, not live-view parity.
+A continuously pinned mountain-map-only crop/size history replay with pressure
+PASS24.2s, so that isolated history is insufficient to reproduce the difference.
+
+Snapshots of decoded HTML PBR maps via createImageBitmap make bitmap-versus-bitmap
+repeats exact across18full compositions under pressure (PASS39.9s). They fail
+original native-versus-bitmap parity, as do blob decoding with default or explicit
+premultiplication/colour-space options. All three differ from stage0, with large
+normal/surface/alpha differences and live-view max up to50. Therefore stability
+alone is insufficient: no bitmap map-input implementation is accepted. The explicit
+options probe first had a quoting syntax error; corrected evidence is separate.
+No renderer baking/input behavior or tolerance changed. Cause remains unresolved.
+Ignored probe/config index `tmp/probes/local-input-release/README.md`; corresponding
+JSON `tmp/performance-local-input-release/`. Sessions5497/4650/65911/5594/57303/
+84483/97435terminal; no captures active. Continue other required goal work.
+
+## Phase3 — Prompt GPU retirement for closed composed bitmaps (1.68.20)
+
+`environment/worker-types.ts` announces final source retirement before closing
+each transferred composed bitmap. `texture-revision.ts` uses weak source keys and
+one-shot disposable subscriptions. Each SceneTextureStore releases its own
+colour/data/frame textures immediately; peers retain unrelated sources. Temporary
+disuse retains the existing120-frame grace period. Old subscriptions cannot remove
+a later canvas lifetime's listeners. The source owner remains responsible for close.
+
+The first actual worker/painter test caught shader-source destruction while still
+bound. Before releasing a GPU source, the painter now detaches only matching
+composite/geometry/artwork/leaf bindings throughout its pooled slots, including
+inactive ones. Sprite slots also drop matching textures. Final painter disposal
+removes subscriptions after its shaders are disposed. The existing offscreen
+export release path uses the same targeted detachment. No per-frame listener scan
+is added and scene decoding/baking/seed sequencing stay unchanged.
+
+Eight retirement/loader units PASS;36native worker/lifetime/lighting/instancing/
+UI/resize/context-restore/rendering browsers PASS1.7m; strict/formatting/checked
+production build PASS. New browser tests prove independent GPU consumers,
+colour/data/crop destruction, unrelated-source survival, peer disposal and actual
+worker replacement before the next draw, without feedback/GL/destroyed-binding
+warnings. Initial focused failure and corrected passes are preserved separately.
+
+A mobile-size390x844 DPR2 control disables only final retirement notifications:
+uploaded source counts before replacement/after replacement/after the next draw/
+after owner disposal are12/12/24/24, versus12/0/12/0 with retirement enabled.
+The final rendered pixels match exactly (max0).585x1266 backing planes yield
+nominal RGBA8 source allocation71,098,560→35,549,280bytes after the second draw.
+This excludes renderer attachments/driver allocations and does not prove resident
+GPU peaks. Stable `tmp/performance-texture-retirement/counts.json`; ignored control
+`tmp/probes/texture-retirement/playwright.config.ts`. Logs
+`tmp/performance-texture-retirement-focused.log`, `-corrected.log`, `-browser.log`,
+`-counts.log`, `-build.log`. Session22380terminal; no measurements active.
+
+This covers final composed worker bitmap lifetimes. Other source owners, whole
+decoded/GPU budgets, startup narrowing, native pressure stability, next-mode
+prediction/slots, paced uploads/variants,120Hz fidelity/CPU budget and full
+Phase5measurements/suites/report remain required.

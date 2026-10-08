@@ -156,7 +156,23 @@ export class PixiScenePainter implements SceneDrawing {
   imageSmoothingEnabled = true;
   imageSmoothingQuality: ImageSmoothingQuality = 'low';
   readonly root = new Container();
-  private readonly textures = new SceneTextureStore();
+  private readonly textures = new SceneTextureStore((source) => {
+    if (this.disposed) return;
+    // Inactive pooled slots can still hold shader bindings from an earlier scene.
+    for (const slot of this.slots) {
+      slot.material?.releaseTextures(source);
+      slot.lookup?.releaseTexture(source);
+      slot.leaf?.releaseTextures(source);
+      if (
+        slot.kind === 'sprite' &&
+        slot.item instanceof MeshSimple &&
+        slot.item.texture.source === source
+      ) {
+        slot.item.texture = Texture.EMPTY;
+        slot.image = undefined;
+      }
+    }
+  });
   private roundStrokeTexture?: Texture;
   private readonly brushRings = new Map<string, GraphicsContext>();
   private readonly glyphArrows = new Map<string, GraphicsContext>();
@@ -1253,11 +1269,6 @@ export class PixiScenePainter implements SceneDrawing {
 
   /** Release uploaded sources after an offscreen export has copied its pixels. */
   releaseTextureSources(sources: Iterable<SceneTexture['source']>): void {
-    for (let i = 0; i < this.cursor; i++) {
-      this.slots[i]?.material?.releaseTextures();
-      this.slots[i]?.lookup?.releaseTexture();
-      this.slots[i]?.leaf?.releaseTextures();
-    }
     this.textures.releaseSources(sources);
   }
 

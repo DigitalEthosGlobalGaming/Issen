@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Pinned memory measured; retirement rejected
+# Performance, assets and seamless transitions — Closed worker GPU sources retire promptly
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -387,3 +387,35 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     tmp/probes/local-input-release/README.md. All investigation processes terminal,
     no captures active. No new version/renderer change. Remaining whole-memory,
     source/startup, next-stage, upload,120Hz and Phase5work is unchanged.
+
+17. Further pressure isolation: Canvas draw state/attributes match with no context
+    loss; removing WebGL presentation still differs. A mountain-only crop/size
+    history replay with pressure PASS24.2s. HTML-map bitmap snapshots make the
+    bitmap-versus-bitmap repeat exact across18compositions (PASS39.9s), but original
+    native-versus-bitmap parity FAILS from stage0 for HTML snapshots and both blob
+    decode-option variants (large normal/surface/alpha changes, live max50).
+    All bitmap/input-retirement implementations remain rejected; no tolerance
+    change. Probe index tmp/probes/local-input-release/README.md and stable JSON
+    tmp/performance-local-input-release/. All investigation sessions terminal.
+    Native input sampling-history cause remains unresolved; continue independent
+    required ownership/prediction/upload work without claiming this issue fixed.
+
+18. Final composed-bitmap disposal at1.68.20 now immediately retires each GPU
+    consumer's colour/data/crop textures. Matching composite/geometry/artwork/leaf
+    bindings detach in all pooled slots before destruction; inactive slots were
+    the source of warnings in the first attempt. Temporary disuse retains120-frame
+    grace. Source ownership/close and baking stay unchanged; peer GPU stores remain
+    independent. Eight retirement/loader units,36native rendering/worker/UI/restore/
+    instancing browsers PASS1.7m; strict/format/checked production build PASS.
+    Mobile-size390x844 DPR2 two-stage control counts12→12→24→24 versus current
+    12→0→12→0 (draw/replacement/new draw/owner disposal). Live pixels are exact0;
+    585x1266 planes give nominal old/new RGBA8 source bytes71,098,560→35,549,280
+    after the second draw. These are source estimates, not resident GPU peaks.
+    Stable tmp/performance-texture-retirement/counts.json; ignored reproducible
+    control tmp/probes/texture-retirement/playwright.config.ts. Logs same prefix
+    -focused/-corrected/-browser/-counts/-build. Session22380terminal; no captures.
+    Version/package/lock/title/changelog1.68.20. Remaining main figure/source/
+    startup budgets, native pressure stability, next-mode prediction/slots,
+    paced uploads/variants,120Hz fidelity/CPU budget and full Phase5requirements
+    remain required. GPU retirement for other source-owner lifecycles still needs
+    coverage as they migrate; this is specifically final composed worker bitmaps.
