@@ -1,3 +1,22 @@
+## LIVE W3 phase 1 broad browser gate — resume exact process
+
+Source under verification is committed 4d4ed49, version 1.68.0. Strict/all401
+units and all47 affected native/startup/restore/game/checkpoint browsers PASS.
+Full command now running:
+ npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure
+Unified exec session 14622 is confirmed LIVE by write_stdin returning this handle.
+Log tmp/lighting-refactor/phase1-broad-browser.log; 260 cases, two Edge workers.
+Latest authoritative observation: three passing cases, no reported failure.
+Poll this same handle, do not restart on timeout, and do not edit application/test
+source while live. Documentation-only changes do not change source under test.
+After terminal, fix actual failures without weakening assertions; get a complete
+passing combined invocation. Then record exact broad evidence/commit checkpoint
+and continue immediately to W3 phase 2 fullscreen MRT diffuse/specular lights,
+light-source registry, deterministic 16-light budget, rig integration/debug.
+W3 phases 2–6 and Part 4 are required and pending; goal remains active.
+No develop push until full completion; immutable pre-refactor retained.
+Prior turn made concrete progress (geometry implementation/tests/commit); this
+handle may legitimately span goal continuations. No other browser jobs are live.
 ## W3 phase 1 focused checkpoint green — broad browser next
 
 Final 1.68.0 geometry implementation has strict npm run typecheck PASS and all
