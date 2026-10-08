@@ -25,6 +25,15 @@ export type EnvironmentSnapshot = {
   layers: number;
   pixels: number;
   decodedBytes?: number;
+  decodedLoader?: {
+    queued: number;
+    decoded: number;
+    pinned: number;
+    bytes: number;
+    peakBytes: number;
+    budget: number;
+    evictions: number;
+  };
   timings?: { assets: number; compose: number; transfer: number };
 };
 export type ComposeRequest =

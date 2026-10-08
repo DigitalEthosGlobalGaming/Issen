@@ -63,6 +63,10 @@ and charm alignment, mirrored cached normals, procedural occlusion, shader
 coverage and all nine stage caches. Visual approval is pending.
 
 Shared loading belongs to [asset-materials.ts](../../src/rendering/asset-materials.ts).
+Worker decoded resources now share the priority/pin/LRU loader in
+`src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
+device-class budgets. Main figure/UI/startup loader migration remains pending;
+the inventory total is not a configured whole-application residency budget.
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
 Only packs selected by a renderer are decoded. Generated maps are excluded from

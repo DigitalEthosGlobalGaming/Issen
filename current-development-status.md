@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 inventory checkpoint complete
+# Performance, assets and seamless transitions — Phase 3 worker loader verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -156,11 +156,36 @@ Continue:
    exact alpha/all180data planes,324lossless WebP/11compactPNG/17lossyWebP. Do not
    repeat asset compaction or resume packing. Current version/lock/title/changelog1.68.7.
    All processes terminal:66010compose;89376/71874/11881browsers; build terminal.
-   No live capture. Next implement3.3compressed prefetch and3.4shared per-thread
+   No live capture at that checkpoint. Next implement3.3compressed prefetch and3.4shared per-thread
    priority/pin/LRU decoded loader. Proposed256/384MB mobile,512MB desktop defaults
    must be validated for current+next scenes plus figures/UI; not yet implemented.
    Phase4next-seed/scene slots, upload warming/cosmetic loading andPhase5full
    verification remain. Seed determinism risk is the only user-decision gate.
+
+4. Shared loader core and worker integration verified at1.68.8. New
+   platform/decoded-images.ts provides serial priorities, shared promises,
+   priority bump, task yields, reference-counted pins, warm unpin, bounded LRU,
+   pre-decode reservations from catalog dimensions and close-on-disposal/late
+   failure handling. Worker wrappers share bitmap resources, release pins on
+   clear, and expose decodedLoader snapshot diagnostics. Six new units+four
+   worker units PASS; four existing worker browsers PASS; checked build PASS.
+   Two actual worker retention cycles PASS (9stages×3,390x844 DPR2): desktop512MiB
+   peak534,788,792bytes/76evictions; low-memory256MiB peak264,275,504/246evictions.
+   Saved27samples each in tmp/test-results/rendering-v2/worker-decoded-budget-work-*/
+   worker-budget-cycle.json. Browser navigator fixtures simulate device class;
+   this does not prove physical phone performance or resident GPU memory.
+   tmp/performance-compose-phase3-worker-loader PASS45/116byte-identical planes;
+   stage0median715.2ms remains>500, others286–460ms. No speedup claim; preparation
+   is excluded by this predecoded fixture and must be remeasured after prefetch.
+   All handles15353/99259/58196/15995/96977terminal; no live capture.
+   Version/package/lock/title/changelog1.68.8. Main figure/UI/startup image owners
+   remain outside this loader; whole-app memory remains unbounded. Worker uses
+   navigator device class only; runtime quality/density budget changes are pending.
+   Next: main-thread managed image ownership (preserve independent previews and
+   cached-material bindings), remove lifetime startup retention/startup-only
+   sources, compressed prefetch, background policy wiring and quiet next-stage
+   decode. Current worker decode interpretation is intentionally unchanged;
+   any bitmap premultiplication/colour-space changes require raw-plane parity.
 
 Goal remains active; final full suites, final traces, budgets, new loader/seed/
 next-slot/loading-state tests, final report and any final push are outstanding.

@@ -619,3 +619,66 @@ deletion or extra compressed-size gain is claimed for that selection change.
 Both duplicate-atlas and existing-WebP findings are recorded. Continue with
 compressed prefetch and a shared priority/pin/LRU decoded-image loader, then
 next-seed/scene slots and paced GPU warming; startup-only assets must be excluded.
+
+## Phase 3.4 — Shared loader core and worker integration
+
+Version1.68.8 adds `platform/decoded-images.ts`: one serial decode queue with
+`now`/`soon`/`idle` priorities, duplicate shared promises, queued priority bumps,
+task yields, reference-counted pins and LRU eviction of unpinned resources.
+Both background priorities pause while hidden, busy or over the frame budget;
+required now requests bypass those gates. Worker callers currently use now only.
+Unpin retains a warm source until budget pressure. Only the loader closes shared
+ImageBitmaps; clearing a worker image releases its pin and cancels its callback,
+without closing a peer owner's bitmap. Loader disposal aborts outstanding work,
+rejects queues and closes late decoded results exactly once.
+
+Installed catalog dimensions reserve nominal decoded bytes before worker decode,
+evicting unpinned old images first. If mandatory pins leave insufficient room,
+the request fails without closing live sources or allocating another known-size
+bitmap. Decoded dimensions must match the reservation. This bounds retained plus
+reserved RGBA estimates, not native decoder overhead, canvas caches or resident
+GPU textures. Unknown-size generic callers have only post-decode admission;
+remaining main integration must provide dimensions or measure that limitation.
+
+Budget helper defaults are256MiB for low quality/deviceMemory≤2,384MiB for other
+mobile and512MiB desktop. Worker construction uses deviceMemory/user-agent
+class; runtime quality/density changes are not yet wired. The core supports
+hidden/busy/frame-budget policy, but runtime background requests/policy wiring
+are still pending. Main figure/UI/startup owners remain outside the loader.
+Whole-application memory is therefore not yet bounded, and no cold-load or
+startup no-regression claim is made for this partial integration.
+
+Six new units PASS: shared promises/priority bumps and paused background work,
+LRU/pin peers/unpin warm retention, pinned pressure/oversize rejection, pending
+disposal/late close/retry, pre-decode reservation, and device defaults. Four
+worker method/transfer ownership units also PASS. Existing four worker browsers
+PASS for all-nine compositions, local fallback, coalescing/disposal and hidden
+owners. Checked production build and strict checks PASS; logs include
+`tmp/performance-phase3-worker-loader-build.log` and
+`tmp/performance-phase3-worker-reservation-browser.log`.
+
+Persistent worker tests cycle all9stages3times at390x844 DPR2. Test-only worker
+navigator settings select the actual256/512MiB constructor policies; no production
+code override. Both PASS: desktop peak534,788,792bytes≤536,870,912budget,76evictions;
+low-memory peak264,275,504≤268,435,456budget,246evictions. Final pinned kit25images,
+157,292,768bytes; final total retention534,784,704desktop/264,252,032low-memory.
+`worker-budget-cycle.json` attachments under
+`tmp/test-results/rendering-v2/worker-decoded-budget-work-*` retain all27samples
+per setting. Log `tmp/performance-phase3-worker-device-budget.log` PASS2.
+These browser simulations prove configured retention/pin behavior, not physical
+phone CPU/GPU residency or whole-application memory.
+
+`tmp/performance-compose-phase3-worker-loader` PASS45/116raw planes, all
+byte-identical to Phase3material-only reference. Compose median/p95 by stage0–8:
+715.2/777.5,299.3/339.5,345.4/380.2,459.6/470.2,416.9/437.7,285.9/325.0,
+370.3/411.6,307.2/332.3,297.7/321.4ms. Stage0remains above500ms and timing is
+mixed; no speedup claim. Fresh worker decoded bytes remain113–214MB. Compose
+measurement excludes the predecoded prepare interval; serial cold preparation
+must be remeasured after compressed prefetch/main loading integration.
+
+All current processes terminal:15353initial browser,99259cycle,58196reserved
+browser,15995compose,96977device budget; no active capture. Continue main-thread
+loader ownership/integration and compressed CacheStorage/HTTP prefetch, excluding
+startup-only sources. Then implement quiet next-stage decode/prediction/scene
+slots, paced texture/variant warming and cosmetic-only loading, and finish the
+remaining high-refresh CPU/motion fidelity plus full Phase5verification.

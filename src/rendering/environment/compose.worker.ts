@@ -48,6 +48,7 @@ scope.onmessage = ({ data }) => {
       const snapshot = {
         ...renderer.snapshot(),
         decodedBytes: workerDocument.decodedSnapshot().bytes,
+        decodedLoader: workerDocument.decodedSnapshot(),
         timings: {
           assets: assetsAt - started,
           compose: composedAt - assetsAt,

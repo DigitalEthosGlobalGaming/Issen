@@ -149,6 +149,14 @@ UI lighting request data maps only; direct player/enemy PBR owners retain their
 explicit diffuse colour path. Inventory generation lives in
 `scripts/assets/runtime-inventory.mjs`, including startup-only and redundant
 diffuse roles separately from actual on-screen selections.
+`platform/decoded-images.ts` owns a serial priority decode queue with shared
+promises, reference-counted live pins and pixel-byte LRU eviction. Known atlas
+dimensions reserve space before decoding; admitted and reserved bytes are
+bounded, while native decoder overhead is outside the nominal estimate. Worker
+image wrappers share loader-owned ImageBitmaps and release pins when cleared;
+only the loader closes cached bitmaps. Snapshot diagnostics include queues,
+residency, pins, bytes, peak, budget and evictions. Main figure/UI/startup owners
+are not yet routed through this loader; whole-application memory remains unbounded.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and
