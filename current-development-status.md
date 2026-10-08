@@ -1,4 +1,34 @@
-# Performance, assets and seamless transitions — Multi-size native sampling isolated
+# Performance, assets and seamless transitions — Fresh-decode pixel control established
+
+Latest checkpoint 43 is diagnostic only; app remains 1.68.35. Independently
+decoding the foam atlas before each Shore build resets the native multi-size
+sampling difference and reproduces the original cold pixels exactly. The final
+same-encoded-blob control checks all 12 colour/normal/surface/emissive planes:
+foam-only refresh and all-source refresh each pass 48 exact hashes across four
+builds. Retaining the original source reproduces the original far-colour delta
+on all three repeats (51,684 channels, max255, alpha23); its other 11 planes match.
+Fresh destinations and unchanged map sources are used. No encoded byte copy is
+needed. This establishes a useful pixel-preserving diagnostic control, not a
+production preload or sampling fix.
+
+All-CPU Shore contexts instead produce a stable different fingerprint. Making
+only colour cutouts CPU-backed changes both original fingerprints and still
+varies between the first and later builds. Neither is integrated. Re-decoding
+has not been timed as a production operation or admitted within the whole-game
+memory budget. No implementation, assets, visual gates or version changed.
+Evidence remains under tmp/probes/scene-image-preload/ and
+tmp/performance-scene-image-preload/isolation/. All probe handles are terminal.
+
+Next use fresh-decode and retained-source controls with matching draw histories
+to validate raw/native output in the actual worker/local preload trial across
+every stage and geometry. Do not infer application parity from Shore alone or
+replace retained resources with repeated required decoding without measuring
+its costs. Then implement admitted worker/local next slots, exact promotion and
+quiet pacing. Whole-game decoded/GPU bounds, figure/startup ownership, 120Hz/CPU
+budgets and full Phase5 remain required. Full goal active; no push/deploy/native
+build/player saves.
+
+## Previous handoff — Multi-size native sampling isolated
 
 Latest checkpoint 42 is diagnostic only; app remains 1.68.35. The rejected
 Shore colour change reproduces without gameplay, prediction, preloading or material

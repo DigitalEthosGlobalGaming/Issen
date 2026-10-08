@@ -2364,3 +2364,49 @@ Next isolate the mixed full-Shore interaction and verify a pixel-preserving
 sampling fix before restoring quiet decoded-soon work and admitted next slots.
 Whole-game memory/transient admission,figure/startup ownership,120Hz/CPU budgets
 and fullPhase5 remain required. Full goal active.
+
+## Checkpoint 43 — Pixel-preserving fresh-decode control
+
+Diagnostic only; production remains 1.68.35. Making the entire Shore canvas
+baking chain CPU-backed makes all 16 far-colour hashes repeatable, but its hash
+differs from both original cold and warm outputs. Changing only colour-cutout
+contexts also changes both hashes and retains a first-to-repeat difference of
+51,823 channels, max255, alpha23. Neither treatment preserves original pixels;
+neither is integrated. These fixture durations do not establish production
+compose costs.
+
+Independent fresh decoding resets the source-history effect. Foam-only blob-HTML
+and default ImageBitmap sequences each repeat exactly when decoding a new source
+for each build; reusing the same encoded Blob also suffices. This differs from
+cloning an already-used ImageBitmap, which did not reset the effect in checkpoint
+42. No claim about the browser's internal implementation is made.
+
+The full Shore fresh-data probe checks 32 cases across material bindings on/off,
+destination reuse/freshness and refreshing foam alone/all sources. Every far-colour
+hash equals the original cold fingerprint. An expanded 144-plane probe checks
+all three layers' colour/normal/surface/emissive output across four builds for
+three controls: retained sources, fresh foam and fresh all sources. The final
+same-encoded-blob version includes exact hash and delta assertions. Both refresh
+controls pass all 48 hashes against the retained control's original cold planes.
+Retained sources reproduce the original 51,684-channel far-colour difference on
+all three repeats, max255, alpha23; its other 11 planes remain exact. Thus foam
+refresh alone preserves original cold output throughout this particular full
+Shore fixture, with unchanged material-map sources and fresh destination canvases.
+
+This establishes a diagnostic control, not a production solution: it has not
+proved worker/native application parity across every stage, geometry or quality,
+and repeated decoding has not been measured or admitted within the overall
+memory budget. Do not normalize production pixels, loosen tolerances or enable
+automatic preload based only on this fixture. Next validate original/candidate
+preload with matched source draw histories and fresh-decode controls, then resume
+whole-budget worker/local next-slot work and promotion/invalidation/quiet pacing.
+
+Sources under tmp/probes/scene-image-preload/: shore-all-cpu, shore-cutout-cpu,
+foam-fresh-data, shore-fresh-data, foam-redecode, shore-fresh-planes and
+shore-redecode-planes. Archived JSON under
+tmp/performance-scene-image-preload/isolation/. All seven probes pass their
+respective count/assertion checks; only the final full-plane probe asserts exact
+original/candidate hashes and expected retained-source deltas. All handles
+terminal. No implementation/version/asset/visual-gate change or headline benchmark
+rerun; full Phase5 and the remaining goal budgets are still required. No
+push/deploy/native build/player saves; full goal active.
