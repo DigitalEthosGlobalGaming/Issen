@@ -20,10 +20,11 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     resource?: T;
     bytes: number;
     touched: number;
+    controller?: AbortController;
   };
   const entries = new Map<string, Entry>();
   const pins = new Map<string, number>();
-  const controller = new AbortController();
+  const preloads = new Set<() => void>();
   let reservedBytes = 0;
   let bytes = 0,
     peakBytes = 0,
@@ -35,6 +36,21 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     busy = false,
     overFrameBudget = false;
   const yieldTask = options.yield ?? (() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
+  function pin(url: string) {
+    if (disposed) return () => {};
+    pins.set(url, (pins.get(url) ?? 0) + 1);
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      const count = pins.get(url) ?? 0;
+      if (count <= 1) pins.delete(url);
+      else pins.set(url, count - 1);
+    };
+  }
+  function cancelPreloads() {
+    for (const release of preloads) release();
+  }
   function evict(entry: Entry) {
     entry.resource!.close();
     bytes -= entry.bytes;
@@ -69,10 +85,12 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
             throw Error(`Decoded image budget exhausted: ${entry.url}`);
           reservedBytes = expected;
           peakBytes = Math.max(peakBytes, bytes + reservedBytes);
-          const resource = await options.decode(entry.url, controller.signal);
+          entry.controller = new AbortController();
+          const resource = await options.decode(entry.url, entry.controller.signal);
           const size = resource.width * resource.height * 4;
           if (
             disposed ||
+            entry.controller.signal.aborted ||
             !Number.isFinite(size) ||
             size <= 0 ||
             (expected && expected !== size) ||
@@ -97,7 +115,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           entry.resolve(resource);
         } catch (error) {
           reservedBytes = 0;
-          entries.delete(entry.url);
+          if (entries.get(entry.url) === entry) entries.delete(entry.url);
           entry.reject(error);
         }
         if (!disposed) await yieldTask();
@@ -106,41 +124,71 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
       running = false;
     }
   }
+  function load(url: string, priority: ImagePriority = 'now'): Promise<T> {
+    if (disposed) return Promise.reject(Error('Decoded image loader disposed'));
+    let entry = entries.get(url);
+    if (entry) {
+      entry.touched = ++sequence;
+      if (rank[priority] < rank[entry.priority]) entry.priority = priority;
+    } else {
+      let resolve!: (value: T) => void, reject!: (error: unknown) => void;
+      const promise = new Promise<T>((yes, no) => {
+        resolve = yes;
+        reject = no;
+      });
+      entry = { url, priority, promise, resolve, reject, bytes: 0, touched: ++sequence };
+      entries.set(url, entry);
+    }
+    // A required consumer wins over speculation, including a shared queued URL.
+    if (priority === 'now') cancelPreloads();
+    void pump();
+    return entry.promise;
+  }
   return {
-    load(url: string, priority: ImagePriority = 'now'): Promise<T> {
-      if (disposed) return Promise.reject(Error('Decoded image loader disposed'));
-      let entry = entries.get(url);
-      if (entry) {
-        entry.touched = ++sequence;
-        if (rank[priority] < rank[entry.priority]) entry.priority = priority;
-      } else {
-        let resolve!: (value: T) => void, reject!: (error: unknown) => void;
-        const promise = new Promise<T>((yes, no) => {
-          resolve = yes;
-          reject = no;
-        });
-        entry = { url, priority, promise, resolve, reject, bytes: 0, touched: ++sequence };
-        entries.set(url, entry);
+    load,
+    pin,
+    /** Hold one admitted future image set without mutating renderer bindings. */
+    prefetch(urls: readonly string[]) {
+      if (disposed || hidden || busy || overFrameBudget) return undefined;
+      const required = new Set([...pins.keys(), ...urls]);
+      let mandatory = 0;
+      for (const url of required) {
+        const size = entries.get(url)?.bytes || options.expectedBytes?.(url);
+        if (!size || !Number.isFinite(size) || size <= 0) return undefined;
+        mandatory += size;
       }
-      void pump();
-      return entry.promise;
-    },
-    pin(url: string) {
-      if (disposed) return () => {};
-      pins.set(url, (pins.get(url) ?? 0) + 1);
+      if (mandatory > options.budget) return undefined;
+      const unique = [...new Set(urls)],
+        releases = unique.map(pin);
       let released = false;
-      return () => {
+      const release = () => {
         if (released) return;
         released = true;
-        const count = pins.get(url) ?? 0;
-        if (count <= 1) pins.delete(url);
-        else pins.set(url, count - 1);
+        preloads.delete(release);
+        for (const unpin of releases) unpin();
+        for (const url of unique) {
+          const entry = entries.get(url);
+          if (!entry || entry.resource || entry.priority === 'now' || pins.has(url)) continue;
+          entries.delete(url);
+          entry.controller?.abort();
+          entry.reject(new DOMException('Image preload cancelled', 'AbortError'));
+        }
       };
+      preloads.add(release);
+      const ready = Promise.all(unique.map((url) => load(url, 'soon'))).then(
+        () => !released,
+        () => {
+          release();
+          return false;
+        },
+      );
+      return { ready, release, active: () => !released };
     },
     policy(next: { hidden?: boolean; busy?: boolean; overFrameBudget?: boolean }) {
       hidden = next.hidden ?? hidden;
       busy = next.busy ?? busy;
       overFrameBudget = next.overFrameBudget ?? overFrameBudget;
+      if (hidden || busy || overFrameBudget) cancelPreloads();
       void pump();
     },
     snapshot() {
@@ -162,8 +210,9 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     dispose() {
       if (disposed) return;
       disposed = true;
-      controller.abort();
+      cancelPreloads();
       for (const entry of entries.values()) {
+        entry.controller?.abort();
         if (entry.resource) entry.resource.close();
         else entry.reject(Error('Decoded image loader disposed'));
       }

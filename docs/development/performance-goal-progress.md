@@ -2271,3 +2271,54 @@ Goal active; no push/deploy/native build/player saves.
 Checked production build (strict TypeScript) and all four bundle checks PASS21.6s,
 including startup, Armoury/gameplay/landscape, edition gates and offline resize.
 All handles terminal; architecture, metadata and release notes synchronized.
+
+## Checkpoint 41 — Admitted image sets; renderer preload trial rejected
+
+Integrated 1.68.35 adds an explicit loader `prefetch` API and main-owner forwarding.
+It admits the union of a measured future set and existing pins before serial
+soon decoding, shares promises/resources and keeps completed images in the LRU.
+Busy,hidden or over-budget policy and now requests cancel future leases. Promoted
+or peer-pinned requests survive; orphaned pending work aborts,late resources close,
+and stale failures cannot delete a replacement entry. `sceneImageUrls` matches
+active environment colour/normal/surface/emissive selections and skips diffuse.
+This is a tested API foundation; runtime automatic next decoding remains disabled.
+
+The native main API guard visits all 9 stages with one protected peer image. All
+admitted sets reuse decoded images when requested now (zero extra decodes),peak
+264,275,216 bytes is below256 MiB, 63 LRU evictions occur and final disposal reports
+zero bytes. Four new units cover union admission/shared leases,policy cancellation/
+late cleanup,required promotion and replacement-request isolation. All 470 units
+PASS 2088.8 ms. Related16 browsers PASS 52.0 s,including original worker plane lifetime,
+native rendering,256/512 MiB cycles,local pressure/stale requests,worker fallback,
+coalescing and visibility. Checked production build (strict TypeScript) and all 4
+bundle checks PASS 21.5 s,including offline resize. Existing tolerances are unchanged.
+
+Automatic quiet-frame observer and worker preload protocol trial was rejected.
+It required settled matching geometry/quality,used exact forecast keys,cancelled
+on busy/hidden/stale identity and left current bindings/planes intact. Required
+local decodes reused future images,with unchanged held scenes and builds. But
+27-visit original/candidate guards found incoming raw/native changes on subsequent
+visits. Quantified local candidate native max 32 versus unchanged-control max 13;
+Shore colour max 255 changes 51,684 channel values,including alpha max 23. That colour
+change was absent from the quantified unchanged control and resembles checkpoint 40.
+Candidate data maps can differ by 255; unchanged reload controls also exhibit data
+map max 255 and alpha changes,so attribution cannot rely on cross-reload hashes
+alone. Warmed unchanged controls still fail. Do not loosen the raw/native gates.
+
+Worker trial initially hid main preload diagnostics under the response snapshot's
+undefined local field. Fixed only in trial,then actual awaited future decoding
+still fails stage-zero low-quality colour-plane equality on the second lap.
+All five tracked renderer/protocol files restored exactly. Observer and its new
+unit/browser integration tests moved to ignored trial evidence; no automatic
+renderer preparation,decode,compose or slot promotion was integrated. Worker and
+local decode interpretation,current planes and original raw pins remain unchanged.
+
+Evidence under tmp/performance-scene-image-preload/: first failed captures,
+cold/warm unchanged controls,quantified compressed raw captures and
+pixel-differences.json,final worker trial,trial source/tests and accepted API/unit
+evidence. Probes under tmp/probes/scene-image-preload/. No repeat headline timing
+suite or latency/frame-budget claim for this checkpoint. The source-sampling
+history root cause is unproven and must be resolved with a reliable comparison
+before enabling next decoding. Whole-game memory/transient admission,worker/local
+next slots/promotion,figure/startup ownership,120Hz/CPU budgets and full Phase 5 remain.
+Full goal active;no push/deploy/native build/player saves.

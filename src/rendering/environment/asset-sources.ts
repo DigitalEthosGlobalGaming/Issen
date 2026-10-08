@@ -1,3 +1,5 @@
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+const materialPacks = new Map(assetMaterialCatalog.map((pack) => [pack.source, pack]));
 const CHERRY_URL = new URL('./assets/cherry-trees-atlas.webp', import.meta.url).href;
 const PETALS_URL = new URL('./assets/petal-ground-atlas.webp', import.meta.url).href;
 const BAMBOO_URL = new URL('./assets/bamboo-atlas.webp', import.meta.url).href;
@@ -58,4 +60,19 @@ export function sceneAssetIndices(stage: number): number[] {
   if (stage === 7) return [2, 3, 4, 6, 10, 21, 22, 25, 27];
   if (stage === 8) return [2, 3, 6, 9, 17, 20, 25, 27];
   return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
+}
+
+/** Same colour and aligned maps as prepare(), without creating active bindings. */
+export function sceneImageUrls(stage: number): string[] {
+  return [
+    ...new Set(
+      sceneAssetIndices(stage).flatMap((index) => {
+        const source = environmentAssetUrls[index]!;
+        const maps = materialPacks.get(source)?.maps;
+        return [source, maps?.normal, maps?.surface, maps?.emissive].filter(
+          (url): url is string => !!url,
+        );
+      }),
+    ),
+  ];
 }

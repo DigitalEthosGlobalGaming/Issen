@@ -95,6 +95,17 @@ export function createMainImageOwner(doc: Document) {
   const releases = new Set<() => void>();
   let disposed = false;
   return {
+    prefetch(urls: readonly string[]) {
+      if (disposed || urls.some((url) => !dimensions.has(url))) return undefined;
+      const preload = shared.loader.prefetch(urls);
+      if (!preload) return undefined;
+      const release = () => {
+        preload.release();
+        releases.delete(release);
+      };
+      releases.add(release);
+      return { ready: preload.ready, release, active: preload.active };
+    },
     acquire(url: string, priority: ImagePriority = 'now') {
       if (disposed) throw Error('Main image owner disposed');
       if (!dimensions.has(url)) throw Error(`Runtime image dimensions unavailable: ${url}`);

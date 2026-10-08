@@ -198,8 +198,22 @@ bounded, while native decoder overhead is outside the nominal estimate. Worker
 image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, uniquely pinned decoded bytes, total bytes, peak, budget and
-evictions. Main figure/startup owners
-are not yet routed through this loader; whole-application memory remains unbounded.
+evictions.
+
+The loader's explicit `prefetch` API admits a complete known image set together
+with existing pins before starting serial soon decodes. Its independent leases
+share queued work and warm resources, without changing renderer bindings. A now
+request or busy/hidden/over-budget policy cancels future leases, aborts orphaned
+pending decodes and preserves promoted/shared consumers. Late cancelled results
+close instead of publishing over a replacement request. The main image owner
+exposes this API with owner disposal and peer lifetime protection. Admission covers
+nominal decoded bytes only; composition canvases, copies and GPU memory are outside
+it. Automatic next-scene decode remains disabled: the integration trial changed
+repeated-visit colour planes. `sceneImageUrls` enumerates the same colour and data
+maps as environment preparation, excluding unused diffuse maps.
+
+Main figure/startup owners are not yet routed through this loader;
+whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the budgeted loader. One pool-level quiet-frame/visibility subscription pauses
 soon/idle requests until a visible settled frame uses at most75% of its budget.

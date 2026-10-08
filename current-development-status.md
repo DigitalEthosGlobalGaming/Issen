@@ -1,4 +1,45 @@
-# Performance, assets and seamless transitions — Worker cutouts retire before copy
+# Performance, assets and seamless transitions — Admitted image preload API
+
+Latest checkpoint 41: integrated 1.68.35 adds explicit decoded-image set admission,
+shared future leases, cancellation and native main-owner forwarding. Known sets
+must fit together with existing pins; required loads and busy/hidden/over-budget
+policy cancel speculation without cancelling promoted or peer consumers. Late
+cancelled resources close and cannot remove a replacement request. Environment
+image enumeration matches active colour/data selections, excluding unused diffuse.
+The API is not enabled in gameplay. Automatic worker/local integrations were
+rejected and restored; no next-slot or transition-latency gain is claimed.
+
+New native image API test visits all nine stages with a protected peer image:
+peak 264,275,216 bytes within 256 MiB, 63 LRU evictions, zero new decodes when each
+admitted set becomes required,one surviving peer pin and final bytes 0. All 470
+units PASS 2.09 s; related 16 browser checks PASS 52.0 s, including original plane
+lifetime/native rendering,256/512 MiB cycles,local input pressure,stale requests,
+worker fallback/coalescing/hidden handling. Checked production build (strict
+TypeScript) and all 4 bundle tests PASS 21.5 s, including offline resize.
+
+Rejected preload integration compared 27 visits per path across portrait high/low
+and landscape high. Local incoming raw planes/native output differ, including
+Shore colour max 255 across 51,684 channel values; quantified native max 32. Separate
+unchanged reload controls also vary in data maps (max 255) and native pixels (max 13),
+so those cross-reload hashes alone are not a reliable attribution control. But
+candidate adds colour differences not present in that control; do not accept it
+or loosen gates. Worker diagnostic overwrite was fixed in the trial, then the
+actual waiting preload run still failed repeated stage-zero low colour hashes.
+All five tracked renderer integration files restored exactly; trial observer,
+tests and source moved to ignored evidence. This resembles the earlier raw-input/
+plane-retirement source-sampling history problem; root cause remains unproven.
+
+Evidence: tmp/performance-scene-image-preload/ contains failed original/trial,
+cold/warm controls, compressed raw pixel captures,quantified differences and
+accepted native API/unit evidence. Probes: tmp/probes/scene-image-preload/.
+Next establish a reliable original/candidate source-sampling control and resolve
+repeat-visit colour changes before re-enabling quiet decoded-soon work. Then
+reconcile transient compose/copy,current/next output and decoded LRU headroom for
+worker/local slot admission and exact promotion/invalidation. Figure/startup
+ownership,whole-game decoded/GPU bounds,120Hz/CPU budgets and full Phase 5 remain
+required. Full goal active; no push/deploy/native build/player saves.
+
+## Previous handoff — Worker cutouts retire before copy
 
 Latest checkpoint 40: integrated 1.68.34 clears all worker stamp cutouts/scratch
 before parallel bitmap copies; completed planes and raw image pins remain cached.
