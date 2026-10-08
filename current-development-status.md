@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Cosmetic loading dispatch verified
+# Performance, assets and seamless transitions — Loading veil and visible motion verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -319,3 +319,18 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     lock/title/changelog1.68.16.150ms loading treatment/direct moving-pixel proof
     remain pending, alongside main ownership/active selections, mode prediction/
     next slots, paced upload/variants,120Hz fidelity and full Phase5requirements.
+
+13. Delayed static ink veil at1.68.17 follows scene-state after150ms and cancels
+    immediately after presentation; short/repeated loads and reduced-motion media
+    are covered. Loading scheduling stays awake even when paused; hit-stop/slowT
+    inputs are masked so frameDelta cannot spend combat timers. Actual held stage
+    requests show303,422changed pixels over0.8167s active and304,235over0.8333s
+    paused, with identical G/player/hazard/run-RNG/hit-stop state. Seven focused
+    scene/continued-run browsers PASS1.0m,13loading/weather/frame units PASS;
+    strict/format/checked production build PASS. Mobile veil screenshot reviewed.
+    Stable captures/JSON: tmp/performance-loading-veil; logs same prefix with
+    -browser.log/-build.log. Session72306terminal, no captures active. Version/
+    package/lock/title/changelog1.68.17. This proves the selected held-load flow,
+    not all cold/warm scenes or seamless promotion. Remaining main image ownership/
+    active selections/startup budget, mode prediction/next slots, paced uploads/
+    variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.

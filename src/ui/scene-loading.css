@@ -1,0 +1,54 @@
+/* The scene-state selector cancels the delay immediately after presentation.
+   A static brush veil avoids motion/flashes under either accessibility setting. */
+#sceneLoadingTreatment {
+  position: absolute;
+  left: 50%;
+  bottom: max(12%, calc(env(safe-area-inset-bottom, 0px) + 24px));
+  transform: translateX(-50%);
+  padding: 18px 38px;
+  width: max-content;
+  max-width: 90%;
+  color: var(--paper);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  pointer-events: none;
+  visibility: hidden;
+}
+#sceneLoadingTreatment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(19, 18, 16, 0.88);
+  clip-path: polygon(
+    0 26%,
+    8% 18%,
+    5% 12%,
+    24% 15%,
+    42% 8%,
+    73% 13%,
+    95% 8%,
+    91% 21%,
+    100% 29%,
+    96% 55%,
+    99% 72%,
+    87% 77%,
+    94% 86%,
+    66% 83%,
+    44% 91%,
+    18% 84%,
+    3% 89%,
+    7% 70%,
+    1% 62%,
+    4% 44%
+  );
+}
+#c:is([data-scene-state='loading'], [data-scene-state='unavailable']) + #sceneLoadingTreatment {
+  animation: scene-loading-delay 1ms step-end 150ms forwards;
+}
+@keyframes scene-loading-delay {
+  to {
+    visibility: visible;
+  }
+}

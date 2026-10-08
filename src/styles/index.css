@@ -1,6 +1,7 @@
 @import './tokens.css';
 @import './base.css';
 @import './hud.css';
+@import '../ui/scene-loading.css';
 @import './screens.css';
 @import '../ui/screens/armory.css';
 @import '../ui/screens/setup-reveals.css';

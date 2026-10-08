@@ -971,3 +971,31 @@ remain pending; this dispatch step does not prove seamless promotion or no froze
 screen under every slow load. Remaining image/active selection budgets, mode
 prediction/next slots, paced texture/variant upload,120Hz fidelity/CPU budget and
 full Phase5measurements/suites/report remain required.
+
+## Phase4 — Delayed loading veil and actual held-load motion (1.68.17)
+
+The static ink veil says “Preparing scenery” through a semantic status region.
+`ui/scene-loading.css` follows the existing canvas scene-state attribute, becoming
+visible after150ms and hiding immediately on presentation. Short loads never show
+it; repeated loads restart the delay. No continuous movement, opacity pulse or
+flashes are added, including under reduced-motion media. Mobile screenshot reviewed.
+
+The held-load test exposed a scheduler edge case: `frameDelta` could consume slowT/
+hit-stop before the cosmetic-only simulation dispatch, while pause could suppress
+cosmetic updates. `runtime/frame-bindings.ts` now masks those timing inputs during
+loading, forces cosmetic update/render demand, and permits the loading dispatch
+while paused. Normal scheduling and paused continuation adoption are unchanged.
+
+Actual held stage requests at390x844 produced303,422changed pixels over0.8167s
+in active play and304,235over0.8333s paused (RGB difference sum>6). G/player/hazard
+state, run RNG, hit-stop and slow-motion timers remain identical across each
+capture. This includes nonzero5s slowT/hit-stop inputs. Seven focused scene/readiness/
+continued-run browsers PASS1.0m;13loading/weather/frame-loop units PASS;
+strict/format/checked production build PASS. Stable PNG/JSON evidence lives under
+`tmp/performance-loading-veil`; browser/build logs use that prefix with
+`-browser.log`/`-build.log`. Session72306terminal, no measurements active.
+
+This is direct moving-pixel evidence for the tested held request, not proof for
+every cold/warm stage or next-slot promotion. Main figure/other source ownership,
+startup budget narrowing, mode prediction/next slots, paced uploads/variants,
+120Hz fidelity/CPU budget and full Phase5requirements remain outstanding.

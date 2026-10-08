@@ -213,6 +213,11 @@ clock, ambient/transition motion, cosmetic weather particles, camera and apparel
 It uses unscaled presentation elapsed time without advancing run timers, players,
 enemies, encounters, trial completion or run RNG. Loading weather uses a temporary
 copy of hazard state with the cosmetic RNG; live hazard fields remain unchanged.
+`runtime/frame-bindings.ts` keeps cosmetic scheduling awake during loading even
+when paused, and masks hit-stop/slow-motion inputs so the scheduler cannot decrement
+combat timers. The static status veil in `ui/scene-loading.css` follows the canvas
+scene-state attribute after150ms, cancelling immediately on presentation. It adds
+no movement or flashing under either accessibility setting.
 
 `game/session/run-flow.ts` owns title/pause/resume/quit controls and current run/
 profile identity restoration. `game/session/checkpoint-flow.ts` owns v1 record

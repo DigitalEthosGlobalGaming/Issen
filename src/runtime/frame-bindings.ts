@@ -262,14 +262,17 @@ export function createFrameBindings(
   }
   const frameLoop = createFrameLoop(
     {
+      // Loading consumes presentation elapsed time without spending combat timing.
       get hitStop() {
-        return readViews().hitStop;
+        const views = readViews();
+        return views.sceneLoading ? 0 : views.hitStop;
       },
       set hitStop(value) {
         readViews().hitStop = value;
       },
       get slowT() {
-        return readViews().G.slowT;
+        const views = readViews();
+        return views.sceneLoading ? 0 : views.G.slowT;
       },
       set slowT(value) {
         readViews().G.slowT = value;
@@ -287,14 +290,15 @@ export function createFrameBindings(
         preparedFrame = undefined;
       },
       demand: () => {
-        const { cinematic, screenAnimation, G, armory } = readViews();
+        const { sceneLoading, cinematic, screenAnimation, G, armory } = readViews();
+        if (sceneLoading) return { update: true, render: true, afterRender: false };
         return cinematic.active
           ? { update: true, render: true, afterRender: false }
           : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded);
       },
       paused: () => {
-        const { G, guided } = readViews();
-        return G.state === 'paused' || guided.frozen;
+        const { sceneLoading, G, guided } = readViews();
+        return !sceneLoading && (G.state === 'paused' || guided.frozen);
       },
       update,
       render,
