@@ -1,5 +1,5 @@
 import { createAudio } from '../../audio/audio.ts';
-import { createGuidedLessons } from '../../game/onboarding/guided-lessons.ts';
+import { createGuidedLessons } from './guided-lessons.ts';
 import type { Settings } from '../../platform/settings.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
 export interface RuntimeAudioViews {

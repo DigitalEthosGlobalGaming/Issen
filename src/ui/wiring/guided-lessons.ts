@@ -1,6 +1,6 @@
 import type { Direction } from '../../shared/directions.ts';
-import { createGuidedLessonState, parseGuidedLessons } from './guided-state.ts';
-import type { GuidedLessonProgress } from './guided-state.ts';
+import { createGuidedLessonState, parseGuidedLessons } from '../../game/onboarding/guided-state.ts';
+import type { GuidedLessonProgress } from '../../game/onboarding/guided-state.ts';
 import './guided-lessons.css';
 
 export { parseGuidedLessons };

@@ -190,7 +190,7 @@ check the pending message, and verify the eventual item grant.
   advances. Keyboard activation and reduced-motion settings are supported.
   `src/game/progression/armory-seen.ts` persists explicit detail views under
   `issen.armorySeen`, with old collections seeded as already viewed.
-- `src/game/onboarding/guided-state.ts` and `guided-lessons.ts` persist completed
+- `src/game/onboarding/guided-state.ts` and `src/ui/wiring/guided-lessons.ts` persist completed
   first ordered-cut and boss-parry lessons under `issen.guidedLessons`. Ordered
   cuts enter frozen practice directly. The boss approaches at normal speed and
   freezes at its glint until a successful parry. There is no separate dismissible

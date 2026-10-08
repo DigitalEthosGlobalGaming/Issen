@@ -1,3 +1,22 @@
+## Latest green checkpoint: guided lesson UI adapter relocation
+
+Moved guided-lessons.ts and its CSS from game/onboarding into ui/wiring; audio
+wiring and the browser fixture import the actual new owner. guided-state.ts
+retains deterministic progress, freeze and input-consumption decisions. Exact
+adapter source parity after relative-import normalization PASS is recorded in
+ tmp/runtime-refactor/guided-ui-move-parity.log; no rules/copy/style change.
+`npm run typecheck`: PASS (tmp/runtime-refactor/guided-ui-move-typecheck.log).
+`node --test tests/unit/*.test.mjs`: all 401 PASS
+(tmp/runtime-refactor/guided-ui-move-unit.log).
+`npx playwright test tests/browser/guided-lessons.spec.ts tests/browser/game.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all six PASS in 29.0s (tmp/runtime-refactor/guided-ui-move-browser.log), exit 0.
+No live browser process remains. Results ownership and runtime frame/scene
+relocation are green in the preceding checkpoints.
+Next: separately delete compiler-audited stale session view/binding capabilities;
+then perform requirement-by-requirement W2 audit, final scenarios/checkpoints/
+units/broad browsers/production/Android-web, docs/behavior report/phone checklist
+and version 1.67.0. All W3/Part 4 remain required; develop is unpushed.
+
 ## Latest green checkpoint: runtime frame/scene orchestration relocation
 
 Physically moved frame-simulation.ts and scene-flow.ts from game/session to runtime.
