@@ -73,8 +73,15 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   let builds = 0;
   const settleLoads: Array<() => void> = [];
 
+  function releaseCompletedCutouts(stage = preparedStage) {
+    cachedMaterials.clearCutouts();
+    const live = stage === 0 ? [9] : stage === 4 ? [0] : [];
+    releaseSceneryCutouts(images.filter((image, index) => image && !live.includes(index)));
+  }
+
   function releaseCompositionInputs(stage: number) {
     if (!mapImages) return;
+    releaseCompletedCutouts(stage);
     // Output planes own their pixels; only live fog and bamboo still need raw inputs.
     const live = stage === 0 ? [9] : stage === 4 ? [0] : [];
     materials?.select(Object.fromEntries(live.map((index) => [String(index), ASSET_URLS[index]!])));
@@ -679,6 +686,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       );
     },
     prepare,
+    releaseCompletedCutouts,
     dispose,
     get backend(): EnvironmentBackend {
       return status;

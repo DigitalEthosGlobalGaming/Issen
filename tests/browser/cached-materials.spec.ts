@@ -60,19 +60,35 @@ test('cached material layers preserve mirrored normals, procedural occlusion and
     const sample = (kind: string, x: number, y: number) => [
       ...stamp.material[kind].source.getContext('2d').getImageData(x, y, 1, 1).data,
     ];
+    const beforeClear = controller.snapshot();
+    const completedNormal = stamp.material.normal.source;
+    controller.clearCutouts();
+    controller.clearCutouts();
+    const afterClear = controller.snapshot();
     const result = {
       flipped: sample('normal', 1, 3)[0],
       covered: sample('surface', 1, 0)[3],
       material: sample('surface', 1, 3)[3],
       procedural: sample('surface', 6, 6)[3],
       coverage: stamp.material.surfaceCoverage,
+      beforeClear,
+      afterClear,
+      completedNormalAlive: completedNormal.width === 8 && completedNormal.height === 8,
     };
+    drawCachedImage(output, image, [0, 0, 4, 4], 0, 0, 4, 4);
+    const bindingsAlive =
+      stamp.material.normal.source === normal && stamp.material.surface.source === surface;
     controller.dispose();
-    return result;
+    return { ...result, bindingsAlive };
   });
   expect(result.flipped).toBeLessThan(128);
   expect(result.covered).toBe(0);
   expect(result.material).toBe(255);
   expect(result.procedural).toBe(0);
   expect(result.coverage).toBe(true);
+  expect(result.beforeClear.entries).toBeGreaterThan(0);
+  expect(result.afterClear.entries).toBe(0);
+  expect(result.afterClear.pixels).toBe(0);
+  expect(result.afterClear.scratchPixels).toBe(0);
+  expect(result.completedNormalAlive && result.bindingsAlive).toBe(true);
 });

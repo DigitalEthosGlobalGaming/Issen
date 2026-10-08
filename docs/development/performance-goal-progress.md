@@ -2137,3 +2137,71 @@ restoration and saved-run isolation, daily presets, held loading and all trials.
 Checked production build (strict TypeScript) and all4bundle testsPASS20.9s:
 startup, Armoury/gameplay/landscape, edition gates and offline resize. Rendering, seed-entry, layout and decode paths retain their existing behavior. Full goal active;
 no push/deploy/native build/player saves.
+
+## Checkpoint 39 — Next-slot admission baseline and completed cutout release, 1.68.33
+
+Checkpoint38 precedes this investigation. Isolated current-plus-incoming probes
+exercise worker transfer and two independent local owners with the actual visit
+ledger. Three stable geometries each cover stage0 through stage8 and back to0:
+390×844/DPR2 high, the same portrait low quality, and900×600/DPR2 high.
+Each renderer path composes30 scenes and verifies27 held current scenes without
+changing any plane bytes. The ledger's predicted seed equals eventual entry.
+This measures ownership overlap, does not implement next-slot promotion.
+
+Initial resize-crossing probes 2PASS36.3s; stable geometry probes 2PASS39.7s.
+Read-only colour-cutout and map-cache diagnostics then2PASS39.8s. Both256 MiB
+image loaders stay within their decoded counters, but those counters omit composed
+planes/cutouts. After worker transfer, minimum worker residency (pinned inputs,
+worker output canvases and measured retained cutouts) for incoming stage0 is
+291,972,320/274,351,732/306,243,120 bytes across those geometries. Main transferred
+current/next planes add71,098,560/31,599,360/95,961,600 bytes in their own realm.
+Local input-plus-current/incoming-plane/cutout minima are
+335,949,632/293,526,904/361,680,984 bytes. Other figures, fog ownership on the main
+worker path, GPU textures/targets, decoder overhead and intermediate allocations
+are excluded. This is not whole-app resident memory or a budget guarantee.
+Before transfer, copied incoming bitmaps also coexist in the worker realm.
+Simply counting decoded-loader bytes would therefore admit an unsafe next slot.
+
+Composition no longer needs its baked stamp cutouts after planes own the pixels.
+`clearCutouts` releases only baked intermediates/scratch, preserving source bindings
+and completed layer maps. Local completion also releases non-live source colour
+cutouts before dropping input leases. The worker clears after all bitmap copies
+settle; its raw wrappers/pins and decode interpretation remain unchanged. Fog and
+bamboo retain live colour inputs/cutouts. No change to assets, plane resolution,
+normal bins, layout, seed sequence or gameplay. This avoids the rejected worker
+raw-input release and runtime-wide enemy suspension from earlier checkpoints.
+
+Candidate overlap probes 2PASS40.1s. All348 compared raw plane hashes per backend
+match the original, across all nine stages and three geometries; held current
+planes also remain exact. Stage0 settled cutout savings are42,470,928/44,599,940/
+44,310,208 bytes for worker and50,898,960/47,975,432/51,767,272 bytes for local.
+Maximum measured removed cutouts are44,968,120/54,677,600 bytes. These are nominal
+retained-pixel savings, not reduced compose peaks: new cutouts exist during build,
+and worker bitmap copies overlap before this release. Local input/plane overlap
+alone still exceeds256 MiB at high quality. Slots remain unintegrated.
+
+Probe compose round trips (including decoding) total14,585.2→14,750.0 ms worker
+and12,926.1→13,085.7 ms local over30 visits; maxima1377.0→1378.9 and1168.5→1195.8 ms.
+These single ordered runs are not statistical latency comparisons and do not prove
+compose/cold-load targets. They expose the outstanding cost rather than claim a
+speedup. Standard performance measurement configuration is unchanged.
+
+Strict TypeScript passed; all 466unitsPASS2325.3 ms. Permanent cache checks verify
+zero entries/pixels/scratch while completed maps and source bindings remain alive.
+Local lifetime tests retain raw/native/replay/context restoration, pressure,
+reacquisition and stale-request guards. Worker256/512 MiB three-lap tests retain
+all original image pins and now assert no completed baked cutouts. Related 11 browser
+checksPASS34.0s, including all-nine native worker/local materials, slope/mirror
+coverage, fallback, coalescing/peer disposal and hidden-owner deferral.
+Checked production build and all 4bundle testsPASS21.3s, including offline resize.
+
+Evidence: tmp/performance-next-scene-admission/ (baseline and candidate JSON,
+hash/cost comparisons, original sources and logs); isolated probes under
+tmp/probes/next-scene-admission/. Next reconcile transient compose/transfer
+allocations and current/next output ownership with shared admission, then integrate
+quiet soon requests and exact slot promotion/invalidation. Selected figure/startup
+ownership, whole-game memory,120Hz/CPU budgets and full Phase5 remain required.
+Goal active; no push/deploy/native build/player saves.
+
+Warming/context restoration and loading-readiness browsers: 11 PASS in 38.8s.
+All handles terminal; metadata and architecture notes are synchronized.

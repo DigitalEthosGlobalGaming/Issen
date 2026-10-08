@@ -1,4 +1,32 @@
-# Performance, assets and seamless transitions — Exact upcoming scene identities
+# Performance, assets and seamless transitions — Completed compose cutout release
+
+Latest checkpoint 39: integrated 1.68.33 clears baked map cutouts/scratch and
+non-live colour cutouts after composition. Completed planes and source bindings
+remain valid; fog/bamboo retain live inputs. Worker clears after bitmap copies
+settle, retaining its original raw wrappers/pins and decoder interpretation.
+Baseline/candidate overlap probes each compose 30 scenes per renderer path across
+all nine stages, stable portrait high/low and landscape high geometry. All 348
+compared plane hashes per backend match exactly; held current planes are unchanged.
+Measured retained cutout savings reach 44,968,120 bytes worker / 54,677,600 local.
+These are settled nominal pixel savings; transient build/copy peaks and whole-game
+memory remain unresolved. Local input/output overlap alone can exceed 256 MiB.
+No next slot has been admitted or integrated.
+
+Strict TypeScript and all 466 units pass. Related 11 browser checks pass in 34.0s;
+warming/context restoration/loading readiness 11 pass in 38.8s. Checked production
+build and all four bundle tests pass in 21.3s, including offline resize. Existing
+native visual tolerances and determinism checks are retained. Probe round trips
+remain roughly unchanged and include decoding; no statistically proven latency
+improvement or frame-budget completion is claimed.
+
+Evidence under tmp/performance-next-scene-admission/; probes under
+tmp/probes/next-scene-admission/. Next reconcile transient compose/transfer
+allocations and current/next output ownership with shared admission, then implement
+quiet soon requests and exact worker/local slot promotion/invalidation. Selected
+figure/startup ownership, whole-game memory, 120 Hz/CPU budgets and full Phase 5
+remain required. Full goal active; no push/deploy/native build/player saves.
+Earlier rejected ownership trials remain rejected.
+## Previous handoff — Exact upcoming scene identities
 
 Latest checkpoint38: integrated1.68.32 publishes the exact upcoming composition
 identity from live stageVisits.peek and geometry/quality ports. Immutable cached

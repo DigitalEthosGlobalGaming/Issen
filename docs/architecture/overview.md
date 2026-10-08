@@ -172,7 +172,11 @@ downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
 hits, misses and evictions separately from decoded assets.
 Local main-thread composition releases non-live colour/material image leases after
 building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
-colour/data canvases and the bounded independent cutouts keep their own pixels.
+colour/data canvases keep their own pixels. Completed composition clears baked
+map cutouts/scratch and non-live colour cutouts (1.68.33), preserving source
+bindings and layer maps. Main composition clears before releasing input leases;
+the worker clears after bitmap copies settle. Fog and bamboo retain their live
+colour cutouts. Worker raw image pins and decode semantics remain unchanged.
 Repeated draws/compose calls with the same composition key reuse that output.
 A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
 pending requests cannot publish over a newer generation. Source binding release

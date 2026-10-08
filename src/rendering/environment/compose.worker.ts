@@ -44,6 +44,7 @@ scope.onmessage = ({ data }) => {
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
+        renderer.releaseCompletedCutouts();
       }
       const snapshot = {
         ...renderer.snapshot(),

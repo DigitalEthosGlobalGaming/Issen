@@ -134,10 +134,14 @@ export function createCachedMaterials(
     if (!bindings?.size) sources.delete(image);
     owner.images.delete(image);
   }
-  function releaseSources() {
-    for (const image of owner.images) unbind(image);
+  /** Drop stamp intermediates while preserving bindings and completed layer maps. */
+  function clearCutouts() {
     for (const cache of owner.cutouts.values()) cache.clear();
     owner.cutouts.clear();
+  }
+  function releaseSources() {
+    for (const image of owner.images) unbind(image);
+    clearCutouts();
   }
   return {
     bind(image: HTMLImageElement, material: (frame: Frame) => SceneMaterial | null) {
@@ -147,6 +151,7 @@ export function createCachedMaterials(
       bindings.set(owner, { owner, material });
     },
     unbind,
+    clearCutouts,
     releaseSources,
     withBindings<T>(draw: () => T): T {
       const previous = bindingOwner;

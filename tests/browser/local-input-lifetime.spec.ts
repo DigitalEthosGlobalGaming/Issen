@@ -159,6 +159,9 @@ test('completed local planes and live effects survive compose input eviction', a
     const liveInputs = row.stage === 0 ? 4 : row.stage === 4 ? 3 : 0;
     expect(row.released.decodedLoader.pinned).toBe(liveInputs);
     expect(row.remainingInputs).toBe(liveInputs);
+    expect(row.released.materialCutouts.entries).toBe(0);
+    expect(row.released.materialCutouts.pixels).toBe(0);
+    expect(row.released.materialCutouts.scratchPixels).toBe(0);
     expect(row.disposed.decodedLoader.bytes).toBe(0);
   }
   expect(warnings).toEqual([]);
