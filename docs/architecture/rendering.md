@@ -155,7 +155,10 @@ The main scene is assembled back to front in a deliberate order:
 4. `combat`: boss, attacking enemies, player, companions and combat particles;
 5. `foreground`: foreground bamboo and grass;
 6. `atmosphere`: gameplay glyphs, smoke, front leaves, weather and text popups;
-7. `post`: camera restore, stamps, film, grain, vignette, damage, flash and letterbox.
+7. `post`: camera restore, stamps, film, grain, vignette, damage, flash and letterbox;
+8. `geometry`: prepare full-resolution G0/G1/G2 from the recorded painter tree;
+9. `lights`: prepare diffuse/specular accumulation;
+10. `forward-composite`: present the same ordered painter tree using those targets.
 
 `presentation/scene-composer.ts` requires an explicit neighbour for extensions,
 for example `scene.composer.insert({ name: 'example', draw(frame, views) {} }, { after: 'combat' })`.
@@ -338,6 +341,8 @@ returning. Leaked drawing state can subtly recolor or displace every later layer
 | Shared visual blade-tip and presence pose | `src/rendering/figures/figure-pose.ts` |
 | Half-resolution light accumulation / guided lookup | `src/rendering/pixi/light-buffer.ts` / `src/rendering/pixi/lighting-composite-glsl.ts` |
 | Combat event lights and effects-clock decay | `src/presentation/event-lights.ts` |
+| Named GPU preparation / borrowed target access | `src/rendering/pixi/scene-painter.ts` |
+| Named post and film insertion chains | `src/presentation/post.ts`, exposed by `src/runtime/frames.ts` |
 | Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
 | HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
 | Armory-only composition                                | `src/rendering/armory-preview.ts`                        |
@@ -394,8 +399,9 @@ only removed scalar and zero-emission uploads can reduce texture residency.
 
 ## Runtime composition ownership
 
-`presentation/scene.ts` supplies seven named passes: environment, midground,
-rear-enemies, combat, foreground, atmosphere and post. `scene-composer.ts` requires
+`presentation/scene.ts` records seven named layers: environment, midground,
+rear-enemies, combat, foreground, atmosphere and post, followed by the native
+geometry, lights and forward-composite passes. `scene-composer.ts` requires
 an explicit before/after neighbour for extensions. Figure/environment/post draws
 read current views and cosmetic randomness; rule mutation, saves and haptics are
 not drawing operations. Runtime frame dispatch owns rule/cosmetic update order;
@@ -405,8 +411,9 @@ WebGL2 is the only live renderer. Canvas/OffscreenCanvas preparation and the
 local alternative to worker texture preparation remain authoring/preparation tools.
 The native colour/soft-light/overlay blend filters remain because they implement
 live Pixi grading with correct alpha; they are not an alternate Canvas renderer.
-The forward material pipeline described above remains until Workstream 3 replaces
-it; no light pre-pass completion is claimed here.
+The native light pre-pass below now replaces the old forward material pipeline.
+Phase sections retain implementation evidence; current extension ownership is
+described in the final hook section.
 
 ## W3 geometry buffer (phase 1)
 
@@ -433,14 +440,12 @@ albedo views. The painter records the completed lightingFrameView separately fro
 the requested lightingView, so tests capture an actual rendered buffer. Borrowed
 readonly geometryTargets expose current g0/g1/g2 textures, dimensions, depth range
 and generation; extensions must reacquire after resize/restore and never destroy
-or mutate these owner resources. Light targets are implemented in phase 2 below; final public post hooks
-remain later W3 work.
+or mutate these owner resources. The current lightingTargets hook below combines
+prepared G/light metadata and guards invalid frames.
 
-This is phase 1, not a completed deferred-lighting pipeline: the current forward
-material shader still renders the ordinary scene while geometry buffers are
-verified. The light pass, 16-light registry, lookup composite, legacy unification,
-instanced foliage and half-resolution option are still required. No performance
-measurement or physical-device verification is claimed.
+The initial phase1 checkpoint verified geometry before replacing the forward
+shader. Subsequent sections describe the completed light/lookup migration. No
+performance measurement or physical-device verification is claimed.
 
 ## W3 light accumulation (phase 2)
 
@@ -474,9 +479,8 @@ owner, because RenderTarget does not manage externally supplied sources.
 The light debug views map radiance to radiance/(1+radiance) for display only;
 production light targets retain HDR. Controls stay session-only.
 
-The ordinary scene still uses the forward shader until phase3 implements lookup.
-Legacy model unification, instanced foliage, half-resolution lighting, event
-sources and named GPU composer passes remain required migration work.
+Phase2 verified accumulation before phase3 switched ordinary material sprites
+to lookup. Later sections describe the current unified pipeline and extensions.
 
 ## W3 lookup composite (phase 3)
 
@@ -506,9 +510,8 @@ against the existing native scene tolerance9, with zero alpha mismatches and
 contribution over black. Screenshots and numeric JSON use testInfo.outputPath;
 ignored checkpoint copies preserve evidence across later test-result cleanup.
 
-This is still migration work. Legacy mapping/old-shader removal, complete scene
-route audit, instanced foliage, half-res quality, event light sources and named
-GPU composer passes remain required before the lighting workstream is complete.
+Phase3 was an intermediate comparison checkpoint. Phase4 removed the temporary
+comparison flag and old shader after these native comparisons passed.
 
 ## W3 single material model and old-shader removal (phase 4 checkpoint)
 
@@ -663,8 +666,8 @@ const unregister = sources.register('lantern-example', frame => [{
 lifecycle.add(unregister);
 ```
 
-Persistent scene sources, half-resolution quality/upsampling, named GPU composer
-passes and remaining extension hooks are not complete at this checkpoint.
+This first phase6 checkpoint covered event lights; subsequent sections document
+persistent sources, quality and extension hooks.
 
 ## W3 persistent scene sources (phase 6)
 
@@ -690,8 +693,8 @@ or RNG, stable reordered identities, retirement, accessibility and disposal. Nat
 proof isolates each of the five sources on a lit surface, verifies nonzero colour,
 repeatability and removal, and attaches a foxfire capture through testInfo.outputPath.
 The inspected capture shows the blue local contribution on the native material.
-Half-resolution quality, named GPU composer/film/post hooks and W3/final gates still
-remain; this checkpoint completes source registration only.
+This checkpoint completed source registration. Subsequent sections cover quality
+and hooks; workstream/final verification are recorded in the handoff.
 
 ## W3 half-resolution lighting (phase 6)
 
@@ -732,5 +735,76 @@ the guide ablated (plain bilinear), preserve exact coverage at existing RGB tole
 and prove all five colour providers/odd dimensions/independent owners/resize/restore/
 disposal. The testing-control check proves target sizes and unchanged saved settings.
 Captures use testInfo.outputPath; the depth-boundary capture was inspected. These
-are correctness checks, not performance captures. Named composer GPU passes and
-remaining film/post/target extension hooks, W3 and final gates still remain.
+are correctness checks, not performance captures. Current named composer and
+film/post/target extension hooks are described below.
+
+
+## Current extension hooks (W3 phase 6)
+
+The seven recording layers above retain their drawing order. Geometry, lights and
+forward-composite are now explicit named composer passes. Auxiliary surfaces still
+call begin/flush; flush prepares the same native passes as necessary. Preparation
+is invalidated by begin, new submissions, film grouping, lighting, resize and
+context loss/restore. Repeated explicit preparation followed by flush does not
+repeat G/light GPU work. A quality-only change replaces L while retaining G.
+There is one painter, one light accumulation model and no alternate renderer.
+
+The painter's lightingTargets getter returns undefined until current G and L are
+prepared. Its outer object and both target metadata objects are frozen. Textures
+are borrowed sampler inputs: never mutate, resize, render into, unload or destroy
+them. Read-only access does not freeze Pixi internals. Reacquire inside each pass;
+do not retain wrappers or sampler bindings across begin, resize, quality changes,
+context loss or disposal. Consumers must detach their sampler references before
+owner replacement/disposal and dispose their own resources through lifecycle.
+
+A minimal target reader can be inserted after lights (or before forward-composite):
+
+```ts
+lifecycle.add(frames.drawScene.composer.insert({
+  name: 'inspect-prepared-lighting',
+  draw(_frame, views) {
+    const targets = views.nativeScene.lightingTargets;
+    if (!targets) return;
+    const { g0, g1, g2, generation } = targets.geometry;
+    const { diffuse, specular, guide, resolution } = targets.light;
+    // Read metadata or sample these borrowed textures in an owned extension pass.
+    // Bind only for this draw, then detach; do not change or destroy the targets.
+  },
+}, { after: 'lights' }));
+```
+
+The post recording chain exposes blood-tint, film, grain, blot, scratches, dust,
+vignette, night-vignette, ink-edge, letterbox, flicker and flash, in original order.
+Its film subchain exposes grade, which invokes the existing film renderer. Both
+use the same unique-name/explicit-neighbour/idempotent-removal contract as scene
+composition. Installation or removal during a draw takes effect next frame.
+They record drawing commands before geometry/light preparation; extensions that
+need current-frame targets belong after lights in the scene composer instead.
+
+Minimal post and film insertion (prepared frame inputs stay read-only):
+
+```ts
+lifecycle.add(frames.drawPost.composer.insert({
+  name: 'inspect-post-frame',
+  draw(frame, views) {
+    const { flicker } = frame;
+    const { W, H } = views;
+    // Consume these prepared values without advancing effects or gameplay.
+  },
+}, { before: 'letterbox' }));
+lifecycle.add(frames.drawPost.filmComposer.insert({
+  name: 'inspect-film-frame',
+  draw(_frame, views) {
+    const film = views.sceneFilm();
+    // Observe the selected grade without changing state.
+  },
+}, { after: 'grade' }));
+```
+
+Light registration uses the lifecycle-owned source example above. Native tests
+exercise actual target render calls, late-submission invalidation, quality/resize,
+read-only snapshots, disposal and unchanged pixels. Runtime tests invoke all three
+insertion chains and verify draws leave rules, RNG, saves and haptics unchanged.
+Future rim lighting, rays, shadows and outlines are hooks only; none is implemented.
+Earlier phase sections record intermediate checkpoints; this section describes
+current hook ownership. Workstream and Part4 verification remain separate gates.

@@ -1,7 +1,8 @@
 import { preferredLightResolution } from '../effects/quality.ts';
 import { GeometryBuffer, requireGeometryBuffers } from './geometry-buffer.ts';
-import type { GeometryDebugView } from './geometry-buffer.ts';
+import type { GeometryTargets, GeometryDebugView } from './geometry-buffer.ts';
 import { LightBuffer, requireLightBuffers } from './light-buffer.ts';
+import type { LightTargets } from './light-buffer.ts';
 import { GraphicsUnsupportedError, reportGraphicsError } from '../graphics-error.ts';
 import {
   Color,
@@ -174,11 +175,40 @@ export class PixiScenePainter implements SceneDrawing {
   private ellipseEnd = 0;
   private ellipseCcw = false;
   private cursor = 0;
+  private geometryDirty = true;
+  private lightDirty = true;
   private disposed = false;
+  private invalidateLighting(): void {
+    this.geometryDirty = this.lightDirty = true;
+  }
+  private get lightResolution(): 1 | 0.5 {
+    return preferredLightResolution(
+      this.canvas.dataset.lightResolution,
+      this.lighting.lightResolution ?? 1,
+    );
+  }
+  /** Borrowed generation-scoped targets, available only after current G/light preparation. */
+  get lightingTargets():
+    Readonly<{ geometry: Readonly<GeometryTargets>; light: Readonly<LightTargets> }> | undefined {
+    if (
+      this.disposed ||
+      this.contextLost ||
+      this.geometryDirty ||
+      this.lightDirty ||
+      this.width !== this.canvas.width ||
+      this.height !== this.canvas.height ||
+      this.lightBuffer.targets?.resolution !== this.lightResolution
+    )
+      return undefined;
+    const geometry = this.geometryBuffer.targets,
+      light = this.lightBuffer.targets;
+    return geometry && light ? Object.freeze({ geometry, light }) : undefined;
+  }
   contextLost = false;
   private readonly loseContext = (event: Event) => {
     event.preventDefault();
     this.contextLost = true;
+    this.invalidateLighting();
     this.canvas.dataset.contextState = 'lost';
   };
   private readonly restoreContext = () => {
@@ -195,6 +225,7 @@ export class PixiScenePainter implements SceneDrawing {
       this.lightBuffer.detachGeometry();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.lightBuffer.resize(this.canvas.width, this.canvas.height, true);
+      this.invalidateLighting();
       this.contextLost = false;
       this.canvas.dataset.contextState = 'ready';
     } catch {
@@ -348,6 +379,7 @@ export class PixiScenePainter implements SceneDrawing {
     registerMaterialSink(this, {
       lights: (lighting) => {
         this.lighting = lighting;
+        this.invalidateLighting();
       },
       draw: (stamp) => {
         const mesh = this.submit('material');
@@ -378,6 +410,7 @@ export class PixiScenePainter implements SceneDrawing {
     });
     registerSceneFilmPass(this, (film, w, h, time, preferences) => {
       if (film !== 'noir' && film !== 'trial-glitch') return false;
+      this.invalidateLighting();
       this.stopRetainingTree();
       this.copyFilm ??= createCopyFilmPass();
       this.copyFilm.update(
@@ -406,6 +439,7 @@ export class PixiScenePainter implements SceneDrawing {
 
   begin(): void {
     if (this.disposed) return;
+    this.invalidateLighting();
     this.retainTree = this.transientGroups.length === 0 && this.clips.length === 0;
     if (!this.retainTree) this.root.removeChildren();
     for (const group of this.transientGroups) {
@@ -426,14 +460,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.beginPath();
   }
 
-  flush(): void {
-    if (this.disposed || this.contextLost) return;
-    this.trimRetainedTree();
-    if (this.width !== this.canvas.width || this.height !== this.canvas.height) {
-      this.width = this.canvas.width;
-      this.height = this.canvas.height;
-      this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
-    }
+  private detachLightingTargets(): void {
     for (const slot of this.slots) {
       slot.material?.releaseLightTargets();
       slot.grass?.releaseLightTargets();
@@ -441,15 +468,43 @@ export class PixiScenePainter implements SceneDrawing {
     }
     this.artworkMaterials.detachTargets();
     this.lightBuffer.detachGeometry();
+  }
+
+  /** Named composer pass; auxiliary flush callers use the same preparation. */
+  geometryPass(): void {
+    if (this.disposed || this.contextLost) return;
+    if (this.width !== this.canvas.width || this.height !== this.canvas.height) {
+      this.width = this.canvas.width;
+      this.height = this.canvas.height;
+      this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
+      this.invalidateLighting();
+    }
+    if (!this.geometryDirty) return;
+    this.trimRetainedTree();
+    this.detachLightingTargets();
     this.drawGeometry();
+    this.geometryDirty = false;
+    this.lightDirty = true;
+  }
+
+  /** Accumulate once for the current submissions, lighting and resolution. */
+  lightPass(): void {
+    if (this.disposed || this.contextLost) return;
+    this.geometryPass();
+    if (this.lightBuffer.targets?.resolution !== this.lightResolution) this.lightDirty = true;
+    if (!this.lightDirty) return;
+    this.detachLightingTargets();
     this.lightBuffer.render(this.geometryBuffer.targets!, {
       ...this.lighting,
-      lightResolution: preferredLightResolution(
-        this.canvas.dataset.lightResolution,
-        this.lighting.lightResolution ?? 1,
-      ),
+      lightResolution: this.lightResolution,
     });
+    this.lightDirty = false;
     this.canvas.dataset.lightBufferSize = `${this.lightBuffer.targets!.width}x${this.lightBuffer.targets!.height}`;
+  }
+
+  flush(): void {
+    if (this.disposed || this.contextLost) return;
+    this.lightPass();
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
     // browser task do not accumulate (captures, previews and restoration).
@@ -795,6 +850,7 @@ export class PixiScenePainter implements SceneDrawing {
     | MeshSimple
     | ReturnType<typeof createGrassMesh>['mesh']
     | ReturnType<typeof createLeafMesh>['mesh'] {
+    this.invalidateLighting();
     let slot = this.slots[this.cursor];
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();

@@ -10,7 +10,7 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
       body: (await response.text()).replace(
         'artworkReady = true;',
         `window.__presentationBoundary = {
-        frameLoop: frames.frameLoop, drawScene: frames.drawScene, preparePresentation: frames.preparePresentation, render: frames.render,
+        drawPost: frames.drawPost, nativeScene: foundation.browser.nativeScene, frameLoop: frames.frameLoop, drawScene: frames.drawScene, preparePresentation: frames.preparePresentation, render: frames.render,
         snapshot: () => JSON.stringify({ G: foundation.run.G, random: foundation.run.activity.runRandom.state(), saves: Object.entries(localStorage) }),
         queue() {
           foundation.run.sceneState.sceneLoading = true; foundation.run.sceneState.sceneReadyToPresent = true;
@@ -33,6 +33,47 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
     const harness = (window as any).__presentationBoundary;
     harness.frameLoop.stop();
     const hapticCalls = harness.guardHaptics();
+    const native = harness.nativeScene;
+    const geometry = Reflect.get(native, 'geometryBuffer'),
+      lights = Reflect.get(native, 'lightBuffer');
+    let geometryCalls = 0,
+      lightCalls = 0;
+    const drawGeometry = geometry.render.bind(geometry),
+      drawLights = lights.render.bind(lights);
+    geometry.render = (...args: any[]) => {
+      geometryCalls++;
+      return drawGeometry(...args);
+    };
+    lights.render = (...args: any[]) => {
+      lightCalls++;
+      return drawLights(...args);
+    };
+    const postCalls: string[] = [];
+    const removePost = harness.drawPost.composer.insert(
+      { name: 'test-post-hook', draw: () => postCalls.push('post') },
+      { before: 'letterbox' },
+    );
+    const removeFilm = harness.drawPost.filmComposer.insert(
+      { name: 'test-film-hook', draw: () => postCalls.push('film') },
+      { after: 'grade' },
+    );
+    const snapshots: boolean[] = [];
+    const removeTargets = harness.drawScene.composer.insert(
+      {
+        name: 'test-light-targets',
+        draw: (_frame: unknown, views: any) => {
+          const targets = views.nativeScene.lightingTargets;
+          snapshots.push(
+            !!targets &&
+              Object.isFrozen(targets) &&
+              Object.isFrozen(targets.geometry) &&
+              Object.isFrozen(targets.light) &&
+              targets.light.guide === targets.geometry.g0,
+          );
+        },
+      },
+      { after: 'lights' },
+    );
     const frame = harness.preparePresentation(0);
     harness.queue();
     const before = harness.snapshot(),
@@ -54,7 +95,21 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
     const settled = harness.score() - initialScore;
     harness.render(0);
     const settledAgain = harness.score() - initialScore;
-    return { pure, settled, settledAgain, order, extensions, haptics: hapticCalls() };
+    removeTargets();
+    removePost();
+    removeFilm();
+    return {
+      pure,
+      settled,
+      settledAgain,
+      order,
+      extensions,
+      haptics: hapticCalls(),
+      geometryCalls,
+      lightCalls,
+      snapshots,
+      postCalls,
+    };
   });
   expect(result).toEqual({
     pure: true,
@@ -69,7 +124,15 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
       'foreground',
       'atmosphere',
       'post',
+      'geometry',
+      'lights',
+      'test-light-targets',
+      'forward-composite',
     ],
     extensions: ['observed', 'observed'],
+    geometryCalls: 4,
+    lightCalls: 4,
+    snapshots: [true, true, true, true],
+    postCalls: ['film', 'post', 'film', 'post', 'film', 'post', 'film', 'post'],
   });
 });

@@ -1,3 +1,39 @@
+## W3 phase6 hooks green — continue workstream gates
+
+Half-resolution checkpoint cdd7a52 is committed. Named geometry, lights and
+forward-composite now follow the original seven recording layers. Painter dirty
+preparation keeps auxiliary begin/flush callers and avoids duplicate G/light work.
+lightingTargets exposes frozen current generation metadata only after preparation;
+new submissions, lighting, quality, size, loss and disposal invalidate access.
+Quality-only changes retain G and replace L. Borrowed textures remain owner-owned.
+
+Post statements retain original order in twelve named recording stages; grade is
+the film subchain. frames.drawPost exposes both insertion chains; target consumers
+insert after lights in drawScene.composer. Lifecycle owns unregister callbacks and
+consumer resources/sampler detachment. Minimal examples and ownership are in
+rendering.md; no future rim/ray/shadow/outline effects were built.
+
+Final npm run typecheck PASS; npm test all415PASS; exact21-file expanded affected
+native/material/foliage/film/source/Options/context/checkpoint runtime suite73PASS
+in2.3m exit0 (session5069 terminal). Logs tmp/lighting-refactor/phase6-hooks-final-
+{typecheck,unit,browser}.log. New actual G/L call counts prove one preparation per
+frame, late-submission/quality/resize invalidation and repeated pixel equality;
+real runtime scene/post/film extensions preserve rules/RNG/saves/haptics. Native
+named-light-passes.png inspected (opaque neutral test surface). No assertion or
+existing tolerance weakened. Version1.68.0 remains aligned. No develop push.
+
+NEXT W3 gates: full broad rendering-v2, test:production and test:android-web;
+startup/error/context native suites and W2 scenarios must remain green (affected
+suite covers native restore, full broad additionally covers graphics-errors).
+Then all Part4 independent final checks: strict/fullunit/both broad configs/
+production/Android/startup/context, requirement audit, final module/byte/behavior/
+manual-phone/perf-opt-in/future-work/preexisting-failure report, status/report
+commit and one final develop push verified against origin. Proven pre-existing
+Android offline.spec.ts:55 immediate pause/reload failure may be accepted only
+with baseline evidence and honest reporting. Goal active; full scope unchanged.
+No live browser job at this checkpoint; record any subsequent handle before ending.
+Do not rerun applied integration scripts or edit source during live browser runs.
+
 ## W3 phase6 half resolution green — continue named passes and extension hooks
 
 Persistent sources11369f2 is committed. SceneLighting.lightResolution1/0.5 controls

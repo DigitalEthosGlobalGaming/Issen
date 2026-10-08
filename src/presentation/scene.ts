@@ -1,3 +1,4 @@
+import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
 import { createSceneComposer } from './scene-composer.ts';
 import { createLightSources } from './light-sources.ts';
 import { clamp } from '../shared/math.ts';
@@ -21,7 +22,10 @@ export interface PresentationFrame {
 
 /** Read-only scene inputs and explicit presentation drawing ports. */
 export interface SceneViews {
-  readonly nativeScene: { begin(): void; flush(): void };
+  readonly nativeScene: Pick<
+    PixiScenePainter,
+    'begin' | 'geometryPass' | 'lightPass' | 'flush' | 'lightingTargets'
+  >;
   readonly lightingDebug: { refresh(): void };
   readonly g: SceneDrawing;
   readonly lightingRig: ReturnType<typeof createLightingRig>;
@@ -268,6 +272,9 @@ export function createRuntimeScene(
         drawPost(frame.post);
       },
     },
+    { name: 'geometry', draw: (_frame, views) => views.nativeScene.geometryPass() },
+    { name: 'lights', draw: (_frame, views) => views.nativeScene.lightPass() },
+    { name: 'forward-composite', draw: (_frame, views) => views.nativeScene.flush() },
   ]);
   return Object.assign(
     function drawScene(frame: PresentationFrame) {
@@ -317,7 +324,6 @@ export function createRuntimeScene(
         ),
       );
       composer.draw({ ...frame, demonRealm: false, inkEnvironment: false, boss: null }, views);
-      nativeScene?.flush();
       cvs.dataset.graphicsBackend = 'pixi';
     },
     { composer, lightSources, dispose: lightSources.dispose },
