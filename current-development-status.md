@@ -1,3 +1,23 @@
+## W2 final gate preparation: version 1.67.0
+
+Requirement-by-requirement audit is in tmp/runtime-refactor/w2-final-requirement-audit.md
+and docs/development/runtime-refactor-results.md. Actual source/controller/table/
+registry/event/composer/checkpoint/renderer evidence inspected, no new ownership
+gap identified. Version/lock/title/changelog aligned to 1.67.0; current architecture/
+rendering maps consolidated; behavior report/manual phone checklist/future opt-in
+captures written. W3 and Part 4 remain fully required.
+Explicit draw-haptics gap closed in presentation-readiness.spec.ts: actual combat
+haptic and direct navigator vibration calls are counted and asserted zero through
+repeated draw and readiness settlement, alongside original run/RNG/save assertions.
+`npx playwright test tests/browser/presentation-readiness.spec.ts tests/browser/changelog.spec.ts --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+all two PASS in 10.3s (w2-final-isolation-changelog.log), terminal exit 0.
+Formatting-only test/html edits followed this focused run; broad final must cover them.
+`node --test tests/unit/*.test.mjs`: final 1.67.0 all 401 PASS (w2-final-unit.log).
+Logs under tmp/runtime-refactor. Final combined broad browser, test:production
+(strict+verification build included) and Android-web gates remain pending.
+Do not start W3 or push develop until W2 gates and checkpoint commit complete.
+Version/docs generation script is non-idempotent and already applied.
+
 ## Latest green checkpoint: obsolete session adapter cleanup
 
 Separately deleted 22 runtime/session.ts getters absent from the compiler-resolved

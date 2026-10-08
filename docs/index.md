@@ -95,3 +95,5 @@
 - [Asset and PBR inventory](features/asset-pbr-inventory.md): living asset register, installed map packs, generation presets, part coverage and remaining conversions.
 
 - [Layout-preserving asset compaction](development/asset-compaction-results.md): W1 changes, invariants, matched byte evidence and verification.
+
+- [Runtime refactor results](development/runtime-refactor-results.md): Workstream 2 ownership, verification, behavior changes and phone play checklist.

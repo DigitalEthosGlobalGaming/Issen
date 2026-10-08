@@ -44,11 +44,11 @@ for the preserved-source comparison and measurement limits.
 
 Issen uses two presentation technologies. The duel scene uses PixiJS WebGL, while
 the interface around it is regular HTML and CSS. It is not an SVG-rendered game.
-Ink uses layered PNG atlases for environments and modular figure artwork, alongside procedural grass, weather and effects.
+Ink uses aligned compact WebP planes (lossless PNG exceptions) for environments and modular figure artwork, alongside procedural grass, weather and effects.
 
 The only SVG in the application is small inline interface artwork, such as the
 mute control in `src/ui/shell.html` and the alternate mute icons assigned by
-`src/game.ts`. Characters, layered scenery, weather, particles and combat effects are
+`src/ui/wiring/audio.ts`. Characters, layered scenery, weather, particles and combat effects are
 drawn through the bounded `SceneDrawing` vocabulary. Its Canvas-shaped operations
 keep existing pose composition readable; the native backend emits Pixi sprites,
 tessellated geometry and cached text quads. Pixel preparation and readback are
@@ -62,7 +62,6 @@ The active entry path is `main.ts` → `main-game.ts` → `scene-surface.ts` →
 atlas-isolation browser checks exercise this same painter. The former test-only
 `createPixiBackend` implementation has been removed. `scene-frame.ts` retains
 the texture, material, sprite and lighting contracts shared with the shaders.
-
 
 `MainGame` prepares WebGL2 contexts for the main scene, Armoury and support
 preview. Tutorial scenes own and dispose a separate WebGL2 surface. The former
@@ -124,7 +123,7 @@ Armoury previews require a prepared WebGL2 surface. Films and SVG scene paths
 also require registered native sinks. Noir and glitch use owned Pixi filters;
 Canvas film self-copies, copy storage and Canvas Path2D fallback are removed.
 Remaining procedural film geometry is drawn by the same native painter.
-The broad W2.1 check remains pending.
+Workstream verification is recorded in [runtime refactor results](../development/runtime-refactor-results.md).
 `SceneSurface` shares repeated initialization calls and owns each auxiliary
 surface's bound listeners and recovery deadline. Restoration cancels that deadline;
 disposal removes listeners, cancels recovery and releases any late-created context.
@@ -315,27 +314,27 @@ letting a preview change gameplay or paint into the wrong surface.
 
 Use `save()` and `restore()` around temporary transforms, alpha or composite modes.
 If state is intentionally set without a save, restore the expected baseline before
-returning. Leaked Canvas state can subtly recolor or displace every later layer.
+returning. Leaked drawing state can subtly recolor or displace every later layer.
 
 ## Where rendering changes belong
 
-| Change                                                 | Owning location                     |
-| ------------------------------------------------------ | ----------------------------------- |
-| Stage palette, weather choice or background theme      | `src/game/content/stages.ts`        |
-| Layered image environments and sprite atlases          | `src/rendering/environment/`        |
-| Static stage scenery and props                         | `src/rendering/scene/background.ts` |
-| Moving weather, leaves, grass or smoke                 | `src/rendering/scene/`              |
-| Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`            |
-| Robe or blade appearance data                          | `src/game/content/cosmetics.ts`     |
-| Combat particles and transient effects                 | `src/rendering/effects/`            |
-| Runtime cached environment construction                | `src/presentation/environment-artwork.ts` |
-| Runtime ambient/grass/weather drawing host            | `src/presentation/environment.ts` |
-| Runtime feedback effect spawning/drawing              | `src/presentation/feedback.ts` |
-| Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts` |
-| Main scene composition / full-frame drawing             | `src/presentation/scene.ts` / `src/presentation/post.ts` |
-| HUD or screen layout and styling                       | `src/ui/` and `src/styles/`         |
-| Armory-only composition                                | `src/rendering/armory-preview.ts`   |
-| Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`               |
+| Change                                                 | Owning location                                          |
+| ------------------------------------------------------ | -------------------------------------------------------- |
+| Stage palette, weather choice or background theme      | `src/game/content/stages.ts`                             |
+| Layered image environments and sprite atlases          | `src/rendering/environment/`                             |
+| Static stage scenery and props                         | `src/rendering/scene/background.ts`                      |
+| Moving weather, leaves, grass or smoke                 | `src/rendering/scene/`                                   |
+| Figure shape, clothing, weapon or pet drawing          | `src/rendering/figures/`                                 |
+| Robe or blade appearance data                          | `src/game/content/cosmetics.ts`                          |
+| Combat particles and transient effects                 | `src/rendering/effects/`                                 |
+| Runtime cached environment construction                | `src/presentation/environment-artwork.ts`                |
+| Runtime ambient/grass/weather drawing host             | `src/presentation/environment.ts`                        |
+| Runtime feedback effect spawning/drawing               | `src/presentation/feedback.ts`                           |
+| Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
+| Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
+| HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
+| Armory-only composition                                | `src/rendering/armory-preview.ts`                        |
+| Native GPU drawing, film shaders and material lighting | `src/rendering/pixi/`                                    |
 
 Keep drawing functions dependent on explicit dimensions, time, state and random
 sources. Reuse the figure/effect/film renderers for alternate views instead of
@@ -385,3 +384,19 @@ the focused rendering suites. No repacking, new loaders or downscaling.
 
 Encoded byte savings reduce download/APK storage. GPU dimensions stay unchanged;
 only removed scalar and zero-emission uploads can reduce texture residency.
+
+## Runtime composition ownership
+
+`presentation/scene.ts` supplies seven named passes: environment, midground,
+rear-enemies, combat, foreground, atmosphere and post. `scene-composer.ts` requires
+an explicit before/after neighbour for extensions. Figure/environment/post draws
+read current views and cosmetic randomness; rule mutation, saves and haptics are
+not drawing operations. Runtime frame dispatch owns rule/cosmetic update order;
+scene readiness settles after a presented frame in `runtime/scene-flow.ts`.
+
+WebGL2 is the only live renderer. Canvas/OffscreenCanvas preparation and the
+local alternative to worker texture preparation remain authoring/preparation tools.
+The native colour/soft-light/overlay blend filters remain because they implement
+live Pixi grading with correct alpha; they are not an alternate Canvas renderer.
+The forward material pipeline described above remains until Workstream 3 replaces
+it; no light pre-pass completion is claimed here.

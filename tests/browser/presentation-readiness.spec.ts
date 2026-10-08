@@ -16,6 +16,12 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
           foundation.run.sceneState.sceneLoading = true; foundation.run.sceneState.sceneReadyToPresent = true;
           foundation.run.sceneState.sceneContinuation = () => { foundation.run.G.score += 7; };
         },
+        guardHaptics() {
+          let calls = 0;
+          foundation.browser.combatHaptics.play = () => { calls++; };
+          navigator.vibrate = () => { calls++; return false; };
+          return () => calls;
+        },
         score: () => foundation.run.G.score,
       }; artworkReady = true;`,
       ),
@@ -26,6 +32,7 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
   const result = await page.evaluate(() => {
     const harness = (window as any).__presentationBoundary;
     harness.frameLoop.stop();
+    const hapticCalls = harness.guardHaptics();
     const frame = harness.preparePresentation(0);
     harness.queue();
     const before = harness.snapshot(),
@@ -47,10 +54,11 @@ test('repeated drawing cannot commit a pending gameplay continuation; orchestrat
     const settled = harness.score() - initialScore;
     harness.render(0);
     const settledAgain = harness.score() - initialScore;
-    return { pure, settled, settledAgain, order, extensions };
+    return { pure, settled, settledAgain, order, extensions, haptics: hapticCalls() };
   });
   expect(result).toEqual({
     pure: true,
+    haptics: 0,
     settled: 7,
     settledAgain: 7,
     order: [
