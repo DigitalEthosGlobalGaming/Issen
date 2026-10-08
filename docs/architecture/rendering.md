@@ -496,6 +496,14 @@ The geometry cutoff uses exact effective mesh/ancestor alpha instead of Pixi's
 byte-packed colour alpha, so authored alpha0.5 is included at default cutoff0.5.
 Composite output preserves Pixi's existing premultiplied-alpha convention.
 Light sampler bindings are detached before light attachments are replaced.
+Material stamps and instanced grass/leaves borrow one painter-owned Pixi light
+bind group; their material uniforms and atlas bindings remain individually owned.
+This keeps light-source listeners independent of the pooled mesh count. Only
+previously prepared slots release their attachment state, and repeated release
+does nothing. The geometry pass retains light bindings unless resizing replaces
+the borrowed guide; the light pass detaches before writing its targets. Context
+restore and disposal release generation-scoped references before replacing or
+destroying targets. Standalone material factories own their own light group.
 
 During phase3 only, canvas.dataset.lightingComparison='forward' selects the old
 forward shader for developer/browser comparison. Phase4 removes both this flag

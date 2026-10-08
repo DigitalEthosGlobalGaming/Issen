@@ -1,6 +1,11 @@
 import { lightingCompositeFunctions } from './lighting-composite-glsl.ts';
-import { Shader, Texture, UniformGroup } from 'pixi.js';
+import { Texture, UniformGroup } from 'pixi.js';
 import type { LightTargets } from './light-buffer.ts';
+import { createLightTargetBinding, setShaderResource } from './shader-resources.ts';
+import { createLightShader } from './shared-light-resources.ts';
+import type { BindGroup, Shader } from 'pixi.js';
+
+const textureNames = ['uDiffuse', 'uMask', 'uSurface', 'uEmissive'] as const;
 
 const fragment = `#version 300 es
 precision highp float;
@@ -42,14 +47,18 @@ void main() {
 }`;
 
 /** Ordered sprite composition only: BRDF evaluation belongs to the fullscreen light pass. */
-export function createCompositeMaterial(vertex: string, materialUniforms: UniformGroup) {
+export function createCompositeMaterial(
+  vertex: string,
+  materialUniforms: UniformGroup,
+  sharedLights?: BindGroup,
+) {
   const compositeUniforms = new UniformGroup({
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
     uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
   });
-  const shader = Shader.from({
-    gl: { vertex: '#version 300 es\n' + vertex, fragment, name: 'issen-light-composite' },
-    resources: {
+  const composite = createLightShader(
+    { vertex: '#version 300 es\n' + vertex, fragment, name: 'issen-light-composite' },
+    {
       materialUniforms,
       compositeUniforms,
       uDiffuse: Texture.WHITE.source,
@@ -57,35 +66,32 @@ export function createCompositeMaterial(vertex: string, materialUniforms: Unifor
       uMask: Texture.WHITE.source,
       uSurface: Texture.WHITE.source,
       uEmissive: Texture.EMPTY.source,
-      uLightDiffuse: Texture.EMPTY.source,
-      uLightSpecular: Texture.EMPTY.source,
-      uLightGuide: Texture.EMPTY.source,
     },
-  });
+    sharedLights,
+  );
+  const shader = composite.shader;
+  const lightBinding = createLightTargetBinding(shader.resources, Texture.EMPTY.source);
   return {
     shader,
     update(source: Shader, targets: Readonly<LightTargets>) {
-      for (const name of ['uDiffuse', 'uMask', 'uSurface', 'uEmissive'])
-        shader.resources[name] = source.resources[name];
-      shader.resources.uLightDiffuse = targets.diffuse.source;
-      shader.resources.uLightSpecular = targets.specular.source;
-      shader.resources.uLightGuide = targets.guide.source;
+      for (const name of textureNames)
+        setShaderResource(shader.resources, name, source.resources[name]);
+      lightBinding.attach(targets);
       compositeUniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
       compositeUniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       compositeUniforms.update();
     },
-    releaseLightTargets() {
-      shader.resources.uLightDiffuse =
-        shader.resources.uLightSpecular =
-        shader.resources.uLightGuide =
-          Texture.EMPTY.source;
-    },
+    releaseLightTargets: lightBinding.detach,
     releaseTextures() {
-      for (const name of ['uDiffuse', 'uMask', 'uSurface', 'uEmissive'])
-        shader.resources[name] = name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source;
+      for (const name of textureNames)
+        setShaderResource(
+          shader.resources,
+          name,
+          name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source,
+        );
     },
     dispose() {
-      shader.destroy();
+      composite.dispose();
     },
   };
 }

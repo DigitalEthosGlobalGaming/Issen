@@ -34,6 +34,7 @@ import { createMaterialMesh } from './material.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
 import { createGrassMesh } from './grass-material.ts';
 import { createLeafMesh } from './leaf-material.ts';
+import { createSharedLightResources } from './shared-light-resources.ts';
 import { registerLeafSink } from '../scene-leaves.ts';
 import { registerGrassSink } from '../scene-grass.ts';
 import { createRoundStroke, createRoundStrokeTexture, updateRoundStroke } from './round-stroke.ts';
@@ -160,6 +161,7 @@ export class PixiScenePainter implements SceneDrawing {
   private readonly brushRings = new Map<string, GraphicsContext>();
   private readonly glyphArrows = new Map<string, GraphicsContext>();
   private readonly slots: Slot[] = [];
+  private readonly sharedLights = createSharedLightResources();
   private readonly gradients = new Map<string, FillGradient>();
   private readonly patterns = new Map<Pattern, FillPattern>();
   private readonly stack: { style: DrawStyle; matrix: Matrix; clipDepth: number }[] = [];
@@ -175,6 +177,7 @@ export class PixiScenePainter implements SceneDrawing {
   private ellipseEnd = 0;
   private ellipseCcw = false;
   private cursor = 0;
+  private preparedLightingSlots = 0;
   private geometryDirty = true;
   private lightDirty = true;
   private disposed = false;
@@ -216,13 +219,7 @@ export class PixiScenePainter implements SceneDrawing {
       requireGeometryBuffers(this.renderer.gl as WebGL2RenderingContext);
       requireLightBuffers(this.renderer.gl as WebGL2RenderingContext);
       this.artworkMaterials.restore();
-      this.artworkMaterials.detachTargets();
-      for (const slot of this.slots) {
-        slot.material?.releaseLightTargets();
-        slot.grass?.releaseLightTargets();
-        slot.leaf?.releaseLightTargets();
-      }
-      this.lightBuffer.detachGeometry();
+      this.detachLightingTargets();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.lightBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.invalidateLighting();
@@ -461,11 +458,15 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   private detachLightingTargets(): void {
-    for (const slot of this.slots) {
+    for (let i = 0; i < this.preparedLightingSlots; i++) {
+      const slot = this.slots[i]!;
       slot.material?.releaseLightTargets();
       slot.grass?.releaseLightTargets();
       slot.leaf?.releaseLightTargets();
     }
+    this.preparedLightingSlots = 0;
+    // A replaced slot may have been the last attached owner; detach centrally too.
+    for (let i = 0; i < 3; i++) this.sharedLights.setResource(Texture.EMPTY.source, i);
     this.artworkMaterials.detachTargets();
     this.lightBuffer.detachGeometry();
   }
@@ -481,7 +482,6 @@ export class PixiScenePainter implements SceneDrawing {
     }
     if (!this.geometryDirty) return;
     this.trimRetainedTree();
-    this.detachLightingTargets();
     this.drawGeometry();
     this.geometryDirty = false;
     this.lightDirty = true;
@@ -532,6 +532,7 @@ export class PixiScenePainter implements SceneDrawing {
         if (slot.item instanceof Graphics) this.artworkMaterials.attach(slot.item);
         if (slot.lookup) slot.lookup.update((slot.item as MeshSimple).texture);
       }
+      this.preparedLightingSlots = this.cursor;
       this.renderer.render({ container: this.root, clear: true });
     }
     this.canvas.dataset.lightingFrameView = view;
@@ -562,6 +563,10 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   private drawGeometry(): void {
+    // Generation changes must release borrowed guide sources before their owner destroys them.
+    const targets = this.geometryBuffer.targets;
+    if (targets && (targets.width !== this.canvas.width || targets.height !== this.canvas.height))
+      this.detachLightingTargets();
     this.geometryBuffer.resize(this.canvas.width, this.canvas.height);
     const restore: (() => void)[] = [];
     try {
@@ -862,9 +867,9 @@ export class PixiScenePainter implements SceneDrawing {
         if (slot?.item instanceof MeshSimple) slot.item.geometry.destroy();
         slot?.item.destroy();
       }
-      const material = kind === 'material' ? createMaterialMesh() : undefined;
-      const grass = kind === 'grass' ? createGrassMesh() : undefined;
-      const leaf = kind === 'leaf' ? createLeafMesh() : undefined;
+      const material = kind === 'material' ? createMaterialMesh(this.sharedLights) : undefined;
+      const grass = kind === 'grass' ? createGrassMesh(this.sharedLights) : undefined;
+      const leaf = kind === 'leaf' ? createLeafMesh(this.sharedLights) : undefined;
       slot = {
         kind,
         material,
@@ -1269,6 +1274,7 @@ export class PixiScenePainter implements SceneDrawing {
     const filterBindings: unknown = Reflect.get(this.renderer.filter, '_globalFilterBindGroup');
     if (filterBindings instanceof BindGroup) filterBindings.destroy();
     this.artworkMaterials.dispose();
+    this.sharedLights.destroy();
     this.lightBuffer.dispose();
     this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();

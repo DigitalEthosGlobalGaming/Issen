@@ -16,6 +16,7 @@ import type { GeometryTargets } from './geometry-buffer.ts';
 import type { LightTargets } from './light-buffer.ts';
 import { lightingCompositeFunctions } from './lighting-composite-glsl.ts';
 import { GraphicsUnsupportedError } from '../graphics-error.ts';
+import { setShaderResource } from './shader-resources.ts';
 
 function createLookupUniforms(batchTextures: number) {
   return new UniformGroup({
@@ -39,6 +40,7 @@ export class ArtworkMaterials {
   private readonly batchTextures: number;
   private readonly meshes = new Set<ReturnType<ArtworkMaterials['createMesh']>>();
   private disposed = false;
+  private targetsAttached = false;
   constructor(private readonly renderer: WebGLRenderer<HTMLCanvasElement>) {
     // Reserve diffuse/specular and a geometry guide for the later half-res lookup.
     // WebGL2 guarantees 16 fragment samplers; every context uses this same budget.
@@ -115,12 +117,12 @@ export class ArtworkMaterials {
       shader,
       update(texture: Texture) {
         texture.textureMatrix.update();
-        shader.resources.uTexture = texture.source;
+        setShaderResource(shader.resources, 'uTexture', texture.source);
         textureUniforms.uniforms.uTextureMatrix = texture.textureMatrix.mapCoord;
         textureUniforms.update();
       },
       releaseTexture() {
-        shader.resources.uTexture = Texture.EMPTY.source;
+        setShaderResource(shader.resources, 'uTexture', Texture.EMPTY.source);
       },
       dispose: () => {
         shader.destroy();
@@ -137,8 +139,11 @@ export class ArtworkMaterials {
     this.renderer.texture.bind(light.diffuse.source, this.batchTextures);
     this.renderer.texture.bind(light.specular.source, this.batchTextures + 1);
     this.renderer.texture.bind(geometry.g0.source, this.batchTextures + 2);
+    this.targetsAttached = true;
   }
   detachTargets(): void {
+    if (!this.targetsAttached) return;
+    this.targetsAttached = false;
     for (let unit = this.batchTextures; unit < this.batchTextures + 3; unit++)
       this.renderer.texture.bind(Texture.EMPTY.source, unit);
   }

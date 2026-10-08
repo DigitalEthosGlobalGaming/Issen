@@ -13,6 +13,7 @@ import type { GeometryTargets } from './geometry-buffer.ts';
 import type { SceneLighting } from '../scene-frame.ts';
 import { selectSceneLights } from '../light-budget.ts';
 import { GraphicsUnsupportedError } from '../graphics-error.ts';
+import { setShaderResource } from './shader-resources.ts';
 
 export type LightDebugView = 'diffuse' | 'specular';
 export interface LightTargets {
@@ -119,6 +120,7 @@ export class LightBuffer {
   private snapshot?: Readonly<LightTargets>;
   private generation = 0;
   private disposed = false;
+  private geometryAttached = false;
   private readonly uniforms = new UniformGroup({
     uAmbient: { value: new Float32Array(3), type: 'vec3<f32>' },
     uDirectional: { value: new Float32Array(3), type: 'vec3<f32>' },
@@ -168,10 +170,11 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
   }
   /** Detach geometry samplers before their owner releases a generation. */
   detachGeometry(): void {
-    this.shader.resources.uG0 =
-      this.shader.resources.uG1 =
-      this.shader.resources.uG2 =
-        Texture.EMPTY.source;
+    if (!this.geometryAttached) return;
+    this.geometryAttached = false;
+    setShaderResource(this.shader.resources, 'uG0', Texture.EMPTY.source);
+    setShaderResource(this.shader.resources, 'uG1', Texture.EMPTY.source);
+    setShaderResource(this.shader.resources, 'uG2', Texture.EMPTY.source);
   }
   resize(width: number, height: number, force = false, resolution: 1 | 0.5 = 1): void {
     if (this.disposed) return;
@@ -231,9 +234,10 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
     this.resize(geometry.width, geometry.height, false, lighting.lightResolution ?? 1);
     if (this.snapshot!.guide !== geometry.g0)
       this.snapshot = Object.freeze({ ...this.snapshot!, guide: geometry.g0 });
-    this.shader.resources.uG0 = geometry.g0.source;
-    this.shader.resources.uG1 = geometry.g1.source;
-    this.shader.resources.uG2 = geometry.g2.source;
+    setShaderResource(this.shader.resources, 'uG0', geometry.g0.source);
+    setShaderResource(this.shader.resources, 'uG1', geometry.g1.source);
+    setShaderResource(this.shader.resources, 'uG2', geometry.g2.source);
+    this.geometryAttached = true;
     const u = this.uniforms.uniforms;
     u.uAmbient.set(lighting.ambient);
     u.uDirectional.set(lighting.directional);
@@ -266,12 +270,12 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
   }
   renderDebug(view: LightDebugView): boolean {
     if (this.disposed || !this.snapshot) return false;
-    this.debugShader.resources.uBuffer = this.snapshot[view].source;
+    setShaderResource(this.debugShader.resources, 'uBuffer', this.snapshot[view].source);
     this.renderer.render({ container: this.debugRoot, clear: true });
     return true;
   }
   private releaseTarget(): void {
-    this.debugShader.resources.uBuffer = Texture.EMPTY.source;
+    setShaderResource(this.debugShader.resources, 'uBuffer', Texture.EMPTY.source);
     const sources = this.target?.colorTextures.slice();
     if (this.snapshot)
       for (const texture of [this.snapshot.diffuse, this.snapshot.specular]) texture.destroy(false);

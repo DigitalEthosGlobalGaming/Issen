@@ -15,6 +15,12 @@ import type { SceneTextureStore } from './texture-store.ts';
 import { DRIFT_BY_ID } from '../scene/drift-catalog.ts';
 import { normalTransform } from '../scene-frame.ts';
 import { lightingCompositeFunctions } from './lighting-composite-glsl.ts';
+import { createLightTargetBinding, setShaderResource } from './shader-resources.ts';
+import { createLightShader } from './shared-light-resources.ts';
+import type { BindGroup } from 'pixi.js';
+
+const compositeTextureNames = ['uDiffuse', 'uEmissive'] as const;
+const geometryTextureNames = ['uDiffuse', 'uNormal', 'uSurface'] as const;
 
 function samples(name: string) {
   return (
@@ -115,7 +121,7 @@ void main(){
   finalColor=vec4(display*alpha,alpha);
 }`;
 /** Four catalogue atlases share a single ordered instanced draw for each depth layer. */
-export function createLeafMesh() {
+export function createLeafMesh(sharedLights?: BindGroup) {
   const data = new Buffer({
     data: new Float32Array(26),
     usage: BufferUsage.VERTEX | BufferUsage.COPY_DST,
@@ -159,16 +165,15 @@ export function createLeafMesh() {
         ]),
       ),
     );
-  const shader = Shader.from({
-    gl: { vertex, fragment: compositeFragment, name: 'issen-instanced-leaf-composite' },
-    resources: {
+  const composite = createLightShader(
+    { vertex, fragment: compositeFragment, name: 'issen-instanced-leaf-composite' },
+    {
       leafUniforms: uniforms,
       ...resources(['uDiffuse', 'uEmissive']),
-      uLightDiffuse: Texture.EMPTY.source,
-      uLightSpecular: Texture.EMPTY.source,
-      uLightGuide: Texture.EMPTY.source,
     },
-  });
+    sharedLights,
+  );
+  const shader = composite.shader;
   const gShader = Shader.from({
     gl: { vertex, fragment: geometryFragment, name: 'issen-instanced-leaf-geometry' },
     resources: { leafUniforms: uniforms, ...resources(['uDiffuse', 'uNormal', 'uSurface']) },
@@ -180,18 +185,18 @@ export function createLeafMesh() {
     front = false,
     spriteMotion = false,
     disposed = false;
-  const releaseLightTargets = () => {
-    shader.resources.uLightDiffuse =
-      shader.resources.uLightSpecular =
-      shader.resources.uLightGuide =
-        Texture.EMPTY.source;
-  };
+  const lightBinding = createLightTargetBinding(shader.resources, Texture.EMPTY.source);
+  const releaseLightTargets = lightBinding.detach;
   const releaseTextures = () => {
     for (let i = 0; i < 4; i++) {
-      for (const name of ['uDiffuse', 'uEmissive'])
-        shader.resources[name + i] = (name === 'uEmissive' ? Texture.EMPTY : Texture.WHITE).source;
-      for (const name of ['uDiffuse', 'uNormal', 'uSurface'])
-        gShader.resources[name + i] = Texture.WHITE.source;
+      for (const name of compositeTextureNames)
+        setShaderResource(
+          shader.resources,
+          name + i,
+          (name === 'uEmissive' ? Texture.EMPTY : Texture.WHITE).source,
+        );
+      for (const name of geometryTextureNames)
+        setShaderResource(gShader.resources, name + i, Texture.WHITE.source);
     }
   };
   return {
@@ -267,12 +272,25 @@ export function createLeafMesh() {
         if (!atlas.material.normal || !atlas.material.surface)
           throw new Error('Leaf atlas requires PBR normal and surface planes');
         const diffuse = textures.get(atlas.texture).source;
-        shader.resources['uDiffuse' + i] = gShader.resources['uDiffuse' + i] = diffuse;
-        gShader.resources['uNormal' + i] = textures.getData(atlas.material.normal).source;
-        gShader.resources['uSurface' + i] = textures.getData(atlas.material.surface).source;
-        shader.resources['uEmissive' + i] = atlas.material.emissive
-          ? textures.get(atlas.material.emissive).source
-          : Texture.EMPTY.source;
+        setShaderResource(shader.resources, 'uDiffuse' + i, diffuse);
+        setShaderResource(gShader.resources, 'uDiffuse' + i, diffuse);
+        setShaderResource(
+          gShader.resources,
+          'uNormal' + i,
+          textures.getData(atlas.material.normal).source,
+        );
+        setShaderResource(
+          gShader.resources,
+          'uSurface' + i,
+          textures.getData(atlas.material.surface).source,
+        );
+        setShaderResource(
+          shader.resources,
+          'uEmissive' + i,
+          atlas.material.emissive
+            ? textures.get(atlas.material.emissive).source
+            : Texture.EMPTY.source,
+        );
         uniforms.uniforms.uAmounts[i] = atlas.material.lighting * lighting;
       });
       uniforms.uniforms.uLocalAlpha = mesh.alpha;
@@ -298,9 +316,7 @@ export function createLeafMesh() {
       };
     },
     prepareComposite(targets: Readonly<LightTargets>) {
-      shader.resources.uLightDiffuse = targets.diffuse.source;
-      shader.resources.uLightSpecular = targets.specular.source;
-      shader.resources.uLightGuide = targets.guide.source;
+      lightBinding.attach(targets);
       uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
       uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       uniforms.update();
@@ -310,7 +326,7 @@ export function createLeafMesh() {
       disposed = true;
       releaseLightTargets();
       releaseTextures();
-      shader.destroy();
+      composite.dispose();
       gShader.destroy();
       mesh.destroy();
       geometry.destroy(true);

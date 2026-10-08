@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 1 next
+# Performance, assets and seamless transitions — Phase 1 in progress
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -58,14 +58,33 @@ prewarmed:false, not a GPU fence. Version/package lock/title/changelog1.68.1.
 
 ## Next
 
-Commit Phase0 instrumentation and tooling/report in reviewable steps. Then:
-1. Phase1.1 binding idempotence/active-slot detach; investigate geometryPass detach
-   with native rendering, resize/context restore and no feedback-loop warnings.
-2. Phase1.2 cached live views with getters;1.3 change-only trial DOM;1.4 CPU readback
+Phase0 commits bc43526 and1aa563d are complete. Phase1.1 is now verified:
+
+- Change-only setters, attachment flags and previously prepared-slot detach.
+- Routine geometryPass detach removed; replacement of the borrowed guide and
+  light-target writes still detach. Resize/context restore/feedback checks PASS.
+- Pixi already checks identity. Actual shared light-source fan-out required one
+  painter-owned BindGroup borrowed by materials, grass and leaves. Standalone
+  factories own their group; atlas/uniform groups retain individual ownership.
+- Strict,2unit checks,35native rendering browsers and7ownership/instancing
+  browsers PASS. Checked production verification build PASS.
+- Version/package lock/title/changelog1.68.2.
+- All15 timings and3diagnostics PASS in
+  tmp/performance/2026-10-08T10-18-38.055Z-a5186c2e (captured before metadata bump).
+  Pooled render median combat6.1→2.8ms,Demon29.4→7.1ms,Inferno45.9→10.1ms.
+  After renderp95=4.0/11.0/17.9ms;120Hz target is NOT reached. Cap remains60fps.
+  Remaining listener self-time requires further investigation; current light
+  source listener count is independent of pool size. No decoded budget yet.
+- Initial smaller candidate: tmp/performance/2026-10-08T10-08-08.648Z-9b4b1032.
+  Both candidates and weighted CPU self-time comparison are recorded in notes.
+- Measurement session52285 and browser sessions are terminal; do not restart them.
+
+Continue:
+1. Phase1.2 cached live views with getters;1.3 change-only trial DOM;1.4 CPU readback
    canvases. Include high-refresh gameplay pacing while keeping time/RNG contracts.
-3. Focused strict/unit/browser checks, then measured Phase1 comparison against
+2. Focused strict/unit/browser checks, then measured Phase1 comparison against
    frozen baselines. Record findings and commit before Phase2 compose.
-4. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas
+3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas
    checkpoint and WebP/quantisation visual checks remain required. Existing W1
    already compacted runtime WebP planes; inventory actual files before converting
    anything again. Seed determinism risk is the only explicit user-decision gate.

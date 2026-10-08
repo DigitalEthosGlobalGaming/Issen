@@ -5,6 +5,10 @@ import type { LightTargets } from './light-buffer.ts';
 import { normalTransform } from '../scene-frame.ts';
 import type { SceneLighting, SceneSprite } from '../scene-frame.ts';
 import type { SceneTextureStore } from './texture-store.ts';
+import { setShaderResource } from './shader-resources.ts';
+import type { BindGroup } from 'pixi.js';
+
+const textureNames = ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'] as const;
 
 const vertex = `
 precision highp float;
@@ -36,7 +40,7 @@ function setUvRect(out: Float32Array, texture: Texture): void {
   out[3] = frame.height / texture.source.height;
 }
 /** Shared geometry data and one ordered light-lookup material; no per-sprite BRDF. */
-export function createMaterialMesh() {
+export function createMaterialMesh(sharedLights?: BindGroup) {
   const uniforms = new UniformGroup({
     uDiffuseRect: { value: new Float32Array([0, 0, 1, 1]), type: 'vec4<f32>' },
     uNormalRect: { value: new Float32Array([0, 0, 1, 1]), type: 'vec4<f32>' },
@@ -50,7 +54,7 @@ export function createMaterialMesh() {
     uHasSurface: { value: 0, type: 'f32' },
     uHasEmissive: { value: 0, type: 'f32' },
   });
-  const compositeMaterial = createCompositeMaterial(vertex, uniforms);
+  const compositeMaterial = createCompositeMaterial(vertex, uniforms, sharedLights);
   const shader = compositeMaterial.shader;
   const geometryMaterial = createGeometryMaterial(vertex, uniforms);
   let cutoff = 0.5;
@@ -87,8 +91,12 @@ export function createMaterialMesh() {
     },
     releaseTextures(): void {
       if (!texturesBound) return;
-      for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'])
-        shader.resources[name] = name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source;
+      for (const name of textureNames)
+        setShaderResource(
+          shader.resources,
+          name,
+          name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source,
+        );
       geometryMaterial.releaseTextures();
       texturesBound = false;
     },
@@ -100,11 +108,11 @@ export function createMaterialMesh() {
       const mask = material.mask ? textures.getData(material.mask) : Texture.WHITE;
       const surface = material.surface ? textures.getData(material.surface) : Texture.WHITE;
       const emissive = material.emissive ? textures.get(material.emissive) : Texture.EMPTY;
-      shader.resources.uDiffuse = diffuse.source;
-      shader.resources.uNormal = normal.source;
-      shader.resources.uMask = mask.source;
-      shader.resources.uSurface = surface.source;
-      shader.resources.uEmissive = emissive.source;
+      setShaderResource(shader.resources, 'uDiffuse', diffuse.source);
+      setShaderResource(shader.resources, 'uNormal', normal.source);
+      setShaderResource(shader.resources, 'uMask', mask.source);
+      setShaderResource(shader.resources, 'uSurface', surface.source);
+      setShaderResource(shader.resources, 'uEmissive', emissive.source);
       texturesBound = true;
       const u = uniforms.uniforms;
       setUvRect(u.uDiffuseRect, diffuse);

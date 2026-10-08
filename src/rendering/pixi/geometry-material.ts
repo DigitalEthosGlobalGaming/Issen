@@ -1,4 +1,7 @@
 import { Shader, Texture, UniformGroup } from 'pixi.js';
+import { setShaderResource } from './shader-resources.ts';
+
+const textureNames = ['uDiffuse', 'uNormal', 'uMask', 'uSurface'] as const;
 
 const fragment = `#version 300 es
 precision highp float;
@@ -78,14 +81,14 @@ export function createGeometryMaterial(vertex: string, materialUniforms: Uniform
   return {
     shader,
     update(source: Shader, depthRange: number, cutoff: number, alpha: number) {
-      for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface'])
-        shader.resources[name] = source.resources[name];
+      for (const name of textureNames)
+        setShaderResource(shader.resources, name, source.resources[name]);
       geometryUniforms.uniforms.uGeometry.set([depthRange, cutoff, alpha]);
       geometryUniforms.update();
     },
     releaseTextures() {
-      for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface'])
-        shader.resources[name] = Texture.WHITE.source;
+      for (const name of textureNames)
+        setShaderResource(shader.resources, name, Texture.WHITE.source);
     },
     dispose() {
       shader.destroy();

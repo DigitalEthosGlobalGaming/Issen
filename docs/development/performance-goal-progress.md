@@ -141,3 +141,72 @@ deployment claim is made. Full suites and final traces remain Phase 5 work.
 Checkpoint 1 is recorded. Next: Phase 1 binding/listener idempotence, cached live
 views, change-only trial DOM, CPU readback canvases and high-refresh pacing;
 re-measure before proceeding to compose and bounded loading.
+
+## Phase 1.1 — Light bindings, 8 October 2026
+
+The requested change-only setters, hoisted texture-name arrays, attachment flags
+and prepared-slot release are implemented. Native geometry rendering does not
+need the routine light detach: removing it passed warning-sensitive pixel,
+resize and context-restoration checks. Generation replacement still detaches
+the borrowed geometry guide; light rendering detaches before target writes.
+
+Investigation found Pixi 8.22 already checks resource identity internally. The
+remaining cost was actual attach/release across many material groups sharing
+three sources. A first measured candidate improved render medians but retained
+that fan-out. Materials and instanced grass/leaves now borrow one painter-owned
+light group through Pixi's public `groups`/`groupMap` API. Atlas bindings and
+uniforms retain their own group and disposal. Standalone factories own a light
+group. The listener count is independent of mesh-pool size; material disposal
+does not destroy a borrowed group. No lighting shader math changed.
+
+The initial candidate's evidence is
+`tmp/performance/2026-10-08T10-08-08.648Z-9b4b1032`: 15 timing samples PASS.
+Its report's median per-repetition render estimates were combat6.9→3.0ms,
+Demon29.8→21.4ms, Inferno52.6→37.6ms. Combat was variable; these medians differ
+from the pooled raw baseline table above. The shared-group candidate is measured
+separately below. Neither candidate establishes the complete goal's targets.
+
+Verification:
+
+- Strict TypeScript and both change-only/no-op binding units PASS.
+- All35 light/composer/geometry/half-resolution/native Pixi browsers PASS.
+- All7 shared ownership, shrinking pool, instanced grass and leaves browsers
+  PASS. Pixel parity, guide replacement, resize, context restoration and
+  warning-sensitive captures remain covered by those checks.
+- New ownership test checks borrowed light listeners survive one peer's
+  disposal, and both material and painter listeners are released by their
+  respective owners. Shrinking-pool test checks40→2prepared slots, constant
+  light listener counts, repeated-flush exact pixels and no GL error.
+- Version/package lock/title/changelog synchronized at1.68.2.
+
+The full Phase1 checkpoint still requires cached live views, change-only DOM,
+CPU readback canvases, high-refresh pacing and their measured comparison.
+
+### Shared-group measurement
+
+Evidence: `tmp/performance/2026-10-08T10-18-38.055Z-a5186c2e`, all15 timings and
+3separate CPU diagnostics PASS. The standard instrumentation fingerprint remains
+identical to Phase0. Runtime code was captured before the1.68.2metadata update;
+the saved build therefore labels itself1.68.1. Conditions match the portrait
+baseline. `frame-budgets.json` pools raw samples; `listener-profile.json` sums
+actual CPU sample time deltas for qualified `*.removeListener` names. This
+weighted calculation replaces the rough profile-inspection estimates above.
+
+| Workload | Render median before→after ms | Render p95 before→after ms | After render p99 ms | After render >8.3 / >16.7 | Interval p95 before→after ms |
+| -------- | ----------------------------: | -------------------------: | ------------------: | ------------------------: | ---------------------------: |
+| Combat   |                       6.1→2.8 |                   15.4→4.0 |                 5.1 |              5 / 4 of1501 |                    19.3→16.9 |
+| Demon    |                      29.4→7.1 |                  39.7→11.0 |                15.5 |            394 / 9 of1493 |                    55.7→19.2 |
+| Inferno  |                     45.9→10.1 |                  81.4→17.9 |                30.4 |          1193 / 96 of1485 |                    82.4→18.5 |
+
+Sampled listener self-time in separate five-second profiles:
+Combat90.7→10.3ms, Demon1030.4→287.2ms, Inferno748.5→523.5ms. The constant
+light-source listener test proves that pooled light-group fan-out is removed;
+these profiles still contain other resource listener churn and do not establish
+that every hotspot is gone. Combat and Inferno median comparisons are marked
+variable by the existing harness. Noisy samples remain in the evidence.
+
+After startup medians across these scenarios are2481–2567ms. Endpoint heap peaks
+are43.9/93.1/192.0MB; nominal main decoded estimates remain878.1MB for each.
+This optimization does not claim a memory budget or near-instant transitions.
+Compose and stage-cycle measurement will be repeated at the full Phase1
+checkpoint; those behavior paths were not optimized here. The60fps cap remains.

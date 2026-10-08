@@ -15,6 +15,9 @@ import type { GrassBlade } from '../scene/ambient.ts';
 import type { LightTargets } from './light-buffer.ts';
 import { lightingCompositeFunctions } from './lighting-composite-glsl.ts';
 import { normalTransform } from '../scene-frame.ts';
+import { createLightTargetBinding, setShaderResource } from './shader-resources.ts';
+import { createLightShader } from './shared-light-resources.ts';
+import type { BindGroup } from 'pixi.js';
 
 const vertex = `#version 300 es
 precision highp float;
@@ -94,7 +97,7 @@ void main() {
 }`;
 
 /** One retained instanced strip for a depth layer; only uniforms change during motion. */
-export function createGrassMesh() {
+export function createGrassMesh(sharedLights?: BindGroup) {
   const data = new Buffer({
     data: new Float32Array(8),
     usage: BufferUsage.VERTEX | BufferUsage.COPY_DST,
@@ -128,16 +131,15 @@ export function createGrassMesh() {
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
     uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
   });
-  const shader = Shader.from({
-    gl: { vertex, fragment: compositeFragment, name: 'issen-instanced-grass-composite' },
-    resources: {
+  const composite = createLightShader(
+    { vertex, fragment: compositeFragment, name: 'issen-instanced-grass-composite' },
+    {
       grassUniforms: uniforms,
       uPalette: Texture.EMPTY.source,
-      uLightDiffuse: Texture.EMPTY.source,
-      uLightSpecular: Texture.EMPTY.source,
-      uLightGuide: Texture.EMPTY.source,
     },
-  });
+    sharedLights,
+  );
+  const shader = composite.shader;
   const gShader = Shader.from({
     gl: { vertex, fragment: geometryFragment, name: 'issen-instanced-grass-geometry' },
     resources: {
@@ -151,16 +153,13 @@ export function createGrassMesh() {
     palette: Texture | undefined,
     disposed = false;
   const releasePalette = () => {
-    shader.resources.uPalette = Texture.EMPTY.source;
-    gShader.resources.uPalette = Texture.EMPTY.source;
+    setShaderResource(shader.resources, 'uPalette', Texture.EMPTY.source);
+    setShaderResource(gShader.resources, 'uPalette', Texture.EMPTY.source);
     palette?.destroy(true);
     palette = undefined;
   };
-  const releaseLightTargets = () => {
-    shader.resources.uLightDiffuse = Texture.EMPTY.source;
-    shader.resources.uLightSpecular = Texture.EMPTY.source;
-    shader.resources.uLightGuide = Texture.EMPTY.source;
-  };
+  const lightBinding = createLightTargetBinding(shader.resources, Texture.EMPTY.source);
+  const releaseLightTargets = lightBinding.detach;
   return {
     mesh,
     releaseLightTargets,
@@ -248,16 +247,14 @@ export function createGrassMesh() {
       uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
       uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
       uniforms.update();
-      shader.resources.uLightDiffuse = targets.diffuse.source;
-      shader.resources.uLightSpecular = targets.specular.source;
-      shader.resources.uLightGuide = targets.guide.source;
+      lightBinding.attach(targets);
     },
     dispose() {
       if (disposed) return;
       disposed = true;
       releaseLightTargets();
       releasePalette();
-      shader.destroy();
+      composite.dispose();
       gShader.destroy();
       mesh.destroy();
       geometry.destroy(true);
