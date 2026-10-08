@@ -112,12 +112,21 @@ Continue:
    Loading286–809ms;7captures retain tasks>16ms (maximum59.1ms), atlas requests
    remain0–28per transition. Main decoded budget still absent; nominal878–928MB.
    Compose session23676 and scene session72683 are TERMINAL exit0. No live captures.
-   Full Phase1measured checkpoint is recorded in progress notes. Continue Phase2:
+   Full Phase1measured checkpoint is recorded in progress notes at1dc25ce.
+   Phase2worker binding/parallel transfer step is verified at1.68.5:4new units,
+   6browsers and checked production build PASS. Compose evidence
+   tmp/performance-compose-phase2-transfer PASS45repetitions/116byte-identical
+   baseline planes; session78210 TERMINAL exit0. Transfer medians are mixed;
+   no uniform speedup claim. Stage0compose median587.2ms remains>500.
+   Continue Phase2:
    bounded masked material cutout cache, visual-checked2degree normal rotation,
    scratch reuse/readback-only CPU contexts, cached worker native methods and
    parallel bitmap copies with complete close-on-failure ownership. Focused tests,
    remeasure every stage against raw baseline, profile/explain stages>500ms and
    record the quantisation visual checkpoint before Phase3.
+   High-refresh submissions alone do not prove smooth120Hz visual motion; prepared
+   poses remain60Hz. Address that fidelity/per-frame waste concern while retaining
+   run determinism before final completion, alongside remaining CPU budget costs.
 3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas
    checkpoint and WebP/quantisation visual checks remain required. Existing W1
    already compacted runtime WebP planes; inventory actual files before converting

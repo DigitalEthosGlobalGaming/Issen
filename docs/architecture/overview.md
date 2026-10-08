@@ -130,6 +130,10 @@ react synchronously. Nested result/offer arrays are copied and frozen by their o
 The Ink environment is owned by `src/rendering/environment/`. It supplies
 layered image scenery to the shared scene composition and film pass, rendered
 through Pixi on WebGL2. Canvas remains a texture-preparation tool.
+Worker context proxies cache bound native methods and adapt image arguments only
+for drawing/patterns. `layer-transfer.ts` copies composed colour/material planes
+concurrently; failures wait for pending copies and close every acquired bitmap
+before the worker reports failure. Completed response ownership remains unchanged.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and

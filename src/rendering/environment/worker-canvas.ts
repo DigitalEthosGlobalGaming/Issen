@@ -1,3 +1,30 @@
+/** Cache native bindings; only image consumers need decoded-source adaptation. */
+export function createWorkerContextProxy(
+  native: OffscreenCanvasRenderingContext2D,
+  unwrap: (source: unknown) => unknown,
+): OffscreenCanvasRenderingContext2D {
+  const methods = new Map<PropertyKey, (...args: unknown[]) => unknown>();
+  return new Proxy(native, {
+    get(target, property) {
+      const value = Reflect.get(target, property, target);
+      if (typeof value !== 'function') return value;
+      let method = methods.get(property);
+      if (!method) {
+        method =
+          property === 'drawImage' || property === 'createPattern'
+            ? (...args: unknown[]) =>
+                Reflect.apply(value, target, [unwrap(args[0]), ...args.slice(1)])
+            : value.bind(target);
+        methods.set(property, method!);
+      }
+      return method;
+    },
+    set(target, property, value) {
+      return Reflect.set(target, property, value, target);
+    },
+  });
+}
+
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
 export function createWorkerDocument(): Document & {
   decodedSnapshot(): { images: number; bytes: number };
@@ -106,23 +133,7 @@ export function createWorkerDocument(): Document & {
           if (!native) return null;
           let proxy = contexts.get(native);
           if (!proxy) {
-            proxy = new Proxy(native, {
-              get(target, property) {
-                const value = Reflect.get(target, property, target);
-                if (typeof value !== 'function') return value;
-                return (...args: unknown[]) =>
-                  Reflect.apply(
-                    value,
-                    target,
-                    property === 'drawImage' || property === 'createPattern'
-                      ? [unwrap(args[0]), ...args.slice(1)]
-                      : args,
-                  );
-              },
-              set(target, property, value) {
-                return Reflect.set(target, property, value, target);
-              },
-            });
+            proxy = createWorkerContextProxy(native, unwrap);
             contexts.set(native, proxy);
           }
           return proxy;

@@ -1,5 +1,6 @@
 import { createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createWorkerDocument } from './worker-canvas.ts';
+import { copyComposedLayers } from './layer-transfer.ts';
 import { closeLayers } from './worker-types.ts';
 import type { ComposedLayer, ComposeRequest, ComposeResponse } from './worker-types.ts';
 
@@ -40,28 +41,9 @@ scope.onmessage = ({ data }) => {
       ) {
         composedAt = performance.now();
         const completed = renderer.exportLayers();
-        const transfer = async (entry: (typeof completed.layers)[number]) => {
-          const copy = (
-            source: HTMLCanvasElement | HTMLImageElement | ImageBitmap,
-            colour = false,
-          ) =>
-            createImageBitmap(source, {
-              premultiplyAlpha: colour ? 'premultiply' : 'none',
-              colorSpaceConversion: 'none',
-            });
-          const layer: ComposedLayer = { colour: await copy(entry.colour, true) };
-          try {
-            for (const kind of ['normal', 'surface', 'emissive'] as const)
-              if (entry.material?.[kind]) layer[kind] = await copy(entry.material[kind]!.source);
-          } catch (error) {
-            closeLayers([layer]);
-            throw error;
-          }
-          return layer;
-        };
-        // Preserve ownership if any transfer fails: completed bitmaps are closed below.
-        for (const entry of completed.layers) layers.push(await transfer(entry));
-        for (const entry of completed.foreground) foreground.push(await transfer(entry));
+        const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
+        layers.push(...copied.slice(0, completed.layers.length));
+        foreground.push(...copied.slice(completed.layers.length));
       }
       const snapshot = {
         ...renderer.snapshot(),

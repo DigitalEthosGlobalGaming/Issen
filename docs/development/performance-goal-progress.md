@@ -383,3 +383,33 @@ These are endpoint samples/nominal sizes, not resident GPU or continuous peaks.
 Phase1findings are recorded before continuing. Phase2cutout-cache quantisation
 must retain pixel evidence and its checkpoint; remaining Phase3inventory/budget
 and Phase4seed/promotion/loading invariants remain outstanding.
+
+## Phase 2 — Worker method bindings and parallel transfer
+
+Version1.68.5 caches each worker native context method once. Only `drawImage`
+and `createPattern` adapt decoded-image wrappers; other methods retain native
+bound functions. All composed colour/material/foreground bitmap copies start
+concurrently through `layer-transfer.ts`. Failure waits for every plane copy,
+including late siblings of a rejected layer, then closes all acquired bitmaps.
+The response owner still closes completed layers if posting the response fails.
+Colour premultiplication and linear map colour-space options are unchanged.
+
+Four new units PASS: stable/native method binding and selective unwrapping,
+all-plane concurrency/order/optional maps, rejection with late sibling copies,
+and synchronous copy failure with asynchronous peers. All6focused browsers PASS:
+worker construction/runtime/composition fallback, all nine lit stages/foreground,
+coalescing/disposal, hidden owners, mirrored material coverage and zero emission.
+Strict checked production build PASS. Evidence logs are
+`tmp/performance-phase2-worker-units.log`,
+`tmp/performance-phase2-worker-browser.log` and
+`tmp/performance-phase2-worker-build.log`.
+
+`tmp/performance-compose-phase2-transfer/results.json` PASS45repetitions;
+all116raw planes remain byte-identical to Phase0. Session78210 is terminal exit0.
+Stage0compose median587.2ms still exceeds500ms. Transfer medians before→after
+Phase1: stages0–8 are38.1→46.8,37.7→38.0,43.2→45.5,70.2→55.2,72.7→78.5,
+46.1→46.0,48.0→46.2,50.5→48.6,30.3→37.8ms. Results are mixed; concurrent copies
+do not establish a uniform speedup on this graphics stack. Round-trip medians
+are625.1/304.6/365.8/520.0/462.5/296.0/399.7/339.5/311.7ms. Do not claim the
+compose target is met. The bounded cutout cache/scratch reuse and visual-checked
+angle quantisation are next; no material quantisation has been introduced yet.
