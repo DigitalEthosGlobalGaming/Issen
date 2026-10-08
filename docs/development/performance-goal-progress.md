@@ -1968,3 +1968,40 @@ next seeds/slots/promotion,120Hz/CPU budget and full Phase5 metrics/traces/suite
 remain required. Goal active at full scope; no push/deploy/native build/saves.
 Final diff/formatPASS; synchronized package/lock/title/changelog. All measurement
 and verification sessions terminal.
+
+## Checkpoint 35 — Worker transfer input release rejected
+
+Before changing worker input ownership, both256/512MiB three-cycle captures pass
+54stage visits in41.3s on an isolated strict-port server/one worker. Completed
+stage0 still pins34inputs213,952,112bytes; remaining stages pin21/24/27/21/18/24/
+28/25inputs132,128,136/151,000,920/169,880,784/132,140,400/113,257,944/150,986,640/
+176,174,304/157,292,768bytes. Low-memory sampled peak264,275,216bytes. Output-plane
+SHA256 baseline also captured: two cycles/nine stages/two seed/size/DPR/quality
+variants for each capacity,72cases;2PASS24.1s. Evidence under
+tmp/performance-worker-input-release/baseline-*.json/logs; source copies and isolated
+probes under tmp/performance-worker-input-release/ and tmp/probes/worker-input-release/.
+Trial releases compose-only inputs after all output copies complete. Its72case
+capture passes loader bounds/zero post-transfer pins, but the full SHA256 gate
+fails: second-cycle stage0low colour plane differs at deviceMemory8. All remaining
+cases/planes match, including every256MiB case and all material planes. Zero pins
+alone is insufficient to accept the change.
+
+Independent native controls compare two unchanged workers and the candidate over
+36cases. Both original controls are exact; candidate stage0low on the second cycle
+differs by24channel levels, exceeding the existing max1 tolerance. Reusing empty
+raw wrappers does not fix it. Retaining warm raw bitmap references/metadata,
+unpinning them and re-pinning required inputs before new map decoding also fails:
+stage0low colour max24 and second-cycle stage7low colour max255. Both controls
+remain exact. Wrapper replacement is not an established cause; material/source-cache
+lifetime or native sampling history remains unresolved. No tolerance increase.
+
+Reverted all four implementation/test files exactly to1.68.31. Restored original
+comparisonPASS21.8s/all36cases exact against both unchanged controls. No version
+or changelog change. Original worker pins/budgets remain; main-thread local release
+from checkpoint34 remains integrated. Failed patches, original modules, hashes,
+colour comparisons and logs retained under tmp/performance-worker-input-release/;
+isolated probes under tmp/probes/worker-input-release/. All handles terminal.
+Next selected figure ownership/incoming pin admission still requires full native
+parity and coordinated headroom; worker release needs a separate proven fix.
+Next slots,120Hz/CPU budgets and full Phase5 remain required. Goal active at full
+scope; no push/deploy/native build/player saves.

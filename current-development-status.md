@@ -1,4 +1,17 @@
-# Performance, assets and seamless transitions — Local input release integrated
+# Performance, assets and seamless transitions — Worker release trial rejected
+
+Latest checkpoint35: worker compose-input release rejected and reverted exactly
+to1.68.31; main-thread local release from checkpoint34 remains integrated.
+Baseline54visits/256and512MiB PASS; candidate72cases meet loader bounds/zero pins
+but one revisited stage0low colour plane changes. Two unchanged worker controls
+match exactly; candidate max24 exceeds max1. Final warm bitmap/unpin trial also
+changes second-cycle stage7low colour by255. Preserving raw wrapper/bitmap identity
+does not resolve the regression; cause unresolved. Restored36case comparisonPASS21.8s,
+all planes exact. Evidence under tmp/performance-worker-input-release/ and
+tmp/probes/worker-input-release/. No implementation/version change; all handles
+terminal. Continue selected figure ownership/incoming admission with native parity
+and coordinated headroom. Worker release needs a separate proven fix. Full goal
+remains active; next slots,120Hz/CPU budgets and Phase5 remain required.
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
