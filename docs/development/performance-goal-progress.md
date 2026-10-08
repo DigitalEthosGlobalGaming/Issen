@@ -1710,3 +1710,42 @@ at full scope; no push/deployment/native build or real player-save mutation.
 Final bundled app/ink checks3PASS24.1s/default2workers; focused formatting/diff
 PASS and version/package/lock/title/changelog synchronized. All check sessions
 terminal. These checks do not substitute for remaining full-goal verification.
+
+## Checkpoint 29 — Enemy prepared canvas retirement baseline
+
+Before editing cache retirement, an80palette body grid crosses the variant/tone
+LRU pixel budgets within one queued native frame. Both unchanged renderer owners
+produce identical pixels. Each holds242native source textures before disposal;
+direct atlas cleanup leaves240prepared colour textures alive. CPU cache counts
+remain95variants/31tones with5,944,064/1,940,224pixels under their limits. This is
+not bounded GPU ownership: already evicted canvases still have native consumers.
+Baseline: tmp/performance-enemy-cache-retirement/baseline.json; saved original
+renderer and queued-grid probe under tmp/probes/enemy-cache-retirement/. Test
+eviction and final disposal together; a release must preserve already queued
+draws, including warmed sources that leave the LRU later in the same frame.
+
+Immediate retireSceneTexture on variant/tone eviction plus final disposal was
+tested and reverted. It clears every native texture (final0) but changes queued
+grid pixels by253, versus unchanged-control max0. Evicted sources may already
+have queued native material stamps, including GPU-warm colours. Existing texture
+store retirement detaches pooled slot bindings immediately, invalidating those
+stamps before flush. This is a real lifetime constraint, not a tolerance issue.
+Rejected evidence: tmp/performance-enemy-cache-retirement/rejected-immediate.json.
+The source/cache ownership implementation is restored exactly; no version bump.
+
+Next retirement work must distinguish final closure from removal of a cache entry
+whose consumers still belong to the pending frame. Preserve queued and repeated
+flush/readback behavior, frame abandonment, context loss, disposal and multiple
+painters. Track pending resources within the memory budget rather than using an
+unbounded timeout/microtask queue or forcing extra render passes. Current texture
+stores pin warming uploads but do not own pending live-frame retirement; begin
+resets slot cursor and flush releases unused slots/collects120-frame resources.
+This identifies where the lifecycle work belongs. Do not reapply immediate cache
+retirement or accept zero disposal counts without the queued-pixel comparison.
+
+Both isolated captures completed (one worker/dedicated strict-port server);
+baseline PASS4.3s, immediate-retirement case FAIL1.7s. Ignored probes contain the saved
+original module and reproducible80palette grid. Production assets, decoding,
+simulation, seeds and frozen standard performance harness remain unchanged. Goal
+remains active at full scope; no push/deploy/native build or player-save mutation.
+Restored renderer/control rerun PASS3.7s, exact queued pixels; source diff empty.

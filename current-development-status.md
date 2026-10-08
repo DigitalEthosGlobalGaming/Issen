@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Direct PBR retirement
+# Performance, assets and seamless transitions — Queued cache retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -656,3 +656,20 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Final bundled startup/gameplay/Armoury/offline3PASS24.1s/default2workers;
     diff/formatPASS; version/package/lock/title/changelog synchronized. All check
     sessions terminal; no push/deploy/native build or real player-save mutation.
+
+29. Enemy prepared-cache GPU baseline/rejected experiment; production restored
+    exactly at1.68.28. An80palette queued grid stays within CPU cache limits
+    (95variants/31tones;5,944,064/1,940,224pixels) but retains242native textures;
+    final enemy disposal leaves240prepared colour textures. Two unchanged owners
+    match exactly. Immediate eviction/disposal retirement reaches0textures but
+    changes pixels by253: queued stamps lose their pooled bindings before flush.
+    Reverted; no tolerance relaxation or version bump. Evidence
+    tmp/performance-enemy-cache-retirement/{baseline,rejected-immediate}.json;
+    saved original/reproducer under tmp/probes/enemy-cache-retirement/. Both runs
+    terminal, baselinePASS4.3s/experimentcaseFAIL1.7s. Next: bounded pending live-frame
+    GPU ownership and retirement after consumers finish, covering repeated flush,
+    cancellation/context loss and peers. Do not force extra render passes or use
+    an unbounded deferred-close queue. Existing warming pins do not cover this.
+    Full selected figure/startup/local ownership, native sampling, next slots,
+    120Hz and Phase5 measurements remain required. No assets/harness/seed changes.
+    Restored control rerunPASS3.7s, exact pixels; implementation diff empty.
