@@ -9,7 +9,7 @@ architecture ownership documentation (`d6c3b5e`). Version is 1.68.0.
 
 - W1: layout-preserving 352 compact runtime images, exact data maps, optional
   emission, retained authoring PNGs. See asset-compaction-results.md.
-- W2: 129-line composition root; plain-record state machines, phase owners,
+- W2: 128-line composition root; plain-record state machines, phase owners,
   typed events, isolated presentation, preserved checkpoints; WebGL2 only.
   See runtime-refactor-results.md for module/scenario/behavior evidence.
 - W3 phases 1–6: native three-target geometry and two-target HDR light pre-pass,
@@ -20,20 +20,11 @@ architecture ownership documentation (`d6c3b5e`). Version is 1.68.0.
 
 ## Verification and open run
 
-Current complete W3 retry is LIVE, session22478. Poll that exact handle;
-do not restart after observation timeout or edit source while it runs.
+The repaired W3 broad gate is TERMINAL, exit 0: all 279 PASS.
 Command: `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`.
-Log: tmp/lighting-refactor/w3-gate-repaired-broad-retry.log (279 selected).
-No other browser/build jobs remain live.
-
-Previous repaired full run session57262 is TERMINAL exit1:278PASS/1FAIL15.1m.
-The no-lives test never reached gameplay: preserved trace records Edge console
-ERR_NO_BUFFER_SPACE fetching src/main-game.ts, so Draw your blade never appeared.
-Evidence: tmp/lighting-refactor/w3-modes-startup-evidence/trace.zip.
-Unchanged focused command `npx playwright test tests/browser/modes.spec.ts --grep 'a missed attack in no-lives' --repeat-each=3 --config playwright.rendering-v2.config.ts --trace retain-on-failure`
-is TERMINAL exit0,3PASS27.9s (session57608), w3-modes-startup-repeat.log.
-No product source, assertion or timeout change was justified or made. Current
-full retry is required before calling the W3 broad gate passing.
+Log: tmp/lighting-refactor/w3-gate-repaired-broad-retry.log.
+No browser/build jobs remain live. W3 checkpoint is complete under the explicit
+pre-existing-failure rule; see docs/development/lighting-refactor-results.md.
 
 - `npm run typecheck`: PASS; `npm test`: all 415 PASS.
   Logs: tmp/lighting-refactor/demon-mist-fix-{typecheck,unit}.log.
@@ -64,8 +55,8 @@ These failures use the goal's explicit pre-existing-failure exception.
 
 ## Next steps — all required
 
-1. Poll session22478 to terminal. If green, write/commit the W3 checkpoint
-   report with exact results above and the completed broad result.
+1. W3 checkpoint is green except the two proven baseline Android failures.
+   Commit this checkpoint, then continue Part 4 without a review gate.
 2. Part 4 independent final strict/full units, both complete browser configs,
    production and Android web, startup graphics-error and context-loss coverage.
    Preserve terminal results; any new failure must be fixed or baseline-proven.

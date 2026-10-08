@@ -97,3 +97,5 @@
 - [Layout-preserving asset compaction](development/asset-compaction-results.md): W1 changes, invariants, matched byte evidence and verification.
 
 - [Runtime refactor results](development/runtime-refactor-results.md): Workstream 2 ownership, verification, behavior changes and phone play checklist.
+
+- [Lighting refactor results](development/lighting-refactor-results.md): W3 native pipeline, foliage, light sources, extension hooks, checkpoint verification and accepted approximations.

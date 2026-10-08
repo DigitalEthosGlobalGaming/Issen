@@ -106,7 +106,7 @@ through `runtime/scene-flow.ts`, including intentional paused phase adoption.
 randomness, and `ServicesContext` with browser ports. `presentation/context.ts`
 defines cosmetic RNG, effects, layout and camera capabilities. The generic
 `GameContext<Presentation>` contract lets rules accept narrow service slices
-without importing rendering types. The 129-line root constructs domain owners and connects startup/disposal. Runtime
+without importing rendering types. The 128-line root constructs domain owners and connects startup/disposal. Runtime
 foundation and named state projections preserve mutable profile/run/layout identity. Current accessors preserve replacement identities and avoid eager
 reads of services constructed later.
 

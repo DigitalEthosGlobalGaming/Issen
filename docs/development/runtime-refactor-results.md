@@ -1,7 +1,7 @@
 # Runtime refactor results (Workstream 2)
 
 Version 1.67.0 replaces the old closure with explicit domain owners, plain-record
-character behavior and disposable event reactions. `src/game.ts` is a 129-line
+character behavior and disposable event reactions. `src/game.ts` is a 128-line
 composition root. Workstream 2 is complete under the documented pre-existing-failure
 rule. Workstream 3 lighting and Part 4 final verification remain required.
 

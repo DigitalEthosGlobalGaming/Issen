@@ -556,9 +556,10 @@ invalidating cached sources. The warning-sensitive film disposal test covers it.
 Absent emissive maps bind shared zero Texture.EMPTY, including initialization
 and release, with no per-material image allocation or absent-map request.
 Instancing, event sources, half-resolution lighting and named GPU composer
-passes remain pending before the lighting workstream can be called complete.
+passes are implemented below. The complete W3 checkpoint is recorded in
+[lighting results](../development/lighting-refactor-results.md).
 
-## W3 instanced grass (phase 5 in progress)
+## W3 instanced grass (phase 5)
 
 scene-grass.ts is the native drawing port. ambient.ts submits a complete layer
 instead of constructing a path per blade. presentation/environment.ts keeps the
@@ -589,7 +590,8 @@ PBR normals and pixel-identical context restore. A second fixture compares the
 authored curves at the unchanged scene tolerance9 (observed mean0.154), accepts
 alpha0.5, rejects below-cutoff geometry and preserves ordered depth layers.
 These are correctness checks, not performance measurements. The catalogue leaf
-implementation below completes phase5; phase6 and the final gates remain pending.
+implementation below completes phase5; phase6 is implemented in the following
+sections. Workstream and final gate evidence is in the development reports.
 
 ## W3 instanced catalogue leaves (phase 5)
 
