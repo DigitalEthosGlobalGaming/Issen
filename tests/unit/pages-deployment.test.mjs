@@ -26,6 +26,7 @@ test('Updating any build retains other branches and removes its stale assets', (
     mkdirSync(build);
     writeFileSync(join(build, 'index.html'), 'production');
     writeFileSync(join(build, 'old.js'), 'old asset');
+    writeFileSync(join(build, 'old.js.map'), '{"sources":["src/main.ts"]}');
     assemblePages(build, site, 'main');
     writeFileSync(join(build, 'index.html'), 'develop');
     assemblePages(build, site, 'develop');
@@ -33,6 +34,10 @@ test('Updating any build retains other branches and removes its stale assets', (
     assemblePages(build, site, 'feature/combat');
     assert.equal(readFileSync(join(site, 'index.html'), 'utf8'), 'production');
     assert.equal(readFileSync(join(site, 'develop/index.html'), 'utf8'), 'develop');
+    assert.equal(
+      readFileSync(join(site, 'develop/old.js.map'), 'utf8'),
+      '{"sources":["src/main.ts"]}',
+    );
     rmSync(join(build, 'old.js'));
     writeFileSync(join(build, 'index.html'), 'new production');
     assemblePages(build, site, 'main');

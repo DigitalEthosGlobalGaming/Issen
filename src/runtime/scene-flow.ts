@@ -1,3 +1,4 @@
+import { markScenePhase, measureScenePhase } from '../platform/scene-timing.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { TrialDefinition } from '../game/content/trials.ts';
 
@@ -76,6 +77,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
     const key = `${demon}:${compositionKey(frame)}`;
     if (key === views.requestedSceneKey) return;
+    markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
     const identity = `${demon}:${G.stage}:${stageSeed}`;
@@ -111,6 +113,19 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const views = readViews();
     const { cvs, G, frameLoop } = views;
     if (views.sceneLoading && views.sceneReadyToPresent) {
+      const key = views.requestedSceneKey;
+      // Baseline uploads happen in the first draw; this marks submission, not a GPU fence.
+      markScenePhase('textures-warmed', key, {
+        mode: 'first-present-submission',
+        prewarmed: false,
+      });
+      markScenePhase('settle-presented-scene', key);
+      measureScenePhase(
+        'scene-load',
+        'issen:prepare-scene:' + key,
+        'issen:settle-presented-scene:' + key,
+        key,
+      );
       views.sceneLoading = false;
       views.sceneReadyToPresent = false;
       cvs.dataset.sceneState = 'ready';

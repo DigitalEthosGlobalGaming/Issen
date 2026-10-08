@@ -1,9 +1,12 @@
+import { markScenePhase } from '../platform/scene-timing.ts';
 import { STAGES } from '../game/content/stages.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { TrialDefinition } from '../game/content/trials.ts';
 import type { DailyRun } from '../game/progression/daily.ts';
 export interface FrameSimulationViews {
   readonly sceneLoading: boolean;
+  readonly sceneRequest?: number;
+  readonly requestedSceneKey?: string;
   readonly activeTrial: TrialDefinition | null;
   readonly trialFailure: string;
   readonly finishTrial: (message?: string) => void;
@@ -12,7 +15,14 @@ export interface FrameSimulationViews {
   readonly cinematic: { readonly active: boolean };
   readonly updateWeather: (dt: number) => void;
   readonly reducedMotion: () => boolean;
-  readonly audio: { update(dt: number, weather: (typeof STAGES)[number]['weather'], wind: number, veil: number): void };
+  readonly audio: {
+    update(
+      dt: number,
+      weather: (typeof STAGES)[number]['weather'],
+      wind: number,
+      veil: number,
+    ): void;
+  };
   readonly presentationState: { readonly wind: number };
   readonly updatePlayer: (dt: number) => void;
   readonly apparelMotion: { update(dt: number, reduced: boolean): void };
@@ -32,9 +42,49 @@ export interface FrameSimulationViews {
 }
 /** Owns simulation dispatch/order; visual clocks and browser capabilities are ports. */
 export function createFrameSimulation(readViews: () => FrameSimulationViews) {
+  let presentedRequest = -1;
   function update(dt: number, raw: number) {
-    const { sceneLoading, activeTrial, trialFailure, finishTrial, G, updateAmbient, cinematic, updateWeather, reducedMotion, audio, presentationState, updatePlayer, apparelMotion, updateEnemies, activeDaily, waveConfiguration, liveOrdered, guided, bossPhase, phaseRouter, updateFx, renderTrialObjective, updateTransition, WX, advanceClock, advanceCamera } = readViews();
+    const views = readViews();
+    const {
+      sceneLoading,
+      activeTrial,
+      trialFailure,
+      finishTrial,
+      G,
+      updateAmbient,
+      cinematic,
+      updateWeather,
+      reducedMotion,
+      audio,
+      presentationState,
+      updatePlayer,
+      apparelMotion,
+      updateEnemies,
+      activeDaily,
+      waveConfiguration,
+      liveOrdered,
+      guided,
+      bossPhase,
+      phaseRouter,
+      updateFx,
+      renderTrialObjective,
+      updateTransition,
+      WX,
+      advanceClock,
+      advanceCamera,
+    } = views;
     if (sceneLoading) return;
+    const request = views.sceneRequest;
+    if (
+      request !== undefined &&
+      request !== presentedRequest &&
+      ['playing', 'boss', 'between', 'standoff'].includes(G.state)
+    ) {
+      presentedRequest = request;
+      markScenePhase('first-gameplay-frame', views.requestedSceneKey ?? String(request), {
+        stage: G.stage,
+      });
+    }
     if (activeTrial && trialFailure) {
       finishTrial(trialFailure);
       return;

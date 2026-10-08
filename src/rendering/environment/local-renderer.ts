@@ -1,4 +1,6 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
+import { compositionKey } from './worker-types.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import {
   createCachedMaterials,
@@ -636,8 +638,13 @@ export function createLocalEnvironmentRenderer(doc: Document) {
 
   return {
     draw,
-    async compose(frame: EnvironmentFrame): Promise<boolean> {
+    async compose(frame: EnvironmentFrame, assetsReady?: () => void): Promise<boolean> {
+      const timingKey = 'false:' + compositionKey(frame);
+      // Worker timing crosses the message boundary; local fallback records its own phases.
+      if (!assetsReady) markScenePhase('compose-sent', timingKey, { backend: 'local' });
       await prepare(frame.stage);
+      assetsReady?.();
+      if (!assetsReady) markScenePhase('assets-ready', timingKey, { backend: 'local' });
       if (
         disposed ||
         !ready ||
@@ -661,6 +668,15 @@ export function createLocalEnvironmentRenderer(doc: Document) {
         cacheKey = key;
       }
       if (frame.stage === 4 && images[0]) foreground.prepare(images[0], frame);
+      if (!assetsReady) {
+        markScenePhase('compose-received', timingKey, { backend: 'local' });
+        measureScenePhase(
+          'compose-roundtrip',
+          'issen:compose-sent:' + timingKey,
+          'issen:compose-received:' + timingKey,
+          timingKey,
+        );
+      }
       return true;
     },
     exportLayers() {

@@ -1,5 +1,8 @@
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
-export function createWorkerDocument(): Document {
+export function createWorkerDocument(): Document & {
+  decodedSnapshot(): { images: number; bytes: number };
+} {
+  const decoded = new Set<WeakRef<DecodedImage>>();
   class DecodedImage {
     bitmap?: ImageBitmap;
     onload: (() => void) | null = null;
@@ -9,6 +12,7 @@ export function createWorkerDocument(): Document {
     width = 0;
     height = 0;
     private source = '';
+    private readonly diagnosticRef = new WeakRef(this);
     private controller?: AbortController;
     private pending: Promise<void> = Promise.resolve();
     get naturalWidth() {
@@ -36,6 +40,7 @@ export function createWorkerDocument(): Document {
             return;
           }
           this.bitmap = bitmap;
+          decoded.add(this.diagnosticRef);
           this.width = bitmap.width;
           this.height = bitmap.height;
           this.complete = true;
@@ -58,6 +63,7 @@ export function createWorkerDocument(): Document {
       this.controller?.abort();
       this.bitmap?.close();
       this.bitmap = undefined;
+      decoded.delete(this.diagnosticRef);
       this.complete = false;
       this.width = this.height = 0;
     }
@@ -74,6 +80,20 @@ export function createWorkerDocument(): Document {
   >();
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
+    decodedSnapshot() {
+      let images = 0,
+        bytes = 0;
+      for (const reference of decoded) {
+        const image = reference.deref();
+        if (!image) {
+          decoded.delete(reference);
+          continue;
+        }
+        images++;
+        bytes += image.naturalWidth * image.naturalHeight * 4;
+      }
+      return { images, bytes };
+    },
     createElement(kind: string) {
       if (kind === 'img') return new DecodedImage();
       if (kind !== 'canvas') throw Error(`Unsupported worker element: ${kind}`);
@@ -116,5 +136,5 @@ export function createWorkerDocument(): Document {
     HTMLImageElement: { value: DecodedImage },
     HTMLCanvasElement: { value: OffscreenCanvas },
   });
-  return doc as unknown as Document;
+  return doc as unknown as Document & { decodedSnapshot(): { images: number; bytes: number } };
 }
