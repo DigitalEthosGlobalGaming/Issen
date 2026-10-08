@@ -24,6 +24,22 @@ without billing. Catalog locks remain visible while billing is disabled. Runtime
 checks are independent of earned unlocks/ranks. See
 [editions and mastery](../features/editions-and-mastery.md).
 
+## Native lighting ownership
+
+Each PixiScenePainter owns full-resolution G0/G1/G2 and diffuse/specular HDR light
+attachments. Its named geometry/light passes prepare once per recorded frame;
+forward-composite preserves painter order with a shared light lookup. Resize,
+quality changes, context restoration and disposal follow surface ownership.
+The session testing tools offer full/half accumulation with normal/depth-aware
+upsampling; all scene colour providers use the same pipeline. Instanced grass
+and catalogue leaves retain layer positions while computing visual motion on GPU.
+
+Presentation light-sources.ts owns registration and the deterministic global
+16-light budget. Runtime presentation connects existing persistent visual lights
+and effects-clock kill/parry/block flashes, without gameplay RNG or draw mutations.
+Frozen borrowed target metadata and named scene/post/film insertion points are
+extension hooks only. See [rendering](rendering.md) for contracts and examples.
+
 ## Startup and ownership
 
 Root `index.html` loads `src/main.ts`. It imports the ordered styles, creates one
@@ -49,8 +65,9 @@ surfaces as soon as they are created, releases them on failure or disposal, and
 keeps retry available after a failed start. A disposed instance cannot remount.
 
 `presentation/scene.ts` owns the ordered scene draw body, with explicit readonly
-scene inputs and drawing ports. Its seven named passes use scene-composer.ts
-with explicit before/after neighbours. Runtime orchestration settles scene readiness
+scene inputs and drawing ports. Its seven recording layers are followed by native
+geometry, lights and forward-composite passes, all using scene-composer.ts with
+explicit before/after neighbours. Runtime orchestration settles scene readiness
 after drawing; presentation cannot commit pending gameplay continuations.
 `presentation/figures.ts` owns frame-specific figure rendering and enemy/boss
 projection, with gameplay updates kept in rule owners. `presentation/cues.ts` owns read-only wave/boss/standoff glyph projection.
@@ -62,7 +79,9 @@ weather hazard timers/simulation remain gameplay-owned.
 `presentation/feedback.ts` owns cosmetic effect factories, popup/stamp spawning
 and drawing, plus cosmetic flash/camera/letterbox actions, effects updates and
 weather/cut bursts. Explicit sound and leaf ports keep run records/RNG outside.
-`presentation/post.ts` owns prepared full-frame drawing; post-preparation.ts owns cosmetic post history and camera/post frame preparation,
+`presentation/post.ts` owns prepared full-frame drawing and named post/film
+insertion chains exposed through runtime/frames.ts; prepared G/light target
+consumers insert after the scene lights pass. post-preparation.ts owns cosmetic post history and camera/post frame preparation,
 separate from replay. post-artwork.ts owns the cached grain, vignette and ink edge. presentation/state.ts
 owns cosmetic clock/camera advancement, effects and camera/flash/letterbox signals; hit-stop and run
 time scale remain gameplay timing. PresentationContext exposes owned cosmetic state. `game.ts` remains the composition and orchestration layer. runtime/foundation.ts constructs explicit browser/profile/run/view records and
