@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Worker uploads precede readiness
+# Performance, assets and seamless transitions — Ordinary scenery shaders precede readiness
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -523,3 +523,36 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Frozen standard harness/assets unchanged. Whole memory/startup/local budgets,
     native pressure stability, deterministic next slots, shader/figure warming,
     120Hz fidelity/CPU budget and all Phase5criteria remain required.
+
+23. Ordinary scenery shader warming at1.68.24: paced Pixi shader.bind(skipSync)
+    prepares geometry/composite, vector/artwork, light, shared batch and final
+    back-buffer copy programs without drawing/target changes/resource sync. A
+    guarded Pixi8.22 _bigTriangleShader borrow covers cold surfaces. Shader-ready
+    generation skips repeated waits after first warm. Main port now warmScene:
+    retain sources across both steps and repeat both after a context generation
+    change. Native test forces loss during shader wait after sources warmed,
+    drives125collection frames, restores and asserts pixels/no uploads/no links.
+    All9same-input pixels exact/first-draw scenery uploads and program creations0;
+    focused lifecycle/held-loading7PASS22.0s. Initial fixture wrong artwork handle
+    selected local fallback: rejected data preserved, corrected probes require
+    worker ownership. Five-program prototype stage3 stillcompilesbatch25.8ms;
+    addingbatch fixeslink. Coldsurface catchesfinalcopy46.7ms; adapter fixeslink.
+    Final mobile cold-surface firstdraw stage0–8:6.9,3.9,2.7,20.6,14.9,0.6,1.0,
+    19.8,0.7ms. Initial warm335.8ms/later23.3–60.9ms; sourcecounts16/stage4=24.
+    Native initial shadercall69.6ms stillstallsloading: not no-freeze/cold-load or
+    p95proof. Profilesstage0/3draw8.4/45.6ms, zero programcreation; stage3GC8.1ms,
+    graphicspreparation5.9/addPath3.6/batching3.2/nativeactiveTexture3.9ms. Remaining
+    geometry/uniform/figure warming and nextslotsneeded. Evidence stable
+    tmp/performance-scene-upload/shader-final-results.json and finalprofiles;
+    probeindex tmp/probes/scene-upload/README.md. Full unit459PASS/checkedbuildPASS,
+    version/package/lock/title/changelog1.68.24; frozen harness/assets unchanged.
+    Broader native39cases34PASS/4startup5sdeadline failures/1replaypixelmax3(limit2).
+    No tolerances/timeouts changed. Isolated5PASS58.6s; shader-disabled replay
+    control3PASS18.3s; enabled replay/all-stage warm repeat18PASS34.9s(default2
+    workers). One max3 replay remains unexplained; not clean fullsuite proof.
+    All sessions terminal; formatting/diff checksPASS. Goal remains full:
+    wholefigure/startup/localbudgets, nativepressure
+    stability, deterministic nextslots/decode, cold smoothness, complete warming,
+    120Hz fidelity/CPUbudget and Phase5allmetrics/traces/suites. Next address broad
+    startup/selected figure ownership and remaining first-use scene preparation;
+    prediction/nextslots still must be wired, not replaced with loading-only waits.

@@ -19,12 +19,10 @@ export function createNativeServices(
   ownerDocument: Document,
   lifecycle: { add(cleanup: () => void): void },
   lighting?: PreparedLighting,
-  painter?: Pick<PixiScenePainter, 'warmTextures'>,
+  painter?: Pick<PixiScenePainter, 'warmScene'>,
 ) {
   const environmentRenderer = createEnvironmentRenderer(ownerDocument, {
-    warmWorkerScene: painter
-      ? (sources, signal) => painter.warmTextures(sources, signal)
-      : undefined,
+    warmWorkerScene: painter ? (sources, signal) => painter.warmScene(sources, signal) : undefined,
   });
   lifecycle.add(environmentRenderer.dispose);
   const demonRealmRenderer = createDemonRealmRenderer(ownerDocument);

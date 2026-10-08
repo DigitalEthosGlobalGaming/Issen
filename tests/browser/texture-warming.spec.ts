@@ -22,7 +22,8 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     const warmed = await create(),
       baseline = await create();
     let firstDraw = false,
-      uploads = 0;
+      uploads = 0,
+      links = 0;
     const gl = warmed.canvas.getContext('webgl2')!,
       texImage = gl.texImage2D.bind(gl);
     gl.texImage2D = ((...args: any[]) => {
@@ -31,8 +32,13 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
         uploads++;
       return (texImage as any)(...args);
     }) as any;
+    const link = gl.linkProgram.bind(gl);
+    gl.linkProgram = (program) => {
+      if (firstDraw) links++;
+      link(program);
+    };
     const owner = createEnvironmentRenderer(document, {
-      warmWorkerScene: (sources, signal) => warmed.warmTextures(sources, signal),
+      warmWorkerScene: (sources, signal) => warmed.warmScene(sources, signal),
     });
     const rows = [];
     for (let stage = 0; stage < 9; stage++) {
@@ -51,6 +57,7 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       const ready = owner.snapshot().texturesWarmed;
       firstDraw = true;
       uploads = 0;
+      links = 0;
       warmed.begin();
       owner.draw(warmed, frame);
       owner.drawForeground(warmed, frame);
@@ -63,7 +70,7 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       let max = 0;
       for (let i = 0; i < actual.length; i++)
         max = Math.max(max, Math.abs(actual[i]! - expected[i]!));
-      rows.push({ stage, ready, uploads, max });
+      rows.push({ stage, ready, uploads, links, max });
     }
     owner.dispose();
     warmed.dispose();
@@ -71,7 +78,9 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     return rows;
   });
   expect(result).toHaveLength(9);
-  expect(result.every((row) => row.ready && row.uploads === 0 && row.max === 0)).toBe(true);
+  expect(
+    result.every((row) => row.ready && row.uploads === 0 && row.links === 0 && row.max === 0),
+  ).toBe(true);
   expect(warnings).toEqual([]);
 });
 
@@ -217,8 +226,22 @@ test('pending sources survive frame collection and reupload after actual context
     });
     const controller = new AbortController();
     await painter.warmTextures(sources.slice(0, 1), controller.signal);
-    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
-    const pending = painter.warmTextures(sources, controller.signal);
+    await painter.warmSceneShaders(controller.signal);
+    let entered = false;
+    const warmShaders = painter.warmSceneShaders.bind(painter);
+    painter.warmSceneShaders = async (signal) => {
+      if (!entered) {
+        Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+        entered = true;
+      }
+      return warmShaders(signal);
+    };
+    const pending = painter.warmScene(sources, controller.signal);
+    const deadline = performance.now() + 10000;
+    while (!entered) {
+      if (performance.now() > deadline) throw Error('shader warming gate timed out');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
     for (let i = 0; i < 125; i++) {
       painter.begin();
       painter.flush();
@@ -241,6 +264,12 @@ test('pending sources survive frame collection and reupload after actual context
     delete (document as any).hidden;
     document.dispatchEvent(new Event('visibilitychange'));
     const ready = await pending;
+    let links = 0;
+    const nativeLink = gl.linkProgram.bind(gl);
+    gl.linkProgram = (program) => {
+      links++;
+      nativeLink(program);
+    };
     let uploads = 0;
     const nativeUpload = gl.texImage2D.bind(gl);
     gl.texImage2D = ((...args: any[]) => {
@@ -254,11 +283,12 @@ test('pending sources survive frame collection and reupload after actual context
     const left = Array.from(pixels.slice(0, 4));
     const right = Array.from(pixels.slice(16 * 4, 17 * 4));
     painter.dispose();
-    return { retained, ready, uploads, left, right };
+    return { retained, ready, links, uploads, left, right };
   });
   expect(result).toEqual({
     retained: 2,
     ready: true,
+    links: 0,
     uploads: 0,
     left: [255, 0, 0, 255],
     right: [0, 255, 0, 255],
@@ -275,15 +305,17 @@ test('painter disposal aborts a hidden upload wait without any later upload', as
       source = document.createElement('canvas');
     source.width = source.height = 8;
     Object.defineProperty(document, 'hidden', { value: true, configurable: true });
-    const pending = painter.warmTextures(
+    const pending = painter.warmScene(
       [{ texture: { source, revision: 0 } }],
       new AbortController().signal,
     );
+    const shaders = painter.warmSceneShaders(new AbortController().signal);
     painter.dispose();
     const ready = await pending;
+    const shaderReady = await shaders;
     delete (document as any).hidden;
     document.dispatchEvent(new Event('visibilitychange'));
-    return { ready, sources: painter.sourceTextureCount };
+    return { ready, shaderReady, sources: painter.sourceTextureCount };
   });
-  expect(result).toEqual({ ready: false, sources: 0 });
+  expect(result).toEqual({ ready: false, shaderReady: false, sources: 0 });
 });

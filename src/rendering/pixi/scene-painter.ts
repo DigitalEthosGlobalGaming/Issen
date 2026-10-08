@@ -20,6 +20,8 @@ import {
   ColorMatrixFilter,
   Texture,
   MeshSimple,
+  DefaultBatcher,
+  Shader,
 } from 'pixi.js';
 import type { FillStyle, GradientOptions, BLEND_MODES } from 'pixi.js';
 import './canvas-blends.ts';
@@ -229,6 +231,7 @@ export class PixiScenePainter implements SceneDrawing {
   }
   contextLost = false;
   private contextGeneration = 0;
+  private warmedShaderGeneration = -1;
   private readonly uploadLifetime = new AbortController();
   private readonly loseContext = (event: Event) => {
     event.preventDefault();
@@ -1295,6 +1298,65 @@ export class PixiScenePainter implements SceneDrawing {
       });
     } finally {
       release();
+    }
+  }
+
+  /** Retain the complete incoming scene until sources and programs share one live context. */
+  async warmScene(uploads: readonly TextureUpload[], signal: AbortSignal): Promise<boolean> {
+    const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
+    if (lifetime.aborted) return false;
+    const release = this.textures.retainSources(uploads.map((upload) => upload.texture.source));
+    try {
+      while (!lifetime.aborted) {
+        const generation = this.contextGeneration;
+        if (
+          !(await this.warmTextures(uploads, lifetime)) ||
+          !(await this.warmSceneShaders(lifetime))
+        )
+          return false;
+        if (generation === this.contextGeneration && !this.canvas.ownerDocument.hidden)
+          return !lifetime.aborted && !this.contextLost;
+      }
+      return false;
+    } finally {
+      release();
+    }
+  }
+
+  /** Compile the ordinary scenery programs through Pixi without drawing or syncing resources. */
+  async warmSceneShaders(signal: AbortSignal): Promise<boolean> {
+    const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
+    if (lifetime.aborted) return false;
+    const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
+    if (ready() && this.warmedShaderGeneration === this.contextGeneration) return true;
+    const material = createMaterialMesh(),
+      batcher = new DefaultBatcher({ maxTextures: this.renderer.limits.maxBatchableTextures });
+    const programs = new Set([
+      ...material.programs,
+      ...this.artworkMaterials.programs,
+      this.lightBuffer.program,
+      batcher.shader.glProgram,
+    ]);
+    // Pixi 8.22 exposes no preparation port for its final back-buffer copy.
+    // Borrow its owned shader; binding with skipSync neither copies nor binds its texture.
+    const presentationShader: unknown = Reflect.get(this.renderer.backBuffer, '_bigTriangleShader');
+    if (presentationShader instanceof Shader) programs.add(presentationShader.glProgram);
+    // Shader destruction preserves shared GlPrograms; native programs belong to this renderer.
+    material.dispose();
+    batcher.destroy();
+    const shaders = [...programs].map((glProgram) => new Shader({ glProgram }));
+    try {
+      const warmed = await paceTextureUploads(shaders, lifetime, {
+        nextFrame: (abort) => nextVisibleFrame(this.canvas.ownerDocument, abort),
+        ready,
+        generation: () => this.contextGeneration,
+        upload: (shader) => this.renderer.shader.bind(shader, true),
+        now: () => performance.now(),
+      });
+      if (warmed) this.warmedShaderGeneration = this.contextGeneration;
+      return warmed;
+    } finally {
+      for (const shader of shaders) shader.destroy();
     }
   }
 

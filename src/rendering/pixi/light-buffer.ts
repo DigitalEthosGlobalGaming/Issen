@@ -168,6 +168,9 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
   get targets(): Readonly<LightTargets> | undefined {
     return this.snapshot;
   }
+  get program() {
+    return this.shader.glProgram;
+  }
   /** Detach geometry samplers before their owner releases a generation. */
   detachGeometry(): void {
     if (!this.geometryAttached) return;

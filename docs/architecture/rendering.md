@@ -754,7 +754,7 @@ film/post/target extension hooks are described below.
 
 ## Worker scenery texture readiness
 
-The main native services pass the scene painter's `warmTextures` port to the
+The main native services pass the scene painter's `warmScene` port to the
 worker environment owner. Before replacing completed layers or settling scene
 readiness, the owner initializes all incoming composed planes and stage 0's live
 fog maps through the existing `SceneTextureStore`. Colour/emissive use colour
@@ -770,11 +770,24 @@ and retire GPU consumers through the existing ownership path. Painter disposal
 also aborts its outstanding uploads. Preparation does not flush an incoming scene
 to the displayed canvas or introduce a second texture cache.
 
+The main port uses `warmScene`, which retains incoming sources across both source
+and shader preparation. It repeats both steps if the context generation changes
+between them. `warmSceneShaders` binds the material geometry/composite, vector/
+artwork lookup, light, default batch and back-buffer copy programs through Pixi's
+shader system with resource synchronization disabled. This compiles the existing
+renderer-owned programs without submitting a scene, changing targets or binding
+incoming texture resources. Completed shader warming is remembered per context
+generation. The final copy shader uses a guarded Pixi 8.22 `_bigTriangleShader`
+adapter because that system has no public preparation port; native cold-surface
+and restoration checks assert zero first-draw links and unchanged pixels.
+
 `textures-warmed` records `paced-source-init` before scene settlement for this
-path; it measures source initialization, not completed GPU execution or shader
-readiness. Local composition fallback, demon scenery and independent preview
-owners retain their existing readiness behavior. Next-scene slots and shader/
-figure warming remain required for seamless transitions.
+path. It includes ordinary scenery program preparation through the main port,
+but proves neither completed GPU execution nor figure/filter shader readiness.
+Native compilation can exceed the pacing target. Local composition fallback,
+demon scenery and independent preview owners retain their existing readiness
+behavior. Next-scene slots, figure warming and remaining first-use drawing work
+remain required for seamless transitions.
 
 ## Current extension hooks (W3 phase 6)
 

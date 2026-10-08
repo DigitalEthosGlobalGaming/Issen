@@ -91,6 +91,9 @@ export class ArtworkMaterials {
       throw new GraphicsUnsupportedError('The scene texture budget is unavailable after restore.');
     this.renderer.limits.maxBatchableTextures = this.batchTextures;
   }
+  get programs() {
+    return [this.graphicsShader.glProgram, this.meshProgram] as const;
+  }
   attach(graphics: Graphics): void {
     const context = graphics.context;
     if (context.customShader === this.graphicsShader) return;

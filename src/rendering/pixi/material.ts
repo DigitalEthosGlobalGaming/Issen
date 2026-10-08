@@ -68,6 +68,7 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
   let texturesBound = false;
   return {
     mesh,
+    programs: [geometryMaterial.shader.glProgram, shader.glProgram] as const,
     releaseLightTargets: compositeMaterial.releaseLightTargets,
     prepareComposite(targets: Readonly<LightTargets>): void {
       compositeMaterial.update(shader, targets);

@@ -1381,3 +1381,74 @@ suite or final startup verification. The old charm catalogue unit fixture lacked
 document event methods required by the existing shared image owner; replacing
 its bare stub with an EventTarget fixes that fixture without production changes.
 All measurement/test sessions are terminal.
+
+## Checkpoint 23 — Ordinary scenery shaders before presentation, 1.68.24
+
+The source-only checkpoint profiles locate first-use program reflection/linking.
+A paced binding prototype uses Pixi's existing shader system with resource sync
+disabled. Five programs preserve exact all-stage pixels and reduce stage 0's
+sampled first draw to 3.4 ms, but stage 3 still compiles the default batch shader
+(25.8 ms). Adding the shared default batch removes that compilation; a cold
+surface without an initial white draw identifies the remaining back-buffer copy
+(46.7 ms). The first fixture used the wrong artwork handle and silently selected
+local fallback; its results are invalid, preserved separately. Corrected probes
+explicitly require worker ownership. Literal-newline and bare module-import
+fixture errors were also corrected before successful measurements.
+
+`warmSceneShaders` prepares material geometry/composite, vector/artwork lookup,
+light, default batch and final back-buffer copy programs. Bindings use
+`renderer.shader.bind(shader, true)`: existing native program cache, no drawing,
+target mutation or resource synchronization. Templates/wrappers are disposed;
+shared GlPrograms and native program ownership stay with Pixi/the renderer.
+The copy shader is borrowed through a guarded Pixi 8.22 adapter. Shader readiness
+is cached per context generation, so later scenes do not repeat shader rAF work.
+
+The main port now calls coordinated `warmScene`. It retains incoming sources
+through both steps and repeats both if context generation changes between them.
+This closes a lifecycle gap: separately awaited source/shader warming could lose
+source GPU storage during the shader wait. A native test forces that exact loss
+after source initialization, drives 125 collection frames, restores the context,
+and asserts correct pixels with zero first-draw uploads/links. Hidden disposal
+and stale-request ownership remain covered. Initial cold-surface tests caught
+the missing copy shader; the guarded adapter fixes them without loosening checks.
+
+Final diagnostic uses one worker, two cold persistent painters, identical bitmaps,
+390x844 DPR2. All nine pixel maxima, first-draw scenery uploads and program
+creations are zero. First-draw ms by stage 0–8:
+6.9, 3.9, 2.7, 20.6, 14.9, 0.6, 1.0, 19.8, 0.7.
+Source counts remain 16 except stage 4's 24. Initial source/program warming wall
+is 335.8 ms, later scenes 23.3–60.9 ms. Initial native program creation includes
+35.1 ms composite, 69.6 ms vector and 53.8 ms artwork calls: pacing cannot split
+native compilation. These calls occur before readiness, but can still stall
+loading cosmetics. Driver/cache/order confounds control timing, and this does
+not prove cold-load speed, no frozen screen, frame p95 or resident memory.
+
+Separate post-warming profiles directly measure stage 0/3 draws at 8.4/45.6 ms.
+No program creation occurs in either first draw. Stage 3 samples 8.1 ms GC,
+5.9 ms graphics preparation, 3.6 ms addPath, 3.2 ms batching and 3.9 ms native
+activeTexture. Profile wall includes exposed-function/CDP boundaries; program/
+idle samples are not equivalent to direct draw time. Remaining first-use
+geometry/uniform preparation and GC require investigation; simply compiling
+programs is not full shader/figure/scene readiness.
+
+Evidence: tmp/performance-scene-upload/shader-prototype-five-programs-results.json,
+shader-prototype-results.json, shader-integrated-results.json,
+shader-no-init-results.json, shader-final-results.json,
+shader-final-profile-results.json and stage-0/3-shader-warmed-first-draw.cpuprofile.
+Runnable probes and their role index remain under tmp/probes/scene-upload.
+Standard performance harness/assets unchanged. Next-scene slots/decoded warming,
+complete figure/startup budgets, local/demon warming, native pressure stability,
+120Hz fidelity/CPU budget and full Phase 5 acceptance remain required.
+
+Verification: all 459 unit tests PASS; checked production verification build,
+format/diff checks PASS. Coordinated lifecycle/held-readiness 7 PASS (22.0s).
+Broader native/runtime run passes 34/39 (1.6min), with four five-second startup
+assertions failing before target behavior, plus one extra-frame replay pixel
+maximum 3 against the existing limit 2. All five pass isolated (58.6s).
+Three shader-disabled replay controls pass (18.3s); enabled replay/all-stage
+warming repeated three times passes all 18 cases with default two workers
+(34.9s), including the final coordinated-disposal check. Tolerances and timeouts
+remain unchanged. The single replay difference is unexplained, not demonstrated
+to be caused by shader warming or resolved for the full goal. Startup and native
+pressure stability remain required. All sessions terminal; no full-suite,
+cold/warm production trace or final acceptance claim.
