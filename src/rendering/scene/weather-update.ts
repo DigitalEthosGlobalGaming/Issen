@@ -179,3 +179,17 @@ export function updateWeather(
   }
   WX.veil += (WX.veilTarget - WX.veil) * (1 - Math.exp(-dt * 5));
 }
+
+/** Loading animates particles while preserving every live weather-hazard field. */
+export function updateCosmeticWeather(
+  WX: WeatherState,
+  wx: WeatherParticle[],
+  dt: number,
+  env: WeatherEnvironment,
+) {
+  updateWeather({ ...WX, banks: WX.banks.map((bank) => ({ ...bank })) }, wx, dt, {
+    ...env,
+    phase: 'loading',
+    hazardRandom: env.random,
+  });
+}

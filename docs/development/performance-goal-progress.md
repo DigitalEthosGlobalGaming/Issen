@@ -946,3 +946,28 @@ control. Strict, formatting and checked production build PASS; log
 change speed or new precompose claim. No active capture. Continue remaining main
 image-owner/active selection work and use this API when wiring quiet next decode,
 normal/trial/daily/cinematic prediction and next-slot promotion/invalidation.
+
+## Phase 4.4 — Cosmetic loading dispatch
+
+Version1.68.16 replaces the loading simulation's immediate return with cosmetic
+clock/ambient/transition/weather/camera/apparel updates. Unscaled raw elapsed time
+keeps presentation moving even while a combat hit-stop delta is zero. Gameplay
+timers, player/enemy/encounter/phase dispatch, trial completion and first-gameplay
+markers remain stopped until readiness. Reduced motion suppresses weather motion
+and is passed to apparel. No loading lightning/gust/smoke hazards are dispatched.
+
+Loading weather updates particles using cosmetic randomness and a temporary copy
+of live hazard fields/banks. Live timers/banks and the combat hazard RNG stay
+unchanged. Two new units prove only cosmetic ports run while loading, run timers
+remain unchanged even with a pending trial failure, reduced motion is respected,
+and all6weather families preserve live hazard state without run-RNG/effect calls.
+Five focused units total PASS, strict/formatting/checked production build PASS.
+Four real readiness/continued-run browsers PASS32.9s; logs
+`tmp/performance-cosmetic-loading-browser.log` and
+`tmp/performance-cosmetic-loading-build.log`. Session14400terminal; no active capture.
+
+The150ms ink-style loading treatment and direct moving-pixel loading evidence
+remain pending; this dispatch step does not prove seamless promotion or no frozen
+screen under every slow load. Remaining image/active selection budgets, mode
+prediction/next slots, paced texture/variant upload,120Hz fidelity/CPU budget and
+full Phase5measurements/suites/report remain required.

@@ -13,7 +13,10 @@ import {
   type PresentationState,
 } from '../presentation/state.ts';
 import { updatePlayerAnimation, type createPlayerAnimation } from '../game/player/player.ts';
-import { updateWeather as simulateWeather } from '../rendering/scene/weather-update.ts';
+import {
+  updateWeather as simulateWeather,
+  updateCosmeticWeather,
+} from '../rendering/scene/weather-update.ts';
 import { STAGES } from '../game/content/stages.ts';
 import type { EnvironmentState } from '../presentation/environment-state.ts';
 import type { createWeatherState } from '../rendering/scene/weather-state.ts';
@@ -105,7 +108,7 @@ export function createFrameBindings(
     const { P, G } = readViews();
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
   }
-  function updateWeather(dt: number) {
+  function updateWeather(dt: number, cosmeticOnly = false) {
     const {
       G,
       cinematic,
@@ -122,7 +125,7 @@ export function createFrameBindings(
       sfx,
       gustLeaves,
     } = readViews();
-    simulateWeather(
+    (cosmeticOnly ? updateCosmeticWeather : simulateWeather)(
       cinematic.active ? environmentState.cinematicWeather : WX,
       environmentState.wx,
       dt,

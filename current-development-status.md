@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Visit seed peek prerequisite verified
+# Performance, assets and seamless transitions — Cosmetic loading dispatch verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -307,3 +307,15 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Version/package/lock/title/changelog1.68.15. Continue remaining main image
     ownership/active selections and narrow startup; use peek for quiet decode and
     normal/trial/daily/cinematic prediction, then complete Phase4/Phase5requirements.
+
+12. Cosmetic loading dispatch verified at1.68.16: raw presentation elapsed time
+    advances clock, ambient/transition motion, cosmetic weather particles, camera
+    and apparel while all gameplay/run/trial/first-frame progression stays frozen.
+    Temporary weather hazard-state/bank copies use cosmetic RNG; live hazard fields
+    and run RNG remain unchanged. Reduced motion suppresses weather motion.
+    Two new loading/weather units plus3weather units PASS; strict/format/build and
+    4actual scene/continued-run browsers PASS32.9s. Session14400terminal, no captures.
+    Logs tmp/performance-cosmetic-loading-browser.log/build.log. Version/package/
+    lock/title/changelog1.68.16.150ms loading treatment/direct moving-pixel proof
+    remain pending, alongside main ownership/active selections, mode prediction/
+    next slots, paced upload/variants,120Hz fidelity and full Phase5requirements.
