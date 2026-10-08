@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 3 worker loader verified
+# Performance, assets and seamless transitions — Phase 3 compressed prefetch verified
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -189,3 +189,26 @@ Continue:
 
 Goal remains active; final full suites, final traces, budgets, new loader/seed/
 next-slot/loading-state tests, final report and any final push are outstanding.
+
+5. Compressed prefetch verified at1.68.9: generated275-file runtime manifest
+   excludes80unused diffuse maps and6startup-only vectors; existing startup glob
+   filtered through it. Runtime source artwork lifetime retention remains.
+   Base-path-scoped CacheStorage with HTTP fallback feeds worker decode unchanged.
+   MainGame starts after loading overlay removal; at most2low-priority fetches,
+   task yields, current/adjacent stage ordering then figures/UI/rest. Frame sampling
+   grants settled quiet title/over/between/shrine/paused time under75%frame budget;
+   combat/loading/panels/hidden/saveData/native gates pause new dispatch.
+   Required worker reads remain available; root disposal aborts/removes observers.
+   Strict,16focused units, changed-file formatting, checked production build PASS.
+   Strong browser PASS4: all275files prefetch, fresh workers prepare all9stages
+   with atlas network blocked; native/saveData storage untouched and dispatch
+   policy pause/resume verified. Existing4worker and3scene-readiness cases PASS.
+   tmp/performance-compose-phase3-prefetch PASS45/116byte-identical raw planes;
+   stage0compose median651.7ms remains>500, others268–406ms. No speedup or startup
+   no-regression claim; prepare/cache-write interval is excluded by this fixture.
+   All processes terminal including98178compose; no active captures. Details/logs
+   in progress notes. Version/package/lock/title/changelog1.68.9.
+   Next: managed main decoded ownership, independent material/preview bindings,
+   remove lifetime startup retention; wire quality/density budget and quiet decode.
+   Then deterministic seed/next slots, paced GPU/variant warming and cosmetic
+   loading; finish120Hz fidelity/CPU budget and full Phase5comparisons/suites/report.

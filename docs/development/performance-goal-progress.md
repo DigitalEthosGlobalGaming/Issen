@@ -682,3 +682,57 @@ loader ownership/integration and compressed CacheStorage/HTTP prefetch, excludin
 startup-only sources. Then implement quiet next-stage decode/prediction/scene
 slots, paced texture/variant warming and cosmetic-only loading, and finish the
 remaining high-refresh CPU/motion fidelity plus full Phase5verification.
+
+## Phase 3.3 — Compressed prefetch and frame policy
+
+Version1.68.9 adds an inventory-generated runtime manifest selecting275files:
+unused80diffuse maps and6startup-only vectors are excluded. The generator uses
+the repository Prettier configuration, and a unit check requires reproducible
+output. Startup filters its existing source-art glob through the manifest;
+this removes4,374,528nominal decoded bytes of startup-only vectors but does
+not yet remove lifetime retention of runtime source art.
+
+After the title loading overlay leaves, MainGame starts two low-priority fetches
+at a time into base-path-scoped `issen.assets.v1:` CacheStorage. Worker decoding
+reads these compressed responses unchanged, falling back to HTTP if storage is
+unavailable. Obsolete keys are removed from this scoped cache only. Native
+Android mode skips storage/prefetch; saveData skips prefetch. No image decode is
+performed by this tier. Root disposal aborts queued transports and removes
+visibility/connection/frame listeners and diagnostics.
+
+Runtime frame sampling grants work on settled title/over/between/shrine/paused
+states without an open panel, with work≤75%of the frame budget. Combat/loading,
+over-budget frames and hidden pages pause newly scheduled requests. At most two
+already active requests can finish after pausing. Stage changes reorder pending
+URLs: current and adjacent stage, then figures/UI, then remaining environments.
+Adjacent stage is only a compressed-file ordering hint; deterministic next-seed
+prediction and quiet next-stage decode remain Phase4work.
+
+Five compressed-store/queue/manifest units plus runtime inventory and frame-loop
+checks PASS16total; strict and changed-file formatting PASS. Four browser cases
+PASS7.7s in `tmp/performance-phase3-prefetch-all-stages.log`: all275files are
+prefetched, then atlas networking is blocked and fresh workers prepare each of
+the9stages using cached responses; native/saveData leave storage untouched;
+visibility/combat/loading/frame-budget gates pause dispatch and quiet resumes it.
+Earlier focused checks also PASS4worker fallback/coalescing/hidden cases and
+3actual run/boss/cinematic scene-readiness cases; logs
+`tmp/performance-phase3-compressed-browser.log` and
+`tmp/performance-phase3-prefetch-policy-browser.log`. Checked production build
+PASS in `tmp/performance-phase3-prefetch-build.log`.
+
+`tmp/performance-compose-phase3-prefetch` PASS45repetitions/116raw planes,
+all byte-identical to worker-loader reference. Compose median/p95 stage0–8:
+651.7/711.5,267.6/349.2,393.5/411.6,344.9/477.9,405.6/475.5,272.0/322.1,
+382.0/417.3,315.9/348.5,301.2/313.0ms. Mixed timings; no uniform speedup claim.
+Stage0remains>500ms with previously profiled software→GPU transfer costs.
+This predecoded fixture excludes cold preparation/cache writes. All-nine
+cache-only browser proves transport behavior after prefetch completion, not
+near-instant compose or no-regression startup. Both need final production
+measurements after main image ownership and next-scene/GPU warming integration.
+
+All captures/checks terminal, including compose98178; no browser measurement is
+active. Continue main-thread decoded loader integration, preserve independent
+preview/material ownership, and release lifetime startup retention. Whole-app
+memory, runtime budget adaptation, next-stage decode/seed/scene slots, paced GPU
+upload/variant warming, cosmetic loading, high-refresh fidelity/CPU budgets and
+Phase5verification remain unresolved. Goal stays active.

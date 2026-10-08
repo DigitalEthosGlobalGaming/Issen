@@ -1,7 +1,7 @@
 {
   "version": 1,
   "limits": [
-    "Generated from runtime references/catalog and actual startup globs; startup-only files are identified for exclusion.",
+    "Generated from runtime references/catalog and startup glob inputs; startup-only matches are excluded by the runtime manifest.",
     "Decoded bytes are nominal width×height×4; SVG bytes describe intrinsic raster size, not browser residency.",
     "Stage totals describe local compose kits; separate fog, figures, UI and canvas caches add memory."
   ],
@@ -68,6 +68,7 @@
         4
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -80,6 +81,7 @@
         4
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -92,6 +94,7 @@
         2
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -104,6 +107,7 @@
         2
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -114,6 +118,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/demon-realm.ts"
       ]
     },
@@ -123,6 +128,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/demon-realm.ts"
       ]
     },
@@ -132,6 +138,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts"
       ]
     },
@@ -141,6 +148,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts"
       ]
     },
@@ -150,6 +158,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts"
       ]
     },
@@ -159,6 +168,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts"
       ]
     },
@@ -170,6 +180,7 @@
         4
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -187,6 +198,7 @@
         7
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -206,6 +218,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -218,6 +231,7 @@
         7
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -231,6 +245,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/worker-renderer.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -245,6 +260,7 @@
         7
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -258,6 +274,7 @@
         3
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -277,6 +294,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -289,6 +307,7 @@
         0
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -309,6 +328,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -322,6 +342,7 @@
         2
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -339,6 +360,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -351,6 +373,7 @@
         3
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -361,6 +384,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts"
       ]
     },
@@ -372,6 +396,7 @@
         7
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -387,6 +412,7 @@
         3
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -399,6 +425,7 @@
         5
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -411,6 +438,7 @@
         5
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -423,6 +451,7 @@
         5
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -435,6 +464,7 @@
         5
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -447,6 +477,7 @@
         5
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -460,6 +491,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -472,6 +504,7 @@
         6
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -485,6 +518,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -497,6 +531,7 @@
         6
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -513,6 +548,7 @@
         8
       ],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
       ]
@@ -523,6 +559,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts"
       ]
     },
@@ -532,6 +569,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-charms.ts"
       ]
     },
@@ -540,7 +578,9 @@
       "diffuse": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/companion-parts-atlas.webp",
@@ -548,6 +588,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-companions.ts"
       ]
     },
@@ -557,6 +598,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-sword.ts"
       ]
     },
@@ -565,7 +607,9 @@
       "diffuse": "src/rendering/figures/assets/pbr/katana/katana_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/mystic-rock.webp",
@@ -573,6 +617,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-companions.ts"
       ]
     },
@@ -582,6 +627,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts"
       ]
     },
@@ -591,6 +637,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts"
       ]
     },
@@ -600,6 +647,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts"
       ]
     },
@@ -608,7 +656,9 @@
       "diffuse": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/player-special-headwear-atlas.webp",
@@ -616,6 +666,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts"
       ]
     },
@@ -625,6 +676,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-sword.ts"
       ]
     },
@@ -634,6 +686,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/ui/screens/armory.css"
       ]
@@ -644,6 +697,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.css"
       ]
     },
@@ -653,6 +707,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.css"
       ]
     },
@@ -662,6 +717,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.css"
       ]
     },
@@ -670,14 +726,18 @@
       "diffuse": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/button-atlas.webp",
       "diffuse": "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/button-highlighted.webp",
@@ -685,6 +745,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/styles/button-frames.css"
       ]
     },
@@ -694,6 +755,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/styles/button-frames.css"
       ]
     },
@@ -703,6 +765,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ]
     },
@@ -712,6 +775,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/startup-loading.ts"
       ]
     },
@@ -720,7 +784,9 @@
       "diffuse": "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/panel-highlighted.webp",
@@ -728,6 +794,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/styles/panel-frames.css"
       ]
     },
@@ -737,6 +804,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/styles/panel-frames.css"
       ]
     },
@@ -746,6 +814,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ]
     },
@@ -755,6 +824,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ]
     },
@@ -764,6 +834,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/trials.css"
       ]
     },
@@ -773,6 +844,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/ui-art.ts"
       ]
     },
@@ -782,6 +854,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -791,6 +864,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -800,6 +874,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -809,6 +884,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -818,6 +894,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -827,6 +904,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -836,6 +914,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/armory.ts"
       ]
     },
@@ -844,35 +923,45 @@
       "diffuse": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-material-paper.webp",
       "diffuse": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-material-silk.webp",
       "diffuse": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-material-stone.webp",
       "diffuse": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-material-wood.webp",
       "diffuse": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png",
       "usesDiffuse": false,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-scroll-paper.webp",
@@ -880,6 +969,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ]
@@ -890,6 +980,7 @@
       "usesDiffuse": false,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ]
@@ -899,7 +990,9 @@
       "diffuse": "src/rendering/figures/assets/blade-pbr/blade-profile-atlas_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": []
+      "consumers": [
+        "src/platform/runtime-assets.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/player-ronin-simple.webp",
@@ -907,6 +1000,7 @@
       "usesDiffuse": true,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-player.ts"
       ]
     },
@@ -916,6 +1010,7 @@
       "usesDiffuse": true,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts"
       ]
     },
@@ -925,6 +1020,7 @@
       "usesDiffuse": true,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts"
       ]
     },
@@ -934,6 +1030,7 @@
       "usesDiffuse": true,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts"
       ]
     },
@@ -943,6 +1040,7 @@
       "usesDiffuse": true,
       "stages": [],
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts"
       ]
     }
@@ -978,6 +1076,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -999,6 +1098,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1020,6 +1120,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1041,6 +1142,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1062,6 +1164,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1080,6 +1183,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1098,6 +1202,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1116,6 +1221,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1134,6 +1240,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1152,6 +1259,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/scene/drift-catalog.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -1170,6 +1278,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1191,6 +1300,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1217,6 +1327,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1245,6 +1356,7 @@
       "decodedBytes": 6290928,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1266,6 +1378,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/environment/worker-renderer.ts",
@@ -1289,6 +1402,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1311,6 +1425,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1333,6 +1448,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1361,6 +1477,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -1382,6 +1499,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1411,6 +1529,7 @@
       "encodedBytes": 1387042,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1430,6 +1549,7 @@
       "encodedBytes": 680698,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1437,6 +1557,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -1450,6 +1571,7 @@
       "encodedBytes": 914480,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1457,6 +1579,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -1470,6 +1593,7 @@
       "encodedBytes": 798374,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1489,6 +1613,7 @@
       "encodedBytes": 339166,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1496,6 +1621,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -1509,6 +1635,7 @@
       "encodedBytes": 560172,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1516,6 +1643,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -1529,6 +1657,7 @@
       "encodedBytes": 895756,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1548,6 +1677,7 @@
       "encodedBytes": 279640,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1555,6 +1685,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -1568,6 +1699,7 @@
       "encodedBytes": 560862,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1575,6 +1707,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -1588,6 +1721,7 @@
       "encodedBytes": 836882,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1607,6 +1741,7 @@
       "encodedBytes": 284244,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1614,6 +1749,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -1627,6 +1763,7 @@
       "encodedBytes": 518298,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1634,6 +1771,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -1647,6 +1785,7 @@
       "encodedBytes": 841714,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
@@ -1663,11 +1802,13 @@
       "encodedBytes": 282130,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1679,11 +1820,13 @@
       "encodedBytes": 524184,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1695,6 +1838,7 @@
       "encodedBytes": 616410,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
@@ -1711,11 +1855,13 @@
       "encodedBytes": 177196,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1727,11 +1873,13 @@
       "encodedBytes": 342606,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1743,6 +1891,7 @@
       "encodedBytes": 536042,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
@@ -1759,11 +1908,13 @@
       "encodedBytes": 122184,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1775,11 +1926,13 @@
       "encodedBytes": 242348,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1791,6 +1944,7 @@
       "encodedBytes": 628146,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
@@ -1807,11 +1961,13 @@
       "encodedBytes": 226426,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -1823,11 +1979,13 @@
       "encodedBytes": 271564,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1839,11 +1997,13 @@
       "encodedBytes": 573548,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1855,6 +2015,7 @@
       "encodedBytes": 598500,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
@@ -1871,11 +2032,13 @@
       "encodedBytes": 132784,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1887,11 +2050,13 @@
       "encodedBytes": 266872,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1903,6 +2068,7 @@
       "encodedBytes": 476892,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
@@ -1919,11 +2085,13 @@
       "encodedBytes": 117406,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -1935,11 +2103,13 @@
       "encodedBytes": 191932,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/scene/drift-catalog.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -1951,6 +2121,7 @@
       "encodedBytes": 707612,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -1970,6 +2141,7 @@
       "encodedBytes": 192064,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1977,6 +2149,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -1990,6 +2163,7 @@
       "encodedBytes": 425908,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -1997,6 +2171,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2010,6 +2185,7 @@
       "encodedBytes": 777490,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2034,6 +2210,7 @@
       "encodedBytes": 254594,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2041,6 +2218,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2059,6 +2237,7 @@
       "encodedBytes": 413658,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2066,6 +2245,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2084,6 +2264,7 @@
       "encodedBytes": 656352,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2110,6 +2291,7 @@
       "encodedBytes": 223772,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2117,6 +2299,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2137,6 +2320,7 @@
       "encodedBytes": 357082,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2144,6 +2328,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2164,6 +2349,7 @@
       "encodedBytes": 746956,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2183,6 +2369,7 @@
       "encodedBytes": 233980,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2190,6 +2377,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": [
@@ -2203,6 +2391,7 @@
       "encodedBytes": 446336,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2210,6 +2399,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2223,6 +2413,7 @@
       "encodedBytes": 689000,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2230,6 +2421,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2243,6 +2435,7 @@
       "encodedBytes": 650702,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2264,6 +2457,7 @@
       "encodedBytes": 246782,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2272,6 +2466,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": [
@@ -2286,6 +2481,7 @@
       "encodedBytes": 401970,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2294,6 +2490,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2308,6 +2505,7 @@
       "encodedBytes": 555106,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2316,6 +2514,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2330,6 +2529,7 @@
       "encodedBytes": 826826,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2350,6 +2550,7 @@
       "encodedBytes": 216984,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2357,6 +2558,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2371,6 +2573,7 @@
       "encodedBytes": 456380,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2378,6 +2581,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2392,6 +2596,7 @@
       "encodedBytes": 710282,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2412,6 +2617,7 @@
       "encodedBytes": 294786,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2419,6 +2625,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2433,6 +2640,7 @@
       "encodedBytes": 455894,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2440,6 +2648,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2454,6 +2663,7 @@
       "encodedBytes": 999582,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2480,6 +2690,7 @@
       "encodedBytes": 274322,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2487,6 +2698,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2507,6 +2719,7 @@
       "encodedBytes": 556252,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2514,6 +2727,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2534,6 +2748,7 @@
       "encodedBytes": 1167732,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2553,6 +2768,7 @@
       "encodedBytes": 396124,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2560,6 +2776,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2573,6 +2790,7 @@
       "encodedBytes": 659586,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2580,6 +2798,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2593,6 +2812,7 @@
       "encodedBytes": 734302,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/demon-realm.ts",
@@ -2621,6 +2841,7 @@
       "encodedBytes": 244356,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2629,6 +2850,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2650,6 +2872,7 @@
       "encodedBytes": 382354,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2658,6 +2881,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2679,6 +2903,7 @@
       "encodedBytes": 546724,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2698,6 +2923,7 @@
       "encodedBytes": 192818,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2705,6 +2931,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2718,6 +2945,7 @@
       "encodedBytes": 256880,
       "decodedBytes": 6290928,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2725,6 +2953,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2738,6 +2967,7 @@
       "encodedBytes": 1013862,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2762,6 +2992,7 @@
       "encodedBytes": 480214,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2769,6 +3000,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2787,6 +3019,7 @@
       "encodedBytes": 699240,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2794,6 +3027,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2812,6 +3046,7 @@
       "encodedBytes": 954354,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2831,6 +3066,7 @@
       "encodedBytes": 368710,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2838,6 +3074,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2851,6 +3088,7 @@
       "encodedBytes": 621280,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2858,6 +3096,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2871,6 +3110,7 @@
       "encodedBytes": 604484,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/pbr-atlas.ts"
@@ -2887,11 +3127,13 @@
       "encodedBytes": 267534,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -2903,11 +3145,13 @@
       "encodedBytes": 403716,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -2919,6 +3163,7 @@
       "encodedBytes": 628648,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -2938,6 +3183,7 @@
       "encodedBytes": 186226,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2945,6 +3191,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -2958,6 +3205,7 @@
       "encodedBytes": 384562,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -2965,6 +3213,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -2978,6 +3227,7 @@
       "encodedBytes": 786224,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3000,6 +3250,7 @@
       "encodedBytes": 328034,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3007,6 +3258,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3023,6 +3275,7 @@
       "encodedBytes": 514586,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3030,6 +3283,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3046,6 +3300,7 @@
       "encodedBytes": 777546,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3065,6 +3320,7 @@
       "encodedBytes": 212954,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3072,6 +3328,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3085,6 +3342,7 @@
       "encodedBytes": 445676,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3092,6 +3350,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3105,6 +3364,7 @@
       "encodedBytes": 1010550,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3124,6 +3384,7 @@
       "encodedBytes": 280624,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3131,6 +3392,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3144,6 +3406,7 @@
       "encodedBytes": 511044,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3151,6 +3414,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3164,6 +3428,7 @@
       "encodedBytes": 809798,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3183,6 +3448,7 @@
       "encodedBytes": 305254,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3190,6 +3456,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3203,6 +3470,7 @@
       "encodedBytes": 540450,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3210,6 +3478,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3223,6 +3492,7 @@
       "encodedBytes": 720956,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3242,6 +3512,7 @@
       "encodedBytes": 216472,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3249,6 +3520,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3262,6 +3534,7 @@
       "encodedBytes": 412966,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3269,6 +3542,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3282,6 +3556,7 @@
       "encodedBytes": 497020,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3301,6 +3576,7 @@
       "encodedBytes": 177438,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3308,6 +3584,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3321,6 +3598,7 @@
       "encodedBytes": 329728,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3328,6 +3606,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3341,6 +3620,7 @@
       "encodedBytes": 647182,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3361,6 +3641,7 @@
       "encodedBytes": 175800,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3368,6 +3649,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3382,6 +3664,7 @@
       "encodedBytes": 211194,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3389,6 +3672,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3403,6 +3687,7 @@
       "encodedBytes": 740240,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3422,6 +3707,7 @@
       "encodedBytes": 210888,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3429,6 +3715,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3442,6 +3729,7 @@
       "encodedBytes": 241326,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3449,6 +3737,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3462,6 +3751,7 @@
       "encodedBytes": 1005876,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3482,6 +3772,7 @@
       "encodedBytes": 241736,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3489,6 +3780,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3503,6 +3795,7 @@
       "encodedBytes": 317580,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3510,6 +3803,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3524,6 +3818,7 @@
       "encodedBytes": 805278,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3543,6 +3838,7 @@
       "encodedBytes": 219018,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3550,6 +3846,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3563,6 +3860,7 @@
       "encodedBytes": 268856,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3570,6 +3868,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3583,6 +3882,7 @@
       "encodedBytes": 455408,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
@@ -3606,6 +3906,7 @@
       "encodedBytes": 179824,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3613,6 +3914,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": [
@@ -3630,6 +3932,7 @@
       "encodedBytes": 318998,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/cached-materials.ts",
         "src/rendering/environment/asset-sources.ts",
@@ -3637,6 +3940,7 @@
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": [
@@ -3655,6 +3959,7 @@
       "decodedBytes": 6290928,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3676,6 +3981,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3702,6 +4008,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3723,6 +4030,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -3741,6 +4049,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3762,6 +4071,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3786,6 +4096,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3807,6 +4118,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3828,6 +4140,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3849,6 +4162,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3870,6 +4184,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3891,6 +4206,7 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3913,6 +4229,7 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3934,6 +4251,7 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3956,6 +4274,7 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -3977,6 +4296,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
@@ -4002,6 +4322,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4019,6 +4340,7 @@
       "encodedBytes": 369786,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4036,6 +4358,7 @@
       "encodedBytes": 79244,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4053,6 +4376,7 @@
       "encodedBytes": 218300,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4071,9 +4395,11 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -4087,6 +4413,7 @@
       "decodedBytes": 6291456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-charms.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4105,9 +4432,11 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -4121,6 +4450,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4139,6 +4469,7 @@
       "decodedBytes": 6291456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4157,6 +4488,7 @@
       "decodedBytes": 6291456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4175,6 +4507,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4192,12 +4525,14 @@
       "encodedBytes": 573042,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
-        "diffuse"
+        "diffuse",
+        "direct-reference"
       ],
       "stages": []
     },
@@ -4208,11 +4543,13 @@
       "encodedBytes": 91322,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4224,11 +4561,13 @@
       "encodedBytes": 170012,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4240,12 +4579,14 @@
       "encodedBytes": 432522,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
-        "diffuse"
+        "diffuse",
+        "direct-reference"
       ],
       "stages": []
     },
@@ -4256,11 +4597,13 @@
       "encodedBytes": 106114,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4272,11 +4615,13 @@
       "encodedBytes": 284556,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4288,12 +4633,14 @@
       "encodedBytes": 564384,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
-        "diffuse"
+        "diffuse",
+        "direct-reference"
       ],
       "stages": []
     },
@@ -4304,11 +4651,13 @@
       "encodedBytes": 97112,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4320,11 +4669,13 @@
       "encodedBytes": 279026,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4336,12 +4687,14 @@
       "encodedBytes": 407782,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
-        "diffuse"
+        "diffuse",
+        "direct-reference"
       ],
       "stages": []
     },
@@ -4352,11 +4705,13 @@
       "encodedBytes": 78772,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4368,11 +4723,13 @@
       "encodedBytes": 153162,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4385,6 +4742,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4403,6 +4761,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4421,9 +4780,11 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -4437,6 +4798,7 @@
       "decodedBytes": 6288340,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4455,6 +4817,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4473,6 +4836,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -4490,6 +4854,7 @@
       "encodedBytes": 431126,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4506,11 +4871,13 @@
       "encodedBytes": 93726,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4522,11 +4889,13 @@
       "encodedBytes": 475086,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4538,6 +4907,7 @@
       "encodedBytes": 555542,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-charms.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4554,11 +4924,13 @@
       "encodedBytes": 136278,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-charms.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4570,11 +4942,13 @@
       "encodedBytes": 324298,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-charms.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4586,6 +4960,7 @@
       "encodedBytes": 469358,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
@@ -4601,10 +4976,12 @@
       "encodedBytes": 86890,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4616,10 +4993,12 @@
       "encodedBytes": 160862,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4631,6 +5010,7 @@
       "encodedBytes": 264394,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4647,11 +5027,13 @@
       "encodedBytes": 81606,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4663,11 +5045,13 @@
       "encodedBytes": 162580,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4679,6 +5063,7 @@
       "encodedBytes": 491804,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4695,11 +5080,13 @@
       "encodedBytes": 91406,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4711,11 +5098,13 @@
       "encodedBytes": 365248,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4727,6 +5116,7 @@
       "encodedBytes": 171096,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
@@ -4742,10 +5132,12 @@
       "encodedBytes": 53884,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4757,10 +5149,12 @@
       "encodedBytes": 58654,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4772,6 +5166,7 @@
       "encodedBytes": 510622,
       "decodedBytes": 6288340,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4788,11 +5183,13 @@
       "encodedBytes": 121548,
       "decodedBytes": 6288340,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4804,11 +5201,13 @@
       "encodedBytes": 253116,
       "decodedBytes": 6288340,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4820,6 +5219,7 @@
       "encodedBytes": 431438,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4836,11 +5236,13 @@
       "encodedBytes": 68352,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4852,11 +5254,13 @@
       "encodedBytes": 168844,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4868,6 +5272,7 @@
       "encodedBytes": 328046,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4884,11 +5289,13 @@
       "encodedBytes": 65362,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4900,11 +5307,13 @@
       "encodedBytes": 214084,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4916,6 +5325,7 @@
       "encodedBytes": 493978,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
@@ -4932,11 +5342,13 @@
       "encodedBytes": 91218,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4948,11 +5360,13 @@
       "encodedBytes": 258292,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -4964,6 +5378,7 @@
       "encodedBytes": 888636,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
@@ -4979,10 +5394,12 @@
       "encodedBytes": 164112,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -4994,10 +5411,12 @@
       "encodedBytes": 352430,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5009,6 +5428,7 @@
       "encodedBytes": 460708,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
@@ -5025,11 +5445,13 @@
       "encodedBytes": 72122,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5041,11 +5463,13 @@
       "encodedBytes": 159834,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5057,6 +5481,7 @@
       "encodedBytes": 398068,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
@@ -5073,11 +5498,13 @@
       "encodedBytes": 76382,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5089,11 +5516,13 @@
       "encodedBytes": 413304,
       "decodedBytes": 6294152,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5106,6 +5535,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -5123,12 +5553,14 @@
       "encodedBytes": 400180,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
-        "diffuse"
+        "diffuse",
+        "direct-reference"
       ],
       "stages": []
     },
@@ -5139,11 +5571,13 @@
       "encodedBytes": 80280,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5155,11 +5589,13 @@
       "encodedBytes": 149420,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/asset-materials.ts",
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5172,9 +5608,11 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -5188,6 +5626,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-player.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -5206,6 +5645,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -5224,6 +5664,7 @@
       "decodedBytes": 6294152,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/figures/ink-sword.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -5242,6 +5683,7 @@
       "decodedBytes": 6291456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.css"
@@ -5261,6 +5703,7 @@
       "decodedBytes": 131072,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.css"
       ],
@@ -5279,6 +5722,7 @@
       "decodedBytes": 131072,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.css"
       ],
@@ -5297,6 +5741,7 @@
       "decodedBytes": 131072,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.css"
       ],
@@ -5329,9 +5774,11 @@
       "decodedBytes": 393216,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -5359,9 +5806,11 @@
       "decodedBytes": 131072,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -5375,6 +5824,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/styles/button-frames.css",
         "src/ui/lighting-debug.ts"
       ],
@@ -5393,6 +5843,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/styles/button-frames.css",
         "src/ui/lighting-debug.ts"
       ],
@@ -5411,6 +5862,7 @@
       "decodedBytes": 160000,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
@@ -5427,6 +5879,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/symbol-art.ts"
       ],
@@ -5445,6 +5898,7 @@
       "decodedBytes": 960000,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/startup-loading.ts"
       ],
@@ -5477,9 +5931,11 @@
       "decodedBytes": 294912,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -5493,6 +5949,7 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/styles/panel-frames.css",
         "src/ui/lighting-debug.ts"
       ],
@@ -5511,6 +5968,7 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/styles/panel-frames.css",
         "src/ui/lighting-debug.ts"
       ],
@@ -5528,6 +5986,7 @@
       "encodedBytes": 1571976,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
@@ -5545,12 +6004,14 @@
       "encodedBytes": 288344,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -5562,12 +6023,14 @@
       "encodedBytes": 710532,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5579,12 +6042,14 @@
       "encodedBytes": 2130906,
       "decodedBytes": 6291456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/armory-preview.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5596,6 +6061,7 @@
       "encodedBytes": 3694,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
@@ -5612,11 +6078,13 @@
       "encodedBytes": 1542,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5628,11 +6096,13 @@
       "encodedBytes": 6244,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5644,6 +6114,7 @@
       "encodedBytes": 3092,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
@@ -5660,11 +6131,13 @@
       "encodedBytes": 1456,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5676,11 +6149,13 @@
       "encodedBytes": 6044,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5692,6 +6167,7 @@
       "encodedBytes": 4624,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
@@ -5708,11 +6184,13 @@
       "encodedBytes": 1924,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5724,11 +6202,13 @@
       "encodedBytes": 7972,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5740,6 +6220,7 @@
       "encodedBytes": 11898,
       "decodedBytes": 393216,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -5755,10 +6236,12 @@
       "encodedBytes": 4076,
       "decodedBytes": 393216,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5770,10 +6253,12 @@
       "encodedBytes": 19686,
       "decodedBytes": 393216,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5785,6 +6270,7 @@
       "encodedBytes": 3212,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -5800,10 +6286,12 @@
       "encodedBytes": 1832,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5815,10 +6303,12 @@
       "encodedBytes": 7040,
       "decodedBytes": 131072,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5830,6 +6320,7 @@
       "encodedBytes": 1674,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
@@ -5846,11 +6337,13 @@
       "encodedBytes": 1146,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5862,11 +6355,13 @@
       "encodedBytes": 3854,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5878,6 +6373,7 @@
       "encodedBytes": 1578,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
@@ -5894,11 +6390,13 @@
       "encodedBytes": 1074,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5910,11 +6408,13 @@
       "encodedBytes": 3484,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5926,6 +6426,7 @@
       "encodedBytes": 627426,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
@@ -5942,11 +6443,13 @@
       "encodedBytes": 349652,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -5958,11 +6461,13 @@
       "encodedBytes": 297102,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -5974,11 +6479,13 @@
       "encodedBytes": 591946,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -5990,6 +6497,7 @@
       "encodedBytes": 83740,
       "decodedBytes": 960000,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
@@ -6006,11 +6514,13 @@
       "encodedBytes": 37808,
       "decodedBytes": 960000,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -6022,11 +6532,13 @@
       "encodedBytes": 48450,
       "decodedBytes": 960000,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6038,11 +6550,13 @@
       "encodedBytes": 85968,
       "decodedBytes": 960000,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6054,6 +6568,7 @@
       "encodedBytes": 6392,
       "decodedBytes": 294912,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6069,10 +6584,12 @@
       "encodedBytes": 4768,
       "decodedBytes": 294912,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6084,10 +6601,12 @@
       "encodedBytes": 15374,
       "decodedBytes": 294912,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6099,6 +6618,7 @@
       "encodedBytes": 2892,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
@@ -6115,11 +6635,13 @@
       "encodedBytes": 3280,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6131,11 +6653,13 @@
       "encodedBytes": 8010,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6147,6 +6671,7 @@
       "encodedBytes": 2708,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
@@ -6163,11 +6688,13 @@
       "encodedBytes": 3134,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6179,11 +6706,13 @@
       "encodedBytes": 7288,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6195,6 +6724,7 @@
       "encodedBytes": 453618,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
@@ -6211,11 +6741,13 @@
       "encodedBytes": 269146,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -6227,11 +6759,13 @@
       "encodedBytes": 236608,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6243,11 +6777,13 @@
       "encodedBytes": 425726,
       "decodedBytes": 6290064,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6259,6 +6795,7 @@
       "encodedBytes": 507556,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
@@ -6275,11 +6812,13 @@
       "encodedBytes": 352382,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "emissive"
       ],
       "stages": []
@@ -6291,11 +6830,13 @@
       "encodedBytes": 293730,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6307,11 +6848,13 @@
       "encodedBytes": 526224,
       "decodedBytes": 6290112,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6323,6 +6866,7 @@
       "encodedBytes": 19156,
       "decodedBytes": 1572864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/trials.css"
@@ -6339,11 +6883,13 @@
       "encodedBytes": 24188,
       "decodedBytes": 1572864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/trials.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6355,11 +6901,13 @@
       "encodedBytes": 68628,
       "decodedBytes": 1572864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/trials.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6371,6 +6919,7 @@
       "encodedBytes": 40482,
       "decodedBytes": 1966080,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/ui-art.ts",
         "src/ui/material-lighting.ts"
@@ -6387,11 +6936,13 @@
       "encodedBytes": 21248,
       "decodedBytes": 1966080,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/ui-art.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6403,11 +6954,13 @@
       "encodedBytes": 75924,
       "decodedBytes": 1966080,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/rendering/ui-art.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6419,6 +6972,7 @@
       "encodedBytes": 2002,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6435,11 +6989,13 @@
       "encodedBytes": 3106,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6451,11 +7007,13 @@
       "encodedBytes": 8104,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6467,6 +7025,7 @@
       "encodedBytes": 2670,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6483,11 +7042,13 @@
       "encodedBytes": 3302,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6499,11 +7060,13 @@
       "encodedBytes": 8612,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6515,6 +7078,7 @@
       "encodedBytes": 1697,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6531,11 +7095,13 @@
       "encodedBytes": 2308,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6547,11 +7113,13 @@
       "encodedBytes": 6778,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6563,6 +7131,7 @@
       "encodedBytes": 1566,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6579,11 +7148,13 @@
       "encodedBytes": 2422,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6595,11 +7166,13 @@
       "encodedBytes": 5898,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6611,6 +7184,7 @@
       "encodedBytes": 986,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6627,11 +7201,13 @@
       "encodedBytes": 938,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6643,11 +7219,13 @@
       "encodedBytes": 2926,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6659,6 +7237,7 @@
       "encodedBytes": 2073,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6675,11 +7254,13 @@
       "encodedBytes": 3124,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6691,11 +7272,13 @@
       "encodedBytes": 8228,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6707,6 +7290,7 @@
       "encodedBytes": 2041,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
@@ -6723,11 +7307,13 @@
       "encodedBytes": 2930,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6739,11 +7325,13 @@
       "encodedBytes": 8450,
       "decodedBytes": 65536,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6755,6 +7343,7 @@
       "encodedBytes": 4972,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6770,10 +7359,12 @@
       "encodedBytes": 8054,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6785,10 +7376,12 @@
       "encodedBytes": 15360,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6800,6 +7393,7 @@
       "encodedBytes": 4474,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6815,10 +7409,12 @@
       "encodedBytes": 4326,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6830,10 +7426,12 @@
       "encodedBytes": 12328,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6845,6 +7443,7 @@
       "encodedBytes": 3754,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6860,10 +7459,12 @@
       "encodedBytes": 6094,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6875,10 +7476,12 @@
       "encodedBytes": 16032,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6890,6 +7493,7 @@
       "encodedBytes": 5604,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6905,10 +7509,12 @@
       "encodedBytes": 9058,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6920,10 +7526,12 @@
       "encodedBytes": 17686,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6935,6 +7543,7 @@
       "encodedBytes": 6847,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
@@ -6950,10 +7559,12 @@
       "encodedBytes": 8110,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -6965,10 +7576,12 @@
       "encodedBytes": 19974,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -6980,6 +7593,7 @@
       "encodedBytes": 4972,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
@@ -6997,12 +7611,14 @@
       "encodedBytes": 4748,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -7014,12 +7630,14 @@
       "encodedBytes": 13616,
       "decodedBytes": 147456,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -7031,6 +7649,7 @@
       "encodedBytes": 1015,
       "decodedBytes": 36864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
@@ -7048,12 +7667,14 @@
       "encodedBytes": 1000,
       "decodedBytes": 36864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
       "roles": [
+        "direct-reference",
         "normal"
       ],
       "stages": []
@@ -7065,12 +7686,14 @@
       "encodedBytes": 2420,
       "decodedBytes": 36864,
       "consumers": [
+        "src/platform/runtime-assets.ts",
         "src/rendering/pbr-atlas.ts",
         "src/ui/material-lighting.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
       "roles": [
+        "direct-reference",
         "surface"
       ],
       "stages": []
@@ -7083,6 +7706,7 @@
       "decodedBytes": 40000,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
@@ -7099,6 +7723,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/symbol-art.ts"
       ],
       "roles": [
@@ -7115,6 +7740,7 @@
       "decodedBytes": 6290064,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/symbol-art.ts"
       ],
@@ -7133,6 +7759,7 @@
       "decodedBytes": 6290112,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/symbol-art.ts"
       ],
@@ -7165,6 +7792,7 @@
       "decodedBytes": 1572864,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/trials.css"
       ],
@@ -7197,6 +7825,7 @@
       "decodedBytes": 1966080,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/rendering/ui-art.ts",
         "src/ui/lighting-debug.ts"
       ],
@@ -7215,6 +7844,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7233,6 +7863,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7251,6 +7882,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7269,6 +7901,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7287,6 +7920,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7305,6 +7939,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7323,6 +7958,7 @@
       "decodedBytes": 65536,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.ts"
       ],
@@ -7341,9 +7977,11 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -7357,9 +7995,11 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -7373,9 +8013,11 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -7389,9 +8031,11 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -7405,9 +8049,11 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts"
       ],
       "roles": [
+        "direct-reference",
         "material-preview",
         "startup-glob"
       ],
@@ -7421,6 +8067,7 @@
       "decodedBytes": 147456,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
@@ -7440,6 +8087,7 @@
       "decodedBytes": 36864,
       "consumers": [
         "src/main-game.ts",
+        "src/platform/runtime-assets.ts",
         "src/ui/lighting-debug.ts",
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"

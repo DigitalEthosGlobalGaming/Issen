@@ -157,6 +157,15 @@ image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, bytes, peak, budget and evictions. Main figure/UI/startup owners
 are not yet routed through this loader; whole-application memory remains unbounded.
+`platform/runtime-assets.ts` is generated from the inventory by
+`scripts/assets/runtime-manifest.mjs`, excluding unused diffuse maps and startup-only
+source art. Main startup filters its existing artwork selection through this manifest.
+`platform/compressed-assets.ts` owns base-path-scoped CacheStorage responses with HTTP
+fallback; worker decoding reads these unchanged compressed responses. MainGame starts
+`platform/background-assets.ts` after removing the loading overlay and disposes it
+with the root. Runtime frame sampling grants quiet background time through
+`platform/asset-background.ts`; visibility, saveData, native mode and frame work
+gate at most two low-priority requests. Required worker reads remain available.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and

@@ -1,5 +1,6 @@
 import { createDecodedImageLoader, decodedImageBudget } from '../../platform/decoded-images.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+import { readCompressedAsset } from '../../platform/compressed-assets.ts';
 
 /** Cache native bindings; only image consumers need decoded-source adaptation. */
 export function createWorkerContextProxy(
@@ -51,8 +52,7 @@ export function createWorkerDocument(): Document & {
           : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
     }),
     async decode(url, signal) {
-      const response = await fetch(url, { signal });
-      if (!response.ok) throw Error(`HTTP ${response.status}: ${url}`);
+      const response = await readCompressedAsset(url, signal);
       // Preserve the existing worker decode interpretation. Data-map options
       // must change only after the complete material-plane parity check.
       return createImageBitmap(await response.blob());

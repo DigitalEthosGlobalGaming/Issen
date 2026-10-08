@@ -179,7 +179,7 @@ export async function runtimeInventory() {
   return {
     version: 1,
     limits: [
-      'Generated from runtime references/catalog and actual startup globs; startup-only files are identified for exclusion.',
+      'Generated from runtime references/catalog and startup glob inputs; startup-only matches are excluded by the runtime manifest.',
       'Decoded bytes are nominal width×height×4; SVG bytes describe intrinsic raster size, not browser residency.',
       'Stage totals describe local compose kits; separate fog, figures, UI and canvas caches add memory.',
     ],

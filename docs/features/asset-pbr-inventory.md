@@ -67,6 +67,13 @@ Worker decoded resources now share the priority/pin/LRU loader in
 `src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
 device-class budgets. Main figure/UI/startup loader migration remains pending;
 the inventory total is not a configured whole-application residency budget.
+The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
+for compressed prefetch and startup filtering; regenerate with
+`node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.
+It excludes the80unused diffuse maps and6startup-only vector files. Prefetch
+holds compressed responses only, starts after startup, and yields to combat,
+loading, hidden pages, saveData and native offline assets. Worker decoding reads
+its base-path-scoped cache with HTTP fallback. Main decoded ownership is pending.
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
 Only packs selected by a renderer are decoded. Generated maps are excluded from

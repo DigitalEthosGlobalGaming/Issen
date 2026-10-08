@@ -8,6 +8,9 @@ import { SceneSurface } from './rendering/scene-surface.ts';
 import { createLightingRig } from './rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from './ui/material-lighting.ts';
 import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
+import { Capacitor } from '@capacitor/core';
+import { startBackgroundAssets } from './platform/background-assets.ts';
+import { runtimeAssets } from './platform/runtime-assets.ts';
 
 const artwork = import.meta.glob<string>(
   [
@@ -24,17 +27,19 @@ const publicArtwork = import.meta.glob<string>(
 );
 // Material owners decode selected maps separately from source artwork.
 const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
+const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
 const urls = [
   ...Object.values(artwork),
   ...Object.keys(publicArtwork).map(
     (path) => `${import.meta.env.BASE_URL}${path.slice('/public/'.length)}`,
   ),
-].filter((url) => !materialMaps.has(url));
+].filter((url) => !materialMaps.has(url) && runtimeUrlSet.has(url));
 
 export class MainGame {
   private root: HTMLElement | null = null;
   private stop: (() => void) | null = null;
   private stopChangelog: (() => void) | null = null;
+  private stopAssets: (() => void) | null = null;
   private disposed = false;
   private starting: Promise<void> | null = null;
   private readonly surfaces = new Map<string, SceneSurface>();
@@ -81,6 +86,10 @@ export class MainGame {
       }
       this.stop = startGame(this.surfaces, { rig: this.lightingRig, ui: this.uiMaterialLighting });
       this.loading.remove();
+      this.stopAssets = startBackgroundAssets(
+        document,
+        Capacitor.isNativePlatform() || import.meta.env.MODE === 'android',
+      );
     } catch (error) {
       this.releaseRoot();
       if (!this.disposed) {
@@ -92,6 +101,8 @@ export class MainGame {
   }
 
   private releaseRoot(): void {
+    this.stopAssets?.();
+    this.stopAssets = null;
     this.stop?.();
     this.stop = null;
     for (const surface of this.surfaces.values()) surface.dispose();
