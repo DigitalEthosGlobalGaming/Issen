@@ -1,3 +1,40 @@
+## W3 phase 3 green — phase 4 must remove the old shader
+
+Default ordinary sprite material now uses composite-material.ts: own linear
+albedo*Ldiffuse + Lspecular + own emissive, then original highlight roll-off,
+sRGB encoding, material/debug coverage, fog, alpha and ordered native blends.
+Old forward BRDF survives only for the required TEMPORARY comparison:
+canvas.dataset.lightingComparison='forward'. Phase4 must remove this flag AND
+the old fragment/point-selection uniforms/CPU code; no permanent fallback.
+Composite light bindings detach before target resize/restore; owners stay isolated.
+Geometry cutoff uses exact mesh/ancestor alpha rather than Pixi byte-truncated
+colour alpha, fixing authored alpha0.5 being treated as below cutoff. Original
+colour/backlighting assertions pass unchanged. Phase1 translucent fixture now
+uses a neutral lit surface behind the below-cutoff blue, preserving every
+visibility assertion while testing the required behind-surface lookup approximation.
+
+Final strict PASS; all404 units PASS; full16-file affected native/material/film/
+startup/recovery/game/real-PBR-comparison suite all55PASS1.9m exit0. Session61844
+TERMINAL; no browser job live. Logs tmp/lighting-refactor/phase3-{typecheck,unit,
+native-browser}.log. Real rock/cloth/steel, mirror/nonuniform/rotation, alpha/fog,
+warm/cool point lights, actual noir and debug-disabled compare: mean displayed
+RGB differences0.03855/0.04166/0.04091/0 (existing tolerance9), alpha mismatches0
+in each case;24396 covered pixels each. Screenshots visually inspected.
+Exact JSON and forward/lookup captures preserved under ignored
+tmp/lighting-refactor/phase3-evidence before later runners clear test-results.
+
+NEXT immediately: phase4 finalize mask-to-PBR mapping and delete old forward
+shader/comparison flag, record this phase3 commit as its recoverable reference.
+Update the comparison test when old shader is removed so it cannot silently
+compare new output to itself. Audit remaining plain native draw routes against
+the all-scene-pipeline policy rather than treating normal-map materials as the
+entire scene. Then required phase5 instanced grass/leaves, phase6 event lights/
+half-res quality/extension hooks/named G-light composer passes and documentation.
+W3 full broad/production/Android gates and allPart4/default-browser/final report/
+one final develop push remain pending. No early push. Version1.68.0 aligned.
+W1/W2 complete with documented proven pre-existing Android recovery exception.
+Applied external staging scripts are non-idempotent; do not rerun. Use repo source.
+
 ## W3 phase 2 green — continue immediately to lookup composite
 
 Version1.68.0: painter-owned native RGBA16F diffuse/specular MRT, fullscreen GGX

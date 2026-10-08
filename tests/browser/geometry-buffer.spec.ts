@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('geometry buffer records coverage, last writer, maps and clip hierarchy without changing composite', async ({
+test('geometry buffer records coverage, last writer, maps, clip hierarchy and translucent lookup', async ({
   page,
 }, testInfo) => {
   await page.goto('/privacy/index.html');
@@ -52,7 +52,7 @@ test('geometry buffer records coverage, last writer, maps and clip hierarchy wit
       points: [],
     });
     stamp(red, 0, 0, 32, 32);
-    stamp(green, 8, 8, 16, 16);
+    stamp(green, 8, 8, 16, 16, { ...material, surface: texture('rgb(64,0,255)') });
     painter.globalAlpha = 0.49;
     stamp(blue, 8, 8, 16, 16);
     painter.globalAlpha = 0.4;

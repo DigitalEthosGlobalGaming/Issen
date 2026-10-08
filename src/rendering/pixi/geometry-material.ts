@@ -16,7 +16,7 @@ uniform mat2 uNormalMatrix;
 uniform vec4 uMaterial;
 uniform float uHasMask;
 uniform float uHasSurface;
-uniform vec2 uGeometry;
+uniform vec3 uGeometry;
 layout(location = 0) out vec4 g0;
 layout(location = 1) out vec4 g1;
 layout(location = 2) out vec4 g2;
@@ -30,7 +30,8 @@ vec2 octEncode(vec3 n) {
 }
 void main() {
   vec4 colour = texture(uDiffuse,uDiffuseRect.xy + vUV * uDiffuseRect.zw);
-  float coverage = colour.a * vColor.a;
+  // Pixi packs colour alpha to a byte; cutoff uses the original effective alpha.
+  float coverage = colour.a * uGeometry.z;
   if (coverage < uGeometry.y) discard;
   vec3 tint = vColor.rgb / max(vColor.a,0.0001);
   vec3 albedo = toLinear(clamp(colour.rgb / max(colour.a,0.0001) * tint,0.0,1.0));
@@ -61,7 +62,7 @@ void main() {
 /** Shares already-updated material maps/UVs and normal transforms with its mesh. */
 export function createGeometryMaterial(vertex: string, materialUniforms: UniformGroup) {
   const geometryUniforms = new UniformGroup({
-    uGeometry: { value: new Float32Array([1, 0.5]), type: 'vec2<f32>' },
+    uGeometry: { value: new Float32Array([1, 0.5, 1]), type: 'vec3<f32>' },
   });
   const shader = Shader.from({
     gl: { vertex: '#version 300 es\n' + vertex, fragment, name: 'issen-geometry-material' },
@@ -76,10 +77,10 @@ export function createGeometryMaterial(vertex: string, materialUniforms: Uniform
   });
   return {
     shader,
-    update(source: Shader, depthRange: number, cutoff: number) {
+    update(source: Shader, depthRange: number, cutoff: number, alpha: number) {
       for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface'])
         shader.resources[name] = source.resources[name];
-      geometryUniforms.uniforms.uGeometry.set([depthRange, cutoff]);
+      geometryUniforms.uniforms.uGeometry.set([depthRange, cutoff, alpha]);
       geometryUniforms.update();
     },
     releaseTextures() {

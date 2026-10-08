@@ -1,5 +1,7 @@
 import { Matrix, Mesh, MeshGeometry, Shader, Texture, UniformGroup } from 'pixi.js';
 import { createGeometryMaterial } from './geometry-material.ts';
+import { createCompositeMaterial } from './composite-material.ts';
+import type { LightTargets } from './light-buffer.ts';
 import { normalTransform } from '../scene-frame.ts';
 import type { SceneLighting, SceneSprite } from '../scene-frame.ts';
 import type { SceneTextureStore } from './texture-store.ts';
@@ -188,6 +190,7 @@ export function createMaterialMesh() {
     },
   });
   const geometryMaterial = createGeometryMaterial(vertex, uniforms);
+  const compositeMaterial = createCompositeMaterial(vertex, uniforms);
   let cutoff = 0.5;
   const geometry = new MeshGeometry({
     positions: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
@@ -201,8 +204,18 @@ export function createMaterialMesh() {
   let texturesBound = false;
   return {
     mesh,
+    releaseLightTargets: compositeMaterial.releaseLightTargets,
+    beginComposite(targets: Readonly<LightTargets>): () => void {
+      compositeMaterial.update(shader, targets);
+      mesh.shader = compositeMaterial.shader;
+      return () => {
+        mesh.shader = shader;
+      };
+    },
     beginGeometry(depthRange: number): () => void {
-      geometryMaterial.update(shader, depthRange, cutoff);
+      let alpha = mesh.alpha;
+      for (let parent = mesh.parent; parent; parent = parent.parent) alpha *= parent.alpha;
+      geometryMaterial.update(shader, depthRange, cutoff, alpha);
       const blend = mesh.blendMode;
       const stateBlend = mesh.state.blend;
       const stateBlendMode = mesh.state.blendMode;
@@ -221,6 +234,7 @@ export function createMaterialMesh() {
       for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'])
         shader.resources[name] = Texture.WHITE.source;
       geometryMaterial.releaseTextures();
+      compositeMaterial.releaseTextures();
       texturesBound = false;
     },
     update(sprite: SceneSprite, lights: SceneLighting, textures: SceneTextureStore): void {
@@ -328,6 +342,7 @@ export function createMaterialMesh() {
       mesh.destroy();
       geometry.destroy();
       geometryMaterial.dispose();
+      compositeMaterial.dispose();
       shader.destroy();
     },
   };

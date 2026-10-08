@@ -470,3 +470,35 @@ production light targets retain HDR. Controls stay session-only.
 The ordinary scene still uses the forward shader until phase3 implements lookup.
 Legacy model unification, instanced foliage, half-resolution lighting, event
 sources and named GPU composer passes remain required migration work.
+
+## W3 lookup composite (phase 3)
+
+Ordinary material sprites now sample the painter's diffuse/specular targets at
+world screen position and combine their own linear albedo and emission. The
+existing highlight roll-off, display encoding, coverage, fog, tint and ordered
+native blend/film passes remain. The sprite shader performs no BRDF evaluation.
+Below-cutoff translucency samples the surface behind it, including its normal,
+depth, roughness, metallic tint and AO. This is the requested accepted
+approximation; overlapping materials can therefore share or tint highlights.
+
+The geometry cutoff uses exact effective mesh/ancestor alpha instead of Pixi's
+byte-packed colour alpha, so authored alpha0.5 is included at default cutoff0.5.
+Composite output preserves Pixi's existing premultiplied-alpha convention.
+Light sampler bindings are detached before light attachments are replaced.
+
+During phase3 only, canvas.dataset.lightingComparison='forward' selects the old
+forward shader for developer/browser comparison. Phase4 removes both this flag
+and that shader. The native light pass still runs during comparison; this flag
+does not select another renderer. Normal production drawing defaults to lookup.
+
+Native PBR studies cover rock, cloth and steel with mirror/rotation/nonuniform
+scale, translucent coverage, fog, warm/cool point lights, actual noir grading and
+lighting disabled. Mean displayed RGB differences were0.03855/0.04166/0.04091/0
+against the existing native scene tolerance9, with zero alpha mismatches and
+24396 covered pixels per case. Thin edges compare their actual displayed
+contribution over black. Screenshots and numeric JSON use testInfo.outputPath;
+ignored checkpoint copies preserve evidence across later test-result cleanup.
+
+This is still migration work. Legacy mapping/old-shader removal, complete scene
+route audit, instanced foliage, half-res quality, event light sources and named
+GPU composer passes remain required before the lighting workstream is complete.

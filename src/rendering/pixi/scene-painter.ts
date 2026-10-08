@@ -164,6 +164,7 @@ export class PixiScenePainter implements SceneDrawing {
     try {
       requireGeometryBuffers(this.renderer.gl as WebGL2RenderingContext);
       requireLightBuffers(this.renderer.gl as WebGL2RenderingContext);
+      for (const slot of this.slots) slot.material?.releaseLightTargets();
       this.lightBuffer.detachGeometry();
       this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
       this.lightBuffer.resize(this.canvas.width, this.canvas.height, true);
@@ -384,6 +385,7 @@ export class PixiScenePainter implements SceneDrawing {
       this.height = this.canvas.height;
       this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
     }
+    for (const slot of this.slots) slot.material?.releaseLightTargets();
     this.lightBuffer.detachGeometry();
     this.drawGeometry();
     this.lightBuffer.render(this.geometryBuffer.targets!, this.lighting);
@@ -404,8 +406,20 @@ export class PixiScenePainter implements SceneDrawing {
       !(lightView
         ? this.lightBuffer.renderDebug(lightView)
         : this.geometryBuffer.renderDebug(geometryView))
-    )
-      this.renderer.render({ container: this.root, clear: true });
+    ) {
+      const restore: (() => void)[] = [];
+      try {
+        // Temporary phase3 comparison only; phase4 removes this and the old shader.
+        if (this.canvas.dataset.lightingComparison !== 'forward')
+          for (let i = 0; i < this.cursor; i++) {
+            const material = this.slots[i]!.material;
+            if (material) restore.push(material.beginComposite(this.lightBuffer.targets!));
+          }
+        this.renderer.render({ container: this.root, clear: true });
+      } finally {
+        for (let i = restore.length - 1; i >= 0; i--) restore[i]!();
+      }
+    }
     this.canvas.dataset.lightingFrameView = view;
     // Filter targets return to Pixi's pool after rendering. Drop the shared
     // bindings before a later resize destroys those pooled textures.
