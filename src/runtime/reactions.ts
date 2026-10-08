@@ -1,3 +1,4 @@
+import { bindEventLights } from '../presentation/event-lights.ts';
 import { bindShrineProgression } from '../game/progression/shrine-listeners.ts';
 import { bindShrineFeedback } from '../ui/wiring/shrine-feedback.ts';
 import { bindGruntCues } from '../presentation/grunt-cues.ts';
@@ -39,6 +40,10 @@ export function bindRuntimeReactions(
     readKillViews: Parameters<typeof bindKillFeedback>[1];
   },
 ) {
+  foundation.lifecycle.add(bindEventLights(events, presentation.lightSources, () => ({
+    time: foundation.view.presentationState.time,
+    reducedFlashes: foundation.browser.reducedFlashes(),
+  })));
   foundation.lifecycle.add(
     bindCombatProgression(events, () => ({
       ST: foundation.profile.profileFoundation.ST,

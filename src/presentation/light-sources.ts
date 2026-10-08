@@ -1,11 +1,13 @@
 import { selectSceneLights, type IdentifiedLight } from '../rendering/light-budget.ts';
-import type { SceneLight, SceneLighting } from '../rendering/scene-frame.ts';
+import type { SceneLight, SceneLighting, SceneTransform } from '../rendering/scene-frame.ts';
 
 export interface LightFrame {
   readonly width: number;
   readonly height: number;
   /** Presentation effects clock; never the gameplay random stream. */
   readonly time: number;
+  /** Logical scene coordinates to physical target pixels, including camera and zoom. */
+  readonly transform?: Readonly<SceneTransform>;
 }
 export interface FrameLight {
   /** Stable within this source across frames. */
@@ -45,5 +47,22 @@ export function createLightSources() {
     dispose() {
       sources.clear();
     },
+  };
+}
+
+/** Scene sources use logical coordinates; independent preview sources may stay in pixels. */
+export function transformSceneLight(
+  light: Readonly<SceneLight>,
+  frame: Readonly<LightFrame>,
+): SceneLight {
+  const t = frame.transform;
+  if (!t) return { ...light };
+  const scale = Math.sqrt(Math.abs(t.a * t.d - t.b * t.c));
+  return {
+    ...light,
+    x: t.a * light.x + t.c * light.y + t.tx,
+    y: t.b * light.x + t.d * light.y + t.ty,
+    z: light.z * scale,
+    radius: light.radius * scale,
   };
 }

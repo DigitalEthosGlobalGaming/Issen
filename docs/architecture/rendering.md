@@ -334,6 +334,7 @@ returning. Leaked drawing state can subtly recolor or displace every later layer
 | Leaf spawn clocks, analytic motion and lifetime metadata | `src/rendering/scene/leaf-motion.ts`, `src/rendering/scene/ambient.ts` |
 | Runtime feedback effect spawning/drawing               | `src/presentation/feedback.ts`                           |
 | Runtime enemy/boss projection and figure host          | `src/presentation/figures.ts`                            |
+| Combat event lights and effects-clock decay | `src/presentation/event-lights.ts` |
 | Main scene composition / full-frame drawing            | `src/presentation/scene.ts` / `src/presentation/post.ts` |
 | HUD or screen layout and styling                       | `src/ui/` and `src/styles/`                              |
 | Armory-only composition                                | `src/rendering/armory-preview.ts`                        |
@@ -627,3 +628,37 @@ Diagnostics proved a single62/63 colour-byte difference also occurred before
 context loss while all five underlying targets remained identical. That test
 assumption was corrected; no production rounding workaround or existing test
 threshold was changed. The dithering hypothesis was tried and reverted.
+
+## W3 event-light sources (phase 6, first checkpoint)
+
+runtime/presentation.ts now owns a shared light-source registry passed to the
+scene by runtime/frame-bindings.ts. runtime/reactions.ts installs event-lights.ts
+listeners for immutable kill/parry/block values; lifecycle disposal unregisters
+both listeners and their source. Run entry clears pending flashes. No rule module
+imports the light registry, and no random stream is consumed. Birth timestamps
+use presentationState.time; paused effects time freezes intensity. Sampling is
+read-only, with quadratic decay over0.14–0.24 effects seconds. Reduced Flashes
+suppresses both event creation and active contributions immediately.
+
+Scene-source positions are logical. LightFrame.transform carries the current
+camera/zoom/DPR matrix; transformSceneLight maps position and radius/depth to the
+physical target before the shared budget. The stage rig remains in target pixels.
+All live flashes enter the global16 ranking, with no earlier per-source cap that
+could drop a stronger light. Expired records retire on event delivery or disposal.
+A native fixture proves actual HDR and composite contribution, frozen redraws,
+quarter radiance at half-life, suppression/expiration/disposal and zero GL errors.
+
+Minimal scene-source extension (the unregister callback belongs to lifecycle):
+
+```ts
+const unregister = sources.register('lantern-example', frame => [{
+  id: 'fixed-lantern',
+  light: transformSceneLight({
+    x: 120, y: 80, z: 20, radius: 60, intensity: 0.5, color: [1, 0.7, 0.4],
+  }, frame),
+}]);
+lifecycle.add(unregister);
+```
+
+Persistent scene sources, half-resolution quality/upsampling, named GPU composer
+passes and remaining extension hooks are not complete at this checkpoint.

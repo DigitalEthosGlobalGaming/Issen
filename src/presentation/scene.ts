@@ -84,8 +84,10 @@ interface ComposedFrame extends PresentationFrame {
   boss: RunState['boss'];
 }
 
-export function createRuntimeScene(readViews: () => SceneViews) {
-  const lightSources = createLightSources();
+export function createRuntimeScene(
+  readViews: () => SceneViews,
+  lightSources = createLightSources(),
+) {
   const composer = createSceneComposer<ComposedFrame, SceneViews>([
     {
       name: 'environment',
@@ -286,13 +288,6 @@ export function createRuntimeScene(readViews: () => SceneViews) {
       } = views;
       nativeScene?.begin();
       lightingDebug.refresh();
-      setSceneLighting(
-        g,
-        lightSources.lighting(
-          { width: W * DPR, height: H * DPR, time: views.time },
-          lightingRig.lighting(W * DPR, H * DPR),
-        ),
-      );
       g.setTransform(DPR, 0, 0, DPR, 0, 0);
       g.save();
       g.translate(frame.cameraX, frame.cameraY);
@@ -301,6 +296,26 @@ export function createRuntimeScene(readViews: () => SceneViews) {
         g.scale(zoom, zoom);
         g.translate(-zoomX, -zoomY);
       }
+      const transform = g.getTransform();
+      setSceneLighting(
+        g,
+        lightSources.lighting(
+          {
+            width: W * DPR,
+            height: H * DPR,
+            time: views.time,
+            transform: {
+              a: transform.a,
+              b: transform.b,
+              c: transform.c,
+              d: transform.d,
+              tx: transform.e,
+              ty: transform.f,
+            },
+          },
+          lightingRig.lighting(W * DPR, H * DPR),
+        ),
+      );
       composer.draw({ ...frame, demonRealm: false, inkEnvironment: false, boss: null }, views);
       nativeScene?.flush();
       cvs.dataset.graphicsBackend = 'pixi';

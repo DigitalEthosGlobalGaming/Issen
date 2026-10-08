@@ -109,6 +109,7 @@ export function createRuntimeFrames(
         ),
       ),
     ),
+    presentation.lightSources,
   );
   foundation.lifecycle.add(drawScene.dispose);
   bindGraphicsLifecycle(() => ({

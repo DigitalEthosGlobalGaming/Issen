@@ -1,3 +1,35 @@
+## W3 phase6 event lights green — continue persistent sources, half-res and hooks
+
+Leaf checkpoint37a9cda is committed. Presentation now owns a shared light-source
+registry across reactions and scene. event-lights.ts listens to kill/parry/block,
+uses immutable positions/effects-clock births, quadratic0.14–0.24-second decay,
+no RNG, and read-only sampling. Reduced Flashes suppresses creation/current lights;
+run entry resets flashes; lifecycle detaches listeners/source. Scene supplies
+camera/zoom/DPR transform before ranking; rig remains physical pixels. No per-source
+cap: all live contributions enter the global16 budget. Stronger earlier parry
+survives1000 weaker cuts in new unit proof.
+
+Final npm run typecheck PASS; npm test all410PASS. Affected exact10-file browser
+run34PASS1.4m exit0 session63174 TERMINAL (before final removal of the source cap).
+Final budget correction then strict/all410units/native event fixture1PASS2.8s exit0.
+Logs tmp/lighting-refactor/phase6-event-{typecheck,unit,final-browser,budget-browser}.log.
+Native probe proves real HDR/colour contributions, effects-time freeze/decay,
+Reduced Flashes, expiration/disposal and zero GL/Pixi errors; screenshot attaches
+through testInfo.outputPath('parry-light.png'). No live browser job. Version1.68.0
+aligned; release note includes cut/parry illumination. No develop push.
+
+NEXT finish phase6 persistent source registrations for sword glints, lanterns,
+embers, foxfire and boss auras, sampling existing read-only presentation poses.
+runtime/presentation.ts owns sources; runtime/frames.ts injects into frame bindings;
+reactions.ts binds event lights. Scene-source helpers use LightFrame.transform.
+Then effects/quality half-resolution light option through Options/testing tools,
+normal/depth-aware upsampling in common composite across material/artwork/grass/
+leaves. LightTargets must distinguish physical light dimensions from full scene
+size: current prepareComposite uses targets.width/height. Add read-only G/light
+post hooks, named film/post insertion examples and named composer G/light passes
+without duplicate GPU work (currently internal flush). W3 full gates and allPart4
+verification/report/one final develop push remain. Full goal active.
+
 ## W3 phase5 leaves green — continue phase6 light sources and hooks
 
 Grass checkpoint b01145e is committed. Leaves now use one ordered native instanced

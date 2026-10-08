@@ -1,3 +1,4 @@
+import { createLightSources } from '../presentation/light-sources.ts';
 import {
   createEquipmentPresentation,
   type EquipmentPresentationViews,
@@ -26,6 +27,8 @@ export function createRuntimePresentation(
   readRules: () => PresentationRulePorts,
   readCinematic: () => EnvironmentHostViews['cinematic'],
 ) {
+  const lightSources = createLightSources();
+  foundation.lifecycle.add(lightSources.dispose);
   const equipmentPresentation = createEquipmentPresentation(() =>
     stateView(
       foundation.view.sealState,
@@ -216,6 +219,7 @@ export function createRuntimePresentation(
     return equipmentPresentation.previewFrame(film, effectsVisible, target);
   }
   return {
+    lightSources,
     equipmentPresentation,
     CHARMCOL,
     environmentState,

@@ -1,3 +1,4 @@
+import { createLightSources } from '../presentation/light-sources.ts';
 import { createFrameSimulation, type FrameSimulationViews } from './frame-simulation.ts';
 import { createFrameLoop } from '../platform/frame-loop.ts';
 import {
@@ -81,7 +82,10 @@ export type FrameBindingViews = SimulationPorts &
   };
 
 /** Owns frame dispatch, prepared drawing and scheduling through current narrow views. */
-export function createFrameBindings(readViews: () => FrameBindingViews) {
+export function createFrameBindings(
+  readViews: () => FrameBindingViews,
+  lightSources = createLightSources(),
+) {
   function updatePlayer(dt: number) {
     const { P, G } = readViews();
     updatePlayerAnimation(P, dt, G.state === 'dead' || G.state === 'over');
@@ -191,7 +195,7 @@ export function createFrameBindings(readViews: () => FrameBindingViews) {
       drawFoxfire,
       drawPost,
     };
-  });
+  }, lightSources);
   function render(raw: number) {
     const { G, armory, settlePresentedScene } = readViews();
     // Only the opaque inspection dialog covers the scene completely.
