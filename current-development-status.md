@@ -1,4 +1,39 @@
-# Performance, assets and seamless transitions — Admitted image preload API
+# Performance, assets and seamless transitions — Multi-size native sampling isolated
+
+Latest checkpoint 42 is diagnostic only; app remains 1.68.35. The rejected
+Shore colour change reproduces without gameplay, prediction, preloading or material
+maps: plain drawBrokenShore repeats change exactly 51,684 channel values, max255,
+alpha max23. Fresh destination canvases reproduce it too. Moving cutout retirement
+after the final readback does not change either cold or warm fingerprint. A
+per-stamp readback probe changes the final cold fingerprint and is not a valid
+unperturbed attribution control; its observations are only suggestive.
+
+Minimal foam-only reproduction draws one unchanged atlas at the actual Shore
+sizes/rotations: first versus subsequent runs change63,088 channel values, max255,
+alpha max29. Varying sizes alone suffices (55,353 changes, alpha max24). Constant
+size, angles-only and cells-only runs are exact. URL images, blob HTML images and
+default ImageBitmaps each reproduce the same63,088 changes. A bitmap clone does
+not reset this history. Fixed-size crop tests are exact across all three kinds.
+This implicates native multi-size sampling, not the loader or material-mask cache;
+the browser mechanism remains unproven.
+
+CPU-backed foam-only destinations are exact across all three source kinds. However,
+CPU-backed full Shore still reproduces the original51,684 change. Do not treat
+willReadFrequently as a proven whole-scene fix or enable it in production without
+full original/candidate parity and compose-cost evidence. No runtime source,
+decode options, assets, visual gates or version changed in this checkpoint.
+Diagnostic sources/results are under tmp/probes/scene-image-preload/ and
+tmp/performance-scene-image-preload/isolation/. All probe handles are terminal.
+
+Next isolate why mixed full Shore differs when its foam-only CPU sequence is
+stable, and identify a sampling treatment that preserves original pixels. Validate
+the treatment against cold/warm raw and native controls before restoring automatic
+decoded-soon work. Then implement whole-budget admitted worker/local next slots,
+exact promotion/invalidation and quiet pacing. Figure/startup ownership, whole-game
+decoded/GPU bounds, 120Hz/CPU budgets and full Phase5 remain required. Full goal
+active; no push/deploy/native build/player saves.
+
+## Previous handoff — Admitted image preload API
 
 Latest checkpoint 41: integrated 1.68.35 adds explicit decoded-image set admission,
 shared future leases, cancellation and native main-owner forwarding. Known sets

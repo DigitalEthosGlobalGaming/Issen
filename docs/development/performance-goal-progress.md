@@ -2322,3 +2322,45 @@ history root cause is unproven and must be resolved with a reliable comparison
 before enabling next decoding. Whole-game memory/transient admission,worker/local
 next slots/promotion,figure/startup ownership,120Hz/CPU budgets and full Phase 5 remain.
 Full goal active;no push/deploy/native build/player saves.
+
+## Checkpoint 42 — Native multi-size sampling isolation
+
+Diagnostic-only checkpoint; production remains1.68.35 with automatic next decode
+disabled. No implementation,version,asset or tolerance change. The plain Shore
+probe has no material bindings and no prediction/loader integration, yet repeats
+the exact rejected far-colour delta:51,684 changed channel values,max255,alpha23.
+Fresh destination canvases first still reproduce it. Retiring colour cutouts after
+the final readback preserves the same cold/warm hashes and difference. Thus neither
+destination reuse nor early cutout retirement is required. Material-mask CPU
+readbacks are also unnecessary. Intermediate stamp readbacks perturb the final
+cold hash (22,393 changes instead of51,684), so their attribution is not conclusive.
+
+An unperturbed foam-only sequence reproduces63,088 channel changes,max255,alpha29,
+without other art,filters,colour cutouts,material maps or renderer bookkeeping.
+The same source is drawn at the original Shore sizes/cells/rotations into fresh
+canvases. Independent source-query ablations show varied sizes alone reproduces
+55,353 changes,alpha24. Constant size,angles-only and cells-only runs are exact.
+All three decode kinds—URL HTML,blob HTML and default ImageBitmap—repeat the
+same63,088 delta. Creating a new bitmap clone of the already-used source does not
+reset it. Fixed-size direct crop draws remain exact across those three kinds.
+These results isolate native multi-size sampling history; they do not identify
+the browser's internal caching mechanism or prove that intrinsic atlas pixels
+change. No renderer source normalization has been accepted.
+
+The foam-only sequence becomes exact on destinations created with
+willReadFrequently:true for all three source kinds. However the full Shore probe
+with that flag on all three destination layers still produces the original
+51,684 delta. Therefore a blanket CPU-backing change is not a verified remedy.
+Its original cold/warm output and compose cost must be established before any
+production trial. The minimal source ablations are diagnostic pass/count checks,
+not a passing visual-stability claim for the application.
+
+Sources under tmp/probes/scene-image-preload/:shore-history,shore-fresh-first,
+shore-after-copy,shore-stamps,foam-source,foam-sequence,foam-ablation,
+foam-kind-sequence,foam-clone,foam-cpu and shore-cpu. Archived result JSON under
+tmp/performance-scene-image-preload/isolation/. All handles terminal; no concurrent
+captures,headline benchmark rerun,push/deploy/native build or player saves.
+Next isolate the mixed full-Shore interaction and verify a pixel-preserving
+sampling fix before restoring quiet decoded-soon work and admitted next slots.
+Whole-game memory/transient admission,figure/startup ownership,120Hz/CPU budgets
+and fullPhase5 remain required. Full goal active.
