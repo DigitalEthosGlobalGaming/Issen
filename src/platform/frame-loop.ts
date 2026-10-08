@@ -18,6 +18,9 @@ export interface FrameDemand {
 
 export interface FrameCallbacks {
   maxFps?(): number;
+  /** Optional independent simulation cadence; omitted preserves coupled scheduling. */
+  maxUpdateFps?(): number;
+  clockReset?(): void;
   demand?(): FrameDemand;
   paused(): boolean;
   update(delta: number, raw: number): void;
@@ -53,11 +56,19 @@ export function createFrameLoop(
   let handle: number | null = null;
   let running = false;
   let due = last;
+  let lastUpdate = last;
+  let updateDue = last;
+  let previousInterval = NaN;
 
   function frame(now: number): void {
     handle = null;
     if (!running) return;
     const interval = 1000 / (callbacks.maxFps?.() ?? Infinity);
+    const updateInterval = callbacks.maxUpdateFps ? 1000 / callbacks.maxUpdateFps() : interval;
+    // Returning to the simulation rate must retain its phase, not the last extra render's.
+    if (callbacks.maxUpdateFps && interval > previousInterval && interval === updateInterval)
+      due = updateDue;
+    previousInterval = interval;
     if (now + 0.1 < due) {
       handle = scheduler.request(frame);
       return;
@@ -67,9 +78,14 @@ export function createFrameLoop(
     last = now;
     const workStart = scheduler.now();
     const demand = callbacks.demand?.();
-    if (!demand || demand.update) {
-      const delta = frameDelta(raw, timing);
-      if (!callbacks.paused()) callbacks.update(delta, raw);
+    if (now + 0.1 >= updateDue) {
+      const updateRaw = Math.min(0.05, Math.max(0, (now - lastUpdate) / 1000));
+      updateDue = Math.max(updateDue + updateInterval, now);
+      lastUpdate = now;
+      if (!demand || demand.update) {
+        const delta = frameDelta(updateRaw, timing);
+        if (!callbacks.paused()) callbacks.update(delta, updateRaw);
+      }
     }
     if (!demand || demand.render) callbacks.render(raw);
     if (!demand || demand.afterRender) callbacks.afterRender();
@@ -81,18 +97,23 @@ export function createFrameLoop(
     resetClock(): void {
       last = scheduler.now();
       due = last;
+      lastUpdate = updateDue = last;
+      callbacks.clockReset?.();
     },
     start(): void {
       if (running) return;
       running = true;
       last = scheduler.now();
       due = last;
+      lastUpdate = updateDue = last;
+      callbacks.clockReset?.();
       handle = scheduler.request(frame);
     },
     stop(): void {
       running = false;
       if (handle !== null) scheduler.cancel(handle);
       handle = null;
+      callbacks.clockReset?.();
     },
   };
 }

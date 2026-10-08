@@ -88,9 +88,13 @@ Continue:
    Browser session76210 and all check processes are terminal. The new live-view
    browser proves12readers keep identity with zero descriptor rebuilds over100reads,
    including equipment/layout/seal/clocks/scenery replacements and cinematic open.
-   Remaining Phase1: high-refresh gameplay pacing, preserving time/RNG contracts.
-   Do not simply double combat updates: frame-loop currently couples update and
-   rendering; weather hazards and phase transitions consume seeded RNG on timers.
+   High-refresh pacing at1.68.4 is implemented and verified:120Hz gameplay render
+   submissions, independent unchanged60Hz simulation, prepared-frame replay on
+   extra draws. Poses remain60Hz without interpolation. Menus/cinematic retain60Hz.
+   Eleven focused units and five corrected browser cases PASS; checked build PASS.
+   Cap-transition regression found/fixed; preliminary44timings/8diagnostics in
+   tmp/performance/2026-10-08T10-57-17.984Z-68f8042d are excluded. Runner stopped;
+   do not resume its earlier build despite preserved running metadata.
 2. Focused strict/unit/browser checks, then measured Phase1 comparison against
    frozen baselines. Record findings and commit before Phase2 compose.
 3. Continue bounded loading and next scenes through Phases2–5. Duplicate-atlas

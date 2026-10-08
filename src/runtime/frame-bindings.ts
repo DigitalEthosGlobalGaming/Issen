@@ -26,6 +26,8 @@ import type { createPlayerFigures } from '../presentation/player-figures.ts';
 import type { Random } from '../shared/random.ts';
 import { cacheView, stateView } from '../game/session/state-view.ts';
 
+const gameplayStates = ['playing', 'boss', 'between', 'standoff', 'shrine', 'dead'];
+
 type SimulationPorts = Omit<
   FrameSimulationViews,
   | 'updateWeather'
@@ -152,8 +154,12 @@ export function createFrameBindings(
       advanceCamera: (raw: number) => advancePresentationCamera(readViews().presentationState, raw),
     }),
   );
+  let presentationChanged = false;
+  let presentationElapsed = 0;
+  let preparedFrame: ReturnType<typeof preparePresentation> | undefined;
   function update(dt: number, raw: number) {
     frameSimulation.update(dt, raw);
+    presentationChanged = true;
   }
   const postPreparation = createPostPreparation(
     frameView({
@@ -240,7 +246,13 @@ export function createFrameBindings(
     const { G, armory, settlePresentedScene } = readViews();
     // Only the opaque inspection dialog covers the scene completely.
     if (G.panel === 'armory' && armory.inspectionExpanded) return;
-    drawScene(preparePresentation(raw));
+    presentationElapsed = Math.min(0.05, presentationElapsed + raw);
+    if (!preparedFrame || presentationChanged || frameRate() === 60) {
+      preparedFrame = preparePresentation(presentationElapsed);
+      presentationElapsed = 0;
+      presentationChanged = false;
+    }
+    drawScene(preparedFrame);
     settlePresentedScene();
   }
   const frameLoop = createFrameLoop(
@@ -262,7 +274,13 @@ export function createFrameBindings(
       },
     },
     {
-      maxFps: () => 60,
+      maxFps: frameRate,
+      maxUpdateFps: () => 60,
+      clockReset: () => {
+        presentationElapsed = 0;
+        presentationChanged = false;
+        preparedFrame = undefined;
+      },
       demand: () => {
         const { cinematic, screenAnimation, G, armory } = readViews();
         return cinematic.active
@@ -297,6 +315,12 @@ export function createFrameBindings(
       },
     },
   );
+  function frameRate() {
+    const { G, cinematic, guided } = readViews();
+    return !G.panel && !cinematic.active && !guided.frozen && gameplayStates.includes(G.state)
+      ? 120
+      : 60;
+  }
   return {
     frameLoop,
     update,

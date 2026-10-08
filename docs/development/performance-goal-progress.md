@@ -253,3 +253,42 @@ Evidence logs: `tmp/performance-phase1-live-views-browser.log`,
 Full Phase1 timing/compose/stage-cycle comparison remains due after addressing
 the60fps cap. More rendering callbacks must not silently increase simulation/RNG
 updates. No Phase2 cache/quantisation or loader work has started.
+
+## Phase 1 — High-refresh pacing
+
+Version1.68.4 permits120render callbacks per second during gameplay. The existing
+60Hz simulation schedule is retained independently, including hit-stop/slow-time
+consumption. Extra draws reuse the prepared presentation; they do not advance
+post effects, game state or RNG. Menus/cinematic/paused/guided states retain60Hz.
+Clock restart clears the prepared frame and pending presentation elapsed time.
+This permits high-refresh submissions; poses still update at60Hz, with no new
+interpolation. Synthetic scheduling does not establish physical120Hz delivery.
+
+A new cap-transition regression exposed a phase shift when returning from120Hz
+to60Hz. Render deadlines now align with simulation deadlines on that change.
+The preliminary measurement was stopped deliberately: its44saved timings and
+8diagnostics in `tmp/performance/2026-10-08T10-57-17.984Z-68f8042d` used the earlier
+candidate. Its original running metadata remains preserved, but the runner is
+confirmed terminal. Do not resume or accept that build as the final comparison.
+
+Corrected verification:
+
+- All11 focused frame-loop/seeded-trial/post-preparation units PASS, including
+  identical update timestamps across menu/gameplay cap changes, idle/resume,
+  actual trial spawns/combat/RNG and more than1.9times the draw callbacks.
+- All5 corrected high-refresh/scene-continuation/readiness browsers PASS.
+  A real runtime extra draw leaves game/post/RNG state identical and performs
+  no additional presentation preparation. Pixel allowance matches the existing
+  prepared-scene test: maximum2byte difference, fewer than1%changed channels.
+  Earlier strict-zero/one-byte fixture assertions failed on edge rounding;
+  production code was not changed to accommodate them.
+- Strict TypeScript and corrected checked production build PASS. The broader
+  native browser set had24PASS plus the initial pixel assertion failure; the
+  corrected focused replay and scene checks above supersede that failed case.
+- Performance-tool units9PASS; standard harness fingerprint is unchanged.
+
+Evidence: `tmp/performance-phase1-pacing-units.log`,
+`tmp/performance-phase1-corrected-pacing-browser.log`,
+`tmp/performance-phase1-corrected-pacing-build.log` and
+`tmp/performance-phase1-tooling-units.log`. Fresh full timings, compose and scene
+measurements remain required before the Phase1 checkpoint and Phase2 work.

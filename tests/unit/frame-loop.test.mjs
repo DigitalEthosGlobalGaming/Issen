@@ -177,3 +177,127 @@ test('stopping inside a frame does not schedule a replacement', () => {
   callback(16);
   assert.equal(requests, 1);
 });
+
+test('120 Hz renders preserve the legacy 60 Hz update deltas and hit-stop consumption', () => {
+  function drive(renderFps, updateFps) {
+    let now = 0,
+      callback,
+      renders = 0;
+    const updates = [],
+      timing = { hitStop: 0.12, slowT: 0.2, timeScale: 0.8 };
+    const loop = createFrameLoop(
+      timing,
+      {
+        maxFps: () => renderFps,
+        ...(updateFps ? { maxUpdateFps: () => updateFps } : {}),
+        paused: () => false,
+        update: (dt, raw) => updates.push([dt, raw]),
+        render: () => renders++,
+        afterRender() {},
+      },
+      {
+        now: () => now,
+        request(cb) {
+          callback = cb;
+          return 1;
+        },
+        cancel() {},
+      },
+    );
+    loop.start();
+    for (let tick = 1; tick <= 240; tick++) {
+      now = (tick * 1000) / 120;
+      callback(now);
+    }
+    loop.stop();
+    return { updates, timing, renders };
+  }
+  const legacy = drive(60),
+    high = drive(120, 60);
+  assert.deepEqual(high.updates, legacy.updates);
+  assert.deepEqual(high.timing, legacy.timing);
+  assert.equal(high.renders, 240);
+  assert.ok(legacy.renders >= 120 && legacy.renders <= 121);
+});
+
+test('independent updates do not accumulate idle time and reset with the render clock', () => {
+  let now = 0,
+    callback,
+    active = false;
+  const updates = [],
+    timing = { hitStop: 1, slowT: 1, timeScale: 1 };
+  const loop = createFrameLoop(
+    timing,
+    {
+      maxFps: () => 120,
+      maxUpdateFps: () => 60,
+      demand: () => ({ update: active, render: true, afterRender: false }),
+      paused: () => false,
+      update: (dt, raw) => updates.push(raw),
+      render() {},
+      afterRender() {},
+    },
+    {
+      now: () => now,
+      request(cb) {
+        callback = cb;
+        return 1;
+      },
+      cancel() {},
+    },
+  );
+  loop.start();
+  for (let tick = 1; tick <= 120; tick++) {
+    now = (tick * 1000) / 120;
+    callback(now);
+  }
+  assert.equal(timing.hitStop, 1);
+  active = true;
+  now += 1000 / 120;
+  callback(now);
+  now += 1000 / 120;
+  callback(now);
+  assert.ok(updates[0] < 0.017);
+  now = 9000;
+  loop.resetClock();
+  now += 10;
+  callback(now);
+  assert.ok(Math.abs(updates.at(-1) - 0.01) < 1e-9);
+  loop.stop();
+});
+
+test('switching between menu and gameplay render caps preserves simulation scheduling', () => {
+  function drive(independent) {
+    let now = 0,
+      callback,
+      tick = 0;
+    const updates = [];
+    const loop = createFrameLoop(
+      { hitStop: 0, slowT: 0, timeScale: 1 },
+      {
+        maxFps: () => (independent && tick >= 30 && tick < 153 ? 120 : 60),
+        ...(independent ? { maxUpdateFps: () => 60 } : {}),
+        paused: () => false,
+        update: (dt, raw) => updates.push([now, dt, raw]),
+        render() {},
+        afterRender() {},
+      },
+      {
+        now: () => now,
+        request(cb) {
+          callback = cb;
+          return 1;
+        },
+        cancel() {},
+      },
+    );
+    loop.start();
+    for (tick = 1; tick <= 240; tick++) {
+      now = (tick * 1000) / 120;
+      callback(now);
+    }
+    loop.stop();
+    return updates;
+  }
+  assert.deepEqual(drive(true), drive(false));
+});
