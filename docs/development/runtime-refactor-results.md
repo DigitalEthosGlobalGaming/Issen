@@ -59,17 +59,25 @@ behavior log remains under ignored tmp/runtime-refactor/behaviour-changes.md.
 
 ## Final verification
 
-Pending on final 1.67.0 source:
+Final 1.67.0 implementation source d87e344; subsequent checkpoint edits are
+verification documentation only. Logs are under tmp/runtime-refactor/.
 
-- `node --test tests/unit/*.test.mjs`
-- `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`
-- `npm run test:production`
-- `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android` with `npm run test:android-web`
+- `node --test tests/unit/*.test.mjs`: all 401 PASS (w2-final-unit.log).
+- `npx playwright test --config playwright.rendering-v2.config.ts --trace retain-on-failure`:
+  all 254 PASS in 14.0m, exit 0 (w2-final-broad-browser.log).
+- `npm run test:production`: strict typecheck/build and all four browser cases
+  PASS in 21.0s, exit 0 (w2-final-production.log).
+- `ISSEN_ANDROID_BUILD_DIR=tmp/.verification-build-android` with
+  `npm run test:android-web`: strict typecheck/build succeed; four cases PASS,
+  one encounter-reload case FAIL in 21.9s, exit 1 (w2-final-android.log).
 
-The known W1 Android encounter-reload failure was reproduced on pre-refactor.
-It must be evaluated again for W2; it is not a blanket exemption for new failures.
-Historical combined browser runs predate this source and are not the final gate.
-
+The Android exception was evaluated again on W2: offline.spec.ts:55 still expects
+#paused to have /on/ after immediate pause/reload and receives class screen.
+The identical unchanged assertion/failure was already reproduced on untouched
+pre-refactor (tmp/asset-compaction/android-recovery-baseline.log). This is the
+explicit pre-existing-failure exception in the goal, not a passing Android suite.
+No test, timeout, tolerance or assertion was weakened or skipped. No native build
+or physical-device test was run. Historical broad runs are not used for this gate.
 ## Manual phone play checklist
 
 This checklist is supplied for the user; automated browser checks are not a claim
