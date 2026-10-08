@@ -1,1 +1,2 @@
 var e=`data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3e%3crect%20width='64'%20height='64'%20rx='12'%20fill='%231a1917'/%3e%3ccircle%20cx='32'%20cy='32'%20r='23'%20fill='none'%20stroke='%23b8322a'%20stroke-width='3'/%3e%3cpath%20d='M12%2048%2046%2010%2053%207%2050%2015%2017%2051Z'%20fill='%23f3eddf'/%3e%3cpath%20d='m14%2042%209%208M9%2055l8-9'%20fill='none'%20stroke='%23b8923a'%20stroke-width='4'/%3e%3c/svg%3e`;export{e as default};
+//# sourceMappingURL=favicon-BpdPzesY.js.map
