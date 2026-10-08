@@ -24,6 +24,13 @@ There is deliberately no continue-with-missing-art path. HMR disposal cancels
 pending images and prevents an obsolete async startup from mounting the game.
 No settings or saves are changed.
 
+As of1.68.27, the four plain enemy colour atlases are excluded from eager startup
+loading. Enemy readiness depends on its diffuse/normal/surface PBR atlases, which
+its renderer loads directly. Plain counterparts remain for the explicit material
+debug viewer. Native body/head/arm/hand painting continues using the same diffuse
+sources. Enemy kit selection and shared-budget integration remain required by the
+active performance goal; this removes duplicate decoding only.
+
 Focused checks: `node --test tests/unit/artwork-preload.test.mjs` and
 `npx playwright test tests/browser/artwork-loading.spec.ts`. These check delayed
 decode, load/decode failures, retries, deduplication, disposal, and browser startup

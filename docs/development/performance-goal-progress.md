@@ -1622,3 +1622,47 @@ performance harness unchanged. No push/deployment/native build or player-save
 mutation. The causal native-sampling explanation remains unresolved; remaining
 figure/startup ownership, local transient headroom, next-slot readiness, 120Hz
 budget and full Phase5 verification still require completion.
+
+## Checkpoint 27 — Enemy duplicate colour ownership baseline
+
+Before changing loading, two unchanged enemy renderer instances each decode
+16HTMLimages totaling100,652,160 nominal RGBA bytes. The four plain colour
+atlases contribute25,163,040bytes. All successful body/head/arm/hand paints use
+the PBR diffuse family; the plain counterparts only gate readiness and are an
+unreachable fallback after successful PBR preparation. They remain useful to the
+explicit material debug viewer, so keep the files but stop eagerly decoding them
+for enemies/startup. Expected enemy catalogue after removal:12images75,489,120bytes.
+The native unchanged-control comparison covers14varied/authored look/pose/fog
+cases:13exact and one maximum channel delta1. Record that observed control noise
+before setting a one-channel tolerance for this focused native comparison.
+Baseline: tmp/performance-enemy-dedup/baseline.json; saved original module and
+probe are under tmp/probes/enemy-dedup/. Shared/pinned selection and whole-game
+memory remain separate required work; this duplicate removal does not prove them.
+
+Implemented at1.68.27: enemy preparation loads only its twelve PBR planes;
+loaded-family diagnostics now reflect successful material preparation. Colour,
+tone, frames and material painting use the same diffuse images as before. The
+four plain colours remain exported for eager-startup exclusion and available to
+material debugging; no asset files removed. Native after comparison passes with
+maximum1, matching the unchanged-control noise: tmp/performance-enemy-dedup/after.json.
+The nominal saving is25,163,040bytes (24.0MiB), excluding transient/browser/cache
+and GPU overhead. Current sources still use direct native loading; selected kits,
+shared decoded-budget integration and immediate final texture retirement remain
+required and must not be claimed complete by this duplicate removal.
+
+New browser tests block all four plain enemy colours and verify12HTMLimages,
+75,489,120bytes, all four ready families, final source clearing, and successful
+real runtime artwork readiness. Existing native family/tint cache checks pass.
+The first related run had6PASS/1FAIL: the startup retry fixture still blocked
+optional companion artwork from before1.68.26 and therefore no longer triggered
+a required-art failure. All three startup fixtures now block required player
+artwork, allow Vite script requests, and assert an intercepted image request.
+Delay/disposal/retry assertions retained; corrected7PASS17.0s/default2workers.
+Eight affected preloader/enemy-presence units PASS. Checked production build with
+strict TypeScript and focused formatting PASS. Final bundled checks are recorded
+in the handoff once terminal. No standard harness edits, push/deployment/native
+build or player-save mutation. All remaining full-goal requirements stay active.
+
+Final bundled app/ink checks:3PASS24.5s/default2workers against the checked1.68.27
+build. Version/package/lock/title/changelog synchronized; diff/format checks PASS.
+All sessions terminal. Enemy/figure/shared/local ownership work remains required.

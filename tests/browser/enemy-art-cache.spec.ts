@@ -166,3 +166,81 @@ test('enemy tint cache survives fog variants and stays bounded through arbitrary
   expect(result.disposed.variantPixels + result.disposed.tonePixels).toBe(0);
   expect(result.disposed.cachedParts + result.disposed.toneParts).toBe(0);
 });
+
+// Plain enemy colours belong to the material viewer; enemy painting uses PBR diffuse.
+test('enemy preparation ignores plain colours and owns only twelve material images', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const plain =
+    /\/assets\/enemy-(?:ronin-simple|clothing-variants|headwear-atlas|headwear-variants)\.webp(?:\?|$)/;
+  await page.route(plain, (route) =>
+    route.request().resourceType() === 'script' ? route.continue() : route.abort(),
+  );
+  const result = await page.evaluate(async () => {
+    const { createInkEnemyRenderer } = await import('/src/rendering/figures/ink-enemy.ts');
+    const create = document.createElement.bind(document);
+    const images: HTMLImageElement[] = [];
+    document.createElement = function (name: string, ...args: any[]) {
+      const node = create(name, ...args);
+      if (name === 'img') images.push(node as HTMLImageElement);
+      return node;
+    } as any;
+    const renderer = createInkEnemyRenderer(document);
+    try {
+      const ready = await renderer.prepare();
+      const snapshot = renderer.snapshot();
+      const bytes = images.reduce(
+        (n, image) => n + image.naturalWidth * image.naturalHeight * 4,
+        0,
+      );
+      const count = images.length;
+      const sources = images.map((image) => image.src);
+      renderer.dispose();
+      return {
+        ready,
+        snapshot,
+        count,
+        bytes,
+        sources,
+        closed: images.every((image) => !image.getAttribute('src')),
+        disposed: renderer.snapshot(),
+      };
+    } finally {
+      renderer.dispose();
+      document.createElement = create;
+    }
+  });
+  expect(result.ready).toBe(true);
+  expect(result.snapshot.loaded.sort()).toEqual(['base', 'clothing', 'heads', 'variationHeads']);
+  expect(result.count).toBe(12);
+  expect(result.bytes).toBe(75489120);
+  expect(result.sources.every((source) => source.includes('/enemy-pbr/'))).toBe(true);
+  expect(result.closed).toBe(true);
+  expect(result.disposed.ready).toBe(false);
+});
+
+test('runtime artwork becomes ready with redundant enemy colours blocked', async ({ page }) => {
+  test.setTimeout(60_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
+  await page.route(
+    /\/assets\/enemy-(?:ronin-simple|clothing-variants|headwear-atlas|headwear-variants)\.webp(?:\?|$)/,
+    (route) => (route.request().resourceType() === 'script' ? route.continue() : route.abort()),
+  );
+  await page.route('**/src/game.ts*', async (route) => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace(
+      'artworkReady = true;',
+      'window.__enemyArtworkReady = foundation.browser.inkEnemy.snapshot(); artworkReady = true;',
+    );
+    await route.fulfill({ response, body });
+  });
+  await page.goto('/');
+  await page.waitForFunction(() => !!(window as any).__enemyArtworkReady, null, {
+    timeout: 45_000,
+  });
+  expect(await page.evaluate(() => (window as any).__enemyArtworkReady.ready)).toBe(true);
+  expect(errors).toEqual([]);
+});

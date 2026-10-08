@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Local sampling controls
+# Performance, assets and seamless transitions — Enemy duplicate colours
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -618,3 +618,22 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     probes and instructions under tmp/probes/local-input-release/. Native sampling
     cause unresolved. Continue remaining figure/startup ownership and transient
     local headroom; next-slot readiness,120Hz and full Phase5 remain required.
+
+27. Enemy duplicate colour decoding removed at1.68.27. Unchanged baseline16native
+    images100,652,160bytes; after12PBRplanes75,489,120bytes, saving25,163,040bytes.
+    Plain counterparts were readiness-only/unreachable fallback after PBR success;
+    retain files for material debugging and exclude eager startup. Native14case
+    comparison max1 matches unchanged-control noise; no painting/frame/tone change.
+    Stable before/after JSON in tmp/performance-enemy-dedup/; original/probe in
+    tmp/probes/enemy-dedup/. New tests block all four plain colours, verify native
+    count/bytes/final clearing and real runtime readiness. Related7browserPASS17s,
+    default2workers;8affectedunitsPASS;checkedbuild/strictTypeScript/formatPASS.
+    Initial6PASS/1FAIL was a stale startup retry fixture blocking now-optional
+    companion art. Delay/disposal/retry fixtures now intercept required player
+    artwork, allow scripts and verify a real blocked request; assertions retained.
+    Direct PBR ownership remains outside shared loader; integrate selected enemy
+    kits plus GPU retirement with preview scopes and remaining player/outfit/sword
+    startup ownership. Local headroom/native sampling, next-slot readiness,
+    120Hz/CPUbudget and full Phase5 metrics/traces/suites remain required.
+    Final bundled app/ink3PASS24.5s(default2workers); all processes terminal.
+    Version/package/lock/title/changelog synchronized; diff/format checks PASS.

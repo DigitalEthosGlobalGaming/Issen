@@ -46,7 +46,8 @@ const HEAD_NECKS = [360, 932, 333, 945];
 const HEAD_BOTTOMS = [574, 570, 1160, 1168];
 const HEAD_WIDTHS = [0.19, 0.235, 0.205, 0.165];
 const LOOKS = new Set(['', 'mask', 'monk', 'jingasa', 'kasa', 'kabuto', 'hair']);
-const URLS = {
+// Retained for material debugging; successful enemy paints use PBR diffuse only.
+export const INK_ENEMY_DEBUG_SOURCES = {
   clothing: new URL('./assets/enemy-clothing-variants.webp', import.meta.url).href,
   variationHeads: new URL('./assets/enemy-headwear-variants.webp', import.meta.url).href,
   base: new URL('./assets/enemy-ronin-simple.webp', import.meta.url).href,
@@ -83,11 +84,9 @@ export function createInkEnemyRenderer(doc: Document) {
     heads: createPbrAtlas(doc, PBR_SOURCES.heads, 1536, 1024),
     variationHeads: createPbrAtlas(doc, PBR_SOURCES.variationHeads, 1254),
   };
-  const images = new Map<string, HTMLImageElement>(),
-    loaded = new Set<string>();
+  const loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
-    tones = new Map<string, HTMLCanvasElement>(),
-    finish = new Set<() => void>();
+    tones = new Map<string, HTMLCanvasElement>();
   // Separate costly pixel recoloring from cheap fog composites. Both stores are bounded.
   const budgets = { variants: 6_000_000, tones: 2_000_000 };
   let variantPixels = 0,
@@ -114,37 +113,13 @@ export function createInkEnemyRenderer(doc: Document) {
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
-    const pbrReady = Promise.all(Object.values(pbr).map((atlas) => atlas.prepare()));
     pending = Promise.all(
-      Object.entries(URLS).map(
-        ([key, url]) =>
-          new Promise<void>((resolve) => {
-            const image = doc.createElement('img');
-            images.set(key, image);
-            const done = () => {
-              finish.delete(done);
-              image.onload = null;
-              image.onerror = null;
-              resolve();
-            };
-            finish.add(done);
-            image.onload = () => {
-              if (
-                !disposed &&
-                image.naturalWidth === (key === 'base' || key === 'variationHeads' ? 1254 : 1536) &&
-                image.naturalHeight === (key === 'base' || key === 'variationHeads' ? 1254 : 1024)
-              )
-                loaded.add(key);
-              done();
-            };
-            image.onerror = done;
-            image.src = url;
-          }),
-      ),
-    ).then(async () => {
-      const materials = await pbrReady;
-      return Object.keys(URLS).every((key) => loaded.has(key)) && materials.every(Boolean);
-    });
+      Object.entries(pbr).map(async ([key, atlas]) => {
+        const ready = await atlas.prepare();
+        if (ready && !disposed) loaded.add(key);
+        return ready;
+      }),
+    ).then((materials) => !disposed && materials.every(Boolean));
     return pending;
   }
   function supports(f: Figure) {
@@ -171,7 +146,7 @@ export function createInkEnemyRenderer(doc: Document) {
     applyFog = true,
   ): HTMLCanvasElement | null {
     const family = familyFor(key),
-      image = pbr[family].diffuse ?? images.get(family);
+      image = pbr[family].diffuse;
     if (!image) return null;
     const fog = applyFog ? Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4)) : 0;
     const mist = env.palette(1).robe;
@@ -449,7 +424,7 @@ export function createInkEnemyRenderer(doc: Document) {
     drawPart,
     snapshot: () => ({
       ready:
-        Object.keys(URLS).every((key) => loaded.has(key)) &&
+        Object.keys(pbr).every((key) => loaded.has(key)) &&
         Object.values(pbr).every((atlas) => atlas.ready),
       loaded: [...loaded],
       cachedParts: cache.size,
@@ -462,18 +437,11 @@ export function createInkEnemyRenderer(doc: Document) {
     dispose() {
       disposed = true;
       for (const atlas of Object.values(pbr)) atlas.dispose();
-      for (const im of images.values()) {
-        im.onload = null;
-        im.onerror = null;
-        im.removeAttribute('src');
-      }
-      for (const fn of [...finish]) fn();
       for (const c of cache.values()) c.width = c.height = 0;
       for (const c of tones.values()) c.width = c.height = 0;
       cache.clear();
       tones.clear();
       variantPixels = tonePixels = 0;
-      images.clear();
       loaded.clear();
     },
   };

@@ -11,6 +11,7 @@ import { assetMaterialCatalog } from './rendering/asset-material-catalog.ts';
 import { Capacitor } from '@capacitor/core';
 import { startBackgroundAssets } from './platform/background-assets.ts';
 import { runtimeAssets } from './platform/runtime-assets.ts';
+import { INK_ENEMY_DEBUG_SOURCES } from './rendering/figures/ink-enemy.ts';
 import { INK_COMPANION_SOURCES } from './rendering/figures/ink-companions.ts';
 
 const artwork = import.meta.glob<string>(
@@ -29,6 +30,7 @@ const publicArtwork = import.meta.glob<string>(
 // Material owners decode selected maps separately from source artwork.
 const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
 const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
+const enemyDebugSources = new Set<string>(Object.values(INK_ENEMY_DEBUG_SOURCES));
 const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
 const urls = [
   ...Object.values(artwork),
@@ -38,7 +40,10 @@ const urls = [
 ].filter((url) => {
   const canonical = new URL(url, document.baseURI).href;
   return (
-    !materialMaps.has(canonical) && !companionSources.has(canonical) && runtimeUrlSet.has(canonical)
+    !materialMaps.has(canonical) &&
+    !companionSources.has(canonical) &&
+    !enemyDebugSources.has(canonical) &&
+    runtimeUrlSet.has(canonical)
   );
 });
 
