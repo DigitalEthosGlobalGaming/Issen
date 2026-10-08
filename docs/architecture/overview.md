@@ -145,6 +145,11 @@ guarded Pixi8.22 EventEmitter listener-context adapter; unrelated resources and
 non-BindGroup observers remain intact. Native mesh/pattern expiry and trial retry
 tests cover the adapter, which must be revalidated when Pixi changes.
 This retirement path does not change source decoding or scene baking.
+`pbr-atlas.ts` uses the same hook before closing directly owned HTML maps.
+Disposing an atlas backed by `MainImageOwner` only releases its leases; warm
+images and peer textures remain alive until actual loader eviction/final disposal.
+Prepared figure cutout/tone canvases have separate ownership and are not closed
+by atlas retirement.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output

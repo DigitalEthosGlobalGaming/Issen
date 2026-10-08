@@ -1,5 +1,6 @@
 import type { SceneMaterial } from './scene-frame.ts';
 import type { MainImageOwner } from '../platform/main-images.ts';
+import { retireSceneTexture } from './texture-revision.ts';
 
 type MapKind = 'diffuse' | 'normal' | 'surface' | 'emissive';
 export type PbrAtlasSources = Record<Exclude<MapKind, 'emissive'>, string> & { emissive?: string };
@@ -86,6 +87,7 @@ export function createPbrAtlas(
       for (const lease of leases.splice(0)) lease.release();
       if (!options.images)
         for (const image of images.values()) {
+          retireSceneTexture(image);
           image.removeAttribute('src');
           image.width = image.height = 0;
         }

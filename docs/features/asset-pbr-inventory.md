@@ -38,6 +38,11 @@ counterparts remain available to material debugging, but are excluded from enemy
 preparation and eager startup decoding as of1.68.27. The enemy catalogue now
 decodes12planes75,489,120nominal RGBA bytes, saving25,163,040bytes. This is source
 accounting, not whole-game or resident GPU memory proof.
+As of1.68.28, directly owned PBR images notify native GPU consumers before source
+disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
+entries survive until the shared loader evicts or closes them. This covers atlas
+planes; prepared figure cutout/tone canvases and selected-kit ownership remain
+separate performance-goal work.
 The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
 records actual source/catalog/startup-glob references, dimensions, bytes and
 stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.

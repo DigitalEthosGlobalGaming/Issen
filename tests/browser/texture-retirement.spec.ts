@@ -316,3 +316,204 @@ test('worker scene replacement retires uploaded completed maps before the next d
   expect(result.disposed).toBe(0);
   expect(warnings).toEqual([]);
 });
+
+test('direct PBR source final disposal releases every GPU consumer', async ({ page }, testInfo) => {
+  const warnings: string[] = [];
+  page.on('console', (message) => {
+    if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+      warnings.push(message.text());
+  });
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createPbrAtlas } = await import('/src/rendering/pbr-atlas.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { SceneTextureStore } = await import('/src/rendering/pixi/texture-store.ts');
+    const { drawMaterialStamp } = await import('/src/rendering/scene-material.ts');
+    const { observeSceneTextureRetirement } = await import('/src/rendering/texture-revision.ts');
+    const pack = assetMaterialCatalog.find((p: any) => p.maps.emissive)!;
+    const atlas = createPbrAtlas(document, pack.maps, ...pack.dimensions);
+    if (!(await atlas.prepare())) throw Error('PBR preparation failed');
+    const material = atlas.material([0, 0, ...pack.dimensions])!;
+    const sources = [
+      atlas.diffuse!,
+      material.normal.source,
+      material.surface.source,
+      material.emissive!.source,
+    ] as HTMLImageElement[];
+    const stores = [new SceneTextureStore(), new SceneTextureStore()];
+    const textures = sources.flatMap((source) => [
+      stores[0].get({ source, revision: 0 }),
+      stores[0].getData({ source, revision: 0 }),
+      stores[1].getFrame(source, 0, 0, 0, 8, 8),
+    ]);
+    const painters = await Promise.all(
+      [0, 1].map(async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 32;
+        return createPixiScenePainter(canvas);
+      }),
+    );
+    for (const painter of painters) {
+      painter.begin();
+      drawMaterialStamp(painter, {
+        texture: { source: atlas.diffuse!, revision: 0 },
+        material,
+        x: 0,
+        y: 0,
+        width: 32,
+        height: 32,
+      });
+      painter.flush();
+    }
+    const before = {
+      stores: stores.map((s) => s.size),
+      native: painters.map((p) => p.sourceTextureCount),
+    };
+    const widthsAtRetirement: number[] = [];
+    for (const source of sources)
+      observeSceneTextureRetirement(source, () => widthsAtRetirement.push(source.naturalWidth));
+    atlas.dispose();
+    const after = {
+      stores: stores.map((s) => s.size),
+      native: painters.map((p) => p.sourceTextureCount),
+      destroyed: textures.map((t) => t.destroyed),
+      widths: sources.map((s) => s.naturalWidth),
+      widthsAtRetirement: [...widthsAtRetirement],
+      ready: atlas.ready,
+    };
+
+    painters.forEach((p) => p.dispose());
+    stores.forEach((s) => s.dispose());
+    return { before, after };
+  });
+  await writeFile(testInfo.outputPath('pbr-retirement.json'), JSON.stringify(result, null, 2));
+  expect(warnings).toEqual([]);
+  expect(result.before.stores).toEqual([8, 4]);
+  expect(result.before.native).toEqual([4, 4]);
+  expect(result.after.stores).toEqual([0, 0]);
+  expect(result.after.native).toEqual([0, 0]);
+  expect(result.after.destroyed.every(Boolean)).toBe(true);
+  expect(result.after.widthsAtRetirement.every((width) => width > 0)).toBe(true);
+  expect(result.after.widthsAtRetirement).toHaveLength(4);
+  expect(result.after.widths).toEqual([0, 0, 0, 0]);
+  expect(result.after.ready).toBe(false);
+});
+
+test('disposing a leased PBR atlas preserves shared native peer pixels until final ownership ends', async ({
+  page,
+}, testInfo) => {
+  const warnings: string[] = [];
+  page.on('console', (message) => {
+    if (/destroyed while still bound|feedback loop|GL_INVALID_OPERATION/i.test(message.text()))
+      warnings.push(message.text());
+  });
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createPbrAtlas } = await import('/src/rendering/pbr-atlas.ts');
+    const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const { drawMaterialStamp } = await import('/src/rendering/scene-material.ts');
+    const pack = assetMaterialCatalog.find((p: any) => p.maps.emissive)!;
+    const owners = [createMainImageOwner(document), createMainImageOwner(document)];
+    // Material-only packs exclude their unused diffuse sibling from the runtime
+    // manifest. Use the authored runtime colour for this shared-lifetime fixture.
+    const atlases = owners.map((images) =>
+      createPbrAtlas(document, { ...pack.maps, diffuse: pack.source }, ...pack.dimensions, {
+        images,
+      }),
+    );
+    if (!(await Promise.all(atlases.map((a) => a.prepare()))).every(Boolean))
+      throw Error('Shared preparation failed');
+    const sources = [
+      atlases[0].diffuse!,
+      ...['normal', 'surface', 'emissive'].map(
+        (kind) => (atlases[0].material([0, 0, ...pack.dimensions]) as any)[kind].source,
+      ),
+    ];
+    const identity = atlases[0].diffuse === atlases[1].diffuse;
+    const canvases = [0, 1].map(() => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 32;
+      return c;
+    });
+    const painters = await Promise.all(canvases.map((c) => createPixiScenePainter(c)));
+    const draw = () =>
+      painters.forEach((p) => {
+        p.begin();
+        drawMaterialStamp(p, {
+          texture: { source: atlases[1].diffuse!, revision: 0 },
+          material: atlases[1].material([0, 0, ...pack.dimensions])!,
+          x: 0,
+          y: 0,
+          width: 32,
+          height: 32,
+        });
+        p.flush();
+      });
+    const pixels = () =>
+      canvases.map((c) => {
+        const gl = c.getContext('webgl2')!;
+        const bytes = new Uint8Array(32 * 32 * 4);
+        gl.readPixels(0, 0, 32, 32, gl.RGBA, gl.UNSIGNED_BYTE, bytes);
+        return bytes;
+      });
+    draw();
+    const before = {
+      counts: painters.map((p) => p.sourceTextureCount),
+      pins: owners[0].snapshot().pinned,
+    };
+    const baseline = pixels();
+    atlases[0].dispose();
+    owners[0].dispose();
+    draw();
+    const peerPixels = pixels();
+    const peer = {
+      counts: painters.map((p) => p.sourceTextureCount),
+      pins: owners[1].snapshot().pinned,
+      widths: sources.map((s) => s.naturalWidth),
+      ready: atlases[1].ready,
+    };
+    const max = peerPixels.reduce(
+      (n, data, index) =>
+        data.reduce((n, value, i) => Math.max(n, Math.abs(value - baseline[index][i])), n),
+      0,
+    );
+    atlases[1].dispose();
+    const unpinned = {
+      counts: painters.map((p) => p.sourceTextureCount),
+      pins: owners[1].snapshot().pinned,
+      widths: sources.map((s) => s.naturalWidth),
+    };
+    owners[1].dispose();
+    const final = {
+      counts: painters.map((p) => p.sourceTextureCount),
+      widths: sources.map((s) => s.naturalWidth),
+      bytes: owners[1].snapshot().bytes,
+    };
+    painters.forEach((p) => {
+      p.begin();
+      p.fillRect(0, 0, 32, 32);
+      p.flush();
+      p.dispose();
+    });
+    return { identity, before, peer, unpinned, final, max };
+  });
+  await writeFile(
+    testInfo.outputPath('pbr-shared-retirement.json'),
+    JSON.stringify(result, null, 2),
+  );
+  expect(result.identity).toBe(true);
+  expect(result.before).toEqual({ counts: [4, 4], pins: 4 });
+  expect(result.peer.counts).toEqual([4, 4]);
+  expect(result.peer.pins).toBe(4);
+  expect(result.peer.ready).toBe(true);
+  expect(result.peer.widths.every((width) => width > 0)).toBe(true);
+  expect(result.max).toBe(0);
+  expect(result.unpinned.counts).toEqual([4, 4]);
+  expect(result.unpinned.pins).toBe(0);
+  expect(result.unpinned.widths.every((width) => width > 0)).toBe(true);
+  expect(result.final).toEqual({ counts: [0, 0], widths: [0, 0, 0, 0], bytes: 0 });
+  expect(warnings).toEqual([]);
+});

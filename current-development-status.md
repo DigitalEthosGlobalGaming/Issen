@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Enemy duplicate colours
+# Performance, assets and seamless transitions — Direct PBR retirement
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -637,3 +637,22 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     120Hz/CPUbudget and full Phase5 metrics/traces/suites remain required.
     Final bundled app/ink3PASS24.5s(default2workers); all processes terminal.
     Version/package/lock/title/changelog synchronized; diff/format checks PASS.
+
+28. Direct PBR retirement at1.68.28: before atlas closure native4/4 and auxiliary
+    stores8/4 stay alive despite four cleared images; after native0/0/stores0/0,
+    all12texture objects destroyed. Four observers see positive width before
+    clearing. Leased atlases only unpin: peer/native4/4 survive with exact pixels;
+    final unpin leaves warm textures, final owner disposal clears native0/0,
+    all widths/loader bytes0. No decode/sampling/gameplay/seed changes. Three new
+    lifecycle units and two native tests, including optional emissive/multiple
+    consumers and pending disposal. Initial shared fixture requested an excluded
+    unused diffuse; use valid authored runtime colour, preserve all assertions.
+    Related17browserPASS19.9s/default2workers; final assertions2PASS3.4s;
+    all462unitsPASS;checkedbuild/strictTypeScriptPASS. Evidence
+    tmp/performance-pbr-retirement/{baseline,direct-after,shared-after}.json and
+    units/build logs. Prepared figure cutout/tone retirement and selected
+    enemy/player/outfit/sword/startup ownership still required, plus local headroom,
+    native sampling, deterministic next slots,120Hz and all Phase5 measurements.
+    Final bundled startup/gameplay/Armoury/offline3PASS24.1s/default2workers;
+    diff/formatPASS; version/package/lock/title/changelog synchronized. All check
+    sessions terminal; no push/deploy/native build or real player-save mutation.

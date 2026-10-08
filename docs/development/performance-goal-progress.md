@@ -1666,3 +1666,47 @@ build or player-save mutation. All remaining full-goal requirements stay active.
 Final bundled app/ink checks:3PASS24.5s/default2workers against the checked1.68.27
 build. Version/package/lock/title/changelog synchronized; diff/format checks PASS.
 All sessions terminal. Enemy/figure/shared/local ownership work remains required.
+
+## Checkpoint 28 — Direct PBR source retirement baseline
+
+Measured before editing disposal: one directly owned four-plane PBR atlas supplies
+two native painters (4source textures each) and two independent colour/data/crop
+stores (8/4entries). Atlas disposal clears every image to zero natural width but
+leaves every GPU entry alive; no retirement observer fires. Baseline evidence:
+tmp/performance-pbr-retirement/baseline.json and runnable ignored probe under
+tmp/probes/pbr-retirement/. Final native disposal must notify the existing source
+retirement hook before closing pixels. Leased images have a different lifetime:
+unpinning an atlas must preserve warm/shared resources and peer pixels until the
+shared loader's actual eviction or final owner disposal. Preserve that distinction.
+
+Implemented at1.68.28: directly owned images call retireSceneTexture before
+source removal/size clearing. Leased images continue to release their pins only;
+the shared pool controls their final retirement. No decode/sampling/material,
+gameplay or seed change. Direct after counts: native0/0, stores0/0, all12texture
+objects destroyed, four callbacks observe positive source width before clearing.
+Shared after test: source identity shared, native4/4 and four pins survive peer
+atlas/owner disposal; pixels match exactly. Last atlas unpin drops pins to zero
+while warm source/native4/4 survive. Final owner disposal clears native0/0,
+all four widths and loader bytes to zero. No binding/feedback warnings.
+
+Three new units cover direct callback order/exactly-once closure, leased lifetime,
+and disposal during a pending decode without late readiness. Two native browser
+tests cover optional emissive alongside colour/normal/surface, every colour/data/
+crop consumer, shared warm/peer lifetime and exact surviving pixels. Initial
+shared fixture requested a material-only pack's excluded diffuse sibling, which
+the runtime manifest correctly rejected; corrected fixture uses that pack's
+authored runtime colour with unchanged lifetime/count/pixel assertions.
+Final related retirement/warming/enemy checks17PASS19.9s/default2workers; final
+assertion additions for native before counts and closed readiness2PASS3.4s.
+All462units PASS; checked production build with strict TypeScript PASS. Evidence:
+tmp/performance-pbr-retirement/{baseline,direct-after,shared-after}.json, units.log
+and build.log. Inputs/assets/frozen standard performance harness unchanged.
+Final bundled checks recorded in the handoff once terminal. Prepared figure
+cutout/tone retirement, selected enemy/player/outfit/sword/startup ownership,
+local transient headroom/native sampling, deterministic next-slot readiness,
+120Hz budget and full Phase5 metrics/traces/suites remain required. Goal active
+at full scope; no push/deployment/native build or real player-save mutation.
+
+Final bundled app/ink checks3PASS24.1s/default2workers; focused formatting/diff
+PASS and version/package/lock/title/changelog synchronized. All check sessions
+terminal. These checks do not substitute for remaining full-goal verification.
