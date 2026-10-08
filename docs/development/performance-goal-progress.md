@@ -1068,3 +1068,38 @@ not a passing regression test. Next isolate reload/raster stability before retir
 inputs, then implement companion selection/startup/preview readiness together.
 Whole-memory budgets, remaining source owners/startup, prediction/next slots,
 uploads/variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.
+
+## Phase3 — Pressure pixel-stability isolation, unchanged implementation
+
+Follow-up probes preserve1.68.19 renderer behavior. Test-only module interception
+adds readbacks or disables cutout retention; no renderer fix is accepted.
+Software Canvas control still differs at stages5/7/8. Disabling material-cutout
+retention also differs, with larger surface errors, so neither switch resolves
+the issue. These probes remain failing investigation artifacts.
+
+Full-size decoded pixel hashes match for all53authored colour/data images used by
+stages5/7/8 after127evictions (one browser PASS10.7s). Isolated stamps match for
+17source kits across six rotation/mirroring variants each after127evictions
+(one browser PASS8.7s). Direct fractional crop/downsample comparisons match for
+all53images after127evictions (PASS7.1s); keeping the three suspect normal maps
+continuously pinned also matches (124evictions, PASS6.7s).
+
+Intermediate traces locate the first full-composition difference at stage7's
+mountain stamp. Raw sampled map pixels already differ immediately after native
+drawImage, before normal correction and source masking. Both passes have matching
+full-size source hash1193658613, crop[0,443.5,887,443.5], normal matrix[1,0,0,1],
+target62x31 (low) or103x52 (high), and matching colour-mask hashes. Stage8 first
+divergent low/high stamps are pine/temple posts. Thus normal quantization, final
+scene-plane placement and colour-mask generation occur after or independently of
+the earliest observed mismatch. Full composition history is still required by
+the current reproducer; direct native sampling alone passes. This does not prove
+a browser/driver bug or identify the missing draw-state/history variable.
+
+Stable evidence `tmp/performance-local-input-release/` contains source-reload,
+stamp-reload, source-downsample, pinned-downsample, stamp-trace, bake-trace and
+raw-bake JSON, plus software/no-cache controls. Runnable probes/configs and their
+roles are recorded in `tmp/probes/local-input-release/README.md`. All sessions
+64218/64936/99090/23938/20117/66607/32623terminal; final direct probes exited0.
+No captures active. Next capture Canvas attributes/draw state and reduce source
+sampling history at the first divergent draw, before reconsidering input
+retirement. All previously listed goal requirements remain outstanding.

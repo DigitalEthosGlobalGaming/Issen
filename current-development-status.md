@@ -370,3 +370,20 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     inputs; then companion active selection/startup/preview readiness together.
     Whole-memory budgets, remaining owners/startup, prediction/next slots, uploads/
     variants,120Hz fidelity/CPU budget and full Phase5requirements remain required.
+
+16. Pressure pixel isolation keeps1.68.19 unchanged: software/no-cutout-cache
+    controls still differ.53full-size source/map hashes and53direct fractional
+    downsample hashes match across eviction; direct sampling with three suspect
+    maps continuously pinned also matches.17isolated kits x6rotation/flip variants
+    match. Four focused probes PASS10.7s/8.7s/7.1s/6.7s. Full-composition tracing
+    locates first stage7 mismatch immediately after native mountain-map drawImage,
+    before normal correction/masking: source hash, crop, normal matrix, target
+    dimensions and colour mask match. Stage8first low/high differences are pine/
+    temple posts. Cause remains unknown; full composition history is required by
+    the current reproducer. Do not infer a cache-key/driver bug or accept input
+    retirement. Next capture Canvas attributes/draw state and reduce source
+    sampling history at that first divergent native draw. Stable JSON
+    tmp/performance-local-input-release/; runnable probe index
+    tmp/probes/local-input-release/README.md. All investigation processes terminal,
+    no captures active. No new version/renderer change. Remaining whole-memory,
+    source/startup, next-stage, upload,120Hz and Phase5work is unchanged.
