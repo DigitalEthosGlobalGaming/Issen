@@ -143,6 +143,12 @@ Owner disposal clears cutouts and scratch alongside layer maps. Software
 rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
 downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
 hits, misses and evictions separately from decoded assets.
+`environment/asset-sources.ts` supplies the unchanged URL/index selections for
+local compose and the generated runtime inventory. Generic material owners and
+UI lighting request data maps only; direct player/enemy PBR owners retain their
+explicit diffuse colour path. Inventory generation lives in
+`scripts/assets/runtime-inventory.mjs`, including startup-only and redundant
+diffuse roles separately from actual on-screen selections.
 See [Ink renderer](../features/ink-renderer.md). The [cinematic viewer](../features/cinematic.md) is owned by ui/screens/cinematic.ts; the runtime connects its temporary scene and film choices to title composition.
 
 `ui/wiring/` owns the DOM/runtime adapters. Each uses explicit current views and

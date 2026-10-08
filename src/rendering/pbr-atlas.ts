@@ -10,6 +10,7 @@ export function createPbrAtlas(
   sources: PbrAtlasSources,
   width: number,
   height = width,
+  options: { colour?: boolean } = {},
 ) {
   const images = new Map<MapKind, HTMLImageElement>();
   const materials = new Map<string, SceneMaterial>();
@@ -20,7 +21,7 @@ export function createPbrAtlas(
     if (disposed) return Promise.resolve(false);
     return (pending ??= Promise.all(
       (Object.keys(sources) as MapKind[])
-        .filter((kind) => sources[kind])
+        .filter((kind) => sources[kind] && (kind !== 'diffuse' || options.colour !== false))
         .map(async (kind) => {
           const image = doc.createElement('img');
           images.set(kind, image);

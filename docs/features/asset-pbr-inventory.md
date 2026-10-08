@@ -1,6 +1,6 @@
 # Game asset and PBR inventory
 
-Last reviewed: 7 October 2026. This is a manually maintained inventory of the
+Last reviewed: 8 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
@@ -28,8 +28,17 @@ and document illustrations are outside this inventory.
 The installed runtime set contains **266 aligned material planes** across
 **86 source families**: diffuse, normal and packed surface for each, plus eight
 nonzero emissive maps. The 258 redundant scalar and 78 zero-emission maps are
-removed. Base artwork and diffuse remain separate because both have consumers.
+removed. Base artwork and diffuse remain separate for the explicit figure
+colour/tone consumers and retained conversion validation. Material-only
+environment, outfit, charm, companion and UI owners use plain colour plus
+normal/surface/optional emissive; they no longer decode the unused diffuse sibling.
 All 86 original authoring PNGs, atlas metadata, recipes and provenance remain.
+The [generated runtime inventory](../../scripts/assets/runtime-inventory.json)
+records actual source/catalog/startup-glob references, dimensions, bytes and
+stage usage. Regenerate with `node scripts/assets/runtime-inventory.mjs`.
+It separately flags unused diffuse decodes (340,955,484nominal RGBA bytes across
+all material-only families) and startup-only vectors pending loader exclusion.
+It includes retained catalog inputs, so its total is not a live-residency budget.
 Runtime colour artwork uses 86 compact siblings. Eleven small colour planes use
 losslessly recompressed `.compact.png`; the other runtime siblings use WebP.
 No dimensions, frames, pivots, anchors or nine-slice coordinates changed.

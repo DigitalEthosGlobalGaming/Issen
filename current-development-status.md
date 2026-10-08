@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Phase 2 checkpoint complete
+# Performance, assets and seamless transitions — Phase 3 inventory checkpoint complete
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -140,10 +140,27 @@ Continue:
    High-refresh submissions alone do not prove smooth120Hz visual motion; prepared
    poses remain60Hz. Address that fidelity/per-frame waste concern while retaining
    run determinism before final completion, alongside remaining CPU budget costs.
-3. Continue bounded loading and next scenes through Phases3–5. Duplicate-atlas
-   checkpoint and WebP/quantisation visual checks remain required. Existing W1
-   already compacted runtime WebP planes; inventory actual files before converting
-   anything again. Seed determinism risk is the only explicit user-decision gate.
+3. Phase3.1verified at1.68.7: generated scripts/assets/runtime-inventory.json and
+   generator record361source/catalog/startup-glob assets, dimensions/bytes,
+   consumers and stage mappings. Shared environment/asset-sources.ts retains
+   original selections. Generic material and UI owners now request colour:false,
+   skipping unused diffuse maps; explicit player/enemy diffuse colour unchanged.
+   Duplicate checkpoint records80material-only diffuse families (341MB nominal
+   across entire set); stage kits fall151–283MB→113–214MB. Generated files remain
+   inputs to conversion validation; no extra encoded-size/deletion gain claimed.
+   tmp/performance-compose-phase3-material-only PASS45/116planes byte-identical
+   toPhase2, stage0compose median630.2ms still>500. Six units,12focused browsers,
+   plus3request/compact validation checks and checked build PASS. Inventory flags
+   startup-only vectors for removal from the new runtime loader/prefetch manifest.
+   Phase3.2existing WebP checkpoint recorded:352hashes+browser comparisons PASS,
+   exact alpha/all180data planes,324lossless WebP/11compactPNG/17lossyWebP. Do not
+   repeat asset compaction or resume packing. Current version/lock/title/changelog1.68.7.
+   All processes terminal:66010compose;89376/71874/11881browsers; build terminal.
+   No live capture. Next implement3.3compressed prefetch and3.4shared per-thread
+   priority/pin/LRU decoded loader. Proposed256/384MB mobile,512MB desktop defaults
+   must be validated for current+next scenes plus figures/UI; not yet implemented.
+   Phase4next-seed/scene slots, upload warming/cosmetic loading andPhase5full
+   verification remain. Seed determinism risk is the only user-decision gate.
 
 Goal remains active; final full suites, final traces, budgets, new loader/seed/
 next-slot/loading-state tests, final report and any final push are outstanding.

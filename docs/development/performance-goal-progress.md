@@ -512,3 +512,110 @@ build PASS at1.68.6. Logs: `tmp/performance-phase2-direct-cache-browser.log`,
 `tmp/performance-phase2-cutout-build.log`. Sessions16116/81757are terminal exit0.
 No live captures remain. Next: generated runtime inventory and duplicate-atlas
 checkpoint, existing WebP audit, then shared budgeted decoding/prefetch/next slots.
+
+## Phase 3.1 — Duplicate-atlas investigation checkpoint
+
+Generated `scripts/assets/runtime-inventory.json` from the actual startup globs,
+static source references, installed material catalog and shared stage selections.
+The generator is `scripts/assets/runtime-inventory.mjs`; every row records
+repository path, dimensions, encoded/nominal decoded bytes, source consumers,
+roles and stage indices. Current scope has361files,120,620,848encoded bytes and
+1,564,435,600nominal RGBA bytes, including currently decoded but unused diffuse
+maps and startup-only vector sources. These are not resident-memory measurements.
+
+`createAssetMaterials` and `createUiMaterialLighting` load each pack through
+`createPbrAtlas`, but only call material(), which reads normal/surface/emissive.
+Their colour stamps use the plain compact artwork. Thus `_diffuse` is redundant
+in these owners. This includes pine, shrubs, rocks/field rocks, snow boulders,
+grass edges, meadow patches, fog wisps, foreground boulders, woodland and snow
+woodland landmarks, and every other environment pack: keep plain colour artwork
+and aligned data maps; stop decoding the unused diffuse. Pixel equivalence of
+plain versus diffuse RGB is unnecessary because diffuse is never drawn here.
+
+Player and four enemy PBR families explicitly read diffuse for lit colour and
+retain plain artwork for their existing tone/readiness paths. Blade profiles
+explicitly use diffuse as colour. Keep both selections until those separate
+consumers can be proven redundant without changing output. The debug material
+preview selects plain pack.source, not diffuse. There are80unused material-only
+diffuse families:340,955,484nominal decoded bytes across the complete set.
+
+Stage0–8 potential decoded savings are69,219,320 /44,042,712 /50,333,640 /
+56,626,928 /44,046,800 /37,752,648 /50,328,880 /56,627,792 /50,332,872bytes.
+Local compose kit estimates would fall from151–283MB to113–214MB, before
+canvases/cutouts and separate main-thread fog/figures/UI. This supports beginning
+with256MB on low-memory mobile and384MB on other mobile, while allowing512MB
+desktop; pinning/current+next slots must still be measured against those budgets.
+Do not claim combined main/worker memory is bounded yet.
+
+Generated diffuse outputs remain referenced by the installed-pack conversion
+catalog and its browser validation; original authoring PNGs/recipes/provenance
+must remain. Runtime decode exclusion can be implemented independently. Audit
+build emission and source-only output retention in Phase3.2 before deleting files
+or claiming compressed-size savings. Startup glob additionally retains4,374,528
+nominal bytes of startup-only vectors, listed explicitly for exclusion from the
+new runtime prefetch/loader manifest. The checkpoint is recorded before changing
+decode selection or selecting the shared loader budget.
+
+### Material-only decode selection verified
+
+Version1.68.7: generic material and UI owners request `colour:false` from
+`createPbrAtlas`; direct player/enemy diffuse callers retain the default colour
+selection. Missing/optional emission behavior and map alignment are unchanged.
+Stage URLs/indices moved unchanged into `environment/asset-sources.ts` so tooling
+and future stage-prefetch selection share the actual code-owned mapping.
+
+`tmp/performance-compose-phase3-material-only` PASS45fresh workers and116planes,
+all byte-identical to Phase2. Decoded estimates match the predicted savings:
+
+| Stage | Decoded bytes before→after | Compose median / p95 ms |
+| --- | ---: | ---: |
+| 0 | 283,171,432→213,952,112 | 630.2 / 711.8 |
+| 1 | 176,170,848→132,128,136 | 289.9 / 339.4 |
+| 2 | 201,334,560→151,000,920 | 346.9 / 359.1 |
+| 3 | 226,507,712→169,880,784 | 458.4 / 470.7 |
+| 4 | 176,187,200→132,140,400 | 427.1 / 459.8 |
+| 5 | 151,010,592→113,257,944 | 290.9 / 335.2 |
+| 6 | 201,315,520→150,986,640 | 385.8 / 398.7 |
+| 7 | 232,802,096→176,174,304 | 312.7 / 344.2 |
+| 8 | 207,625,640→157,292,768 | 305.1 / 336.2 |
+
+No uniform compose improvement is claimed. Six focused units PASS (three new):
+unused colour request exclusion with aligned emission/disposal, regenerated
+inventory consistency including measured stage totals/duplicate families, SVG
+intrinsic dimensions, and existing optional-map/catalog validation. Seven
+material/UI/preview/worker browsers PASS; five direct figure/sword/cache browsers
+PASS; repeat request checks plus compact-plane validation PASS3. The outfit/charm
+and all31UI pack fixtures observe zero diffuse requests. Checked production
+build PASS. Logs: `tmp/performance-phase3-material-only-browser.log`,
+`tmp/performance-phase3-material-only-figure.log`,
+`tmp/performance-phase3-material-requests-webp.log` and
+`tmp/performance-phase3-material-only-build.log`. Measurement66010and browser
+89376/71874/11881handles are terminal exit0. Decoded budgets are still unimplemented.
+
+## Phase 3.2 — Existing compact WebP checkpoint
+
+The repository already implements the requested conversion policy through
+`scripts/assets/compact.mjs` / `compact.py`, integrated with PBR installation.
+Do not reconvert, repack or remove authoring originals. Current manifest hash
+audit PASS352outputs. Existing encodings:324lossless WebP (194,014,709→120,281,810
+bytes),11lossless compact PNG exceptions (66,182→62,365),17lossy WebP
+(183,570→127,948). Converted retained inputs total194,264,461→120,472,123bytes;
+the earlier266,530,086PNG total additionally includes now-omitted scalar/zero maps.
+Lossy manifest maximum8levels/channel and largest mean0.472318 are within the
+unchanged0.5/8colour guard. Lossless manifest differences are0.
+
+`compacted-planes.spec.ts` rerun PASS against saved original inputs: every
+converted plane keeps dimensions and exact alpha; all180normal/surface/emissive
+planes are bit-identical. Raw WebGL sampling uses no colour-space conversion or
+premultiplication. Existing UI native unlit/alpha checks and all-nine worker
+composition compare complete drawn outputs on their actual decode paths; worker
+planes remain byte-identical to the accepted Phase2reference. There is no new
+lossy conversion and no new slope/normal visual difference at this checkpoint.
+Future shared-loader bitmap decode options still require the same comparison.
+Existing generated diffuse files remain conversion-validation inputs, while
+their80material-only families no longer decode in gameplay/menu owners. No file
+deletion or extra compressed-size gain is claimed for that selection change.
+
+Both duplicate-atlas and existing-WebP findings are recorded. Continue with
+compressed prefetch and a shared priority/pin/LRU decoded-image loader, then
+next-seed/scene slots and paced GPU warming; startup-only assets must be excluded.

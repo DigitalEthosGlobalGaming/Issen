@@ -62,7 +62,9 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     if (!value) {
       const image = doc.createElement('img');
       image.src = pack.source;
-      const atlas = createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1]);
+      const atlas = createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1], {
+        colour: false,
+      });
       value = {
         pack,
         image,

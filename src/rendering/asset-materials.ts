@@ -20,7 +20,10 @@ export function createAssetMaterials<K extends string>(doc: Document, sources: R
       const pack = packs.get(next[key]);
       if (!pack) continue;
       selected.set(key, next[key]);
-      atlases.set(key, createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1]));
+      atlases.set(
+        key,
+        createPbrAtlas(doc, pack.maps, pack.dimensions[0], pack.dimensions[1], { colour: false }),
+      );
     }
   }
   select(sources);

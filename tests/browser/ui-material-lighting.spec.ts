@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test';
 test('all UI packs render through the shader and CSS images follow the light without losing slices', async ({
   page,
 }) => {
+  const requested: string[] = [];
+  page.on('request', (request) => requested.push(request.url()));
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
     const { createUiMaterialLighting } = await import('/src/ui/material-lighting.ts');
@@ -92,4 +94,5 @@ test('all UI packs render through the shader and CSS images follow the light wit
   expect(result.sealVariable).toBe(true);
   expect(result.materialStamps).toBe(10);
   expect(result.restored).toBe(true);
+  expect(requested.some((url) => /_diffuse\.(?:webp|png)/.test(url))).toBe(false);
 });
