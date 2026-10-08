@@ -1,4 +1,4 @@
-# Performance, assets and seamless transitions — Selected companion ownership
+# Performance, assets and seamless transitions — Local sampling controls
 
 Active objective: [goal-objective.md](goal-objective.md). Work on develop.
 Profiling is explicitly authorized. The old refactor is complete at 2d27986;
@@ -600,3 +600,21 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     cold/warm timing/traces and all Phase5 suites remain required; goal active.
     Final bundled checks3PASS23.8s(default2workers), format/diffPASS. All sessions
     terminal; no push/deploy/native build or real player-save mutation.
+
+26. Diagnostic-only local sampling controls; no accepted implementation or version
+    bump. Original scenery PNG material requests (60 files, from pre-refactor)
+    versus current WebP fail stage0 onward: rawmax255/livemax6. PNG repeat under
+    figure decode pressure reproduces the unchanged WebP control: stages0–6 exact,
+    stage7 raw127/255/live2/3, stage8 raw255/26/live3/2. WebP is not the sole cause
+    of repeat instability. Original-source full-size PNG/WebP parity not audited.
+    Software canvas snapshots repeat exactly18compositions(PASS38.8s), but differ
+    from original HTML inputs(raw255/live50/alpha162/opaqueRGB186); rejected.
+    Snapshot canvases are outside loader accounting, so bounded loader counters
+    do not prove total memory. Initial PNG route intercepted figure requests;
+    corrected scenery-only route measured successfully. All diagnostic processes
+    terminal; one worker intentionally isolates sampling; current production
+    inputs/assets/ownership and frozen standard harness unchanged. Stable evidence
+    tmp/performance-local-input-release/{png,canvas}-{equivalence,repeat}.json;
+    probes and instructions under tmp/probes/local-input-release/. Native sampling
+    cause unresolved. Continue remaining figure/startup ownership and transient
+    local headroom; next-slot readiness,120Hz and full Phase5 remain required.

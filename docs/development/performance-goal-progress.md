@@ -1578,3 +1578,47 @@ production trace and suite remain required. Goal stays active at full scope.
 
 Final bundled app/ink checks: 3 PASS (23.8s), default two workers, against the
 final checked build. Formatting and diff checks PASS; all sessions terminal.
+
+## Checkpoint 26 — Local sampling format controls (no implementation accepted)
+
+Continued the rejected local-input retirement investigation using the unchanged
+renderer. Production source ownership, baking and assets remain unchanged. The
+earlier retirement patch remains rejected; ordinary browser passes cannot replace
+the pressure comparison. This checkpoint records diagnostic results, not a
+completed memory or visual requirement.
+
+Two fresh-context PNG controls substitute original material PNGs from the
+immutable pre-refactor tree through test-only scenery request routes. Sixty
+normal/surface/emissive files are actually requested across nine stages with two
+size/DPR/seed/quality variants. Figure pressure inputs retain current WebP files.
+Original PNG versus current WebP composition fails exact parity from stage 0:
+maximum raw delta255 and live delta6. This comparison alone cannot establish a
+codec cause; original-source full-size RGBA equivalence was not audited here.
+PNG versus PNG repeat also fails, despite identical format on both sides:
+stages0–6 exact, stage7 raw127/255 and live2/3, stage8 raw255/26 and live3/2.
+Those late-stage maxima match the earlier unchanged WebP control. WebP encoding
+therefore cannot be the sole explanation of that repeat instability. Loader
+peak264,282,368bytes remains below256MiB and final disposal returns bytes to zero.
+The initial route inadvertently intercepted figure maps absent from the PNG
+fixture; narrowing it to environment URLs fixed the fixture before measurement.
+
+Two additional test-only controls snapshot HTML material maps into full-size
+software canvases. Canvas versus canvas repeats exactly across all18compositions,
+including decoded-figure pressure and native live presentation (PASS38.8s).
+Original HTML versus canvas fails from stage0 (38.4s): maximum raw255/live50,
+alpha162, opaqueRGB186 and alpha-weightedRGB187.73. This input substitution is
+rejected for the same visual-preservation reason as the previous bitmap attempt.
+The extra full-size snapshot canvases are outside loader accounting: its bounded
+bytes and disposal counter do not prove a bounded total for this experiment.
+
+Both two-case runs used one worker deliberately for isolated sampling diagnostics,
+with a dedicated strict-port server owned by each run. All processes are terminal.
+Stable reports: tmp/performance-local-input-release/png-equivalence.json,
+png-repeat.json, canvas-equivalence.json and canvas-repeat.json. Runnable ignored
+probes and configurations are documented in tmp/probes/local-input-release/README.md.
+No tolerance was relaxed, no production alternative accepted, and no benchmark
+claim or version bump follows from these diagnostic-only changes. Frozen standard
+performance harness unchanged. No push/deployment/native build or player-save
+mutation. The causal native-sampling explanation remains unresolved; remaining
+figure/startup ownership, local transient headroom, next-slot readiness, 120Hz
+budget and full Phase5 verification still require completion.
