@@ -29,6 +29,31 @@ export function createLightingDebug(
   marker.setAttribute('aria-label', 'Drag light position');
   app.append(root, marker);
   const controls = root.querySelector('.lighting-controls')!;
+  const bufferLabel = doc.createElement('label');
+  bufferLabel.textContent = 'Buffer view';
+  const bufferSelect = doc.createElement('select');
+  bufferSelect.setAttribute('aria-label', 'Buffer view');
+  for (const [value, label] of [
+    ['none', 'Scene'],
+    ['g0', 'Normal / depth'],
+    ['g1', 'Surface'],
+    ['g2', 'Linear albedo'],
+  ]) {
+    const option = doc.createElement('option');
+    option.value = value!;
+    option.textContent = label!;
+    bufferSelect.append(option);
+  }
+  bufferLabel.append(bufferSelect);
+  root.append(bufferLabel);
+  bufferSelect.addEventListener(
+    'change',
+    () => {
+      canvas().dataset.lightingView = bufferSelect.value;
+      invalidate();
+    },
+    { signal: events.signal },
+  );
   const previewLabel = doc.createElement('label');
   previewLabel.textContent = 'Material preview';
   const previewSelect = doc.createElement('select');
@@ -79,10 +104,7 @@ export function createLightingDebug(
     marker.style.left = `${bounds.left + rig.state.x * bounds.width}px`;
     marker.style.top = `${bounds.top + rig.state.y * bounds.height}px`;
     marker.style.color = rig.state.color;
-    root.querySelector('p')!.textContent =
-      canvas().dataset.graphicsBackend === 'pixi'
-        ? 'Drag the light marker or adjust its position.'
-        : 'Lighting requires WebGL. This view uses Canvas.';
+    root.querySelector('p')!.textContent = 'Drag the light marker or adjust its position.';
   };
   function sync() {
     for (const input of inputs) {
@@ -204,6 +226,7 @@ export function createLightingDebug(
     refresh: position,
     dispose() {
       events.abort();
+      delete canvas().dataset.lightingView;
       root.remove();
       marker.remove();
     },

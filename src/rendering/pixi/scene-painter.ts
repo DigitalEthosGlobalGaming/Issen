@@ -1,4 +1,6 @@
-import { GraphicsUnsupportedError } from '../graphics-error.ts';
+import { GeometryBuffer, requireGeometryBuffers } from './geometry-buffer.ts';
+import type { GeometryDebugView } from './geometry-buffer.ts';
+import { GraphicsUnsupportedError, reportGraphicsError } from '../graphics-error.ts';
 import {
   Color,
   Container,
@@ -158,8 +160,14 @@ export class PixiScenePainter implements SceneDrawing {
     this.canvas.dataset.contextState = 'lost';
   };
   private readonly restoreContext = () => {
-    this.contextLost = false;
-    this.canvas.dataset.contextState = 'ready';
+    try {
+      requireGeometryBuffers(this.renderer.gl as WebGL2RenderingContext);
+      this.geometryBuffer.resize(this.canvas.width, this.canvas.height, true);
+      this.contextLost = false;
+      this.canvas.dataset.contextState = 'ready';
+    } catch {
+      reportGraphicsError(this.canvas);
+    }
   };
   private readonly clips: Graphics[] = [];
   private readonly transientGroups: Container[] = [];
@@ -180,10 +188,17 @@ export class PixiScenePainter implements SceneDrawing {
     points: [],
   };
 
+  private readonly geometryBuffer: GeometryBuffer;
+  get geometryTargets() {
+    return this.geometryBuffer.targets;
+  }
+
   constructor(
     readonly canvas: HTMLCanvasElement,
     private readonly renderer: WebGLRenderer<HTMLCanvasElement>,
   ) {
+    this.geometryBuffer = new GeometryBuffer(renderer);
+    this.geometryBuffer.resize(canvas.width, canvas.height);
     canvas.addEventListener('webglcontextlost', this.loseContext);
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
@@ -359,11 +374,21 @@ export class PixiScenePainter implements SceneDrawing {
       this.height = this.canvas.height;
       this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
     }
+    this.drawGeometry();
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
     // browser task do not accumulate (captures, previews and restoration).
-    this.renderer.clear({ target: this.renderer.view.renderTarget, clearColor: [0, 0, 0, 0] });
-    this.renderer.render({ container: this.root, clear: true });
+    this.renderer.renderTarget.bind({
+      target: this.renderer.view.renderTarget,
+      clear: true,
+      clearColor: [0, 0, 0, 0],
+    });
+    const debug = this.canvas.dataset.lightingView;
+    const view: GeometryDebugView =
+      debug === 'g0' || debug === 'g1' || debug === 'g2' ? debug : 'none';
+    if (!this.geometryBuffer.renderDebug(view))
+      this.renderer.render({ container: this.root, clear: true });
+    this.canvas.dataset.lightingFrameView = view;
     // Filter targets return to Pixi's pool after rendering. Drop the shared
     // bindings before a later resize destroys those pooled textures.
     const filterBindings: unknown = Reflect.get(this.renderer.filter, '_globalFilterBindGroup');
@@ -385,6 +410,40 @@ export class PixiScenePainter implements SceneDrawing {
     }
     for (const key of this.patterns.keys())
       if (!this.usedPatterns.has(key)) this.patterns.delete(key);
+  }
+
+  private drawGeometry(): void {
+    this.geometryBuffer.resize(this.canvas.width, this.canvas.height);
+    const restore: (() => void)[] = [];
+    try {
+      // Reuse the exact transform and mask hierarchy; film/tint filters belong to composite.
+      const visit = (item: Container) => {
+        if (item.filters) {
+          const filters = item.filters;
+          item.filters = null;
+          restore.push(() => {
+            item.filters = [...filters];
+          });
+        }
+        for (const child of item.children) visit(child);
+      };
+      visit(this.root);
+      for (let i = 0; i < this.cursor; i++) {
+        const slot = this.slots[i]!;
+        if (slot.material)
+          restore.push(slot.material.beginGeometry(this.geometryBuffer.targets!.depthRange));
+        else {
+          const renderable = slot.item.renderable;
+          slot.item.renderable = false;
+          restore.push(() => {
+            slot.item.renderable = renderable;
+          });
+        }
+      }
+      this.geometryBuffer.render(this.root);
+    } finally {
+      for (let i = restore.length - 1; i >= 0; i--) restore[i]!();
+    }
   }
 
   save(): void {
@@ -1022,6 +1081,7 @@ export class PixiScenePainter implements SceneDrawing {
     // Keep this guarded adapter covered by the warning-sensitive disposal test.
     const filterBindings: unknown = Reflect.get(this.renderer.filter, '_globalFilterBindGroup');
     if (filterBindings instanceof BindGroup) filterBindings.destroy();
+    this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();
     this.renderer.destroy({ removeView: false });
     for (const gradient of this.gradients.values()) gradient.destroy();
@@ -1049,6 +1109,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
       stencil: true,
     });
     if (!context) throw new GraphicsUnsupportedError();
+    requireGeometryBuffers(context);
     await renderer.init({
       context,
       preferWebGLVersion: 2,

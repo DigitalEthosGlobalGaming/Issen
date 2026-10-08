@@ -400,3 +400,37 @@ The native colour/soft-light/overlay blend filters remain because they implement
 live Pixi grading with correct alpha; they are not an alternate Canvas renderer.
 The forward material pipeline described above remains until Workstream 3 replaces
 it; no light pre-pass completion is claimed here.
+
+## W3 geometry buffer (phase 1)
+
+Each PixiScenePainter owns three native MRT attachments in geometry-buffer.ts.
+G0 stores octahedral world normal XY, signed depth normalized into a scene-sized
+range, and effective coverage. G1 stores roughness/metallic/AO and a byte material
+flag (0 unlit, 1 PBR, 2 legacy mask during migration). G2 stores linear albedo and
+material lighting amount. All are 8-bit normalized data; zero-depth ties round
+explicitly to the upper representable neighbour. Geometry alpha cutoff defaults
+to 0.5 and is configurable per SceneMaterial. Last covered writer wins in painter
+order, blending is disabled, and the original clip hierarchy is retained. Fog,
+film and grading filters remain exclusively in the ordered composite.
+
+Geometry shaders share the current material maps, UVs and inverse-transpose normal
+matrix. OpenGL normalY, mirroring, rotation and nonuniform scale are preserved.
+The painter replaces its targets on size/context restoration and releases them on
+disposal. Main geometry remains DPR-capped by viewport.ts; auxiliary surfaces own
+independent targets at their explicit canvas size. A restored context revalidates
+MRT. Fewer than three draw buffers or colour attachments shows the existing
+unsupported-graphics Retry/Reload view; there is no multipass substitute.
+
+The session-only lighting panel offers Scene, Normal/depth, Surface and Linear
+albedo views. The painter records the completed lightingFrameView separately from
+the requested lightingView, so tests capture an actual rendered buffer. Borrowed
+readonly geometryTargets expose current g0/g1/g2 textures, dimensions, depth range
+and generation; extensions must reacquire after resize/restore and never destroy
+or mutate these owner resources. Light targets and the final public post hooks
+remain later W3 work.
+
+This is phase 1, not a completed deferred-lighting pipeline: the current forward
+material shader still renders the ordinary scene while geometry buffers are
+verified. The light pass, 16-light registry, lookup composite, legacy unification,
+instanced foliage and half-resolution option are still required. No performance
+measurement or physical-device verification is claimed.

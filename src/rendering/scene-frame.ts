@@ -16,6 +16,8 @@ export interface SceneTexture {
 }
 
 export interface SceneMaterial {
+  /** Minimum effective alpha written to the geometry buffer; default 0.5. */
+  alphaCutoff?: number;
   normal?: SceneTexture;
   /** PBR data: R roughness, G metallic, B ambient occlusion, A opaque by default. */
   surface?: SceneTexture;

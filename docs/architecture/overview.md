@@ -503,3 +503,5 @@ The guided DOM/CSS adapter is `ui/wiring/guided-lessons.ts`; deterministic lesso
 progress, freeze and practice input decisions stay in `game/onboarding/guided-state.ts`.
 See [runtime refactor results](../development/runtime-refactor-results.md) for
 verification, intentional ordering changes and the manual phone checklist.
+
+W3 phase 1 adds painter-owned native G-buffer targets and geometry-material output shaders under rendering/pixi/. The ordered forward composite remains during migration; light accumulation, instancing and final extension hooks are pending. See rendering.md for target layout, debug controls and ownership.

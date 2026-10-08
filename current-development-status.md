@@ -1,3 +1,54 @@
+## W3 phase 1 focused checkpoint green — broad browser next
+
+Final 1.68.0 geometry implementation has strict npm run typecheck PASS and all
+401 units PASS. Exact 12-file affected browser command passed all 47 in 1.9m,
+exit 0; phase1-native-browser.log under tmp/lighting-refactor. Session 72734 closed.
+Files: geometry-buffer, lighting-mrt, pixi-backend/scenes/catalogue/films,
+material-colour, graphics-errors, presentation-readiness, game,
+runtime-checkpoint-fixtures, changelog; config playwright.rendering-v2.config.ts
+and --trace retain-on-failure. Real target/depth/surface/albedo/cutoff/clip/normal
+values, below-cutoff forward translucency, source/target ownership, restore
+material reupload, missing-MRT error and actual debug views are covered.
+Native title debug screenshots were visually inspected after waiting for startup
+completion and the painter's completed lightingFrameView metadata. No assertion
+or timeout was weakened; midpoint depth now has explicit 8-bit rounding.
+No live process remains at this checkpoint. NEXT: run the complete combined broad
+browser invocation with source fixed, save phase1-broad-browser.log and record its
+exact live handle. Do not begin phase 2 until the broad check finishes green.
+Then implement light accumulation/registry/16-light ranking and rig/debug, followed
+by the remaining mandatory W3 phases and Part 4. No early develop push.
+External generation scripts already applied/non-idempotent; do not rerun.
+## W3 phase 1 implementation — focused browser verification live
+
+Version 1.68.0, lock/title/changelog aligned. Native painter-owned G0/G1/G2 targets,
+geometry material shader, default/per-material alpha cutoff, last-writer data,
+borrowed current texture/generation hook and session-only lighting debug views
+implemented. Resize/restore/dispose own independent surfaces; MRT is required at
+startup and restore. Existing forward shader remains pending W3 phases 2–4.
+Strict npm run typecheck PASS; final node --test tests/unit/*.test.mjs all 401 PASS.
+Logs tmp/lighting-refactor/phase1-{typecheck,unit}.log.
+Focused 12-file browser invocation is LIVE in unified exec session 72734; log
+ tmp/lighting-refactor/phase1-native-browser.log, latest observed 23 passing cases.
+Poll exact handle; keep application/tests fixed until terminal, do not restart on
+observation timeout. New five-case geometry checks cover exact channels, cutoffs,
+last writer, preserved forward translucency/clips, rotation/nonuniform/normalY,
+independent targets/source destruction, restored material pixels, missing MRT,
+completed debug frames and session-only state. Native MRT probe is also included.
+Screenshots use testInfo.outputPath and actual rendered views were inspected.
+
+A rendering regression was fixed: Pixi clear does not bind its supplied target,
+so clear after MRT had erased G data and accumulated the view alpha. Explicit view
+bind+clear restores original material/film assertions. Mesh GL blend state is
+restored alongside container blend mode. Restore tests now issue restoration in
+another browser task after loss dispatch; timeout/assertions unchanged. Zero-depth
+8-bit tie is explicitly encoded, rather than weakening byte assertions.
+NEXT on focused terminal: fix failures, record exact results, run required broad
+browser verification with this source fixed, finalize phase-1 docs/audit/status
+and commit green checkpoint. Only then proceed to W3 phase 2 light accumulation,
+16-light registry/rig/debug. All later W3 phases and Part 4 remain required.
+No develop push, profiling/benchmarks, native/store builds or real-save changes.
+Generation scripts in the external workspace are applied and non-idempotent;
+do not rerun them. Ignored W3 audit tmp/lighting-refactor/audit.md.
 ## W3 audit checkpoint — native MRT verified, G-buffer next
 
 W1/W2 complete under the explicit pre-existing Android failure exception below.

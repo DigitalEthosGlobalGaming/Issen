@@ -1,4 +1,5 @@
 import { Matrix, Mesh, MeshGeometry, Shader, Texture, UniformGroup } from 'pixi.js';
+import { createGeometryMaterial } from './geometry-material.ts';
 import { normalTransform } from '../scene-frame.ts';
 import type { SceneLighting, SceneSprite } from '../scene-frame.ts';
 import type { SceneTextureStore } from './texture-store.ts';
@@ -186,6 +187,8 @@ export function createMaterialMesh() {
       uEmissive: Texture.WHITE.source,
     },
   });
+  const geometryMaterial = createGeometryMaterial(vertex, uniforms);
+  let cutoff = 0.5;
   const geometry = new MeshGeometry({
     positions: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
     uvs: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
@@ -198,14 +201,31 @@ export function createMaterialMesh() {
   let texturesBound = false;
   return {
     mesh,
+    beginGeometry(depthRange: number): () => void {
+      geometryMaterial.update(shader, depthRange, cutoff);
+      const blend = mesh.blendMode;
+      const stateBlend = mesh.state.blend;
+      const stateBlendMode = mesh.state.blendMode;
+      mesh.shader = geometryMaterial.shader;
+      mesh.blendMode = 'none';
+      mesh.state.blend = false;
+      return () => {
+        mesh.shader = shader;
+        mesh.blendMode = blend;
+        mesh.state.blendMode = stateBlendMode;
+        mesh.state.blend = stateBlend;
+      };
+    },
     releaseTextures(): void {
       if (!texturesBound) return;
       for (const name of ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'])
         shader.resources[name] = Texture.WHITE.source;
+      geometryMaterial.releaseTextures();
       texturesBound = false;
     },
     update(sprite: SceneSprite, lights: SceneLighting, textures: SceneTextureStore): void {
       const material = sprite.material!;
+      cutoff = Math.max(0, Math.min(1, material.alphaCutoff ?? 0.5));
       const diffuse = textures.get(sprite.texture);
       const normal = material.normal ? textures.getData(material.normal) : Texture.WHITE;
       const mask = material.mask ? textures.getData(material.mask) : Texture.WHITE;
@@ -307,6 +327,7 @@ export function createMaterialMesh() {
     dispose(): void {
       mesh.destroy();
       geometry.destroy();
+      geometryMaterial.dispose();
       shader.destroy();
     },
   };
