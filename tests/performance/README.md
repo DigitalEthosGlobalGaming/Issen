@@ -20,7 +20,7 @@ npm run test:performance-tools
 ```
 
 The first command is the complete standard **web** suite: five repetitions per
-scenario, 3 seconds of warmup, 5 seconds of measurement (at least 10 seconds for
+scenario, 3 seconds of warmup, 5 seconds of measurement (at least 30 seconds for
 `cinematic-transitions`), then one separate
 diagnostic capture. Every repetition starts in a disposable browser context.
 These are initial defaults, not a statistical confidence guarantee. Use longer
@@ -50,7 +50,7 @@ without stopping or reusing the other server.
   650 ms; it does not activate cinematic mode and therefore does not render Demon.
   `cinematic-transitions` opens the real viewer, waits for each requested composition
   to appear, then advances after a 350 ms interval. Its measurement lasts at least
-  10 seconds and guards that all nine stages and Demon actually appeared. Preparation,
+  30 seconds and guards that all nine stages and Demon actually appeared. Preparation,
   decoding and rebuilding remain included; each sample records `measurementMs`.
 
 Fixtures fix seed 424242, Free edition, High cosmetic density and synthetic saves.
@@ -95,11 +95,41 @@ retain every completed sample:
 node tests/performance/benchmarks/resume-run.mjs tmp/performance/<failed-run>
 ```
 
+For an interrupted run still marked `running`, first confirm its process has
+stopped, then pass `--interrupted` to the recovery command. Never recover a live
+run or overlap measurements.
+
 This writes a new folder, preserves the original failed results and records which
 missing samples/diagnostics were completed. It rejects changed host, browser,
 graphics or tooling identity. It neither rebuilds nor replaces successful samples.
 A recovered run becomes passing only when all required repetitions and diagnostics
 exist. Report the failure and recovery when using it as a baseline.
+
+For the explicitly requested stage-loading investigation, run these sequentially:
+
+```sh
+node tests/performance/benchmarks/summarize-frame-budgets.mjs tmp/performance/<completed-run>
+node tests/performance/benchmarks/measure-compose.mjs tmp/performance-compose-baseline
+node tests/performance/benchmarks/measure-scene-flow.mjs tmp/performance-scene-baseline
+```
+
+The first derives median/p95/p99 and counts above 8.3/16.7 ms from retained raw
+samples without changing the standard harness or its fingerprint. The compose
+probe covers all nine stages, five repetitions and fixed seed, retaining raw
+colour and material planes for subsequent pixel comparison. The scene probe
+builds a separate instrumented production bundle, uses fixed-seed cinematic
+presentation ports, and records cold/warm stage cycles, worker timings,
+decoded-byte estimates, sampled heap peaks, startup, and gameplay intervals and
+CPU update/render times. It saves a trace per scene; `Scheduler::RunTask` events
+on the presentation mark's thread cover the presenting task and the next two
+seconds, including tasks between 16 and 50 ms that Long Tasks does not expose.
+Missing trace task events fail the probe rather than being reported as zero.
+
+Cold clears HTTP cache after startup; shared decoded startup images remain.
+Warm retains HTTP cache and uses the same scene seed. Neither means cold browser
+process or OS cache. Decoded estimates are nominal RGBA sizes and do not measure
+resident GPU memory. Desktop captures do not establish mobile/120 Hz delivery.
+The scene probe owns port 5298; do not run it concurrently with other captures.
 
 For the separate unchanged-viewport resize investigation:
 

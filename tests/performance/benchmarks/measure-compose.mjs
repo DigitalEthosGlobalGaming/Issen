@@ -11,7 +11,7 @@ await server.listen();
 const browser = await chromium.launch({ channel: 'msedge' });
 const rows = [];
 try {
-  for (const stage of [0, 1]) {
+  for (const stage of Array.from({ length: 9 }, (_, stage) => stage)) {
     for (let repetition = 0; repetition < 5; repetition++) {
       const page = await browser.newPage();
       await page.goto('http://127.0.0.1:5297/privacy/index.html');
@@ -25,7 +25,7 @@ try {
           const request = (data) =>
             new Promise((resolve, reject) => {
               worker.onmessage = ({ data }) =>
-                data.ok ? resolve(data) : reject(Error(data.error));
+                data.phase ? undefined : data.ok ? resolve(data) : reject(Error(data.error));
               worker.onerror = reject;
               worker.postMessage({ id: ++id, ...data });
             });
@@ -49,7 +49,7 @@ try {
             });
             const milliseconds = performance.now() - start;
             const planes = [];
-            for (const [index, layer] of reply.layers.entries()) {
+            for (const [index, layer] of [...reply.layers, ...reply.foreground].entries()) {
               for (const kind of ['colour', 'normal', 'surface', 'emissive']) {
                 const image = layer[kind];
                 if (!image) continue;
@@ -68,7 +68,7 @@ try {
                 image.close();
               }
             }
-            return { milliseconds, planes };
+            return { milliseconds, planes, snapshot: reply.snapshot };
           } finally {
             worker.terminate();
           }
@@ -98,7 +98,8 @@ try {
             throw Error('Compose pixels changed: ' + JSON.stringify(differences.at(-1)));
         }
       }
-      rows.push({ stage, repetition, milliseconds: result.milliseconds, differences });
+      rows.push({ stage, repetition, milliseconds: result.milliseconds,
+        snapshot: result.snapshot, differences });
       console.log(JSON.stringify(rows.at(-1)));
       await page.close();
     }

@@ -1,7 +1,7 @@
 window.__profile = {
  G, fx, frameLoop, startRun, spawnEnemy, enemyPos, killEnemy, startTrial, openPanel, closePanel, pause,
  state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0),transitions:window.__sceneTransitions||0,renderedScenes:[...(window.__renderedScenes||[])]}),
- configure(name) {
+ async configure(name) {
   window.__scenario=name;
   if(name==='scene-transitions') { window.__sceneTransitions=0; window.__nextScene=0; window.__sceneAt=performance.now()+650; }
   if(name==='cinematic-transitions') {
@@ -15,6 +15,9 @@ window.__profile = {
   if(name==='film-inferno') EQ.film='trial-inferno';
   if(name==='kill-effects') EQ.fx='scattered-armour';
   if(name==='stress-100') {
+   const deadline=performance.now()+45000;
+   while(cvs.dataset.sceneState==='loading') { if(performance.now()>deadline) throw Error('Stress scene did not become ready'); await new Promise(resolve=>setTimeout(resolve,20)); }
+
    window.__resetProfileRandom(); time=0;
    G.enemies=[]; G.pendingSpawns=[]; G.toSpawn=0; G.attacker=null; G.gapT=1e9;
    for(let i=0;i<100;i++) { const e=spawnEnemy(i%5,true); e.state='idle'; e.fixed={x:W*(.06+(i%10)*.098),y:H*(.22+Math.floor(i/10)*.054),h:H*.14,fog:(i%5)*.08}; e.pos=enemyPos(e); }

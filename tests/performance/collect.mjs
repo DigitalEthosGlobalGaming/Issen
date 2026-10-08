@@ -97,7 +97,7 @@ export async function measure(
     }
     // Allow a complete cycle, including cold worker composition, at default settings.
     const measurementMs =
-      scenario === 'cinematic-transitions' ? Math.max(10000, config.duration) : config.duration;
+      scenario === 'cinematic-transitions' ? Math.max(30000, config.duration) : config.duration;
     await page.waitForTimeout(measurementMs);
     const b = metrics(await cdp.send('Performance.getMetrics'));
     const sample = await page.evaluate(() => {
