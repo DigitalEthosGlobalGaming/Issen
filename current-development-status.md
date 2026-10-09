@@ -1,5 +1,33 @@
 # Current development status
 
+## Current handoff — leaf experiments rejected; preview cycles below cap
+
+App1.69.56 unchanged. Flat constant leaf tint/opacity still fails3/5 strict
+restores; reverted. Explicit final opacity rounding fails one of three restores
+and changes a controlled catalogue colour sample in all three repetitions;
+reverted. No renderer/test experiment remains and no assertion was relaxed.
+Evidence: `tmp/test-results/browser/context-{flat-leaf-colour,
+rounded-leaf-opacity}-16956/`. Reassess instead of another blind renderer tweak.
+
+Existing realm/inspection probe now repeats three real UI cycles and asserts the
+sampled combined cap/page errors. Pan-special portrait:422 samples, peak492,779,248
+of536,870,912bytes; koken landscape:419 samples, peak485,163,528. Both low-memory
+tier/DPR2, no page errors. Third settled Demon/inspection/return values closely
+match the second cycle. These50ms samples plus settled phase snapshots are not
+every transient/native allocation, and cinematic Demon is not Demon Mirror
+combat. Evidence: `tmp/probes/realm-preview-{pan-cycle,
+koken-landscape-cycle}-16956.json`; script `realm-preview-cycle-memory.mjs`.
+
+Review-only proposal under ignored `tmp/proposals/leaf-restoration-native-rounding.patch`
+would accept at most one alpha byte in four of100,800 fixture pixels, retaining
+exact geometry/HDR/lifetime checks. Not applied or treated as a fix. Main-goal's
+"Never loosen a tolerance ... to make it pass" rule requires explicit user
+authorization before accepting that bounded native-rounding policy. Continue
+independent remaining memory/mode and final-report work while that decision is
+pending; keep the strict failure open without approval.
+All processes terminal. Latest checked production remains1.69.55. Goal active;
+no push/deploy/native build/save edits.
+
 ## Current handoff — stable local data-plane backing (1.69.56)
 
 Local normal/surface Canvas planes now request CPU backing when first created.

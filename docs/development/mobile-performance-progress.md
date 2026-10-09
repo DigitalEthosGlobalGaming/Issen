@@ -1,5 +1,23 @@
 # Mobile performance continuation
 
+## Leaf rounding experiments and preview residency — 10 October 2026
+
+App1.69.56 unchanged. Flat leaf tint/opacity fails3/5 strict restores; explicit
+final opacity rounding fails1/3 restores and all three controlled colour-sample
+comparisons. Both reverted; no assertion relaxed. Evidence:
+`tmp/test-results/browser/context-{flat-leaf-colour,rounded-leaf-opacity}-16956/`.
+
+Three live cinematic-Demon/inspection/return cycles stay below the tracked
+512MiB cap on the low-memory tier/DPR2: pan-special portrait peak492,779,248bytes
+(422samples), koken landscape485,163,528 (419samples), no page errors. Second and
+third settled residency nearly match. Sampling50ms plus phase snapshots does
+not cover every transient/native allocation or Demon Mirror combat. Existing
+probe extended under ignored `tmp/probes/realm-preview-cycle-memory.mjs`, with
+captures `realm-preview-{pan-cycle,koken-landscape-cycle}-16956.json`.
+The strict leaf restore remains open. A review-only bounded-native-rounding
+proposal has not been applied; explicit authorization is required to change
+the existing exact-alpha gate. Broader mode/transient and final checks remain.
+
 ## Stable local normal/surface backing — 10 October 2026
 
 Version1.69.56 requests CPU backing at creation for main-document cached normal
