@@ -1,5 +1,73 @@
 # Current development status
 
+## Current handoff — approval recovered; live-flow probe exposes headroom gap
+
+Approval review is available again: the unchanged strict leaf case passes once
+in isolation (6.5s). This does not resolve the reproduced failures. The proposed
+GLSL invariant position/UV/colour change still fails one of three strict restores;
+reverted. Dithering and invariance are both rejected; texture/mip content and
+Canvas-only conversion were ruled out by the previous diagnostic. Keep the two
+strict restoration failures open and reassess further work after these two failed
+fix approaches. Their scope still blocks a clean final browser checkpoint.
+
+New low-tier portrait/DPR2 probe uses live boss input and shrine choices, without
+assigning stages or ordinals. It progresses through stage 7 but does not complete
+all nine: the reused manual driver requires further readiness/input diagnosis.
+Replacing the first-duel fixed timer with shrine-state polling and using finer
+10ms input steps still leaves the later flow incomplete. Do not claim all-stage
+natural coverage from these captures or treat this disposable probe as a game
+regression without diagnosing the driver. Manual clocks invalidate frame-time
+claims; the fixture profile really equips cat/steel/hai/nocharm.
+
+The finer run samples 14,221 frame/worker-message boundaries and records a tracked
+peak538,865,924bytes against536,870,912 (512MiB): 1,995,012bytes over budget. The
+coarse run samples3,227 boundaries and peaks532,375,780bytes (below budget). The
+finer peak includes98,273,528bytes of background reservation; main decoded bytes
+increase by6,291,456 and main canvas/GPU storage also grows. The run did not reach
+its final memory assertion, but the saved peak contradicts a whole-ledger cap.
+These are nominal tracked estimates, not all transient/native residency.
+
+Evidence: `tmp/test-results/browser/context-leaf-invariant/`,
+`tmp/test-results/browser/natural-rush-{timer,fine-input}-16950/` with persisted
+`natural-rush-memory.json`; sources/config/helpers under ignored `tmp/probes/`.
+All processes terminal. No renderer or test-source experiment remains. App1.69.50
+unchanged; this documentation does not bump it.
+
+Next: identify the extra6MiB source and the late allocation relative to optional
+scene reservation. Required main decode reclamation currently trims unpinned main
+cache, while next-slot pressure is polled at250ms and cancellation cannot credit
+worker resources before actual acknowledgement. Resolve foreground/optional
+headroom without hiding the peak or weakening prepared-transition requirements.
+Then finish live progression/loadout/transient coverage and the full requirement
+report. The earlier credits limitation has cleared. Goal active, incomplete.
+
+## Current handoff — restoration localized; test launch unavailable
+
+Further leaf diagnostics reproduce the strict failure in the native WebGL
+backbuffer: one to three channels can differ by one byte after context recreation.
+Canvas copying alone is not the cause. All eleven levels of both diffuse and
+emissive textures match exactly before/after reupload, as do geometry/HDR targets.
+A synchronous readback before the Canvas copy masked the failure in one sample;
+after-copy readback reproduces it in two of three samples. Do not use the former
+ordering as a fix or relax the alpha assertion.
+
+Evidence: `tmp/test-results/browser/context-raw-after-copy/` and
+`tmp/test-results/browser/context-mip-readback/`, with persisted
+`native-leaf-restoration.json` files. Diagnostic source is preserved only in
+`tmp/probes/leaf-context-raw-and-mip-diagnostic.spec.txt`; the committed browser
+fixture was restored. Dithering was already rejected. Texture reupload/mip content
+is now ruled out for the sampled leaf differences. Local stage 4 restoration
+still requires separate diagnosis.
+
+Next proposed targeted experiment: GLSL invariant vertex outputs for leaf
+position/UV/colour across context recreation. The three-line production change
+was reverted without verification: automatic approval review could not complete
+because the workspace is out of credits, so the browser launch did not execute.
+Do not treat this as an unsafe-action determination or bypass the review. Resume
+this check when workspace credits are refilled. No graphics processes are live.
+The last committed application remains 1.69.50 (`c3534dd`). This handoff update is
+uncommitted; no unverified renderer change remains. Goal active and incomplete.
+
 ## Current handoff — final integration checks, two restoration failures remain
 
 App 1.69.50 corrects inventory classification of four enemy diffuse planes consumed

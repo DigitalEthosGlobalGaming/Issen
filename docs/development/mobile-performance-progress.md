@@ -1,5 +1,22 @@
 # Mobile performance continuation
 
+## Restoration and live progression diagnostics — 10 October 2026
+
+Raw WebGL readback confirms the leaf restoration difference precedes Canvas
+copying; every diffuse/emissive mip level matches after reupload. Dithering and
+explicit GLSL vertex invariance do not resolve it and were reverted. No strict
+assertion was relaxed. Local stage4 restoration also remains open.
+
+A disposable portrait/DPR2/low-tier rush probe drives actual combat and shrine
+choices through stage7 without assigning ordinals. Its manual driver does not yet
+complete all9, so this is partial progression evidence. Finer input samples14,221
+frame/worker boundaries and peaks538,865,924bytes against512MiB, including a next
+preparation reservation. This exposes a1,995,012byte tracked headroom gap; it is
+not a verified bound or native resident-memory measurement. Coarse sampling had
+missed that excess. Preserve the saved capture and identify the late6MiB main
+source/foreground allocation before adjusting optional admission. Detailed
+artifacts and the next action are in the current handoff.
+
 ## Final integration checkpoint — 10 October 2026
 
 Version 1.69.50 fixes generated inventory inference for enemy diffuse consumers
