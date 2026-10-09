@@ -1,3 +1,4 @@
+import { drawingPixelRatio } from '../../presentation/viewport.ts';
 /** One canvas moves into a modal; equipment and preview effects keep their owner. */
 export function createArmoryInspection(root: HTMLElement, canvas: HTMLCanvasElement) {
   const doc = root.ownerDocument,
@@ -17,7 +18,7 @@ export function createArmoryInspection(root: HTMLElement, canvas: HTMLCanvasElem
   function resize() {
     const bounds = canvas.getBoundingClientRect();
     if (!bounds.width || !bounds.height) return;
-    const dpr = Math.min(2, win.devicePixelRatio || 1);
+    const dpr = drawingPixelRatio(doc, bounds.width, bounds.height, win.devicePixelRatio || 1);
     const width = Math.round(bounds.width * dpr),
       height = Math.round(bounds.height * dpr);
     if (canvas.width !== width) canvas.width = width;

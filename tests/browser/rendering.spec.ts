@@ -209,7 +209,19 @@ for (const shared of [false, true])
         unaffected: canvases[1].toDataURL() === before,
         different: canvases[0].toDataURL() !== canvases[1].toDataURL(),
         slices,
+        gpuBefore: surfaces[0].native!.memorySnapshot.bytes,
+        gpuAfter: 0,
       };
+      first.suspend();
+      result.gpuAfter = surfaces[0].native!.memorySnapshot.bytes;
+      second.draw(frame);
+      if (canvases[1].toDataURL() !== before) throw new Error('Suspension changed another preview');
+      if (canvases[0].width !== 1 || canvases[0].height !== 1)
+        throw new Error('Suspension retained the preview drawing buffer');
+      canvases[0].width = 600;
+      canvases[0].height = 440;
+      await first.prepare();
+      first.draw(frame);
       first.dispose();
       if (shared && !artwork.inkPlayer.snapshot().ready)
         throw new Error('Borrower disposed shared artwork');
@@ -221,7 +233,8 @@ for (const shared of [false, true])
       for (const renderer of Object.values(artwork)) renderer.dispose();
       return result;
     }, shared);
-    expect(result).toEqual({ unaffected: true, different: true, slices: 1 });
+    expect(result).toMatchObject({ unaffected: true, different: true, slices: 1 });
+    expect(result.gpuAfter).toBeLessThan(result.gpuBefore / 4);
   });
 
 test('weather layers render in both orientations without mutating simulation state', async ({

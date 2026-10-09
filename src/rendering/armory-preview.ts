@@ -1,6 +1,9 @@
 import { createInkCharmRenderer } from './figures/ink-charms.ts';
 import type { SceneSurface } from './scene-surface.ts';
-import { invalidateSceneTexture } from './texture-revision.ts';
+import { invalidateSceneTexture, retireSceneTexture } from './texture-revision.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
+import { createMainImageOwner } from '../platform/main-images.ts';
+import { drawingPixelRatio } from '../presentation/viewport.ts';
 import { createInkCompanionRenderer } from './figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
 import { createInkPlayerRenderer } from './figures/ink-player.ts';
@@ -16,7 +19,7 @@ import { updateEffects } from './effects/update.ts';
 import { applyFilm } from './effects/film.ts';
 import { clamp } from '../shared/math.ts';
 import { applyDeathPose, deathShadowOpacity } from './figures/death.ts';
-import roomUrl from '../ui/assets/armoury-room.webp';
+const roomUrl = new URL('../ui/assets/armoury-room.webp', import.meta.url).href;
 import { createAssetMaterials } from './asset-materials.ts';
 import {
   createCachedMaterials,
@@ -64,11 +67,16 @@ export function createArmoryPreview(
 ) {
   if (!surface?.native) throw new Error('Armory preview requires a prepared WebGL2 surface');
   let context = surface.drawing;
-  const room = canvas.ownerDocument.createElement('img');
-  const roomMaterials = createAssetMaterials(canvas.ownerDocument, { room: roomUrl });
+  let suspendedSize: { width: number; height: number } | undefined = {
+    width: canvas.width,
+    height: canvas.height,
+  };
+  surface.native.suspend();
+  const roomImages = createMainImageOwner(canvas.ownerDocument);
+  let room = canvas.ownerDocument.createElement('img');
+  const roomMaterials = createAssetMaterials<string>(canvas.ownerDocument, {}, roomImages);
   const cachedMaterials = createCachedMaterials();
   room.decoding = 'async';
-  room.src = roomUrl;
   const { inkCharm, inkCompanion, inkEnemy, inkPlayer, inkSword } = artwork ?? {
     inkCharm: createInkCharmRenderer(canvas.ownerDocument),
     inkCompanion: createInkCompanionRenderer(canvas.ownerDocument),
@@ -87,18 +95,49 @@ export function createArmoryPreview(
   let outfitGeneration = 0;
   let outfitRobe: string | undefined;
   void inkSword.prepare();
-  const roomCache = canvas.ownerDocument.createElement('canvas');
+  const roomCache = trackPixelSource(
+    canvas.ownerDocument,
+    canvas.ownerDocument.createElement('canvas'),
+    'canvas',
+  );
+  roomCache.width = roomCache.height = 0;
   let roomDisposed = false;
-  void roomMaterials.prepare().then(() => {
-    if (roomDisposed) return;
-    cachedMaterials.bind(room, (frame) => roomMaterials.material('room', frame));
-    roomCache.width = 0;
-  });
+  let roomGeneration = 0;
+  let roomLease: ReturnType<typeof roomImages.acquire> | undefined;
+  let roomPending: Promise<boolean> | undefined;
   let roomReady = false;
-  room.onload = () => {
-    roomReady = true;
-    roomCache.width = 0;
-  };
+  function prepareRoom() {
+    if (roomDisposed) return Promise.resolve(false);
+    if (roomPending) return roomPending;
+    const generation = roomGeneration;
+    roomMaterials.select({ room: roomUrl });
+    const lease = (roomLease = roomImages.acquire(roomUrl));
+    return (roomPending = Promise.all([lease.ready, roomMaterials.prepare()])
+      .then(([image]) => {
+        if (roomDisposed || generation !== roomGeneration || !roomMaterials.ready('room'))
+          return false;
+        room = image;
+        cachedMaterials.bind(room, (frame) => roomMaterials.material('room', frame));
+        roomReady = true;
+        roomCache.width = 0;
+        if (lastFrame) draw(lastFrame, true);
+        return true;
+      })
+      .catch(() => false));
+  }
+  function releaseRoom() {
+    roomGeneration++;
+    roomReady = false;
+    roomPending = undefined;
+    cachedMaterials.releaseSources();
+    clearCachedMaterial(roomCache, false);
+    retireSceneTexture(roomCache);
+    roomCache.width = roomCache.height = 0;
+    roomMaterials.select({});
+    roomLease?.release();
+    roomLease = undefined;
+    room = canvas.ownerDocument.createElement('img');
+  }
   const fx = createEffects();
   let dummy = makeFig(4242);
   let elapsed = 9,
@@ -144,7 +183,27 @@ export function createArmoryPreview(
 
   function draw(frame: PreviewFrame, repaint = false): void {
     if (roomDisposed) return;
+    if (suspendedSize) {
+      if (canvas.width <= 1 || canvas.height <= 1) {
+        const bounds = canvas.getBoundingClientRect();
+        const ratio =
+          bounds.width > 0 && bounds.height > 0
+            ? drawingPixelRatio(
+                canvas.ownerDocument,
+                bounds.width,
+                bounds.height,
+                canvas.ownerDocument.defaultView!.devicePixelRatio || 1,
+              )
+            : 1;
+        canvas.width =
+          bounds.width > 0 ? Math.max(1, Math.round(bounds.width * ratio)) : suspendedSize.width;
+        canvas.height =
+          bounds.height > 0 ? Math.max(1, Math.round(bounds.height * ratio)) : suspendedSize.height;
+      }
+      suspendedSize = undefined;
+    }
     lastFrame = frame;
+    void prepareRoom();
     if (outfitRobe !== frame.appearance.robeId) {
       outfitRobe = frame.appearance.robeId;
       if (outfitSelection.select(outfitRobe)) {
@@ -196,7 +255,7 @@ export function createArmoryPreview(
       roomCache.height = height;
       const background = cachedMaterialContext(roomCache.getContext('2d')!);
       if ((roomReady || room.complete) && room.naturalWidth) {
-        drawArmoryRoom(background, room, width, height);
+        cachedMaterials.withBindings(() => drawArmoryRoom(background, room, width, height));
       }
       const gradient = background.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, 'rgba(10,10,9,.1)');
@@ -310,8 +369,7 @@ export function createArmoryPreview(
   return {
     prepare: () =>
       Promise.all([
-        room.decode().catch(() => {}),
-        roomMaterials.prepare(),
+        prepareRoom(),
         inkCharm.prepare(),
         companionSelection.prepare(),
         inkEnemy.prepare(),
@@ -321,15 +379,19 @@ export function createArmoryPreview(
     demo,
     draw,
     suspend() {
+      if (canvas.width > 1 && canvas.height > 1)
+        suspendedSize = { width: canvas.width, height: canvas.height };
       if (context) inkPlayer.releaseCanvas(context);
       outfitGeneration++;
       outfitRobe = undefined;
       outfitSelection.select();
       lastFrame = undefined;
+      releaseRoom();
       companionPet = companionAppearance = '';
       companionGeneration++;
       surface?.native?.releaseTextureSources(companionSelection.sources());
       companionSelection.select('');
+      surface.native!.suspend();
     },
     dispose() {
       if (context) inkPlayer.releaseCanvas(context);
@@ -337,13 +399,13 @@ export function createArmoryPreview(
       outfitSelection.dispose();
       roomDisposed = true;
       lastFrame = undefined;
+      releaseRoom();
       companionGeneration++;
       surface?.native?.releaseTextureSources(companionSelection.sources());
       companionSelection.dispose();
       roomMaterials.dispose();
+      roomImages.dispose();
       cachedMaterials.dispose();
-      room.onload = null;
-      room.removeAttribute('src');
       roomCache.width = roomCache.height = 0;
       // Borrowed artwork belongs to the runtime. Closing a preview must not
       // invalidate another canvas's prepared parts or in-flight image loads.

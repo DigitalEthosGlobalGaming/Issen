@@ -54,4 +54,13 @@ for (const memory of [2, 8])
     await page.screenshot({ path: info.outputPath('inspection-desktop.png') });
     await page.getByRole('button', { name: 'Close inspection' }).click();
     await expect(page.locator('.prev #prevC')).toBeVisible();
+    await page.locator('#armory [data-back]').click();
+    await expect(page.locator('#prevC')).toHaveJSProperty('width', 1);
+    await page.locator('#bArmory').click();
+    await expect
+      .poll(() =>
+        page.locator('#prevC').evaluate((canvas) => (canvas as HTMLCanvasElement).width > 1),
+      )
+      .toBe(true);
+    await expect(page.locator('#armory')).toHaveClass(/on/);
   });

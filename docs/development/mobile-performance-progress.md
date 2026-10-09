@@ -8,6 +8,39 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Preview room ownership and suspension — 9 October 2026
+
+Version1.69.28 loads room colour/material images through shared main-image leases
+only when a preview prepares/draws. A canonical catalogue URL also fixes the
+previous relative-URL material lookup mismatch: despite eager prepare calls,
+the previous preview did not actually load room maps. Earlier assumptions about
+duplicated room-map residency were incorrect. Its two direct plain-room images
+were eager and untracked. Room/canvas ownership is now tracked; a single shared
+room pack contains4planes25,165,824nominal decoded bytes.
+
+Suspension releases room leases, owner-scoped cutouts and baked planes, shrinks
+the auxiliary drawing buffer/targets to1x1 and clears its uploaded source cache.
+Contexts/shaders remain reusable. Preview construction starts suspended; draw
+restores dimensions from visible bounds or saved detached-fixture dimensions.
+This explicit restoration is required because a panel reopen may not deliver a
+ResizeObserver callback. Inspection adopts the gameplay low-memory drawing cap.
+Releasing one owner preserves another owner's pins and pixels; unpinned room
+inputs remain eligible for ordinary budget eviction rather than forced closing.
+
+Five focused room/owned+shared peer/inspection cases pass across targeted runs.
+Closing drops tracked auxiliary GPU allocation by more than75%. One owned-peer
+exact pixel assertion failed during a concurrent graphics run and passed its
+isolated focused rerun; assertions remain unchanged. Keep this intermittent
+native pixel issue visible at integration. Low-memory inspection screenshot
+review retains readable figure/material lighting and room atmosphere.
+
+Evidence: `tmp/test-results/browser/preview-{restored,owned-isolated}/`;
+earlier coherent inspection capture under `preview-suspension/`. The same
+ordinary all-stage diagnostic now observes491,109,740bytes (468MiB) maximum;
+first481,142,076 and last476,689,996. `tmp/probes/all-stage-memory-preview-retired.json`.
+These nominal samples cover hidden previews, not active inspection/Demon peaks
+or physical residency. Final room-cache initialization also uses0x0 backing.
+
 ## Required transition headroom — 9 October 2026
 
 Version1.69.27 compares required preparation/upload estimates against the combined

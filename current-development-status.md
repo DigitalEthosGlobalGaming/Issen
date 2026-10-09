@@ -1,4 +1,42 @@
-# Mobile performance — Required transition headroom
+# Mobile performance — Preview room ownership and suspension
+
+App1.69.28 loads shared preview room inputs on demand using main-image leases.
+Canonical asset URL fixes previous relative-URL material lookup mismatch; room
+PBR maps previously were not loading, despite eager prepare calls. The prior
+assumption of duplicate room maps was incorrect; eager plain-room images were
+untracked. New room/canvas ownership is tracked; shared room pack4planes25,165,824
+nominal bytes. Scoped cached-material bindings keep peer previews independent.
+
+Preview suspension unpins room inputs, clears owner cutouts/baked planes and
+uploaded GPU sources, and reduces drawing targets/buffer to1x1. Construction
+starts suspended. Drawing explicitly restores dimensions from visible bounds
+(or saved detached fixture size); ResizeObserver alone failed real panel reopen.
+Inspection uses the existing low-memory drawing cap. Context/shaders reusable;
+closing preserves live peers/shared runtime artwork and evictable warm images.
+
+Five focused room/peer/inspection cases pass across targeted runs. Tracked
+auxiliary GPU allocation drops >75% on suspend. Owned-peer exact pixel check
+failed once in concurrent graphics run, then passed isolated rerun; assertions
+unchanged. Results: `tmp/test-results/browser/preview-{restored,owned-isolated}/`.
+Earlier successful inspection captures in `preview-suspension/`; reviewed
+low-memory portrait room/material lighting and figure readability.
+
+Same ordinary all-stage sample with hidden previews: peak491,109,740bytes (468MiB)
+under512MiB; first481,142,076/last476,689,996. Evidence
+`tmp/probes/all-stage-memory-preview-retired.json`. Nominal samples do not cover
+active inspection/Demon combined peaks or physical residency. Room cache now
+initializes0x0 after that sample. Checked build log
+`tmp/probes/preview-retirement-build.log`; metadata/changelog1.69.28.
+
+Next: measure actual Demon/cinematic entry/exit and active preview combined
+ownership; required reservations/progress/native scratch accounting remain.
+Strict software-vs-GPU later-cycle colour mismatch still unresolved (notes
+`tmp/probes/compact-worker-copy-failures.md`); use focused native pixel/baseline
+diagnostic. Integration checkpoint/final suites and measurement matrix remain.
+Physical Android/120Hz unproven. Goal active. No push/deploy/native builds/real
+save changes; cancelled packing/lit-only work remains cancelled.
+
+## Previous handoff — Required transition headroom
 
 App1.69.27 compares required prepare/upload estimates against the combined
 document budget after main-cache reclamation. When they do not fit, outgoing

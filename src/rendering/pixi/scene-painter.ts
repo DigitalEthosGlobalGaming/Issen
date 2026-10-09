@@ -1516,6 +1516,15 @@ export class PixiScenePainter implements SceneDrawing {
     this.textures.releaseSources(sources, preserveFrame);
   }
 
+  /** Hidden auxiliary previews keep their context but release large drawing resources. */
+  suspend(): void {
+    if (this.disposed) return;
+    this.canvas.width = this.canvas.height = 1;
+    this.begin();
+    this.textures.dispose();
+    this.flush();
+  }
+
   dispose(): void {
     this.uploadLifetime.abort();
     if (this.disposed) return;
