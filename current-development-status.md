@@ -1,4 +1,37 @@
-# Performance, assets and seamless transitions — Matched-history preload checks
+# Performance, assets and seamless transitions — Continuous map controls isolated
+
+Latest checkpoint 45 is diagnostic only; app remains 1.68.35. An unchanged
+continuous27-visit local256 MiB control reproduces19 normal/surface differences
+between its two arms, including the exact first failed stage0-low hashes from
+checkpoint44. The maps-first preload candidate matches one complete unchanged
+control scene (all planes and both native draws together) at25 of27 visits.
+Landscape stage6 and7 remain unmatched; no visual pass or preload integration
+is claimed. Composed-plane snapshotting reproduces the maps-first trial exactly
+and leaves those two scenes unmatched. Raw-map snapshotting instead changes132
+plane hashes, starting on the first cold stage0 build; it is rejected.
+
+Minimal mountain normal/surface sampling reproduces first-to-repeat changes on
+GPU destinations for URL HTML,blob HTML and default ImageBitmap sources:
+normal21,133 changed channels,max255,alpha37; surface34,158,max235,alpha0.
+CPU destinations repeat exactly but differ from original cold GPU pixels.
+Explicit medium/high smoothing also changes original pixels and still varies.
+A fresh full-size1:1 CPU source copy per sequence preserves original cold GPU
+pixels exactly in this minimal fixture. Retaining one such copy repeats the
+original difference; it is not a reusable fix. No browser-internal mechanism is
+claimed, and minimal source-copy parity does not prove actual renderer parity.
+
+All eight tracked trial files restored exactly; temporary observer removed.
+No implementation/version/asset/visual tolerance change. Evidence under
+tmp/probes/scene-image-preload/ and
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+Next isolate the decoded-source lifetime/sampling of the two remaining landscape
+scenes, using unchanged controls and the fresh-decode control rather than raw-map
+or composed-plane snapshotting. Worker/local next slots, whole-budget admission,
+promotion/invalidation, quiet pacing, figure/startup ownership,120Hz/CPU budgets
+and fullPhase5 remain required. Full goal active; no push/deploy/native build or
+player saves.
+
+## Previous handoff — Matched-history preload checks
 
 Latest checkpoint 44 is diagnostic only; app remains 1.68.35. Actual automatic
 preload trial passes matched-source-history comparisons for 27 fresh renderer

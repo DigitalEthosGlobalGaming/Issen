@@ -2462,3 +2462,56 @@ controls and explicit source lifetime/draw histories before enabling preload.
 Whole-budget next slots, exact promotion/invalidation, quiet pacing, figure/
 startup ownership, 120Hz/CPU budgets and full Phase5 remain required. No headline
 benchmark rerun, push/deploy/native build or player saves; full goal active.
+
+## Checkpoint 45 — Continuous controls and map-source treatments
+
+Diagnostic only; app remains1.68.35. A fresh unchanged local256 MiB continuous
+control captures the same27 visits in two arms without any automatic preload.
+Its exact equality gate fails at stage0-low on the same normal/surface hashes
+as checkpoint44. There are19 differing planes between unchanged arms. Comparing
+the archived maps-first preload candidate against these two controls shows25/27
+complete scenes match one unchanged arm exactly: every plane and both native
+draws must come from that same arm, with no per-plane mixing or tolerance change.
+Landscape stage6 and7 still have no complete matching control. Existing variation
+does not justify accepting those remaining differences.
+
+A minimal sequence samples the common mountain normal and surface maps at the
+same varied sizes used by the preceding source probes. URL HTML,blob HTML and
+default ImageBitmap kinds all reproduce the same GPU first-to-repeat delta:
+normal21,133 channels,max255,alpha37; surface34,158,max235,alpha0. CPU destinations
+are stable across all three kinds. Explicit medium/high GPU smoothing neither
+preserves original cold pixels nor prevents history differences. CPU destinations
+also change the cold output: bitmap normal74,883 channels,max255,alpha42;
+surface59,568,max255,alpha25. No destination/smoothing normalization is accepted.
+
+Fresh full-size1:1 CPU canvas copies of the raw maps, recreated before each
+minimal GPU sequence, preserve original cold pixels exactly for both maps and
+all three decode kinds, across all three repeats. A single retained copy instead
+reproduces the original21,133/34,158 differences on later repeats; its strict
+stability assertion fails. Thus a fresh copy is a limited reset control, not a
+reusable source fix. No claim about browser internals or production costs follows.
+
+Full renderer trials reject extrapolating the minimal copy result. Fresh
+normal/surface CPU snapshots per PBR atlas, enabled only in the candidate, change
+132 plane hashes across27 visits, starting with all six material planes on the
+first cold stage0 build. Moving the snapshot to already-composed map canvas inputs
+preserves every candidate plane hash and both native draws from the prior
+maps-first trial, but does not resolve its two unmatched landscape scenes. The
+original cross-arm gate still fails at stage0-low. Neither treatment is integrated;
+snapshot memory and compose costs have not been admitted or established.
+
+All eight tracked trial sources restored byte-for-byte: the six renderer/protocol/
+enumerator sources plus pbr-atlas and cached-materials. Temporary observer removed;
+git diff confirms no rendering changes. No version,asset,implementation or visual
+tolerance change; no headline benchmark rerun. Sources under
+tmp/probes/scene-image-preload/: continuous-control,map-source-sequence,
+map-source-quality,map-source-cpu-parity,map-source-copy,map-source-retained-copy,
+map-snapshot-cycle and map-plane-snapshot-cycle. Result JSON archived under
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+
+Next investigate decoded-source lifetime and sampling for landscape stage6/7
+with matching unchanged controls and the fresh-decode control. Do not reuse raw
+or composed-plane snapshotting as a proven remedy. Full next-slot implementation,
+whole-budget admission,exact promotion/invalidation,quiet pacing,figure/startup
+ownership,120Hz/CPU budgets and fullPhase5 remain required. Full goal active;
+no push/deploy/native build/player saves.
