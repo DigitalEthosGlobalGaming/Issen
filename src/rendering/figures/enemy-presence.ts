@@ -8,6 +8,7 @@ const weapons = [
   ['doji', 0.56],
   ['kuro', 0.5],
 ] as const;
+export const ENEMY_WEAPON_IDS: readonly string[] = weapons.map(([id]) => id);
 
 /** Visual-only choices remain stable through checkpoint recovery and consume no RNG. */
 export function enemyPresence(f: Figure, time: number, reducedMotion = false): Figure {

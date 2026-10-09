@@ -1,5 +1,12 @@
 import type { createLifecycle } from '../platform/lifecycle.ts';
 import type { EnvironmentState } from './environment-state.ts';
+import { documentImageBudget } from '../platform/main-images.ts';
+
+export function drawingPixelRatio(doc: Document, width: number, height: number, ratio: number) {
+  return documentImageBudget(doc) <= 256 * 1024 * 1024
+    ? Math.min(1.5, ratio, Math.sqrt(600_000 / (width * height)))
+    : Math.min(2, ratio);
+}
 export interface ViewportViews {
   W: number;
   H: number;
@@ -25,11 +32,25 @@ export function createViewport(readViews: () => ViewportViews) {
   let viewportPrepared = false;
   function resize() {
     const views = readViews();
-    const { cvs, layout, buildBG, buildMist, buildGrass, buildLeaves, buildWeather, buildPost, screenAnimation, artworkReady, prepareScene, environmentState, reposition } = views;
+    const {
+      cvs,
+      layout,
+      buildBG,
+      buildMist,
+      buildGrass,
+      buildLeaves,
+      buildWeather,
+      buildPost,
+      screenAnimation,
+      artworkReady,
+      prepareScene,
+      environmentState,
+      reposition,
+    } = views;
     const r = cvs.getBoundingClientRect();
     const width = Math.max(1, r.width);
     const height = Math.max(1, r.height);
-    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    const ratio = drawingPixelRatio(cvs.ownerDocument, width, height, window.devicePixelRatio || 1);
     if (
       viewportPrepared &&
       views.W === width &&

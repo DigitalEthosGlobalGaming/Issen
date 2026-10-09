@@ -2,9 +2,11 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import { compositionKey } from './worker-types.ts';
+import { createSceneImagePreload } from './image-preload.ts';
 import {
   environmentAssetUrls as ASSET_URLS,
   sceneAssetIndices as sceneAssets,
+  sceneImageUrls,
 } from './asset-sources.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import {
@@ -51,11 +53,16 @@ export interface EnvironmentFrame {
 }
 
 /** Instance-owned image loading and caches; safe for independent previews. */
-export function createLocalEnvironmentRenderer(doc: Document) {
+export function createLocalEnvironmentRenderer(
+  doc: Document,
+  options: { gpuComposedLayers?: boolean } = {},
+) {
   // Worker documents supply their own managed image wrappers.
   const mapImages = doc.defaultView ? createMainImageOwner(doc) : undefined;
   const sourceLeases = new Map<number, ReturnType<NonNullable<typeof mapImages>['acquire']>>();
-  const cachedMaterials = createCachedMaterials();
+  const cachedMaterials = createCachedMaterials({
+    gpuComposedLayers: options.gpuComposedLayers ?? !doc.defaultView,
+  });
   let materials: ReturnType<typeof createAssetMaterials<string>> | undefined;
   const foreground = createBambooForegroundRenderer(doc);
   let disposed = false;
@@ -72,11 +79,31 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   let cacheKey = '';
   let builds = 0;
   const settleLoads: Array<() => void> = [];
+  let completedFrame: EnvironmentFrame | undefined;
+  const preload = mapImages
+    ? createSceneImagePreload(
+        doc,
+        () => (!disposed && cacheKey && status === 'layered' ? completedFrame : undefined),
+        (stage) => mapImages.prefetch(sceneImageUrls(stage)),
+      )
+    : undefined;
 
-  function releaseCompositionInputs(stage: number) {
-    if (!mapImages) return;
+  function releaseCompletedCutouts(retainLiveColour = true) {
+    cachedMaterials.clearCutouts();
+    const live = retainLiveColour
+      ? preparedStage === 0
+        ? [9]
+        : preparedStage === 4
+          ? [0]
+          : []
+      : [];
+    releaseSceneryCutouts(images.filter((image, index) => image && !live.includes(index)));
+  }
+
+  function releaseCompositionInputs(stage: number, retainLive = true) {
+    releaseCompletedCutouts(retainLive);
     // Output planes own their pixels; only live fog and bamboo still need raw inputs.
-    const live = stage === 0 ? [9] : stage === 4 ? [0] : [];
+    const live = retainLive ? (stage === 0 ? [9] : stage === 4 ? [0] : []) : [];
     materials?.select(Object.fromEntries(live.map((index) => [String(index), ASSET_URLS[index]!])));
     for (const [index, lease] of sourceLeases) {
       if (live.includes(index)) continue;
@@ -86,10 +113,18 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       sourceLeases.delete(index);
       delete images[index];
     }
+    if (!mapImages)
+      images.forEach((image, index) => {
+        if (live.includes(index)) return;
+        cachedMaterials.unbind(image);
+        image.removeAttribute('src');
+        delete images[index];
+      });
     pending = undefined;
   }
 
   function prepare(stage = 0): Promise<void> {
+    preload?.cancel();
     if (pending && stage === preparedStage) return pending;
     if (disposed) return Promise.resolve();
     const request = ++generation;
@@ -583,6 +618,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
   }
 
   function dispose() {
+    preload?.dispose();
     materials?.dispose();
     mapImages?.dispose();
     cachedMaterials.dispose();
@@ -646,6 +682,7 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       if (frame.stage === 4 && images[0])
         cachedMaterials.withBindings(() => foreground.prepare(images[0]!, frame));
       releaseCompositionInputs(frame.stage);
+      completedFrame = { ...frame };
       if (!assetsReady) {
         markScenePhase('compose-received', timingKey, { backend: 'local' });
         measureScenePhase(
@@ -679,11 +716,15 @@ export function createLocalEnvironmentRenderer(doc: Document) {
       );
     },
     prepare,
+    releaseCompletedCutouts,
+    // Exported planes own every pixel; live motion belongs to the receiving renderer.
+    releaseExportInputs: () => releaseCompositionInputs(preparedStage, false),
     dispose,
     get backend(): EnvironmentBackend {
       return status;
     },
     snapshot: () => ({
+      imagePreload: preload?.snapshot(),
       ...(mapImages ? { decodedLoader: mapImages.snapshot() } : {}),
       materialCutouts: cachedMaterials.snapshot(),
       foreground: foreground.snapshot(),

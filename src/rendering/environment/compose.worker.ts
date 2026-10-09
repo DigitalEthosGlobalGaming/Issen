@@ -2,16 +2,62 @@ import { createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createWorkerDocument } from './worker-canvas.ts';
 import { copyComposedLayers } from './layer-transfer.ts';
 import { closeLayers } from './worker-types.ts';
+import { sceneImageUrls } from './asset-sources.ts';
 import type { ComposedLayer, ComposeRequest, ComposeResponse } from './worker-types.ts';
 
 const scope = globalThis as unknown as {
   onmessage: ((event: MessageEvent<ComposeRequest>) => void) | null;
   postMessage(message: ComposeResponse, transfer: Transferable[]): void;
 };
-const workerDocument = createWorkerDocument();
-const renderer = createLocalEnvironmentRenderer(workerDocument);
+let service:
+  | {
+      workerDocument: ReturnType<typeof createWorkerDocument>;
+      renderer: ReturnType<typeof createLocalEnvironmentRenderer>;
+    }
+  | undefined;
+function createService(decodedBudget?: number) {
+  const workerDocument = createWorkerDocument(decodedBudget);
+  return { workerDocument, renderer: createLocalEnvironmentRenderer(workerDocument) };
+}
 let pending = Promise.resolve();
+let imagePreload: ReturnType<ReturnType<typeof createWorkerDocument>['prefetchImages']>;
+const queued = new Set<number>(),
+  cancelled = new Set<number>();
 scope.onmessage = ({ data }) => {
+  if (data.kind === 'cancel') {
+    if (queued.has(data.requestId)) cancelled.add(data.requestId);
+    return;
+  }
+  const { workerDocument, renderer } = (service ??= createService(data.decodedBudget));
+  // Cancellation and policy changes bypass the compose queue.
+  imagePreload?.release();
+  imagePreload = undefined;
+  workerDocument.stopImagePreload();
+  if (data.kind === 'preload') {
+    const lease =
+      data.stage !== undefined && Number.isInteger(data.stage) && data.stage >= 0 && data.stage <= 8
+        ? workerDocument.prefetchImages(sceneImageUrls(data.stage))
+        : undefined;
+    imagePreload = lease;
+    void (lease?.ready ?? Promise.resolve(false)).then((ready) => {
+      scope.postMessage(
+        {
+          id: data.id,
+          ok: ready,
+          layers: [],
+          foreground: [],
+          snapshot: {
+            ...renderer.snapshot(),
+            decodedLoader: workerDocument.decodedSnapshot(),
+            ...workerDocument.canvasSnapshot(),
+          },
+        },
+        [],
+      );
+    });
+    return;
+  }
+  queued.add(data.id);
   pending = pending.then(async () => {
     const layers: ComposedLayer[] = [],
       foreground: ComposedLayer[] = [];
@@ -19,11 +65,19 @@ scope.onmessage = ({ data }) => {
     let assetsAt = started,
       composedAt = started;
     try {
+      if (cancelled.has(data.id))
+        throw new DOMException('Scenery preparation cancelled', 'AbortError');
       if (data.kind === 'prepare') {
-        await renderer.prepare(data.stage);
+        // An exported current scene owns its pixels; released inputs are not a
+        // reason to invalidate its key. Changed compose keys reacquire normally.
+        const current = renderer.snapshot();
+        if (current.stage !== data.stage || current.backend !== 'layered')
+          await renderer.prepare(data.stage);
         assetsAt = composedAt = performance.now();
       } else if (
         await renderer.compose(data.frame, () => {
+          if (cancelled.has(data.id))
+            throw new DOMException('Scenery preparation cancelled', 'AbortError');
           assetsAt = performance.now();
           scope.postMessage(
             {
@@ -33,20 +87,48 @@ scope.onmessage = ({ data }) => {
               phase: 'assets-ready',
               layers: [],
               foreground: [],
-              snapshot: renderer.snapshot(),
+              snapshot: {
+                ...renderer.snapshot(),
+                ...workerDocument.canvasSnapshot(),
+                decodedLoader: workerDocument.decodedSnapshot(),
+              },
             },
             [],
           );
         })
       ) {
         composedAt = performance.now();
+        scope.postMessage(
+          {
+            id: data.id,
+            ok: true,
+            key: data.key,
+            phase: 'composed',
+            layers: [],
+            foreground: [],
+            snapshot: {
+              ...renderer.snapshot(),
+              ...workerDocument.canvasSnapshot(),
+              decodedLoader: workerDocument.decodedSnapshot(),
+            },
+          },
+          [],
+        );
+        // Live motion uses transferred planes and the main thread's own raw inputs.
+        renderer.releaseExportInputs();
         const completed = renderer.exportLayers();
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
+        // Copies and composed canvases own their pixels. Raw inputs need no
+        // residency between scenes; reacquisition follows the existing key path.
+        workerDocument.releaseUnusedImages();
+        if (cancelled.has(data.id))
+          throw new DOMException('Scenery preparation cancelled', 'AbortError');
       }
       const snapshot = {
         ...renderer.snapshot(),
+        ...workerDocument.canvasSnapshot(),
         decodedBytes: workerDocument.decodedSnapshot().bytes,
         decodedLoader: workerDocument.decodedSnapshot(),
         timings: {
@@ -71,17 +153,28 @@ scope.onmessage = ({ data }) => {
       scope.postMessage(response, bitmaps);
     } catch (error) {
       closeLayers([...layers, ...foreground]);
+      if (cancelled.has(data.id)) {
+        renderer.releaseExportInputs();
+        workerDocument.releaseUnusedImages();
+      }
       scope.postMessage(
         {
           id: data.id,
           ok: false,
           layers: [],
           foreground: [],
-          snapshot: renderer.snapshot(),
+          snapshot: {
+            ...renderer.snapshot(),
+            ...workerDocument.canvasSnapshot(),
+            decodedLoader: workerDocument.decodedSnapshot(),
+          },
           error: String(error),
         },
         [],
       );
+    } finally {
+      queued.delete(data.id);
+      cancelled.delete(data.id);
     }
   });
 };

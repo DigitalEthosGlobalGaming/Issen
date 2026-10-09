@@ -2,6 +2,7 @@ import { Rectangle, Texture } from 'pixi.js';
 import type { TextureSource } from 'pixi.js';
 import type { SceneTexture } from '../scene-frame.ts';
 import { observeSceneTextureRetirement } from '../texture-revision.ts';
+import { rgbaMipBytes } from '../../platform/pixel-memory.ts';
 
 interface PreparedSource {
   texture: Texture;
@@ -87,9 +88,17 @@ export class SceneTextureStore {
     return this.get(input, true);
   }
   get(input: SceneTexture, data = false): Texture {
-    if (input.frame) return this.getFrame(input.source, input.revision, ...input.frame, data);
-    const prepared = this.prepare(input.source, input.revision, data);
-    return prepared.texture;
+    const texture = input.frame
+      ? this.getFrame(input.source, input.revision, ...input.frame, data)
+      : this.prepare(input.source, input.revision, data).texture;
+    if (input.mipmaps && !texture.source.autoGenerateMipmaps) {
+      texture.source.autoGenerateMipmaps = true;
+      texture.source.style.minFilter = 'linear';
+      texture.source.style.magFilter = 'linear';
+      texture.source.style.mipmapFilter = 'linear';
+      texture.source.update();
+    }
+    return texture;
   }
   getFrame(
     source: SceneTexture['source'],
@@ -127,6 +136,17 @@ export class SceneTextureStore {
     return this.sources.size + this.dataSources.size;
   }
 
+  /** Source backing estimate, including mip levels; excludes render targets and driver overhead. */
+  get memorySnapshot(): { sources: number; bytes: number } {
+    const sources = new Set<TextureSource>();
+    for (const store of [this.sources, this.dataSources])
+      for (const prepared of store.values()) sources.add(prepared.texture.source);
+    let bytes = 0;
+    for (const source of sources)
+      bytes += rgbaMipBytes(source.pixelWidth, source.pixelHeight, source.autoGenerateMipmaps);
+    return { sources: sources.size, bytes };
+  }
+
   /** Queued/replay sources retire when that frame ends or is abandoned. */
   releaseRetired(): void {
     this.releaseSources(this.retired);
@@ -145,8 +165,17 @@ export class SceneTextureStore {
   }
 
   /** A completed offscreen export no longer needs its source textures. */
-  releaseSources(inputs: Iterable<SceneTexture['source']>): void {
+  releaseSources(inputs: Iterable<SceneTexture['source']>, preserveFrame = false): void {
     for (const source of inputs) {
+      if (
+        preserveFrame &&
+        this.frameStarted &&
+        (this.sources.get(source)?.lastFrame === this.frame ||
+          this.dataSources.get(source)?.lastFrame === this.frame)
+      ) {
+        this.retired.add(source);
+        continue;
+      }
       this.retired.delete(source);
       for (const store of [this.sources, this.dataSources]) {
         const prepared = store.get(source);

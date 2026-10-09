@@ -1,6 +1,6 @@
 window.__profile = {
  G, fx, frameLoop, startRun, spawnEnemy, enemyPos, killEnemy, startTrial, openPanel, closePanel, pause,
- state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0),transitions:window.__sceneTransitions||0,renderedScenes:[...(window.__renderedScenes||[])]}),
+ state: () => ({state:G.state,panel:G.panel,enemies:G.enemies.length,runTime:G.runTime,kills:G.kills,time,particles:Object.values(fx).reduce((n,a)=>n+a.length,0),transitions:window.__sceneTransitions||0,renderedScenes:[...(window.__renderedScenes||[])],driftLeaves:presentation.environmentState.leaves.length,gustLeaves:presentation.environmentState.leaves.filter(leaf=>leaf.gust).length}),
  async configure(name) {
   window.__scenario=name;
   if(name==='scene-transitions') { window.__sceneTransitions=0; window.__nextScene=0; window.__sceneAt=performance.now()+650; }
@@ -9,7 +9,12 @@ window.__profile = {
    window.__sceneTransitions=0; window.__renderedScenes=new Set(); window.__sceneAt=performance.now()+350;
   }
   if (name==='demon') { startTrial('demon-mirror'); if(!activeTrial) throw Error('Trial did not start'); }
-  else if(['combat','paused','inactive-combat','film-glitch','film-inferno','kill-effects','stress-100'].includes(name)) startRun();
+  else if(['combat','drift-calm','drift-gust','paused','inactive-combat','film-glitch','film-inferno','kill-effects','stress-100'].includes(name)) startRun();
+  if(name.startsWith('drift-')) {
+   const deadline=performance.now()+45000;
+   while(cvs.dataset.sceneState==='loading') { if(performance.now()>deadline) throw Error('Drift scene did not become ready'); await new Promise(resolve=>setTimeout(resolve,20)); }
+   window.__driftGustAt=0;
+  }
   if(name==='paused') pause();
   if(name==='film-glitch') EQ.film='trial-glitch';
   if(name==='film-inferno') EQ.film='trial-inferno';
@@ -24,6 +29,13 @@ window.__profile = {
   }
  },
  beforeUpdate() {
+  if(window.__scenario?.startsWith('drift-')) {
+   foundation.run.WX.gustT=1e9;
+   if(window.__scenario==='drift-gust' && performance.now()>=window.__driftGustAt) {
+    presentation.gustLeaves(70);
+    window.__driftGustAt=performance.now()+1500;
+   }
+  }
   if(window.__scenario==='cinematic-transitions') {
    const scene=cvs.dataset.rendererBackend==='demon-realm'?STAGES.length:environmentRenderer.snapshot().stage;
    const requested=Number(document.querySelector('#cinematic').dataset.scene);
@@ -42,5 +54,11 @@ window.__profile = {
   if(window.__scenario==='stress-100') {G.gapT=1e9; return;}
   const e=G.attacker;
   if(e && e.state==='attack' && e.p>=.82) onSwipe(activeTrial?.mirrored?OPP[e.dir]:e.dir);
+ },
+ afterUpdate() {
+  if(window.__scenario==='drift-calm') {
+   const state=presentation.environmentState;
+   for(let i=state.leaves.length-1;i>=0;i--) if(state.leaves[i].gust) { state.leaves.splice(i,1); state.leafMotion.invalidate(); }
+  }
  },
 };

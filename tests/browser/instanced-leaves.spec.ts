@@ -31,31 +31,22 @@ test('ordered leaf instances preserve all catalogue frames and opacity while GPU
     };
     const normal = texture('rgb(128,128,255)'),
       surface = texture('rgb(217,0,255)');
-    const atlases = ['leaves', 'petals', 'debris', 'fire'].map((id, i) => {
-      const diffuse = texture(['#b05020', '#40a080', '#4050b0', '#c09040'][i]!);
-      const g = diffuse.source.getContext('2d')!;
-      // Distinct framing and coverage in every cell, including fractional rounded atlas crops.
-      for (let cell = 0; cell < 8; cell++) {
-        g.clearRect((cell % 4) * 16, Math.floor(cell / 4) * 16, 16, 16);
-        g.fillStyle = `rgba(${40 + cell * 20},${40 + i * 40},${160 - cell * 10},${0.65 + cell * 0.04})`;
-        g.fillRect((cell % 4) * 16 + 2, Math.floor(cell / 4) * 16 + 1, 12, 14);
-      }
-      return {
-        id,
-        texture: diffuse,
-        width: 64,
-        height: 32,
-        material: {
-          normal,
-          surface,
-          lighting: 1,
-          depth: 0,
-          fog: 0,
-          fogColor: [0, 0, 0],
-          normalY: 1,
-        },
-      };
+    const merged = texture('#fff');
+    merged.source.width = 1024;
+    merged.source.height = 512;
+    const mergedContext = merged.source.getContext('2d')!;
+    DRIFT_SPRITES.forEach((sprite, i) => {
+      const [u, v, w, h] = sprite.frame;
+      mergedContext.fillStyle = `rgba(${40 + (i % 8) * 20},${40 + Math.floor(i / 8) * 40},${160 - (i % 8) * 10},${0.65 + (i % 8) * 0.04})`;
+      mergedContext.fillRect(u * 1024 + 10, v * 512 + 5, w * 1024 - 20, h * 512 - 10);
     });
+    const atlases = ['leaves', 'petals', 'debris', 'fire'].map((id) => ({
+      id,
+      texture: merged,
+      width: 1024,
+      height: 512,
+      material: { normal, surface, lighting: 1, depth: 0, fog: 0, fogColor: [0, 0, 0], normalY: 1 },
+    }));
     const motion = createLeafMotion();
     const leaves = DRIFT_SPRITES.map((sprite, i) => ({
       sprite: sprite.id,
@@ -211,7 +202,7 @@ test('ordered leaf instances preserve all catalogue frames and opacity while GPU
   });
   expect(errors).toEqual([]);
   expect(result.error).toBe(0);
-  expect(result.draws).toEqual([32, 32, 32, 32, 32, 32, 32, 32]);
+  expect(result.draws).toEqual([32, 32, 32, 32]);
   for (const sample of result.samples) {
     expect(sample.expected[3]).toBeGreaterThan(50);
     expect(sample.actual).toEqual(sample.expected);
@@ -223,7 +214,7 @@ test('ordered leaf instances preserve all catalogue frames and opacity while GPU
   expect(result.lightingDifference).toBeGreaterThan(0.05);
   expect(result.unchanged).toBe(true);
   expect(result.retained).toBe(true);
-  expect(result.pbr).toBeGreaterThan(500);
+  expect(result.pbr).toBe(0);
   await page
     .locator('#leaf-probe')
     .screenshot({ path: testInfo.outputPath('instanced-leaves.png') });
@@ -231,7 +222,7 @@ test('ordered leaf instances preserve all catalogue frames and opacity while GPU
   expect(errors).toEqual([]);
 });
 
-test('actual catalogue leaves retain independent layers, target lifetimes and two-sided PBR after restore', async ({
+test('actual catalogue leaves retain independent layers, target lifetimes and lit flutter after restore', async ({
   page,
 }, testInfo) => {
   await page.route('**/favicon.ico', (route) => route.fulfill({ status: 204 }));
@@ -408,9 +399,14 @@ test('actual catalogue leaves retain independent layers, target lifetimes and tw
       0,
     );
     let alphaMismatch = 0,
+      maxAlphaDifference = 0,
       displayDifference = 0;
     for (let i = 0; i < actual.length; i += 4) {
       if (actual[i + 3] !== w.actualLeafExpected[i + 3]) alphaMismatch++;
+      maxAlphaDifference = Math.max(
+        maxAlphaDifference,
+        Math.abs(actual[i + 3] - w.actualLeafExpected[i + 3]),
+      );
       for (let channel = 0; channel < 3; channel++)
         displayDifference += Math.abs(
           (actual[i + channel] * actual[i + 3]) / 255 -
@@ -439,6 +435,7 @@ test('actual catalogue leaves retain independent layers, target lifetimes and tw
       covered,
       error,
       alphaMismatch,
+      maxAlphaDifference,
       meanDisplayDifference,
       targetDifferences,
     };
@@ -448,7 +445,11 @@ test('actual catalogue leaves retain independent layers, target lifetimes and tw
   // the same scene tolerance as the preserved renderer comparison fixtures.
   expect(result.targetRepeatDifferences).toEqual([0, 0, 0, 0, 0]);
   expect(restored.targetDifferences).toEqual([0, 0, 0, 0, 0]);
-  expect(restored.alphaMismatch).toBe(0);
+  await testInfo.attach('native-leaf-restoration', {
+    body: JSON.stringify({ result, restored }),
+    contentType: 'application/json',
+  });
+  expect(restored.alphaMismatch, JSON.stringify(restored)).toBe(0);
   expect(restored.meanDisplayDifference).toBeLessThan(9);
   expect(restored.replaced).toBe(true);
   expect(restored.covered).toBeGreaterThan(1000);
@@ -456,7 +457,7 @@ test('actual catalogue leaves retain independent layers, target lifetimes and tw
   expect(errors).toEqual([]);
 });
 
-test('folded leaf backs write two-sided normals and preserve scoped native clipping', async ({
+test('folded leaf backs stay visible without geometry writes and preserve scoped native clipping', async ({
   page,
 }) => {
   await page.route('**/favicon.ico', (route) => route.fulfill({ status: 204 }));
@@ -571,11 +572,12 @@ test('folded leaf backs write two-sided normals and preserve scoped native clipp
   });
   expect(errors).toEqual([]);
   expect(result.error).toBe(0);
-  expect(result.both.normals[0]![0]).toBeGreaterThan(140);
-  expect(result.both.normals[1]![0]).toBeLessThan(115);
-  expect(result.both.normals.map((n) => n[3])).toEqual([230, 230]);
-  expect(result.both.flags).toEqual([1, 1]);
-  expect(result.both.colours[0]![0]! - result.both.colours[1]![0]!).toBeGreaterThan(5);
+  expect(result.both.normals).toEqual([
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ]);
+  expect(result.both.flags).toEqual([0, 0]);
+  expect(result.both.colours[0]).toEqual(result.both.colours[1]);
   expect(result.both.colours.map((c) => c[3])).toEqual([229, 229]);
   expect(result.clipped.normals[0]).toEqual(result.both.normals[0]);
   expect(result.clipped.normals[1]).toEqual([0, 0, 0, 0]);

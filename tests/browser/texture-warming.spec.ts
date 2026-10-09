@@ -24,6 +24,7 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     let firstDraw = false,
       uploads = 0,
       links = 0;
+    let transferredBytes = 0;
     const gl = warmed.canvas.getContext('webgl2')!,
       texImage = gl.texImage2D.bind(gl);
     gl.texImage2D = ((...args: any[]) => {
@@ -38,7 +39,18 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       link(program);
     };
     const owner = createEnvironmentRenderer(document, {
-      warmWorkerScene: (sources, signal) => warmed.warmScene(sources, signal),
+      warmWorkerScene: (sources, signal) => {
+        const bitmaps = new Set(
+          sources
+            .map((source) => source.texture.source)
+            .filter((source) => source instanceof ImageBitmap),
+        );
+        transferredBytes = [...bitmaps].reduce(
+          (total, source) => total + source.width * source.height * 4,
+          0,
+        );
+        return warmed.warmScene(sources, signal);
+      },
     });
     const rows = [];
     for (let stage = 0; stage < 9; stage++) {
@@ -70,17 +82,47 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       let max = 0;
       for (let i = 0; i < actual.length; i++)
         max = Math.max(max, Math.abs(actual[i]! - expected[i]!));
-      rows.push({ stage, ready, uploads, links, max });
+      const memory = owner.snapshot();
+      rows.push({
+        stage,
+        ready,
+        uploads,
+        links,
+        max,
+        transferredBytes,
+        accountedTransferred: memory.transferredBytes,
+        workerCanvasBytes: memory.canvasBytes,
+        workerCanvases: memory.canvases,
+        gpuBytes: warmed.sourceMemorySnapshot.bytes,
+        rendererGpuBytes: warmed.memorySnapshot.bytes,
+        workerDecodedBytes: memory.decodedLoader?.bytes,
+      });
     }
     owner.dispose();
     warmed.dispose();
     baseline.dispose();
-    return rows;
+    return {
+      rows,
+      disposedGpuBytes: warmed.sourceMemorySnapshot.bytes + baseline.sourceMemorySnapshot.bytes,
+      disposedTransferredBytes: owner.snapshot().transferredBytes,
+    };
   });
-  expect(result).toHaveLength(9);
+  expect(result.disposedGpuBytes).toBe(0);
+  expect(result.disposedTransferredBytes).toBe(0);
+  expect(result.rows).toHaveLength(9);
   expect(
-    result.every((row) => row.ready && row.uploads === 0 && row.links === 0 && row.max === 0),
+    result.rows.every((row) => row.ready && row.uploads === 0 && row.links === 0 && row.max === 0),
   ).toBe(true);
+  for (const row of result.rows) {
+    expect(row.accountedTransferred, `stage ${row.stage} transferred planes`).toBe(
+      row.transferredBytes,
+    );
+    expect(row.workerCanvasBytes).toBeGreaterThanOrEqual(row.transferredBytes);
+    expect(row.workerCanvases).toBeGreaterThan(0);
+    expect(row.gpuBytes).toBeGreaterThanOrEqual(row.transferredBytes);
+    expect(row.rendererGpuBytes).toBeGreaterThan(row.gpuBytes);
+    expect(row.workerDecodedBytes).toBe(0);
+  }
   expect(warnings).toEqual([]);
 });
 
@@ -170,7 +212,7 @@ test('hidden stale warming preserves the old scene and closes partially uploaded
   });
 });
 
-test('failed texture warming closes the worker response and settles through local composition', async ({
+test('failed texture warming closes the worker response and reports unavailable scenery', async ({
   page,
 }) => {
   await page.goto('/privacy/index.html');
@@ -200,7 +242,7 @@ test('failed texture warming closes the worker response and settles through loca
     return { ready, worker: snapshot.worker, failure: snapshot.workerFailure, width };
   });
   expect(result).toEqual({
-    ready: true,
+    ready: false,
     worker: false,
     failure: 'Error: fixture warm failure',
     width: 0,
@@ -293,6 +335,55 @@ test('pending sources survive frame collection and reupload after actual context
     left: [255, 0, 0, 255],
     right: [0, 255, 0, 255],
   });
+});
+
+test('resize during shader preparation warms the replacement targets before readiness', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 32;
+    const painter = await createTestDrawing(canvas);
+    const source = document.createElement('canvas');
+    source.width = source.height = 16;
+    const ink = source.getContext('2d')!;
+    ink.fillStyle = '#f00';
+    ink.fillRect(0, 0, 16, 16);
+    const shaders = painter.warmSceneShaders.bind(painter);
+    let resized = false;
+    painter.warmSceneShaders = async (signal) => {
+      if (!resized) {
+        resized = true;
+        canvas.width = 64;
+        canvas.height = 48;
+        painter.begin();
+      }
+      return shaders(signal);
+    };
+    try {
+      const ready = await painter.warmScene(
+        [{ texture: { source, revision: 0 } }],
+        new AbortController().signal,
+      );
+      const gl = canvas.getContext('webgl2')!;
+      let uploads = 0;
+      const upload = gl.texImage2D;
+      gl.texImage2D = (...args: any[]) => {
+        uploads++;
+        return Reflect.apply(upload, gl, args);
+      };
+      painter.begin();
+      painter.drawImage(source, 0, 0);
+      painter.flush();
+      gl.texImage2D = upload;
+      return { ready, resized, uploads, pixel: Array.from(painter.getImageData(0, 0, 1, 1).data) };
+    } finally {
+      painter.dispose();
+    }
+  });
+  expect(result).toEqual({ ready: true, resized: true, uploads: 0, pixel: [255, 0, 0, 255] });
 });
 
 test('painter disposal aborts a hidden upload wait without any later upload', async ({ page }) => {

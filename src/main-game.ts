@@ -13,6 +13,7 @@ import { startBackgroundAssets } from './platform/background-assets.ts';
 import { runtimeAssets } from './platform/runtime-assets.ts';
 import { INK_ENEMY_DEBUG_SOURCES } from './rendering/figures/ink-enemy.ts';
 import { INK_COMPANION_SOURCES } from './rendering/figures/ink-companions.ts';
+import { INK_OUTFIT_SOURCES } from './rendering/figures/outfit-kit.ts';
 
 const artwork = import.meta.glob<string>(
   [
@@ -30,8 +31,25 @@ const publicArtwork = import.meta.glob<string>(
 // Material owners decode selected maps separately from source artwork.
 const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
 const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
+// Scene composition, demon and drift owners prepare their inputs without duplicate startup images.
+const environmentSources = new Set(
+  runtimeAssets.filter((asset) => asset.group === 'environment').map((asset) => asset.url),
+);
 const enemyDebugSources = new Set<string>(Object.values(INK_ENEMY_DEBUG_SOURCES));
 const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
+const outfitSources = new Set<string>(Object.values(INK_OUTFIT_SOURCES));
+// These native artwork owners share decode leases instead of lifetime startup images.
+const sharedSources = new Set(
+  assetMaterialCatalog
+    .filter((pack) =>
+      [
+        'src/rendering/figures/assets/player-ronin-simple.png',
+        'src/rendering/figures/assets/charm-atlas.png',
+        'src/ui/assets/world-ui-atlas.png',
+      ].includes(pack.sourcePath),
+    )
+    .map((pack) => pack.source),
+);
 const urls = [
   ...Object.values(artwork),
   ...Object.keys(publicArtwork).map(
@@ -41,7 +59,10 @@ const urls = [
   const canonical = new URL(url, document.baseURI).href;
   return (
     !materialMaps.has(canonical) &&
+    !environmentSources.has(canonical) &&
     !companionSources.has(canonical) &&
+    !outfitSources.has(canonical) &&
+    !sharedSources.has(canonical) &&
     !enemyDebugSources.has(canonical) &&
     runtimeUrlSet.has(canonical)
   );

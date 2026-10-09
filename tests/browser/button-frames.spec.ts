@@ -41,8 +41,11 @@ test('hover highlights menu buttons and previewable locked Armoury tiles', async
   await page.goto('/');
   const armory = page.locator('#bArmory');
   await expect(armory).toBeVisible({ timeout: 30000 });
+  // Compare the published lit frames after their asynchronous CSS replacement.
+  await expect(armory).toHaveCSS('border-image-source', /data:image\//);
   const normal = await armory.evaluate((element) => getComputedStyle(element).borderImageSource);
   await armory.hover();
+  await expect(armory).toHaveCSS('border-image-source', /data:image\//);
   const highlighted = await armory.evaluate(
     (element) => getComputedStyle(element).borderImageSource,
   );

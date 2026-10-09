@@ -1,80 +1,117 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { DRIFT_ATLASES as urls, DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
-import { createAssetMaterials } from '../asset-materials.ts';
-import { drawMaterialStamp } from '../scene-material.ts';
+import { createLeafMotion } from './leaf-motion.ts';
 import { drawInstancedLeaves } from '../scene-leaves.ts';
-import type { LeafAtlas, LeafFrame } from '../scene-leaves.ts';
+import type { LeafFrame } from '../scene-leaves.ts';
+import type { PixiScenePainter } from '../pixi/scene-painter.ts';
+import { createDriftImages } from './drift-images.ts';
+import type { TextureUpload } from '../texture-upload.ts';
+import type { SceneTexture } from '../scene-frame.ts';
 
-/** One retained path and decoded atlas images per runtime; no per-frame image processing. */
-export function createDriftRenderer(doc: Document = document) {
-  const materials = createAssetMaterials(doc, urls);
-  const images = new Map<string, HTMLImageElement>();
+/** Incoming families prepare independently while the last submitted leaves remain drawable. */
+export function createDriftRenderer(doc: Document = document, painter?: () => PixiScenePainter) {
+  const consumers = new Set<SceneDrawing>();
+  const inputs = createDriftImages(
+    doc,
+    (sources, preserveFrame) => {
+      for (const g of consumers) releaseSources(g, sources, preserveFrame);
+    },
+    painter
+      ? async (atlases, signal) => {
+          const g = painter();
+          const uploads: TextureUpload[] = atlases.flatMap((atlas) => [
+            { texture: atlas.texture },
+            ...(atlas.material.emissive ? [{ texture: atlas.material.emissive }] : []),
+          ]);
+          consumers.add(g);
+          const release = g.retainTextureSources(uploads.map((upload) => upload.texture.source));
+          try {
+            if (await g.warmScene(uploads, signal)) return release;
+            release();
+            return false;
+          } catch {
+            release();
+            return false;
+          }
+        }
+      : undefined,
+  );
   let disposed = false;
-  let pending: Promise<void> | undefined;
-  let leafAtlases: readonly LeafAtlas[] | undefined;
-  const ready = () =>
-    images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
+  let lastLeaves: LeafFrame['leaves'] | undefined;
+  let heldLeaves: LeafFrame['leaves'] | undefined;
+  function releaseSources(
+    g: SceneDrawing,
+    sources: SceneTexture['source'][],
+    preserveFrame = false,
+  ) {
+    if ('releaseTextureSources' in g)
+      (g as SceneDrawing & Pick<PixiScenePainter, 'releaseTextureSources'>).releaseTextureSources(
+        sources,
+        preserveFrame,
+      );
+  }
+  function releaseCanvas(g: SceneDrawing) {
+    releaseSources(g, inputs.sources());
+    consumers.delete(g);
+  }
+  const emberMotion = createLeafMotion();
+  const emberLeaves = [
+    {
+      x: 0,
+      y: 0,
+      z: 1,
+      s: 1,
+      rot: 0,
+      vr: 0,
+      fl: 0,
+      vf: 0,
+      vy: 0,
+      ph: 0,
+      col: '#fff',
+      sprite: 'fire.ember',
+      flutter: 0,
+    },
+  ];
+  emberMotion.register(emberLeaves[0]!);
   function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
-    const sprite = DRIFT_BY_ID.get(id)!;
-    const image = images.get(sprite.atlas);
-    if (!image) return;
-    const [x, y, w, h] = sprite.frame;
-    const sx = Math.round(x * image.naturalWidth),
-      sy = Math.round(y * image.naturalHeight);
-    const sw = Math.round((x + w) * image.naturalWidth) - sx;
-    const sh = Math.round((y + h) * image.naturalHeight) - sy;
-    const width = size * sprite.size,
-      height = (width * sh) / sw;
-    g.globalAlpha *= opacity * sprite.opacity;
-    const frame = [sx, sy, sw, sh] as const;
-    const material = materials.material(sprite.atlas, frame);
-    const dx = -width * sprite.pivot[0],
-      dy = -height * sprite.pivot[1];
-    if (material)
-      drawMaterialStamp(g, {
-        texture: { source: image, revision: 0, frame },
-        material,
-        x: dx,
-        y: dy,
-        width,
-        height,
-      });
-    else g.drawImage(image, ...frame, dx, dy, width, height);
+    emberLeaves[0]!.sprite = id;
+    emberLeaves[0]!.s = size / 3;
+    emberMotion.invalidate();
+    g.globalAlpha *= opacity / 0.9;
+    drawInstancedLeaves(g, {
+      leaves: emberLeaves,
+      front: false,
+      motion: emberMotion,
+      spriteMotion: true,
+      scale: 1,
+      width: 1,
+      height: 1,
+      atlases: inputs.atlases,
+    });
   }
   return {
     get ready() {
-      return ready();
+      return inputs.ready;
     },
-    prepare() {
-      return (pending ??= Promise.all(
-        Object.entries(urls).map(async ([id, url]) => {
-          const image = doc.createElement('img');
-          image.src = url;
-          try {
-            await image.decode();
-            if (!disposed && image.naturalWidth > 0) images.set(id, image);
-          } catch {
-            /* Runtime startup reports missing artwork and offers retry. */
-          }
-        }),
-      ).then(async () => {
-        await materials.prepare();
-      }));
+    prepare(stage?: number) {
+      if (disposed) return Promise.resolve(false);
+      const pending = inputs.prepare(stage);
+      if (!inputs.ready) heldLeaves ??= lastLeaves;
+      return pending.then((ready) => {
+        if (inputs.ready) heldLeaves = undefined;
+        return ready;
+      });
     },
     drawLeaves(g: SceneDrawing, frame: Omit<LeafFrame, 'atlases'>) {
-      if (!ready()) return;
-      leafAtlases ??= Object.keys(urls).map((id) => {
-        const source = images.get(id)!,
-          width = source.naturalWidth,
-          height = source.naturalHeight;
-        const material = materials.material(id, [0, 0, width, height]);
-        if (!material) throw new Error('Missing prepared leaf material');
-        return { id, texture: { source, revision: 0 }, material, width, height };
-      });
-      drawInstancedLeaves(g, { ...frame, atlases: leafAtlases });
+      if (disposed || !inputs.atlases.length) return;
+      consumers.add(g);
+      const leaves = heldLeaves ?? frame.leaves;
+      lastLeaves = leaves;
+      drawInstancedLeaves(g, { ...frame, leaves, atlases: inputs.atlases });
     },
     drawEmber(g: SceneDrawing, p: WeatherParticle, index: number, scale: number) {
+      if (disposed || !inputs.image('fire')) return;
+      consumers.add(g);
       g.save();
       g.translate(p.x, p.y);
       g.rotate(p.ph);
@@ -86,12 +123,14 @@ export function createDriftRenderer(doc: Document = document) {
       );
       g.restore();
     },
+    releaseCanvas,
+    snapshot: inputs.snapshot,
     dispose() {
+      if (disposed) return;
       disposed = true;
-      leafAtlases = undefined;
-      materials.dispose();
-      for (const image of images.values()) image.removeAttribute('src');
-      images.clear();
+      lastLeaves = heldLeaves = undefined;
+      for (const g of consumers) releaseCanvas(g);
+      inputs.dispose();
     },
   };
 }

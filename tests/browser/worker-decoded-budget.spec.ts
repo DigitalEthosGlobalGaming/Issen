@@ -78,7 +78,12 @@ for (const deviceMemory of [8, 2])
                 lowQuality: false,
               },
             });
-            rows.push({ cycle, stage, ...reply.snapshot.decodedLoader });
+            rows.push({
+              cycle,
+              stage,
+              cutouts: reply.snapshot.materialCutouts,
+              ...reply.snapshot.decodedLoader,
+            });
             for (const layer of [...reply.layers, ...reply.foreground])
               for (const kind of ['colour', 'normal', 'surface', 'emissive']) layer[kind]?.close();
           }
@@ -93,7 +98,15 @@ for (const deviceMemory of [8, 2])
     expect(result.every((row) => row.bytes <= row.budget && row.peakBytes <= row.budget)).toBe(
       true,
     );
-    expect(result.every((row) => row.queued === 0 && row.pinned > 0)).toBe(true);
+    expect(
+      result.every((row) => row.queued === 0 && row.pinned === 0 && row.pinnedBytes === 0),
+    ).toBe(true);
+    expect(
+      result.every(
+        (row) =>
+          row.cutouts.entries === 0 && row.cutouts.pixels === 0 && row.cutouts.scratchPixels === 0,
+      ),
+    ).toBe(true);
     expect(result.at(-1).evictions).toBeGreaterThan(0);
     const output = testInfo.outputPath('worker-budget-cycle.json');
     await writeFile(output, JSON.stringify(result, null, 2));

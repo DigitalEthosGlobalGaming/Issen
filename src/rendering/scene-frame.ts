@@ -12,6 +12,8 @@ export interface SceneTexture {
   source: HTMLImageElement | HTMLCanvasElement | ImageBitmap;
   /** Increment only when a prepared canvas's pixels change. */
   revision: number;
+  /** Opt-in for right-sized particle atlases; ordinary scene textures keep their policy. */
+  mipmaps?: boolean;
   frame?: readonly [x: number, y: number, width: number, height: number];
 }
 

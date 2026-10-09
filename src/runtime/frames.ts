@@ -47,6 +47,7 @@ export function createRuntimeFrames(
               ['sceneLoading', 'sceneRequest', 'requestedSceneKey'],
               stateView(foundation.view.geometry, ['W', 'H', 'S', 'DPR', 'L'], {
                 G: foundation.run.G,
+                stageVisits: foundation.view.stageVisits,
                 P: foundation.run.P,
                 WX: foundation.run.WX,
                 R: foundation.view.R,

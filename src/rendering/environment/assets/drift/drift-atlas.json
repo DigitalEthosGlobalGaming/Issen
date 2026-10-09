@@ -1,0 +1,243 @@
+{
+  "cell": 128,
+  "gutter": 4,
+  "content": 120,
+  "dimensions": [
+    1024,
+    512
+  ],
+  "frames": {
+    "leaves": [
+      [
+        4,
+        4,
+        120,
+        120
+      ],
+      [
+        132,
+        4,
+        120,
+        120
+      ],
+      [
+        260,
+        4,
+        120,
+        120
+      ],
+      [
+        388,
+        4,
+        120,
+        120
+      ],
+      [
+        516,
+        4,
+        120,
+        120
+      ],
+      [
+        644,
+        4,
+        120,
+        120
+      ],
+      [
+        772,
+        4,
+        120,
+        120
+      ],
+      [
+        900,
+        4,
+        120,
+        120
+      ]
+    ],
+    "petals": [
+      [
+        4,
+        132,
+        120,
+        120
+      ],
+      [
+        132,
+        132,
+        120,
+        120
+      ],
+      [
+        260,
+        132,
+        120,
+        120
+      ],
+      [
+        388,
+        132,
+        120,
+        120
+      ],
+      [
+        516,
+        132,
+        120,
+        120
+      ],
+      [
+        644,
+        132,
+        120,
+        120
+      ],
+      [
+        772,
+        132,
+        120,
+        120
+      ],
+      [
+        900,
+        132,
+        120,
+        120
+      ]
+    ],
+    "debris": [
+      [
+        4,
+        260,
+        120,
+        120
+      ],
+      [
+        132,
+        260,
+        120,
+        120
+      ],
+      [
+        260,
+        260,
+        120,
+        120
+      ],
+      [
+        388,
+        260,
+        120,
+        120
+      ],
+      [
+        516,
+        260,
+        120,
+        120
+      ],
+      [
+        644,
+        260,
+        120,
+        120
+      ],
+      [
+        772,
+        260,
+        120,
+        120
+      ],
+      [
+        900,
+        260,
+        120,
+        120
+      ]
+    ],
+    "fire": [
+      [
+        4,
+        388,
+        120,
+        120
+      ],
+      [
+        132,
+        388,
+        120,
+        120
+      ],
+      [
+        260,
+        388,
+        120,
+        120
+      ],
+      [
+        388,
+        388,
+        120,
+        120
+      ],
+      [
+        516,
+        388,
+        120,
+        120
+      ],
+      [
+        644,
+        388,
+        120,
+        120
+      ],
+      [
+        772,
+        388,
+        120,
+        120
+      ],
+      [
+        900,
+        388,
+        120,
+        120
+      ]
+    ]
+  },
+  "sources": [
+    {
+      "path": "src/rendering/environment/assets/drift-leaves-atlas.png",
+      "sha256": "ca5255457502e3673e2e054b70556b8b4f4cbf1702e82befefd2c1c9c68bf128"
+    },
+    {
+      "path": "src/rendering/environment/assets/drift-petals-atlas.png",
+      "sha256": "8d6b834400bf357ca386784d40326bc38220f32489bf5d0d0cfc15ae64658443"
+    },
+    {
+      "path": "src/rendering/environment/assets/drift-debris-atlas.png",
+      "sha256": "389656c302320fbc53e27a92f162e42e20e5df23f161cdc4287355d0a64328d0"
+    },
+    {
+      "path": "src/rendering/environment/assets/drift-fire-atlas.png",
+      "sha256": "e319b96c67b51994c2a4d43d29eb5a03a729a34f1572da0d377422e3e072aeca"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/drift-fire-atlas/drift-fire-atlas_emissive.webp",
+      "sha256": "9437e1f6d8484d5359fd0bb466a51edfc141cc4b2ea40c80b855db5dc613a16f"
+    }
+  ],
+  "before": {
+    "fileBytes": 4378340,
+    "decodedBytes": 81823976
+  },
+  "after": {
+    "fileBytes": 155694,
+    "decodedBytes": 4194304,
+    "gpuBytesWithMipmapsEstimate": 5592405
+  },
+  "decodedReduction": 0.9487399145697833
+}

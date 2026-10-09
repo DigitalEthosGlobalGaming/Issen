@@ -1,11 +1,16 @@
 import type { Random } from '../../shared/random.ts';
 
-export const DRIFT_ATLASES: Readonly<Record<string, string>> = {
-  leaves: new URL('../environment/assets/drift-leaves-atlas.webp', import.meta.url).href,
-  petals: new URL('../environment/assets/drift-petals-atlas.webp', import.meta.url).href,
-  debris: new URL('../environment/assets/drift-debris-atlas.webp', import.meta.url).href,
-  fire: new URL('../environment/assets/drift-fire-atlas.webp', import.meta.url).href,
-};
+export const DRIFT_COLOUR = new URL(
+  '../environment/assets/drift/drift-colour.webp',
+  import.meta.url,
+).href;
+export const DRIFT_EMISSIVE = new URL(
+  '../environment/assets/drift/drift-emissive.webp',
+  import.meta.url,
+).href;
+export const DRIFT_ATLASES: Readonly<Record<string, string>> = Object.fromEntries(
+  ['leaves', 'petals', 'debris', 'fire'].map((family) => [family, DRIFT_COLOUR]),
+);
 
 /** Frame rectangles and pivots are normalized to the atlas and frame respectively. */
 export interface DriftSprite {
@@ -44,11 +49,11 @@ const families = {
   ],
 } as const;
 export const DRIFT_SPRITES: readonly DriftSprite[] = Object.entries(families).flatMap(
-  ([atlas, names]) =>
+  ([atlas, names], row) =>
     names.map((name, index) => ({
       id: `${atlas}.${name}`,
       atlas: atlas as DriftSprite['atlas'],
-      frame: [(index % 4) / 4, Math.floor(index / 4) / 2, 1 / 4, 1 / 2] as const,
+      frame: [(index * 128 + 4) / 1024, (row * 128 + 4) / 512, 120 / 1024, 120 / 512] as const,
       pivot: [0.5, 0.5] as const,
       size: atlas === 'petals' ? 0.85 : 1,
       spin: atlas === 'fire' ? 0.2 : atlas === 'debris' ? 0.7 : 1,
@@ -129,6 +134,13 @@ export const DRIFT_MIXTURES: readonly Mixture[] = [
 ];
 /** Blossom keeps its original abundance; other scenes leave more open space. Index 9 is Demon. */
 export const DRIFT_DENSITY = [0.4, 0.3, 1, 0.3, 0.4, 0.15, 0.35, 0.25, 0.25, 0.3] as const;
+/** Catalogue preparation remains explicit; runtime scenes need only their mixture's families. */
+export function driftAtlasIds(stage?: number): string[] {
+  if (stage === undefined) return Object.keys(DRIFT_ATLASES);
+  const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
+  const selected = new Set(mixture.map(([id]) => DRIFT_BY_ID.get(id)!.atlas));
+  return Object.keys(DRIFT_ATLASES).filter((id) => selected.has(id));
+}
 export function chooseDriftSprite(stage: number, random: Random): DriftSprite {
   const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
   let roll = random() * mixture.reduce((total, entry) => total + entry[1], 0);

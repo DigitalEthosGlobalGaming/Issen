@@ -11,6 +11,15 @@ Use Node 24, Java **21**, and Android SDK platform/build-tools **36**. The app
 targets API 36 and currently permits Android 7/API 24 or later; the minimum is
 provisional until device testing. Gradle may install its own compatible Build
 Tools revision as well.
+Scenery preparation requires workers, OffscreenCanvas and bitmap decoding.
+`capacitor.config.json` declares WebView111 or later to match the installed Vite
+build's Chrome111 baseline. The runtime still checks capabilities and reports
+scene failures with retry; Android API level alone does not prove browser features.
+`server.errorPath` selects the bundled `startup-error.html` for native startup
+errors, including a WebView below the declared floor. It needs no JavaScript or
+Capacitor plugins, so unsupported JavaScript cannot prevent the recovery message.
+This declaration and desktop offline-asset checks do not replace a physical
+WebView startup, stage-cycle, failure/recovery and context-restoration check.
 Android Studio is the easiest maintained setup: install the SDK, open `android/`, let
 Gradle sync and select its Java 21 Gradle JDK. Set `ANDROID_HOME` to your SDK path
 when using the command line, or let Studio write ignored `android/local.properties`.

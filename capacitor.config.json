@@ -2,7 +2,11 @@
   "appId": "com.digitalethosglobalgaming.issen",
   "appName": "Issen",
   "webDir": ".mobile-build",
+  "server": {
+    "errorPath": "startup-error.html"
+  },
   "android": {
-    "allowMixedContent": false
+    "allowMixedContent": false,
+    "minWebViewVersion": 111
   }
 }

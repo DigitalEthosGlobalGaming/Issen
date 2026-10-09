@@ -30,7 +30,7 @@ test('Demon cinematic scene has varied scenery and immediate scene changes', asy
     canvas.height = 390;
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const g = await createTestDrawing(canvas);
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (!(await renderer.prepare())) throw Error('Demon scenery unavailable');
     const draw = (seed: number) => {
       g.begin();
       renderer.draw(g, 844, 390, 0, true, seed);

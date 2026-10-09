@@ -4,6 +4,8 @@ import { SEVEN_DAWNS_PATHS } from './crest-art.ts';
 import { renderUiMaterialTexture } from '../ui/material-textures.ts';
 import { createAssetMaterials } from './asset-materials.ts';
 import { drawMaterialStamp } from './scene-material.ts';
+import { createMainImageOwner } from '../platform/main-images.ts';
+import { retireSceneTexture } from './texture-revision.ts';
 const ATLAS_URL = new URL('../ui/assets/world-ui-atlas.webp', import.meta.url).href;
 export type SealMaterial = 'paper' | 'wood' | 'metal' | 'silk' | 'stone';
 const frames = {
@@ -16,49 +18,66 @@ const frames = {
 const crestIds = ['tomoe', 'kikyo', 'juji', 'aoi', 'fuji', 'tsuru', 'rokumon'];
 type UiArt = {
   disposed: boolean;
-  image: HTMLImageElement;
+  image?: HTMLImageElement;
+  images: ReturnType<typeof createMainImageOwner>;
   materials: ReturnType<typeof createAssetMaterials<'atlas'>>;
   cache: Map<string, HTMLCanvasElement>;
   ready: Promise<boolean>;
+  prepared: boolean;
 };
 const states = new WeakMap<Document, UiArt>();
 function state(doc: Document): UiArt {
   let value = states.get(doc);
   if (!value) {
-    const image = doc.createElement('img');
-    image.src = ATLAS_URL;
-    const materials = createAssetMaterials(doc, { atlas: ATLAS_URL });
+    const images = createMainImageOwner(doc);
+    const lease = images.acquire(ATLAS_URL);
+    const materials = createAssetMaterials(doc, { atlas: ATLAS_URL }, images);
     value = {
       disposed: false,
-      image,
+      images,
       materials,
       cache: new Map(),
-      ready: Promise.all([
-        image
-          .decode()
-          .then(() => true)
-          .catch(() => false),
-        materials.prepare(),
-      ]).then(([imageReady, maps]) => imageReady && maps.every(Boolean)),
+      ready: Promise.resolve(false),
+      prepared: false,
     };
+    const owned = value;
+    owned.ready = Promise.all([lease.ready, materials.prepare()]).then(
+      ([image, maps]) => {
+        if (owned.disposed) return false;
+        owned.image = image;
+        return (owned.prepared = maps.every(Boolean));
+      },
+      () => false,
+    );
     states.set(doc, value);
   }
   return value;
 }
 function load(doc: Document) {
   const image = state(doc).image;
-  return image.complete && image.naturalWidth ? image : null;
+  return image?.complete && image.naturalWidth ? image : null;
 }
 export function prepareUiArt(doc: Document): Promise<boolean> {
   return state(doc).ready;
+}
+/** Inspection does not initialise artwork or acquire additional pins. */
+export function uiArtSnapshot(doc: Document) {
+  const value = states.get(doc);
+  return value
+    ? { ready: value.prepared, cached: value.cache.size, decodedLoader: value.images.snapshot() }
+    : null;
 }
 export function disposeUiArt(doc: Document) {
   const value = states.get(doc);
   if (!value) return;
   value.disposed = true;
   value.materials.dispose();
-  value.image.removeAttribute('src');
-  for (const canvas of value.cache.values()) canvas.width = canvas.height = 0;
+  value.images.dispose();
+  value.image = undefined;
+  for (const canvas of value.cache.values()) {
+    retireSceneTexture(canvas);
+    canvas.width = canvas.height = 0;
+  }
   value.cache.clear();
   states.delete(doc);
 }
@@ -81,6 +100,7 @@ function tinted(doc: Document, material: SealMaterial, color: string) {
   if (cache.size >= 40) {
     const key = cache.keys().next().value!;
     const old = cache.get(key)!;
+    retireSceneTexture(old, true);
     old.width = old.height = 0;
     cache.delete(key);
   }

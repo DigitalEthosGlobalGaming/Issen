@@ -1,10 +1,20 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { createPbrAtlas } from '../pbr-atlas.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
+import { createPreparedFigureAtlas } from './prepared-atlas.ts';
+import { documentImageBudget } from '../../platform/main-images.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
+import type { Palette } from '../palette.ts';
+import {
+  materialTextureUploads,
+  nextVisibleFrame,
+  paceTextureUploads,
+  type TextureUpload,
+} from '../texture-upload.ts';
+import { ENEMY_PALETTES } from './enemy-appearance.ts';
 
 type Part = EnemyPart;
 type Frame = readonly [number, number, number, number];
@@ -79,11 +89,40 @@ function familyFor(key: string): keyof typeof PBR_SOURCES {
 }
 /** Front-view puppet, in the caller's normalized figure transform. No gameplay state. */
 export function createInkEnemyRenderer(doc: Document) {
+  const compact = documentImageBudget(doc) <= 256 * 1024 * 1024;
   const pbr = {
-    base: createPbrAtlas(doc, PBR_SOURCES.base, 1254),
-    clothing: createPbrAtlas(doc, PBR_SOURCES.clothing, 1536, 1024),
-    heads: createPbrAtlas(doc, PBR_SOURCES.heads, 1536, 1024),
-    variationHeads: createPbrAtlas(doc, PBR_SOURCES.variationHeads, 1254),
+    base: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.base,
+      1254,
+      1254,
+      Object.values(BASE_FRAMES),
+      compact,
+    ),
+    clothing: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.clothing,
+      1536,
+      1024,
+      CLOTHING_FRAMES,
+      compact,
+    ),
+    heads: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.heads,
+      1536,
+      1024,
+      Object.values(HEAD_FRAMES),
+      compact,
+    ),
+    variationHeads: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.variationHeads,
+      1254,
+      1254,
+      VARIANT_HEAD_FRAMES,
+      compact,
+    ),
   };
   const loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
@@ -112,15 +151,25 @@ export function createInkEnemyRenderer(doc: Document) {
   }
   let disposed = false,
     pending: Promise<boolean> | undefined;
+  const preparation = new AbortController();
+  let preparedParts: { key: string; uploads: TextureUpload[] } | undefined;
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
-    pending = Promise.all(
-      Object.entries(pbr).map(async ([key, atlas]) => {
-        const ready = await atlas.prepare();
-        if (ready && !disposed) loaded.add(key);
-        return ready;
-      }),
+    const prepareAtlas = async ([key, atlas]: (typeof entries)[number]) => {
+      const ready = await atlas.prepare();
+      if (ready && !disposed) loaded.add(key);
+      return ready;
+    };
+    const entries = Object.entries(pbr);
+    pending = (
+      compact
+        ? (async () => {
+            const materials: boolean[] = [];
+            for (const entry of entries) materials.push(await prepareAtlas(entry));
+            return materials;
+          })()
+        : Promise.all(entries.map(prepareAtlas))
     ).then((materials) => !disposed && materials.every(Boolean));
     return pending;
   }
@@ -142,14 +191,15 @@ export function createInkEnemyRenderer(doc: Document) {
   function sprite(
     key: string,
     frame: Frame,
-    f: Figure,
-    env: FigureEnvironment,
+    f: Pick<Figure, 'fog' | 'pal'>,
+    env: Pick<FigureEnvironment, 'palette'>,
     cloth: boolean,
     applyFog = true,
   ): HTMLCanvasElement | null {
     const family = familyFor(key),
-      image = pbr[family].diffuse;
-    if (!image) return null;
+      colour = pbr[family].colour(frame);
+    if (!colour) return null;
+    const image = colour.source;
     const fog = applyFog ? Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4)) : 0;
     const mist = env.palette(1).robe;
     const palette = cloth ? f.pal : null,
@@ -168,7 +218,7 @@ export function createInkEnemyRenderer(doc: Document) {
       return found;
     }
     const [sx, sy, sw, sh] = frame,
-      c = doc.createElement('canvas');
+      c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
     const ratio = 256 / Math.max(sw, sh);
     c.width = Math.max(1, Math.round(sw * ratio));
     c.height = Math.max(1, Math.round(sh * ratio));
@@ -181,7 +231,7 @@ export function createInkEnemyRenderer(doc: Document) {
         tones.delete(toneKey);
         tones.set(toneKey, tone);
       } else {
-        tone = doc.createElement('canvas');
+        tone = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
         tone.width = c.width;
         tone.height = c.height;
         const tg = tone.getContext('2d', { willReadFrequently: true });
@@ -189,7 +239,7 @@ export function createInkEnemyRenderer(doc: Document) {
           c.width = c.height = 0;
           return null;
         }
-        tg.drawImage(image, sx, sy, sw, sh, 0, 0, tone.width, tone.height);
+        tg.drawImage(image, ...colour.frame, 0, 0, tone.width, tone.height);
         const data = tg.getImageData(0, 0, tone.width, tone.height),
           a = rgb(palette.robeD),
           b = rgb(palette.robeL);
@@ -205,7 +255,7 @@ export function createInkEnemyRenderer(doc: Document) {
         retain(tones, toneKey, tone);
       }
       g.drawImage(tone, 0, 0);
-    } else g.drawImage(image, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    } else g.drawImage(image, ...colour.frame, 0, 0, c.width, c.height);
     if (fog) {
       g.globalCompositeOperation = 'source-atop';
       g.globalAlpha = fog;
@@ -214,6 +264,77 @@ export function createInkEnemyRenderer(doc: Document) {
     }
     retain(cache, keyFull, c);
     return c;
+  }
+  /** Prepare the finite regular-enemy wardrobe using the same cutouts as paint(). */
+  async function prepareUploads(
+    extraPalettes: readonly Palette[],
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    const lifetime = AbortSignal.any([signal, preparation.signal]);
+    const selected = [
+      ...new Map(
+        [...ENEMY_PALETTES, ...extraPalettes].map((palette) => [
+          palette.robeD + palette.robeL,
+          palette,
+        ]),
+      ).values(),
+    ];
+    const key = selected
+      .map((palette) => palette.robeD + palette.robeL)
+      .sort()
+      .join(':');
+    if (lifetime.aborted) return;
+    if (
+      preparedParts?.key === key &&
+      preparedParts.uploads.every(({ texture }) => texture.source.width > 0)
+    )
+      return preparedParts.uploads;
+    if (!(await prepare()) || lifetime.aborted) return;
+    const stamps: { key: string; frame: Frame; cloth: boolean; palette?: Palette }[] = [];
+    for (const [key, frame] of Object.entries(BASE_FRAMES)) {
+      const cloth = key !== 'head' && key !== 'hand';
+      for (const palette of cloth ? [...selected, undefined] : [undefined])
+        stamps.push({ key, frame, cloth, palette });
+    }
+    for (const [i, frame] of CLOTHING_FRAMES.entries())
+      for (const palette of selected)
+        stamps.push({ key: 'clothing:' + i, frame, cloth: true, palette });
+    for (const [key, frame] of Object.entries(HEAD_FRAMES))
+      stamps.push({ key: 'head:' + key, frame, cloth: false });
+    for (const [i, frame] of VARIANT_HEAD_FRAMES.entries())
+      stamps.push({ key: 'variationHead:' + i, frame, cloth: false });
+    const uploads: TextureUpload[] = [];
+    let complete = true;
+    const ready = await paceTextureUploads(stamps, lifetime, {
+      nextFrame: (abort) => nextVisibleFrame(doc, abort),
+      ready: () => !disposed && !doc.hidden,
+      generation: () => 0,
+      now: () => doc.defaultView!.performance.now(),
+      upload: ({ key, frame, cloth, palette }) => {
+        const image = sprite(
+          key,
+          frame,
+          { fog: 0, pal: palette },
+          { palette: () => ENEMY_PALETTES[0]! },
+          cloth,
+          false,
+        );
+        if (!image) {
+          complete = false;
+          return;
+        }
+        uploads.push(
+          ...materialTextureUploads(
+            { source: image, revision: 0 },
+            pbr[familyFor(key)].material(frame),
+          ),
+        );
+      },
+    });
+    if (ready && complete && uploads.every(({ texture }) => texture.source.width > 0)) {
+      preparedParts = { key, uploads };
+      return uploads;
+    }
   }
   function stamp(
     g: SceneDrawing,
@@ -423,6 +544,7 @@ export function createInkEnemyRenderer(doc: Document) {
   }
   return {
     prepare,
+    prepareUploads,
     drawPart,
     snapshot: () => ({
       ready:
@@ -434,10 +556,13 @@ export function createInkEnemyRenderer(doc: Document) {
       variantPixels,
       tonePixels,
       maxCachePixels: budgets.variants + budgets.tones,
+      compact,
       disposed,
     }),
     dispose() {
       disposed = true;
+      preparation.abort();
+      preparedParts = undefined;
       for (const atlas of Object.values(pbr)) atlas.dispose();
       for (const c of [...cache.values(), ...tones.values()]) {
         retireSceneTexture(c);

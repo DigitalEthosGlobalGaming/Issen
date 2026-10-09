@@ -14,6 +14,9 @@ import { createWeatherState } from '../rendering/scene/weather-state.ts';
 
 import { STAGES } from '../game/content/stages.ts';
 import type { createFrameLoop } from '../platform/frame-loop.ts';
+import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
+import { BOSS_IDENTITIES } from '../game/content/bosses.ts';
+import { mountStartupLoading } from '../ui/startup-loading.ts';
 /** Compose combat/scoring, character positions and kill rules through explicit owners. */
 export function createRuntimeSceneCoordination(
   foundation: ReturnType<typeof createRuntimeFoundation>,
@@ -21,7 +24,14 @@ export function createRuntimeSceneCoordination(
   ui: ReturnType<typeof createRuntimeUIBase>,
   combat: Pick<ReturnType<typeof createRuntimeCombat>, 'spawnEnemy'>,
   readClock: () => Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>,
+  readArtworkReady: () => boolean,
 ) {
+  let sceneError: ReturnType<typeof mountStartupLoading> | undefined;
+  const clearSceneError = () => {
+    sceneError?.remove();
+    sceneError = undefined;
+  };
+  foundation.lifecycle.add(clearSceneError);
   function buildWeather(resetSimulation = true) {
     presentation.buildWeatherArtwork();
     if (resetSimulation)
@@ -69,12 +79,47 @@ export function createRuntimeSceneCoordination(
           cvs: foundation.browser.cvs,
           screenAnimation: ui.screenAnimation,
           demonRealmRenderer: foundation.browser.demonRealmRenderer,
+          driftRenderer: presentation.driftRenderer,
+          prepareFigureArtwork: (signal: AbortSignal) => {
+            const G = foundation.run.G;
+            const current =
+              G.boss && (G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss'))
+                ? G.boss
+                : undefined;
+            const ordinal =
+              foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain] ?? G.bossCount + 1;
+            const tones = current?.def.pal
+              ? [current.def.pal]
+              : BOSS_IDENTITIES[(ordinal - 1) % BOSS_IDENTITIES.length]!.tones;
+            return foundation.browser.prepareFigureArtwork(
+              [...ENEMY_WEAPON_IDS, foundation.profile.profileEquipment.EQ.blade],
+              tones.map((tone) => foundation.view.palette.robe(tone)),
+              signal,
+            );
+          },
           environmentRenderer: foundation.browser.environmentRenderer,
+          reclaimMemory: foundation.browser.reclaimMemory,
+          sceneRecovery: {
+            show(retry: () => void) {
+              // Startup owns its loading/reload screen until artwork is published.
+              if (!readArtworkReady()) return;
+              sceneError ??= mountStartupLoading(retry);
+              sceneError.scene();
+            },
+            clear: clearSceneError,
+          },
           lifecycle: foundation.lifecycle,
           frameLoop: readClock(),
         }),
       ),
     ),
+  );
+  foundation.lifecycle.add(
+    foundation.browser.environmentRenderer.observeFailure(() => {
+      if (!readArtworkReady()) return;
+      foundation.run.sceneState.requestedSceneKey = '';
+      sceneFlow.prepareScene();
+    }),
   );
   function prepareScene() {
     return sceneFlow.prepareScene();

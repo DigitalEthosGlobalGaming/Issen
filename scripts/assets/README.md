@@ -1,5 +1,27 @@
 # Layout-preserving texture compaction
 
+## Drift-only right-sizing
+
+The active mobile performance goal authorizes a merged drift atlas separately
+from the cancelled general packing work. `python scripts/assets/drift-atlas.py`
+generates trial colour/emissive WebP planes and lossless review references under
+`tmp/drift-atlas/`. Default cells are 128px with 4px gutters; use `--cell=192`
+only if largest-gust scene review warrants it. `--output` selects the reviewed
+installation destination; `--review-output` keeps PNG references under ignored
+tmp even when installing WebP planes. It preserves full-resolution sources and uses
+associated-alpha Lanczos resizing. The report includes source hashes, frame
+rectangles, file sizes and nominal decoded/mipmapped GPU estimates.
+
+Run focused generator checks with
+`python scripts/assets/tests/drift_atlas.test.py`. Runtime uses the installed
+colour/emissive pair under `src/rendering/environment/assets/drift/`, shared by
+all four families. Original PNG artwork and PBR generation inputs remain authoring
+sources; the old drift packs are excluded from the runtime material catalog.
+Removed generated base WebP sizes remain available in `compaction-manifest.json`
+for the generator's historical full-set comparison.
+
+## Existing compaction
+
 Generate the runtime loading inventory with
 `node scripts/assets/runtime-inventory.mjs`. The committed JSON records intrinsic
 dimensions, encoded/nominal decoded bytes, consumers and stage usage from source,

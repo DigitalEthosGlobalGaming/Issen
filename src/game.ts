@@ -1,3 +1,4 @@
+import { STAGES as sceneStages } from './game/content/stages.ts';
 import { createRuntimeFrames } from './runtime/frames.ts';
 import { createRuntimeControls } from './runtime/controls.ts';
 import { createRuntimeGameplay } from './runtime/gameplay.ts';
@@ -39,6 +40,7 @@ export function startGame(
   );
 
   const ui = createRuntimeUIBase(foundation, () => game.shrinePhase);
+  let artworkReady = false;
   const game = createRuntimeGameplay(
     foundation,
     presentation,
@@ -49,9 +51,8 @@ export function startGame(
       refreshArmoryNew: () => controls.refreshArmoryNew(),
     }),
     () => ({ resetClock: () => frames.frameLoop.resetClock() }),
+    () => artworkReady,
   );
-
-  let artworkReady = false;
 
   const controls = createRuntimeControls(
     foundation,
@@ -81,6 +82,7 @@ export function startGame(
         ['W', 'H', 'DPR'],
         stateView(foundation.view.stageState, ['stageSeed'], {
           lifecycle: foundation.lifecycle,
+          cvs: foundation.browser.cvs,
           frameLoop: frames.frameLoop,
           G: foundation.run.G,
           cinematic: controls.cinematic,
@@ -92,10 +94,17 @@ export function startGame(
           runResults: ui.runResults,
           audio: foundation.browser.audio,
           driftRenderer: presentation.driftRenderer,
+          driftStage: () =>
+            foundation.run.activity.activeTrial?.realm === 'demon' ||
+            presentation.environmentState.previewDemon
+              ? sceneStages.length
+              : foundation.run.G.stage,
           reducedMotion: foundation.browser.reducedMotion,
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,
           petOf: presentation.petOf,
+          robeOf: () => foundation.profile.profileEquipment.EQ.robe,
+          bladeOf: () => foundation.profile.profileEquipment.EQ.blade,
           computeMods: game.computeMods,
           applySeal: foundation.view.applySeal,
           resize: frames.resize,

@@ -1,3 +1,5 @@
+import { trackPixelSource } from './pixel-memory.ts';
+
 export interface ArtworkProgress {
   loaded: number;
   total: number;
@@ -26,6 +28,7 @@ export function createArtworkPreloader(
   function load(url: string): Promise<void> {
     return new Promise((resolve) => {
       const image = createImage();
+      if (image.ownerDocument) trackPixelSource(image.ownerDocument, image, 'decoded');
       let settled = false;
       const finish = (success: boolean) => {
         if (settled) return;

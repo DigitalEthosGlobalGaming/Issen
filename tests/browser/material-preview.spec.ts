@@ -56,8 +56,8 @@ test('the lighting menu can render retained artwork and the six original packs',
     app.remove();
     return { options, families: assetMaterialCatalog.length, drawn, changed };
   });
-  expect(result.families).toBe(86);
-  expect(result.options).toBe(87);
+  expect(result.families).toBe(82);
+  expect(result.options).toBe(83);
   expect(result.drawn).toHaveLength(10);
   expect(result.drawn.every(Boolean)).toBe(true);
   expect(result.changed).toBe(true);

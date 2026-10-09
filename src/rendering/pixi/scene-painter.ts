@@ -29,6 +29,9 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
+import { rendererGpuMemory } from './gpu-memory.ts';
+import { documentPixelMemory, trackPixelSource } from '../../platform/pixel-memory.ts';
+import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
 import { paceTextureUploads, nextVisibleFrame } from '../texture-upload.ts';
@@ -232,6 +235,7 @@ export class PixiScenePainter implements SceneDrawing {
   contextLost = false;
   private contextGeneration = 0;
   private warmedShaderGeneration = -1;
+  private warmedSceneryFilterGeneration = -1;
   private readonly uploadLifetime = new AbortController();
   private readonly loseContext = (event: Event) => {
     event.preventDefault();
@@ -291,6 +295,7 @@ export class PixiScenePainter implements SceneDrawing {
     private readonly renderer: WebGLRenderer<HTMLCanvasElement>,
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
+    documentPixelMemory(canvas.ownerDocument).trackGpu(this);
     this.geometryBuffer.resize(canvas.width, canvas.height);
     this.artworkMaterials = new ArtworkMaterials(renderer);
     this.lightBuffer = new LightBuffer(renderer);
@@ -298,12 +303,21 @@ export class PixiScenePainter implements SceneDrawing {
     canvas.addEventListener('webglcontextlost', this.loseContext);
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
-    this.measure = canvas.ownerDocument.createElement('canvas').getContext('2d')!;
+    this.measure = trackPixelSource(
+      canvas.ownerDocument,
+      canvas.ownerDocument.createElement('canvas'),
+      'canvas',
+    ).getContext('2d')!;
     registerLeafSink(this, (frame) => {
       const item = this.submit('leaf');
       const slot = this.slots[this.cursor - 1]!;
       this.applyTransform(item, this.matrix);
-      slot.leaf!.update(frame, this.textures, this.lighting.materialLighting ?? 1, this.matrix);
+      slot.leaf!.update(
+        frame,
+        this.textures,
+        this.lighting.materialLighting ?? 1,
+        this.lighting.ambient,
+      );
     });
     registerGrassSink(this, (frame) => {
       const item = this.submit('grass');
@@ -485,7 +499,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.beginPath();
   }
 
-  private detachLightingTargets(): void {
+  private detachLightingTargets(detachGeometry = true): void {
     for (let i = 0; i < this.preparedLightingSlots; i++) {
       const slot = this.slots[i]!;
       slot.material?.releaseLightTargets();
@@ -496,7 +510,7 @@ export class PixiScenePainter implements SceneDrawing {
     // A replaced slot may have been the last attached owner; detach centrally too.
     for (let i = 0; i < 3; i++) this.sharedLights.setResource(Texture.EMPTY.source, i);
     this.artworkMaterials.detachTargets();
-    this.lightBuffer.detachGeometry();
+    if (detachGeometry) this.lightBuffer.detachGeometry();
   }
 
   /** Named composer pass; auxiliary flush callers use the same preparation. */
@@ -521,7 +535,9 @@ export class PixiScenePainter implements SceneDrawing {
     this.geometryPass();
     if (this.lightBuffer.targets?.resolution !== this.lightResolution) this.lightDirty = true;
     if (!this.lightDirty) return;
-    this.detachLightingTargets();
+    // Light outputs are about to be written, but their geometry inputs remain
+    // the same generation. Resize/restore/disposal detach those samplers.
+    this.detachLightingTargets(false);
     this.lightBuffer.render(this.geometryBuffer.targets!, {
       ...this.lighting,
       lightResolution: this.lightResolution,
@@ -581,8 +597,8 @@ export class PixiScenePainter implements SceneDrawing {
     this.textures.collect();
     for (const [key, gradient] of this.gradients) {
       if (this.usedGradients.has(key)) continue;
-      // Unload GPU storage without invalidating a source still referenced by
-      // Pixi's last batch bind group. Its JS wrapper can then be collected.
+      // Release GPU storage while the previous graphics data finishes retirement.
+      // Keep its source valid until Pixi resets the pooled batch references.
       gradient.texture.source.unload();
       this.gradients.delete(key);
     }
@@ -612,11 +628,9 @@ export class PixiScenePainter implements SceneDrawing {
       visit(this.root);
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
-        if (slot.material || slot.grass || slot.leaf)
+        if (slot.material || slot.grass)
           restore.push(
-            (slot.material ?? slot.grass ?? slot.leaf)!.beginGeometry(
-              this.geometryBuffer.targets!.depthRange,
-            ),
+            (slot.material ?? slot.grass)!.beginGeometry(this.geometryBuffer.targets!.depthRange),
           );
         else {
           const renderable = slot.item.renderable;
@@ -885,6 +899,18 @@ export class PixiScenePainter implements SceneDrawing {
     | ReturnType<typeof createLeafMesh>['mesh'] {
     this.invalidateLighting();
     let slot = this.slots[this.cursor];
+    // A varying cue count shifts later draw kinds. Reuse an unsubmitted slot
+    // before replacing its mesh; swapping keeps the existing pool size bound.
+    if (slot && slot.kind !== kind) {
+      const available = this.slots.findIndex(
+        (candidate, index) => index > this.cursor && candidate.kind === kind,
+      );
+      if (available !== -1) {
+        this.slots[this.cursor] = this.slots[available]!;
+        this.slots[available] = slot;
+        slot = this.slots[this.cursor];
+      }
+    }
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();
       slot?.lookup?.dispose();
@@ -1255,7 +1281,11 @@ export class PixiScenePainter implements SceneDrawing {
         padding = this.lineWidth + 2;
       const left = Math.ceil(m.actualBoundingBoxLeft + padding),
         top = Math.ceil(m.actualBoundingBoxAscent + padding);
-      const c = this.canvas.ownerDocument.createElement('canvas');
+      const c = trackPixelSource(
+        this.canvas.ownerDocument,
+        this.canvas.ownerDocument.createElement('canvas'),
+        'canvas',
+      );
       c.width = Math.max(1, Math.ceil(left + m.actualBoundingBoxRight + padding));
       c.height = Math.max(1, Math.ceil(top + m.actualBoundingBoxDescent + padding));
       const ink = c.getContext('2d')!;
@@ -1279,26 +1309,107 @@ export class PixiScenePainter implements SceneDrawing {
     return this.textures.size;
   }
 
+  get sourceMemorySnapshot(): { sources: number; bytes: number } {
+    return this.textures.memorySnapshot;
+  }
+
+  get memorySnapshot() {
+    return this.disposed
+      ? { sources: 0, bytes: 0, textureBytes: 0, renderbufferBytes: 0, browserReserveBytes: 0 }
+      : {
+          ...rendererGpuMemory(this.renderer),
+          browserReserveBytes: this.canvas.width * this.canvas.height * 12,
+        };
+  }
+
   get sourceRetirementSnapshot(): { sources: number; bytes: number } {
     return this.textures.retirementSnapshot;
   }
 
-  /** Initialize the same sources used by drawing, preserving colour/data interpretation. */
+  /** Keep prepared sources in this painter until their owner promotes or invalidates them. */
+  retainTextureSources(sources: Iterable<SceneTexture['source']>): () => void {
+    return this.textures.retainSources(sources);
+  }
+
+  private uploadTargetStamp = '';
+  private uploadTargetGeneration = 0;
+  private textureUploadGeneration(): number {
+    const stamp = [
+      this.contextGeneration,
+      this.canvas.width,
+      this.canvas.height,
+      this.lightResolution,
+      this.geometryBuffer.targets?.generation,
+      this.lightBuffer.targets?.generation,
+    ].join(':');
+    if (stamp !== this.uploadTargetStamp) {
+      this.uploadTargetStamp = stamp;
+      this.uploadTargetGeneration++;
+    }
+    return this.uploadTargetGeneration;
+  }
+  private prepareSurfaceTargets(): void {
+    const width = Math.max(1, this.canvas.width),
+      height = Math.max(1, this.canvas.height);
+    const geometry = this.geometryBuffer.targets,
+      light = this.lightBuffer.targets;
+    if (
+      geometry?.width !== width ||
+      geometry.height !== height ||
+      light?.sceneWidth !== width ||
+      light.sceneHeight !== height ||
+      light.resolution !== this.lightResolution
+    ) {
+      this.detachLightingTargets();
+      this.geometryBuffer.resize(width, height);
+      this.lightBuffer.resize(width, height, false, this.lightResolution);
+      this.invalidateLighting();
+    }
+    if (this.width !== this.canvas.width || this.height !== this.canvas.height) {
+      this.width = this.canvas.width;
+      this.height = this.canvas.height;
+      this.renderer.resize(width, height, 1);
+      this.invalidateLighting();
+    }
+  }
+
+  /** Initialize artwork and current surface targets through the existing texture system. */
   async warmTextures(uploads: readonly TextureUpload[], signal: AbortSignal): Promise<boolean> {
     const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
     if (lifetime.aborted) return false;
+    if (!this.contextLost && !this.canvas.ownerDocument.hidden) this.prepareSurfaceTargets();
     const release = this.textures.retainSources(uploads.map((upload) => upload.texture.source));
     try {
-      const sources = [
+      const artworkSources = [
+        Texture.WHITE.source,
+        Texture.EMPTY.source,
         ...new Set(uploads.map((upload) => this.textures.get(upload.texture, upload.data).source)),
       ];
+      // Targets can be replaced during resize/restoration while this job yields.
+      const sources = [
+        ...artworkSources.map((source) => () => source),
+        () => this.geometryBuffer.targets!.g0.source,
+        () => this.geometryBuffer.targets!.g1.source,
+        () => this.geometryBuffer.targets!.g2.source,
+        () => this.lightBuffer.targets!.diffuse.source,
+        () => this.lightBuffer.targets!.specular.source,
+        () => {
+          // Pixi8.22 owns this texture; borrow its existing lazy preparation path.
+          const prepare: unknown = Reflect.get(this.renderer.backBuffer, '_getBackBufferTexture');
+          if (typeof prepare !== 'function') throw Error('Back-buffer preparation unavailable');
+          const target = this.renderer.renderTarget.getRenderTarget(this.canvas);
+          const texture: unknown = prepare.call(this.renderer.backBuffer, target.colorTexture);
+          if (!(texture instanceof Texture)) throw Error('Back-buffer preparation failed');
+          return texture.source;
+        },
+      ];
       const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
-      if (ready() && sources.every((source) => source._gpuData?.[this.renderer.uid])) return true;
+      if (ready() && sources.every((source) => source()._gpuData?.[this.renderer.uid])) return true;
       return await paceTextureUploads(sources, lifetime, {
         nextFrame: (abort) => nextVisibleFrame(this.canvas.ownerDocument, abort),
         ready,
-        generation: () => this.contextGeneration,
-        upload: (source) => this.renderer.texture.initSource(source),
+        generation: () => this.textureUploadGeneration(),
+        upload: (source) => this.renderer.texture.initSource(source()),
         now: () => performance.now(),
       });
     } finally {
@@ -1307,19 +1418,32 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   /** Retain the complete incoming scene until sources and programs share one live context. */
-  async warmScene(uploads: readonly TextureUpload[], signal: AbortSignal): Promise<boolean> {
+  async warmScene(
+    uploads: readonly TextureUpload[],
+    signal: AbortSignal,
+    options: { sceneryFilters?: boolean } = {},
+  ): Promise<boolean> {
     const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
     if (lifetime.aborted) return false;
     const release = this.textures.retainSources(uploads.map((upload) => upload.texture.source));
     try {
       while (!lifetime.aborted) {
-        const generation = this.contextGeneration;
-        if (
-          !(await this.warmTextures(uploads, lifetime)) ||
-          !(await this.warmSceneShaders(lifetime))
-        )
+        const generation = this.textureUploadGeneration();
+        const ready =
+          (await this.warmTextures(uploads, lifetime)) &&
+          (await this.warmSceneShaders(lifetime, options.sceneryFilters));
+        if (!ready) {
+          if (
+            !lifetime.aborted &&
+            !this.disposed &&
+            (this.contextLost ||
+              this.canvas.ownerDocument.hidden ||
+              generation !== this.textureUploadGeneration())
+          )
+            continue;
           return false;
-        if (generation === this.contextGeneration && !this.canvas.ownerDocument.hidden)
+        }
+        if (generation === this.textureUploadGeneration() && !this.canvas.ownerDocument.hidden)
           return !lifetime.aborted && !this.contextLost;
       }
       return false;
@@ -1329,25 +1453,44 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   /** Compile the ordinary scenery programs through Pixi without drawing or syncing resources. */
-  async warmSceneShaders(signal: AbortSignal): Promise<boolean> {
+  async warmSceneShaders(signal: AbortSignal, sceneryFilters = false): Promise<boolean> {
     const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
     if (lifetime.aborted) return false;
     const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
-    if (ready() && this.warmedShaderGeneration === this.contextGeneration) return true;
+    if (
+      ready() &&
+      this.warmedShaderGeneration === this.contextGeneration &&
+      (!sceneryFilters || this.warmedSceneryFilterGeneration === this.contextGeneration)
+    )
+      return true;
     const material = createMaterialMesh(),
+      leaf = createLeafMesh(),
       batcher = new DefaultBatcher({ maxTextures: this.renderer.limits.maxBatchableTextures });
     const programs = new Set([
       ...material.programs,
+      ...leaf.programs,
       ...this.artworkMaterials.programs,
       this.lightBuffer.program,
       batcher.shader.glProgram,
     ]);
+    if (sceneryFilters) {
+      const blur = new BlurFilter({ strength: 1, quality: 4 }),
+        grayscale = new ColorMatrixFilter();
+      programs.add(blur.blurXFilter.glProgram);
+      programs.add(blur.blurYFilter.glProgram);
+      programs.add(grayscale.glProgram);
+      blur.blurXFilter.destroy();
+      blur.blurYFilter.destroy();
+      blur.destroy();
+      grayscale.destroy();
+    }
     // Pixi 8.22 exposes no preparation port for its final back-buffer copy.
     // Borrow its owned shader; binding with skipSync neither copies nor binds its texture.
     const presentationShader: unknown = Reflect.get(this.renderer.backBuffer, '_bigTriangleShader');
     if (presentationShader instanceof Shader) programs.add(presentationShader.glProgram);
     // Shader destruction preserves shared GlPrograms; native programs belong to this renderer.
     material.dispose();
+    leaf.dispose();
     batcher.destroy();
     const shaders = [...programs].map((glProgram) => new Shader({ glProgram }));
     try {
@@ -1358,7 +1501,10 @@ export class PixiScenePainter implements SceneDrawing {
         upload: (shader) => this.renderer.shader.bind(shader, true),
         now: () => performance.now(),
       });
-      if (warmed) this.warmedShaderGeneration = this.contextGeneration;
+      if (warmed) {
+        this.warmedShaderGeneration = this.contextGeneration;
+        if (sceneryFilters) this.warmedSceneryFilterGeneration = this.contextGeneration;
+      }
       return warmed;
     } finally {
       for (const shader of shaders) shader.destroy();
@@ -1366,8 +1512,8 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   /** Release uploaded sources after an offscreen export has copied its pixels. */
-  releaseTextureSources(sources: Iterable<SceneTexture['source']>): void {
-    this.textures.releaseSources(sources);
+  releaseTextureSources(sources: Iterable<SceneTexture['source']>, preserveFrame = false): void {
+    this.textures.releaseSources(sources, preserveFrame);
   }
 
   dispose(): void {
@@ -1404,8 +1550,8 @@ export class PixiScenePainter implements SceneDrawing {
     this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();
     this.renderer.destroy({ removeView: false });
-    // Native graphics retain Pixi cached batch bind groups beyond renderer disposal.
-    // Release GPU storage as for retired gradients without invalidating their sources.
+    // Release GPU storage as for retired gradients; pooled graphics may still
+    // reference their source wrappers until their next reset.
     for (const gradient of this.gradients.values()) gradient.texture.source.unload();
     this.gradients.clear();
     this.root.destroy();
@@ -1446,6 +1592,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
       preserveDrawingBuffer: false,
       useBackBuffer: true,
     });
+    installWebGLGraphicsData(renderer);
     return new PixiScenePainter(canvas, renderer);
   } catch (error) {
     try {

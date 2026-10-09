@@ -41,6 +41,7 @@ export function createRuntimeGameplay(
   ui: ReturnType<typeof createRuntimeUIBase>,
   readMenus: () => MenuPorts,
   readClock: () => Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>,
+  readArtworkReady: () => boolean,
 ) {
   function reviveDaruma(ph = false, support = false) {
     deathPhase.reviveDaruma(ph, support);
@@ -104,7 +105,14 @@ export function createRuntimeGameplay(
     playerDie,
   }));
 
-  const scene = createRuntimeSceneCoordination(foundation, presentation, ui, combat, readClock);
+  const scene = createRuntimeSceneCoordination(
+    foundation,
+    presentation,
+    ui,
+    combat,
+    readClock,
+    readArtworkReady,
+  );
 
   const sessionBindings = createRuntimeSession(foundation, presentation, context, () => ({
     get resultsSession() {

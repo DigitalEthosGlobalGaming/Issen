@@ -37,6 +37,18 @@ export function mountStartupLoading(retry: () => void) {
       error.textContent = message;
       button.hidden = false;
     },
+    scene() {
+      button.addEventListener('click', activate);
+      element.querySelector('h1')!.textContent = 'Scene unavailable';
+      status.textContent = 'This scene could not be prepared.';
+      progress.hidden = true;
+      error.textContent =
+        'Try again. If this continues, update your browser or Android System WebView.';
+      button.textContent = 'Retry';
+      button.hidden = false;
+      action = retry;
+      if (!element.isConnected) document.body.append(element);
+    },
     graphics(reload = false) {
       button.addEventListener('click', activate);
       element.querySelector('h1')!.textContent = 'Graphics not supported';

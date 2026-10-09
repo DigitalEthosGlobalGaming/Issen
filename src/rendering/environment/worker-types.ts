@@ -8,11 +8,13 @@ export type ComposedLayer = {
   emissive?: ImageBitmap;
 };
 export type EnvironmentSnapshot = {
+  imagePreload?: { key?: string; status: 'none' | 'pending' | 'ready' | 'denied' };
   materialCutouts?: {
     entries: number;
     pixels: number;
     pixelBudget: number;
     scratchPixels: number;
+    gpuBakes?: number;
     hits: number;
     misses: number;
     evictions: number;
@@ -26,6 +28,8 @@ export type EnvironmentSnapshot = {
   layers: number;
   pixels: number;
   decodedBytes?: number;
+  canvasBytes?: number;
+  canvases?: number;
   decodedLoader?: {
     queued: number;
     decoded: number;
@@ -39,9 +43,12 @@ export type EnvironmentSnapshot = {
   timings?: { assets: number; compose: number; transfer: number };
   texturesWarmed?: boolean;
 };
-export type ComposeRequest =
+export type ComposeRequest = { decodedBudget?: number } & (
+  | { id: number; kind: 'cancel'; requestId: number }
+  | { id: number; kind: 'preload'; stage?: number }
   | { id: number; kind: 'prepare'; stage: number }
-  | { id: number; kind: 'compose'; key: string; frame: EnvironmentFrame };
+  | { id: number; kind: 'compose'; key: string; frame: EnvironmentFrame }
+);
 export type ComposeResponse = {
   id: number;
   ok: boolean;
@@ -50,9 +57,13 @@ export type ComposeResponse = {
   foreground: ComposedLayer[];
   snapshot: EnvironmentSnapshot;
   error?: string;
-  phase?: 'assets-ready';
+  phase?: 'assets-ready' | 'composed';
 };
-export function compositionKey(frame: EnvironmentFrame) {
+export type CompositionIdentity = Pick<
+  EnvironmentFrame,
+  'width' | 'height' | 'dpr' | 'stage' | 'stageSeed' | 'lowQuality'
+>;
+export function compositionKey(frame: CompositionIdentity) {
   return JSON.stringify([
     frame.width,
     frame.height,
@@ -69,4 +80,13 @@ export function closeLayers(layers: readonly ComposedLayer[]) {
         retireSceneTexture(bitmap);
         bitmap.close();
       }
+}
+
+/** Transferred pixels are independent copies of the worker's composed canvases. */
+export function composedLayerBytes(layers: readonly ComposedLayer[]): number {
+  const sources = new Set<ImageBitmap>();
+  for (const layer of layers)
+    for (const source of [layer.colour, layer.normal, layer.surface, layer.emissive])
+      if (source) sources.add(source);
+  return [...sources].reduce((bytes, source) => bytes + source.width * source.height * 4, 0);
 }

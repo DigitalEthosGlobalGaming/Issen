@@ -5,6 +5,7 @@ import type { createNativeServices } from '../presentation/native-services.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { RunCheckpoint } from '../platform/run-checkpoint.ts';
 import type { createAudio } from '../audio/audio.ts';
+import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
 type Disposable = { dispose(): void };
 type NativeStartup = Pick<
   ReturnType<typeof createNativeServices>,
@@ -12,6 +13,7 @@ type NativeStartup = Pick<
 >;
 export interface RuntimeStartupViews extends NativeStartup {
   readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly cvs: { readonly dataset: DOMStringMap };
   readonly frameLoop: ReturnType<typeof createFrameLoop>;
   readonly G: RunState;
   readonly cinematic: { readonly restores: boolean; restore(): void };
@@ -23,7 +25,8 @@ export interface RuntimeStartupViews extends NativeStartup {
   readonly guided: Disposable;
   readonly runResults: Disposable;
   readonly audio: ReturnType<typeof createAudio>;
-  readonly driftRenderer: { prepare(): Promise<unknown>; readonly ready: boolean };
+  readonly driftRenderer: { prepare(stage: number): Promise<unknown>; readonly ready: boolean };
+  driftStage(): number;
   readonly stageSeed: number;
   readonly W: number;
   readonly H: number;
@@ -33,6 +36,8 @@ export interface RuntimeStartupViews extends NativeStartup {
   reducedFlashes(): boolean;
   density(): number;
   petOf(): string;
+  robeOf(): string;
+  bladeOf(): string;
   computeMods(): unknown;
   applySeal(): void;
   resize(): void;
@@ -137,12 +142,13 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
   });
   const { stageSeed, W, H, DPR, presentationState } = readViews();
   inkCompanion.select(readViews().petOf());
+  inkPlayer.select(readViews().robeOf());
   void Promise.all([
     inkCharm.prepare(),
     inkCompanion.prepare(),
     inkEnemy.prepare(),
     inkPlayer.prepare(),
-    inkSword.prepare(),
+    inkSword.prepareParts([...ENEMY_WEAPON_IDS, readViews().bladeOf()]),
     environmentRenderer.compose({
       stageSeed,
       width: W,
@@ -154,21 +160,29 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       reducedFlashes: reducedFlashes(),
       lowQuality: density() <= 0.3,
     }),
-    driftRenderer.prepare(),
-  ]).then(() => {
+    driftRenderer.prepare(readViews().driftStage()),
+  ]).then(([, , , , weaponsReady]) => {
     if (artworkDisposed) return;
     const failed = [
       inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
       !inkCompanion.ready ? 'companions' : null,
       !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
-      !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
+      !inkPlayer.snapshot().ready ||
+      !inkPlayer.snapshot().outfits.outfits.includes(readViews().robeOf())
         ? 'outfits'
         : null,
-      !inkSword.ready ? 'weapons' : null,
+      !inkSword.ready || !weaponsReady ? 'weapons' : null,
       environmentRenderer.backend !== 'layered' ? 'scene' : null,
       !driftRenderer.ready ? 'drifting debris' : null,
     ].filter((name): name is string => !!name);
     if (failed.length) {
+      if (environmentRenderer.snapshot().workerFailure) {
+        const { cvs } = readViews();
+        cvs.dataset.sceneState = 'unavailable';
+        cvs.dataset.sceneError = environmentRenderer.snapshot().workerFailure;
+        artworkLoading.scene();
+        return;
+      }
       artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
       return;
     }

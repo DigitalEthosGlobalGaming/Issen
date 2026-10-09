@@ -3,6 +3,8 @@ export async function configure(page, scenario) {
   if (
     [
       'combat',
+      'drift-calm',
+      'drift-gust',
       'demon',
       'paused',
       'inactive-combat',
@@ -42,6 +44,12 @@ export async function configure(page, scenario) {
 }
 
 export function checkState(scenario, initial, final) {
+  if (scenario === 'drift-calm' && (initial.gustLeaves !== 0 || final.gustLeaves !== 0))
+    throw Error('Calm fixture contains gust leaves');
+  if (scenario.startsWith('drift-') && !(initial.driftLeaves > 0 && final.driftLeaves > 0))
+    throw Error('Drift fixture has no leaves');
+  if (scenario === 'drift-gust' && !(initial.gustLeaves > 0 && final.gustLeaves > 0))
+    throw Error('Gust fixture has no gust leaves');
   if (
     scenario === 'cinematic-transitions' &&
     (final.renderedScenes?.length !== 10 || !final.renderedScenes.includes(9))
@@ -59,7 +67,15 @@ export function checkState(scenario, initial, final) {
   if (scenario.startsWith('inactive-') && JSON.stringify(initial) !== JSON.stringify(final))
     throw Error('Inactive scenario advanced simulation');
   if (
-    ['combat', 'demon', 'film-glitch', 'film-inferno', 'kill-effects'].includes(scenario) &&
+    [
+      'combat',
+      'drift-calm',
+      'drift-gust',
+      'demon',
+      'film-glitch',
+      'film-inferno',
+      'kill-effects',
+    ].includes(scenario) &&
     ['dead', 'over', 'title'].includes(final.state)
   )
     throw Error(`Scenario ${scenario} ended unexpectedly in ${final.state}`);

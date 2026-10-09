@@ -18,6 +18,7 @@ export const suites = {
   lifecycle: ['inactive-combat', 'inactive-inspection'],
   memory: ['menu-cycles'],
   transitions: ['scene-transitions', 'cinematic-transitions'],
+  drift: ['drift-calm', 'drift-gust'],
 };
 export const allScenarios = Object.values(suites).flat();
 export function options(argv) {
@@ -28,6 +29,8 @@ export function options(argv) {
       suite: { type: 'string', default: 'all' },
       scenario: { type: 'string' },
       mode: { type: 'string', default: 'full' },
+      drift: { type: 'string', default: 'new' },
+      'cpu-rate': { type: 'string', default: '1' },
       repeats: { type: 'string', default: '5' },
       warmup: { type: 'string', default: '3000' },
       duration: { type: 'string', default: '5000' },
@@ -38,6 +41,7 @@ export function options(argv) {
       port: { type: 'string', default: '5199' },
       headed: { type: 'boolean', default: false },
       compare: { type: 'string' },
+      control: { type: 'string' },
       doctor: { type: 'boolean' },
       help: { type: 'boolean' },
       adb: { type: 'string' },
@@ -49,13 +53,18 @@ export function options(argv) {
     target: ['web', 'emulator', 'android-device'],
     mode: ['full', 'timing', 'diagnostic', 'build'],
     suite: ['all', ...Object.keys(suites)],
+    drift: ['off', 'current', 'new'],
   })) {
     if (!allowed.includes(values[key])) throw Error(`Invalid --${key}: ${values[key]}`);
   }
-  for (const key of ['repeats', 'warmup', 'duration', 'dpr', 'seed', 'port']) {
+  for (const key of ['repeats', 'warmup', 'duration', 'dpr', 'seed', 'port', 'cpu-rate']) {
     values[key] = Number(values[key]);
     if (!Number.isFinite(values[key]) || values[key] <= 0) throw Error(`--${key} must be positive`);
   }
+  if (values['cpu-rate'] < 1 || values['cpu-rate'] > 20)
+    throw Error('--cpu-rate must be between 1 and 20');
+  if (values.target !== 'web' && values['cpu-rate'] !== 1)
+    throw Error('--cpu-rate is a web-only CPU approximation');
   if (!Number.isInteger(values.repeats) || values.repeats > 50)
     throw Error('--repeats must be an integer from 1 to 50');
   if (!Number.isInteger(values.port) || values.port < 1024 || values.port > 65535)

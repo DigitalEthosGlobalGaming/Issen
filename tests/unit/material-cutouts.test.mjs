@@ -57,6 +57,7 @@ test('cache keys separate every pixel-affecting source, revision, crop, size and
   const base = request(),
     key = materialCutoutKey(base, identity);
   const variants = [
+    { gpu: true },
     { map: { ...base.map, source: {} } },
     { map: { ...base.map, revision: 1 } },
     { map: { ...base.map, frame: [1, 0, 4, 4] } },
@@ -78,6 +79,44 @@ test('cache keys separate every pixel-affecting source, revision, crop, size and
     materialCutoutKey({ ...base, normalMatrix: cutoutNormalTransform(rotation(8.9)) }, identity),
     key,
   );
+});
+
+test('GPU and software bakes cannot reuse a canvas with the other fixed context mode', () => {
+  const modes = [],
+    canvases = [];
+  const doc = {
+    createElement() {
+      const canvas = {
+        width: 1,
+        height: 1,
+        getContext(_type, options) {
+          if (!this.context) {
+            modes.push(options.willReadFrequently);
+            this.context = { setTransform() {}, clearRect() {} };
+          }
+          return this.context;
+        },
+      };
+      canvases.push(canvas);
+      return canvas;
+    },
+  };
+  const cache = createMaterialCutouts(doc, 16),
+    base = request();
+  const software = cache.get(base, () => {});
+  const gpu = cache.get({ ...base, gpu: true }, () => {});
+  assert.equal(
+    cache.get({ ...base, gpu: true }, () => {}),
+    gpu,
+  );
+  const softwareAgain = cache.get(base, () => {});
+  assert.deepEqual(modes, [true, false, true]);
+  assert.notEqual(software, gpu);
+  assert.notEqual(gpu, softwareAgain);
+  assert.equal(cache.snapshot().gpuBakes, 1);
+  assert.equal(cache.snapshot().pixels, 16);
+  cache.clear();
+  assert.ok(canvases.every((canvas) => canvas.width === 0 && canvas.height === 0));
 });
 
 test('cutout LRU stays under pixel budget, bypasses oversized items and releases sources/scratch', () => {

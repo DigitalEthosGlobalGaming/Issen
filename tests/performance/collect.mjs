@@ -50,6 +50,8 @@ export async function measure(
   };
   try {
     await cdp.send('Performance.enable');
+    if (config['cpu-rate'] > 1)
+      await cdp.send('Emulation.setCPUThrottlingRate', { rate: config['cpu-rate'] });
     if (diagnostic) {
       await cdp.send('Profiler.enable');
       await cdp.send('Profiler.start');
@@ -57,6 +59,7 @@ export async function measure(
     const url = new URL(origin);
     url.searchParams.set('scenario', scenario);
     url.searchParams.set('seed', String(config.seed));
+    url.searchParams.set('drift', config.drift);
     await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(() => window.__profile?.schemaVersion === 1, {}, { timeout: 60000 });
     const startupMs = await page.evaluate(() => window.__profile.readyMs);

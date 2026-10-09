@@ -7,6 +7,7 @@ import { readCompressedAsset } from './compressed-assets.ts';
 import { runtimeAssets } from './runtime-assets.ts';
 import { observeAssetBackground } from './asset-background.ts';
 import { retireSceneTexture } from '../rendering/texture-revision.ts';
+import { trackPixelSource } from './pixel-memory.ts';
 
 type Resource = { image: HTMLImageElement; width: number; height: number; close(): void };
 type Pool = {
@@ -19,12 +20,29 @@ const dimensions = new Map<string, number>(
   runtimeAssets.map((asset) => [asset.url, asset.width * asset.height * 4]),
 );
 
+/** Thread-independent policy comes from the renderer's owning document. */
+export function documentImageBudget(doc: Document): number {
+  const navigator = doc.defaultView?.navigator as
+    (Navigator & { deviceMemory?: number }) | undefined;
+  return decodedImageBudget({
+    mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
+    deviceMemory: navigator?.deviceMemory,
+  });
+}
+
+/** Reclaim only unpinned cached images; live/preview leases remain authoritative. */
+export function trimMainImages(doc: Document, bytesToRelease: number): number {
+  const loader = pools.get(doc)?.loader;
+  if (!loader || !(bytesToRelease > 0)) return 0;
+  return loader.trim(Math.max(0, loader.snapshot().bytes - bytesToRelease));
+}
+
 async function decode(doc: Document, url: string, signal: AbortSignal): Promise<Resource> {
   const response = await readCompressedAsset(url, signal);
   const blob = await response.blob();
   if (signal.aborted) throw new DOMException('Image decode aborted', 'AbortError');
   const objectUrl = URL.createObjectURL(blob);
-  const image = doc.createElement('img');
+  const image = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   image.decoding = 'async';
   let closed = false;
   const close = () => {
@@ -53,13 +71,8 @@ async function decode(doc: Document, url: string, signal: AbortSignal): Promise<
 export function createMainImageOwner(doc: Document) {
   let pool = pools.get(doc);
   if (!pool) {
-    const navigator = doc.defaultView?.navigator as
-      (Navigator & { deviceMemory?: number }) | undefined;
     const loader = createDecodedImageLoader<Resource>({
-      budget: decodedImageBudget({
-        mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
-        deviceMemory: navigator?.deviceMemory,
-      }),
+      budget: documentImageBudget(doc),
       expectedBytes: (url) => dimensions.get(url),
       decode: (url, signal) => decode(doc, url, signal),
     });
@@ -95,6 +108,17 @@ export function createMainImageOwner(doc: Document) {
   const releases = new Set<() => void>();
   let disposed = false;
   return {
+    prefetch(urls: readonly string[]) {
+      if (disposed || urls.some((url) => !dimensions.has(url))) return undefined;
+      const preload = shared.loader.prefetch(urls);
+      if (!preload) return undefined;
+      const release = () => {
+        preload.release();
+        releases.delete(release);
+      };
+      releases.add(release);
+      return { ready: preload.ready, release, active: preload.active };
+    },
     acquire(url: string, priority: ImagePriority = 'now') {
       if (disposed) throw Error('Main image owner disposed');
       if (!dimensions.has(url)) throw Error(`Runtime image dimensions unavailable: ${url}`);

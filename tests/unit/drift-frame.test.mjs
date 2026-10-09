@@ -5,7 +5,7 @@ import { normalTransform } from '../../src/rendering/scene-frame.ts';
 
 test('leaf atlas pose preserves pivot under rotation and mirrored flutter without changing motion state', () => {
   const source = {};
-  const images = new Map([['leaves', { source, width: 1536, height: 1024 }]]);
+  const images = new Map([['leaves', { source, width: 1024, height: 512 }]]);
   const leaf = Object.freeze({
     sprite: 'leaves.willow',
     x: 110,
@@ -17,13 +17,13 @@ test('leaf atlas pose preserves pivot under rotation and mirrored flutter withou
     flutter: 1,
   });
   const sprite = leafSprite(leaf, images, true);
-  assert.deepEqual(sprite.texture.frame, [0, 0, 384, 512]);
+  assert.deepEqual(sprite.texture.frame, [4, 4, 120, 120]);
   assert.equal(sprite.width, 15);
-  assert.equal(sprite.height, 20);
+  assert.equal(sprite.height, 15);
   assert.equal(sprite.alpha, 0.6);
   const t = sprite.transform;
-  assert.ok(Math.abs(t.a * 7.5 + t.c * 10 + t.tx - leaf.x) < 1e-8);
-  assert.ok(Math.abs(t.b * 7.5 + t.d * 10 + t.ty - leaf.y) < 1e-8);
+  assert.ok(Math.abs(t.a * 7.5 + t.c * 7.5 + t.tx - leaf.x) < 1e-8);
+  assert.ok(Math.abs(t.b * 7.5 + t.d * 7.5 + t.ty - leaf.y) < 1e-8);
   assert.ok(t.a * t.d - t.b * t.c < 0, 'flutter mirrors the surface');
   assert.equal(leaf.fl, Math.PI);
 });
@@ -31,7 +31,7 @@ test('leaf atlas pose preserves pivot under rotation and mirrored flutter withou
 test('missing drift images skip safely and fire variants reuse the same prepared atlas', () => {
   assert.equal(leafSprite({ sprite: 'missing' }, new Map(), true), null);
   const source = {};
-  const images = new Map([['fire', { source, width: 1536, height: 1024 }]]);
+  const images = new Map([['fire', { source, width: 1024, height: 512 }]]);
   const particle = Object.freeze({ x: 10, y: 20, z: 1, ph: 0 });
   const sprites = [0, 1, 2].map((i) => emberSprite(particle, i, 2, images));
   assert.equal(new Set(sprites.map((s) => s.texture.frame.join(','))).size, 3);

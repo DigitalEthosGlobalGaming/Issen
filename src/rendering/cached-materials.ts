@@ -1,8 +1,10 @@
 import type { SceneDrawing } from './scene-drawing.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
 import type { SceneMaterial, SceneTexture } from './scene-frame.ts';
 import { normalTransform } from './scene-frame.ts';
 import { drawMaterialStamp } from './scene-material.ts';
 import { createMaterialCutouts, cutoutNormalTransform } from './material-cutouts.ts';
+import { retireSceneTexture } from './texture-revision.ts';
 
 type Frame = readonly [number, number, number, number];
 type Layer = {
@@ -18,6 +20,7 @@ type Owner = {
   cutouts: Map<Document, ReturnType<typeof createMaterialCutouts>>;
   pixelBudget: number;
   normalAngleStep: number;
+  gpuComposedLayers: boolean;
 };
 const sources = new WeakMap<
   HTMLImageElement,
@@ -119,7 +122,7 @@ export function cachedMaterialContext(native: CanvasRenderingContext2D): SceneDr
 
 /** Material data follows the same placement and compositing order as cached colour. */
 export function createCachedMaterials(
-  options: { pixelBudget?: number; normalAngleStep?: number } = {},
+  options: { pixelBudget?: number; normalAngleStep?: number; gpuComposedLayers?: boolean } = {},
 ) {
   const owner: Owner = {
     layers: new Set(),
@@ -127,17 +130,26 @@ export function createCachedMaterials(
     cutouts: new Map(),
     pixelBudget: options.pixelBudget ?? 4_000_000,
     normalAngleStep: options.normalAngleStep ?? 2,
+    gpuComposedLayers: options.gpuComposedLayers ?? false,
   };
+  let retiredGpuBakes = 0;
   function unbind(image: HTMLImageElement) {
     const bindings = sources.get(image);
     bindings?.delete(owner);
     if (!bindings?.size) sources.delete(image);
     owner.images.delete(image);
   }
+  /** Drop stamp intermediates while preserving bindings and completed layer maps. */
+  function clearCutouts() {
+    for (const cache of owner.cutouts.values()) {
+      retiredGpuBakes += cache.snapshot().gpuBakes;
+      cache.clear();
+    }
+    owner.cutouts.clear();
+  }
   function releaseSources() {
     for (const image of owner.images) unbind(image);
-    for (const cache of owner.cutouts.values()) cache.clear();
-    owner.cutouts.clear();
+    clearCutouts();
   }
   return {
     bind(image: HTMLImageElement, material: (frame: Frame) => SceneMaterial | null) {
@@ -147,6 +159,7 @@ export function createCachedMaterials(
       bindings.set(owner, { owner, material });
     },
     unbind,
+    clearCutouts,
     releaseSources,
     withBindings<T>(draw: () => T): T {
       const previous = bindingOwner;
@@ -161,7 +174,7 @@ export function createCachedMaterials(
     },
     dispose() {
       releaseSources();
-      for (const canvas of owner.layers) clearCachedMaterial(canvas);
+      for (const canvas of owner.layers) clearCachedMaterial(canvas, false);
       owner.layers.clear();
     },
     snapshot() {
@@ -173,6 +186,7 @@ export function createCachedMaterials(
         pixels: total('pixels'),
         pixelBudget: total('pixelBudget'),
         scratchPixels: total('scratchPixels'),
+        gpuBakes: retiredGpuBakes + total('gpuBakes'),
         hits: total('hits'),
         misses: total('misses'),
         evictions: total('evictions'),
@@ -180,14 +194,17 @@ export function createCachedMaterials(
     },
   };
 }
-export function clearCachedMaterial(canvas: HTMLCanvasElement) {
+export function clearCachedMaterial(canvas: HTMLCanvasElement, preserveFrame = true) {
   const layer = layers.get(canvas);
   if (!layer) return;
   for (const cache of layer.owner.cutouts.values()) {
     cache.invalidate(canvas);
     for (const map of [layer.normal, layer.surface, layer.emissive]) cache.invalidate(map);
   }
-  for (const map of [layer.normal, layer.surface, layer.emissive]) map.width = map.height = 0;
+  for (const map of [layer.normal, layer.surface, layer.emissive]) {
+    retireSceneTexture(map, preserveFrame);
+    map.width = map.height = 0;
+  }
   layer.owner.layers.delete(canvas);
   layers.delete(canvas);
 }
@@ -199,7 +216,11 @@ function materialLayer(canvas: HTMLCanvasElement, owner: Owner): Layer {
   }
   if (!layer) {
     const map = () => {
-      const c = canvas.ownerDocument.createElement('canvas');
+      const c = trackPixelSource(
+        canvas.ownerDocument,
+        canvas.ownerDocument.createElement('canvas'),
+        'canvas',
+      );
       c.width = canvas.width;
       c.height = canvas.height;
       return c;
@@ -311,6 +332,16 @@ export function drawCachedImage(
       const scratch = cutouts.get(
         {
           kind,
+          gpu:
+            owner.gpuComposedLayers &&
+            !!cached &&
+            alignedNormal &&
+            frame[0] === 0 &&
+            frame[1] === 0 &&
+            frame[2] === source.width &&
+            frame[3] === source.height &&
+            pixelWidth === frame[2] &&
+            pixelHeight === frame[3],
           map,
           frame,
           mask: colour ?? source,

@@ -1,8 +1,11 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import type { Figure } from './types.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
+import { createMainImageOwner } from '../../platform/main-images.ts';
+import type { PixiScenePainter } from '../pixi/scene-painter.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
 type Frame = readonly [number, number, number, number];
@@ -142,13 +145,14 @@ export function supportsInkOutfit(id?: string): boolean {
   return !!id && Object.hasOwn(INK_OUTFIT_RECIPES, id);
 }
 
-const SOURCES = {
+export const INK_OUTFIT_SOURCES = {
   masks: new URL('./assets/player-mask-atlas.webp', import.meta.url).href,
   special: new URL('./assets/player-special-headwear-atlas.webp', import.meta.url).href,
   armour: new URL('./assets/armour-plates-atlas.webp', import.meta.url).href,
   headwear: new URL('./assets/outfit-headwear-atlas.webp', import.meta.url).href,
   cloth: new URL('./assets/outfit-cloth-atlas.webp', import.meta.url).href,
 };
+const SOURCES = INK_OUTFIT_SOURCES;
 // Updated from each atlas's measured alpha bounds, not nominal grid cell bounds.
 const FRAMES: Record<AtlasKey, readonly Frame[]> = {
   masks: [
@@ -183,48 +187,143 @@ const FRAMES: Record<AtlasKey, readonly Frame[]> = {
   ],
 };
 export function createOutfitKit(doc: Document) {
-  const materials = createAssetMaterials(doc, SOURCES);
+  const owner = createMainImageOwner(doc);
+  type Kit = {
+    lease: ReturnType<typeof owner.acquire>;
+    materials: ReturnType<typeof createAssetMaterials<'atlas'>>;
+    pending: Promise<boolean>;
+  };
+  const kits = new Map<AtlasKey, Kit>();
   const images = new Map<AtlasKey, HTMLImageElement>();
   const loaded = new Set<AtlasKey>();
   const tinted = new Map<string, HTMLCanvasElement>();
-  const finish = new Set<() => void>();
+  const consumers = new Set<SceneDrawing>();
+  const borrowers = new Map<symbol, readonly AtlasKey[]>();
   let disposed = false,
-    pending: Promise<void> | undefined;
+    managed = false;
+  let pending: Promise<boolean> | undefined;
+  let primary: readonly AtlasKey[] = [];
+  const required = (id?: string): readonly AtlasKey[] =>
+    INK_OUTFIT_RECIPES[id ?? '']?.required ?? [];
+  function sources(key: AtlasKey, kit: Kit) {
+    const material = kit.materials.material('atlas', [0, 0, 1254, 1254]);
+    return [
+      images.get(key),
+      material?.normal?.source,
+      material?.surface?.source,
+      material?.emissive?.source,
+    ].filter((source) => !!source);
+  }
+  function releaseCanvas(g: SceneDrawing) {
+    if ('releaseTextureSources' in g)
+      (g as SceneDrawing & Pick<PixiScenePainter, 'releaseTextureSources'>).releaseTextureSources(
+        [...kits].flatMap(([key, kit]) => sources(key, kit)),
+      );
+    consumers.delete(g);
+  }
+  function release(key: AtlasKey, kit: Kit, preserveFrame = true) {
+    for (const g of consumers)
+      if ('releaseTextureSources' in g)
+        (g as SceneDrawing & Pick<PixiScenePainter, 'releaseTextureSources'>).releaseTextureSources(
+          sources(key, kit),
+          preserveFrame,
+        );
+    for (const [id, canvas] of tinted)
+      if (id.startsWith(key + ':')) {
+        retireSceneTexture(canvas, preserveFrame);
+        canvas.width = canvas.height = 0;
+        tinted.delete(id);
+      }
+    kit.materials.dispose();
+    kit.lease.release();
+    kits.delete(key);
+    images.delete(key);
+    loaded.delete(key);
+  }
+  function sync() {
+    if (disposed) return;
+    pending = undefined;
+    const selection = new Set(primary);
+    for (const keys of borrowers.values()) for (const key of keys) selection.add(key);
+    for (const [key, kit] of kits) if (!selection.has(key)) release(key, kit);
+    for (const key of selection) {
+      if (kits.has(key)) continue;
+      const lease = owner.acquire(SOURCES[key]);
+      const materials = createAssetMaterials(doc, { atlas: SOURCES[key] }, owner);
+      const kit: Kit = { lease, materials, pending: Promise.resolve(false) };
+      kits.set(key, kit);
+      kit.pending = Promise.all([lease.ready, materials.prepare()]).then(
+        ([image, maps]) => {
+          if (disposed || kits.get(key) !== kit) return false;
+          if (image.naturalWidth !== 1254 || image.naturalHeight !== 1254 || !maps.every(Boolean))
+            return false;
+          images.set(key, image);
+          loaded.add(key);
+          return true;
+        },
+        () => false,
+      );
+    }
+  }
+  async function prepared(keys: readonly AtlasKey[]) {
+    const expected = keys.map((key) => kits.get(key));
+    const ready = await Promise.all(expected.map((kit) => kit?.pending ?? false));
+    return (
+      !disposed && ready.every(Boolean) && expected.every((kit, i) => kit === kits.get(keys[i]!))
+    );
+  }
   function prepare() {
-    if (pending) return pending;
-    if (disposed) return Promise.resolve();
-    pending = Promise.all(
-      (Object.keys(SOURCES) as AtlasKey[]).map(
-        (key) =>
-          new Promise<void>((resolve) => {
-            const image = doc.createElement('img');
-            images.set(key, image);
-            const done = () => {
-              finish.delete(done);
-              image.onload = null;
-              image.onerror = null;
-              resolve();
-            };
-            finish.add(done);
-            image.onload = () => {
-              if (!disposed && image.naturalWidth === 1254 && image.naturalHeight === 1254)
-                loaded.add(key);
-              done();
-            };
-            image.onerror = done;
-            image.src = SOURCES[key];
-          }),
-      ),
-    ).then(async () => {
-      await materials.prepare();
-    });
-    return pending;
+    if (disposed) return Promise.resolve(false);
+    // Standalone catalogue consumers can prepare everything; runtime and previews select first.
+    if (!managed && !pending) {
+      primary = Object.keys(SOURCES) as AtlasKey[];
+      sync();
+    }
+    return (pending ??= prepared([...kits.keys()]));
+  }
+  function select(id?: string) {
+    if (disposed) return false;
+    managed = true;
+    const next = required(id);
+    if (next.length === primary.length && next.every((key) => primary.includes(key))) return false;
+    primary = next;
+    sync();
+    return true;
+  }
+  function borrow() {
+    managed = true;
+    const id = Symbol('outfit preview');
+    let selection: readonly AtlasKey[] = [],
+      released = false;
+    borrowers.set(id, selection);
+    return {
+      select(robe?: string) {
+        if (released || disposed) return false;
+        const next = required(robe);
+        if (next.length === selection.length && next.every((key) => selection.includes(key)))
+          return false;
+        selection = next;
+        borrowers.set(id, selection);
+        sync();
+        return true;
+      },
+      async prepare() {
+        const expected = selection;
+        return !released && (await prepared(expected)) && !released && expected === selection;
+      },
+      dispose() {
+        if (released) return;
+        released = true;
+        borrowers.delete(id);
+        sync();
+      },
+    };
   }
   function ready(id?: string) {
     return (
       !disposed &&
       supportsInkOutfit(id) &&
-      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key) && materials.ready(key))
+      INK_OUTFIT_RECIPES[id!]!.required.every((key) => loaded.has(key))
     );
   }
   function stamp(g: SceneDrawing, a: Attachment, lean: number) {
@@ -237,7 +336,7 @@ export function createOutfitKit(doc: Document) {
       const key = a.atlas + ':' + a.frame + ':' + a.tint;
       let c = tinted.get(key);
       if (!c) {
-        c = doc.createElement('canvas');
+        c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
         c.width = sw;
         c.height = sh;
         const cg = c.getContext('2d');
@@ -254,7 +353,7 @@ export function createOutfitKit(doc: Document) {
     const h = (a.width * sh) / sw;
     const x = a.x + lean - a.width * (a.anchorX ?? 0.5),
       y = a.y - h * (a.anchorY ?? 0);
-    const material = materials.material(a.atlas, frame);
+    const material = kits.get(a.atlas)?.materials.material('atlas', frame);
     if (material)
       drawMaterialStamp(g, {
         texture: { source, revision: 0, frame: a.tint ? undefined : frame },
@@ -269,9 +368,13 @@ export function createOutfitKit(doc: Document) {
   }
   return {
     prepare,
+    select,
+    borrow,
+    releaseCanvas,
     ready,
     recipe: (id?: string) => (id ? INK_OUTFIT_RECIPES[id] : undefined),
     draw(g: SceneDrawing, stage: 'body' | 'head', f: Figure) {
+      consumers.add(g);
       const recipe = INK_OUTFIT_RECIPES[f.robeId!];
       if (!recipe) return;
       for (const a of recipe[stage]) {
@@ -334,6 +437,7 @@ export function createOutfitKit(doc: Document) {
       elbow: [number, number],
       hand: [number, number],
     ) {
+      consumers.add(g);
       const recipe = INK_OUTFIT_RECIPES[f.robeId!];
       if (!recipe) return;
       if (recipe.shoulders)
@@ -361,17 +465,15 @@ export function createOutfitKit(doc: Document) {
       loaded: [...loaded],
       tints: tinted.size,
       outfits: Object.keys(INK_OUTFIT_RECIPES).filter(ready),
+      equipped: [...primary],
+      borrowed: [...borrowers.values()].filter((keys) => keys.length > 0).length,
+      decodedLoader: owner.snapshot(),
     }),
     dispose() {
-      materials.dispose();
+      if (disposed) return;
       disposed = true;
-      for (const im of images.values()) {
-        retireSceneTexture(im);
-        im.onload = null;
-        im.onerror = null;
-        im.removeAttribute('src');
-      }
-      for (const fn of [...finish]) fn();
+      for (const [key, kit] of kits) release(key, kit, false);
+      owner.dispose();
       for (const c of tinted.values()) {
         retireSceneTexture(c);
         c.width = 0;
@@ -380,6 +482,8 @@ export function createOutfitKit(doc: Document) {
       images.clear();
       loaded.clear();
       tinted.clear();
+      consumers.clear();
+      borrowers.clear();
     },
   };
 }

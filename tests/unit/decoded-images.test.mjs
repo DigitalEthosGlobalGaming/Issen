@@ -10,6 +10,81 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('explicit headroom trimming evicts unused images in LRU order and preserves pins', async () => {
+  const closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    decode: async (url) => resource(url, closed),
+    yield: turn,
+  });
+  await loader.load('older');
+  const release = loader.pin('live');
+  await loader.load('live');
+  await loader.load('recent');
+  assert.equal(loader.trim(800), 400);
+  assert.deepEqual(closed, ['older']);
+  assert.equal(loader.trim(), 400);
+  assert.deepEqual(closed, ['older', 'recent']);
+  assert.equal(loader.snapshot().bytes, 400);
+  assert.equal(loader.snapshot().pinnedBytes, 400);
+  release();
+  assert.equal(loader.trim(), 400);
+  assert.equal(loader.snapshot().bytes, 0);
+  assert.throws(() => loader.trim(-1), RangeError);
+  loader.dispose();
+});
+
+test('speculation does not refresh the LRU age of previously used images', async () => {
+  const closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    decode: async (url) => resource(url, closed),
+    yield: turn,
+  });
+  await loader.load('older');
+  await loader.load('recent');
+  const future = loader.prefetch(['older']);
+  assert.ok(future);
+  assert.equal(await future.ready, true);
+  future.release();
+  await loader.load('incoming');
+  assert.deepEqual(closed, ['older'], 'prediction must not displace the recent consumer');
+  loader.dispose();
+});
+
+test('first required use of prefetched images preserves cold request completion recency', async () => {
+  const run = async (prefetch) => {
+    const closed = [];
+    const loader = createDecodedImageLoader({
+      budget: 1200,
+      expectedBytes: () => 400,
+      decode: async (url) => resource(url, closed),
+      yield: turn,
+    });
+    await loader.load('older');
+    await loader.load('recent');
+    if (prefetch) {
+      const future = loader.prefetch(['incoming']);
+      assert.ok(future);
+      assert.equal(await future.ready, true);
+      future.release();
+    }
+    const incoming = loader.load('incoming');
+    const recent = loader.load('recent');
+    await Promise.all([incoming, recent]);
+    await loader.load('next');
+    await loader.load('last');
+    const evicted = [...closed];
+    loader.dispose();
+    return evicted;
+  };
+  const cold = await run(false),
+    warmed = await run(true);
+  assert.deepEqual(cold, ['older', 'recent']);
+  assert.deepEqual(warmed, cold, 'warm completion must retain the same next victims');
+});
+
 test('queued requests share a promise, bump priority and bypass blocked idle work', async () => {
   const calls = [],
     closed = [];
@@ -168,4 +243,136 @@ test('device defaults use 256/384 MiB mobile and 512 MiB desktop', () => {
   assert.equal(decodedImageBudget({ lowQuality: true }), 256 * 1024 * 1024);
   assert.equal(decodedImageBudget({ mobile: true }), 384 * 1024 * 1024);
   assert.equal(decodedImageBudget(), 512 * 1024 * 1024);
+});
+
+test('future image sets admit their union with live pins and retain shared warm decodes', async () => {
+  const closed = [],
+    calls = [];
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    expectedBytes: () => 400,
+    decode: async (url) => {
+      calls.push(url);
+      return resource(url, closed);
+    },
+    yield: turn,
+  });
+  const live = loader.pin('live');
+  await loader.load('live');
+  const a = loader.prefetch(['a', 'b', 'a']);
+  const peer = loader.prefetch(['a', 'b']);
+  assert.ok(a && peer);
+  assert.equal(loader.prefetch(['extra']), undefined, 'future pins reserve the entire set');
+  assert.equal(await a.ready, true);
+  assert.equal(await peer.ready, true);
+  assert.deepEqual(calls, ['live', 'a', 'b']);
+  assert.equal(loader.snapshot().pinnedBytes, 1200);
+  a.release();
+  assert.equal(loader.snapshot().pinnedBytes, 1200, 'peer keeps future sources pinned');
+  peer.release();
+  assert.equal(loader.snapshot().pinnedBytes, 400);
+  assert.deepEqual(closed, [], 'completed future decodes stay in the LRU');
+  const warmed = loader.load('a');
+  await warmed;
+  assert.equal(calls.length, 3);
+  live();
+  loader.dispose();
+});
+
+test('busy, hidden and over-budget frames cancel queued future work, with no late result leak', async () => {
+  for (const policy of [{ busy: true }, { hidden: true }, { overFrameBudget: true }]) {
+    const calls = [],
+      closed = [];
+    let finish, signal;
+    const loader = createDecodedImageLoader({
+      budget: 800,
+      expectedBytes: () => 400,
+      decode: (url, incoming) => {
+        calls.push(url);
+        signal = incoming;
+        return new Promise((resolve) => {
+          finish = resolve;
+        });
+      },
+      yield: turn,
+    });
+    const preload = loader.prefetch(['a', 'b']);
+    assert.ok(preload);
+    loader.policy(policy);
+    assert.equal(await preload.ready, false);
+    assert.equal(preload.active(), false);
+    assert.equal(signal.aborted, true);
+    finish(resource('a', closed));
+    await turn();
+    assert.deepEqual(calls, ['a']);
+    assert.deepEqual(closed, ['a']);
+    assert.equal(loader.snapshot().queued, 0);
+    assert.equal(loader.snapshot().bytes, 0);
+    assert.equal(loader.prefetch(['b']), undefined);
+    loader.dispose();
+  }
+});
+
+test('required loads promote shared pending work and cancel other future pins before admission', async () => {
+  let finish;
+  const closed = [],
+    calls = [];
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    decode: (url, signal) => {
+      calls.push(url);
+      if (url === 'shared')
+        return new Promise((resolve) => {
+          finish = () => {
+            assert.equal(signal.aborted, false);
+            resolve(resource(url, closed));
+          };
+        });
+      return Promise.resolve(resource(url, closed));
+    },
+    yield: turn,
+  });
+  const preload = loader.prefetch(['shared', 'obsolete']);
+  const required = loader.load('shared', 'now');
+  finish();
+  await required;
+  assert.equal(await preload.ready, false);
+  assert.deepEqual(calls, ['shared']);
+  const live = loader.pin('required');
+  await loader.load('required');
+  assert.equal(loader.snapshot().pinnedBytes, 400);
+  assert.ok(loader.snapshot().peakBytes <= 800);
+  live();
+  loader.dispose();
+});
+
+test('unmeasured future sets are denied and cancellation does not remove a replacement request', async () => {
+  let finish;
+  const closed = [],
+    calls = [];
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: (url) => (url === 'unknown' ? undefined : 400),
+    decode: (url) => {
+      calls.push(url);
+      return calls.length === 1
+        ? new Promise((resolve) => {
+            finish = resolve;
+          })
+        : Promise.resolve(resource(url, closed));
+    },
+    yield: turn,
+  });
+  assert.equal(loader.prefetch(['unknown']), undefined);
+  const preload = loader.prefetch(['a']);
+  preload.release();
+  const replacement = loader.load('a');
+  finish(resource('old-a', closed));
+  assert.equal(await preload.ready, false);
+  await replacement;
+  assert.deepEqual(calls, ['a', 'a']);
+  assert.deepEqual(closed, ['old-a']);
+  assert.equal(loader.snapshot().decoded, 1);
+  loader.dispose();
 });

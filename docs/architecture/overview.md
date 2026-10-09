@@ -51,9 +51,11 @@ prepares scene surfaces, then calls `startGame()` in `src/game.ts`.
 Startup loading/progress and retry use
 `platform/artwork-preload.ts` and `ui/startup-loading.ts`; retry calls the same
 instance's `begin()` without mounting a second root.
-Catalogued runtime PBR maps are excluded from this lifetime preloader. Material
-owners
-decode selected packs, release departed packs, and retain shared scenery packs
+Catalogued runtime PBR maps, environment sources, selected companion/outfit
+sources and pooled player/charm/world UI sources are excluded from the startup
+preloader. Its retained images are released after mounting. Scene composition,
+demon and drift owners prepare their own inputs. Material owners decode selected
+packs, release departed packs, and retain shared scenery packs
 across scene changes. UI textures use a separate owned shader surface and share
 the session lighting rig with startup and gameplay.
 `MainGame.dispose()` stops the runtime and releases startup resources and the
@@ -159,20 +161,65 @@ and nominal RGBA bytes are exposed through sourceRetirementSnapshot; this exclud
 render targets, wrappers and driver allocations. CPU cache budgets are unchanged.
 Player/outfit tones and tints, base atlas images, and weapon raw maps/cached parts
 notify ordinary immediate retirement before final source clearing. Independent
-renderer owners do not retire a peer's separate images or canvases. Catalogue
-selection and shared decoded-budget integration remain separate work.
+renderer owners do not retire a peer's separate images or canvases.
+Outfit kits use shared main-image leases for equipped and borrowed recipe families.
+Runtime startup selects the equipped robe; previews borrow independently and
+release selections on suspension/disposal. Unused family sources retire in each
+consuming painter with queued-frame preservation, without closing shared decoded
+images. Final disposal remains immediate. Closed preview painters unregister
+from the outfit owner; standalone catalogue preparation uses all families through
+the same kit path. Player-base planes also use shared leases; plain colour serves
+tone generation while PBR diffuse serves untinted stamps. Player consumers release
+their own raw/tone GPU textures on preview suspension/disposal and unregister.
+Final disposal releases consumers before leases/owned tone pixels.
+Enemy and weapon decoded ownership remains work.
+
+Stage readiness prepares figure artwork through `native-services.prepareFigureArtwork`.
+Enemy preparation reuses the bounded sprite/tone caches for the four regular
+palettes, uncoloured base parts, headwear and variant heads. Stage entry also
+prepares the incoming boss archetype's three possible cloth tones without
+choosing an identity or consuming RNG; an active boss keeps its current palette
+during resize/recovery. Weapon preparation covers regular enemy recipes and the
+equipped player blade, including special/gold parts. Both owners return the exact
+colour/data sources used by drawing. The gameplay painter retains and warms them;
+only an accepted replacement releases the prior figure lease. New scene requests
+abort obsolete preparation and native-service disposal cancels outstanding waits.
+An unchanged intact enemy preparation reuses its source list immediately.
+
+Painter texture preparation includes shared white/empty textures, current
+geometry/light targets and Pixi's owned back-buffer texture. A guarded Pixi8.22
+`_getBackBufferTexture` adapter prepares that existing target without drawing.
+Paced jobs read replacement target sources dynamically; viewport, quality,
+target and context generations suppress stale readiness. Surface dimensions are
+synchronised before allocation, and source/shader preparation repeats when the
+surface changes while yielding. This does not eliminate framebuffer, MSAA or
+geometry setup costs on a later draw; first-draw latency still needs final profiling.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output
-size and normal basis identify entries. Normal rotation uses two-degree bins,
+size, baking backend and normal basis identify entries. Normal rotation uses two-degree bins,
 preserving reflection, anisotropy and shear; surface/emissive values stay exact.
 Owner disposal clears cutouts and scratch alongside layer maps. Software
-rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
-downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
-hits, misses and evictions separately from decoded assets.
+rasterization remains necessary for atlas map/mask downsampling parity. Worker
+owners opt into GPU scratch only for aligned, full composed-layer copies at
+identical source/bake pixel sizes. Fractional backing sizes retain software
+baking. GPU and software entries cannot recycle each other's fixed-context
+canvases. Main owners retain software baking. Snapshots expose cache pixels,
+GPU bakes, hits, misses and evictions separately from decoded assets.
 Local main-thread composition releases non-live colour/material image leases after
 building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
-colour/data canvases and the bounded independent cutouts keep their own pixels.
+colour/data canvases keep their own pixels. Completed composition clears baked
+map cutouts/scratch and non-live colour cutouts (1.68.33), preserving source
+bindings and layer maps. Main composition clears before releasing input leases
+and retains live fog/bamboo colour cutouts. The worker clears all stamp cutouts
+before parallel bitmap copies (1.68.34); live motion uses transferred planes and
+main-thread inputs. Completed worker planes remain cached for exact-key requests.
+Retiring those planes and rebuilding on demand failed the colour parity guard.
+Worker export composition now releases all raw colour/material image pins after
+its completed planes are built (1.69.12). Exported planes own their pixels; live
+motion uses transferred planes and the receiving renderer's inputs. Exact-key
+exports reuse those planes, while changed keys reacquire their inputs from the
+worker's bounded LRU cache. Decode interpretation is unchanged.
 Repeated draws/compose calls with the same composition key reuse that output.
 A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
 pending requests cannot publish over a newer generation. Source binding release
@@ -191,8 +238,66 @@ bounded, while native decoder overhead is outside the nominal estimate. Worker
 image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, uniquely pinned decoded bytes, total bytes, peak, budget and
-evictions. Main figure/startup owners
-are not yet routed through this loader; whole-application memory remains unbounded.
+evictions.
+
+The loader's explicit `prefetch` API admits a complete known image set together
+with existing pins before starting serial soon decodes. Its independent leases
+share queued work and warm resources, without changing renderer bindings. A now
+request or busy/hidden/over-budget policy cancels future leases, aborts orphaned
+pending decodes and preserves promoted/shared consumers. Late cancelled results
+close instead of publishing over a replacement request. The main image owner
+exposes this API with owner disposal and peer lifetime protection. Admission covers
+nominal decoded bytes only; composition canvases, copies and GPU memory are outside
+it. Speculative requests do not refresh residency age. First required use of a
+new speculative resource receives completion-order recency after cached hits,
+preserving the required batch's eviction order without decoding it again.
+`sceneImageUrls` enumerates data maps before colours, matching preparation and
+excluding unused diffuse maps.
+
+`environment/image-preload.ts` grants speculative work after a settled matching
+scene receives a visible quiet frame. Its lease uses all six composition identity
+fields. Local diagnostic renderers preload decoded inputs through the main pool.
+The runtime worker composes one next scene and warms its sources and shaders
+through the existing painter. Current transferred planes remain drawable while
+worker composition changes. Explicit texture leases protect the next scene from
+frame collection. Exact-key composition promotes the slot without recomposition;
+foreground warming rechecks readiness for the current graphics context.
+Busy frames cancel pending work but retain a completed slot. Hidden pages,
+invalid geometry, changed predictions, explicit preparation, context loss and
+disposal cancel it. Cancellation prevents stale publication and closes copies;
+worker cancellation checks before building and after asynchronous copying, but
+cannot interrupt a synchronous native canvas call already in progress.
+Worker requests carry the owning document's device-class image budget. The worker
+creates its loader on the first request, using the same256/384/512MiB policy as
+the main pool rather than independently selecting a different worker default.
+These remain per-pool bounds, not a combined whole-application memory allowance.
+
+`platform/scene-memory.ts` sums weakly observed main-thread pixels/GPU resources
+and registered live/preview worker owners, including transferred planes and
+pending reservations. Next-scene admission uses twice the document image budget
+(512MiB low-memory,768MiB mobile,1024MiB desktop), with64MiB native headroom plus
+12bytes per painter output pixel reserved for browser drawing buffers. The scene
+estimate includes its decoded kit, canvas/copy/upload planes and20MiB scratch.
+Reservations persist until cancelled work settles. These conservative nominal
+estimates govern optional work; they do not enforce a whole-app cap or measure
+physical driver allocations. Required current resources and unregistered
+auxiliary canvases still need the final combined-memory audit.
+
+Charms, selected companions/outfits and world UI artwork use this loader.
+Player-base and drift colour/emissive planes use the same pool. Drift's four
+logical families share one merged two-plane atlas, so surviving particles stay
+drawable across stage changes without reacquiring family-specific maps.
+Generation checks reject superseded requests. Runtime drift preparation uploads
+the mipmapped pair through the consuming painter texture store and compiles its
+single composite program before publication. Leaves never enter the geometry
+pass; lighting samples the scene light with ambient fallback over empty geometry.
+An owner-held texture lease survives frame collection until replacement or
+disposal. Supersession aborts hidden uploads; failed warming keeps the previous
+drawable set and permits retry. Standalone owners without
+a painter retain their decode-only preparation contract.
+Startup excludes plain player/charm/world
+UI sources owned there. Enemy, weapon and other eager startup images remain outside it;
+whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the budgeted loader. One pool-level quiet-frame/visibility subscription pauses
 soon/idle requests until a visible settled frame uses at most75% of its budget.
@@ -227,7 +332,15 @@ prediction. Normal and daily waves predict the next three-wave visit; rush predi
 the next duel's visit. Trials retain their scenery, cinematic choices are unknown,
 and inactive or mismatched run/stage state has no prediction. Frame samples carry
 the optional next stage so compressed priority updates when modes change at the
-same stage. Prediction neither enters a visit nor consumes combat randomness.
+same stage. `runtime/scene-prediction.ts` reads the live visit ledger's non-mutating
+`peek` and geometry/quality getters to publish the exact upcoming composition
+identity (stage, seed, width, height, DPR and low quality). It caches a frozen
+identity until one of those fields changes, clearing it for unknown visits or
+invalid geometry. Background diagnostics write `assetNextScene` only when that
+reference changes. Prediction neither enters a visit nor consumes combat randomness.
+Quiet-frame worker preparation consumes this identity for its next-scene slot.
+Local diagnostic owners retain image-only prefetch. Prediction itself neither
+composes a scene nor changes the current visit.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader
@@ -487,13 +600,22 @@ the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
 handles native-aspect frames, ground anchors and contact fades. Runtime weather
 and final film grading remain separate from image assets.
 
-Since 1.66.0, `environment/index.ts` selects a renderer-owned module worker when
-Worker and OffscreenCanvas are available. `local-renderer.ts` composes colour and
+Since1.69.16, `environment/index.ts` requires a renderer-owned scenery worker.
+Worker, OffscreenCanvas and createImageBitmap are checked before construction;
+the first real composition verifies worker canvas/decode/transfer capabilities.
+`local-renderer.ts` remains the shared composition implementation used inside
+the worker and by diagnostic comparison tools; it is not a runtime fallback.
+It composes colour and
 material depth planes; `compose.worker.ts` transfers owned ImageBitmaps back to
 `worker-renderer.ts`. One completed composition remains drawable while the latest
 queued stage/size is prepared. Superseded requests coalesce, inactive owners defer
-new work, and disposal closes bitmaps and terminates the worker. The explicit local
-renderer remains the unsupported/failed-worker fallback. Cosmetic motion stays on
+new work, and disposal closes bitmaps and terminates the worker. Constructor,
+runtime, unreadable-message, post, timeout, compose and upload failures mark the
+owner unavailable, terminate the worker, abort uploads and settle pending callers.
+Explicit retry starts a fresh worker generation; late old results cannot publish
+or settle the replacement's callers. Startup offers reload recovery. Later scene
+failures offer retry through scene flow, retaining its stage identity and pending
+encounter while combat remains held. Cosmetic motion stays on
 the presentation clock; the worker does not own gameplay or animation loops.
 
 Since 1.66.1, the runtime explicitly prepares a selected scene and presents its
@@ -524,8 +646,9 @@ owns settlement/invalidation. The runtime connects navigation and resize to that
 policy rather than embedding screen-specific frame caps. Audio keeps a separate
 inactive gate so returning never overrides player pause or mute.
 
-Drifting particle catalogs and drawing belong to `rendering/scene/drift-catalog.ts`
-and `drift-renderer.ts`; ambient simulation owns particle identity and motion.
+Drifting particle catalogs, selected image leases and drawing belong to
+`rendering/scene/drift-catalog.ts`, `drift-images.ts` and `drift-renderer.ts`;
+ambient simulation owns particle identity and motion.
 See [drifting debris](../features/drifting-debris.md) for atlas extension and controls.
 
 `game/phases/standoff.ts` owns challenger setup, draw-window updates and swipe/tap
@@ -632,6 +755,48 @@ borrowed. Geometry, stage visits, seals, equipment previews, environment caches,
 figures and post history have their own presentation owners. Graphics recovery
 and viewport orchestration belong to `graphics-lifecycle.ts` and `viewport.ts`.
 Live weather hazards, hit stop, slow motion and player records remain rule-owned.
+
+`platform/pixel-memory.ts` weakly observes decoded images and canvas backing
+sizes without extending their lifetimes. Native services expose nominal main
+image/canvas, worker image/canvas, transferred-plane and source-texture bytes.
+Painter managed-texture estimates include mip levels, HDR/filter/history/back-buffer
+targets and all registered preview painters; they are separate from decoded pixels.
+A Pixi8.22 descriptor adapter adds stencil/MSAA renderbuffers without GL queries.
+These counters exclude default browser drawing buffers, driver overhead and
+unregistered auxiliary canvases. They are groundwork
+for combined admission, not an enforced whole-app cap or physical residency proof.
+
+Worker export closes unpinned raw decoded inputs after every plane copy settles;
+completed canvas/bitmap pixels remain independent. Explicit loader trimming
+preserves pins and pending required work. Demon artwork starts on `prepare()`
+instead of ordinary startup, and a failed preparation can reacquire inputs on retry.
+Its stage gate builds the existing mountain layer and prop cutouts, captures their
+material sources without drawing a GPU frame, and warms them through the gameplay
+painter. A current-source lease survives texture collection. Demon preparation
+also warms its blur/grayscale programs; ordinary preparation omits these programs.
+Realm exit cancels pending work and retires Demon inputs, cutouts and layer maps.
+Generation checks prevent obsolete work from publishing after re-entry/disposal.
+Entering Demon suspends the ordinary scenery owner: it terminates its worker,
+releases current/next scene planes and fog inputs, aborts warming and settles
+pending requests without failure notification. Ordinary preparation/drawing
+starts a fresh worker on demand. Its stage seed is unchanged; failure still uses
+explicit recovery. Hidden state and background sampling cannot restart a suspended
+owner by themselves.
+Low-memory enemies replace their raw PBR atlases with a finite set of aligned
+256px part planes during preparation. Families build sequentially; part copies
+yield and disposal cancels pending work. Colour/tone caches and material drawing
+consume those same prepared planes, including after context recovery. Higher
+memory tiers retain original atlas sampling. Gameplay/appearance seed selection
+is independent of this presentation policy.
+The256MiB decode tier bounds the main drawing buffer to about600,000pixels and
+DPR1.5, keeping logical layout/input coordinates unchanged. Scene preparation
+reclaims unpinned main-image cache before work and before readiness, targeting
+32MiB of free space within the combined admission budget. Optional next-scene
+admission also reclaims cache against its reservation estimate. Pinned live/preview
+images are never evicted by this operation. Meadow fog inputs/cutouts close when
+neither current, requested nor next scenery needs them; return preparation reloads.
+This is resource reclamation and a bounded drawing policy, not an enforced limit
+on all mandatory resources or proof of transient/all-stage memory peaks.
 
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence

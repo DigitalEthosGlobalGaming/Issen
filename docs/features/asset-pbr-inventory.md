@@ -1,11 +1,20 @@
 # Game asset and PBR inventory
 
-Last reviewed: 8 October 2026. This is a manually maintained inventory of the
+Last reviewed: 9 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
 
 ## Scope and status
+
+As of1.69.26, worker scenery on the256MiB decoded-image tier decodes aligned
+catalogue colour/material planes at half width/height. Original logical atlas
+dimensions and crop coordinates remain intact through worker source adaptation;
+file layouts and authoring assets stay unchanged. Higher tiers decode original
+dimensions. Input residency falls approximately75%; this is not a whole-app cap.
+As of1.69.27, required transition pressure can retire outgoing material planes
+while retaining their colour planes during loading. Incoming/restored scenes
+prepare full aligned materials before readiness.
 
 Lists every media file under `src/`, `public/`, `assets/` and Android source
 resources, plus UI atlas metadata. Atlases represent many sprites: this document
@@ -33,16 +42,45 @@ colour/tone consumers and retained conversion validation. Material-only
 environment, outfit, charm, companion and UI owners use plain colour plus
 normal/surface/optional emissive; they no longer decode the unused diffuse sibling.
 All 86 original authoring PNGs, atlas metadata, recipes and provenance remain.
+
+Worker composition uses GPU baking for aligned full-layer PBR copies whose
+source and bake pixel sizes match exactly. Atlas downsampling, fractional
+backing copies and main-thread composition retain software baking; material
+files and the installed plane set are unchanged.
 Enemy colour/tone painting uses the PBR diffuse atlases. Its four plain colour
 counterparts remain available to material debugging, but are excluded from enemy
 preparation and eager startup decoding as of1.68.27. The enemy catalogue now
 decodes12planes75,489,120nominal RGBA bytes, saving25,163,040bytes. This is source
 accounting, not whole-game or resident GPU memory proof.
+As of1.69.23, the256MiB decode-budget tier prepares25enemy part frames as aligned
+colour/normal/surface canvases with a256px maximum edge, then closes each family's
+raw atlases. Families prepare sequentially and copies yield through the existing
+preparation scheduler. Other tiers retain original atlas sampling. Authoring and
+runtime files remain unchanged; this is per-owner preparation, not asset packing.
 As of1.68.28, directly owned PBR images notify native GPU consumers before source
 disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
 entries survive until the shared loader evicts or closes them. This covers atlas
 planes; prepared figure cutout/tone canvases and selected-kit ownership remain
 separate performance-goal work.
+
+World UI artwork uses the shared main-thread decoded-image pool as of1.69.5:
+plain colour plus normal/surface, three768×640planes (5,898,240nominal RGBA
+bytes). Disposal unpins those planes without clearing peers; loader eviction
+retires their GPU consumers. Owned seal tints retire on disposal and cache
+eviction, preserving queued frame replay until the next frame boundary.
+Outfit colour/material planes use the shared pool as of1.69.6. Runtime selection
+pins equipped recipe families; previews borrow their own families and release
+them on suspension/disposal. The default robe needs no outfit planes, avoiding
+15 eager1254²planes (94,350,960nominal bytes/about90MiB); a family requires three
+planes/18,870,192bytes. Unpinned raw images remain cacheable within the pool,
+while consuming painters retire unused GPU sources at the frame boundary.
+Player base sources use the pool as of1.69.7: four1254²planes/25,160,256nominal
+bytes. Both plain colour (tone generation) and diffuse (untinted PBR stamps) are
+required and retained. Its consuming painters release their own GPU sources on
+preview suspension/disposal. Startup excludes plain player/charm/world UI images
+already owned by the pool, avoiding a second startup image owner.
+Enemy/weapon direct image ownership still needs integration;
+the shared loader snapshot is not a whole-game memory bound.
 Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
 (1.68.29). Current-frame textures survive replay until that painter's next begin,
 context loss or disposal; older-frame entries retire immediately. Diagnostics
@@ -53,6 +91,16 @@ retire native textures before source closure (1.68.30). Weapon LRU eviction uses
 the same frame-preserving boundary as enemy caches. All20outfits and20weapons
 match the saved original exactly; owner disposal returns native counts to zero.
 These owners still prepare their catalogues outside the shared decoded budget.
+Weapon cutout preparation now selects the equipped blade plus six enemy styles
+before startup/scene presentation. Default steel prepares12cutouts/1,036,478pixels
+(4,145,912nominal RGBA bytes); pan prepares14/1,200,318 (4,801,272bytes), beam
+13/1,083,070 (4,332,280bytes). Full20-style diagnostic preparation retains31/
+2,567,054pixels (10,268,216bytes); runtime does not prepare that full set up front.
+These are cached canvas pixels, separate from direct atlas and GPU ownership.
+Worker `prepare` preserves the completed key when the requested stage already
+has layered output (1.69.13). Repeated exports retain exact pixels and0input pins;
+changed composition keys reacquire and build normally. Preparing a current stage
+does not repin all its raw inputs merely to export the existing planes.
 Local main-thread scenery now unpins non-live inputs after compose (1.68.31).
 Stage0 retains four fog planes25,176,608nominal bytes, stage4 three bamboo planes
 18,870,192; other stages retain no raw compose inputs. Output canvases/cutouts
@@ -90,7 +138,10 @@ coverage and all nine stage caches. Visual approval is pending.
 Shared loading belongs to [asset-materials.ts](../../src/rendering/asset-materials.ts).
 Worker decoded resources now share the priority/pin/LRU loader in
 `src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
-device-class budgets. Main figure/UI/startup loader migration remains pending;
+device-class budgets. As of1.69.12 requests propagate the owning document's
+256/384/512MiB policy; completed worker exports release all raw input pins while
+keeping their independently owned output planes. Warm decodes remain evictable.
+Enemy/weapon and remaining figure/UI/startup loader migration remains pending;
 the inventory total is not a configured whole-application residency budget.
 Local-fallback PBR maps now use the shared native main-image pool through explicit
 leases; old-stage maps unpin, warm maps remain until LRU pressure, and independent
@@ -120,7 +171,21 @@ its base-path-scoped cache with HTTP fallback. Main decoded ownership is pending
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
 Only packs selected by a renderer are decoded. Generated maps are excluded from
-lifetime startup retention. Scene changes retain their shared packs and release
+startup decoding. Environment source images are also excluded as of1.69.8;
+scene composition, demon and drift prepare their inputs independently. This
+removes36 plain startup sources/226,501,456nominal RGBA bytes, without claiming
+resident savings. As of1.69.15 all drift families share two1024×512 colour/emissive
+planes,4,194,304nominal decoded bytes versus81,823,976 for the historical full
+set (94.87% reduction). The drift-only mipmapped GPU estimate is5,592,405bytes;
+this is not measured physical residency. All families remain available for moving
+particles during stage changes. Preparation warms the pair through its consuming
+painter before publication; disposal releases its two pooled leases and painter
+textures. The cheap composite path samples scene light, falls back to ambient
+over empty geometry and preserves fire emission without normal/surface maps or
+geometry-buffer writes. Original PNG/PBR authoring sources remain; old generated
+base WebPs are removed and old drift packs excluded from the runtime catalog.
+Direct demon/fog ownership still needs migration.
+Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
 weapons use their generated packs. Stage scenery, foreground bamboo, demon realm
 props and debris now submit material data. Cached layers retain transformed
@@ -128,7 +193,7 @@ normals and material coverage; procedural paint clears covered material pixels.
 Raster UI backgrounds, borders, symbols, crests and tinted seals use the same
 shader through CSS texture replacement; original slices, crops and alpha remain
 intact. Startup and gameplay share one session-only rig. Canvas comparison keeps
-original colour art. The tilde panel's Material preview exposes all **86** packs,
+original colour art. The tilde panel's Material preview exposes all **82** runtime packs,
 including retained sources without reintroducing them into gameplay.
 
 All 80 previously missing raster packs are installed: 36 environment/debris,
@@ -240,10 +305,10 @@ those in the family and mixed-material tables above.
 | [cherry-trees-atlas.png](../../src/rendering/environment/assets/cherry-trees-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/cherry-trees-atlas/README.md) | `wood` |
 | [demon-landmarks-atlas.png](../../src/rendering/environment/assets/demon-landmarks-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-landmarks-atlas/README.md) | `stone` + `wood` |
 | [demon-terrain-atlas.png](../../src/rendering/environment/assets/demon-terrain-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-terrain-atlas/README.md) | `stone` |
-| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
-| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
-| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
-| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
+| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
+| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
+| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
+| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
 | [fallen-bamboo-atlas.png](../../src/rendering/environment/assets/fallen-bamboo-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/fallen-bamboo-atlas/README.md) | `wood` |
 | [field-banks-atlas.png](../../src/rendering/environment/assets/field-banks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-banks-atlas/README.md) | `stone` |
 | [field-rocks-atlas.png](../../src/rendering/environment/assets/field-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-rocks-atlas/README.md) | `stone` |

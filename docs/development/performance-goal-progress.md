@@ -1968,3 +1968,934 @@ next seeds/slots/promotion,120Hz/CPU budget and full Phase5 metrics/traces/suite
 remain required. Goal active at full scope; no push/deploy/native build/saves.
 Final diff/formatPASS; synchronized package/lock/title/changelog. All measurement
 and verification sessions terminal.
+
+## Checkpoint 35 — Worker transfer input release rejected
+
+Before changing worker input ownership, both256/512MiB three-cycle captures pass
+54stage visits in41.3s on an isolated strict-port server/one worker. Completed
+stage0 still pins34inputs213,952,112bytes; remaining stages pin21/24/27/21/18/24/
+28/25inputs132,128,136/151,000,920/169,880,784/132,140,400/113,257,944/150,986,640/
+176,174,304/157,292,768bytes. Low-memory sampled peak264,275,216bytes. Output-plane
+SHA256 baseline also captured: two cycles/nine stages/two seed/size/DPR/quality
+variants for each capacity,72cases;2PASS24.1s. Evidence under
+tmp/performance-worker-input-release/baseline-*.json/logs; source copies and isolated
+probes under tmp/performance-worker-input-release/ and tmp/probes/worker-input-release/.
+Trial releases compose-only inputs after all output copies complete. Its72case
+capture passes loader bounds/zero post-transfer pins, but the full SHA256 gate
+fails: second-cycle stage0low colour plane differs at deviceMemory8. All remaining
+cases/planes match, including every256MiB case and all material planes. Zero pins
+alone is insufficient to accept the change.
+
+Independent native controls compare two unchanged workers and the candidate over
+36cases. Both original controls are exact; candidate stage0low on the second cycle
+differs by24channel levels, exceeding the existing max1 tolerance. Reusing empty
+raw wrappers does not fix it. Retaining warm raw bitmap references/metadata,
+unpinning them and re-pinning required inputs before new map decoding also fails:
+stage0low colour max24 and second-cycle stage7low colour max255. Both controls
+remain exact. Wrapper replacement is not an established cause; material/source-cache
+lifetime or native sampling history remains unresolved. No tolerance increase.
+
+Reverted all four implementation/test files exactly to1.68.31. Restored original
+comparisonPASS21.8s/all36cases exact against both unchanged controls. No version
+or changelog change. Original worker pins/budgets remain; main-thread local release
+from checkpoint34 remains integrated. Failed patches, original modules, hashes,
+colour comparisons and logs retained under tmp/performance-worker-input-release/;
+isolated probes under tmp/probes/worker-input-release/. All handles terminal.
+Next selected figure ownership/incoming pin admission still requires full native
+parity and coordinated headroom; worker release needs a separate proven fix.
+Next slots,120Hz/CPU budgets and full Phase5 remain required. Goal active at full
+scope; no push/deploy/native build/player saves.
+
+## Checkpoint 36 — Ordered shared enemy admission diagnostic
+
+Production remains1.68.31. Compare original direct maps and a test-only shared
+main-image owner after local composition finishes, then release both enemy owners
+before the next compose. Both three-cycle/all9stage fixturesPASS41.7s total
+(original22.2s/shared17.6s). These are diagnostic durations, not a compose speedup.
+At390x844 DPR2, all27visits per fixture admit all12enemy maps with two owners;
+shared pins add75,489,120bytes once. Maximum accounted loader bytes264,280,976
+below268,435,456; pinned peak100,665,728 including live fog. Every14appearance
+native comparison, peer comparison and peer-after-disposal comparison is exact
+on all27visits; original repeat exact, no GL warnings. Final loader0. Original
+fixture peak264,275,216 excludes direct enemy maps outside the pool; it is not a
+whole-app resident-memory baseline. Original duplicated enemy maps150,978,240bytes
+versus shared75,489,120 are already measured at checkpoint32.
+
+Holding shared enemy inputs during the next local stage1→0 compose still fails
+admission: composefalse/backendunavailable while enemy stays ready,42decoded pins
+264,264,624bytes; four required inputs cannot fit. Original direct-enemy control
+composes successfully because those maps remain outside its loader. Both fixtures
+confirm this predicted differencePASS4.9s. This is evidence against unconditional
+shared-owner integration, not a changed production test or accepted failure.
+Existing presentation suppresses enemies/boss/player/pet while sceneLoading;
+runtime must release their compose-conflicting leases before incoming preparation
+and reacquire required artwork before presentation. Startup prepares all figures
+and scene together, while two preview constructors also eagerly prepare the same
+runtime artwork; those calls need coordinated admission, including stale requests
+and preview ownership, before integration. No new rendering backend or budget raise.
+
+Evidence under tmp/performance-enemy-admission/: ordered original/shared samples,
+incoming original/shared samples, original source, logs and isolated probes under
+tmp/probes/enemy-admission/. Persistent-owner test-only port then releases PBR
+leases/material bindings, reconstructs atlases and resets readiness/pending while
+preserving bounded colour/tone caches. Same two enemy owners survive all27visits
+with high-DPR/low-quality/high-DPR cycles and new visit seeds; each owner releases
+before compose and reacquires afterward. Native14appearance/peer/peer-after-release
+comparisons are exact every visit; one owner releasing keeps the peer's12maps
+pinned/ready, both releasing leaves only local live inputs. No GL warnings;
+PASS18.6s. This tests settled ownership boundaries, not concurrent pending release,
+runtime startup/preview gates, complete context restore or first-present scheduling.
+Production unchanged/source-test diff empty. Next integrate the proven lifetime
+with runtime admission/stale-generation guards and startup/preview readiness,
+then strict/unit/browser/build verification and version notes. Remaining player/
+outfit/sword/startup ownership, next slots,120Hz/CPU budgets and Phase5 still
+required. All handles terminal; goal active, no push/deploy/native build/saves.
+
+## Checkpoint 37 — Runtime-wide enemy suspension rejected
+
+Trial routes all enemy maps through the existing main pool and adds deferred
+prepare/suspend/resume/cancel with generation guards. Runtime suspends before
+compose, reacquires before readiness, and startup uses that same readiness path
+instead of duplicate composition. Existing eager preview prepare waits behind
+the gate. Bounded colour/tone caches survive source release. No asset/decoder,
+budget, gameplay or seed changes. Baseline/checkpoint36 preceded this trial.
+
+Strict TypeScriptPASS; all467unitsPASS, including4new ordering/stale/failure/
+disposal checks. Saved-original native comparison across27high/low/high visits
+PASS18.9s with existing max1 tolerance. New pending decode/waiter cancellation
+and source identity checks, startup, cinematic/paused continuation/loading-state
+browsers14PASS47.0s. Native lifetime/real runtime/GPU related first run15PASS/1FAIL
+11.8s: queued0 assertion counted unrelated UI exports. Lease URL diagnostics show
+button/panel/scroll/logo jobs; queued3/4 occurs while all enemy maps are ready.
+All-stage lifetime/runtime2PASS21.1s after recording that shared queue accurately.
+First source fixture also needed requested URLs behind blob URLs; no decode or
+selection assertion removed. Both assertion failures/logs remain preserved.
+
+Real low-memory fallback startup plus27stage visits per selection (empty/crow)
+2PASS39.3s. UI/charm/companion leases stay in the same pool. Samples under
+tmp/performance-enemy-admission/integrated-runtime-{empty,crow}.json record all
+required scene/enemy readiness and peaks268,183,176/268,245,408below268,435,456;
+crow selection holds3companion leases. Other figure/startup/
+canvas/GPU resources remain outside this accounting. This is not whole-game memory
+or latency completion. Preview ownership still required a separate guard check.
+
+That guard fails: a visible Armoury effects preview successfully draws all8enemy
+parts before incoming scene preparation, then0/8 while compose is held. Controls
+pass the same runtime artwork instance to both previews; runtime-wide suspension
+therefore suppresses another visible consumer. Independent preview output cannot
+be sacrificed for compose headroom. Rejected integration despite other passes;
+reverted all7tracked source/test files exactly to1.68.31 and moved4new trial tests
+to ignored evidence. Restored preview guardPASS6.6s/all8parts during held load.
+No version/changelog change. Trial patch/full sources/tests and logs under
+tmp/performance-enemy-admission/rejected-runtime/ and rejected-runtime.patch;
+isolated guard under tmp/probes/enemy-admission/preview-loading.spec.ts.
+
+Next ownership must distinguish visible preview requirements from hidden runtime
+figures and coordinate incoming admission without hiding either consumer or
+raising/splitting budgets. Settled lease release/reacquisition remains proven at
+checkpoint36; applying it indiscriminately is unsafe. All handles terminal; full
+goal active, no push/deploy/native build/player saves. Selected figure/startup
+ownership, next slots,120Hz/CPU budgets and Phase5 still required.
+
+## Checkpoint 38 — Exact live upcoming scene identities, 1.68.32
+
+Baseline on checkpoint37/1.68.31: existing stage progression, visit seeds and
+compressed-loader units13PASS703.9ms. The visit ledger already exposes a pure
+peek; frame sampling previously sent only a numeric next stage to compressed
+prefetch. No next-slot loading or latency improvement is claimed here.
+
+The runtime now reads that same live ledger and geometry/quality ports to publish
+an immutable six-field upcoming composition identity: stage, stage seed, width,
+height, DPR and low quality. Unchanged fields reuse the object, so background
+metadata serializes/writes only on identity changes. Existing compressed queue
+ordering and quiet/visible/frame-budget/native/saveData gates are retained.
+Normal and daily progression predicts the next three-wave visit; rush predicts
+the next duel. Trials retain fixed scenery; cinematic choices are unknown.
+Inactive/mismatched runs and invalid geometry clear the prediction. No entry,
+checkpoint, layout, gameplay random draw or decoder operation is added.
+
+New3unit checks cover720normal/rush wave entries across two initial seeds and ten
+laps, unchanged ledger/state, exact eventual entry/key,100same-reference reads,
+all six identity invalidations, every trial, unknown cinematic choices and invalid
+geometry/inactive runs. Existing actual wave/RNG replay remains included.
+All466unitsPASS1876.3ms. Strict TypeScript passed during focused iteration.
+New actual normal/daily browser samples follow waves1/4/7/10, compare future peek
+to eventual entry, and preserve settled combat RNG/current seed/visit count.
+Initial5prefetch browsers passed but both new live tests compared RNG before the
+legitimate pending encounter continuation; fixed the test sampling point to scene
+settlement, retaining the RNG assertion. Corrected2live testsPASS17.2s.
+Failed evidence is preserved; production behavior was not changed for that failure.
+
+Evidence under tmp/performance-next-scene-identity/: baseline/units/browser logs
+and normal/daily visit JSON. Decoded soon requests and worker/local next slots,
+slot admission/promotion/invalidation, enemy/startup ownership, whole-game memory,
+120Hz/CPU budgets and final Phase5 remain required. No latency benchmark repeated
+for a prediction-only change; the standard performance harness remains unchanged.
+
+Related27browser checksPASS1.9m, including compressed ordering/policy, cinematic
+restoration and saved-run isolation, daily presets, held loading and all trials.
+Checked production build (strict TypeScript) and all4bundle testsPASS20.9s:
+startup, Armoury/gameplay/landscape, edition gates and offline resize. Rendering, seed-entry, layout and decode paths retain their existing behavior. Full goal active;
+no push/deploy/native build/player saves.
+
+## Checkpoint 39 — Next-slot admission baseline and completed cutout release, 1.68.33
+
+Checkpoint38 precedes this investigation. Isolated current-plus-incoming probes
+exercise worker transfer and two independent local owners with the actual visit
+ledger. Three stable geometries each cover stage0 through stage8 and back to0:
+390×844/DPR2 high, the same portrait low quality, and900×600/DPR2 high.
+Each renderer path composes30 scenes and verifies27 held current scenes without
+changing any plane bytes. The ledger's predicted seed equals eventual entry.
+This measures ownership overlap, does not implement next-slot promotion.
+
+Initial resize-crossing probes 2PASS36.3s; stable geometry probes 2PASS39.7s.
+Read-only colour-cutout and map-cache diagnostics then2PASS39.8s. Both256 MiB
+image loaders stay within their decoded counters, but those counters omit composed
+planes/cutouts. After worker transfer, minimum worker residency (pinned inputs,
+worker output canvases and measured retained cutouts) for incoming stage0 is
+291,972,320/274,351,732/306,243,120 bytes across those geometries. Main transferred
+current/next planes add71,098,560/31,599,360/95,961,600 bytes in their own realm.
+Local input-plus-current/incoming-plane/cutout minima are
+335,949,632/293,526,904/361,680,984 bytes. Other figures, fog ownership on the main
+worker path, GPU textures/targets, decoder overhead and intermediate allocations
+are excluded. This is not whole-app resident memory or a budget guarantee.
+Before transfer, copied incoming bitmaps also coexist in the worker realm.
+Simply counting decoded-loader bytes would therefore admit an unsafe next slot.
+
+Composition no longer needs its baked stamp cutouts after planes own the pixels.
+`clearCutouts` releases only baked intermediates/scratch, preserving source bindings
+and completed layer maps. Local completion also releases non-live source colour
+cutouts before dropping input leases. The worker clears after all bitmap copies
+settle; its raw wrappers/pins and decode interpretation remain unchanged. Fog and
+bamboo retain live colour inputs/cutouts. No change to assets, plane resolution,
+normal bins, layout, seed sequence or gameplay. This avoids the rejected worker
+raw-input release and runtime-wide enemy suspension from earlier checkpoints.
+
+Candidate overlap probes 2PASS40.1s. All348 compared raw plane hashes per backend
+match the original, across all nine stages and three geometries; held current
+planes also remain exact. Stage0 settled cutout savings are42,470,928/44,599,940/
+44,310,208 bytes for worker and50,898,960/47,975,432/51,767,272 bytes for local.
+Maximum measured removed cutouts are44,968,120/54,677,600 bytes. These are nominal
+retained-pixel savings, not reduced compose peaks: new cutouts exist during build,
+and worker bitmap copies overlap before this release. Local input/plane overlap
+alone still exceeds256 MiB at high quality. Slots remain unintegrated.
+
+Probe compose round trips (including decoding) total14,585.2→14,750.0 ms worker
+and12,926.1→13,085.7 ms local over30 visits; maxima1377.0→1378.9 and1168.5→1195.8 ms.
+These single ordered runs are not statistical latency comparisons and do not prove
+compose/cold-load targets. They expose the outstanding cost rather than claim a
+speedup. Standard performance measurement configuration is unchanged.
+
+Strict TypeScript passed; all 466unitsPASS2325.3 ms. Permanent cache checks verify
+zero entries/pixels/scratch while completed maps and source bindings remain alive.
+Local lifetime tests retain raw/native/replay/context restoration, pressure,
+reacquisition and stale-request guards. Worker256/512 MiB three-lap tests retain
+all original image pins and now assert no completed baked cutouts. Related 11 browser
+checksPASS34.0s, including all-nine native worker/local materials, slope/mirror
+coverage, fallback, coalescing/peer disposal and hidden-owner deferral.
+Checked production build and all 4bundle testsPASS21.3s, including offline resize.
+
+Evidence: tmp/performance-next-scene-admission/ (baseline and candidate JSON,
+hash/cost comparisons, original sources and logs); isolated probes under
+tmp/probes/next-scene-admission/. Next reconcile transient compose/transfer
+allocations and current/next output ownership with shared admission, then integrate
+quiet soon requests and exact slot promotion/invalidation. Selected figure/startup
+ownership, whole-game memory,120Hz/CPU budgets and full Phase5 remain required.
+Goal active; no push/deploy/native build/player saves.
+
+Warming/context restoration and loading-readiness browsers: 11 PASS in 38.8s.
+All handles terminal; metadata and architecture notes are synchronized.
+
+## Checkpoint 40 — Worker copy overlap and preserved exact-key output, 1.68.34
+
+Baseline is checkpoint39/1.68.33. Saved original source modules precede the trial;
+original transfer/context units pass (four tests,47.8 ms). A serial destructive-copy
+trial keeps the accepted alpha/colour-space options, retires each copied backing
+canvas, clears output metadata and rebuilds subsequent requests. Strict TypeScript
+and seven focused units pass, including one-at-a-time ordering and synchronous/
+asynchronous failure cleanup. Saved-original/candidate native WebGL output over
+27 visits is exact, with exact frame replay and no GL warnings (PASS18.3 s).
+
+The stronger full-size repeated-key guard fails. Held transferred bitmaps remain
+exact, and every data-map hash matches, but rebuilt colour differs: Shore's far
+plane changes in all three geometry modes (max255,37071/2312/51684 changed channel
+values); low-quality stage0's base colour changes by21 across7910 values. These
+390×844 high/low and900×600 high comparisons expose a regression missed by the
+smaller native fixture. Kept the strict assertion; quantified and preserved both
+failed runs. Rejected and restored all five tracked source/unit files exactly to
+1.68.33; new trial browser test moved to ignored evidence. Restored control covers
+27 unchanged keys/three geometry modes, all hashes exact, PASS21.2 s. The cause of
+rebuild colour history remains unresolved. Completed-plane retirement is not
+integrated, and repeating cached keys must preserve original planes.
+
+Accepted change releases completed stamp intermediates before the existing
+parallel bitmap copies. Worker clears all baked-map/scratch and colour cutouts;
+its live motion belongs to transferred planes and main-thread inputs. Main local
+owners retain their existing fog/bamboo colour inputs/cutouts. Completed planes,
+raw wrappers/pins, decode interpretation, resolution, layouts and seed sequence
+remain unchanged. No regeneration is introduced for exact-key requests.
+
+Read-only copy-entry diagnostics compare saved original and accepted worker over
+27 visits. All native pixels and replay are exact, no GL warnings; every candidate
+copy starts with zero map/scratch/colour cutout pixels (PASS18.1 s). Original copy
+entry holds up to33,849,316 nominal cutout bytes in this small-geometry fixture;
+those intermediates are now absent during copying. This measures a copy-phase
+reduction, not whole-app resident memory or the earlier compose peak. Full geometry
+probe30scenesPASS20.7 s; all 348 held raw plane hashes match checkpoint39, covering
+all nine stages, portrait high/low and landscape high. All final worker colour
+cutouts are zero, including bamboo. Earlier original/accepted transfer sums are
+487.6→372.4 ms over27 visits; one ordered run is not a statistical latency claim.
+
+The new permanent retained-plane test exercises every stage in three geometry/
+quality modes: prepare retains completed dimensions/pixels, repeated keys do not
+rebuild, original and repeated/held plane hashes match, and original image pins
+remain within256 MiB. Focused original-retention variantPASS20.9 s; final related
+21browsersPASS1.1m, including retained planes, native materials, local pressure/
+live effects, stale requests, worker fallback/coalescing/hidden handling,256/512 MiB
+cycles, texture warming/context restore and cosmetic loading/RNG preservation.
+All 466unitsPASS1937.2 ms. Checked production verification follows below.
+
+Evidence under tmp/performance-worker-plane-transfer/: original/trial source,
+rejected tests, native and copy-entry JSON, raw comparisons, failed rebuild pixel
+counts and all logs. Isolated probes under tmp/probes/worker-plane-transfer/;
+full-size inventory probe remains under tmp/probes/next-scene-admission/.
+Next-slot admission still needs transient build/copy and current/next plane
+accounting, including decoded LRU headroom. Existing parallel copies can still
+exceed the low-memory total when combined with pinned images/output; cutout
+retirement does not by itself make slots safe. Do not reapply destructive plane
+retirement without a proven repeated-key colour fix. Selected figure/startup
+ownership, whole-game decoded/GPU bounds, quiet soon work, exact next-slot
+promotion/invalidation,120Hz/CPU budgets and full Phase5 remain required.
+Goal active; no push/deploy/native build/player saves.
+
+Checked production build (strict TypeScript) and all four bundle checks PASS21.6s,
+including startup, Armoury/gameplay/landscape, edition gates and offline resize.
+All handles terminal; architecture, metadata and release notes synchronized.
+
+## Checkpoint 41 — Admitted image sets; renderer preload trial rejected
+
+Integrated 1.68.35 adds an explicit loader `prefetch` API and main-owner forwarding.
+It admits the union of a measured future set and existing pins before serial
+soon decoding, shares promises/resources and keeps completed images in the LRU.
+Busy,hidden or over-budget policy and now requests cancel future leases. Promoted
+or peer-pinned requests survive; orphaned pending work aborts,late resources close,
+and stale failures cannot delete a replacement entry. `sceneImageUrls` matches
+active environment colour/normal/surface/emissive selections and skips diffuse.
+This is a tested API foundation; runtime automatic next decoding remains disabled.
+
+The native main API guard visits all 9 stages with one protected peer image. All
+admitted sets reuse decoded images when requested now (zero extra decodes),peak
+264,275,216 bytes is below256 MiB, 63 LRU evictions occur and final disposal reports
+zero bytes. Four new units cover union admission/shared leases,policy cancellation/
+late cleanup,required promotion and replacement-request isolation. All 470 units
+PASS 2088.8 ms. Related16 browsers PASS 52.0 s,including original worker plane lifetime,
+native rendering,256/512 MiB cycles,local pressure/stale requests,worker fallback,
+coalescing and visibility. Checked production build (strict TypeScript) and all 4
+bundle checks PASS 21.5 s,including offline resize. Existing tolerances are unchanged.
+
+Automatic quiet-frame observer and worker preload protocol trial was rejected.
+It required settled matching geometry/quality,used exact forecast keys,cancelled
+on busy/hidden/stale identity and left current bindings/planes intact. Required
+local decodes reused future images,with unchanged held scenes and builds. But
+27-visit original/candidate guards found incoming raw/native changes on subsequent
+visits. Quantified local candidate native max 32 versus unchanged-control max 13;
+Shore colour max 255 changes 51,684 channel values,including alpha max 23. That colour
+change was absent from the quantified unchanged control and resembles checkpoint 40.
+Candidate data maps can differ by 255; unchanged reload controls also exhibit data
+map max 255 and alpha changes,so attribution cannot rely on cross-reload hashes
+alone. Warmed unchanged controls still fail. Do not loosen the raw/native gates.
+
+Worker trial initially hid main preload diagnostics under the response snapshot's
+undefined local field. Fixed only in trial,then actual awaited future decoding
+still fails stage-zero low-quality colour-plane equality on the second lap.
+All five tracked renderer/protocol files restored exactly. Observer and its new
+unit/browser integration tests moved to ignored trial evidence; no automatic
+renderer preparation,decode,compose or slot promotion was integrated. Worker and
+local decode interpretation,current planes and original raw pins remain unchanged.
+
+Evidence under tmp/performance-scene-image-preload/: first failed captures,
+cold/warm unchanged controls,quantified compressed raw captures and
+pixel-differences.json,final worker trial,trial source/tests and accepted API/unit
+evidence. Probes under tmp/probes/scene-image-preload/. No repeat headline timing
+suite or latency/frame-budget claim for this checkpoint. The source-sampling
+history root cause is unproven and must be resolved with a reliable comparison
+before enabling next decoding. Whole-game memory/transient admission,worker/local
+next slots/promotion,figure/startup ownership,120Hz/CPU budgets and full Phase 5 remain.
+Full goal active;no push/deploy/native build/player saves.
+
+## Checkpoint 42 — Native multi-size sampling isolation
+
+Diagnostic-only checkpoint; production remains1.68.35 with automatic next decode
+disabled. No implementation,version,asset or tolerance change. The plain Shore
+probe has no material bindings and no prediction/loader integration, yet repeats
+the exact rejected far-colour delta:51,684 changed channel values,max255,alpha23.
+Fresh destination canvases first still reproduce it. Retiring colour cutouts after
+the final readback preserves the same cold/warm hashes and difference. Thus neither
+destination reuse nor early cutout retirement is required. Material-mask CPU
+readbacks are also unnecessary. Intermediate stamp readbacks perturb the final
+cold hash (22,393 changes instead of51,684), so their attribution is not conclusive.
+
+An unperturbed foam-only sequence reproduces63,088 channel changes,max255,alpha29,
+without other art,filters,colour cutouts,material maps or renderer bookkeeping.
+The same source is drawn at the original Shore sizes/cells/rotations into fresh
+canvases. Independent source-query ablations show varied sizes alone reproduces
+55,353 changes,alpha24. Constant size,angles-only and cells-only runs are exact.
+All three decode kinds—URL HTML,blob HTML and default ImageBitmap—repeat the
+same63,088 delta. Creating a new bitmap clone of the already-used source does not
+reset it. Fixed-size direct crop draws remain exact across those three kinds.
+These results isolate native multi-size sampling history; they do not identify
+the browser's internal caching mechanism or prove that intrinsic atlas pixels
+change. No renderer source normalization has been accepted.
+
+The foam-only sequence becomes exact on destinations created with
+willReadFrequently:true for all three source kinds. However the full Shore probe
+with that flag on all three destination layers still produces the original
+51,684 delta. Therefore a blanket CPU-backing change is not a verified remedy.
+Its original cold/warm output and compose cost must be established before any
+production trial. The minimal source ablations are diagnostic pass/count checks,
+not a passing visual-stability claim for the application.
+
+Sources under tmp/probes/scene-image-preload/:shore-history,shore-fresh-first,
+shore-after-copy,shore-stamps,foam-source,foam-sequence,foam-ablation,
+foam-kind-sequence,foam-clone,foam-cpu and shore-cpu. Archived result JSON under
+tmp/performance-scene-image-preload/isolation/. All handles terminal; no concurrent
+captures,headline benchmark rerun,push/deploy/native build or player saves.
+Next isolate the mixed full-Shore interaction and verify a pixel-preserving
+sampling fix before restoring quiet decoded-soon work and admitted next slots.
+Whole-game memory/transient admission,figure/startup ownership,120Hz/CPU budgets
+and fullPhase5 remain required. Full goal active.
+
+## Checkpoint 43 — Pixel-preserving fresh-decode control
+
+Diagnostic only; production remains 1.68.35. Making the entire Shore canvas
+baking chain CPU-backed makes all 16 far-colour hashes repeatable, but its hash
+differs from both original cold and warm outputs. Changing only colour-cutout
+contexts also changes both hashes and retains a first-to-repeat difference of
+51,823 channels, max255, alpha23. Neither treatment preserves original pixels;
+neither is integrated. These fixture durations do not establish production
+compose costs.
+
+Independent fresh decoding resets the source-history effect. Foam-only blob-HTML
+and default ImageBitmap sequences each repeat exactly when decoding a new source
+for each build; reusing the same encoded Blob also suffices. This differs from
+cloning an already-used ImageBitmap, which did not reset the effect in checkpoint
+42. No claim about the browser's internal implementation is made.
+
+The full Shore fresh-data probe checks 32 cases across material bindings on/off,
+destination reuse/freshness and refreshing foam alone/all sources. Every far-colour
+hash equals the original cold fingerprint. An expanded 144-plane probe checks
+all three layers' colour/normal/surface/emissive output across four builds for
+three controls: retained sources, fresh foam and fresh all sources. The final
+same-encoded-blob version includes exact hash and delta assertions. Both refresh
+controls pass all 48 hashes against the retained control's original cold planes.
+Retained sources reproduce the original 51,684-channel far-colour difference on
+all three repeats, max255, alpha23; its other 11 planes remain exact. Thus foam
+refresh alone preserves original cold output throughout this particular full
+Shore fixture, with unchanged material-map sources and fresh destination canvases.
+
+This establishes a diagnostic control, not a production solution: it has not
+proved worker/native application parity across every stage, geometry or quality,
+and repeated decoding has not been measured or admitted within the overall
+memory budget. Do not normalize production pixels, loosen tolerances or enable
+automatic preload based only on this fixture. Next validate original/candidate
+preload with matched source draw histories and fresh-decode controls, then resume
+whole-budget worker/local next-slot work and promotion/invalidation/quiet pacing.
+
+Sources under tmp/probes/scene-image-preload/: shore-all-cpu, shore-cutout-cpu,
+foam-fresh-data, shore-fresh-data, foam-redecode, shore-fresh-planes and
+shore-redecode-planes. Archived JSON under
+tmp/performance-scene-image-preload/isolation/. All seven probes pass their
+respective count/assertion checks; only the final full-plane probe asserts exact
+original/candidate hashes and expected retained-source deltas. All handles
+terminal. No implementation/version/asset/visual-gate change or headline benchmark
+rerun; full Phase5 and the remaining goal budgets are still required. No
+push/deploy/native build/player saves; full goal active.
+
+## Checkpoint 44 — Matched-history automatic preload trial
+
+Diagnostic only; app remains 1.68.35. Temporarily restored the rejected observer,
+worker preload protocol and local integration from checkpoint 41 to test actual
+renderer behavior. Each original/candidate pair starts with a fresh renderer,
+draws the same current scene, then enters the same next scene. All nine boundaries
+are checked in portrait, low-quality portrait and landscape. This matches prior
+source draw history while preserving actual automatic preload scheduling.
+
+Local256, worker256 and worker512 MiB configurations each pass 27 pairs. The
+archived strict verifier proves 1,044 exact plane comparisons and 81 native frame
+comparisons per configuration: incoming/current original versus candidate,
+unchanged candidate held planes and corresponding held native draws. Total3,132
+plane comparisons and243 native comparisons. Every preload reports ready;
+local entries perform zero new decodes and builds remain unchanged during
+preload. All three loader peaks are251,692,784 bytes. The low-budget worker probe
+sets deviceMemory inside the worker before importing its runtime; all27 responses
+confirm268,435,456 budget and worker backend. High-budget responses confirm
+536,870,912 budget and worker backend. Worker decode counts are not instrumented.
+These are decoded-loader counters, not whole-game or transient memory bounds.
+
+The initial local assertion that its second native draw must equal its first
+fails on eight landscape cases. The disabled original arm has the same changes,
+and original/candidate second draws match exactly in all27 cases. The final
+verifier compares native output at matching draw ordinals and retains exact
+held-plane invariance; it changes no pixel tolerance. Raw/native parity therefore
+passes for these isolated transition pairs. Continuous history remains a separate
+required gate; isolated pairs cannot prove repeated visits safe.
+
+Required prepare starts material maps before colour images; the preload URL
+enumerator originally interleaves them. A temporary maps-first trial tests this
+ordering in the original continuous27-visit fixture. The gate still fails:
+19 normal/surface plane hashes differ on later visits (first at stage0,
+low-quality portrait). All colour plane hashes match, and no feedback-loop or
+bound-texture warnings occur. Ordering alone is not an accepted fix; native/map
+sampling and source lifetime across continuous visits remain unresolved.
+
+All six tracked renderer/protocol/enumerator files restored byte-for-byte to the
+saved production sources; git diff confirms no rendering change. Temporary
+observer removed. No automatic preload, normalization, next slots, assets,
+version or visual tolerance change is integrated. Sources under
+tmp/probes/scene-image-preload/: matched-history, matched-history-expanded,
+verify-matched-history and ordered-history. Archived local-low, worker-low,
+worker-high and ordered-cycle-local-low JSON under
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+
+Next resolve the continuous-cycle data-map difference with matching original
+controls and explicit source lifetime/draw histories before enabling preload.
+Whole-budget next slots, exact promotion/invalidation, quiet pacing, figure/
+startup ownership, 120Hz/CPU budgets and full Phase5 remain required. No headline
+benchmark rerun, push/deploy/native build or player saves; full goal active.
+
+## Checkpoint 45 — Continuous controls and map-source treatments
+
+Diagnostic only; app remains1.68.35. A fresh unchanged local256 MiB continuous
+control captures the same27 visits in two arms without any automatic preload.
+Its exact equality gate fails at stage0-low on the same normal/surface hashes
+as checkpoint44. There are19 differing planes between unchanged arms. Comparing
+the archived maps-first preload candidate against these two controls shows25/27
+complete scenes match one unchanged arm exactly: every plane and both native
+draws must come from that same arm, with no per-plane mixing or tolerance change.
+Landscape stage6 and7 still have no complete matching control. Existing variation
+does not justify accepting those remaining differences.
+
+A minimal sequence samples the common mountain normal and surface maps at the
+same varied sizes used by the preceding source probes. URL HTML,blob HTML and
+default ImageBitmap kinds all reproduce the same GPU first-to-repeat delta:
+normal21,133 channels,max255,alpha37; surface34,158,max235,alpha0. CPU destinations
+are stable across all three kinds. Explicit medium/high GPU smoothing neither
+preserves original cold pixels nor prevents history differences. CPU destinations
+also change the cold output: bitmap normal74,883 channels,max255,alpha42;
+surface59,568,max255,alpha25. No destination/smoothing normalization is accepted.
+
+Fresh full-size1:1 CPU canvas copies of the raw maps, recreated before each
+minimal GPU sequence, preserve original cold pixels exactly for both maps and
+all three decode kinds, across all three repeats. A single retained copy instead
+reproduces the original21,133/34,158 differences on later repeats; its strict
+stability assertion fails. Thus a fresh copy is a limited reset control, not a
+reusable source fix. No claim about browser internals or production costs follows.
+
+Full renderer trials reject extrapolating the minimal copy result. Fresh
+normal/surface CPU snapshots per PBR atlas, enabled only in the candidate, change
+132 plane hashes across27 visits, starting with all six material planes on the
+first cold stage0 build. Moving the snapshot to already-composed map canvas inputs
+preserves every candidate plane hash and both native draws from the prior
+maps-first trial, but does not resolve its two unmatched landscape scenes. The
+original cross-arm gate still fails at stage0-low. Neither treatment is integrated;
+snapshot memory and compose costs have not been admitted or established.
+
+All eight tracked trial sources restored byte-for-byte: the six renderer/protocol/
+enumerator sources plus pbr-atlas and cached-materials. Temporary observer removed;
+git diff confirms no rendering changes. No version,asset,implementation or visual
+tolerance change; no headline benchmark rerun. Sources under
+tmp/probes/scene-image-preload/: continuous-control,map-source-sequence,
+map-source-quality,map-source-cpu-parity,map-source-copy,map-source-retained-copy,
+map-snapshot-cycle and map-plane-snapshot-cycle. Result JSON archived under
+tmp/performance-scene-image-preload/matched-history/. All handles terminal.
+
+Next investigate decoded-source lifetime and sampling for landscape stage6/7
+with matching unchanged controls and the fresh-decode control. Do not reuse raw
+or composed-plane snapshotting as a proven remedy. Full next-slot implementation,
+whole-budget admission,exact promotion/invalidation,quiet pacing,figure/startup
+ownership,120Hz/CPU budgets and fullPhase5 remain required. Full goal active;
+no push/deploy/native build/player saves.
+
+## Checkpoint 51 — Bounded draw-slot reuse, 9 October 2026
+
+Version 1.69.2 swaps an unsubmitted matching-kind slot into the requested draw
+position before allocating a replacement. The existing array remains bounded by
+its prior peak size; submitted objects retain their order and are never reused
+within the same frame. The original missing-kind replacement/disposal path stays
+in place. No texture sampling, shader, simulation, seed or save changes.
+
+The standard harness passes five timing samples and a separate diagnostic for
+Demon and Inferno before/after, with matching instrumentation and geometry.
+Alternating normal-combat samples reuse those exact saved builds and the standard
+measure() workload. Pooled CPU render times, milliseconds:
+
+| Workload | Before median / p95 / p99 | After median / p95 / p99 | Before / after renders over16.7ms |
+| --- | --- | --- | --- |
+| Combat | 2.5 / 3.6 / 4.5 | 2.2 / 3.2 / 4.0 | 3/1504 / 1/1503 |
+| Demon | 6.8 / 10.0 / 14.5 | 5.8 / 7.2 / 10.1 | 4/1505 / 0/1503 |
+| Inferno | 11.2 / 20.8 / 34.3 | 9.4 / 14.0 / 21.4 | 202/1466 / 32/1495 |
+
+Combat update median/p95/p99 stays0.1/0.2/0.3ms. Sampled removeListener self time
+in separate diagnostic windows falls303.4 to64.5ms for Demon and604.3 to412.9ms
+for Inferno. These sampled costs do not replace headline timing. Gameplay has a
+120fps cap and60fps simulation; near16.7ms headless desktop callback intervals
+do not prove120Hz display delivery. Inferno still exceeds the8.3ms CPU target.
+
+The saved original/current40-frame native comparison is exact. The permanent
+regression retains all12 original meshes across changing draw order, keeps peak12,
+verifies root submission order and final disposal, and checks GL/binding warnings.
+All475 unit tests,34 related native browser tests, strict/checked production build
+and four production browsers pass. Version/lock/title/changelog and ownership
+notes are synchronized. All capture/verification processes are terminal.
+
+Linear-gradient ramp sharing was tried first and fully reverted. Matrices match
+exactly, but34/35 native frames change (11,203 channels,max3); original/original
+controls change only one frame (five channels,max1). No tolerance is relaxed.
+
+Before/after evidence: tmp/performance/2026-10-09T02-17-21.471Z-e941054d and
+2026-10-09T02-26-12.404Z-7c5cceab, including source maps/profiles, traces, saved
+builds and frame-budgets.json. Exact oracle, rejected trial, alternating combat
+comparison and verification logs: tmp/performance-gameplay-checkpoint51/.
+
+Next target remaining measured Inferno resource-binding/gradient preparation
+without the rejected sampling change. Next-scene slots, quiet composition/uploads,
+local paused differences, cancellation, whole-memory/figure/startup admission and
+all Phase5 metrics/traces/suites remain required. Full goal active; no deployment,
+native build or real player-save changes.
+
+## Checkpoint 52 — Retained geometry bindings, 9 October 2026
+
+Version 1.69.3 retains the light pass's unchanged geometry inputs across ordinary
+frames. Light outputs detach before accumulation; geometry samplers detach before
+resize/restore generation replacement and disposal. Original/current40-frame lit
+comparison is exact, and the regression verifies steady-frame retention plus old
+source retirement. No source sampling, shader, simulation or seed changes.
+
+Five matched standard samples before/after, pooled render median/p95/p99 in ms:
+Demon5.8/7.2/10.1 ->5.4/6.8/8.6; Inferno9.4/14.0/21.4 ->8.25/11.1/15.2.
+Inferno renders over16.7ms fall32/1495 to14/1498; Demon stays0. Five alternating
+saved-build combat samples per arm are close:2.2/3.1/4.0 ->2.3/3.2/4.3ms, with
+identical0.1/0.2/0.3ms update cost. This is not a claimed combat improvement.
+Inferno still misses8.3ms; desktop callback intervals do not prove120Hz delivery.
+All475 units,35 native browsers, strict/checked build and four production browsers
+pass, with synchronized version/title/changelog. All handles are terminal.
+
+A separate120-frame native Inferno diagnostic reveals264 additional EMPTY source
+and style listeners per frame; disposal leaves31,704/31,705. Pixi8.22's graphics
+context builder unconditionally creates globally cached WebGPU texture bind groups
+on WebGL, whose installed adaptor binds batch textures directly without them.
+An ignored instance-local prototype preserves BigPool/batcher/transforms/buffers/
+instructions and skips that allocation. Its source/style counts stay8/2 and return
+to0/1 baseline on disposal. All40 lit native Inferno frames match the original
+exactly. This prototype still needs production typing, lifecycle/peer/restore
+coverage and matched app timing; it is not integrated or a whole-GPU budget claim.
+
+Evidence: tmp/performance-gameplay-checkpoint52/; standard before/after saved
+bundles and source-mapped captures in tmp/performance/2026-10-09T02-26-12.404Z-7c5cceab
+and2026-10-09T02-38-40.787Z-fd9dd49b. Next integrate that verified WebGL allocation
+fix, then resume deterministic scene slots, quiet composition/upload pacing,
+whole-memory/figure/startup admission and all Phase5 metrics/traces/suites. Full
+goal remains active; no deployment, native build or real player-save changes.
+
+## Checkpoint 53 — WebGL graphics listener lifetime, 9 October 2026
+
+Version 1.69.4 integrates the instance-local graphics-data builder verified at
+checkpoint52. Pixi8.22 builds globally cached WebGPU batch bind groups even for
+WebGL; its GL adaptor binds textures directly without reading those groups.
+The adapter keeps Pixi's BigPool, batcher, transforms, geometry buffers and
+instructions, omitting only the unused groups. No dependency/global mutation,
+shader, source sampling, draw order, simulation or seed change. Recheck this
+version-specific adapter when upgrading Pixi.
+
+The integrated/original comparison is exact across40 lit changing-order Inferno
+frames. The permanent regression runs two painters through120 animated frames,
+two resizes, context restoration,40 more restored frames and peer disposal.
+EMPTY source/style/WHITE source counts stay16/3/2 with both painters,8/2/1 with
+one, then return to baseline0/1/0 after disposal. Restored and surviving-peer
+pixels are exact and GL errors absent. Before the fix, a single120-frame painter
+left31,704 EMPTY source listeners after disposal. These are ownership counts,
+not a whole-game GPU residency measurement.
+
+Five matched standard samples, pooled CPU render median/p95/p99 in milliseconds:
+
+| Workload | Before | After | Before / after over8.3ms | Before / after over16.7ms |
+| --- | --- | --- | --- | --- |
+| Demon | 5.4 / 6.8 / 8.6 | 4.55 / 5.9 / 7.6 | 20/1503 / 6/1504 | 0 / 0 |
+| Inferno | 8.25 / 11.1 / 15.2 | 4.4 / 5.4 / 6.4 | 743/1498 / 5/1489 | 14 / 2 |
+
+Five alternating normal-combat samples per saved bundle pass:2.3/3.2/4.1 to
+2.2/3.1/3.8ms; over8.3ms remains5/1502, over16.7ms1/1502. Update cost remains
+0.1/0.2/0.3ms. This close comparison is not a major combat gain claim.
+Separate source-mapped CPU captures record no sampled removeListener self time
+for either workload, versus checkpoint52's69.5/303.5ms. Zero sampled time does
+not prove zero cost. Identical instrumentation fingerprint, geometry, seed,
+warmup and duration; no overlapping captures or test activity.
+
+Both measured render p95 values now fit8.3ms. Headless callbacks remain near
+16.7ms, so actual120Hz delivery is unproven. Two Inferno timing outliers over
+16.7ms remain; diagnostic profiles are separate windows and do not explain
+individual timing outliers. Full workload/transition/whole-memory goals remain.
+
+Evidence: tmp/performance-gameplay-checkpoint53/, including original source,
+integrated-webgl-geometry-bindings.json, graphics-lifetime.json, combat-control/
+and verification logs. Standard baseline: tmp/performance/2026-10-09T02-38-40.787Z-fd9dd49b;
+after: tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e, retaining raw samples,
+frame-budgets.json, source-cpu-summary.json, source maps, profiles and traces.
+The timing build preceded only the release-version/comment synchronization.
+
+All475 units,36 related native browser cases, strict/checked production build
+and four bundled production tests pass. Version/package/lock/title/changelog and
+rendering notes are synchronized; changed-file format/diff checks pass and all measurement
+and verification handles are terminal.
+Whole-repository format:check flags431 unchanged files, verified against HEAD:
+178 are checkout CRLF differences,253 also fail formatting on committed HEAD.
+All431 match HEAD after line-ending normalization; evidence is in
+format-baseline.json/log. No unrelated formatting edits are included.
+
+Next resume deterministic next-scene slots, quiet composition/uploads, local
+paused differences, generator cancellation, whole-memory admission and selected
+figure/startup ownership. All Phase5 measurements/traces/suites remain required.
+No deployment, native build or real player-save changes; full goal active.
+
+## Checkpoint 54 — Local task-yield fidelity isolated, 9 October 2026
+
+Diagnostic only; app remains1.69.4. The repaired local generator drained
+synchronously matches the original through27 visits:348 incoming planes,
+unchanged held planes and both native draws per visit. High/low portrait and
+landscape use matching history, geometry and seeds. No tolerance was relaxed.
+
+Two ignored-probe defects initially changed only stage0 native fog. Live motion
+used the production cached-material binding module while composition used a
+private clone; the cloned meadow helper was then a generator called without
+draining from live fog. Matching the probe's material/motion modules and adding
+a synchronous tile wrapper fixes both. The final full native equality gate
+passes; earlier failed sync captures do not establish an application regression.
+
+Against the same synchronous generator, unrestricted statement-level yielding
+changes23/27 visits with1,483 recorded yields. Completed-stamp/restore/temporary
+cleanup boundaries reduce this to the same four checkpoint49 failures, with399
+recorded yields: high portrait Hollow colour/surface and native draws, high
+portrait Shore colour and native draws, landscape Hollow colour only, landscape
+Shore colour and native draws. Every held plane matches its incoming plane.
+Low portrait is exact. Thus the remaining four differences occur with yielding,
+not synchronous generator transformation. This does not identify the browser's
+raster mechanism or prove safe pacing; the yielded route remains rejected.
+
+The final paired native run reports one passing synchronous oracle and one
+expected failing atomic candidate, after collecting all visits before assertions.
+No production implementation, version, assets, run state or broad-suite result
+changed. All three native-control processes are terminal. Evidence and reliable
+final sources/maker/tests are in tmp/performance-scene-image-preload/checkpoint54/.
+Use local-generator-sync54-final.json, local-generator-atomic54.json,
+local-generator-paused54.json, their summaries and final-controls.log; the live
+ignored source is tmp/probes/scene-image-preload/cooperative54/.
+
+Next isolate command/source lifetime at the first Hollow/Shore difference and
+measure worker composition's actual interference with main gameplay. Worker
+chunk wall time alone is not a main-thread frame measurement. Preserve exact
+controls, whole-memory admission, generator cancellation and texture-store lease
+requirements before next-slot integration. All Phase5 metrics/traces/suites,
+actual120Hz delivery and whole-game memory bounds remain outstanding. Goal active;
+no deployment, native build or real player-save changes.
+
+## Checkpoint 55 — Worker interference with gameplay, 9 October 2026
+
+Diagnostic only; app remains1.69.4. Five fresh-context samples per arm use the
+same saved production Inferno build, standard3s warmup/5s window and seed424242.
+Arms alternate idle-prepared worker, synchronous composition and repaired atomic
+yielding. Inputs are prepared before warmup. Both portrait390x844/DPR2 and
+landscape900x600/DPR2 pass workload checks. Timestamped callback pushes add the
+same overhead in every arm; no CPU sampling, traces or allocation wrappers run.
+Forced active-play composition measures interference, not production scheduling.
+
+Matched windows use each repetition's larger compose elapsed time plus100ms for
+every arm, preventing five-second averaging from hiding short stalls.
+
+| Geometry / arm | Matched render median / p95 / p99, ms | Renders over16.7ms | Callback interval p99, ms |
+| --- | --- | --- | --- |
+| Portrait idle | 4.7 / 5.8 / 6.6 | 1/291 | 24.9 |
+| Portrait synchronous | 5.2 / 7.1 / 18.6 | 3/288 | 27.3 |
+| Portrait yielded | 4.7 / 5.7 / 7.2 | 1/289 | 20.5 |
+| Landscape idle | 4.5 / 5.6 / 15.8 | 2/415 | 23.7 |
+| Landscape synchronous | 5.0 / 6.3 / 18.5 | 5/415 | 26.8 |
+| Landscape yielded | 4.7 / 6.1 / 17.1 | 5/414 | 25.8 |
+
+Full-window render p95 is5.7/6.1/5.7ms in portrait and5.5/6.0/5.9ms in landscape.
+Portrait results support atomic yielding; landscape tail cost remains. This is
+not proof of zero interference or120Hz delivery; callbacks remain near16.7ms.
+Elapsed compose median synchronous/yielded is678.5/852.3ms in portrait and
+1070.4/1295.1ms in landscape. Yielding has a measured latency cost. Portrait
+records12 GPU bakes and39 yields; landscape takes the original software-bake
+route,0 GPU bakes and52 yields. The first landscape run had an incorrect GPU-only
+guard and is excluded; its replacement verifies completed layered composition
+and records actual route counters, without changing implementation or pixels.
+
+A preflight synchronous sample has a75.4ms callback interval184ms into compose.
+The five-sample run's94.8ms maximum occurs1170ms after worker completion and is
+not attributed to its compose interval. Raw/timestamped records and timeline
+audits preserve this distinction. Extra setup callbacks before the timestamp
+hook remain in full-window raw metrics; matched windows use timestamped records.
+
+The measured worker source's protocol adapter passes all27 strict scene visits:
+348 incoming/held planes and54 native draws match the original, including low
+portrait and landscape. Worker/no-fallback coverage is positive, decoded peak
+264,275,504bytes stays below268,435,456 and no GL/binding warnings occur. Pool
+bytes are not whole-game decoded/GPU bounds. The timing receiver closes bitmaps;
+it does not measure persistent next-slot storage or GPU warming.
+
+Evidence: tmp/performance-scene-image-preload/checkpoint55/: results.json,
+results-summary.json, results-timeline-audit.json, preflight/landscape results,
+logs, worker-atomic55.json and preserved driver/worker/generator/oracle sources.
+The same saved gameplay build is tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e.
+All handles are terminal; no production code/version, asset, seed, save or broad
+suite changes. Next implement whole-memory admission and selected figure/UI
+ownership, then retained worker/local slots with quiet grants, cancellation,
+existing texture-store leases and uploads. Local yielding differences, actual
+120Hz delivery and allPhase5 metrics/traces/suites remain open. Full goal active.
+
+## Checkpoint56 — World UI images and tint lifetime (1.69.5)
+
+`ui-art.ts` now acquires its plain colour and material maps through the shared
+main-image pool. Actual browser preparation creates three768×640planes,
+5,898,240nominal RGBA bytes (5.625MiB). The baseline loader reported0 of these;
+the candidate reports3 decoded/3 pinned and the correct bytes. Disposal releases
+all UI pins while an independent owner keeps cacheable sources alive; disposal
+of the last owner closes all sources and returns loader/native counts to0.
+No budget increase, new image conversion or separate texture cache.
+
+Owned tint canvases notify native consumers before disposal. The existing40
+entry limit now retires evicted GPU sources while preserving queued replay.
+Native baseline after26 captures:8 sources,6 left after UI disposal. Candidate:
+8 sources,3 left after UI disposal with a pool peer; all five owned tints retire,
+raw planes remain unpinned cache entries. Remaining3 close with the last owner.
+This does not assert a resident5.625MiB saving: it accounts for and shares those
+sources, while allowing eviction. Raw figures/outfits/weapons and canvas/GPU
+overlap still prevent a whole-game memory claim or safe retained-next admission.
+
+Strict original/current native oracle:26/26 visible captures exact, max channel
+difference0, no GL/binding warnings. It covers five seals and eight crests under
+two lighting states, using independent fresh painter/canvas lifetimes. A probe
+first used a nonexistent lighting API, then compared unequal initialization
+lifetimes and saw a1-value first-frame difference before production edits.
+Corrected original/original baseline is exact; the same setup gates candidate.
+Tint eviction compares warmed frames and also has exact queued/replayed pixels.
+No tolerance was relaxed. Evidence is under tmp/probes/ui-ownership56/ with
+baseline.json, pooled.json, saved original, oracle and dedicated config; native
+reports under tmp/test-results/ui-ownership56/. No timing inference from this
+instrumented ownership oracle.
+
+New permanent ui-art-ownership.spec.ts verifies accounting, shared-peer survival,
+pending cancellation/restart, non-initialising snapshots, tint retirement and
+40-entry eviction with six queued retirees released at the next frame boundary.
+Audit confirms charms/selected companions already use the pool, while enemy,
+player, all five outfit families and weapons still decode directly. Runtime
+figures.ts starts eager enemy/player/weapon preparation on first figure draw.
+Selected family lifetimes remain the next step before whole-memory admission.
+
+Verification:475 unit tests,14 related native tests (UI art ownership, UI material
+lighting, main-image budget and figure texture retirement),4 production tests
+with strict checked source-map build, changed-file formatting and diff whitespace
+checks all pass. The low-memory stage-cycling regression remains a pool bound,
+not a whole-game bound. All handles terminal. Package/lock/title/changelog agree
+at1.69.5; local develop commit only, no push/deploy/native build. Goal active.
+
+## Checkpoint57 — Selected outfit ownership (1.69.6)
+
+Runtime startup/figures select the equipped robe, and each preview borrows its
+own required families. The five outfit families now acquire shared main-image
+colour/material leases. Switching selection unpins unused families, retires
+owned tint canvases and retires raw GPU consumers in only the using painters.
+Frame-preserving release uses the existing SceneTextureStore; queued/replayed
+pixels survive until beginFrame, while final disposal remains immediate. Preview
+suspension/disposal unregisters its consumer. Stale async completion cannot
+publish removed kits; generation guards prevent repainting a closed preview.
+
+Measured original/player preparation:19 decoded image objects and119,511,216
+nominal RGBA bytes. Selected sumi:4 unchanged base-player planes/25,160,256bytes.
+Avoided15 outfit planes:94,350,960bytes (about90MiB). A selected family needs
+3planes/18,870,192bytes; supported equipped recipes need zero, one or two families.
+Multiple previews union their needs with the equipped selection. Unpinned raw
+images remain cacheable within the unchanged256/384/512MiB budgets. This proves
+selected ownership and source accounting, not whole-game/physical memory bounds.
+
+The actual runtime test with all outfit URLs blocked first timed out before game
+startup: MainGame's global preloader still eagerly decoded five plain atlases.
+Exclude those URLs there, just as selected companions are excluded. Compressed
+background fetching remains comprehensive. The preloader stops retaining five
+plain image objects, but do not add their nominal bytes to the measured saving:
+browser sharing of same-URL decodes between HTML images is not measured. Startup
+now completes with unused outfit sources unavailable. A second test setup wrongly
+assumed preview uses armory.selected; existing preview uses equipped appearance.
+The final case supplies a distinct appearance through the existing preview API,
+then verifies panel-close releases that borrowed family. No product behavior or
+visual tolerance changed to satisfy the tests.
+
+Native original/current oracle:all20 outfits × two mirrored transforms exact,
+40 visible captures, max channel difference0, with wind, cloth, fog and posed
+arms. Original/original control was exact before edits. Ignored saved originals,
+maker, oracle/config and baseline.json/selected.json are under
+tmp/probes/outfit-ownership57/; reports under tmp/test-results/outfit-ownership57/.
+New permanent outfit-selection.spec.ts covers primary/borrowed sharing, selected
+pins/bytes, stale/pending cancellation, disposal, queued/replayed equality, native
+peer survival and actual startup/preview close. Preparation caches promises for
+unchanged selections; standalone full-catalogue consumers use the same kit path.
+
+Player-base, enemy and weapon sources still decode directly. Whole-memory
+admission must include these, worker/main overlap, canvases/copies and GPU sources
+before retained next scenes. Near-zero stage changes, quiet/cancelable worker/
+local slots, persistent texture leases and Phase5 measurements/traces/full suites
+remain open. No seed, save, artwork, budget or cancelled-work changes. Goal active.
+
+Verification:475 units;45 broader native cases covering companion/figure/UI
+ownership, main-image budgets, armory/outfit powers, catalogue and Pixi lifecycle;
+21 final selected-outfit/texture-retirement/warming cases (3 overlapping with
+the broader run,63 unique native cases total); final40-capture strict original
+oracle;4 final checked production tests. All pass, including strict TypeScript,
+source-map build, changed-file formatting and diff whitespace. The initial
+production run also passed, but final startup exclusion/guard changes justified
+the final build/test rerun. All process handles terminal. Logs are under
+tmp/probes/outfit-ownership57/{unit.log,related.log,production-final.log}.
+Version metadata/changelog/title agree at1.69.6; local develop commit only.
+
+## Checkpoint58 — Shared player base and startup ownership (1.69.7)
+
+Four1254²player base planes now use MainImageOwner/PbrAtlas leases:
+25,160,256nominal RGBA bytes. Plain colour generates tones; PBR diffuse serves
+untinted stamps, so both remain. Independent owners share images/promises/pins.
+Disposal cancels pending leases without clearing peers or resurrecting players.
+This accounts/shares required bytes, not a guaranteed physical-byte saving.
+Using painters release their own base/tone GPU sources on preview suspension/
+disposal and unregister. Final disposal releases consumers before unpinning raw
+images/clearing owned tones. Startup excludes plain player/charm/world UI URLs
+already owned by this pool; blocked direct-image requests no longer prevent
+startup, while shared fetch/blob decode succeeds and player/charm are ready.
+
+Native oracle:40 exact visible captures, all20 outfits under both mirrors,
+max channel difference0. A copied checkpoint57 harness initially prepared only
+the candidate's changed outfit, missing kasa in its now-selected original.
+Correct both preparations: original/original baseline passes before edits,
+original/pooled candidate passes after. No tolerance change. Companion suspension
+test originally expected only3 total GPU releases, but now13 retire. The fixed
+test explicitly proves10 player sources (3 base/7 hai tones), then3 companion
+sources, preserving distinct exact ownership gates. Permanent new tests prove
+4 unique planes/25,160,256bytes with a surviving peer, final zero bytes/pins,
+pending cancellation/no resurrection and actual blocked-direct startup.
+
+Passive resource inventory during actual startup finds54 distinct direct-image
+environment URLs/339,779,840nominal bytes, including demon/drift/fog/mountain
+maps. The default250-entry buffer was truncated and incorrectly returned0;
+4000 entries capture the requests. This is requested-source accounting, not
+resident memory or attribution to one owner. Audit remaining eager startup and
+direct environment owners next, preserving selected scene/demon/drift readiness,
+worker fallback and offline paths. Their overlap, enemy/weapon ownership and
+decoded/canvas/GPU/copy admission remain unbounded; no safe next-scene claim.
+
+Evidence: tmp/probes/player-ownership58/ saved originals, maker, oracle/config,
+baseline.json/shared.json, startup.json and logs. Verification:475 units;
+12 figure/outfit/player/UI native cases and18 startup/UI-lighting/main-budget/
+armory/companion cases with2 overlaps (28 unique). One companion assertion was
+corrected/rechecked as described above; all pass. Four checked production tests
+include strict TypeScript/source-map build. Exact oracle, changed formatting and
+diff checks pass; all handles terminal. Version1.69.7 metadata/title/changelog
+agree. Local develop only, no assets/seeds/saves/budget changes or push/deploy/
+native build. Full goal active; cancelled work stays cancelled.
