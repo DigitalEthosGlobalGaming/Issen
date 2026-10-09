@@ -100,7 +100,9 @@ export async function runtimeInventory() {
   const diffuseConsumers = new Set();
   for (const file of sourceFiles.filter((name) => name.endsWith('.ts'))) {
     const text = await readFile(file, 'utf8');
-    if (!/\.diffuse\b/.test(text)) continue;
+    // Prepared figure atlases consume the selected pack's diffuse map through
+    // their colour accessor, even when the caller no longer reads .diffuse.
+    if (!/\.diffuse\b|createPreparedFigureAtlas\s*\(/.test(text)) continue;
     for (const match of text.matchAll(/pack\.sourcePath\s*===\s*['"]([^'"]+\.png)['"]/g))
       diffuseConsumers.add(path.basename(match[1], '.png'));
   }

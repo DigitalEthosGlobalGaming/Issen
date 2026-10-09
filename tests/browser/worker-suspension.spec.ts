@@ -107,7 +107,8 @@ test('realm suspension releases ordinary scenery and resumes the same scene with
     }
   });
   await writeFile(testInfo.outputPath('worker-suspension.json'), JSON.stringify(result, null, 2));
-  expect(result.resident.canvasBytes).toBeGreaterThan(0);
+  // Completed scenes live in transferred bitmaps, not duplicate worker canvases.
+  expect(result.resident.canvasBytes).toBe(0);
   expect(result.nextReady).toBe(true);
   expect(result.resumedNextReady).toBe(true);
   expect(result.resident.transferredBytes).toBeGreaterThan(0);

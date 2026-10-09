@@ -96,6 +96,8 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
         gpuBytes: warmed.sourceMemorySnapshot.bytes,
         rendererGpuBytes: warmed.memorySnapshot.bytes,
         workerDecodedBytes: memory.decodedLoader?.bytes,
+        workerDecodedBudget: memory.decodedLoader?.budget,
+        workerPinned: memory.decodedLoader?.pinned,
       });
     }
     owner.dispose();
@@ -117,11 +119,13 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     expect(row.accountedTransferred, `stage ${row.stage} transferred planes`).toBe(
       row.transferredBytes,
     );
-    expect(row.workerCanvasBytes).toBeGreaterThanOrEqual(row.transferredBytes);
-    expect(row.workerCanvases).toBeGreaterThan(0);
+    // Exported bitmaps own the completed pixels; their worker canvases are retired.
+    expect(row.workerCanvasBytes).toBe(0);
+    expect(row.workerCanvases).toBe(0);
     expect(row.gpuBytes).toBeGreaterThanOrEqual(row.transferredBytes);
     expect(row.rendererGpuBytes).toBeGreaterThan(row.gpuBytes);
-    expect(row.workerDecodedBytes).toBe(0);
+    expect(row.workerPinned).toBe(0);
+    expect(row.workerDecodedBytes).toBeLessThanOrEqual(row.workerDecodedBudget! / 2);
   }
   expect(warnings).toEqual([]);
 });

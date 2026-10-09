@@ -1,5 +1,45 @@
 # Current development status
 
+## Current handoff — final integration checks, two restoration failures remain
+
+App 1.69.50 corrects inventory classification of four enemy diffuse planes consumed
+through prepared figure atlases. The saved inventory and compressed manifest were
+already correct; neither was regenerated. Eight focused inventory checks and all
+508 unit/performance-tool cases pass. Checked production build/strict TypeScript
+and all four production cases pass (17.2s), with default two workers.
+
+The full browser checkpoint finished: 410/415 pass (17.1m). Three stale resource
+expectations were corrected: hidden previews now release every native source;
+exported worker canvases are retired; retained high-tier raw inputs are unpinned
+and bounded to half the decoded budget. All three focused cases pass. No full
+browser rerun is needed merely for these assertion corrections.
+
+Two unchanged strict context-restore checks fail again in the focused run:
+- `instanced-leaves.spec.ts:225`: one alpha pixel differs by one byte after restore
+  (two displayed channels differ); geometry and HDR light targets are exact.
+- `local-input-lifetime.spec.ts:4`: high-quality stage 4 restored output differs
+  by at most two bytes versus the permitted one; retained planes and live output
+  after input eviction remain exact across all eleven rows.
+
+Temporary test-only instrumentation disabling native dithering failed both
+checks again; rejected and fully removed. Do not loosen either assertion, claim
+these are resolved flakes, or rerun the full suite to diagnose them. Next inspect
+restoration/reupload and raw backbuffer versus browser-copy pixels with targeted
+instrumentation. One rejected diagnostic hypothesis so far; time-box further work.
+
+Evidence: `tmp/probes/final-16950-{units,browser,focused,production}.log`,
+`tmp/test-results/browser/{final-16950,final-16950-focused,context-no-dither}/`,
+`tmp/test-results/production/final-16950/`. All test handles terminal.
+
+The retained older meadow compose profile attributes most sampled drawing time
+to software-backed canvas uploads; it is diagnostic context, not a profile of the
+latest build. Latest timing evidence remains the saved 1.69.49 capture. After
+restoration diagnosis, finish natural progression/loadout/transient coverage and
+the complete requirement audit/report. Physical Android/120 Hz and native process
+residency are unproven; do not replace those requirements with partial counters.
+Goal active. Local commits only; no pushes/deploys/native builds/real-save changes;
+cancelled packing and separate lit-only integration stay cancelled.
+
 ## Current handoff — bounded two-slot worker decode integrated
 
 App1.69.49 uses two decode slots only in worker documents; main-thread defaults

@@ -82,6 +82,17 @@ test('runtime inventory reproduces installed file metadata and measured stage ki
       .usesDiffuse,
     true,
   );
+  for (const family of [
+    'enemy-ronin-simple',
+    'enemy-clothing-variants',
+    'enemy-headwear-atlas',
+    'enemy-headwear-variants',
+  ]) {
+    const pair = inventory.duplicatePairs.find((row) =>
+      row.source.endsWith('/' + family + '.webp'),
+    );
+    assert.equal(pair.usesDiffuse, true, 'prepared enemy colour still consumes the diffuse map');
+  }
   assert.ok(
     inventory.assets
       .find((row) => row.path.endsWith('/pine-atlas.webp'))

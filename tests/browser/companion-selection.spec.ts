@@ -266,11 +266,14 @@ test('runtime startup skips unused companions and panels release their selected 
   expect(result.closedArmory.borrowed).toBe(0);
   expect(result.support.snapshot.borrowed).toBe(1);
   expect(result.closedSupport.snapshot.borrowed).toBe(0);
-  expect(result.support.native - result.closedSupport.native).toBe(3);
+  expect(result.support.native).toBeGreaterThan(0);
+  // Suspension releases the whole hidden preview, including its player and weapon.
+  expect(result.closedSupport.native).toBe(0);
   expect(result.pending).toMatchObject({ selected: ['rock'], borrowed: 1, ready: false });
   expect(result.arrived.snapshot).toMatchObject({ selected: ['rock'], borrowed: 1, ready: true });
   expect(result.arrived.native - result.afterPlayerRelease).toBe(10);
-  expect(result.afterPlayerRelease - result.closedRock.native).toBe(3);
+  expect(result.afterPlayerRelease).toBeGreaterThan(0);
+  expect(result.closedRock.native).toBe(0);
   expect(result.closedRock.snapshot.borrowed).toBe(0);
   expect(errors).toEqual([]);
   const path = testInfo.outputPath('runtime-companion-selection.json');

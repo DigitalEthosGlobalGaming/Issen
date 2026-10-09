@@ -1,5 +1,22 @@
 # Mobile performance continuation
 
+## Final integration checkpoint — 10 October 2026
+
+Version 1.69.50 fixes generated inventory inference for enemy diffuse consumers
+using prepared figure atlases. Saved inventory/manifest were correct and unchanged.
+All 508 unit/tool tests and all four checked-production cases pass; TypeScript is
+included in the production verification build. Full browser: 410/415 pass, 17.1m.
+
+Three stale resource assertions now match complete preview suspension and worker
+output retirement/bounded unpinned input retention. Their focused reruns pass.
+Two strict context-restore cases reproduce: catalogue drift has one alpha pixel
+one byte different, with exact geometry/HDR targets; stage 4 local output has a
+two-byte maximum difference with exact retained planes and eviction output.
+Disabling native dithering in temporary tests did not resolve either and was
+reverted. Assertions remain unchanged; these failures are unresolved, not waived.
+Evidence and next diagnosis are in the current development handoff. No broad
+suite or unchanged performance capture was repeated.
+
 The [active objective](../../goal-objective.md) supersedes the earlier exact-pixel
 performance goal. Intentional rendering simplifications are allowed when the
 game's feel and readability remain good. Worker scenery is required on supported
