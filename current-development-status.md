@@ -1,5 +1,37 @@
 # Current development status
 
+## Current handoff — live all-nine progression verified (1.69.51)
+
+The disposable live Rush probe now completes all nine duel transitions:
+0→1→2→3→4→5→6→7→8→0, with bossCount1→10 (no assigned stages/ordinals).
+Earlier stage-7 timeouts were a probe assumption: `openShrine()` calls nextStep
+when no eligible offers remain. The fixture waited for a Shrine that would not
+appear while the next duel was already active. It now accepts either actual
+Shrine choices or automatic progression, records the departing stage immediately
+after the defeat, waits for a living active duel, and yields input batches.
+No game change was needed for this diagnosis.
+
+All-nine capture passes (1.7min), no page errors. 17,819 boundaries (17,531 frames,
+288 worker messages) peak536,702,920bytes against536,870,912, leaving167,992bytes.
+After-transition samples379,866,600–414,831,096bytes. Actual saved fixture loadout
+is cat/steel/sumi/nocharm (earlier notes claiming hai were inaccurate). This proves
+sampled nominal tracking for this one low-tier portrait/DPR2 live cycle only;
+not every allocation/native process, other loadouts/modes, or frame-time delivery.
+The narrow headroom still requires stronger optional-work admission. Do not
+increase budgets or remove tracked allocations to obtain passing claims.
+
+Evidence: `tmp/test-results/browser/natural-rush-automatic-shrine-16951/` with
+`natural-rush-memory.json`; repeatable fixture/config/input helper remain under
+`tmp/probes/natural-rush*` and `tmp/probes/natural-drive-boss.ts`. The preceding
+readiness-only run reproduced the Shrine assumption under
+`tmp/test-results/browser/natural-rush-readiness-16951/`. Both processes terminal.
+App unchanged; this documentation does not bump the version.
+
+Next: budget-aware UI job admission and foreground/optional headroom, broader
+loadout/mode/transient coverage, the two strict restoration failures and final
+requirement report. Existing UI/TypeScript verification remains valid. No push,
+deployment, native build or real-save edits. Goal active, incomplete.
+
 ## Current handoff — release idle CSS lighting resources (1.69.51)
 
 The stage-0 source trace identifies four Armoury-room planes acquired by
