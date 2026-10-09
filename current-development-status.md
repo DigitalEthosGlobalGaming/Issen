@@ -1,4 +1,64 @@
-# Performance, assets and seamless transitions — Cooperative copy costs isolated
+# Performance, assets and seamless transitions — Mask sampling costs isolated
+
+Checkpoint 50 is diagnostic only; application remains 1.69.1 at checkpoint 48.
+Software map destinations do not improve the existing worker prototype: three
+stage0 native profiles record680 drawImage calls taking512.0–555.2ms, including
+237 software-to-software calls taking498.9–541.6ms. No pixel verdict is claimed.
+Software colour cutouts reduce instrumented drawImage time to116.5–123.6ms, but
+fail every one of27 incoming-plane visits and native first draws. Reject them.
+Requested context attributes label routes; they do not measure physical residency.
+
+A separate raw software alpha mask leaves colour planes exact but changes
+normal/surface/emissive planes in nine visits: stages0,6,7 at all three sizes.
+Eight corresponding native first draws change; landscape stage7 remains native
+exact. The positive worker/mask path is verified. Three properly configured
+profiles record690 drawImage calls taking255.5–351.6ms and maximum synchronous
+steps27.1–64.8ms. Reject this route; no tolerance or decode option changes.
+The earlier alpha-mask-profile/ run did not apply its mask edit and is invalid
+as mask evidence; use alpha-mask-profile-final/ instead.
+
+Isolated worker alpha controls explain the mask failure. Twelve integer atlas
+frames from bamboo, pine and shrubs match exactly at full source dimensions,
+including the original source-atop haze. All36 downsampled comparisons differ,
+with maximum alpha delta14. These sources contain80,655–248,127 partially opaque
+pixels per frame, so treating their alpha as binary is incorrect. A bitmap made
+from the software crop reproduces the same failures. Explicit low, medium and
+high smoothing controls all fail downsampled comparisons; medium/high reach185.
+This isolates source/resampling behavior, not a particular browser kernel.
+
+Bitmap snapshots of the original GPU-requested colour canvas pass all48 isolated
+alpha comparisons exactly. Their ignored per-stamp prototype is still unsuitable:
+55 bitmap creations take8.0–8.4ms total synchronously (maximum2.0–2.2ms), but
+680 drawImage calls take399.1–446.6ms, including213 software-to-GPU calls taking
+390.5–438.3ms. Maximum synchronous steps remain24.9–68.6ms. There is no full-scene
+pixel verdict for this last timing-only trial; the isolated alpha success is not
+a scene-equivalence claim. Instrumented profiles are not headline compose or
+gameplay frame measurements. No mask/copy prototype is integrated.
+
+Evidence is under tmp/performance-scene-image-preload/checkpoint50/:
+software-maps-profile/, software-colour-profile/, software-colour-worker.json,
+alpha-mask-profile-final/, alpha-mask-worker.json, alpha-resampling.json,
+bitmap-alpha-resampling.json, gpu-bitmap-alpha-resampling.json,
+quality-alpha-resampling.json and gpu-colour-bitmap-profile/.
+Rejected sources are preserved in software-map-source/ and
+gpu-colour-bitmap-source/. Current ignored cooperative modules contain the last
+GPU-colour bitmap trial. The reliable checkpoint49 passing source remains in
+checkpoint49/bitmap-source/; the maker scripts omit later delegation repairs.
+All diagnostic/browser processes are terminal. No application source, version,
+asset, seed, save, production build or broad suite changed this checkpoint.
+
+Next return to the outstanding gameplay frame budget with focused source-mapped
+Demon/Inferno profiles using the existing opt-in harness. The Phase1 p95 baselines
+remain9.7/18.2ms; no later gameplay improvement is established. Fix measured
+recurring work without changing rendering. Then resume admitted worker/local
+next slots and exact quiet promotion/upload pacing: the rejected mask/copy routes
+do not justify an unpaced second renderer. Local paused pixel differences,
+generator cancellation, fractional terrain bakes, whole-memory admission and
+figure/startup ownership remain open. Next-slot warming must retain the existing
+texture-store lease through promotion/invalidation and context-generation
+readiness. All Phase5 measurements/traces/suites remain required; full goal active.
+
+## Previous handoff — Cooperative copy costs isolated
 
 Checkpoint 49 is diagnostic only; application remains 1.69.1 at checkpoint 48.
 Atomic-boundary local yielding after stamps, context restores and temporary
