@@ -1,5 +1,32 @@
 # Current development status
 
+## Current handoff — bounded worker reuse prototype selected
+
+App1.69.46 unchanged. Isolated high-tier worker sequence0→1→2→0 compares existing
+full trimming, temporary256MiB unpinned retention, and MessageChannel decode
+yielding. Validated source anchors; all three sequences PASS10.9s. Evidence
+`tmp/probes/worker-reuse-validated.log` and
+`tmp/test-results/worker-reuse-validated/`. Native scene preparation is exercised,
+but this fixture has no gameplay figures/preview load and is not whole-app proof.
+
+Original stage1 asset preparation221.2ms becomes0.1ms with retained shared inputs;
+stage2 302.3ms becomes149.6ms; stage0 revisit317.5ms becomes0.1ms. Retained decoded
+storage188,775,504–245,388,672bytes, within256MiB, pinned0. Initial cold input
+load remains~500ms. MessageChannel yielding leaves stage1 assets217.4ms and stage2
+301.5ms: no useful decode improvement, reject that approach. The first message
+prototype did not match transformed source; its timing is invalid. Validated rerun
+has explicit anchor assertions and saved output. No application source changed.
+
+Next implementation: retain bounded unpinned inputs only with whole-app headroom;
+keep low-tier full trimming. Drop unrelated retained images before incoming decode
+so old/new raw kits do not overlap. Add explicit worker cache reclamation before
+admission/texture warming under pressure, with acknowledged counters; do not
+subtract cached memory until the worker actually releases it. Verify shared reuse,
+pressure reclamation and cancellation, then controlled whole-runtime high-tier
+admission before another broad timing matrix. Historical alpha assertion/final
+natural progression/transient-native coverage remain open. All handles terminal;
+goal active. No pushes/deploys/native builds/real-save changes.
+
 ## Current handoff — production timing reveals cold decode regression
 
 App1.69.46, worktree implementation at577f992. Existing production scene-flow

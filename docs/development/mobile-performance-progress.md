@@ -8,6 +8,26 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Worker reuse investigation — 10 October 2026
+
+Focused high-tier sequence0→1→2→0 compares full trimming, a disposable256MiB
+unpinned-cache prototype and message-task decode yielding. Retention reduces
+stage1 asset preparation221.2→0.1ms, stage2 302.3→149.6ms and stage0 revisit
+317.5→0.1ms. Retained raw storage188,775,504–245,388,672bytes stays within the
+prototype cap, with no pins. First cold load remains~500ms. This fixture excludes
+gameplay/preview figures and therefore does not establish combined memory safety.
+
+The validated MessageChannel experiment does not improve asset preparation:
+stage1 217.4ms, stage2 301.5ms. Reject timer-yield substitution; it does not solve
+re-decoding. An earlier unmatched source anchor invalidates that initial timing.
+All validated arms assert source replacement and pass in10.9s. Evidence
+`tmp/probes/worker-reuse-validated.log` and
+`tmp/test-results/worker-reuse-validated/`. Application behavior is unchanged.
+
+Integration must retain only with whole-app headroom, preserve low-tier trimming,
+release unrelated cached inputs before incoming decode, and acknowledge actual
+worker reclamation before admitting work. Cache reuse alone is insufficient.
+
 ## Production scene-flow checkpoint — 10 October 2026
 
 Existing fixed-seed production probe at900x600/DPR1/Edge154 completes all18
