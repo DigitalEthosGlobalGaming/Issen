@@ -57,7 +57,7 @@ export type ComposeResponse = {
   foreground: ComposedLayer[];
   snapshot: EnvironmentSnapshot;
   error?: string;
-  phase?: 'assets-ready';
+  phase?: 'assets-ready' | 'composed';
 };
 export type CompositionIdentity = Pick<
   EnvironmentFrame,

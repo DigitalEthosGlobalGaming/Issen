@@ -1,4 +1,80 @@
 import { test, expect } from '@playwright/test';
+
+test('worker phase accounting includes pinned inputs without settling scene readiness', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
+    const NativeWorker = window.Worker;
+    let releaseResponse: (() => void) | undefined;
+    const phases: Array<{ phase: string; decoded: number; canvas: number }> = [];
+    let owner: ReturnType<typeof createEnvironmentRenderer>;
+    window.Worker = class extends EventTarget {
+      native: Worker;
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super();
+        this.native = new NativeWorker(url, options);
+        this.native.addEventListener('message', ({ data }) => {
+          const publish = () => this.dispatchEvent(new MessageEvent('message', { data }));
+          if (data.phase) {
+            publish();
+            phases.push({
+              phase: data.phase,
+              decoded: owner.memorySnapshot.decodedBytes,
+              canvas: owner.memorySnapshot.canvasBytes,
+            });
+          } else releaseResponse = publish;
+        });
+      }
+      postMessage(message: unknown) {
+        this.native.postMessage(message);
+      }
+      terminate() {
+        this.native.terminate();
+      }
+    } as unknown as typeof Worker;
+    owner = createEnvironmentRenderer(document);
+    let settled = false;
+    try {
+      const pending = owner
+        .compose({
+          width: 120,
+          height: 180,
+          dpr: 1,
+          stage: 1,
+          stageSeed: 424242,
+          time: 0,
+          lowQuality: true,
+          reducedMotion: true,
+          reducedFlashes: true,
+        })
+        .then((ready) => {
+          settled = true;
+          return ready;
+        });
+      const deadline = performance.now() + 15000;
+      while (!releaseResponse && performance.now() < deadline)
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      if (!releaseResponse) throw Error('Worker did not complete');
+      const settledBeforeResponse = settled;
+      releaseResponse();
+      const ready = await pending;
+      return { phases, settledBeforeResponse, ready, final: owner.memorySnapshot };
+    } finally {
+      owner.dispose();
+      window.Worker = NativeWorker;
+    }
+  });
+  expect(result.phases.map((row) => row.phase)).toEqual(['assets-ready', 'composed']);
+  expect(result.phases.every((row) => row.decoded > 0)).toBe(true);
+  expect(result.phases[1].canvas).toBeGreaterThan(0);
+  expect(result.settledBeforeResponse).toBe(false);
+  expect(result.ready).toBe(true);
+  expect(result.final.decodedBytes).toBe(0);
+  expect(result.final.transferredBytes).toBeGreaterThan(0);
+});
+
 for (const policy of [
   { memory: 2, mobile: false, budget: 256 },
   { memory: 4, mobile: true, budget: 384 },

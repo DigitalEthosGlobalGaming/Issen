@@ -173,23 +173,24 @@ export function createWorkerEnvironmentRenderer(
           closeLayers([...data.layers, ...data.foreground]);
           return;
         }
-        if (data.phase === 'assets-ready') {
-          const request = requests.get(data.id);
-          if (request) markScenePhase('assets-ready', request.timingPrefix + data.key);
-          return;
-        }
         const request = requests.get(data.id);
         if (!request) {
           closeLayers([...data.layers, ...data.foreground]);
           return;
         }
-        clearTimeout(request.timer);
-        requests.delete(data.id);
         workerResources = {
           decodedLoader: data.snapshot.decodedLoader,
           canvasBytes: data.snapshot.canvasBytes,
           canvases: data.snapshot.canvases,
         };
+        if (data.phase) {
+          if (data.phase === 'assets-ready')
+            markScenePhase('assets-ready', request.timingPrefix + data.key);
+          else markScenePhase('composed', request.timingPrefix + data.key);
+          return;
+        }
+        clearTimeout(request.timer);
+        requests.delete(data.id);
         request.resolve(data);
       });
       return true;

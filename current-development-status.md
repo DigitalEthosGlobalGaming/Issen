@@ -1,4 +1,34 @@
-# Mobile performance — Reclaimed cache and bounded low-memory drawing
+# Mobile performance — Worker transient accounting
+
+App1.69.25 publishes decoded-loader/canvas ownership at assets-ready and composed
+phases before releasing inputs. Main worker owners update memory counters without
+resolving compose/readiness; final and error responses carry resource counters.
+
+Real runtime390x844/DPR2/deviceMemory2 stage0–8→0 diagnostic uses game.setStage
+and real scene readiness with paused combat. Settled estimates fit512MiB, but
+phase accounting exposes556–654MiB observed preparation peaks, including incoming
+pinned kits108–204MiB. The old sampled counter understated these peaks (max516MiB).
+Evidence: `tmp/probes/all-stage-memory-before.json`,
+`tmp/probes/all-stage-memory-phases.json`; reusable ignored probe
+`tmp/probes/all-stage-memory.mjs`. Samples every50ms plus worker-event snapshots.
+These are nominal phase-boundary observations, not physical/scratch peak proof.
+
+Five focused browser checks pass7.9s (phase readiness, worker failures/retry,
+suspension, pending requests);5related units pass. Checked verification build
+with strict TypeScript passes; log `tmp/probes/worker-phase-build.log`.
+Version/package/lock/title/changelog agree1.69.25. All processes terminal.
+
+Next concrete fix: reduce required worker decoded-kit pressure on low-memory
+devices while preserving logical atlas layout and scene composition. Consider
+layout-preserving decode resizing with explicit nominal-to-bitmap coordinate
+adaptation; validate aligned maps/landmarks and representative scene feel.
+Do not revive tight packing. Required transient budget enforcement, preview/
+Demon accounting, transition checkpoint and final suites/matrix remain. Current
+accounting still lacks reservations covering decode progress between phases and
+intermediate native scratch; do not claim a cap. Physical Android/120Hz remains
+unproven. Goal active; no push/deploy/native builds/real-save mutation.
+
+## Previous handoff — Reclaimed cache and bounded low-memory drawing
 
 App1.69.24 bounds main drawing on the256MiB decode tier to approximately600k
 pixels/DPR1.5 without changing logical layout/input coordinates. Scene preparation

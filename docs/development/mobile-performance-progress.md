@@ -8,6 +8,32 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Worker preparation phase accounting — 9 October 2026
+
+Version1.69.25 reports decoded-loader and tracked-canvas ownership at assets-ready
+and after composition, before releasing inputs. The main owner adopts these
+resource counters without resolving the compose request or scene readiness.
+Failure responses also include current counters; final responses replace them
+after export/reclamation. Phase observation does not allocate rendering resources.
+
+A real-runtime diagnostic at390x844/DPR2/deviceMemory2 paused combat, visited
+ordinary stages0–8 through `game.setStage`, then returned to0. All settled
+estimates fit512MiB (412–478MiB in the first sample). Without worker phase
+accounting the observed transition peak was516MiB; with phase accounting it
+was654MiB. Incoming pinned worker kits contribute108–204MiB. Stage preparation
+peaks observed at phase boundaries were556–654MiB; final residency430–478MiB.
+These are nominal ownership estimates, not physical residency or a bound on
+intermediate native scratch. Preparation times573–1234ms include loading,
+composition, warming and first presentation, not compose CPU time alone.
+
+Evidence: `tmp/probes/all-stage-memory-before.json` and
+`tmp/probes/all-stage-memory-phases.json`. The extended existing admission probe
+records50ms samples plus resource snapshots on worker response events. No full
+measurement matrix or physical-device capture ran. Preview/Demon peaks remain
+unmeasured. Next reduce required worker input pressure while preserving scene
+layout and then enforce the combined transient budget; optional next admission
+still does not establish a whole-app cap.
+
 ## Cache reclamation and low-memory drawing — 9 October 2026
 
 Version1.69.24 limits the256MiB decode tier's main drawing buffer to roughly600k

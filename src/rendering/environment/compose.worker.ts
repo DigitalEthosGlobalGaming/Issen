@@ -87,13 +87,33 @@ scope.onmessage = ({ data }) => {
               phase: 'assets-ready',
               layers: [],
               foreground: [],
-              snapshot: renderer.snapshot(),
+              snapshot: {
+                ...renderer.snapshot(),
+                ...workerDocument.canvasSnapshot(),
+                decodedLoader: workerDocument.decodedSnapshot(),
+              },
             },
             [],
           );
         })
       ) {
         composedAt = performance.now();
+        scope.postMessage(
+          {
+            id: data.id,
+            ok: true,
+            key: data.key,
+            phase: 'composed',
+            layers: [],
+            foreground: [],
+            snapshot: {
+              ...renderer.snapshot(),
+              ...workerDocument.canvasSnapshot(),
+              decodedLoader: workerDocument.decodedSnapshot(),
+            },
+          },
+          [],
+        );
         // Live motion uses transferred planes and the main thread's own raw inputs.
         renderer.releaseExportInputs();
         const completed = renderer.exportLayers();
@@ -143,7 +163,11 @@ scope.onmessage = ({ data }) => {
           ok: false,
           layers: [],
           foreground: [],
-          snapshot: renderer.snapshot(),
+          snapshot: {
+            ...renderer.snapshot(),
+            ...workerDocument.canvasSnapshot(),
+            decodedLoader: workerDocument.decodedSnapshot(),
+          },
           error: String(error),
         },
         [],
