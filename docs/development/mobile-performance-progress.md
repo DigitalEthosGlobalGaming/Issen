@@ -8,6 +8,47 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Low-memory enemy part preparation — 9 October 2026
+
+Version1.69.23 replaces full enemy atlas residency on the256MiB decode-budget tier
+with25aligned part frames, maximum edge256px. It uses the existing colour cutout
+resolution for colour, normal and surface; existing tone/material drawing then
+uses those owned planes. Preparation processes one family at a time and yields
+between copies; raw images close after the family's parts are complete. Other
+tiers use original atlases. No asset files, appearance rules or RNG changed.
+
+Low-memory390x844/DPR2 first-game accounting before→compact sample:
+
+| Component | Before bytes | Compact bytes |
+| --- | ---: | ---: |
+| Main decoded | 243,432,120 | 167,943,000 |
+| Main canvases | 27,940,280 | 43,491,768 |
+| GPU estimate | 259,071,932 | 219,235,868 |
+| Committed including reserves | 691,635,020 | 591,861,324 |
+
+Saving99,773,696bytes/14.4%; still55MB above512MiB. These are ownership estimates,
+not physical device memory. The compact sample preceded final serial-family
+scheduling; plane dimensions/content/lifetimes are unchanged. A failed first
+diagnostic injection used `window` in a worker; corrected to `globalThis` and the
+sample completed. No product fix was inferred from that harness timeout.
+
+Native36appearance montages cover regular/boss palettes, fog, daylight/dark
+directional light and mirroring. Visual review retains silhouettes/tints/material
+lighting; average channel difference0.020/255 (intentional detail reduction,
+not an exact-pixel gate). Raw decoded bytes after full-reference disposal0,
+maximum compact plane256. Actual compact context restoration is exact. Hidden
+disposal settlesfalse and releases inputs/canvases; final native sources0.
+Ten unique related browser checks PASS9.9s; final compact/recovery2PASS4.4s.
+Related units10PASS; checked build/strict TypeScript PASS. Evidence:
+`tmp/probes/scene-low-memory-{baseline,compact-enemy}.json`,
+`tmp/test-results/browser/compact-enemy-*/` (JSON/original/compact screenshots)
+and `tmp/probes/compact-enemy-build.log`.
+
+Next: reclaim unused main-image/fog/preview resources and enforce combined
+mandatory budgets. Full all-stage/transition/final validation remains; physical
+Android/120Hz targets unproven. General packing/lit-only work stays cancelled;
+no push/deployment/native build/real-save changes.
+
 ## Ordinary worker suspension during Demon — 9 October 2026
 
 Version1.69.22 terminates the ordinary scenery worker on Demon entry rather than

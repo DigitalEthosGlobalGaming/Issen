@@ -782,6 +782,12 @@ pending requests without failure notification. Ordinary preparation/drawing
 starts a fresh worker on demand. Its stage seed is unchanged; failure still uses
 explicit recovery. Hidden state and background sampling cannot restart a suspended
 owner by themselves.
+Low-memory enemies replace their raw PBR atlases with a finite set of aligned
+256px part planes during preparation. Families build sequentially; part copies
+yield and disposal cancels pending work. Colour/tone caches and material drawing
+consume those same prepared planes, including after context recovery. Higher
+memory tiers retain original atlas sampling. Gameplay/appearance seed selection
+is independent of this presentation policy.
 
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence

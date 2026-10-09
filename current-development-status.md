@@ -1,4 +1,37 @@
-# Mobile performance — Ordinary worker suspension in Demon
+# Mobile performance — Low-memory enemy part planes
+
+App1.69.23 uses bounded aligned colour/normal/surface planes for25enemy part
+frames on the256MiB decode-budget tier. Maximum edge256px matches existing colour
+cutouts. Each family prepares sequentially, yields between part copies and closes
+raw atlases; higher tiers retain original sampling. No asset files/packing change.
+
+Representative390x844/DPR2 low-memory first-game sample: committed691,635,020→
+591,861,324bytes (-99,773,696/14.4%). Main decoded243,432,120→167,943,000;
+canvas27,940,280→43,491,768; GPU259,071,932→219,235,868. These are nominal
+ownership estimates including existing reserves, not physical residency proof.
+The compact sample preceded the final serial-family scheduling change; prepared
+plane content/lifetimes are unchanged.512MiB cap remains exceeded55MB.
+
+Native36appearance comparison covers regular/authored bosses, palette/fog,
+day/dark directional lighting and mirroring. Reviewed original/compact montages:
+feel/lighting/readability retained; mean channel difference0.020/255. Compact
+inputs close after preparation; hidden disposal settlesfalse with decoded/canvas0.
+Actual context restoration matches pixels exactly; final GPU sources0. Ten unique
+focused browser checks pass9.9s, final compact/recovery2pass4.4s;10related units
+pass. Checked production build includes strict TypeScript. Version metadata and
+changelog agree1.69.23. Evidence: `tmp/probes/scene-low-memory-*.json`,
+`tmp/test-results/browser/compact-enemy-*/` and `tmp/probes/compact-enemy-build.log`.
+All verification handles terminal.
+
+Next: reclaim unpinned main-image cache and unused fog/preview ownership, then
+enforce combined required-resource limits with appropriate render-target headroom.
+Do not claim whole-app limits from optional next-scene admission. Transition
+integration/all-stage peaks/final suites and matrix remain. Demon CPU capture
+needs mobile-size timing; gradient churn/later boss palette misses remain possible.
+Physical Android/120Hz unproven; full goal active. Cancelled general packing/
+lit-only work stays cancelled. No push/deploy/native builds/real-save mutation.
+
+## Previous handoff — Ordinary worker suspension in Demon
 
 App1.69.22 suspends ordinary scenery on Demon entry: terminate the worker,
 abort current/next warming, settle callers without failure notification and

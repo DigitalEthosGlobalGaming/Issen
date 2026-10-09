@@ -1,7 +1,8 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
-import { createPbrAtlas } from '../pbr-atlas.ts';
+import { createPreparedFigureAtlas } from './prepared-atlas.ts';
+import { documentImageBudget } from '../../platform/main-images.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
@@ -88,11 +89,40 @@ function familyFor(key: string): keyof typeof PBR_SOURCES {
 }
 /** Front-view puppet, in the caller's normalized figure transform. No gameplay state. */
 export function createInkEnemyRenderer(doc: Document) {
+  const compact = documentImageBudget(doc) <= 256 * 1024 * 1024;
   const pbr = {
-    base: createPbrAtlas(doc, PBR_SOURCES.base, 1254),
-    clothing: createPbrAtlas(doc, PBR_SOURCES.clothing, 1536, 1024),
-    heads: createPbrAtlas(doc, PBR_SOURCES.heads, 1536, 1024),
-    variationHeads: createPbrAtlas(doc, PBR_SOURCES.variationHeads, 1254),
+    base: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.base,
+      1254,
+      1254,
+      Object.values(BASE_FRAMES),
+      compact,
+    ),
+    clothing: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.clothing,
+      1536,
+      1024,
+      CLOTHING_FRAMES,
+      compact,
+    ),
+    heads: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.heads,
+      1536,
+      1024,
+      Object.values(HEAD_FRAMES),
+      compact,
+    ),
+    variationHeads: createPreparedFigureAtlas(
+      doc,
+      PBR_SOURCES.variationHeads,
+      1254,
+      1254,
+      VARIANT_HEAD_FRAMES,
+      compact,
+    ),
   };
   const loaded = new Set<string>();
   const cache = new Map<string, HTMLCanvasElement>(),
@@ -126,12 +156,20 @@ export function createInkEnemyRenderer(doc: Document) {
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
-    pending = Promise.all(
-      Object.entries(pbr).map(async ([key, atlas]) => {
-        const ready = await atlas.prepare();
-        if (ready && !disposed) loaded.add(key);
-        return ready;
-      }),
+    const prepareAtlas = async ([key, atlas]: (typeof entries)[number]) => {
+      const ready = await atlas.prepare();
+      if (ready && !disposed) loaded.add(key);
+      return ready;
+    };
+    const entries = Object.entries(pbr);
+    pending = (
+      compact
+        ? (async () => {
+            const materials: boolean[] = [];
+            for (const entry of entries) materials.push(await prepareAtlas(entry));
+            return materials;
+          })()
+        : Promise.all(entries.map(prepareAtlas))
     ).then((materials) => !disposed && materials.every(Boolean));
     return pending;
   }
@@ -159,8 +197,9 @@ export function createInkEnemyRenderer(doc: Document) {
     applyFog = true,
   ): HTMLCanvasElement | null {
     const family = familyFor(key),
-      image = pbr[family].diffuse;
-    if (!image) return null;
+      colour = pbr[family].colour(frame);
+    if (!colour) return null;
+    const image = colour.source;
     const fog = applyFog ? Math.max(0, Math.min(1, Math.round(f.fog * 4) / 4)) : 0;
     const mist = env.palette(1).robe;
     const palette = cloth ? f.pal : null,
@@ -200,7 +239,7 @@ export function createInkEnemyRenderer(doc: Document) {
           c.width = c.height = 0;
           return null;
         }
-        tg.drawImage(image, sx, sy, sw, sh, 0, 0, tone.width, tone.height);
+        tg.drawImage(image, ...colour.frame, 0, 0, tone.width, tone.height);
         const data = tg.getImageData(0, 0, tone.width, tone.height),
           a = rgb(palette.robeD),
           b = rgb(palette.robeL);
@@ -216,7 +255,7 @@ export function createInkEnemyRenderer(doc: Document) {
         retain(tones, toneKey, tone);
       }
       g.drawImage(tone, 0, 0);
-    } else g.drawImage(image, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    } else g.drawImage(image, ...colour.frame, 0, 0, c.width, c.height);
     if (fog) {
       g.globalCompositeOperation = 'source-atop';
       g.globalAlpha = fog;
@@ -517,6 +556,7 @@ export function createInkEnemyRenderer(doc: Document) {
       variantPixels,
       tonePixels,
       maxCachePixels: budgets.variants + budgets.tones,
+      compact,
       disposed,
     }),
     dispose() {

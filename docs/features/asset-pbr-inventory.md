@@ -43,6 +43,11 @@ counterparts remain available to material debugging, but are excluded from enemy
 preparation and eager startup decoding as of1.68.27. The enemy catalogue now
 decodes12planes75,489,120nominal RGBA bytes, saving25,163,040bytes. This is source
 accounting, not whole-game or resident GPU memory proof.
+As of1.69.23, the256MiB decode-budget tier prepares25enemy part frames as aligned
+colour/normal/surface canvases with a256px maximum edge, then closes each family's
+raw atlases. Families prepare sequentially and copies yield through the existing
+preparation scheduler. Other tiers retain original atlas sampling. Authoring and
+runtime files remain unchanged; this is per-owner preparation, not asset packing.
 As of1.68.28, directly owned PBR images notify native GPU consumers before source
 disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
 entries survive until the shared loader evicts or closes them. This covers atlas
