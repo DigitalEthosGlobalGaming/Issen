@@ -1,5 +1,31 @@
 # Current development status
 
+## Current handoff — production timing reveals cold decode regression
+
+App1.69.46, worktree implementation at577f992. Existing production scene-flow
+probe completed18 fixed-seed cold/warm preview transitions at900x600/DPR1 in
+Edge154. Evidence `tmp/performance-scene-final-16946/` includes exact instrumented
+build/source maps, per-stage traces and results. All post-presentation two-second
+windows have no main tasks above16ms; maximum9.603ms. Title readiness2375.7ms,
+first gameplay3503.3ms, compared with2897.4/4099.6ms in saved baseline-v2. Actual
+gameplay frame p9516.9ms; CPU render p953.1ms. Desktop60Hz delivery does not prove
+physical120Hz; don't repeat this environment trying to establish that target.
+
+Unprepared preview transition regression remains: cold639.4–1149.2ms and
+warm574.9–1164.6ms versus baseline313.9–894.2/358.8–875.0ms. Worker assets now
+take279–415ms cold versus8.7–111.5ms baseline. Export-time full raw-cache trimming
+forces shared inputs to decode again; no worker raw bytes remain after transfer.
+Composition itself is217.9–505.7ms across both cycles, versus baseline maxima
+693.0/632.0ms. Only warm meadow is slightly above500ms. These are single fixed
+probe captures, not an alternating causal benchmark or normal prepared progression.
+
+Next: investigate bounded higher-memory worker raw-input reuse with an explicit
+admission/reclamation policy; preserve low-tier headroom. Do not simply retain a
+large cache without proving combined memory and next-scene preparation. Then
+broader natural progression/loadout/transient/native coverage and final suites.
+Historical leaf alpha assertion remains strict at final verification. All capture
+processes terminal. Goal active; no push/deploy/native build/real-save changes.
+
 ## Current handoff — worker colour comparison fixture corrected
 
 App remains1.69.46. Software comparison worker now uses production's static-scene

@@ -8,6 +8,28 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Production scene-flow checkpoint — 10 October 2026
+
+Existing fixed-seed production probe at900x600/DPR1/Edge154 completes all18
+cold/warm preview transitions on1.69.46. Saved baseline-v2 uses the same probe,
+geometry and browser version; both are single captures rather than an alternating
+causal benchmark. Startup title/first gameplay2897.4/4099.6ms becomes
+2375.7/3503.3ms. No task exceeds16ms in any first-two-second presentation window;
+maximum9.603ms, compared with baseline maxima64.387ms cold/76.763ms warm.
+
+Unprepared loading regresses: cold range313.9–894.2ms becomes639.4–1149.2ms;
+warm358.8–875.0ms becomes574.9–1164.6ms. Worker cold asset preparation8.7–111.5ms
+becomes279–415ms. Export-time full raw-cache trimming removes shared decoded
+inputs, so every visit decodes them again. Composition is217.9–505.7ms across
+both cycles; only warm meadow slightly exceeds500ms. This reveals remaining work
+on bounded high-tier input reuse, with combined-memory admission retained.
+
+Ten-second gameplay sample: frame median16.7/p9516.9/p9917.4ms; CPU render
+median2.1/p953.1/p993.8ms. Actual delivery stays near60Hz, not proven120Hz.
+Evidence `tmp/performance-scene-final-16946/` retains build/source maps, raw data
+and all stage traces. This preview workload does not prove natural progression,
+prepared transitions or whole-app transient/native memory bounds.
+
 ## Worker comparison resource lifetime — 10 October 2026
 
 The historical software/GPU full-layer colour mismatch came from a comparison
