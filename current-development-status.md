@@ -1,6 +1,36 @@
 # Current development status
 
-## Current handoff — compact low-memory accessories
+## Current handoff — rush entry delay confirmed
+
+App remains 1.69.41; this checkpoint changes evidence/documentation only. A focused
+low-tier 390×844/DPR 2 Edge probe corrected the controlled pause by preserving
+`pausedFrom`. Keeping boss 1 alive while promoting stage 1 then takes 13.6 ms;
+figure preparation reuses 213 uploads in 0.4 ms and warming finishes 1.9 ms after start.
+That control is not a valid next-duel transition: it retains the old boss.
+
+A second probe uses the runtime `nextStep()` from controlled `between` state
+instead of directly calling `setStage`. It enters boss 2/helm on stage 1 and takes
+221.7 ms despite a prepared environment. Enemy preparation finishes 130.0 ms after
+start with 252 uploads; union warming finishes 198.3 ms after start. This confirms
+incoming figure preparation, rather than environment composition, remains on
+the transition path. Initial preparation timings vary; these are focused single
+samples, not frame-delivery or physical-device performance claims. Evidence:
+`tmp/probes/rush-pause-preparation.json` and
+`tmp/probes/rush-entry-preparation.json`; scripts of the same names reproduce
+them. Both isolate Edge/Vite and terminate in `finally`.
+
+Source inspection: boss defeat retains `G.boss` but sets state `between`;
+`startRushDuel` changes scenery before calling `startBoss`, which defers until
+scene readiness. Scene preparation selects upcoming identity tones in `between`
+and the current boss palette only in `boss`/paused-from-boss. Thus the selection
+is correct for the real next-duel path; do not fix the delay by retaining the
+outgoing palette or treating a paused control as natural combat progression.
+Next: prepare the incoming figure set ahead of promotion within the existing
+quiet-frame/memory/cancellation policy. Companion first-use, natural progression,
+transient/native bounds and final verification remain open as listed below.
+No runtime edits or routine suite reruns at this diagnostic checkpoint.
+
+## Previous handoff — compact low-memory accessories
 
 App1.69.41 reuses prepared-figure atlas copying for the256MiB tier: outfit families
 have four aligned parts capped256px; charms have12parts capped128px. Copies preserve
