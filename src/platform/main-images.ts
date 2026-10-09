@@ -123,6 +123,8 @@ export function createMainImageOwner(doc: Document) {
   const releases = new Set<() => void>();
   let disposed = false;
   return {
+    bytesFor: shared.loader.bytesFor,
+    cancelUnused: shared.loader.cancelUnused,
     prefetch(urls: readonly string[]) {
       if (disposed || urls.some((url) => !dimensions.has(url))) return undefined;
       const preload = shared.loader.prefetch(urls);

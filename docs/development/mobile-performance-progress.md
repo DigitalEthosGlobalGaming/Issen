@@ -1,5 +1,25 @@
 # Mobile performance continuation
 
+## UI export admission and live wrap — 10 October 2026
+
+Version1.69.52 reserves complete UI jobs, defers them under combined pressure,
+tracks custom colour canvases, and accounts for retained CSS outputs at8bytes/pixel
+(estimated decoded plus browser upload). Busy/hidden frames cancel unshared pending
+requests; active decode reservations remain until settlement. Explicit UI prepare
+still respects memory admission while retaining existing CSS artwork on deferral.
+Twenty focused memory units and five UI browser cases pass, including pressure
+recovery, cancellation, peer protection, all31packs and relighting/alpha/slicing.
+
+The live probe now completes all9duels and wraps to stage0. Previously it assumed
+every defeated boss opened a Shrine; exhausted eligible offers legitimately skip
+it. The expanded ledger exposes a wrap peak578,889,336bytes against512MiB, despite
+the tested UI cancellation. The worker snapshot retains a165,949,584byte next-slot
+reservation during/after the foreground handoff. Trace that lifetime before
+changing policy; do not credit cancellation before acknowledgement or remove
+CSS output accounting. The old below-cap sample omitted this CSS allowance.
+Evidence and next actions are in the current development handoff. Whole-app
+boundedness, broader loadouts and strict restoration failures remain unresolved.
+
 ## Restoration and live progression diagnostics — 10 October 2026
 
 Raw WebGL readback confirms the leaf restoration difference precedes Canvas

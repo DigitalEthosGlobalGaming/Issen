@@ -29,6 +29,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     reject(error: unknown): void;
     resource?: T;
     bytes: number;
+    reservedBytes: number;
     touched: number;
     queued: number;
     speculativeOnly: boolean;
@@ -95,6 +96,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         let reservation = 0;
         const unreserve = () => {
           reservedBytes = Math.max(0, reservedBytes - reservation);
+          entry.reservedBytes = 0;
           reservation = 0;
         };
         try {
@@ -114,6 +116,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
             throw Error(`Decoded image budget exhausted: ${entry.url}`);
           reservation = expected;
           reservedBytes += reservation;
+          entry.reservedBytes = reservation;
           entry.controller = new AbortController();
           peakBytes = Math.max(peakBytes, bytes + reservedBytes);
           options.onMemoryChange?.();
@@ -191,6 +194,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         resolve,
         reject,
         bytes: 0,
+        reservedBytes: 0,
         queued,
         touched: speculative ? 0 : queued,
         speculativeOnly: speculative,
@@ -204,6 +208,23 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
   }
   return {
     load: (url: string, priority: ImagePriority = 'now') => request(url, priority),
+    /** Storage already accounted for by the pool, including active decodes. */
+    bytesFor(urls: readonly string[]) {
+      return [...new Set(urls)].reduce((total, url) => {
+        const entry = entries.get(url);
+        return total + (entry ? entry.bytes + entry.reservedBytes : 0);
+      }, 0);
+    },
+    /** Cancel abandoned requests only after all consumers have released their pins. */
+    cancelUnused(urls: readonly string[]) {
+      for (const url of new Set(urls)) {
+        const entry = entries.get(url);
+        if (!entry || entry.resource || pins.has(url)) continue;
+        entries.delete(url);
+        entry.controller?.abort();
+        entry.reject(new DOMException('Image request cancelled', 'AbortError'));
+      }
+    },
     pin,
     /** Explicit headroom reclamation never closes pinned pixels or pending required work. */
     trim(targetBytes = 0) {

@@ -1,5 +1,47 @@
 # Current development status
 
+## Current handoff — budget-aware UI jobs; expanded ledger exposes wrap excess (1.69.52)
+
+UI exports now reserve whole-job input/upload/render-target storage before
+acquisition; shared main-pool residency and actual painter storage replace the
+reservation. Reclamation sees the plan before evicting its inputs, so evicting
+those inputs cannot invent headroom. CSS exports retain an8bytes/pixel estimate
+for decoded/browser-upload backing; custom colour canvases are tracked too.
+Exports which cannot fit defer, including explicit prepare calls, while keeping
+existing CSS artwork. Quiet samples retry at250ms intervals. Background jobs
+cancel on busy/hidden frames and release their pins/workspace. The shared loader
+only cancels abandoned requests with no remaining pins; active decode bytes stay
+reserved until actual settlement. Shared peers remain protected.
+
+Twenty focused memory unit tests and five UI browser tests pass (11.7s), covering
+peer protection, pending settlement, pressure deferral/recovery, blocked-decode
+cancellation, all31packs and relighting/alpha/slicing. Checked production build
+with strict TypeScript and all four production cases pass (20.6s). No full browser
+rerun; two previously reproduced strict restoration failures remain open.
+
+Two live all-nine captures complete progression but fail the expanded memory
+assertion: admission-only577,903,096bytes; with busy cancellation578,889,336bytes,
+against536,870,912. The latter samples16,355 boundaries, has no page errors and
+wraps0→…→8→0. Its peak is at stage0 on return. The stage8 departure/returned
+snapshots retain165,949,584bytes in the worker next-slot set even though the
+current nextScene key is absent on return. After presentation total548,939,272.
+This may be an unresolved cancelled/foreground slot lifetime, overlapping work
+or reservation attribution; it is not yet diagnosed. UI cancellation is verified
+locally but did not resolve the wrap excess. Reassess worker lifetime next rather
+than repeat these two approaches. Do not remove new CSS accounting to restore
+the earlier below-cap result; that result used a narrower ledger.
+
+Evidence: `tmp/test-results/browser/ui-admission-cancellation-16951/`,
+`tmp/test-results/browser/natural-rush-ui-{admission,cancellation}-16951/`, and
+`tmp/test-results/production/ui-admission-16952/`. All processes terminal.
+No push/deploy/native build/real-save edits. Goal active, incomplete.
+
+Next: trace next-slot key/request/controller/finished/foreground state and its
+acknowledgement during the stage8→0 handoff; retain cancellation storage until
+real release. Broader loadouts/modes/transient coverage, restoration failures
+and the final requirement report remain required. Version/package/lock/title/
+changelog synchronized. Reuse passing focused checks unless changed.
+
 ## Current handoff — live all-nine progression verified (1.69.51)
 
 The disposable live Rush probe now completes all nine duel transitions:

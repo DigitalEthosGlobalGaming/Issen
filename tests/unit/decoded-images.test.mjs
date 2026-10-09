@@ -10,6 +10,42 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('abandoned requests cancel after the last pin and retain reservation until decode settles', async () => {
+  const closed = [];
+  let finish;
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  const releaseA = loader.pin('live'),
+    releaseB = loader.pin('live');
+  const live = loader.load('live');
+  const queued = loader.load('abandoned');
+  const queuedFailure = assert.rejects(queued, { name: 'AbortError' });
+  loader.cancelUnused(['live', 'abandoned']);
+  await queuedFailure;
+  assert.equal(loader.snapshot().queued, 1);
+  assert.equal(loader.bytesFor(['live']), 400);
+  releaseA();
+  loader.cancelUnused(['live']);
+  assert.equal(loader.bytesFor(['live']), 400);
+  const liveFailure = assert.rejects(live, { name: 'AbortError' });
+  releaseB();
+  loader.cancelUnused(['live']);
+  await liveFailure;
+  assert.equal(loader.snapshot().reservedBytes, 400);
+  finish(resource('live', closed));
+  await turn();
+  assert.equal(loader.snapshot().reservedBytes, 0);
+  assert.deepEqual(closed, ['live']);
+  loader.dispose();
+});
+
 test('memory observers cannot start a second decode of the same active entry', async () => {
   let loader,
     reentered = false;
@@ -64,16 +100,19 @@ test('two decode slots reserve their aggregate bytes and wait for pinned headroo
   assert.equal(loader.load('first'), first);
   assert.deepEqual(started, ['first', 'second']);
   assert.equal(loader.snapshot().reservedBytes, 800);
+  assert.equal(loader.bytesFor(['first', 'first', 'third']), 400);
   finish.get('first')(resource('first', closed));
   await first;
   await turn();
   assert.deepEqual(started, ['first', 'second']);
   assert.equal(loader.snapshot().bytes, 800);
+  assert.equal(loader.bytesFor(['first', 'second']), 800);
   finish.get('second')(resource('second', closed));
   await second;
   await turn();
   assert.deepEqual(started, ['first', 'second', 'third']);
   assert.deepEqual(closed, ['second']);
+  assert.equal(loader.bytesFor(['second', 'third']), 400);
   assert.equal(loader.snapshot().reservedBytes, 400);
   finish.get('third')(resource('third', closed));
   await third;
@@ -81,6 +120,7 @@ test('two decode slots reserve their aggregate bytes and wait for pinned headroo
   assert.equal(loader.snapshot().reservedBytes, 0);
   release();
   loader.dispose();
+  assert.equal(loader.bytesFor(['first', 'second', 'third']), 0);
 });
 
 test('parallel completion and failure release only their own reservations', async () => {

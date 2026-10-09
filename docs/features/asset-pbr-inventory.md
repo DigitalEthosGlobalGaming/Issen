@@ -204,9 +204,12 @@ clearing source pixels. Releasing a lease alone preserves warm images and peers.
 UI lighting now leases one source/data pack per export and releases pins and GPU
 source textures afterwards. Lit CSS outputs remain available for redraw, while
 the export painter shrinks to 1×1 and releases large lighting targets between
-jobs. Its export canvas is tracked and completed jobs reclaim unpinned inputs
-against combined pressure. Background dispatch yields to busy/loading/hidden frames. The managed
-budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
+jobs. Its export canvas and retained custom colour canvases are tracked. Jobs
+reserve input and temporary render/upload storage against the combined ledger
+before decoding. Deferred jobs retry during quiet frames; busy/hidden frames
+cancel unshared pending inputs without crediting a decode before it settles.
+CSS exports retain an estimated decoded/upload allowance of8bytes/pixel until
+disposal. These nominal estimates do not prove native process residency.
 Charm renderers now share their18,874,368-byte colour/normal/surface kit through
 main-pool leases; separate previews retain independent tint caches and pins.
 Companions now lease only the equipped kit plus visible preview selections:

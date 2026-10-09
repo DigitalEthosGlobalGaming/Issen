@@ -351,11 +351,15 @@ bindings detach before source destruction. Each completed or failed job suspends
 the export painter to a 1×1 surface, releasing its large lighting targets before
 the next frame grant; the export canvas is included in the shared pixel ledger.
 Unpinned main images are reclaimed against combined pressure after each job.
-Background exports wait for quiet
-visible frame grants before decode and upload; explicit prepare/custom texture
-requests bypass that wait. `asset-background` supports independent subscribers
-for UI exports and compressed prefetch. Exported DOM/CSS images and other figure
-owners remain outside the decoded-input estimate.
+Jobs reserve their full input/upload/render-target peak before acquiring images;
+shared input residency and actual painter storage replace those reservations.
+CSS outputs retain an estimated decoded/browser-upload allowance until disposal.
+Background jobs wait for quiet visible frames and cancel pending unshared inputs
+when gameplay becomes busy or hidden. Deferred jobs retry on quiet samples at
+most every 250ms. Explicit prepare/custom requests bypass the quiet wait but
+still defer exports which cannot fit, preserving existing CSS artwork.
+`asset-background` supports independent subscribers for UI exports and compressed
+prefetch. These estimates do not establish actual native resident memory.
 `figures/ink-charms.ts` leases its colour atlas and selected data maps from the
 shared main pool. Charm previews share decode residency while retaining separate
 tint caches; disposal releases only their own pins and ignores late attachment.

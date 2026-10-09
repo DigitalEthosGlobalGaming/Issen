@@ -8,7 +8,7 @@ import { registerUiTextureRenderer } from './material-textures.ts';
 import { createMainImageOwner } from '../platform/main-images.ts';
 import { observeAssetBackground } from '../platform/asset-background.ts';
 import { trackPixelSource } from '../platform/pixel-memory.ts';
-import { reclaimSceneMemory } from '../platform/scene-memory.ts';
+import { reclaimSceneMemory, registerSceneMemory } from '../platform/scene-memory.ts';
 
 type Frame = readonly [number, number, number, number];
 type Pack = (typeof assetMaterialCatalog)[number];
@@ -29,18 +29,23 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
   const decodedImages = createMainImageOwner(doc);
   let quiet = false,
     foregroundRequests = 0,
-    wake: (() => void) | undefined;
+    wake: (() => void) | undefined,
+    cancelExport: (() => void) | undefined;
   const allowed = () => foregroundRequests > 0 || (quiet && !doc.hidden);
   const resume = () => {
-    if (allowed()) wake?.();
+    if (!allowed()) cancelExport?.();
+    if (allowed()) {
+      wake?.();
+      if (deferred && performance.now() >= retryAt) schedule();
+    }
   };
   const stopBackground = observeAssetBackground((_stage, settled, work, budget) => {
     quiet = settled && work <= budget * 0.75;
     resume();
   });
   doc.addEventListener('visibilitychange', resume);
-  async function grant() {
-    while (!allowed() && !disposed) {
+  async function grant(current = () => true) {
+    while (!allowed() && !disposed && current()) {
       await new Promise<void>((resolve) => {
         wake = resolve;
       });
@@ -60,7 +65,37 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     scheduled = false,
     rendering = false,
     dirty = false,
-    version = 0;
+    version = 0,
+    deferred = false,
+    retryAt = 0;
+  let allocation: { urls: string[]; inputs: number; output: number; gpu: number } | undefined;
+  function pendingBytes(plan: NonNullable<typeof allocation>) {
+    return (
+      Math.max(0, plan.inputs - decodedImages.bytesFor(plan.urls)) +
+      Math.max(0, plan.gpu - (painter?.memorySnapshot.bytes ?? 0)) +
+      Math.max(0, plan.output - canvas.width * canvas.height * 4) +
+      Math.max(0, plan.output * 3 - (painter?.memorySnapshot.browserReserveBytes ?? 0)) +
+      plan.output * 2
+    );
+  }
+  const exportMemory = {
+    get memorySnapshot() {
+      return {
+        decodedBytes: 0,
+        canvasBytes: 0,
+        transferredBytes: 0,
+        // CSS output may own both decoded pixels and a browser-uploaded copy.
+        // This is an estimate, not an observation of native residency.
+        reservedBytes: disposed
+          ? 0
+          : [...jobs.values()].reduce(
+              (bytes, value) => bytes + (value.url ? value.frame[2] * value.frame[3] * 8 : 0),
+              0,
+            ) + (allocation ? pendingBytes(allocation) : 0),
+      };
+    },
+  };
+  registerSceneMemory(doc, exportMemory);
   const preparePainter = () =>
     (painterPending ??= import('../rendering/pixi/scene-painter.ts')
       .then((module) => module.createPixiScenePainter(canvas))
@@ -81,7 +116,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     if (!value) {
       let ownedColour: HTMLCanvasElement | undefined;
       if (colour) {
-        ownedColour = doc.createElement('canvas');
+        ownedColour = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
         ownedColour.width = colour.width;
         ownedColour.height = colour.height;
         ownedColour.getContext('2d')!.drawImage(colour, 0, 0);
@@ -120,6 +155,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     if (disposed || rendering) return;
     rendering = true;
     dirty = false;
+    deferred = false;
     try {
       if (!jobs.size) return;
       await grant();
@@ -131,15 +167,48 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
         await grant();
         if (disposed) return;
         const pack = value.asset;
+        const urls = [pack.source, pack.maps.normal, pack.maps.surface, pack.maps.emissive].filter(
+          (url): url is string => !!url,
+        );
+        const inputs = new Set(urls).size * pack.dimensions[0] * pack.dimensions[1] * 4;
+        const output = value.frame[2] * value.frame[3] * 4;
+        // Uploaded inputs plus RGBA geometry, HDR lights, stencil and back buffers.
+        // Ten RGBA planes conservatively cover this unfiltered single-stamp export.
+        const plan = { urls, inputs, output, gpu: inputs + output * 10 };
+        // Publish before reclamation too: evicting an input from this pack moves
+        // its bytes back into the plan instead of creating fictitious headroom.
+        allocation = plan;
+        const memory = reclaimSceneMemory(doc);
+        if (memory.committedBytes > memory.budget) {
+          allocation = undefined;
+          deferred = true;
+          retryAt = performance.now() + 250;
+          continue;
+        }
+        // Publish the whole job before the first await so next-scene admission
+        // sees future decode/upload storage. Residency replaces this reservation.
         const lease = decodedImages.acquire(pack.source);
         const atlas = createPbrAtlas(doc, pack.maps, ...pack.dimensions, {
           colour: false,
           images: decodedImages,
         });
+        let cancelled = false;
+        const cancel = () => {
+          cancelled = true;
+          atlas.dispose();
+          lease.release();
+          decodedImages.cancelUnused(urls);
+          allocation = undefined;
+          deferred = true;
+          retryAt = performance.now() + 250;
+          wake?.();
+        };
+        cancelExport = cancel;
         try {
           const [source, maps] = await Promise.allSettled([lease.ready, atlas.prepare()]);
           if (
             disposed ||
+            cancelled ||
             source.status !== 'fulfilled' ||
             maps.status !== 'fulfilled' ||
             !maps.value
@@ -147,8 +216,9 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
             continue;
           const material = atlas.material(value.frame);
           if (!material) continue;
-          await grant();
+          await grant(() => !cancelled);
           if (disposed) return;
+          if (cancelled) continue;
           const [, , width, height] = value.frame;
           canvas.width = width;
           canvas.height = height;
@@ -177,11 +247,13 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
             ),
           ]);
         } finally {
+          cancelExport = undefined;
           atlas.dispose();
           lease.release();
           // CSS owns the exported pixels. Do not retain the full-size lighting
           // targets while waiting for the next quiet frame or after the last job.
           target.suspend();
+          allocation = undefined;
           reclaimSceneMemory(doc);
         }
       }
@@ -305,10 +377,13 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
       sourceTextures: painter?.sourceTextureCount ?? 0,
       gpuMemory: painter?.memorySnapshot,
       exportPixels: canvas.width * canvas.height,
+      reservedBytes: exportMemory.memorySnapshot.reservedBytes,
+      deferred,
     }),
     dispose() {
       if (disposed) return;
       disposed = true;
+      cancelExport?.();
       stopBackground();
       doc.removeEventListener('visibilitychange', resume);
       wake?.();

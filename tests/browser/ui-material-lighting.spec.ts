@@ -1,6 +1,120 @@
 import { expect, test } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('busy frames cancel pending background UI exports without retaining their workspace', async ({
+  page,
+}) => {
+  let releaseRequest!: () => void;
+  let requested!: () => void;
+  const blocked = new Promise<void>((resolve) => {
+    releaseRequest = resolve;
+  });
+  const started = new Promise<void>((resolve) => {
+    requested = resolve;
+  });
+  await page.route('**/src/ui/assets/armoury-room.webp', async (route) => {
+    requested();
+    await blocked;
+    await route.abort().catch(() => {});
+  });
+  await page.goto('/privacy/index.html');
+  await page.evaluate(async () => {
+    const { createUiMaterialLighting } = await import('/src/ui/material-lighting.ts');
+    const { createLightingRig } = await import('/src/rendering/lighting-rig.ts');
+    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const room = assetMaterialCatalog.find((pack) =>
+      pack.sourcePath.endsWith('/armoury-room.png'),
+    )!;
+    const style = document.createElement('style');
+    style.textContent = `.cancel-room {background-image:url("${room.source}")}`;
+    document.head.append(style);
+    const scope = window as any;
+    scope.cancelUi = createUiMaterialLighting(document, createLightingRig());
+    scope.cancelSample = sampleAssetBackground;
+    sampleAssetBackground(0, true, 0, 8.3);
+  });
+  try {
+    await started;
+    expect(
+      await page.evaluate(() => (window as any).cancelUi.snapshot().reservedBytes),
+    ).toBeGreaterThan(0);
+    await page.evaluate(() => (window as any).cancelSample(0, false, 0, 8.3));
+    await expect
+      .poll(() => page.evaluate(() => (window as any).cancelUi.snapshot().decodedLoader.queued))
+      .toBe(0);
+    const cancelled = await page.evaluate(() => (window as any).cancelUi.snapshot());
+    expect(cancelled.rendered).toBe(0);
+    expect(cancelled.reservedBytes).toBe(0);
+    expect(cancelled.deferred).toBe(true);
+    expect(cancelled.exportPixels).toBe(1);
+    await page.evaluate(() => (window as any).cancelUi.dispose());
+  } finally {
+    releaseRequest();
+  }
+});
+
+test('UI exports defer under shared pressure and reserve CSS backing after recovery', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createUiMaterialLighting } = await import('/src/ui/material-lighting.ts');
+    const { createLightingRig } = await import('/src/rendering/lighting-rig.ts');
+    const { registerSceneMemory } = await import('/src/platform/scene-memory.ts');
+    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const room = assetMaterialCatalog.find((pack) =>
+      pack.sourcePath.endsWith('/armoury-room.png'),
+    )!;
+    const style = document.createElement('style');
+    style.textContent = `.pressure-room { background-image: url("${room.source}"); }`;
+    document.head.append(style);
+    const scope = window as any;
+    scope.uiPressure = {
+      memorySnapshot: {
+        decodedBytes: 0,
+        canvasBytes: 0,
+        transferredBytes: 0,
+        reservedBytes: 430 * 1024 * 1024,
+      },
+    };
+    registerSceneMemory(document, scope.uiPressure);
+    scope.pressureUi = createUiMaterialLighting(document, createLightingRig());
+    scope.pressureSample = sampleAssetBackground;
+    scope.pressureStyle = style;
+    sampleAssetBackground(0, true, 0, 8.3);
+    await scope.pressureUi.prepare();
+  });
+  const blocked = await page.evaluate(() => (window as any).pressureUi.snapshot());
+  expect(blocked.deferred).toBe(true);
+  expect(blocked.rendered).toBe(0);
+  expect(blocked.decodedLoader.bytes).toBe(0);
+  expect(blocked.reservedBytes).toBe(0);
+  await page.evaluate(() => {
+    (window as any).uiPressure.memorySnapshot.reservedBytes = 0;
+  });
+  await expect
+    .poll(async () =>
+      page.evaluate(() => {
+        const scope = window as any;
+        scope.pressureSample(0, true, 0, 8.3);
+        return scope.pressureUi.snapshot().rendered;
+      }),
+    )
+    .toBe(1);
+  const ready = await page.evaluate(() => (window as any).pressureUi.snapshot());
+  expect(ready.reservedBytes).toBe(1536 * 1024 * 8);
+  expect(ready.exportPixels).toBe(1);
+  await page.evaluate(() => {
+    const scope = window as any;
+    scope.pressureUi.dispose();
+    scope.pressureStyle.remove();
+  });
+  expect(await page.evaluate(() => (window as any).pressureUi.snapshot().reservedBytes)).toBe(0);
+});
+
 test('background UI exports wait for quiet visible frames and disposal releases a waiting pass', async ({
   page,
 }) => {
