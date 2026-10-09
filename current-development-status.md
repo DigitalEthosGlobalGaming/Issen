@@ -1,3 +1,56 @@
+# Performance, assets and seamless transitions — Scene-owned startup inputs
+
+Checkpoint59 removes36 plain environment sources from broad startup decoding,
+app1.69.8. Scene composition, demon and drift already prepare their own inputs.
+The removed sources total226,501,456nominal RGBA bytes; this describes avoided
+startup decode inputs, not measured resident savings. The preloader releases
+its retained images after mounting (since1.68.13), so earlier references to
+second lifetime startup owners were inaccurate. Compressed prefetch remains.
+
+Actual startup succeeds with future bamboo/temple/snow/cherry/shore direct
+image requests blocked, both with the worker and constructor-failure local
+fallback. Demon/drift preparation succeeds independently. Direct environment
+resource inventory falls54→26 URLs/339,779,840→163,623,424nominal bytes with
+the worker; local fallback requests22/138,446,816. These are unique requested
+sources, not resident memory or one-owner accounting. Direct demon/drift/live
+fog images and enemy/weapon selection still need pooled ownership.
+
+The fixture initially also blocked the Temple UI symbol, preventing startup;
+restricting its URL filter to environment assets corrects it. Production's old
+>=10 page-resource count depended on eager loading and missed worker requests.
+The corrected test observes context requests, verifies all11 stage0 source
+atlases, starts gameplay, goes offline, resizes and awaits a new preparation
+mark plus ready state. A title-only readiness assertion was invalid; title
+startup does not expose runtime scene-flow's readiness marker. No pixel or
+rendering tolerance changes. Native all-nine-scene/mist/drift checks remain.
+
+Matched existing title timing harness: five samples per arm,3s warmup/5s measure,
+390x844/DPR2/high/fixed seed. Startup-ready median2638.4→2219.1ms (-15.9%);
+five-sample maximum3162.0→2707.4ms. Title render median1.5ms in both and frame
+p95median16.9ms in both. This proves an improvement in this sampled environment,
+not actual120Hz delivery or the remaining first-two-second long-task target.
+The candidate run completed five guarded samples but its comparison option was
+mistakenly a results filename instead of a directory. Raw failure is retained;
+compare.mjs validates that sole error and invokes the unchanged report function
+on completed samples, including compatibility checks. No workload retry/claim
+of a passing raw candidate report. Both builds used1.69.7 metadata before bump.
+
+Evidence: tmp/probes/startup-scene59/ holds before/after main-game source,
+baseline/worker/local source inventories, comparison script/JSON and logs.
+Performance builds/results: tmp/performance/2026-10-09T04-35-06.731Z-0b65c5ea/
+and tmp/performance/2026-10-09T04-36-16.649Z-c9e997ac/. Next finish remaining
+selected main-image owners and combined decoded/canvas/GPU/copy admission before
+quiet cancelable worker/local next slots and persistent texture leases. Local
+yielded composition still has four unresolved exact-pixel differences; retain
+its passing synchronous control. Budgets256/384/512MiB remain unchanged.
+Verification:475 units,9 related native cases,4 production cases and the checked
+strict TypeScript/source-map build pass. Changed-file formatting/diff checks pass;
+all process handles are terminal. Local develop commit only; versions agree.
+Full Phase5 metrics/traces/suites remain open; goal stays active. No seed/save/
+asset edits, push/deploy/native build. Packing/tight repack/lit-only stay cancelled.
+
+## Previous handoff — Shared player base ownership
+
 # Performance, assets and seamless transitions — Shared player base ownership
 
 Checkpoint58 routes four player base planes through the main-image pool,
@@ -8,7 +61,7 @@ preserves peers. These bytes become accounted/shared, not a guaranteed physical
 memory saving. Consuming painters release only their own raw/tone GPU sources
 on preview suspension/disposal and unregister; final disposal releases consumers
 before unpinning images and clearing tones. Startup excludes plain player/charm/
-world UI sources already owned by the pool, avoiding second lifetime owners.
+world UI sources already owned by the pool, avoiding second startup owners.
 
 The original/current oracle passes40 exact visible outfit/mirror captures. The
 first copied harness missed kasa because it prepared only the candidate's new

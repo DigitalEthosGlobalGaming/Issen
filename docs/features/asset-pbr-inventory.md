@@ -64,7 +64,7 @@ Player base sources use the pool as of1.69.7: four1254²planes/25,160,256nominal
 bytes. Both plain colour (tone generation) and diffuse (untinted PBR stamps) are
 required and retained. Its consuming painters release their own GPU sources on
 preview suspension/disposal. Startup excludes plain player/charm/world UI images
-already owned by the pool, avoiding a second lifetime image owner.
+already owned by the pool, avoiding a second startup image owner.
 Enemy/weapon direct image ownership still needs integration;
 the shared loader snapshot is not a whole-game memory bound.
 Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
@@ -144,7 +144,11 @@ its base-path-scoped cache with HTTP fallback. Main decoded ownership is pending
 Its static catalog is generated from installed pack metadata with
 `node scripts/pbr/update-runtime-catalog.mjs`; regenerate it when adding packs.
 Only packs selected by a renderer are decoded. Generated maps are excluded from
-lifetime startup retention. Scene changes retain their shared packs and release
+startup decoding. Environment source images are also excluded as of1.69.8;
+scene composition, demon and drift prepare their inputs independently. This
+removes36 plain startup sources/226,501,456nominal RGBA bytes, without claiming
+resident savings. Direct demon/drift/fog ownership still needs migration.
+Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
 weapons use their generated packs. Stage scenery, foreground bamboo, demon realm
 props and debris now submit material data. Cached layers retain transformed

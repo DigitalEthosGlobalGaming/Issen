@@ -51,10 +51,11 @@ prepares scene surfaces, then calls `startGame()` in `src/game.ts`.
 Startup loading/progress and retry use
 `platform/artwork-preload.ts` and `ui/startup-loading.ts`; retry calls the same
 instance's `begin()` without mounting a second root.
-Catalogued runtime PBR maps, selected companion sources and outfit family sources
-are excluded from this lifetime preloader. Material
-owners
-decode selected packs, release departed packs, and retain shared scenery packs
+Catalogued runtime PBR maps, environment sources, selected companion/outfit
+sources and pooled player/charm/world UI sources are excluded from the startup
+preloader. Its retained images are released after mounting. Scene composition,
+demon and drift owners prepare their own inputs. Material owners decode selected
+packs, release departed packs, and retain shared scenery packs
 across scene changes. UI textures use a separate owned shader surface and share
 the session lighting rig with startup and gameplay.
 `MainGame.dispose()` stops the runtime and releases startup resources and the

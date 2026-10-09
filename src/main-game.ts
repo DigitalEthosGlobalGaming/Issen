@@ -31,6 +31,10 @@ const publicArtwork = import.meta.glob<string>(
 // Material owners decode selected maps separately from source artwork.
 const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.values(pack.maps)));
 const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
+// Scene composition, demon and drift owners prepare their inputs without duplicate startup images.
+const environmentSources = new Set(
+  runtimeAssets.filter((asset) => asset.group === 'environment').map((asset) => asset.url),
+);
 const enemyDebugSources = new Set<string>(Object.values(INK_ENEMY_DEBUG_SOURCES));
 const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
 const outfitSources = new Set<string>(Object.values(INK_OUTFIT_SOURCES));
@@ -55,6 +59,7 @@ const urls = [
   const canonical = new URL(url, document.baseURI).href;
   return (
     !materialMaps.has(canonical) &&
+    !environmentSources.has(canonical) &&
     !companionSources.has(canonical) &&
     !outfitSources.has(canonical) &&
     !sharedSources.has(canonical) &&
