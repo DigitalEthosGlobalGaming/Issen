@@ -1,5 +1,27 @@
 # Current development status
 
+## Current handoff — production integration green; browser suite live
+
+App1.69.56 unchanged. Current checked production build/typecheck and all four
+production cases pass (19.1s browser portion): startup, edition gates, armory/run/
+landscape and offline sprite resize. Log: `tmp/production-integration-16956.log`.
+Existing current-code unit500/tool9 passing logs remain reusable; do not repeat.
+
+Full419-case browser integration launched with default two workers, output
+`tmp/test-results/browser/integration-16956/`, log
+`tmp/browser-integration-16956.log`. Exec session63888 remains live, first25 cases
+pass at this checkpoint. Resume by polling that handle; do not restart based on
+an observation timeout. Do not edit renderer/test sources or run competing
+graphics/performance workloads until it terminates. Inspect the complete result
+and rerun only concrete failures as necessary; no tests skipped or relaxed.
+
+Working requirement audit: `tmp/proposals/mobile-performance-completion-audit-16956.md`.
+Remaining independent evidence: Demon Mirror/Inferno combined memory observations
+through existing gameplay fixtures, stable final timing matrix, complete report
+and physical-device gaps. Leaf rounding proposal remains unapproved: the user's
+"yes" concerned receiving a new goal prompt, not the assertion change. Goal
+active; no push/deploy/native build/real-save edits.
+
 ## Current handoff — leaf experiments rejected; preview cycles below cap
 
 App1.69.56 unchanged. Flat constant leaf tint/opacity still fails3/5 strict
