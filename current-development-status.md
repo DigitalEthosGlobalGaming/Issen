@@ -1,4 +1,58 @@
-# Performance, assets and seamless transitions — WebGL graphics lifetime fixed
+# Performance, assets and seamless transitions — Local yielding isolated
+
+Checkpoint54 is diagnostic only; app remains1.69.4 at checkpoint53. Repaired
+local generator controls now distinguish transformation correctness from task
+yielding. The final synchronous original/generator control passes all27 visits:
+348 incoming planes, held planes and both native draws per visit are exact.
+Portrait high/low and landscape use the same seeds and matched capture ordinals.
+No production renderer, asset, seed, save, version or tolerance changed.
+
+Two ignored-probe mistakes initially changed stage0's native fog despite exact
+composed planes. The archived generator's live motion imported the production
+material-binding module; after moving motion to the probe, its live fog called
+a shared tile helper that had become a generator without draining it. The final
+probe uses its own motion/material bindings and a synchronous tile wrapper;
+composition delegates to tileSteps. Positive final27-visit native equality
+verifies both repairs. Earlier failed sync captures are retained as diagnostics,
+not evidence of an application regression or successful equivalence.
+
+With that repaired source, unrestricted statement-level yielding changes23/27
+visits (1,483 recorded yields). Restricting yields to completed stamps, restores
+and temporary-source cleanup reproduces the four known differences:
+- high portrait Hollow: colour/surface planes and both native draws;
+- high portrait Shore: colour plane and both native draws;
+- landscape Hollow: colour plane, native draws remain exact;
+- landscape Shore: colour plane and both native draws.
+The final atomic comparison captures all27 visits/348 planes and399 yields;
+held planes match incoming in every visit. Low portrait remains exact. This
+isolates yielding against the same generator drained synchronously; it does not
+prove a browser raster mechanism or safe pacing. Keep the yielded route rejected.
+
+Evidence: tmp/performance-scene-image-preload/checkpoint54/:
+local-generator-sync54-final.json, sync-final-summary.json (passing),
+local-generator-atomic54.json, atomic-summary.json (four failures),
+local-generator-paused54.json, paused-summary.json (statement-level failures),
+final-controls.log and earlier-control logs/results. Reliable final source,
+maker and tests are archived under reliable-source/. Live ignored modules are
+tmp/probes/scene-image-preload/cooperative54/, with make-local-control54.mjs,
+local-generator-sync54.spec.ts and local-generator-atomic54.spec.ts. The maker
+starts from checkpoint49's archived source, disables async map copies, repairs
+motion/tile sharing and restricts task grants to atomic boundaries. Do not use
+the rejected software-mask/current cooperative directory or old incomplete makers.
+
+All three native-control processes are terminal. No broad unit/production or
+headline performance rerun was needed for this diagnostic-only work. Next isolate
+the first differing Hollow/Shore command/source lifetime, preserving the passing
+synchronous control and exact assertions. Measure actual main-gameplay interference
+from the worker prototype rather than equating worker chunk wall times with
+main-thread frame cost. Admission still needs current/next planes, raw images,
+copy/scratch overlap, figures/UI and GPU storage; a decoded-pool bound is insufficient.
+Then integrate admitted next slots, cancellation, persistent texture-store leases,
+promotion/invalidation and quiet uploads. AllPhase5 metrics/traces/suites and
+actual120Hz delivery remain required. Goal active; no push/deploy/native build.
+Cancelled packing, tight repacking and separate lit-only work remain cancelled.
+
+## Previous handoff — WebGL graphics lifetime fixed
 
 Checkpoint53: app1.69.4 installs the instance-local WebGL graphics-data adapter
 in src/rendering/pixi/webgl-graphics-data.ts. Pixi8.22's original builder creates

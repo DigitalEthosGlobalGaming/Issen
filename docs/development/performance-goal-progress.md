@@ -2656,3 +2656,44 @@ Next resume deterministic next-scene slots, quiet composition/uploads, local
 paused differences, generator cancellation, whole-memory admission and selected
 figure/startup ownership. All Phase5 measurements/traces/suites remain required.
 No deployment, native build or real player-save changes; full goal active.
+
+## Checkpoint 54 — Local task-yield fidelity isolated, 9 October 2026
+
+Diagnostic only; app remains1.69.4. The repaired local generator drained
+synchronously matches the original through27 visits:348 incoming planes,
+unchanged held planes and both native draws per visit. High/low portrait and
+landscape use matching history, geometry and seeds. No tolerance was relaxed.
+
+Two ignored-probe defects initially changed only stage0 native fog. Live motion
+used the production cached-material binding module while composition used a
+private clone; the cloned meadow helper was then a generator called without
+draining from live fog. Matching the probe's material/motion modules and adding
+a synchronous tile wrapper fixes both. The final full native equality gate
+passes; earlier failed sync captures do not establish an application regression.
+
+Against the same synchronous generator, unrestricted statement-level yielding
+changes23/27 visits with1,483 recorded yields. Completed-stamp/restore/temporary
+cleanup boundaries reduce this to the same four checkpoint49 failures, with399
+recorded yields: high portrait Hollow colour/surface and native draws, high
+portrait Shore colour and native draws, landscape Hollow colour only, landscape
+Shore colour and native draws. Every held plane matches its incoming plane.
+Low portrait is exact. Thus the remaining four differences occur with yielding,
+not synchronous generator transformation. This does not identify the browser's
+raster mechanism or prove safe pacing; the yielded route remains rejected.
+
+The final paired native run reports one passing synchronous oracle and one
+expected failing atomic candidate, after collecting all visits before assertions.
+No production implementation, version, assets, run state or broad-suite result
+changed. All three native-control processes are terminal. Evidence and reliable
+final sources/maker/tests are in tmp/performance-scene-image-preload/checkpoint54/.
+Use local-generator-sync54-final.json, local-generator-atomic54.json,
+local-generator-paused54.json, their summaries and final-controls.log; the live
+ignored source is tmp/probes/scene-image-preload/cooperative54/.
+
+Next isolate command/source lifetime at the first Hollow/Shore difference and
+measure worker composition's actual interference with main gameplay. Worker
+chunk wall time alone is not a main-thread frame measurement. Preserve exact
+controls, whole-memory admission, generator cancellation and texture-store lease
+requirements before next-slot integration. All Phase5 metrics/traces/suites,
+actual120Hz delivery and whole-game memory bounds remain outstanding. Goal active;
+no deployment, native build or real player-save changes.
