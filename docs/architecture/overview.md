@@ -231,17 +231,20 @@ UI lighting request data maps only; direct player/enemy PBR owners retain their
 explicit diffuse colour path. Inventory generation lives in
 `scripts/assets/runtime-inventory.mjs`, including startup-only and redundant
 diffuse roles separately from actual on-screen selections.
-`platform/decoded-images.ts` owns a serial priority decode queue with shared
+`platform/decoded-images.ts` owns a priority decode queue with shared
 promises, reference-counted live pins and pixel-byte LRU eviction. Known atlas
 dimensions reserve space before decoding; admitted and reserved bytes are
-bounded, while native decoder overhead is outside the nominal estimate. Worker
+bounded, including the aggregate reservations of concurrent decodes. Main-thread
+decoding is serial; worker documents use two slots. Concurrent mode requires
+known positive input sizes and waits when another reservation owns needed room.
+Native decoder overhead is outside the nominal estimate. Worker
 image wrappers share loader-owned ImageBitmaps and release pins when cleared;
 only the loader closes cached bitmaps. Snapshot diagnostics include queues,
 residency, pins, uniquely pinned decoded bytes, total bytes, peak, budget and
 evictions.
 
 The loader's explicit `prefetch` API admits a complete known image set together
-with existing pins before starting serial soon decodes. Its independent leases
+with existing pins before starting paced soon decodes. Its independent leases
 share queued work and warm resources, without changing renderer bindings. A now
 request or busy/hidden/over-budget policy cancels future leases, aborts orphaned
 pending decodes and preserves promoted/shared consumers. Late cancelled results

@@ -88,6 +88,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
           : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
     });
   const loader = createDecodedImageLoader({
+    concurrency: 2,
     onMemoryChange: () => {
       for (const listener of memoryListeners) listener();
     },

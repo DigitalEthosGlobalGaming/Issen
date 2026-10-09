@@ -1,5 +1,44 @@
 # Current development status
 
+## Current handoff — bounded two-slot worker decode integrated
+
+App1.69.49 uses two decode slots only in worker documents; main-thread defaults
+stay serial. The shared loader validates concurrent mode/known sizes, accounts
+aggregate pending reservations in admission and peak bytes, excludes active
+entries from queue selection, and waits for reserved room rather than spuriously
+failing pinned requests. Completion/failure releases only its own reservation;
+late disposed results close. Decode starts respect selected priority. Controllers
+are set before memory notifications so reentrant observers cannot duplicate work.
+
+Twenty-four focused unit cases PASS, including four new aggregate headroom,
+priority/unknown-size, failure/disposal and reentrant-observer cases. Ten real-worker
+reuse/pressure, all-stage256/384/512MiB lifetime, promotion/invalidation/busy cases
+PASS27.3s/default2. Checked production build/TypeScript plus startup/Armoury/run/
+landscape and offline resize PASS9.8s/default2. Evidence
+`tmp/test-results/{browser,production}/parallel-worker-decode/`.
+
+Production900x600/DPR1/Edge154 capture: cold median487.8ms versus serial1.69.48
+589.8ms, warm457.2 versus552.8ms; cold range297.4–870.5ms, warm301.4–918.0ms.
+No task>16ms in18 first-two-second windows; max9.35ms. Title2137.4ms/first gameplay
+2608.0ms; CPU render p953.0ms, actual frame p9517ms. Cold/warm compose maxima
+526.7/568.1ms at meadow; other stages below500ms. Evidence
+`tmp/performance-scene-parallel2-16949/`. Captured before the controller-notification
+ordering safeguard (no reentrant observer in this runtime); added unit proves that
+guard. Single captures, not universal speedup/physical120Hz proof. Historical cold
+median548.1ms is now higher, but individual stage timings are not uniformly faster.
+
+Controlled low-tier rush/cat all9 environment/figure prepares/promotions PASS:
+waits17.0–26.8ms, sampled committed peak508.64MiB versus512MiB. Evidence
+`tmp/probes/rush-companion-parallel2-16949.json`. Controlled phase/ordinal fixture,
+not natural combat/all-transient/native residency proof. All handles terminal.
+
+Next: substantial final verification checkpoint (unit/browser/production and
+requirement audit), preserving strict historical native leaf alpha assertion.
+Then close natural progression/loadout/transient/native coverage and explain
+residual meadow compose cost with retained evidence before further optimization.
+Do not repeat unchanged broad timing captures. Goal active; no pushes/deploys/
+native builds/real-save changes; cancelled packing/lit-only stays cancelled.
+
 ## Current handoff — shared inputs survive foreground admission
 
 App1.69.48 prunes foreground cache to its incoming URLs and awaits actual counters

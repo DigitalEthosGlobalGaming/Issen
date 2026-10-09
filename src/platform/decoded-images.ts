@@ -2,16 +2,25 @@ export type ImagePriority = 'now' | 'soon' | 'idle';
 export type DecodedResource = { width: number; height: number; close(): void };
 const rank: Record<ImagePriority, number> = { now: 0, soon: 1, idle: 2 };
 
-/** One serial decode queue per thread; callers separately pin their live sources. */
+/** Priority decode queue; callers separately pin their live sources. */
 export function createDecodedImageLoader<T extends DecodedResource>(options: {
   budget: number;
   decode(url: string, signal: AbortSignal): Promise<T>;
   expectedBytes?: (url: string) => number | undefined;
   yield?: () => Promise<void>;
   onMemoryChange?: () => void;
+  concurrency?: number;
 }) {
   if (!Number.isFinite(options.budget) || options.budget <= 0)
     throw RangeError('Invalid decoded image budget');
+  const concurrency = options.concurrency ?? 1;
+  if (
+    !Number.isInteger(concurrency) ||
+    concurrency < 1 ||
+    concurrency > 4 ||
+    (concurrency > 1 && !options.expectedBytes)
+  )
+    throw RangeError('Concurrent decoding requires known sizes and one to four slots');
   type Entry = {
     url: string;
     priority: ImagePriority;
@@ -33,8 +42,8 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     peakBytes = 0,
     evictions = 0,
     sequence = 0;
-  let running = false,
-    disposed = false,
+  let running = 0;
+  let disposed = false,
     hidden = false,
     busy = false,
     overFrameBudget = false;
@@ -64,33 +73,54 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     for (const entry of [...entries.values()]
       .filter((entry) => entry.resource && !pins.has(entry.url))
       .sort((a, b) => a.touched - b.touched)) {
-      if (bytes + size <= options.budget) break;
+      if (bytes + reservedBytes + size <= options.budget) break;
       evict(entry);
     }
-    return bytes + size <= options.budget;
+    return bytes + reservedBytes + size <= options.budget;
   }
   async function pump() {
-    if (running || disposed) return;
-    running = true;
+    if (running >= concurrency || disposed) return;
+    running++;
     try {
       while (!disposed) {
         const entry = [...entries.values()]
           .filter(
             (entry) =>
               !entry.resource &&
+              !entry.controller &&
               (entry.priority === 'now' || (!hidden && !busy && !overFrameBudget)),
           )
           .sort((a, b) => rank[a.priority] - rank[b.priority] || a.queued - b.queued)[0];
         if (!entry) break;
+        let reservation = 0;
+        const unreserve = () => {
+          reservedBytes = Math.max(0, reservedBytes - reservation);
+          reservation = 0;
+        };
         try {
           const expected = options.expectedBytes?.(entry.url) ?? 0;
+          if (concurrency > 1 && !(expected > 0 && Number.isFinite(expected)))
+            throw Error(`Unknown decoded image size: ${entry.url}`);
+          // Another pending decode can own the last free bytes. Wait for that
+          // slot rather than failing a request which fits after it settles.
+          if (
+            expected <= options.budget &&
+            expected > 0 &&
+            !makeRoom(expected) &&
+            reservedBytes > 0
+          )
+            break;
           if (expected > options.budget || (expected > 0 && !makeRoom(expected)))
             throw Error(`Decoded image budget exhausted: ${entry.url}`);
-          reservedBytes = expected;
+          reservation = expected;
+          reservedBytes += reservation;
+          entry.controller = new AbortController();
           peakBytes = Math.max(peakBytes, bytes + reservedBytes);
           options.onMemoryChange?.();
-          entry.controller = new AbortController();
-          const resource = await options.decode(entry.url, entry.controller.signal);
+          const pending = options.decode(entry.url, entry.controller.signal);
+          void pump();
+          const resource = await pending;
+          unreserve();
           const size = resource.width * resource.height * 4;
           if (
             disposed ||
@@ -111,15 +141,14 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
             );
           }
           entry.resource = resource;
-          reservedBytes = 0;
           entry.bytes = size;
           if (!entry.speculativeOnly) entry.touched = ++sequence;
           bytes += size;
-          peakBytes = Math.max(peakBytes, bytes);
+          peakBytes = Math.max(peakBytes, bytes + reservedBytes);
           options.onMemoryChange?.();
           entry.resolve(resource);
         } catch (error) {
-          reservedBytes = 0;
+          unreserve();
           options.onMemoryChange?.();
           if (entries.get(entry.url) === entry) entries.delete(entry.url);
           entry.reject(error);
@@ -127,7 +156,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         if (!disposed) await yieldTask();
       }
     } finally {
-      running = false;
+      running--;
     }
   }
   function request(url: string, priority: ImagePriority = 'now', speculative = false): Promise<T> {

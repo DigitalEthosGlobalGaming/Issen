@@ -8,6 +8,30 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Bounded worker decode concurrency — 10 October 2026
+
+Version1.69.49 uses two worker decode slots while main-thread decoding remains
+serial. Reservations sum every pending known-size input and participate in budget
+admission, eviction and peak accounting. Active entries cannot start twice;
+temporary reservation pressure waits, and each completion/failure releases only
+its own bytes. Reentrant observers see an already claimed entry. Unknown sizes
+cannot enter concurrent mode. Twenty-four focused unit cases and ten real-worker
+cache/lifetime/next-scene checks pass; checked production smokes pass9.8s.
+
+Same production scene-flow probe reports cold median487.8ms versus serial589.8ms,
+warm457.2 versus552.8ms. Cold range297.4–870.5ms, warm301.4–918.0ms. No task>16ms
+in18 first-two-second presentation windows; maximum9.35ms. Title/first gameplay
+2137.4/2608.0ms; actual frame p9517ms versus CPU render p953.0ms. Meadow compose
+526.7/568.1ms remains slightly above the approximate500ms target; other stages
+stay below it. Evidence `tmp/performance-scene-parallel2-16949/`. Capture precedes
+the reentrant notification safeguard; application observers do not exercise that
+path. These are single captures, not causal confidence or physical120Hz proof.
+
+Controlled low-memory rush/cat loop prepares/promotes all9 stages including wrap,
+17.0–26.8ms waits and sampled committed peak508.64MiB against512MiB. Evidence
+`tmp/probes/rush-companion-parallel2-16949.json`. Natural progression, all transient
+allocations/native residency and final suite verification remain separate work.
+
 ## Shared-input admission credit — 10 October 2026
 
 Version1.69.48 preserves foreground incoming URLs during worker pruning, waits

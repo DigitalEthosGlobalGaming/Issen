@@ -10,6 +10,159 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('memory observers cannot start a second decode of the same active entry', async () => {
+  let loader,
+    reentered = false;
+  const started = [],
+    finish = new Map(),
+    closed = [];
+  loader = createDecodedImageLoader({
+    budget: 800,
+    concurrency: 2,
+    expectedBytes: () => 400,
+    yield: turn,
+    onMemoryChange: () => {
+      if (!reentered) {
+        reentered = true;
+        loader.policy({ busy: true });
+      }
+    },
+    decode: (url) => {
+      started.push(url);
+      return new Promise((resolve) => finish.set(url, resolve));
+    },
+  });
+  const a = loader.load('a'),
+    b = loader.load('b');
+  assert.deepEqual(started, ['a', 'b']);
+  assert.equal(loader.snapshot().reservedBytes, 800);
+  finish.get('a')(resource('a', closed));
+  finish.get('b')(resource('b', closed));
+  await Promise.all([a, b]);
+  loader.dispose();
+  assert.deepEqual(closed.sort(), ['a', 'b']);
+});
+
+test('two decode slots reserve their aggregate bytes and wait for pinned headroom', async () => {
+  const closed = [],
+    started = [],
+    finish = new Map();
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    concurrency: 2,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: (url) => {
+      started.push(url);
+      return new Promise((resolve) => finish.set(url, resolve));
+    },
+  });
+  const release = loader.pin('first');
+  const first = loader.load('first'),
+    second = loader.load('second'),
+    third = loader.load('third');
+  assert.equal(loader.load('first'), first);
+  assert.deepEqual(started, ['first', 'second']);
+  assert.equal(loader.snapshot().reservedBytes, 800);
+  finish.get('first')(resource('first', closed));
+  await first;
+  await turn();
+  assert.deepEqual(started, ['first', 'second']);
+  assert.equal(loader.snapshot().bytes, 800);
+  finish.get('second')(resource('second', closed));
+  await second;
+  await turn();
+  assert.deepEqual(started, ['first', 'second', 'third']);
+  assert.deepEqual(closed, ['second']);
+  assert.equal(loader.snapshot().reservedBytes, 400);
+  finish.get('third')(resource('third', closed));
+  await third;
+  assert.equal(loader.snapshot().peakBytes, 800);
+  assert.equal(loader.snapshot().reservedBytes, 0);
+  release();
+  loader.dispose();
+});
+
+test('parallel completion and failure release only their own reservations', async () => {
+  const closed = [],
+    finish = new Map(),
+    fail = new Map();
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    concurrency: 2,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: (url) =>
+      new Promise((resolve, reject) => {
+        finish.set(url, resolve);
+        fail.set(url, reject);
+      }),
+  });
+  const first = loader.load('first'),
+    second = loader.load('second');
+  const rejected = assert.rejects(first, /decode failed/);
+  fail.get('first')(Error('decode failed'));
+  await rejected;
+  assert.equal(loader.snapshot().reservedBytes, 400);
+  assert.equal(loader.snapshot().bytes, 400);
+  finish.get('second')(resource('second', closed));
+  await second;
+  assert.equal(loader.snapshot().reservedBytes, 0);
+  const late = loader.load('late'),
+    invalid = loader.load('invalid');
+  await turn();
+  const lateRejected = assert.rejects(late, /disposed/);
+  const invalidRejected = assert.rejects(invalid, /disposed/);
+  loader.dispose();
+  finish.get('late')(resource('late', closed));
+  finish.get('invalid')(resource('invalid', closed));
+  await Promise.all([lateRejected, invalidRejected]);
+  await turn();
+  assert.deepEqual(closed.sort(), ['invalid', 'late', 'second']);
+  assert.equal(loader.snapshot().bytes, 0);
+});
+
+test('bounded concurrency validates sizes and chooses queued required work ahead of idle', async () => {
+  assert.throws(
+    () =>
+      createDecodedImageLoader({
+        budget: 800,
+        concurrency: 2,
+        decode: async () => resource('x', []),
+      }),
+    RangeError,
+  );
+  const started = [],
+    finish = new Map(),
+    closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 1600,
+    concurrency: 2,
+    expectedBytes: (url) => (url === 'unknown' ? undefined : 400),
+    yield: turn,
+    decode: (url) => {
+      started.push(url);
+      return new Promise((resolve) => finish.set(url, resolve));
+    },
+  });
+  const a = loader.load('a'),
+    b = loader.load('b'),
+    idle = loader.load('idle', 'idle'),
+    now = loader.load('now');
+  finish.get('a')(resource('a', closed));
+  await a;
+  await turn();
+  assert.deepEqual(started, ['a', 'b', 'now']);
+  finish.get('b')(resource('b', closed));
+  finish.get('now')(resource('now', closed));
+  await Promise.all([b, now]);
+  await turn();
+  finish.get('idle')(resource('idle', closed));
+  await idle;
+  await assert.rejects(loader.load('unknown'), /Unknown decoded image size/);
+  loader.dispose();
+});
+
 test('decode reservations notify before allocation and clear on success, trim and failure', async () => {
   const changes = [],
     closed = [];
