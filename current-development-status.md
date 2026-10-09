@@ -1,4 +1,68 @@
-# Performance, assets and seamless transitions — Worker composed-map optimization verified
+# Performance, assets and seamless transitions — Cooperative copy costs isolated
+
+Checkpoint 49 is diagnostic only; application remains 1.69.1 at checkpoint 48.
+Atomic-boundary local yielding after stamps, context restores and temporary
+source cleanup still fails exact output in the same four visits: portrait
+Hollow colour/surface/native, portrait Shore colour/native, landscape Hollow
+colour only, and landscape Shore colour/native. All27 visits were captured;
+the trial remains rejected. Summed local work between those boundaries reaches
+164.9ms, so those boundaries do not establish pacing.
+
+The same atomic worker schedule passes all27 visits exactly (1.8m), with
+positive GPU bakes and the actual256MiB worker path. Per-step maxima are
+20.3–36.0ms in high portrait,18.3–26.7ms in low portrait and79.4–117.9ms in
+landscape. The landscape maximum remains the fractional full-layer software
+bake. These are diagnostic call/chunk wall times, not gameplay frame p95.
+
+An ignored prototype delegates material stamps and awaits createImageBitmap
+copies of baked maps before GPU plane draws. It preserves software atlas baking
+and restores material bindings around each synchronous iterator step. All nine
+protocol preflight cases pass with positive copy counts. The final27-visit
+worker oracle passes exact incoming/held planes and both native draws (2.1m),
+with positive worker-path coverage and no fallback; decoded peak264,275,504bytes
+stays within256MiB. Initial syntax and incomplete nested-delegation failures were
+repaired before this verdict. No pixel assertion or decode option was changed.
+
+Reject that copy approach for integration: it shifts the synchronous stall.
+Portrait bitmap creation still reaches31.5ms; landscape cutout baking reaches
+58.4ms. Three stage0 900x600/DPR1 instrumented profiles show680 drawImage calls
+now take14.7–16.0ms, but225 bitmap creations take423.4–458.5ms synchronously,
+with only1.2–1.5ms total promise wait. The largest sampled creation reaches91.4ms.
+CPU ImageData copying, restricted to requested-software cutouts and retaining
+direct GPU copies, also fails the pacing investigation: three profiles show
+213 copies taking428.6–479.7ms synchronously, getImageData420.6–471.8ms,
+maximum individual copy24.7–66.5ms and total promise wait0.9–1.3ms. No pixel
+verdict is claimed for this last timing-only variant. Context-mode route labels
+come from requested willReadFrequently attributes, not measured physical GPU
+residency. Profile overhead excludes these from headline compose timings.
+
+Evidence is under tmp/performance-scene-image-preload/checkpoint49/:
+atomic-local.json, atomic-local-chunks.json, atomic-worker.json,
+bitmap-worker.json, bitmap-worker-chunks.json, bitmap-profile/ and
+image-data-profile/. The passing bitmap prototype and oracle are archived in
+bitmap-source/; current tmp/probes/scene-image-preload/cooperative/ has the
+subsequent rejected ImageData timing variant. Regenerating either maker will
+not reproduce all later nested-delegation fixes; use the archived final source.
+The native profiler reuses profile-compose under an ignored adapter. All
+measurement/browser processes are terminal. Two shell helpers printing huge
+profile lines were interrupted only after all three profiles/results completed.
+
+Next investigate map destination/raster ownership rather than another promise
+wrapper around the same synchronous copy. Preserve original source sampling,
+alpha and strict plane/native comparisons. Cancellation must close outstanding
+bitmaps and unwind generator cleanup before any resumable integration. Next-slot
+warming also needs an explicit source lease: current warmScene releases its
+texture-store lease on return, and collect retires untouched sources after120
+rendered frames. A completed next slot must retain that same store until
+promotion/invalidation, including context-generation readiness; merely awaiting
+warmScene is insufficient for a long quiet interval.
+
+Then implement admitted worker/local next slots with exact promotion, quiet
+pacing and whole-memory accounting. Local paused differences, figure/startup
+ownership,120Hz/CPU budgets and fullPhase5 remain required. Full goal active;
+no application change, version bump, push/deploy/native build or player saves.
+
+## Previous handoff — Worker composed-map optimization verified
 
 Checkpoint 48: app version 1.69.1 keeps aligned, full composed-layer map copies
 on GPU-backed worker cutouts when source and bake pixel sizes match exactly.
