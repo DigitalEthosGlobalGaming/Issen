@@ -1,4 +1,61 @@
-# Performance, assets and seamless transitions — Scene-owned startup inputs
+# Performance, assets and seamless transitions — Shared drift ownership
+
+Checkpoint 60 routes drift colour and material maps through the main-image pool,
+app 1.69.9. Four colour atlases plus nine normal/surface/emissive maps become
+13 shared/accounted planes, 81,823,976 nominal RGBA bytes. This does not imply
+a resident-memory saving: one renderer still prepares all four families.
+Independent renderers share decodes and pins. Pending cancellation cannot clear
+a peer. Consuming painters release their own raw/map GPU uploads before final
+unpinning; ready/disposed guards prevent further drawing and cold resurrection.
+The pool keeps unpinned inputs cacheable while another owner survives.
+
+A saved original/current native oracle matches all 140 captures exactly:
+32 sprites plus three ember variants, two orientations and DPR 1/2. The peer
+fixture initially expected four simultaneous requests; the loader intentionally
+has one in flight. Its pinned diagnostic counts decoded entries, so pending
+inputs are four queued / zero decoded pins. The fixture now asserts those
+actual states and all 13 decoded pins after readiness. A two-channel first-to-
+second-frame difference also occurs in the saved original, then repeats exactly;
+prime that initial native frame before requiring zero peer-disposal differences.
+No tolerance changes. Independent consuming painters go 13→0 and 13→13 on
+one owner's disposal; the surviving peer renders exact settled pixels. The saved
+original retires nine map uploads but leaves four colour uploads (13→4); the
+pooled owner's consuming painter goes13→0. This is nominal upload-count evidence.
+
+Runtime startup succeeds with all direct drift image URLs blocked, using shared
+fetch/blob decoding. Direct environment inventory now requests 13 URLs /
+81,799,448 nominal bytes with the worker, or nine / 56,622,840 locally; those
+remaining sources belong to demon and live fog. They are requested-source
+accounting, not resident memory or one-owner attribution. Selected drift sets,
+demon/fog cutout-aware lifetime and selected enemy/weapon owners remain next.
+Do not migrate demon images by clearing globally shared scenery cutouts while
+a peer still holds a pooled raw source; handle cutout and consumer lifetimes.
+
+Matched existing title harness: five samples per arm, 3s warmup / 5s measurement,
+390×844 / DPR 2 / high / fixed seed. Startup median 2235.9→2203.5 ms; title
+render median 1.5 ms in both, frame-p95 median 16.9→17.0 ms. Startup is roughly
+unchanged in this sampled environment; no speedup, actual 120Hz, physical-memory
+or first-two-second-long-task claim. Both timing reports pass compatibility and
+workload guards; builds use 1.69.8 metadata before the patch bump.
+
+Evidence: tmp/probes/drift60/ contains saved original/before/after renderer,
+native oracle/config and baseline/current JSON, original repeat control,
+worker/local inventories, and timing/unit/production/ownership logs. Timing
+builds/results: tmp/performance/2026-10-09T04-51-33.977Z-a8f6392f/ and
+tmp/performance/2026-10-09T04-52-51.732Z-75ddace3/. Verification:475 units,
+eight unique related native cases, four checked production cases,140 exact native
+captures and changed-file formatting/diff checks pass. All process handles are
+terminal; version/package/lock/title/changelog agree. Local develop commit only.
+Remaining whole decoded /
+canvas / GPU / copy admission must cover drift and the other owners before
+retained worker/local next scenes. Preserve the same texture lease through
+warming/promotion. Quiet gating, cancellation, next-slot invalidation and full
+Phase 5 remain open. Local yielded composition still has four unresolved exact
+pixel differences; retain its passing synchronous control. Budgets remain
+256/384/512 MiB. Goal active; no seed/save/asset changes, push/deploy/native build.
+Cancelled packing, tight repacking and lit-only stay cancelled.
+
+## Previous handoff — Scene-owned startup inputs
 
 Checkpoint59 removes36 plain environment sources from broad startup decoding,
 app1.69.8. Scene composition, demon and drift already prepare their own inputs.

@@ -5,16 +5,41 @@ import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { drawInstancedLeaves } from '../scene-leaves.ts';
 import type { LeafAtlas, LeafFrame } from '../scene-leaves.ts';
+import { createMainImageOwner } from '../../platform/main-images.ts';
+import type { PixiScenePainter } from '../pixi/scene-painter.ts';
 
 /** One retained path and decoded atlas images per runtime; no per-frame image processing. */
 export function createDriftRenderer(doc: Document = document) {
-  const materials = createAssetMaterials(doc, urls);
+  const imageOwner = createMainImageOwner(doc);
+  const materials = createAssetMaterials(doc, urls, imageOwner);
   const images = new Map<string, HTMLImageElement>();
+  const leases: Array<ReturnType<typeof imageOwner.acquire>> = [];
+  const consumers = new Set<SceneDrawing>();
   let disposed = false;
   let pending: Promise<void> | undefined;
   let leafAtlases: readonly LeafAtlas[] | undefined;
   const ready = () =>
-    images.size === Object.keys(urls).length && Object.keys(urls).every(materials.ready);
+    !disposed &&
+    images.size === Object.keys(urls).length &&
+    Object.keys(urls).every(materials.ready);
+  function releaseCanvas(g: SceneDrawing) {
+    const sources = [...images]
+      .flatMap(([id, image]) => {
+        const material = materials.material(id, [0, 0, image.naturalWidth, image.naturalHeight]);
+        return [
+          image,
+          material?.normal?.source,
+          material?.surface?.source,
+          material?.emissive?.source,
+        ];
+      })
+      .filter((source) => !!source);
+    if ('releaseTextureSources' in g)
+      (g as SceneDrawing & Pick<PixiScenePainter, 'releaseTextureSources'>).releaseTextureSources(
+        sources,
+      );
+    consumers.delete(g);
+  }
   function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
     const sprite = DRIFT_BY_ID.get(id)!;
     const image = images.get(sprite.atlas);
@@ -47,12 +72,13 @@ export function createDriftRenderer(doc: Document = document) {
       return ready();
     },
     prepare() {
+      if (disposed) return Promise.resolve();
       return (pending ??= Promise.all(
         Object.entries(urls).map(async ([id, url]) => {
-          const image = doc.createElement('img');
-          image.src = url;
+          const lease = imageOwner.acquire(url);
+          leases.push(lease);
           try {
-            await image.decode();
+            const image = await lease.ready;
             if (!disposed && image.naturalWidth > 0) images.set(id, image);
           } catch {
             /* Runtime startup reports missing artwork and offers retry. */
@@ -64,6 +90,7 @@ export function createDriftRenderer(doc: Document = document) {
     },
     drawLeaves(g: SceneDrawing, frame: Omit<LeafFrame, 'atlases'>) {
       if (!ready()) return;
+      consumers.add(g);
       leafAtlases ??= Object.keys(urls).map((id) => {
         const source = images.get(id)!,
           width = source.naturalWidth,
@@ -75,6 +102,8 @@ export function createDriftRenderer(doc: Document = document) {
       drawInstancedLeaves(g, { ...frame, atlases: leafAtlases });
     },
     drawEmber(g: SceneDrawing, p: WeatherParticle, index: number, scale: number) {
+      if (!ready()) return;
+      consumers.add(g);
       g.save();
       g.translate(p.x, p.y);
       g.rotate(p.ph);
@@ -86,11 +115,16 @@ export function createDriftRenderer(doc: Document = document) {
       );
       g.restore();
     },
+    releaseCanvas,
+    snapshot: imageOwner.snapshot,
     dispose() {
+      if (disposed) return;
       disposed = true;
       leafAtlases = undefined;
+      for (const g of consumers) releaseCanvas(g);
       materials.dispose();
-      for (const image of images.values()) image.removeAttribute('src');
+      for (const lease of leases.splice(0)) lease.release();
+      imageOwner.dispose();
       images.clear();
     },
   };

@@ -147,7 +147,10 @@ Only packs selected by a renderer are decoded. Generated maps are excluded from
 startup decoding. Environment source images are also excluded as of1.69.8;
 scene composition, demon and drift prepare their inputs independently. This
 removes36 plain startup sources/226,501,456nominal RGBA bytes, without claiming
-resident savings. Direct demon/drift/fog ownership still needs migration.
+resident savings. Drift sources/maps use pooled leases as of1.69.9:13 planes/
+81,823,976nominal bytes become shared/accounted; disposal releases only its
+consuming painters. All four drift families are still prepared. Selected drift
+families and direct demon/fog ownership still need migration.
 Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
 weapons use their generated packs. Stage scenery, foreground bamboo, demon realm

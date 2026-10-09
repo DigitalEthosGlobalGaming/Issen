@@ -239,7 +239,9 @@ requests that bypass the compose queue. Worker requests preserve the current
 raw pins and apply the same decoded-byte admission. Denied sets remain cold.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
-Player-base planes use the same pool; startup excludes plain player/charm/world
+Player-base and drift colour/material planes use the same pool; drift owns all
+four atlas families and releases consuming painters before unpinning on disposal.
+Selected drift families remain pending. Startup excludes plain player/charm/world
 UI sources owned there. Enemy, weapon and other eager startup images remain outside it;
 whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
