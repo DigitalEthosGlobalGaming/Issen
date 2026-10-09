@@ -809,11 +809,16 @@ duplicate estimates for the same allocation. This is accounting, not an absolute
 physical-memory guarantee.
 Worker export retires composition/foreground canvases before posting independent
 bitmaps. The256MiB tier closes all unpinned raw inputs. Higher tiers may retain
-an unpinned LRU capped at half their decoded budget, further bounded by whole-app
-headroom beyond the conservative incoming preparation peak. Before each compose,
+an unpinned LRU capped at half their decoded budget and current non-worker backing
+headroom. Foreground upload admission reclaims retained inputs when the actual
+incoming planes/GPU backing need that room; background composition retains no raw
+cache, leaving room for incoming figures. Before each compose,
 unrelated cached inputs close; shared incoming inputs stay available for reuse.
 Pressure sends an explicit worker trim request: foreground preparation/upload
 waits for actual resource counters, while optional admission retries after reclaim.
+Foreground pruning may preserve its incoming stage's URLs. Only acknowledged
+remaining shared bytes count toward that stage's preparation estimate; no memory
+credit is applied before the worker reports reclamation.
 The response keeps completed-scene metadata but reports actual remaining worker
 canvas bytes. Main current/next slots own reusable bitmaps; repeated direct worker
 requests reuse available inputs or reacquire evicted ones and rebuild. Explicit loader trimming

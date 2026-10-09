@@ -87,6 +87,7 @@ export function createWorkerEnvironmentRenderer(
   > = {};
   let resourceRequestId = 0;
   let cacheTrim: Promise<ComposeResponse> | undefined;
+  let cacheTrimStage: number | undefined;
   const nextSlots = new Set<NextSlot>();
   const incomingResponses = new Set<ComposeResponse>();
   let nextSlot: NextSlot | undefined,
@@ -306,16 +307,22 @@ export function createWorkerEnvironmentRenderer(
       try {
         const decodedBudget = documentImageBudget(doc);
         const memory = documentSceneMemory(doc);
-        const estimate =
-          request.kind === 'compose'
-            ? scenePreparationBytes(request.frame, decodedBudget)
-            : undefined;
-        // Retention is optional and must fit beyond the entire incoming peak.
+        // Foreground raw inputs already belong to its preparation peak. Bound
+        // retention by current non-worker backing; the upload gate reclaims if
+        // its actual response plus GPU backing needs that room. Next slots keep
+        // zero raw cache so figure warming can use their reserved headroom.
         const retainedBytes =
-          decodedBudget > 256 * 1024 * 1024 && estimate !== undefined
+          request.kind === 'compose' &&
+          !timingPrefix.startsWith('next:') &&
+          decodedBudget > 256 * 1024 * 1024
             ? Math.max(
                 0,
-                Math.min(decodedBudget / 2, memory.budget - memory.committedBytes - estimate),
+                Math.min(
+                  decodedBudget / 2,
+                  memory.budget -
+                    memory.committedBytes +
+                    (workerResources.decodedLoader?.bytes ?? 0),
+                ),
               )
             : 0;
         worker!.postMessage({ ...request, id, decodedBudget, retainedBytes });
@@ -324,8 +331,13 @@ export function createWorkerEnvironmentRenderer(
       }
     });
   }
-  function trimWorkerCache() {
-    return (cacheTrim ??= send({ kind: 'trim' }).finally(() => {
+  function trimWorkerCache(stage?: number): Promise<ComposeResponse> {
+    // A pressure trim and an incoming-source trim have different keep sets.
+    // Complete the existing operation before issuing the requested policy.
+    if (cacheTrim)
+      return cacheTrimStage === stage ? cacheTrim : cacheTrim.then(() => trimWorkerCache(stage));
+    cacheTrimStage = stage;
+    return (cacheTrim = send({ kind: 'trim', stage }).finally(() => {
       cacheTrim = undefined;
     }));
   }
@@ -554,8 +566,12 @@ export function createWorkerEnvironmentRenderer(
       if (!prepared) {
         const estimate = scenePreparationBytes(frame, documentImageBudget(doc));
         if (estimate !== undefined) {
+          if (workerResources.decodedLoader?.bytes) await trimWorkerCache(frame.stage);
+          // Acknowledged remaining inputs now all belong to this incoming kit.
+          const sharedBytes = workerResources.decodedLoader?.bytes ?? 0;
           const incomingBytes =
-            estimate + (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
+            Math.max(0, estimate - sharedBytes) +
+            (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
           let pressure = reclaimSceneMemory(doc, incomingBytes);
           if (
             pressure.committedBytes + incomingBytes > pressure.budget &&

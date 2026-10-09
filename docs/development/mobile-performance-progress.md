@@ -8,6 +8,39 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Shared-input admission credit — 10 October 2026
+
+Version1.69.48 preserves foreground incoming URLs during worker pruning, waits
+for actual resource reports, and credits only those remaining shared bytes to its
+preparation estimate. Foreground retained inputs already belong to preparation;
+the actual GPU upload gate still reclaims them under pressure. Background raw
+cache is zero so figure warming keeps headroom. Six relevant browser cases pass,
+and a ledger-derived pressure fixture preserves a strict zero-new-decode shared
+assertion. A prior fixed pressure fixture exceeded the whole budget itself; its
+failure was not evidence that shared pixels should remain under impossible pressure.
+Checked production startup/offline-resize checks pass9.6s.
+
+Same production scene probe at900x600/DPR1/Edge154:
+
+| Version | Cold load median | Warm load median | Cold maximum | Warm maximum |
+| --- | ---: | ---: | ---: | ---: |
+| 1.69.46 | 770.8ms | 752.5ms | 1149.2ms | 1164.6ms |
+| 1.69.47 | 604.6ms | 606.1ms | 962.1ms | 905.4ms |
+| 1.69.48 | 589.8ms | 552.8ms | 918.9ms | 907.4ms |
+
+Version48 composition maxima475.8/470.5ms; none of18 presentation windows has
+a main task>16ms, maximum10.039ms. Title/first gameplay2281.9/2972.6ms; frame
+p9517ms versus CPU render p953.2ms. These are single sequential captures, not
+alternating causal or physical120Hz proof. Evidence
+`tmp/performance-scene-{cache-16947,shared-16948}/`. Historical cold median548.1ms
+remains faster at several stages: baseline worker decodes concurrently, while
+current managed decoding is serial. Bounded concurrency is the next targeted issue.
+
+Controlled high-tier rush/cat loop still prepares/promotes all9 stages,14.0–30.4ms
+waits, sampled committed peak937.12MiB against1024MiB. Evidence
+`tmp/probes/rush-companion-admission-shared-worker-cache.json`. Fixture controls
+ordinals/phase entry and does not prove natural combat/all transient/native bounds.
+
 ## Bounded worker input reuse — 10 October 2026
 
 Version1.69.47 retains unpinned raw inputs on higher tiers only within half their

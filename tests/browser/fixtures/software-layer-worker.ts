@@ -56,7 +56,10 @@ scope.onmessage = ({ data }) => {
     let exportedSnapshot: ReturnType<typeof renderer.snapshot> | undefined;
     try {
       if (data.kind === 'trim') {
-        workerDocument.releaseUnusedImages();
+        workerDocument.releaseUnusedImages(
+          0,
+          data.stage === undefined ? [] : sceneImageUrls(data.stage, false),
+        );
       } else if (data.kind === 'prepare') {
         await renderer.prepare(data.stage);
         assetsAt = composedAt = performance.now();

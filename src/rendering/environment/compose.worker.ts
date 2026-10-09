@@ -106,7 +106,10 @@ scope.onmessage = ({ data }) => {
       if (cancelled.has(data.id))
         throw new DOMException('Scenery preparation cancelled', 'AbortError');
       if (data.kind === 'trim') {
-        workerDocument.releaseUnusedImages();
+        workerDocument.releaseUnusedImages(
+          0,
+          data.stage === undefined ? [] : sceneImageUrls(data.stage, false),
+        );
       } else if (data.kind === 'prepare') {
         // An exported current scene owns its pixels; released inputs are not a
         // reason to invalidate its key. Changed compose keys reacquire normally.

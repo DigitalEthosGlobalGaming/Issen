@@ -1,5 +1,43 @@
 # Current development status
 
+## Current handoff — shared inputs survive foreground admission
+
+App1.69.48 prunes foreground cache to its incoming URLs and awaits actual counters
+before crediting retained bytes against preparation. Retention caps use non-worker
+backing headroom; actual response/GPU upload pressure still trims before warming.
+Background compose keeps zero raw cache to preserve incoming figure headroom.
+Same-policy trim requests coalesce; different keep sets sequence after the pending
+trim. No accounting credit precedes a worker response/progress report.
+
+Six focused reuse/promotion/pressure/invalidation/busy cases PASS9.3s. New strict
+pressure-shared zero-decode assertion initially failed: fixed850MiB pressure plus
+fog/cache/native overhead exceeded the whole budget even before prepare. Fixture
+now derives pressure from ledger headroom, leaving40MiB for scratch but insufficient
+room for double-counted shared inputs. Both cases PASS6.4s, no assertion loosened.
+Checked production build/TypeScript plus two startup/offline-resize smokes PASS9.6s.
+Results `tmp/test-results/browser/worker-shared-{admission,pressure-final}/` and
+`tmp/test-results/production/worker-shared-admission/`.
+
+Production scene-flow1.69.46→47→48 cold load medians770.8→604.6→589.8ms; warm
+752.5→606.1→552.8ms. Version48 cold range266.0–918.9ms, warm296.7–907.4ms;
+composition maxima475.8/470.5ms; all18 first-two-second windows no tasks>16ms,
+max10.039ms. Title2281.9ms/first gameplay2972.6ms; frame p9517ms, CPU render
+p953.2ms. Evidence `tmp/performance-scene-{cache-16947,shared-16948}/` plus saved
+1.69.46 capture. Single sequential captures, not alternating causal/physical120Hz
+proof. Historical baseline cold median548.1ms remains faster at some stages.
+
+Controlled high-tier rush/cat loop all9 environment/figure preparations/promotions
+PASS: waits14.0–30.4ms, sampled peak937.12MiB against1024MiB. Evidence
+`tmp/probes/rush-companion-admission-shared-worker-cache.json`; controlled ordinals,
+not natural combat/all-transient/native bounds. All processes terminal.
+
+Next concrete cold issue: baseline e63767d worker document starts fetch/bitmap
+decodes concurrently; current decoded loader serializes them. Investigate bounded
+worker-only decode concurrency with aggregate pending-byte reservations and
+priority/cancellation tests; keep main-thread pacing intact. Then final natural
+progression/loadout/transient/native coverage and applicable suites. Goal active;
+no push/deploy/native build/real-save changes; cancelled work stays cancelled.
+
 ## Current handoff — bounded worker input reuse integrated
 
 App1.69.47 retains unpinned worker inputs above the256MiB tier, capped at half

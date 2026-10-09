@@ -45,7 +45,20 @@ for (const memory of [2, 8])
         if (!(await owner.compose({ ...frame, stage: 1 }))) throw Error('Shared scene failed');
         const shared = owner.snapshot(),
           sharedDecodes = decodes.length;
-        pressure.width = memory === 8 ? (850 * 1024 * 1024) / 4 : 0;
+        const beforePressure = documentSceneMemory(document);
+        // Leave room for preparation scratch, but not a second copy of the
+        // shared raw kit. A cache credit is valid only after pruning is reported.
+        pressure.width =
+          memory === 8
+            ? Math.max(
+                0,
+                beforePressure.budget - beforePressure.committedBytes - 40 * 1024 * 1024,
+              ) / 4
+            : 0;
+        decodes.length = 0;
+        if (!(await owner.compose({ ...frame, stage: 1, stageSeed: frame.stageSeed + 1 })))
+          throw Error('Shared scene under pressure failed');
+        const pressureSharedDecodes = decodes.length;
         if (!(await owner.compose({ ...frame, stage: 2 }))) throw Error('Pressure scene failed');
         const final = owner.snapshot(),
           committed = documentSceneMemory(document);
@@ -53,6 +66,7 @@ for (const memory of [2, 8])
           initial,
           shared,
           sharedDecodes,
+          pressureSharedDecodes,
           final,
           committed,
           trims: requests.filter((request) => request.kind === 'trim').length,
@@ -69,6 +83,7 @@ for (const memory of [2, 8])
       expect(result.initial.decodedLoader!.bytes).toBeGreaterThan(0);
       expect(result.initial.decodedLoader!.bytes).toBeLessThanOrEqual(256 * 1024 * 1024);
       expect(result.sharedDecodes).toBe(0);
+      expect(result.pressureSharedDecodes).toBe(0);
       expect(result.trims).toBeGreaterThan(0);
       expect(result.final.decodedLoader!.evictions).toBeGreaterThan(
         result.shared.decodedLoader!.evictions,
