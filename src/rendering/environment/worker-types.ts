@@ -29,6 +29,8 @@ export type EnvironmentSnapshot = {
   pixels: number;
   decodedBytes?: number;
   canvasBytes?: number;
+  /** Reserved independent bitmap copies while worker export is in progress. */
+  exportBytes?: number;
   canvases?: number;
   decodedLoader?: {
     queued: number;

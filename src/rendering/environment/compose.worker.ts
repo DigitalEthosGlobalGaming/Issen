@@ -1,6 +1,6 @@
 import { createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createWorkerDocument } from './worker-canvas.ts';
-import { copyComposedLayers } from './layer-transfer.ts';
+import { copyComposedLayers, exportedLayerBytes } from './layer-transfer.ts';
 import { closeLayers } from './worker-types.ts';
 import { sceneImageUrls } from './asset-sources.ts';
 import type { ComposedLayer, ComposeRequest, ComposeResponse } from './worker-types.ts';
@@ -37,12 +37,18 @@ function observeDecodeProgress(
         key: data.kind === 'compose' ? data.key : undefined,
         layers: [],
         foreground: [],
-        snapshot: { ...renderer.snapshot(), ...workerDocument.canvasSnapshot(), decodedLoader },
+        snapshot: {
+          ...renderer.snapshot(),
+          ...workerDocument.canvasSnapshot(),
+          decodedLoader,
+          exportBytes,
+        },
       },
       [],
     );
   });
 }
+let exportBytes = 0;
 let pending = Promise.resolve();
 let imagePreload: ReturnType<ReturnType<typeof createWorkerDocument>['prefetchImages']>;
 const queued = new Set<number>(),
@@ -76,6 +82,7 @@ scope.onmessage = ({ data }) => {
             ...renderer.snapshot(),
             decodedLoader: workerDocument.decodedSnapshot(),
             ...workerDocument.canvasSnapshot(),
+            exportBytes,
           },
         },
         [],
@@ -126,6 +133,9 @@ scope.onmessage = ({ data }) => {
         })
       ) {
         composedAt = performance.now();
+        const completed = renderer.exportLayers();
+        const entries = [...completed.layers, ...completed.foreground];
+        exportBytes = exportedLayerBytes(entries);
         scope.postMessage(
           {
             id: data.id,
@@ -138,14 +148,14 @@ scope.onmessage = ({ data }) => {
               ...renderer.snapshot(),
               ...workerDocument.canvasSnapshot(),
               decodedLoader: workerDocument.decodedSnapshot(),
+              exportBytes,
             },
           },
           [],
         );
         // Live motion uses transferred planes and the main thread's own raw inputs.
         renderer.releaseExportInputs();
-        const completed = renderer.exportLayers();
-        const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
+        const copied = await copyComposedLayers(entries);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
         exportedSnapshot = renderer.snapshot();
@@ -161,6 +171,7 @@ scope.onmessage = ({ data }) => {
       const snapshot = {
         ...(exportedSnapshot ?? renderer.snapshot()),
         ...workerDocument.canvasSnapshot(),
+        exportBytes: 0,
         decodedBytes: workerDocument.decodedSnapshot().bytes,
         decodedLoader: workerDocument.decodedSnapshot(),
         timings: {
@@ -183,8 +194,10 @@ scope.onmessage = ({ data }) => {
         ),
       );
       scope.postMessage(response, bitmaps);
+      exportBytes = 0;
     } catch (error) {
       closeLayers([...layers, ...foreground]);
+      exportBytes = 0;
       if (cancelled.has(data.id)) {
         renderer.releaseExportInputs();
         workerDocument.releaseUnusedImages();
@@ -205,6 +218,7 @@ scope.onmessage = ({ data }) => {
         [],
       );
     } finally {
+      exportBytes = 0;
       stopProgress();
       queued.delete(data.id);
       cancelled.delete(data.id);

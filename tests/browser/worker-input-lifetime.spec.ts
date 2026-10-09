@@ -26,6 +26,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
       decoded: number;
       canvas: number;
       reserved: number;
+      exported: number;
       settled: boolean;
     }> = [];
     let settled = false;
@@ -44,6 +45,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
               decoded: owner.memorySnapshot.decodedBytes,
               canvas: owner.memorySnapshot.canvasBytes,
               reserved: data.snapshot.decodedLoader?.reservedBytes ?? 0,
+              exported: owner.memorySnapshot.reservedBytes,
               settled,
             });
           } else releaseResponse = publish;
@@ -80,8 +82,16 @@ test('worker phase accounting includes pinned inputs without settling scene read
       if (!releaseResponse) throw Error('Worker did not complete');
       const settledBeforeResponse = settled;
       releaseResponse();
+      const handoffBytes = owner.memorySnapshot.transferredBytes;
       const ready = await pending;
-      return { phases, expectedBytes, settledBeforeResponse, ready, final: owner.memorySnapshot };
+      return {
+        phases,
+        expectedBytes,
+        settledBeforeResponse,
+        handoffBytes,
+        ready,
+        final: owner.memorySnapshot,
+      };
     } finally {
       owner.dispose();
       window.Worker = NativeWorker;
@@ -91,6 +101,9 @@ test('worker phase accounting includes pinned inputs without settling scene read
   expect(boundaries.map((row) => row.phase)).toEqual(['assets-ready', 'composed']);
   expect(boundaries.every((row) => row.decoded === result.expectedBytes)).toBe(true);
   expect(boundaries[1].canvas).toBeGreaterThan(0);
+  expect(boundaries[0].exported).toBe(0);
+  expect(boundaries[1].exported).toBe(result.final.transferredBytes);
+  expect(result.final.reservedBytes).toBe(0);
   const progress = result.phases.filter((row) => row.phase === 'decode-progress');
   expect(
     progress.some(
@@ -104,6 +117,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
   expect(result.final.decodedBytes).toBe(0);
   expect(result.final.canvasBytes).toBe(0);
   expect(result.final.transferredBytes).toBeGreaterThan(0);
+  expect(result.handoffBytes).toBe(result.final.transferredBytes);
 });
 
 for (const policy of [

@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate as nextTurn } from 'node:timers/promises';
 import { createWorkerContextProxy } from '../../src/rendering/environment/worker-canvas.ts';
-import { copyComposedLayers } from '../../src/rendering/environment/layer-transfer.ts';
+import {
+  copyComposedLayers,
+  exportedLayerBytes,
+} from '../../src/rendering/environment/layer-transfer.ts';
 import { workerDecodeSize } from '../../src/rendering/environment/decode-size.ts';
 
 test('compact worker planes retain logical draw size and adapt fractional crop coordinates', () => {
@@ -149,4 +152,15 @@ test('synchronous copy failure still closes asynchronous copies in other planes'
   for (const p of f.pending) p.resolve();
   await rejected;
   assert.ok(f.pending.every((p) => p.bitmap.closed === 1));
+});
+
+test('export reservation counts independent plane copies including shared sources and foreground', () => {
+  const colour = { width: 10, height: 20 },
+    map = { width: 30, height: 40 };
+  const entries = [
+    { colour, material: { normal: { source: map }, surface: { source: map } } },
+    { colour, material: { emissive: { source: map } } },
+  ];
+  assert.equal(exportedLayerBytes(entries), (2 * 10 * 20 + 3 * 30 * 40) * 4);
+  assert.equal(exportedLayerBytes([]), 0);
 });

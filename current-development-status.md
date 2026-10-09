@@ -1,5 +1,40 @@
 # Current development status
 
+## Current handoff — worker bitmap export reservations
+
+App1.69.37 reserves independent bitmap copies before worker export, alongside its
+composed canvases. Counts every plane/foreground copy even with shared sources.
+Decode-progress preserves export reservation; final response replaces it with
+main transferred ownership in the receive handler, before callers resume. Optional
+next-slot estimates subtract reported worker backing for the matching request;
+response handoff then replaces temporary incoming ownership without duplication.
+Failure/suspension clear counters/resources. No compose, sampling or seed changes.
+
+Strict TypeScript and6worker composition units PASS. Seven focused browser checks
+PASS8.4s/default2workers: worker phase reservation/settlement, next promotion,
+admission pressure, busy cancellation, worker suspension and required transition
+pressure/full-map recovery. Evidence `tmp/test-results/browser/export-reservations/`.
+Additional synchronous receive-handoff assertion PASS1.1s: transferred bytes are
+visible before awaiting callers resume (`tmp/test-results/browser/export-handoff/`).
+Checked production build/strict TypeScript and all4production smoke cases PASS18.8s,
+including startup/Armoury/run/landscape, editions and offline resize. Log
+`tmp/probes/export-reservations-production.log`; results
+`tmp/test-results/production/export-reservations/`. Formatting/diff checks PASS.
+All-stage low-memory ordinary run0–8→0 completes. Corrected phase observer uses
+message worker counters directly instead of queueMicrotask's previous-phase values.
+With export reservations, peak486,218,372bytes/463.7MiB, final443,382,644bytes/422.8MiB.
+Export copy reservations28,837,440bytes ordinary,33,577,344bytes bamboo. Evidence
+`tmp/probes/all-stage-memory-export-reserved.json`; pre-change corrected capture
+`all-stage-memory-phase-corrected.json` omitted these copies and is not full proof.
+
+These phase-boundary plus50ms observations cover this portrait regular-loadout
+cycle, not every transient/native scratch, viewport or mode. Final measurement
+matrix, historical native colour mismatch, applicable suites and physical
+Android/120Hz evidence remain required. Goal active; no push/deploy/native build/
+real-save changes. Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — Demon mist upload churn removed
+
 ## Current handoff — Demon mist upload churn removed
 
 App1.69.36 Demon mist samples one bounded radial field with fractional crops;

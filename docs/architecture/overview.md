@@ -799,6 +799,14 @@ including after context restoration; later base-only requests do not reopen the
 special atlas. Higher tiers retain original material sampling. This reduces
 resident inputs; it does not enforce a whole-game memory cap.
 
+Before export, the worker reserves nominal bytes for every independent bitmap
+copy, including foreground and repeated source references. Compose/decode progress
+keeps that reservation visible until the final response. The main receiver adopts
+response ownership in its event handler before resolving callers; next-slot
+ownership replaces that temporary handoff owner. Background reservation estimates
+subtract already reported worker backing only for their matching request, avoiding
+duplicate estimates for the same allocation. This is accounting, not an absolute
+physical-memory guarantee.
 Worker export closes unpinned raw decoded inputs after every plane copy settles
 and retires composition/foreground canvases before posting independent bitmaps.
 The response keeps completed-scene metadata but reports actual remaining worker

@@ -4,6 +4,26 @@ import type { ComposedLayer } from './worker-types.ts';
 type LayerSource = { colour: HTMLCanvasElement; material: SceneMaterial | null };
 type Copy = (source: ImageBitmapSource, colour: boolean) => Promise<ImageBitmap>;
 
+/** Every exported plane gets an independent bitmap, even when its source is shared. */
+export function exportedLayerBytes(entries: readonly LayerSource[]): number {
+  const bytes = (source: {
+    width: number;
+    height: number;
+    naturalWidth?: number;
+    naturalHeight?: number;
+  }) => (source.naturalWidth ?? source.width) * (source.naturalHeight ?? source.height) * 4;
+  return entries.reduce(
+    (total, entry) =>
+      total +
+      bytes(entry.colour) +
+      (['normal', 'surface', 'emissive'] as const).reduce(
+        (sum, kind) => sum + (entry.material?.[kind] ? bytes(entry.material[kind].source) : 0),
+        0,
+      ),
+    0,
+  );
+}
+
 /** Copy all planes concurrently, retaining ownership until every copy has settled. */
 export async function copyComposedLayers(
   entries: readonly LayerSource[],

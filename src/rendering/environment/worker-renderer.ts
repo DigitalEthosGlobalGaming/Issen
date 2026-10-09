@@ -80,7 +80,11 @@ export function createWorkerEnvironmentRenderer(
     foreground: ComposedLayer[] = [];
   let snapshot = emptySnapshot();
   let workerFailure: string | undefined;
-  let workerResources: Pick<EnvironmentSnapshot, 'decodedLoader' | 'canvasBytes' | 'canvases'> = {};
+  let workerResources: Pick<
+    EnvironmentSnapshot,
+    'decodedLoader' | 'canvasBytes' | 'canvases' | 'exportBytes'
+  > = {};
+  let resourceRequestId = 0;
   const nextSlots = new Set<NextSlot>();
   const incomingResponses = new Set<ComposeResponse>();
   let nextSlot: NextSlot | undefined,
@@ -192,10 +196,12 @@ export function createWorkerEnvironmentRenderer(
           closeLayers([...data.layers, ...data.foreground]);
           return;
         }
+        resourceRequestId = data.id;
         workerResources = {
           decodedLoader: data.snapshot.decodedLoader,
           canvasBytes: data.snapshot.canvasBytes,
           canvases: data.snapshot.canvases,
+          exportBytes: data.snapshot.exportBytes,
         };
         if (data.phase) {
           if (data.phase === 'decode-progress') {
@@ -209,6 +215,7 @@ export function createWorkerEnvironmentRenderer(
         }
         clearTimeout(request.timer);
         requests.delete(data.id);
+        if (data.layers.length || data.foreground.length) incomingResponses.add(data);
         request.resolve(data);
       });
       return true;
@@ -458,6 +465,7 @@ export function createWorkerEnvironmentRenderer(
           timingKey,
         );
         slot.response = response;
+        incomingResponses.delete(response);
         // Worker inputs are released before this response; reserve the remaining GPU upload.
         slot.reservedBytes = composedLayerBytes([...response.layers, ...response.foreground]);
         if (
@@ -732,7 +740,22 @@ export function createWorkerEnvironmentRenderer(
               bytes + composedLayerBytes([...response.layers, ...response.foreground]),
             0,
           ),
-        reservedBytes: [...nextSlots].reduce((bytes, slot) => bytes + slot.reservedBytes, 0),
+        reservedBytes:
+          (workerResources.exportBytes ?? 0) +
+          [...nextSlots].reduce(
+            (bytes, slot) =>
+              bytes +
+              (!slot.response && slot.requestId === resourceRequestId
+                ? Math.max(
+                    0,
+                    slot.reservedBytes -
+                      (workerResources.decodedLoader?.bytes ?? 0) -
+                      (workerResources.canvasBytes ?? 0) -
+                      (workerResources.exportBytes ?? 0),
+                  )
+                : slot.reservedBytes),
+            0,
+          ),
       };
     },
     draw(ctx: SceneDrawing, frame: EnvironmentFrame): boolean {
