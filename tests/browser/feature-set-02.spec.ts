@@ -1,3 +1,4 @@
+import { waitForManualStartup } from './fixtures/manual-startup.ts';
 import { expect, test } from '@playwright/test';
 
 test('Temple browsing never spends and Throwing Knife upgrades its own capacity', async ({
@@ -118,7 +119,7 @@ test('wave taps consume a knife only with a target and boss taps never consume o
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
-  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await waitForManualStartup(page, () => page.evaluate(() => (window as any).advanceSet02(1)));
   const tap = () =>
     page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })));
   const advance = (count: number) => page.evaluate((n) => (window as any).advanceSet02(n), count);

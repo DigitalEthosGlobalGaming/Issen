@@ -1,3 +1,4 @@
+import { waitForManualStartup } from './fixtures/manual-startup.ts';
 import { expect, test } from '@playwright/test';
 
 test.use({ hasTouch: true });
@@ -146,7 +147,7 @@ for (const input of ['keyboard', 'touch'] as const) {
     });
     await page.goto('/');
     await expect(page.locator('#app')).toHaveCount(1, { timeout: 30000 });
-    await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+    await waitForManualStartup(page, () => page.evaluate(() => (window as any).advance(1)));
     await page.keyboard.press('Control+Shift+A');
     await page.getByLabel('Wave within stage').selectOption('3');
     await page
@@ -158,7 +159,7 @@ for (const input of ['keyboard', 'touch'] as const) {
           await page.evaluate(() => (window as any).advance(1));
           return page.locator('#c').getAttribute('data-scene-state');
         },
-        { timeout: 15000 },
+        { timeout: 15000, intervals: [50] },
       )
       .toBe('ready');
     for (
@@ -236,7 +237,7 @@ test('first boss holds the glint until the player parries with touch', async ({ 
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
-  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await waitForManualStartup(page, () => page.evaluate(() => (window as any).advance(1)));
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })
@@ -247,7 +248,7 @@ test('first boss holds the glint until the player parries with touch', async ({ 
         await page.evaluate(() => (window as any).advance(1));
         return page.locator('#c').getAttribute('data-scene-state');
       },
-      { timeout: 15000 },
+      { timeout: 15000, intervals: [50] },
     )
     .toBe('ready');
   await expect(page.getByRole('heading', { name: 'Watch for the glint' })).toBeVisible();

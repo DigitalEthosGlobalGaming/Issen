@@ -5,6 +5,7 @@ import type { createNativeServices } from '../presentation/native-services.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { RunCheckpoint } from '../platform/run-checkpoint.ts';
 import type { createAudio } from '../audio/audio.ts';
+import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
 type Disposable = { dispose(): void };
 type NativeStartup = Pick<
   ReturnType<typeof createNativeServices>,
@@ -35,6 +36,7 @@ export interface RuntimeStartupViews extends NativeStartup {
   density(): number;
   petOf(): string;
   robeOf(): string;
+  bladeOf(): string;
   computeMods(): unknown;
   applySeal(): void;
   resize(): void;
@@ -145,7 +147,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
     inkCompanion.prepare(),
     inkEnemy.prepare(),
     inkPlayer.prepare(),
-    inkSword.prepare(),
+    inkSword.prepareParts([...ENEMY_WEAPON_IDS, readViews().bladeOf()]),
     environmentRenderer.compose({
       stageSeed,
       width: W,
@@ -158,7 +160,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       lowQuality: density() <= 0.3,
     }),
     driftRenderer.prepare(readViews().driftStage()),
-  ]).then(() => {
+  ]).then(([, , , , weaponsReady]) => {
     if (artworkDisposed) return;
     const failed = [
       inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
@@ -168,7 +170,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       !inkPlayer.snapshot().outfits.outfits.includes(readViews().robeOf())
         ? 'outfits'
         : null,
-      !inkSword.ready ? 'weapons' : null,
+      !inkSword.ready || !weaponsReady ? 'weapons' : null,
       environmentRenderer.backend !== 'layered' ? 'scene' : null,
       !driftRenderer.ready ? 'drifting debris' : null,
     ].filter((name): name is string => !!name);

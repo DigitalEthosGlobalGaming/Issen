@@ -55,7 +55,11 @@ scope.onmessage = ({ data }) => {
       composedAt = started;
     try {
       if (data.kind === 'prepare') {
-        await renderer.prepare(data.stage);
+        // An exported current scene owns its pixels; released inputs are not a
+        // reason to invalidate its key. Changed compose keys reacquire normally.
+        const current = renderer.snapshot();
+        if (current.stage !== data.stage || current.backend !== 'layered')
+          await renderer.prepare(data.stage);
         assetsAt = composedAt = performance.now();
       } else if (
         await renderer.compose(data.frame, () => {

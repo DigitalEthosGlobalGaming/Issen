@@ -14,6 +14,7 @@ import { createWeatherState } from '../rendering/scene/weather-state.ts';
 
 import { STAGES } from '../game/content/stages.ts';
 import type { createFrameLoop } from '../platform/frame-loop.ts';
+import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
 /** Compose combat/scoring, character positions and kill rules through explicit owners. */
 export function createRuntimeSceneCoordination(
   foundation: ReturnType<typeof createRuntimeFoundation>,
@@ -70,6 +71,11 @@ export function createRuntimeSceneCoordination(
           screenAnimation: ui.screenAnimation,
           demonRealmRenderer: foundation.browser.demonRealmRenderer,
           driftRenderer: presentation.driftRenderer,
+          prepareWeaponParts: () =>
+            foundation.browser.inkSword.prepareParts([
+              ...ENEMY_WEAPON_IDS,
+              foundation.profile.profileEquipment.EQ.blade,
+            ]),
           environmentRenderer: foundation.browser.environmentRenderer,
           lifecycle: foundation.lifecycle,
           frameLoop: readClock(),

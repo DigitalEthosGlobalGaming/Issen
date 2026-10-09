@@ -77,6 +77,16 @@ retire native textures before source closure (1.68.30). Weapon LRU eviction uses
 the same frame-preserving boundary as enemy caches. All20outfits and20weapons
 match the saved original exactly; owner disposal returns native counts to zero.
 These owners still prepare their catalogues outside the shared decoded budget.
+Weapon cutout preparation now selects the equipped blade plus six enemy styles
+before startup/scene presentation. Default steel prepares12cutouts/1,036,478pixels
+(4,145,912nominal RGBA bytes); pan prepares14/1,200,318 (4,801,272bytes), beam
+13/1,083,070 (4,332,280bytes). Full20-style diagnostic preparation retains31/
+2,567,054pixels (10,268,216bytes); runtime does not prepare that full set up front.
+These are cached canvas pixels, separate from direct atlas and GPU ownership.
+Worker `prepare` preserves the completed key when the requested stage already
+has layered output (1.69.13). Repeated exports retain exact pixels and0input pins;
+changed composition keys reacquire and build normally. Preparing a current stage
+does not repin all its raw inputs merely to export the existing planes.
 Local main-thread scenery now unpins non-live inputs after compose (1.68.31).
 Stage0 retains four fog planes25,176,608nominal bytes, stage4 three bamboo planes
 18,870,192; other stages retain no raw compose inputs. Output canvases/cutouts

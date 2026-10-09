@@ -31,6 +31,7 @@ export interface SceneFlowViews {
   readonly screenAnimation: { invalidate(): void };
   readonly demonRealmRenderer: { prepare(): Promise<boolean> };
   readonly driftRenderer: { prepare(stage: number): Promise<boolean> };
+  prepareWeaponParts(): Promise<boolean>;
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string };
@@ -95,7 +96,8 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const pending = Promise.all([
       demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
       views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
-    ]).then(([sceneReady, driftReady]) => sceneReady && driftReady);
+      views.prepareWeaponParts(),
+    ]).then(([sceneReady, driftReady, weaponsReady]) => sceneReady && driftReady && weaponsReady);
     void pending
       .then((ready) => {
         if (lifecycle.disposed || request !== views.sceneRequest) return;

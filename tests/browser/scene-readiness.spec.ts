@@ -27,6 +27,11 @@ test.beforeEach(async ({ page }) => {
           const blocked = new Promise(resolve => { releaseScene = resolve; });
           foundation.browser.environmentRenderer.compose = async frame => { await blocked; return composeScene(frame); };
         },
+        holdWeapons() {
+          const blocked = new Promise(resolve => { releaseScene = resolve; });
+          const prepareParts = foundation.browser.inkSword.prepareParts.bind(foundation.browser.inkSword);
+          foundation.browser.inkSword.prepareParts = async ids => { await blocked; return prepareParts(ids); };
+        },
         release() { releaseScene(); },
         freezeMenu() { ui.screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }
       };
@@ -224,33 +229,37 @@ test('a run waits for scenery and a presented background before spawning or adva
     .toBeGreaterThan(0);
 });
 
-test('a boss waits for its new scene and remains paused when loading finishes', async ({
-  page,
-}) => {
-  await page.locator('#bPlay').click();
-  await page.locator('#bBegin').click();
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
-  await page.evaluate(() => {
-    const h = (window as any).__sceneReadiness;
-    h.hold();
-    h.G.bossCount = 1;
-    h.startRushDuel();
+for (const held of ['scenery', 'weapons'])
+  test(`a boss waits for ${held} and remains paused when loading finishes`, async ({ page }) => {
+    await page.locator('#bPlay').click();
+    await page.locator('#bBegin').click();
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 15000,
+    });
+    await page.evaluate((held) => {
+      const h = (window as any).__sceneReadiness;
+      if (held === 'weapons') h.holdWeapons();
+      else h.hold();
+      h.G.bossCount = 1;
+      h.startRushDuel();
+    }, held);
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'loading');
+    expect(await page.evaluate(() => (window as any).__sceneReadiness.G.boss)).toBeNull();
+    await page.keyboard.press('p');
+    await page.evaluate(() => (window as any).__sceneReadiness.release());
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 15000,
+    });
+    expect(
+      await page.evaluate(() => {
+        const { G } = (window as any).__sceneReadiness;
+        return {
+          stage: G.stage,
+          bossCount: G.bossCount,
+          boss: !!G.boss,
+          state: G.state,
+          pausedFrom: G.pausedFrom,
+        };
+      }),
+    ).toEqual({ stage: 1, bossCount: 2, boss: true, state: 'paused', pausedFrom: 'boss' });
   });
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'loading');
-  expect(await page.evaluate(() => (window as any).__sceneReadiness.G.boss)).toBeNull();
-  await page.keyboard.press('p');
-  await page.evaluate(() => (window as any).__sceneReadiness.release());
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
-  expect(
-    await page.evaluate(() => {
-      const { G } = (window as any).__sceneReadiness;
-      return {
-        stage: G.stage,
-        bossCount: G.bossCount,
-        boss: !!G.boss,
-        state: G.state,
-        pausedFrom: G.pausedFrom,
-      };
-    }),
-  ).toEqual({ stage: 1, bossCount: 2, boss: true, state: 'paused', pausedFrom: 'boss' });
-});

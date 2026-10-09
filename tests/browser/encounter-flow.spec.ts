@@ -1,3 +1,4 @@
+import { waitForManualStartup } from './fixtures/manual-startup.ts';
 import { expect, test } from '@playwright/test';
 import { defeatCurrentBoss } from './drive-boss.ts';
 
@@ -61,7 +62,7 @@ test('boss rush victory opens a shrine and its choice starts the next duel', asy
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
+  await waitForManualStartup(page, () => page.evaluate(() => (window as any).advanceGameFrames(1)));
   await page.evaluate(() => {
     document.querySelector<HTMLButtonElement>('#bPlay')!.click();
     document.querySelector<HTMLButtonElement>('#bBegin')!.click();

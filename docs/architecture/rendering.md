@@ -128,6 +128,13 @@ PBR atlas instead of the generated steel study. The material shader also accepts
 packed roughness/metallic/AO and an emissive texture. OpenGL normal Y is converted
 to the scene's Y-down basis before rotation and mirroring. See [sword lighting](../features/sword-lighting.md) for debug controls and map ownership. GPU resources belong to each
 renderer, while the small prepared maps belong to their artwork owner.
+Runtime startup and scene readiness await the weapon owner's `prepareParts()`
+for the equipped blade and six deterministic enemy weapon styles. Preparation
+uses the draw path's existing bounded cutout cache, including both pan finishes,
+in visible-frame batches targeting 4ms. A single native readback cannot yield.
+Matching selected sets share their preparation promise; disposal cancels hidden
+waits. This prepares colour cutouts only: raw atlas ownership and figure GPU
+warming still require separate integration.
 See [material studies](../features/material-studies.md) for authoring conventions,
 the selected artwork and the visual comparison fixture.
 

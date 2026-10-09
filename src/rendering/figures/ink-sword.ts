@@ -6,6 +6,7 @@ import { retireSceneTexture } from '../texture-revision.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
+import { nextVisibleFrame, paceTextureUploads } from '../texture-upload.ts';
 import {
   BLADE_RECIPES,
   BLADE_PROFILE_FRAMES,
@@ -39,6 +40,8 @@ export function createInkSwordRenderer(doc: Document) {
     finish = new Set<() => void>();
   let disposed = false,
     pending: Promise<void> | undefined;
+  const partPreparations = new Map<string, Promise<boolean>>();
+  const preparation = new AbortController();
   const pbrReady = () =>
     !disposed &&
     ['normal', 'surface'].every((kind) => loaded.has(kind as MapKind)) &&
@@ -128,6 +131,57 @@ export function createInkSwordRenderer(doc: Document) {
       cache.delete(first);
     }
     return c;
+  }
+  /** Prepare the finite catalogue before presentation; draw uses these same cutouts. */
+  function prepareParts(ids: readonly string[] = Object.keys(BLADE_RECIPES)): Promise<boolean> {
+    if (disposed) return Promise.resolve(false);
+    const selected = [...new Set(ids)].sort();
+    if (selected.some((id) => !Object.hasOwn(BLADE_RECIPES, id))) return Promise.resolve(false);
+    const key = selected.join(':');
+    const prior = partPreparations.get(key);
+    if (prior) return prior;
+    const pendingParts = prepare().then(async () => {
+      if (disposed || !ready()) return false;
+      const stamps: { family: Family; frame: Frame; tint?: string }[] = [];
+      for (const id of selected) {
+        const recipe = BLADE_RECIPES[id]!;
+        if (recipe.special) {
+          stamps.push({ family: 'special', frame: SPECIAL_FRAMES[recipe.special] });
+          if (recipe.special === 'pan')
+            stamps.push({ family: 'special', frame: SPECIAL_FRAMES.pan, tint: '#c8a650' });
+        } else {
+          stamps.push(
+            {
+              family: 'blades',
+              frame: BLADE_PROFILE_FRAMES[recipe.profile]!.frame,
+              tint: recipe.tint,
+            },
+            { family: 'hilts', frame: HILT_FRAMES[recipe.hilt]!, tint: recipe.hiltTint },
+            { family: 'hilts', frame: GUARD_PARTS[recipe.guard]!.frame },
+          );
+        }
+      }
+      let complete = true;
+      return paceTextureUploads(stamps, preparation.signal, {
+        nextFrame: (signal) => nextVisibleFrame(doc, signal),
+        ready: () => !disposed && !doc.hidden,
+        generation: () => 0,
+        now: () => doc.defaultView!.performance.now(),
+        upload: ({ family, frame, tint }) => {
+          complete = !!part(family, frame, tint) && complete;
+        },
+      }).then((prepared) => prepared && complete);
+    });
+    partPreparations.set(key, pendingParts);
+    return pendingParts;
+  }
+  function ready() {
+    return (
+      loaded.size === Object.values(SOURCES).filter(Boolean).length &&
+      pbrReady() &&
+      fittings.ready('hilts') &&
+      fittings.ready('special')
+    );
   }
   function draw(
     g: SceneDrawing,
@@ -252,24 +306,26 @@ export function createInkSwordRenderer(doc: Document) {
   }
   return {
     prepare,
+    prepareParts,
     draw,
     get ready() {
-      return (
-        loaded.size === Object.values(SOURCES).filter(Boolean).length &&
-        pbrReady() &&
-        fittings.ready('hilts') &&
-        fittings.ready('special')
-      );
+      return ready();
     },
     snapshot: () => ({
       loaded: [...loaded],
       cachedParts: cache.size,
+      cachedPixels: [...cache.values()].reduce(
+        (total, canvas) => total + canvas.width * canvas.height,
+        0,
+      ),
       pbrReady: pbrReady(),
       disposed,
     }),
     dispose() {
       if (disposed) return;
       disposed = true;
+      preparation.abort();
+      partPreparations.clear();
       fittings.dispose();
       materials.clear();
       for (const im of images.values()) {

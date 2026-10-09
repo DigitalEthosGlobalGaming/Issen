@@ -98,7 +98,9 @@ for (const deviceMemory of [8, 2])
     expect(result.every((row) => row.bytes <= row.budget && row.peakBytes <= row.budget)).toBe(
       true,
     );
-    expect(result.every((row) => row.queued === 0 && row.pinned > 0)).toBe(true);
+    expect(
+      result.every((row) => row.queued === 0 && row.pinned === 0 && row.pinnedBytes === 0),
+    ).toBe(true);
     expect(
       result.every(
         (row) =>

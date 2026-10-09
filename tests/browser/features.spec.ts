@@ -1,3 +1,4 @@
+import { waitForManualStartup } from './fixtures/manual-startup.ts';
 import { expect, test } from '@playwright/test';
 import { defeatCurrentBoss } from './drive-boss.ts';
 
@@ -169,7 +170,7 @@ test('boss victory waits until run end to award Embers and reveal Boss Rush once
   });
   await page.goto('/');
   await expect(page.locator('#app')).toHaveCount(1);
-  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+  await waitForManualStartup(page, () => page.evaluate(() => (window as any).advance(1)));
   await page.keyboard.press('Control+Shift+A');
   await page
     .getByRole('button', { name: 'Jump to boss', exact: true })

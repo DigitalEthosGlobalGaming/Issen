@@ -1,4 +1,78 @@
-# Performance, assets and seamless transitions — Worker input lifetime
+# Performance, assets and seamless transitions — Selected weapon preparation
+
+Checkpoint64 completes selected weapon cutout preparation and fixes repeated worker
+preparation invalidating completed scenes, app1.69.13. Goal remains active at full
+scope. Work is local on develop; no push, deployment, native build or real-save
+changes. Packing, tight repacking and the separate lit-only integration stay cancelled.
+
+Weapon `prepareParts()` uses the existing draw cache and visible-frame batches
+with a4ms target. A native readback cannot be interrupted. Startup and scene
+readiness await the equipped blade plus the six deterministic enemy styles;
+matching sets share a promise, hidden waits resume on visibility, disposal cancels
+and unknown IDs return false. Startup also checks the preparation result. The
+enemy style list is derived from its existing tuple; no choices, RNG, pixels or
+save formats change. Both pan finishes are prepared. Direct raw weapon atlas
+ownership and GPU warming remain open; this prepares cached colour pixels only.
+
+Full20-style diagnostic preparation moves31 readbacks from draw to preparation;
+all80 saved original/candidate native SHA256 captures match, including both mirror
+and gold states. A single diagnostic prepare takes49.7→161.9ms: work moves earlier,
+not free. Full preparation retains31cutouts/2,567,054pixels (10,268,216nominal RGBA
+bytes). Runtime selects fewer: steel12/1,036,478 (4,145,912bytes), pan14/1,200,318
+(4,801,272bytes), beam13/1,083,070 (4,332,280bytes). These selected peer tests make
+80 exact native comparisons with0 draw readbacks; disposal returns both painters
+to0 source textures. Existing80-entry weapon eviction/replay assertions still pass.
+
+Worker `prepare` now preserves an already completed layered stage instead of
+clearing its key merely because exported inputs were released. Original same-key
+first/repeat build count1→2 becomes1→1 across27 lifetime cases; copied and held
+planes remain exact, with0 input pins/bytes. Changed keys reacquire normally.
+The old budget tests now require0 exported pins/bytes, retaining budget, eviction,
+cutout and exact-pixel assertions. This does not prove a combined memory bound.
+
+Verification:final476 unit tests pass; checked production/strict TypeScript passes
+all4 cases, including offline gameplay resize. Final complete browser suite passes
+all373 cases with two workers (19.0m), including worker/local preload native
+comparisons, context restoration, cancellation, cinematic and saved-run isolation.
+A held-weapon boss test proves readiness gates spawning and preserves pause.
+All process handles are terminal. Package/lock/title/changelog agree at1.69.13;
+changed-file formatting and diff checks pass.
+
+First full browser run:362 pass/11 fail. Saved previous-commit control reproduces
+10:lit CSS changes after the hover test captures its original URL, six manual-clock
+cases never drive paced startup, two old budget pin assertions and repeated worker
+key invalidation. Await published lit CSS; drive manual startup and readiness at
+its existing50ms virtual step without increasing deadlines; keep exact native
+comparisons. Three further manual cases need50ms readiness polling rather than
+one-second backoff and then pass. The perfect-cut trial's initial timeout passes
+on the original, focused candidate and final full suite; its cause remains unresolved.
+Global format:check still reports421 pre-existing warnings; line-ending normalization
+leaves253, all independently confirmed in HEAD and none in changed files. Do not
+mass-format unrelated source to hide these warnings.
+
+Five matched title samples per arm compare startup median2144.1→2159.5ms (+0.7%),
+render median1.5→1.5ms and frame-p95 median17.0→17.0ms. Compatible reports pass;
+builds retain their pre-bump1.69.11/1.69.12 metadata. No actual120Hz, physical-memory
+or first-two-second-long-task claim. Timing compares
+`tmp/performance/2026-10-09T06-02-12.492Z-b9871a84/` with
+`tmp/performance/2026-10-09T06-27-12.931Z-76242e95/`.
+
+Evidence:`tmp/probes/sword64/` retains original and restored candidate source,
+80-case baseline/final native oracles, selected pixel counts, initial/control/final
+full and focused logs, original worker lifetime rows, unit/production and formatting
+proof. Final worker/native details remain under `tmp/test-results/browser/`.
+
+Remaining:enemy/weapon selected decoded ownership, incoming enemy variants and
+same-painter figure texture warming; demon/live-fog cutout-aware ownership;
+combined decoded/canvas/GPU/copy admission; quiet cancelable worker/local next
+slots with texture leases through promotion; full120Hz/cold-warm/first-two-second
+and Phase5 reporting. Current GPU leases protect collection, but source retirement
+still destroys retained textures; releasing CPU pixels requires an explicit
+residency and context-restoration contract, not blind all-family pooling or a
+budget increase. Local yielded composition still differs in four exact cases;
+retain the synchronous passing control. No goal completion claim.
+
+## Previous handoff — Worker input lifetime
 
 Checkpoint63 aligns worker image policy and releases completed composition inputs,
 app1.69.12. Actual low-memory startup audit succeeds both with worker and forced
@@ -2052,3 +2126,4 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Phase5 remain required. Goal active; no push/deploy/native build/player saves.
     Final diff/formatPASS; version/package/lock/title/changelog synchronized.
     All measurement and verification sessions terminal.
+
