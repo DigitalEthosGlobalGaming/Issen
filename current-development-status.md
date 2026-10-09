@@ -1,4 +1,37 @@
-# Mobile performance — Compact low-memory worker inputs
+# Mobile performance — Required transition headroom
+
+App1.69.27 compares required prepare/upload estimates against the combined
+document budget after main-cache reclamation. When they do not fit, outgoing
+normal/surface/emissive planes and GPU sources retire; outgoing colour remains
+drawable while loading. Full incoming material planes warm before readiness.
+Retirement clears the outgoing completed key, so cancellation/return recomposes
+its full materials. Already prepared promotions keep their admitted resources.
+
+Same390x844/DPR2/deviceMemory2 all-stage0–8→0 sample: maximum observed committed
+540,926,164→494,093,948bytes (516→471MiB), ~41MiB below512MiB; final419–471MiB.
+Return-to-meadow preparation peaks469MiB. Upload-only retirement initially peaked
+536,694,428bytes; moving retirement before compose adds practical headroom.
+Evidence: `tmp/probes/all-stage-memory-{upload,preparation}-headroom.json`.
+These remain nominal sampled/phase observations for one viewport, not an absolute
+physical/all-scenario cap. Worker decode progress/native scratch and preview/
+Demon/concurrent ownership remain to audit.
+
+Five focused pressure/promotion cases pass; final2pressure tests pass7.1s with
+early retirement, retained outgoing colour, full incoming materials and
+cancellation recomposition. No WebGL feedback/invalid-operation/destroyed-bound
+warnings. Checked production build/strict TypeScript log:
+`tmp/probes/transition-headroom-build.log`. Version metadata/changelog1.69.27.
+All handles terminal; no push/deploy/native builds/real-save changes.
+
+Next: preview/Demon resource audit and combined pressure with those owners;
+required-work reservations/whole transient accounting remain. Diagnose the strict
+software-vs-GPU later-cycle colour mismatch with a focused pixel/baseline sample
+(failure notes `tmp/probes/compact-worker-copy-failures.md`), without rerunning the
+large matrix blindly or weakening assertions. Transition/resource checkpoint and
+final suites/measurement matrix remain. Physical Android/120Hz unproven. Goal
+active; cancelled general packing/lit-only integration remain cancelled.
+
+## Previous handoff — Compact low-memory worker inputs
 
 App1.69.26 decodes aligned catalogue scenery colour/material planes at half
 width/height on the256MiB decoded tier using native high-quality bitmap resize.

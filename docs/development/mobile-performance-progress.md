@@ -8,6 +8,31 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Required transition headroom — 9 October 2026
+
+Version1.69.27 compares required preparation/upload estimates against the combined
+document budget after reclaiming unpinned images. Under pressure it retires the
+outgoing normal/surface/emissive planes and their GPU sources while retaining
+colour planes for animated loading presentation. Incoming scenery still prepares
+all material planes and warms them before readiness. Retiring outgoing maps clears
+its completed key, so cancellation/return recomposes the full original materials.
+An already prepared promotion retains its admitted resources normally.
+
+The same390x844/DPR2/deviceMemory2 stage0–8→0 sample now observes a maximum
+494,093,948bytes (471MiB), versus540,926,164bytes (516MiB) before this change.
+Settled samples419–471MiB; return-to-meadow preparation469MiB. The first experiment
+retired only before upload and peaked536,694,428bytes, leaving insufficient
+headroom; moving pressure retirement before composition addresses that overlap.
+Evidence: `tmp/probes/all-stage-memory-{upload,preparation}-headroom.json`.
+These are nominal observations for this viewport, not a physical or universal cap.
+Preview/Demon/concurrent ownership and intermediate native scratch remain to audit.
+
+Five focused pressure/promotion tests pass; the final two pressure cases pass7.1s
+after early retirement. They use actual native rendering, verify outgoing colour
+survives while maps close, and verify cancellation returns full material planes
+through recomposition. No feedback-loop/destroyed-bound-source/invalid-operation
+warnings occur. Source draw logic and gameplay seed handling remain unchanged.
+
 ## Compact low-memory worker inputs — 9 October 2026
 
 Version1.69.26 decodes catalogue scenery colour and aligned material inputs at

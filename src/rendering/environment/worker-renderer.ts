@@ -125,6 +125,19 @@ export function createWorkerEnvironmentRenderer(
     completed = undefined;
     currentKey = '';
   }
+  function releaseOutgoingMaterials() {
+    for (const layer of [...layers, ...foreground])
+      for (const kind of ['normal', 'surface', 'emissive'] as const) {
+        const source = layer[kind];
+        if (!source) continue;
+        retireSceneTexture(source);
+        source.close();
+        delete layer[kind];
+      }
+    // Retain outgoing colour for responsive loading. Returning to this identity
+    // must compose its full material planes again before scene readiness.
+    currentKey = '';
+  }
   function failWorker(reason: string) {
     if (disposed || workerFailure) return;
     workerFailure = reason;
@@ -500,11 +513,12 @@ export function createWorkerEnvironmentRenderer(
     try {
       if (!prepared) {
         const estimate = scenePreparationBytes(frame, documentImageBudget(doc));
-        if (estimate !== undefined)
-          reclaimSceneMemory(
-            doc,
-            estimate + (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0),
-          );
+        if (estimate !== undefined) {
+          const incomingBytes =
+            estimate + (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
+          const pressure = reclaimSceneMemory(doc, incomingBytes);
+          if (pressure.committedBytes + incomingBytes > pressure.budget) releaseOutgoingMaterials();
+        }
       }
       if (frame.stage === 0) await prepareFog();
       if (disposed || workerFailure || generation !== workerGeneration) return;
@@ -537,6 +551,12 @@ export function createWorkerEnvironmentRenderer(
         failWorker(response.error || 'Scenery worker could not compose the selected scene');
         return;
       }
+      const uploadBytes =
+        composedLayerBytes([...response.layers, ...response.foreground]) +
+        (frame.stage === 0 && fog?.naturalWidth ? 4 * fog.naturalWidth * fog.naturalHeight * 4 : 0);
+      const pressure = reclaimSceneMemory(doc, uploadBytes);
+      if (!promoted && pressure.committedBytes + uploadBytes > pressure.budget)
+        releaseOutgoingMaterials();
       if (!(await warmLayers(frame, response.layers, response.foreground))) {
         if (generation === workerGeneration) settle(key, false);
         return;

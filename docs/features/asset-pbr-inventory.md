@@ -12,6 +12,9 @@ catalogue colour/material planes at half width/height. Original logical atlas
 dimensions and crop coordinates remain intact through worker source adaptation;
 file layouts and authoring assets stay unchanged. Higher tiers decode original
 dimensions. Input residency falls approximately75%; this is not a whole-app cap.
+As of1.69.27, required transition pressure can retire outgoing material planes
+while retaining their colour planes during loading. Incoming/restored scenes
+prepare full aligned materials before readiness.
 
 Lists every media file under `src/`, `public/`, `assets/` and Android source
 resources, plus UI atlas metadata. Atlases represent many sprites: this document
