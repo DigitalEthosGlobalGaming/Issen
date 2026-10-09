@@ -106,3 +106,32 @@ test('disposing a pending owned PBR atlas prevents late readiness and repeated r
     true,
   );
 });
+
+test('replaced owned PBR inputs preserve queued native frames before closure', async () => {
+  const images = [];
+  const atlas = createPbrAtlas(
+    {
+      createElement() {
+        const source = image();
+        images.push(source);
+        return source;
+      },
+    },
+    sources,
+    8,
+  );
+  assert.equal(await atlas.prepare(), true);
+  const retirement = [];
+  for (const source of images)
+    observeSceneTextureRetirement(source, (preserveFrame) =>
+      retirement.push([preserveFrame, source.naturalWidth]),
+    );
+  atlas.dispose(true);
+  assert.deepEqual(retirement, [
+    [true, 8],
+    [true, 8],
+    [true, 8],
+    [true, 8],
+  ]);
+  assert.ok(images.every((source) => source.naturalWidth === 0));
+});

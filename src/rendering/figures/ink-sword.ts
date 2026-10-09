@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { documentImageBudget } from '../../platform/main-images.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
@@ -38,6 +39,12 @@ const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: st
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
   const fittings = createAssetMaterials<string>(doc, { hilts: SOURCES.hilts });
+  const compactSpecial = documentImageBudget(doc) <= 256 * 1024 * 1024;
+  const specialMaterials = new Map<string, SceneMaterial>();
+  const specialParts = new Map<string, HTMLCanvasElement>();
+  const specialPlanes = new Set<HTMLCanvasElement>();
+  let specialCompaction: Promise<boolean> | undefined;
+  let specialCompacted = false;
   const materials = new Map<number, SceneMaterial>();
   const surface = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   const images = new Map<SourceKind, HTMLImageElement>(),
@@ -63,7 +70,7 @@ export function createInkSwordRenderer(doc: Document) {
     specialRequested ||= special;
     fittings.select({
       hilts: SOURCES.hilts,
-      ...(specialRequested ? { special: SOURCES.special } : {}),
+      ...(specialRequested && !specialCompacted ? { special: SOURCES.special } : {}),
     });
     const pending = Promise.all(
       (Object.keys(SOURCES) as SourceKind[])
@@ -111,14 +118,16 @@ export function createInkSwordRenderer(doc: Document) {
     width: number,
     height: number,
   ) {
-    const material = fittings.material(family, frame);
+    const material = fittingMaterial(family, frame);
     if (material)
       drawMaterialStamp(g, { texture: { source, revision: 0 }, material, x, y, width, height });
     else g.drawImage(source, x, y, width, height);
   }
   function part(family: Family, frame: Frame, tint?: string): HTMLCanvasElement | null {
-    const key = family + ':' + frame.join(',') + ':' + (tint || ''),
-      prior = cache.get(key);
+    const key = family + ':' + frame.join(',') + ':' + (tint || '');
+    const prepared = specialParts.get(key);
+    if (prepared) return prepared;
+    const prior = cache.get(key);
     if (prior) {
       cache.delete(key);
       cache.set(key, prior);
@@ -154,6 +163,84 @@ export function createInkSwordRenderer(doc: Document) {
     }
     return c;
   }
+  function fittingMaterial(family: 'hilts' | 'special', frame: Frame) {
+    return family === 'special' && specialCompacted
+      ? (specialMaterials.get(frame.join(',')) ?? null)
+      : fittings.material(family, frame);
+  }
+  /** Keep the finite special catalogue independent of the ordinary tint LRU. */
+  function compactSpecialParts(): Promise<boolean> {
+    if (!compactSpecial || specialCompacted) return Promise.resolve(true);
+    return (specialCompaction ??= (async () => {
+      let complete = true;
+      const prepared = await paceTextureUploads(Object.values(SPECIAL_FRAMES), preparation.signal, {
+        nextFrame: (signal) => nextVisibleFrame(doc, signal),
+        ready: () => !disposed && !doc.hidden,
+        generation: () => 0,
+        now: () => doc.defaultView!.performance.now(),
+        upload: (frame) => {
+          const colour = part('special', frame);
+          const original = fittings.material('special', frame);
+          if (!colour || !original) {
+            complete = false;
+            return;
+          }
+          const material: SceneMaterial = { ...original };
+          for (const kind of ['normal', 'surface', 'emissive'] as const) {
+            const texture = original[kind];
+            if (!texture) continue;
+            const plane = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
+            plane.width = colour.width;
+            plane.height = colour.height;
+            specialPlanes.add(plane);
+            const context = plane.getContext('2d');
+            if (!context) {
+              complete = false;
+              return;
+            }
+            context.drawImage(
+              texture.source,
+              frame[0],
+              frame[1],
+              frame[2],
+              frame[3],
+              0,
+              0,
+              plane.width,
+              plane.height,
+            );
+            material[kind] = {
+              source: plane,
+              revision: 0,
+              frame: [0, 0, plane.width, plane.height],
+            };
+          }
+          specialMaterials.set(frame.join(','), material);
+          const tints = frame === SPECIAL_FRAMES.pan ? [undefined, '#c8a650'] : [undefined];
+          for (const tint of tints) {
+            const colourPart = part('special', frame, tint);
+            if (!colourPart) {
+              complete = false;
+              return;
+            }
+            const key = 'special:' + frame.join(',') + ':' + (tint || '');
+            specialParts.set(key, colourPart);
+            cache.delete(key);
+          }
+        },
+      });
+      if (!prepared || !complete || disposed) return false;
+      specialCompacted = true;
+      const raw = images.get('special');
+      if (raw) {
+        retireSceneTexture(raw, true);
+        raw.removeAttribute('src');
+        images.delete('special');
+      }
+      fittings.select({ hilts: SOURCES.hilts }, true);
+      return true;
+    })());
+  }
   /** Prepare the finite catalogue before presentation; draw uses these same cutouts. */
   function prepareParts(ids: readonly string[] = Object.keys(BLADE_RECIPES)): Promise<boolean> {
     if (disposed) return Promise.resolve(false);
@@ -164,6 +251,8 @@ export function createInkSwordRenderer(doc: Document) {
     if (prior) return prior;
     const pendingParts = prepare(selected).then(async () => {
       if (disposed || !ready(selected)) return false;
+      if (selected.some((id) => BLADE_RECIPES[id]?.special) && !(await compactSpecialParts()))
+        return false;
       const stamps: { family: Family; frame: Frame; tint?: string }[] = [];
       for (const id of selected) {
         const recipe = BLADE_RECIPES[id]!;
@@ -205,7 +294,7 @@ export function createInkSwordRenderer(doc: Document) {
         .every((kind) => loaded.has(kind)) &&
       pbrReady() &&
       fittings.ready('hilts') &&
-      (!special || (loaded.has('special') && fittings.ready('special')))
+      (!special || (loaded.has('special') && (specialCompacted || fittings.ready('special'))))
     );
   }
   async function prepareUploads(
@@ -231,7 +320,7 @@ export function createInkSwordRenderer(doc: Document) {
               fog: 0,
               fogColor: [0.53, 0.51, 0.47] as const,
             }
-          : fittings.material(family, frame);
+          : fittingMaterial(family, frame);
       uploads.push(...materialTextureUploads({ source: image, revision: 0 }, material));
       return true;
     };
@@ -381,8 +470,13 @@ export function createInkSwordRenderer(doc: Document) {
     },
     snapshot: () => ({
       loaded: [...loaded],
-      cachedParts: cache.size,
-      cachedPixels: [...cache.values()].reduce(
+      specialCompacted,
+      specialPixels: [...specialPlanes, ...specialParts.values()].reduce(
+        (n, c) => n + c.width * c.height,
+        0,
+      ),
+      cachedParts: cache.size + specialParts.size,
+      cachedPixels: [...cache.values(), ...specialParts.values()].reduce(
         (total, canvas) => total + canvas.width * canvas.height,
         0,
       ),
@@ -406,10 +500,13 @@ export function createInkSwordRenderer(doc: Document) {
       }
       surface.width = surface.height = 0;
       for (const f of [...finish]) f();
-      for (const c of cache.values()) {
+      for (const c of [...cache.values(), ...specialParts.values(), ...specialPlanes]) {
         retireSceneTexture(c);
         c.width = c.height = 0;
       }
+      specialMaterials.clear();
+      specialParts.clear();
+      specialPlanes.clear();
       cache.clear();
       images.clear();
       loaded.clear();

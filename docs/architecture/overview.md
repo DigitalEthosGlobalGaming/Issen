@@ -791,8 +791,13 @@ omit the special-weapon family; pan/beam selections coalesce one lazy family loa
 Raw source preparation remains shared across selections and full-catalogue callers
 retain their default behavior. Selected cutout preparation checks only its required
 family. Preview weapon changes repaint after preparation without advancing effects;
-suspension/disposal suppress late repaint. Loaded special inputs currently remain
-resident until renderer disposal; this does not enforce a whole-game memory cap.
+suspension/disposal suppress late repaint. On the256MiB decoded tier, special preparation copies both finite frames and the
+gold-pan colour into aligned512px-wide canvases outside the ordinary tint LRU.
+After copying, full special colour/material inputs retire while native consumers
+can finish their queued frame. Readiness and uploads use these owned planes,
+including after context restoration; later base-only requests do not reopen the
+special atlas. Higher tiers retain original material sampling. This reduces
+resident inputs; it does not enforce a whole-game memory cap.
 
 Worker export closes unpinned raw decoded inputs after every plane copy settles
 and retires composition/foreground canvases before posting independent bitmaps.

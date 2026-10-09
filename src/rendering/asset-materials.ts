@@ -12,11 +12,11 @@ export function createAssetMaterials<K extends string>(
   const atlases = new Map<K, ReturnType<typeof createPbrAtlas>>();
   const selected = new Map<K, string>();
   let disposed = false;
-  function select(next: Record<K, string>) {
+  function select(next: Record<K, string>, preserveQueued = false) {
     if (disposed) return;
     for (const [key, atlas] of atlases)
       if (selected.get(key) !== next[key]) {
-        atlas.dispose();
+        atlas.dispose(preserveQueued);
         atlases.delete(key);
         selected.delete(key);
       }

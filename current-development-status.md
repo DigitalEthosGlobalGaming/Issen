@@ -1,3 +1,31 @@
+# Current development status
+
+## Current handoff — compact special weapons
+
+App1.69.35 low-memory special preparation retains finite pan/beam/gold-pan colour
+cutouts plus aligned normal/surface planes, max512px width. Seven canvases total
+467,456pixels/1,869,824bytes replace three decoded inputs18,882,456bytes; net
+17,012,632byte backing reduction. Higher tiers keep original material sampling.
+Finite parts live outside tint LRU; queued native frames survive raw retirement.
+Base-only preparation cannot reopen maps. Disposal closes owned canvases/inputs.
+
+Strict TypeScript PASS;4PBR lifetime units PASS. Three existing weapon browser
+checks PASS (lazy selection, exact native output/readback avoidance, hidden/disposal).
+New compact lifecycle check PASS: exact settled replay and context-restored pixels,
+all variants visible, decoded saving18,882,456bytes, final owned bytes/source textures0.
+Painter canvas remains accounted separately. First cold readback comparison max1;
+settle/readback before exact replay, no tolerance relaxation. Evidence
+`tmp/test-results/browser/compact-special-recovery/`; earlier checks in
+`tmp/test-results/browser/compact-special/`. No broad suite repeated for this chunk.
+
+Whole-app special-loadout peak and representative visual review remain required.
+Prior regular flow511.5MiB is one viewport, not a universal cap. Native scratch/
+renderbuffer headroom, historical software/GPU mismatch, final measurement matrix,
+applicable suites and physical Android/120Hz evidence remain outstanding. Goal active.
+No push/deploy/native build/save changes; cancelled work stays cancelled.
+
+## Previous handoff — selected weapon inputs
+
 # Mobile performance — Selected special-weapon inputs
 
 App1.69.34 ordinary runtime/startup/preview weapon requests omit special inputs.

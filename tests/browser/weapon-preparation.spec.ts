@@ -181,3 +181,95 @@ test('hidden weapon preparation resumes on visibility and disposal cancels the w
     invalid: false,
   });
 });
+
+test('low-memory special cutouts release raw inputs and survive catalogue changes', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { configurable: true, value: 2 });
+    const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
+    const { documentPixelMemory } = await import('/src/platform/pixel-memory.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { createPalette } = await import('/src/rendering/palette.ts');
+    const sword = createInkSwordRenderer(document);
+    const canvas = document.createElement('canvas');
+    canvas.width = 240;
+    canvas.height = 200;
+    const painter = await createTestDrawing(canvas);
+    try {
+      await sword.prepare(['pan']);
+      const before = documentPixelMemory(document).snapshot();
+      if (!(await sword.prepareParts(['pan']))) throw Error('Special preparation failed');
+      // Base-only preparation must not reopen the retired special material atlas.
+      await sword.prepare(['steel']);
+      const uploads = await sword.prepareUploads(['pan', 'koken'], new AbortController().signal);
+      const after = documentPixelMemory(document).snapshot();
+      const draw = () => {
+        painter.begin();
+        painter.save();
+        painter.translate(35, 130);
+        painter.scale(240, 240);
+        for (const [id, gold] of [
+          ['pan', false],
+          ['pan', true],
+          ['koken', false],
+        ])
+          if (!sword.draw(painter, 0, 0, -0.17, createPalette(), { len: 0.65, gold }, id))
+            throw Error('Missing compact weapon');
+        painter.restore();
+        return [...painter.getImageData(0, 0, 240, 200).data];
+      };
+      await painter.warmScene(uploads, new AbortController().signal);
+      draw(); // Settle the native readback path before exact replay comparison.
+      const pixels = draw();
+      const repeated = draw();
+      const extension = canvas.getContext('webgl2').getExtension('WEBGL_lose_context');
+      const lost = new Promise<void>((resolve) =>
+        canvas.addEventListener('webglcontextlost', () => resolve(), { once: true }),
+      );
+      extension.loseContext();
+      await lost;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const restored = new Promise<void>((resolve) =>
+        canvas.addEventListener('webglcontextrestored', () => resolve(), { once: true }),
+      );
+      extension.restoreContext();
+      await restored;
+      await painter.warmScene(uploads, new AbortController().signal);
+      draw();
+      const recovered = draw();
+      const snapshot = sword.snapshot();
+      sword.dispose();
+      painter.begin();
+      return {
+        before,
+        after,
+        snapshot,
+        uploads: uploads.length,
+        restoredMaximum: pixels.reduce(
+          (n, value, i) => Math.max(n, Math.abs(value - recovered[i])),
+          0,
+        ),
+        maximum: pixels.reduce((n, value, i) => Math.max(n, Math.abs(value - repeated[i])), 0),
+        visible: pixels.some((value, i) => i % 4 === 3 && value > 0),
+        final: documentPixelMemory(document).snapshot(),
+        textures: painter.sourceTextureCount,
+      };
+    } finally {
+      sword.dispose();
+      painter.dispose();
+    }
+  });
+  await writeFile(testInfo.outputPath('compact-special.json'), JSON.stringify(result, null, 2));
+  expect(result.snapshot.specialCompacted).toBe(true);
+  expect(result.before.decodedBytes - result.after.decodedBytes).toBe(18_882_456);
+  expect(result.snapshot.specialPixels).toBeLessThan(600_000);
+  expect(result.uploads).toBeGreaterThan(0);
+  expect(result.maximum).toBe(0);
+  expect(result.restoredMaximum).toBe(0);
+  expect(result.visible).toBe(true);
+  expect(result.final.decodedBytes).toBe(0);
+  expect(result.final.canvasBytes).toBe(result.before.canvasBytes);
+  expect(result.textures).toBe(0);
+});

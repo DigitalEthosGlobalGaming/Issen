@@ -82,13 +82,13 @@ export function createPbrAtlas(
       }
       return material;
     },
-    dispose() {
+    dispose(preserveQueued = false) {
       disposed = true;
       ready = false;
       for (const lease of leases.splice(0)) lease.release();
       if (!options.images)
         for (const image of images.values()) {
-          retireSceneTexture(image);
+          retireSceneTexture(image, preserveQueued);
           image.removeAttribute('src');
           image.width = image.height = 0;
         }

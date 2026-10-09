@@ -10,8 +10,11 @@ renderer coverage is tracked separately below.
 As of1.69.34, ordinary weapon requests omit special-weapon colour/normal/surface
 inputs (3planes,18,882,456nominal decoded bytes). Pan/beam selections lazily prepare
 the same authored pack and cutouts. Full-catalogue preparation remains available;
-once requested, that family remains resident until owner disposal. Files, UVs and
-material coverage unchanged.
+As of1.69.35, the256MiB decoded tier replaces the selected special family with
+three colour cutouts (pan, gold pan, beam) and four aligned material planes,
+all at most512px wide. These total467,456pixels/1,869,824nominal bytes, replacing
+18,882,456bytes of raw inputs. Higher tiers retain original material sampling.
+Authoring files and material coverage remain unchanged.
 
 As of1.69.31, preview room inputs unpin after baking independent colour/material
 planes. Resize reacquires the same shared pack; cached room planes remain drawable
