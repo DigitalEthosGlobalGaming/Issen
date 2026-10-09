@@ -1,5 +1,41 @@
 # Current development status
 
+## Current handoff — restoration experiments rejected (1.69.55 unchanged)
+
+Two targeted renderer experiments remain unsuccessful and are fully reverted:
+disabling browser antialiasing while retaining Pixi back-buffer AA fails one of
+three strict leaf restores; explicit highp composite texture samplers fail local
+stage4 (max2), and leaf-only confirmation fails one of five after three initial
+passes. Do not interpret a short passing run as resolution. Existing assertions
+remain unchanged. No implementation/version change this checkpoint.
+
+A corrected diagnostic reads Pixi's resolved single-sample back buffer after
+Canvas capture: two of three restores differ by one colour channel there, with
+the same presented-canvas mismatch; geometry/HDR targets stay exact. Thus final
+presentation copying alone cannot explain the leaf differences. The initial
+diagnostic incorrectly read a multisample framebuffer (GL_INVALID_OPERATION);
+discard those results, not a renderer defect. Corrected reads preserve the prior
+READ_FRAMEBUFFER binding. Three diagnostic alpha passes do not resolve the
+unmodified intermittent alpha failure.
+
+Unmodified local fixture with diagnostic details still fails stage4 high-quality
+restoration. All eleven raw-plane/live-eviction/replay rows remain exact. Stage0
+high restore:217 changed colour channels, max1, alphaMax0. Stage4 high:302 changed
+colour channels, max2, alphaMax0; premultiplied max also2. Opaque pixel samples
+rule out straight-alpha amplification as the explanation for this local failure.
+Next restoration question: do stage4 encoded geometry/HDR targets differ, or only
+its composite/back buffer? Reuse its existing fixture and inspect those targets
+before another production change. Do not retry dithering, invariance, second-AA
+removal or sampler precision without new causal evidence.
+
+Evidence under `tmp/test-results/browser/context-{single-msaa,resolved-backbuffer,
+highp-samplers,highp-local,highp-leaf-confirmation,local-display-details}-16955/`;
+diagnostic fixtures/configs under `tmp/probes/restoration-{presentation,local}.*`.
+All graphics processes terminal; tracked renderer/test sources unchanged, latest
+checked production1.69.55 still applicable. Goal active: broader memory coverage,
+the two restoration failures and final requirement/report verification remain.
+No push/deploy/native build/real-save edits.
+
 ## Current handoff — gameplay allowance for optional preparation (1.69.55)
 
 Optional next scenes, background figures and UI exports now reclaim/admit against

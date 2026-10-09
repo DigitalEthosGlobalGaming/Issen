@@ -1,5 +1,30 @@
 # Mobile performance continuation
 
+## Restoration follow-up; no retained renderer change — 10 October 2026
+
+App1.69.55 unchanged. Removing browser AA while retaining Pixi back-buffer AA
+fails one of three strict leaf restores; explicit highp samplers also fail local
+stage4 max2 and one of five leaf-only confirmations after three initial passes.
+Both experiments are reverted; assertions remain unchanged. Reassess rather than
+repeat these approaches, dithering or vertex invariance without causal evidence.
+
+Corrected resolved-back-buffer diagnostics find one differing colour channel in
+two of three restores, matching the presented Canvas mismatch while geometry/HDR
+targets remain exact. Final presentation alone cannot explain that leaf result.
+The first diagnostic read a multisample framebuffer and generated GL error1282;
+discard those measurements. Corrected reads use the resolved framebuffer and
+restore READ_FRAMEBUFFER state. Their three alpha passes do not clear the
+unmodified intermittent alpha failure.
+
+Existing all-eleven local rows remain raw/live/replay exact. Restored stage0 high
+has217 differing colour channels/max1; stage4 high has302/max2. Both alpha maxima
+are0. Premultiplied stage4 max remains2 with opaque samples, ruling out
+straight-alpha amplification. Next compare its encoded geometry/HDR targets and
+back buffer to localize that separate failure before another renderer experiment.
+Evidence: `tmp/test-results/browser/context-{single-msaa,resolved-backbuffer,
+highp-samplers,highp-local,highp-leaf-confirmation,local-display-details}-16955/`.
+No full-suite, production or performance rerun on the unchanged renderer.
+
 ## Gameplay headroom for optional work — 10 October 2026
 
 Version 1.69.55 leaves a 32MiB gameplay allowance when admitting next scenes,
