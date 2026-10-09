@@ -1,5 +1,10 @@
 import { documentPixelMemory } from './pixel-memory.ts';
-import { documentImageBudget, trimMainImages, mainImageReservation } from './main-images.ts';
+import {
+  documentImageBudget,
+  trimMainImages,
+  mainImageReservation,
+  setMainImageReclaimer,
+} from './main-images.ts';
 
 type SceneOwner = {
   readonly memorySnapshot: {
@@ -11,6 +16,14 @@ type SceneOwner = {
 };
 const owners = new WeakMap<Document, Set<WeakRef<SceneOwner>>>();
 const registered = new WeakMap<Document, WeakSet<SceneOwner>>();
+const monitored = new WeakSet<Document>();
+function monitorMainDecodes(doc: Document) {
+  if (monitored.has(doc)) return;
+  monitored.add(doc);
+  setMainImageReclaimer(doc, () => {
+    reclaimSceneMemory(doc);
+  });
+}
 export function reclaimSceneMemory(doc: Document, additionalBytes = 0) {
   const before = documentSceneMemory(doc);
   if (before.committedBytes + additionalBytes <= before.budget) return before;
@@ -18,6 +31,7 @@ export function reclaimSceneMemory(doc: Document, additionalBytes = 0) {
   return documentSceneMemory(doc);
 }
 export function registerSceneMemory(doc: Document, owner: SceneOwner) {
+  monitorMainDecodes(doc);
   let seen = registered.get(doc);
   if (!seen) registered.set(doc, (seen = new WeakSet()));
   if (seen.has(owner)) return;
@@ -29,6 +43,7 @@ export function registerSceneMemory(doc: Document, owner: SceneOwner) {
 
 /** Shared across live/preview owners; reservations cover work not yet in a worker response. */
 export function documentSceneMemory(doc: Document) {
+  monitorMainDecodes(doc);
   const main = documentPixelMemory(doc).snapshot();
   let workerDecodedBytes = 0,
     workerCanvasBytes = 0,

@@ -1,4 +1,41 @@
-# Mobile performance — Pending decode accounting
+# Mobile performance — GPU upload reservations and resident trimming
+
+App1.69.33 reserves uninitialized source/target texture bytes in the painter's
+combined ledger. Concurrent jobs deduplicate source identities; formats/mips
+match GPU estimates. Native init replaces pending storage with residency.
+Context generation/resize refresh targets; abort/disposal clears reservations.
+Cache reclamation precedes paced uploads. Native next-slot GPU estimates hand off
+to the painter rather than double counting; custom warmers retain old estimates.
+
+Main decode changes also trigger combined reclamation via a document policy
+callback. New pressure test found trimMainImages subtracting requested release
+from resident+reserved total: loader.trim compares only resident bytes, so pending
+reservation could suppress eviction. Fixed target excludes reservedBytes. Test
+observes actual decode boundary; initial immediate-queue check was premature.
+
+6focused GPU/pixel/ledger units PASS; concurrent/resize2browser PASS4.0s;
+context restoration/disposal2PASS3.1s; main queue/promotion/admission/busy4PASS;
+corrected pre-decode pressure case PASS2.2s. Exact owned/shared preview peer cases
+PASS10.4s. Art/pixels unchanged.
+Evidence `tmp/test-results/browser/{gpu-reservations,gpu-reservation-recovery,
+allocation-reclaim,allocation-reclaim-fixed,gpu-reclaim-preview-peers}/`.
+
+Actual low-memory Demon/inspection capture still over512MiB: latest550,534,704
+bytes (525.0MiB), including6,291,456pending main decode bytes; main decoded
+154,800,984/GPU239,543,204bytes. Evidence
+`tmp/probes/realm-preview-memory-resident-trim.json`. Prior GPU-only/allocation
+captures~523MiB. No repeatable peak reduction claim; reclamation did not remove
+the later live-input overlap. Next change must reduce/schedule live room/
+figure resources or native target overlap, rather than repeat reclamation probes.
+Native scratch/renderbuffer admission and final mode/viewport matrix remain.
+
+Strict checked build PASS (`tmp/probes/gpu-reservation-build.log`); synchronized
+metadata/title/changelog1.69.33. Goal active; historical
+copy mismatch, broader integration/final suites, performance matrix and physical
+Android/120Hz evidence remain. No push/deploy/native build/player-save changes;
+cancelled work stays cancelled.
+
+## Previous handoff — Pending decode accounting
 
 App1.69.32 exposes loader reservedBytes separately and includes pending main-pool
 decodes in combined committed memory. Worker loaders notify byte changes before

@@ -23,13 +23,14 @@ import {
   DefaultBatcher,
   Shader,
 } from 'pixi.js';
-import type { FillStyle, GradientOptions, BLEND_MODES } from 'pixi.js';
+import type { FillStyle, GradientOptions, BLEND_MODES, TextureSource } from 'pixi.js';
 import './canvas-blends.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
-import { rendererGpuMemory } from './gpu-memory.ts';
+import { rendererGpuMemory, pendingTextureBytes } from './gpu-memory.ts';
+import { registerSceneMemory, reclaimSceneMemory } from '../../platform/scene-memory.ts';
 import { documentPixelMemory, trackPixelSource } from '../../platform/pixel-memory.ts';
 import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
@@ -281,6 +282,8 @@ export class PixiScenePainter implements SceneDrawing {
   };
 
   private readonly geometryBuffer: GeometryBuffer;
+  private readonly pendingUploads = new Map<AbortSignal, Set<TextureSource>>();
+  private readonly uploadMemoryOwner;
   private readonly lightBuffer: LightBuffer;
   private readonly artworkMaterials: ArtworkMaterials;
   get lightTargets() {
@@ -296,6 +299,21 @@ export class PixiScenePainter implements SceneDrawing {
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
     documentPixelMemory(canvas.ownerDocument).trackGpu(this);
+    const painter = this;
+    this.uploadMemoryOwner = {
+      get memorySnapshot() {
+        const sources = [...painter.pendingUploads].flatMap(([signal, sources]) =>
+          signal.aborted || painter.disposed || painter.contextLost ? [] : [...sources],
+        );
+        return {
+          decodedBytes: 0,
+          canvasBytes: 0,
+          transferredBytes: 0,
+          reservedBytes: pendingTextureBytes(sources, painter.renderer.uid),
+        };
+      },
+    };
+    registerSceneMemory(canvas.ownerDocument, this.uploadMemoryOwner);
     this.geometryBuffer.resize(canvas.width, canvas.height);
     this.artworkMaterials = new ArtworkMaterials(renderer);
     this.lightBuffer = new LightBuffer(renderer);
@@ -1405,14 +1423,24 @@ export class PixiScenePainter implements SceneDrawing {
       ];
       const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
       if (ready() && sources.every((source) => source()._gpuData?.[this.renderer.uid])) return true;
+      const reserve = () => {
+        if (!ready()) return;
+        this.pendingUploads.set(lifetime, new Set(sources.map((source) => source())));
+        reclaimSceneMemory(this.canvas.ownerDocument);
+      };
+      reserve();
       return await paceTextureUploads(sources, lifetime, {
         nextFrame: (abort) => nextVisibleFrame(this.canvas.ownerDocument, abort),
         ready,
         generation: () => this.textureUploadGeneration(),
-        upload: (source) => this.renderer.texture.initSource(source()),
+        upload: (source) => {
+          reserve();
+          this.renderer.texture.initSource(source());
+        },
         now: () => performance.now(),
       });
     } finally {
+      this.pendingUploads.delete(lifetime);
       release();
     }
   }

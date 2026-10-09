@@ -28,6 +28,7 @@ test('a warmed next scene survives current draws and promotes without recomposit
       document,
       (items, options) => drawing.warmScene(items, options),
       {
+        ownsUploadReservation: true,
         retainWorkerSources: (sources) => drawing.retainTextureSources(sources),
       },
     );

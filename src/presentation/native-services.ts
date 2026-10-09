@@ -24,6 +24,7 @@ export function createNativeServices(
   painter?: Pick<PixiScenePainter, 'warmScene' | 'retainTextureSources'>,
 ) {
   const environmentRenderer = createEnvironmentRenderer(ownerDocument, {
+    ownsUploadReservation: !!painter,
     warmWorkerScene: painter ? (sources, signal) => painter.warmScene(sources, signal) : undefined,
     retainWorkerSources: painter ? (sources) => painter.retainTextureSources(sources) : undefined,
   });

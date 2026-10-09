@@ -2,6 +2,63 @@ import { expect, test } from '@playwright/test';
 import type { Route } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('combined pressure reclaims unpinned main cache before the next decode allocation', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { documentSceneMemory, registerSceneMemory } =
+      await import('/src/platform/scene-memory.ts');
+    const { runtimeAssets } = await import('/src/platform/runtime-assets.ts');
+    const assets = runtimeAssets
+      .filter((asset) => asset.width * asset.height < 200000)
+      .sort((a, b) => b.width * b.height - a.width * a.height)
+      .slice(0, 2);
+    const owner = createMainImageOwner(document);
+    const pressure = {
+      memorySnapshot: { decodedBytes: 0, canvasBytes: 0, transferredBytes: 0, reservedBytes: 0 },
+    };
+    registerSceneMemory(document, pressure);
+    const decode = HTMLImageElement.prototype.decode;
+    try {
+      const first = owner.acquire(assets[0].url);
+      const image = await first.ready;
+      first.release();
+      const retained = image.naturalWidth > 0;
+      const before = documentSceneMemory(document);
+      const expected = assets[1].width * assets[1].height * 4;
+      pressure.memorySnapshot.reservedBytes = before.budget - before.committedBytes - expected / 2;
+      let closedBeforeAllocation = false,
+        withinBudget = false;
+      HTMLImageElement.prototype.decode = async function () {
+        closedBeforeAllocation = image.naturalWidth === 0;
+        const pending = documentSceneMemory(document);
+        withinBudget = pending.committedBytes <= pending.budget;
+        return decode.call(this);
+      };
+      const second = owner.acquire(assets[1].url);
+      const ready = (await second.ready).naturalWidth > 0;
+      return {
+        retained,
+        closedBeforeAllocation,
+        withinBudget,
+        ready,
+      };
+    } finally {
+      HTMLImageElement.prototype.decode = decode;
+      pressure.memorySnapshot.reservedBytes = 0;
+      owner.dispose();
+    }
+  });
+  expect(result).toEqual({
+    retained: true,
+    closedBeforeAllocation: true,
+    withinBudget: true,
+    ready: true,
+  });
+});
+
 test('shared main decode queue waits for visible quiet frames while required images bypass pacing', async ({
   page,
 }) => {

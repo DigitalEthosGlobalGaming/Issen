@@ -16,6 +16,11 @@ type Pool = {
   stopScheduling(): void;
 };
 const pools = new WeakMap<Document, Pool>();
+const reclaimers = new WeakMap<Document, () => void>();
+/** The combined ledger supplies its policy without coupling the pool to renderer owners. */
+export function setMainImageReclaimer(doc: Document, reclaim: () => void) {
+  reclaimers.set(doc, reclaim);
+}
 const dimensions = new Map<string, number>(
   runtimeAssets.map((asset) => [asset.url, asset.width * asset.height * 4]),
 );
@@ -34,7 +39,8 @@ export function documentImageBudget(doc: Document): number {
 export function trimMainImages(doc: Document, bytesToRelease: number): number {
   const loader = pools.get(doc)?.loader;
   if (!loader || !(bytesToRelease > 0)) return 0;
-  return loader.trim(Math.max(0, loader.snapshot().bytes - bytesToRelease));
+  const snapshot = loader.snapshot();
+  return loader.trim(Math.max(0, snapshot.bytes - snapshot.reservedBytes - bytesToRelease));
 }
 
 /** Pending decode estimates are separate from pixels already visible in the registry. */
@@ -77,6 +83,7 @@ export function createMainImageOwner(doc: Document) {
   let pool = pools.get(doc);
   if (!pool) {
     const loader = createDecodedImageLoader<Resource>({
+      onMemoryChange: () => reclaimers.get(doc)?.(),
       budget: documentImageBudget(doc),
       expectedBytes: (url) => dimensions.get(url),
       decode: (url, signal) => decode(doc, url, signal),

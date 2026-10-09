@@ -27,6 +27,7 @@ import type {
 
 const FOG_URL = new URL('./assets/fog-wisps-atlas.webp', import.meta.url).href;
 export type WorkerSceneOptions = {
+  ownsUploadReservation?: boolean;
   retainWorkerSources?: (sources: Iterable<TextureUpload['texture']['source']>) => () => void;
 };
 type NextSlot = {
@@ -353,6 +354,7 @@ export function createWorkerEnvironmentRenderer(
     const timingKey = (slot ? 'next:' : 'false:') + key;
     markScenePhase('texture-warm-start', timingKey);
     try {
+      if (slot && options.ownsUploadReservation) slot.reservedBytes = 0;
       const ready = await warmWorkerScene(sources, controller.signal);
       if (
         controller.signal.aborted ||

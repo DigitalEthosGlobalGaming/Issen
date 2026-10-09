@@ -778,6 +778,14 @@ addition to tracked resident pixels. Worker loaders publish byte-changing decode
 progress before allocation; scenery ownership updates counters and reclaims
 unpinned main cache without resolving readiness. Equal-byte updates coalesce;
 assets-ready/composed/final responses retain their existing readiness semantics.
+Painter warming reserves deduplicated, not-yet-initialized texture storage across
+concurrent jobs, including source formats/mips and existing surface targets.
+Native initialization replaces each reservation with measured managed-texture
+bytes; cancellation/disposal clears it. Reclamation runs before paced uploads and
+at main decode byte changes. Resident-cache trim targets exclude pending decode
+reservations. Native next-scene warming hands upload estimation to the painter;
+other supplied warmers retain their explicit next-slot estimate. This is headroom
+management, not a guarantee that all pinned resources fit or native scratch is covered.
 
 Worker export closes unpinned raw decoded inputs after every plane copy settles
 and retires composition/foreground canvases before posting independent bitmaps.

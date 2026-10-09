@@ -1,4 +1,4 @@
-import type { WebGLRenderer } from 'pixi.js';
+import type { WebGLRenderer, TextureSource } from 'pixi.js';
 import { rgbaMipBytes } from '../../platform/pixel-memory.ts';
 
 /** Nominal storage for the uncompressed formats used by Issen and Pixi targets. */
@@ -11,6 +11,19 @@ export function texturePixelBytes(format: string): number {
   const match = /^(rgba|bgra|rg|r)(8|16|32)/.exec(format);
   if (!match) return 16; // Conservative for an unexpected format; no physical residency claim.
   return (({ rgba: 4, bgra: 4, rg: 2, r: 1 }[match[1]!] ?? 4) * Number(match[2])) / 8;
+}
+
+/** Pending source storage, deduplicated and replaced by residency after native init. */
+export function pendingTextureBytes(sources: Iterable<TextureSource>, rendererUid: number) {
+  let bytes = 0;
+  for (const source of new Set(sources)) {
+    if (source._gpuData?.[rendererUid]) continue;
+    bytes +=
+      (rgbaMipBytes(source.pixelWidth, source.pixelHeight, source.autoGenerateMipmaps) *
+        texturePixelBytes(source.format)) /
+      4;
+  }
+  return bytes;
 }
 
 /** Pixi 8.22's managed textures include source, HDR, filter, history and back-buffer textures. */
