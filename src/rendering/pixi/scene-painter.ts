@@ -29,6 +29,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
+import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
 import { paceTextureUploads, nextVisibleFrame } from '../texture-upload.ts';
@@ -583,8 +584,8 @@ export class PixiScenePainter implements SceneDrawing {
     this.textures.collect();
     for (const [key, gradient] of this.gradients) {
       if (this.usedGradients.has(key)) continue;
-      // Unload GPU storage without invalidating a source still referenced by
-      // Pixi's last batch bind group. Its JS wrapper can then be collected.
+      // Release GPU storage while the previous graphics data finishes retirement.
+      // Keep its source valid until Pixi resets the pooled batch references.
       gradient.texture.source.unload();
       this.gradients.delete(key);
     }
@@ -1418,8 +1419,8 @@ export class PixiScenePainter implements SceneDrawing {
     this.geometryBuffer.dispose();
     this.copyFilm?.filter.destroy();
     this.renderer.destroy({ removeView: false });
-    // Native graphics retain Pixi cached batch bind groups beyond renderer disposal.
-    // Release GPU storage as for retired gradients without invalidating their sources.
+    // Release GPU storage as for retired gradients; pooled graphics may still
+    // reference their source wrappers until their next reset.
     for (const gradient of this.gradients.values()) gradient.texture.source.unload();
     this.gradients.clear();
     this.root.destroy();
@@ -1460,6 +1461,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
       preserveDrawingBuffer: false,
       useBackBuffer: true,
     });
+    installWebGLGraphicsData(renderer);
     return new PixiScenePainter(canvas, renderer);
   } catch (error) {
     try {

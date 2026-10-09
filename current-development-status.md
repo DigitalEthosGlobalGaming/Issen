@@ -1,4 +1,63 @@
-# Performance, assets and seamless transitions — Geometry bindings retained
+# Performance, assets and seamless transitions — WebGL graphics lifetime fixed
+
+Checkpoint53: app1.69.4 installs the instance-local WebGL graphics-data adapter
+in src/rendering/pixi/webgl-graphics-data.ts. Pixi8.22's original builder creates
+globally cached WebGPU batch bind groups even for GL; its GL adaptor never uses
+them. The adapter preserves BigPool, batcher, transforms, geometry, instructions
+and uploads while omitting only unused groups. No dependency/global mutation,
+shader, gradient/source sampling, draw-order, simulation or seed changes.
+Recheck the version-specific adapter when upgrading Pixi.
+
+Integrated/original native comparison passes40 lit animated changing-order
+Inferno frames exactly. The permanent webgl-graphics-lifetime regression covers
+two painters,120 animated frames, two resizes, restoration,40 more restored
+frames, peer disposal and40 surviving-peer frames. EMPTY source/style/WHITE
+listeners stay16/3/2 with both painters,8/2/1 with one and return to baseline
+0/1/0 on final disposal. Restored and surviving-peer pixels match exactly; GL
+errors absent. Original single-painter120-frame disposal left31,704 EMPTY source
+listeners. This fixes that reproduced listener leak, not whole-game GPU residency.
+
+Matched standard five-sample render median/p95/p99 in ms:
+- Demon5.4/6.8/8.6 ->4.55/5.9/7.6; over8.3ms20/1503 ->6/1504; over16.7ms0.
+- Inferno8.25/11.1/15.2 ->4.4/5.4/6.4; over8.3ms743/1498 ->5/1489;
+  over16.7ms14 ->2.
+Both measured CPU render p95s now fit8.3ms. Headless callbacks remain near16.7ms
+and do not prove120Hz display delivery. Two Inferno timing outliers remain;
+separate diagnostic windows do not explain individual timing outliers.
+Source-mapped profiles record no sampled removeListener self time versus
+checkpoint52's69.5/303.5ms. Zero samples do not prove zero cost.
+Five alternating normal-combat saved-build samples per arm pass:2.3/3.2/4.1
+->2.2/3.1/3.8ms; over8.3ms remains5/1502, over16.7ms1/1502. Updates remain
+0.1/0.2/0.3ms. This close comparison is not a major combat gain claim.
+
+Evidence: tmp/performance-gameplay-checkpoint53/ (original source, exact oracle,
+graphics-lifetime.json, combat-control/, verification logs and makers).
+Before standard build: tmp/performance/2026-10-09T02-38-40.787Z-fd9dd49b;
+after: tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e, with raw samples,
+frame-budgets.json, source-cpu-summary.json, source maps, CPU/heap/traces/build.
+Same instrumentation fingerprint85311fdbddd17a504d77f5474a770d9af0087012c1e42ecad042462149244843,
+390x844/DPR2, seed424242, three-second warmup/five-second windows. Timing build
+preceded only release-version/comment synchronization; no overlapping tests.
+
+All475 units,36 related native browser tests, checked production build/strict
+TypeScript and four bundled production tests pass. Version/package/lock/title/
+changelog and rendering ownership notes are synchronized. All capture and
+verification handles are terminal; changed-file format/diff checks pass.
+Whole-repository format:check flags431 unchanged files:178 pass after checkout
+CRLF normalization,253 also fail on committed HEAD. All431 are unchanged versus
+HEAD after line-ending normalization; format-baseline.json/log records this.
+No unrelated formatting edits are included.
+
+Next resume deterministic next-scene slots, quiet composition/uploads, local
+paused differences, generator cancellation, whole-memory admission and selected
+figure/startup ownership. Preserve the same SceneTextureStore lease through
+next-slot promotion/invalidation: current warmScene releases it in finally,
+and unused sources expire after120 rendered frames. Existing decoded pool bounds
+are not whole-game bounds. AllPhase5 workloads/transition metrics/traces/suites
+remain required. Full goal active; no push/deploy/native build or player saves.
+Cancelled packing, tight repacking and separate lit-only work stay cancelled.
+
+## Previous handoff — Geometry bindings retained
 
 Checkpoint 52: app 1.69.3 retains the light pass's unchanged geometry sampler
 bindings across ordinary frames. Light outputs still detach before accumulation;

@@ -41,6 +41,14 @@ Version 1.69.3 retains the light pass's geometry sampler bindings during ordinar
 frames. Light outputs still detach before accumulation. Geometry inputs detach
 before resize or context restoration replaces their generation, and on disposal.
 
+Version 1.69.4 installs an instance-local WebGL graphics-data builder in
+`pixi/webgl-graphics-data.ts`. Pixi 8.22's default builder creates globally cached
+WebGPU texture bind groups even on WebGL, retaining gradient/EMPTY listeners.
+The WebGL adaptor binds textures directly. The adapter preserves Pixi's BigPool,
+batcher, geometry, transforms, instructions and buffer uploads, omitting only
+those unused groups. Native tests cover animated graphics, peers, resize, context
+restoration and listener cleanup. Recheck this adapter when upgrading Pixi.
+
 Unclipped frames retain their root draw order; surplus children are detached when
 a frame uses fewer slots. Clipping and film grouping leave this fast path and
 keep the existing scoped tree lifecycle. Solid full ellipses can use the painter's

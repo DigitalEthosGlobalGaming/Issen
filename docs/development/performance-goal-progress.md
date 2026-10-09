@@ -2596,3 +2596,63 @@ and2026-10-09T02-38-40.787Z-fd9dd49b. Next integrate that verified WebGL allocat
 fix, then resume deterministic scene slots, quiet composition/upload pacing,
 whole-memory/figure/startup admission and all Phase5 metrics/traces/suites. Full
 goal remains active; no deployment, native build or real player-save changes.
+
+## Checkpoint 53 — WebGL graphics listener lifetime, 9 October 2026
+
+Version 1.69.4 integrates the instance-local graphics-data builder verified at
+checkpoint52. Pixi8.22 builds globally cached WebGPU batch bind groups even for
+WebGL; its GL adaptor binds textures directly without reading those groups.
+The adapter keeps Pixi's BigPool, batcher, transforms, geometry buffers and
+instructions, omitting only the unused groups. No dependency/global mutation,
+shader, source sampling, draw order, simulation or seed change. Recheck this
+version-specific adapter when upgrading Pixi.
+
+The integrated/original comparison is exact across40 lit changing-order Inferno
+frames. The permanent regression runs two painters through120 animated frames,
+two resizes, context restoration,40 more restored frames and peer disposal.
+EMPTY source/style/WHITE source counts stay16/3/2 with both painters,8/2/1 with
+one, then return to baseline0/1/0 after disposal. Restored and surviving-peer
+pixels are exact and GL errors absent. Before the fix, a single120-frame painter
+left31,704 EMPTY source listeners after disposal. These are ownership counts,
+not a whole-game GPU residency measurement.
+
+Five matched standard samples, pooled CPU render median/p95/p99 in milliseconds:
+
+| Workload | Before | After | Before / after over8.3ms | Before / after over16.7ms |
+| --- | --- | --- | --- | --- |
+| Demon | 5.4 / 6.8 / 8.6 | 4.55 / 5.9 / 7.6 | 20/1503 / 6/1504 | 0 / 0 |
+| Inferno | 8.25 / 11.1 / 15.2 | 4.4 / 5.4 / 6.4 | 743/1498 / 5/1489 | 14 / 2 |
+
+Five alternating normal-combat samples per saved bundle pass:2.3/3.2/4.1 to
+2.2/3.1/3.8ms; over8.3ms remains5/1502, over16.7ms1/1502. Update cost remains
+0.1/0.2/0.3ms. This close comparison is not a major combat gain claim.
+Separate source-mapped CPU captures record no sampled removeListener self time
+for either workload, versus checkpoint52's69.5/303.5ms. Zero sampled time does
+not prove zero cost. Identical instrumentation fingerprint, geometry, seed,
+warmup and duration; no overlapping captures or test activity.
+
+Both measured render p95 values now fit8.3ms. Headless callbacks remain near
+16.7ms, so actual120Hz delivery is unproven. Two Inferno timing outliers over
+16.7ms remain; diagnostic profiles are separate windows and do not explain
+individual timing outliers. Full workload/transition/whole-memory goals remain.
+
+Evidence: tmp/performance-gameplay-checkpoint53/, including original source,
+integrated-webgl-geometry-bindings.json, graphics-lifetime.json, combat-control/
+and verification logs. Standard baseline: tmp/performance/2026-10-09T02-38-40.787Z-fd9dd49b;
+after: tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e, retaining raw samples,
+frame-budgets.json, source-cpu-summary.json, source maps, profiles and traces.
+The timing build preceded only the release-version/comment synchronization.
+
+All475 units,36 related native browser cases, strict/checked production build
+and four bundled production tests pass. Version/package/lock/title/changelog and
+rendering notes are synchronized; changed-file format/diff checks pass and all measurement
+and verification handles are terminal.
+Whole-repository format:check flags431 unchanged files, verified against HEAD:
+178 are checkout CRLF differences,253 also fail formatting on committed HEAD.
+All431 match HEAD after line-ending normalization; evidence is in
+format-baseline.json/log. No unrelated formatting edits are included.
+
+Next resume deterministic next-scene slots, quiet composition/uploads, local
+paused differences, generator cancellation, whole-memory admission and selected
+figure/startup ownership. All Phase5 measurements/traces/suites remain required.
+No deployment, native build or real player-save changes; full goal active.
