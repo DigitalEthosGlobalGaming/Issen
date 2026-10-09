@@ -95,7 +95,9 @@ export function createArmoryPreview(
   const outfitSelection = inkPlayer.borrow();
   let outfitGeneration = 0;
   let outfitRobe: string | undefined;
-  void inkSword.prepare();
+  let weaponGeneration = 0;
+  let weaponId: string | undefined;
+  void inkSword.prepare([]);
   const roomCache = trackPixelSource(
     canvas.ownerDocument,
     canvas.ownerDocument.createElement('canvas'),
@@ -212,6 +214,15 @@ export function createArmoryPreview(
       suspendedSize = undefined;
     }
     lastFrame = frame;
+    const selectedWeapon = frame.appearance.bladeId ?? 'steel';
+    if (weaponId !== selectedWeapon) {
+      weaponId = selectedWeapon;
+      const generation = ++weaponGeneration;
+      void inkSword.prepareParts([selectedWeapon]).then((ready) => {
+        if (ready && !roomDisposed && generation === weaponGeneration && lastFrame)
+          draw(lastFrame, true);
+      });
+    }
     if (!roomCacheReady || roomCache.width !== canvas.width || roomCache.height !== canvas.height)
       void prepareRoom();
     if (outfitRobe !== frame.appearance.robeId) {
@@ -384,11 +395,13 @@ export function createArmoryPreview(
         companionSelection.prepare(),
         inkEnemy.prepare(),
         outfitSelection.prepare(),
-        inkSword.prepare(),
+        inkSword.prepare([lastFrame?.appearance.bladeId ?? 'steel']),
       ]),
     demo,
     draw,
     suspend() {
+      weaponGeneration++;
+      weaponId = undefined;
       if (canvas.width > 1 && canvas.height > 1)
         suspendedSize = { width: canvas.width, height: canvas.height };
       if (context) inkPlayer.releaseCanvas(context);
@@ -404,6 +417,7 @@ export function createArmoryPreview(
       surface.native!.suspend();
     },
     dispose() {
+      weaponGeneration++;
       if (context) inkPlayer.releaseCanvas(context);
       outfitGeneration++;
       outfitSelection.dispose();

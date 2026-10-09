@@ -7,6 +7,12 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.34, ordinary weapon requests omit special-weapon colour/normal/surface
+inputs (3planes,18,882,456nominal decoded bytes). Pan/beam selections lazily prepare
+the same authored pack and cutouts. Full-catalogue preparation remains available;
+once requested, that family remains resident until owner disposal. Files, UVs and
+material coverage unchanged.
+
 As of1.69.31, preview room inputs unpin after baking independent colour/material
 planes. Resize reacquires the same shared pack; cached room planes remain drawable
 after raw inputs are evicted. Post-bake reclamation includes32MiB of preparation

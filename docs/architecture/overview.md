@@ -786,6 +786,13 @@ at main decode byte changes. Resident-cache trim targets exclude pending decode
 reservations. Native next-scene warming hands upload estimation to the painter;
 other supplied warmers retain their explicit next-slot estimate. This is headroom
 management, not a guarantee that all pinned resources fit or native scratch is covered.
+Weapon preparation accepts selected IDs. Regular runtime/startup/preview requests
+omit the special-weapon family; pan/beam selections coalesce one lazy family load.
+Raw source preparation remains shared across selections and full-catalogue callers
+retain their default behavior. Selected cutout preparation checks only its required
+family. Preview weapon changes repaint after preparation without advancing effects;
+suspension/disposal suppress late repaint. Loaded special inputs currently remain
+resident until renderer disposal; this does not enforce a whole-game memory cap.
 
 Worker export closes unpinned raw decoded inputs after every plane copy settles
 and retires composition/foreground canvases before posting independent bitmaps.

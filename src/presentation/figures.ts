@@ -74,7 +74,7 @@ export function createFiguresPresentation(readViews: () => FigureViews) {
       void inkEnemy.prepare();
       inkPlayer.select(EQ.robe);
       void inkPlayer.prepare();
-      void inkSword.prepare();
+      void inkSword.prepare([]);
     }
     return createFigureRenderer(g, {
       inkCharm,

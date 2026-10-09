@@ -1,6 +1,49 @@
 import { test, expect } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('regular preparation skips special inputs and special selections share one lazy preparation', async ({
+  page,
+}) => {
+  let specialRequests = 0;
+  await page.route(/special-weapons-atlas(?:_normal|_surface)?\.webp(?:\?|$)/, async (route) => {
+    specialRequests++;
+    await route.continue();
+  });
+  await page.goto('/privacy/index.html');
+  await page.evaluate(async () => {
+    const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
+    const sword = ((window as any).__selectedSword = createInkSwordRenderer(document));
+    if (
+      !(await sword.prepareParts(['steel'])) ||
+      !sword.ready ||
+      sword.snapshot().loaded.includes('special')
+    )
+      throw Error('Regular preparation loaded special inputs or failed readiness');
+  });
+  expect(specialRequests).toBe(0);
+  const result = await page.evaluate(async () => {
+    const sword = (window as any).__selectedSword;
+    try {
+      const first = sword.prepare(['pan']),
+        second = sword.prepare(['koken']);
+      const shared = first === second;
+      await first;
+      const uploads = await sword.prepareUploads(['pan', 'koken'], new AbortController().signal);
+      return {
+        shared,
+        ready: sword.ready,
+        special: sword.snapshot().loaded.includes('special'),
+        uploads: uploads.length,
+      };
+    } finally {
+      sword.dispose();
+    }
+  });
+  expect(specialRequests).toBe(3);
+  expect(result).toMatchObject({ shared: true, ready: true, special: true });
+  expect(result.uploads).toBeGreaterThan(0);
+});
+
 test('selected weapon cutouts match cold native draws without first-use readbacks', async ({
   page,
 }, testInfo) => {

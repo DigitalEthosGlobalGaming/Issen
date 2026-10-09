@@ -1,4 +1,41 @@
-# Mobile performance — GPU upload reservations and resident trimming
+# Mobile performance — Selected special-weapon inputs
+
+App1.69.34 ordinary runtime/startup/preview weapon requests omit special inputs.
+prepare(ids) coalesces base/all requests and raw source promises; default no-argument
+full-catalogue preparation stays compatible. Selected cutouts check required-family
+readiness. Pan/beam requests lazily load special colour/normal/surface3planes,
+18,882,456nominal decoded bytes. Preview selection prepares cutouts, repaints
+without advancing effects, and suppresses stale repaint after suspension/disposal.
+Draw avoids repeated preparation once its raw family is ready. Art/materials unchanged.
+
+Four focused browser cases PASS4.5s: ordinary preparation makes0special requests,
+pan/beam share1family preparation (3requests), exact cold/prepared cutout pixels,
+hidden/disposal and preview repaint timing. Evidence
+`tmp/test-results/browser/selected-weapon-inputs/`. Existing catalogue tests retain
+full preparation and exact pixel gates. Full4case production suite PASS19.5s,
+including checked build/strict TypeScript, startup/Armoury/run, edition gates and
+offline resize. Log `tmp/probes/selected-weapon-production.log`; results
+`tmp/test-results/production/selected-weapon-inputs/`.
+
+Same low-memory regular-loadout Demon/inspection capture maximum536,325,656bytes
+(511.5MiB), inspection334MiB/restored title402MiB. Evidence
+`tmp/probes/realm-preview-memory-selected-weapons.json`. Narrow margin, one viewport;
+no all-scenario/physical cap claim. After first special selection, its inputs remain
+resident until disposal; selected-family lifetime/compact prepared planes still
+needed for special loadouts and long-run admission. Native scratch/renderbuffer
+headroom and final matrix remain.
+
+Two room experiments rejected/reverted: shrinking baked room only within its layout
+class did not address portrait inspection→landscape-style normal preview; retiring
+old room material planes did not reduce the observed peak. Evidence
+`tmp/probes/realm-preview-memory-{room-shrink,room-material-retired}.json`; no source
+changes retained. Do not repeat those unchanged probes. Goal remains active;
+historical software/GPU copy mismatch, broader final tests/matrix and physical
+Android/120Hz evidence outstanding. Synchronized metadata/title/changelog1.69.34;
+format/diff checks PASS. No push/deploy/native build/save changes; cancelled packing/lit-only stays
+cancelled.
+
+## Previous handoff — GPU upload reservations and resident trimming
 
 App1.69.33 reserves uninitialized source/target texture bytes in the painter's
 combined ledger. Concurrent jobs deduplicate source identities; formats/mips

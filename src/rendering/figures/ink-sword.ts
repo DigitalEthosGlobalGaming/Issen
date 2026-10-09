@@ -37,7 +37,7 @@ const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: st
 };
 /** Instance-owned modular weapon cache. Caller owns effects and local figure transforms. */
 export function createInkSwordRenderer(doc: Document) {
-  const fittings = createAssetMaterials(doc, { hilts: SOURCES.hilts, special: SOURCES.special });
+  const fittings = createAssetMaterials<string>(doc, { hilts: SOURCES.hilts });
   const materials = new Map<number, SceneMaterial>();
   const surface = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   const images = new Map<SourceKind, HTMLImageElement>(),
@@ -45,47 +45,60 @@ export function createInkSwordRenderer(doc: Document) {
     cache = new Map<string, HTMLCanvasElement>(),
     finish = new Set<() => void>();
   let disposed = false,
-    pending: Promise<void> | undefined;
+    specialRequested = false;
+  const preparations = new Map<string, Promise<void>>();
+  const sourcePreparations = new Map<SourceKind, Promise<void>>();
   const partPreparations = new Map<string, Promise<boolean>>();
   const preparation = new AbortController();
   const pbrReady = () =>
     !disposed &&
     ['normal', 'surface'].every((kind) => loaded.has(kind as MapKind)) &&
     (!SOURCES.emissive || loaded.has('emissive'));
-  function prepare(): Promise<void> {
-    if (pending) return pending;
+  function prepare(ids: readonly string[] = Object.keys(BLADE_RECIPES)): Promise<void> {
     if (disposed) return Promise.resolve();
-    pending = Promise.all(
+    const special = ids.some((id) => BLADE_RECIPES[id]?.special);
+    const key = special ? 'all' : 'base';
+    const prior = preparations.get(key);
+    if (prior) return prior;
+    specialRequested ||= special;
+    fittings.select({
+      hilts: SOURCES.hilts,
+      ...(specialRequested ? { special: SOURCES.special } : {}),
+    });
+    const pending = Promise.all(
       (Object.keys(SOURCES) as SourceKind[])
-        .filter((kind) => SOURCES[kind])
-        .map(
-          (family) =>
-            new Promise<void>((resolve) => {
-              const im =
-                family === 'surface'
-                  ? surface
-                  : trackPixelSource(doc, doc.createElement('img'), 'decoded');
-              images.set(family, im);
-              const done = () => {
-                im.onload = null;
-                im.onerror = null;
-                finish.delete(done);
-                resolve();
-              };
-              finish.add(done);
-              im.onload = () => {
-                const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
-                if (!disposed && im.naturalWidth === w && im.naturalHeight === h)
-                  loaded.add(family);
-                done();
-              };
-              im.onerror = done;
-              im.src = SOURCES[family]!;
-            }),
-        ),
+        .filter((kind) => SOURCES[kind] && (kind !== 'special' || special))
+        .map((family) => {
+          const prior = sourcePreparations.get(family);
+          if (prior) return prior;
+          const loading = new Promise<void>((resolve) => {
+            const im =
+              family === 'surface'
+                ? surface
+                : trackPixelSource(doc, doc.createElement('img'), 'decoded');
+            images.set(family, im);
+            const done = () => {
+              im.onload = null;
+              im.onerror = null;
+              finish.delete(done);
+              resolve();
+            };
+            finish.add(done);
+            im.onload = () => {
+              const [w, h] = family === 'special' ? [1774, 887] : [1254, 1254];
+              if (!disposed && im.naturalWidth === w && im.naturalHeight === h) loaded.add(family);
+              done();
+            };
+            im.onerror = done;
+            im.src = SOURCES[family]!;
+          });
+          sourcePreparations.set(family, loading);
+          return loading;
+        }),
     ).then(async () => {
       await fittings.prepare();
     });
+    preparations.set(key, pending);
     return pending;
   }
   function fittingStamp(
@@ -149,8 +162,8 @@ export function createInkSwordRenderer(doc: Document) {
     const key = selected.join(':');
     const prior = partPreparations.get(key);
     if (prior) return prior;
-    const pendingParts = prepare().then(async () => {
-      if (disposed || !ready()) return false;
+    const pendingParts = prepare(selected).then(async () => {
+      if (disposed || !ready(selected)) return false;
       const stamps: { family: Family; frame: Frame; tint?: string }[] = [];
       for (const id of selected) {
         const recipe = BLADE_RECIPES[id]!;
@@ -184,12 +197,15 @@ export function createInkSwordRenderer(doc: Document) {
     partPreparations.set(key, pendingParts);
     return pendingParts;
   }
-  function ready() {
+  function ready(ids: readonly string[] = specialRequested ? Object.keys(BLADE_RECIPES) : []) {
+    const special = ids.some((id) => BLADE_RECIPES[id]?.special);
     return (
-      loaded.size === Object.values(SOURCES).filter(Boolean).length &&
+      (Object.keys(SOURCES) as SourceKind[])
+        .filter((kind) => SOURCES[kind] && kind !== 'special')
+        .every((kind) => loaded.has(kind)) &&
       pbrReady() &&
       fittings.ready('hilts') &&
-      fittings.ready('special')
+      (!special || (loaded.has('special') && fittings.ready('special')))
     );
   }
   async function prepareUploads(
@@ -246,9 +262,10 @@ export function createInkSwordRenderer(doc: Document) {
       length = bs?.len ?? 0.52;
     if (disposed || !recipe || ![gx, gy, ang, length].every(Number.isFinite) || length <= 0)
       return false;
-    void prepare();
-    if (recipe.special ? !loaded.has('special') : !loaded.has('blades') || !loaded.has('hilts'))
+    if (recipe.special ? !loaded.has('special') : !loaded.has('blades') || !loaded.has('hilts')) {
+      void prepare([id]);
       return false;
+    }
     // Resolve all required stamps before touching the caller's context.
     if (recipe.special) {
       const frame = SPECIAL_FRAMES[recipe.special],
@@ -377,6 +394,8 @@ export function createInkSwordRenderer(doc: Document) {
       disposed = true;
       preparation.abort();
       partPreparations.clear();
+      preparations.clear();
+      sourcePreparations.clear();
       fittings.dispose();
       materials.clear();
       for (const im of images.values()) {
