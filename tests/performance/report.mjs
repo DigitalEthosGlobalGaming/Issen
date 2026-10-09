@@ -8,6 +8,9 @@ export function stats(values) {
     count: a.length,
     median: a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2,
     p95: a[Math.max(0, Math.ceil(a.length * 0.95) - 1)],
+    p99: a[Math.max(0, Math.ceil(a.length * 0.99) - 1)],
+    over8_3: a.filter((v) => v > 8.3).length,
+    over16_7: a.filter((v) => v > 16.7).length,
     min: a[0],
     max: a.at(-1),
   };
@@ -42,6 +45,8 @@ export function comparison(current, baseline) {
     'dpr',
     'buildMode',
     'quality',
+    'drift',
+    'cpuRate',
     'seed',
     'warmup',
     'duration',

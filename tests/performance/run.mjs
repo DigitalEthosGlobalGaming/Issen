@@ -70,6 +70,8 @@ const manifest = {
   buildMode: 'production instrumented; offline fonts; free edition',
   instrumentation: toolHash.digest('hex'),
   quality: 'high',
+  drift: config.drift,
+  cpuRate: config['cpu-rate'],
   seed: config.seed,
   warmup: config.warmup,
   duration: config.duration,

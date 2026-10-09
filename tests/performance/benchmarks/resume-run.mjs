@@ -63,6 +63,8 @@ const config = options([
   `--warmup=${manifest.warmup}`,
   `--duration=${manifest.duration}`,
   `--repeats=${manifest.repeats}`,
+  `--drift=${manifest.drift ?? 'current'}`,
+  `--cpu-rate=${manifest.cpuRate ?? 1}`,
 ]);
 config.scenarios = manifest.scenarios;
 const out = path.resolve(

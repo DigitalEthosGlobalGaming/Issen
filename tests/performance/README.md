@@ -37,6 +37,20 @@ without stopping or reusing the other server.
 
 ## Scenarios and workload
 
+Drift comparisons use `--suite=drift --drift=off|current|new --mode=timing`.
+The switch exists only in instrumented builds: off skips leaf and ember submission
+while keeping asset preparation and cosmetic simulation. Current uses the existing
+PBR renderer; new fails explicitly until the replacement path is implemented.
+Calm suppresses gust particles; gust adds repeated bursts through the normal
+cosmetic spawn function. Guards require leaves in both scenes, zero gust leaves
+in calm and gust leaves in gust. This is a controlled sustained-gust workload,
+not an unchanged natural-weather run. Raw frame/render statistics include p99
+and counts above 8.3/16.7 ms. `--cpu-rate=4` applies CDP CPU throttling on web;
+it approximates slower CPU execution, not mobile GPU bandwidth or 120 Hz delivery.
+Record separate off/current/new arms with the same settings. The baseline
+comparison command rejects changed drift modes or throttle rates; cross-mode
+cost comparisons must explicitly identify the differing mode.
+
 - `menus`: title, Stats, Options, Armoury, inspection, setup, Temple, Trials,
   pause and reduced-motion title. Only Scroll menus exist in the application.
 - `gameplay`: combat, Demon Mirror, Glitch, Inferno and Scattered Armour kills.

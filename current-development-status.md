@@ -1,4 +1,39 @@
-# Performance, assets and seamless transitions — Selected weapon preparation
+# Mobile performance — Drift baseline and atlas preparation
+
+The new [active goal](goal-objective.md) supersedes the earlier exact-pixel
+performance objective. Visual simplification is authorized when the game's feel
+and readability remain good. Worker scenery becomes required; automatic local
+fallback will be replaced with clear error/retry recovery. Existing checkpoint64
+implementation remains intact; tooling checkpoint bumps metadata to app1.69.14. No push/deployment/native build/save
+changes. General packing and the separate lit-only integration remain cancelled;
+the requested merged drift atlas is a scoped exception.
+
+The performance runner now provides test-build-only off/current drift modes,
+calm/gust fixtures, CPU throttling and p99/8.3/16.7ms statistics. New mode fails
+explicitly until implemented. Calm must remove combat-generated gusts after
+simulation; initial contaminated captures are retained but excluded. Runtime
+application code is unchanged. Seven performance-tool checks pass.
+
+The reproducible generator produces a trial1024×512 colour/emissive atlas with
+128px cells,120px content and4px gutters. Full-set nominal decoded memory falls
+81,823,976→4,194,304bytes (94.87%); encoded4,378,340→155,694bytes. Two generator
+checks pass for alpha-safe resizing, odd source boundaries, frames and gutters.
+Trial sheets reviewed; actual daylight/dark/fire/gust and DPR3 checks remain.
+
+Corrected baseline passes all24 samples: off/current × calm/gust × CPU rate1/4
+× three repetitions. The evidence document records run paths, timing and caveats.
+Desktop off/current CPU deltas are noisy; no isolated GPU-cost or120Hz claim.
+All measurement handles are terminal. No full application suite was rerun for
+this test-tool/generator-only chunk; baseline builds include strict TypeScript.
+
+See [continuation evidence and decisions](docs/development/mobile-performance-progress.md).
+Next: integrate merged atlas, drift-only mipmaps and one-pass lit rendering;
+compare saved controls before completing drift checkpoint. Then worker recovery
+and transition/resource integration. Full suites are reserved for substantial
+checkpoints and final verification. Package/lock/title/changelog agree at1.69.14;
+baseline controls were captured at1.69.13 before this metadata-only bump.
+
+## Previous handoff — Selected weapon preparation
 
 Checkpoint64 completes selected weapon cutout preparation and fixes repeated worker
 preparation invalidating completed scenes, app1.69.13. Goal remains active at full

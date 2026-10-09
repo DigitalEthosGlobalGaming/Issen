@@ -39,16 +39,24 @@ test('CLI rejects misspelled scenarios and unsafe measurement configuration', ()
     ['--port=1'],
     ['--viewport=x'],
     ['--typo'],
+    ['--drift=typo'],
+    ['--cpu-rate=0.5'],
+    ['--target=emulator', '--cpu-rate=4'],
   ])
     assert.throws(() => options(args));
   assert.deepEqual(options([]).scenarios, allScenarios);
   assert.deepEqual(options(['--scenario=combat,combat']).scenarios, ['combat']);
+  assert.deepEqual(options(['--suite=drift']).scenarios, ['drift-calm', 'drift-gust']);
+  assert.equal(options(['--drift=off', '--cpu-rate=4'])['cpu-rate'], 4);
 });
 test('statistics distinguish absent callbacks from zero-time work', () => {
   assert.equal(stats([]).median, null);
   assert.equal(stats([0, 0]).median, 0);
   assert.equal(stats([4, 1, 3, 2]).median, 2.5);
   assert.equal(stats([4, 1, 3, 2]).p95, 4);
+  assert.equal(stats([1, 9, 17]).p99, 17);
+  assert.equal(stats([1, 9, 17]).over8_3, 2);
+  assert.equal(stats([1, 9, 17]).over16_7, 1);
 });
 test('baseline comparison refuses changed conditions and failed baselines', () => {
   const a = { manifest: { target: 'web', dpr: 2 }, samples: [], status: 'passed' };
@@ -79,8 +87,35 @@ test('test-only runtime transform fails loudly if application anchors drift', ()
   );
   const config = readFileSync(new URL('../../vite.config.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(config, /performancePlugin|tests\/performance/);
+  const drift = readFileSync(
+    new URL('../../src/rendering/scene/drift-renderer.ts', import.meta.url),
+    'utf8',
+  );
+  const driftInstrumented = instrumentRuntime(drift, 'src/rendering/scene/drift-renderer.ts');
+  assert.match(driftInstrumented.code, /driftProbeMode === 'off'/);
+  assert.match(driftInstrumented.code, /New drift path is not implemented/);
+  assert.doesNotMatch(drift, /driftProbeMode|location.search/);
 });
 test('scenario invariants detect stress drift, dead runs and inactive simulation', () => {
+  assert.throws(
+    () =>
+      checkState(
+        'drift-calm',
+        { driftLeaves: 30, gustLeaves: 2 },
+        { driftLeaves: 30, gustLeaves: 0 },
+      ),
+    /Calm/,
+  );
+  assert.throws(
+    () =>
+      checkState(
+        'drift-gust',
+        { driftLeaves: 30, gustLeaves: 0 },
+        { driftLeaves: 30, gustLeaves: 0 },
+      ),
+    /Gust/,
+  );
+  checkState('drift-calm', { driftLeaves: 30, gustLeaves: 0 }, { driftLeaves: 30, gustLeaves: 0 });
   assert.throws(
     () => checkState('stress-100', { enemies: 100 }, { enemies: 99, kills: 0 }),
     /Stress/,
