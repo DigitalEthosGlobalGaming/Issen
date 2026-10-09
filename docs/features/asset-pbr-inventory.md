@@ -7,6 +7,16 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.41, the256MiB tier copies selected outfit families into four finite parts
+(max256px per part) and charms into12parts (max128px). Original colour planes and
+aligned normal/surface/optional emissive are copied through the existing prepared
+figure helper. Main-image leases unpin raw inputs after copying; preview borrowers
+share the selected outfit family. Headwear parts use2,178,048nominal bytes instead
+of18,870,192raw bytes; charm parts1,634,304instead of18,874,368. Existing tint/sprite
+canvases are additional. Higher tiers retain original sampling. Representative
+monk/yoroi/mino+omikuji gameplay/preview visuals reviewed; subtle detail softening
+is intentional, with shapes/colours/lighting retained. Authored files unchanged.
+
 As of1.69.40, scene readiness warms the selected player outfit and charm through
 their existing material stamps and tint caches. Charm sprite canvases now join
 pixel accounting and notify GPU consumers before eviction/disposal. The temporary

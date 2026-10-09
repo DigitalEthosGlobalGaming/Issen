@@ -3,6 +3,7 @@ import type { SceneMaterial } from '../scene-frame.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
 import { nextVisibleFrame, paceTextureUploads } from '../texture-upload.ts';
+import type { MainImageOwner } from '../../platform/main-images.ts';
 
 type Frame = readonly [number, number, number, number];
 /** Low-memory figure inputs become finite aligned part planes, not a second atlas. */
@@ -13,8 +14,9 @@ export function createPreparedFigureAtlas(
   height: number,
   frames: readonly Frame[],
   compact: boolean,
+  options: { images?: MainImageOwner; maxSize?: number } = {},
 ) {
-  const atlas = createPbrAtlas(doc, sources, width, height);
+  const atlas = createPbrAtlas(doc, sources, width, height, options);
   const parts = new Map<string, { colour: HTMLCanvasElement; material: SceneMaterial }>();
   const canvases: HTMLCanvasElement[] = [];
   const lifetime = new AbortController();
@@ -22,7 +24,7 @@ export function createPreparedFigureAtlas(
     pending: Promise<boolean> | undefined;
   function copy(source: CanvasImageSource, frame: Frame) {
     const canvas = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
-    const ratio = 256 / Math.max(frame[2], frame[3]);
+    const ratio = (options.maxSize ?? 256) / Math.max(frame[2], frame[3]);
     canvas.width = Math.max(1, Math.round(frame[2] * ratio));
     canvas.height = Math.max(1, Math.round(frame[3] * ratio));
     canvases.push(canvas);
@@ -71,12 +73,24 @@ export function createPreparedFigureAtlas(
     material(frame: Frame) {
       return ready ? (parts.get(frame.join(','))?.material ?? atlas.material(frame)) : null;
     },
-    dispose() {
+    textureSources() {
+      return compact
+        ? [...canvases]
+        : [
+            atlas.diffuse,
+            ...['normal', 'surface', 'emissive'].map(
+              (kind) =>
+                atlas.material([0, 0, width, height])?.[kind as 'normal' | 'surface' | 'emissive']
+                  ?.source,
+            ),
+          ].filter((source) => !!source);
+    },
+    dispose(preserveFrame = false) {
       lifetime.abort();
       ready = false;
-      atlas.dispose();
+      atlas.dispose(preserveFrame);
       for (const canvas of canvases) {
-        retireSceneTexture(canvas);
+        retireSceneTexture(canvas, preserveFrame);
         canvas.width = canvas.height = 0;
       }
       canvases.length = 0;

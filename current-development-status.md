@@ -1,6 +1,57 @@
 # Current development status
 
-## Current handoff — selected player and charm warming
+## Current handoff — compact low-memory accessories
+
+App1.69.41 reuses prepared-figure atlas copying for the256MiB tier: outfit families
+have four aligned parts capped256px; charms have12parts capped128px. Copies preserve
+original colour sources and logical attachment geometry; colour/normal/surface/
+optional emissive align. Shared main-image leases unpin inputs after copies finish;
+pressure can close raw planes without invalidating parts. Primary/preview outfit
+borrowers share one family; final release retires parts/tints. Higher tiers retain
+original sampling. Existing enemy helper policy unchanged. Snapshots expose part
+pixels. Headwear backing2,178,048bytes replaces18,870,192raw; charm1,634,304replaces
+18,874,368, excluding additional existing tint/sprite canvases.
+
+Outfit-only daily first next scene changed denied→ready,23.2ms presentation/sample
+peak506.8MiB, but full loop still denied8→0. Adding finite charm maps completes all
+nine controlled daily next-stage preparations/promotions:21.3–33.8ms waits, sampled
+peak509.2MiB. Rush also completes all nine, including formerly denied8→0: first
+211ms (changed enemy-palette preparation unresolved), later9.7–19.1ms; peak511.6MiB.
+These run actual frame-loop samples with no injected quiet samples, but control
+paused state/ordinals/stage entry; not natural combat progression, all transients
+or physical residency proof. Evidence `tmp/probes/daily-compact-outfit.json`,
+`automatic-next-scene-daily-compact-outfit.json`, and
+`automatic-next-scene-{daily,rush}-compact-accessories.json`.
+
+Fixed-pose monk/yoroi/mino plus omikuji screenshots at gameplay/preview sizes reviewed
+before/after; coherent silhouettes/colours/lighting retained, subtle softening
+accepted. Same low-tier control disables only accessory compaction. Three-player
+fixture managed GPU119,591,528→57,187,376bytes; raw inputs remain evictable in the
+main pool, not automatically gone at screenshot time. Main pinned bytes
+100,645,200→25,160,256. This fixture is not a whole-game memory cap.
+Evidence `tmp/probes/accessory-visual-{before,after}.{json,png}`.
+
+Strict TypeScript PASS; four PBR lifetime and scene-occlusion units PASS. Five
+focused browser checks PASS5.5s/default2workers: low/high selected artwork warming,
+forced raw eviction with unchanged repeated pixels/zero first-use uploads, high
+primary/preview selection, cancellation, low hidden/context recovery/final GPU0.
+Results `tmp/test-results/browser/compact-accessories/`. New compact preview test
+PASS2.7s: one shared backing across primary/two borrowers, all raw inputs close,
+exact drawable pixels, last borrower releases native sources0. Additional part
+pixel bound PASS3.2s (`compact-accessory-preview/`, `compact-accessory-bounds/`).
+Checked production build/strict TypeScript plus startup/Armoury/run/landscape and
+offline-resize smoke cases PASS10.1s/default2workers. Results
+`tmp/test-results/production/compact-accessories/`.
+
+Goal active: future boss palette scheduling and companion first-use, natural run
+progression/viewport/special-loadout coverage, mandatory/transient/native bounds,
+historical native colour mismatch, final cold/warm/frame/compose matrix and
+applicable suites remain. Physical Android/120Hz evidence unavailable. First
+rush palette wait remains actionable; avoid repeating unchanged whole matrices.
+All sessions terminal; no push/deploy/native build/real-save changes. Cancelled
+packing/lit-only stays cancelled.
+
+## Previous handoff — selected player and charm warming
 
 App1.69.40 includes the selected robe/charm and actual charm colour in scene figure
 readiness. Player preparation captures existing body/arms/head material stamps in

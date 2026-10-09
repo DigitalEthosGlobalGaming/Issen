@@ -1,5 +1,76 @@
 import { expect, test } from '@playwright/test';
 
+test('compact outfit previews share finite backing after raw input eviction', async ({ page }) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createOutfitKit } = await import('/src/rendering/figures/outfit-kit.ts');
+    const { trimMainImages } = await import('/src/platform/main-images.ts');
+    const { documentPixelMemory } = await import('/src/platform/pixel-memory.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 120;
+    canvas.height = 120;
+    const drawing = await createTestDrawing(canvas),
+      kit = createOutfitKit(document);
+    kit.select('kasa');
+    await kit.prepare();
+    const first = documentPixelMemory(document).snapshot().canvasBytes;
+    const a = kit.borrow(),
+      b = kit.borrow();
+    a.select('monk');
+    b.select('kasa');
+    await Promise.all([a.prepare(), b.prepare()]);
+    const shared = documentPixelMemory(document).snapshot().canvasBytes;
+    kit.select('sumi');
+    const draw = () => {
+      drawing.begin();
+      drawing.save();
+      drawing.translate(60, 110);
+      drawing.scale(90, 90);
+      kit.draw(drawing, 'head', {
+        x: 0,
+        y: 0,
+        h: 1,
+        fog: 0,
+        robeId: 'monk',
+        d: makeFig(1),
+        pose: EPOSE.left,
+      });
+      drawing.restore();
+      drawing.flush();
+      return canvas.toDataURL();
+    };
+    const before = draw();
+    trimMainImages(document, Infinity);
+    const evicted = kit.snapshot(),
+      after = draw();
+    a.dispose();
+    const peer = kit.snapshot();
+    b.dispose();
+    drawing.begin();
+    drawing.flush();
+    const released = kit.snapshot(),
+      native = drawing.sourceTextureCount;
+    kit.dispose();
+    drawing.dispose();
+    return { first, shared, exact: before === after, evicted, peer, released, native };
+  });
+  expect(result.shared).toBe(result.first);
+  expect(result.exact).toBe(true);
+  expect(result.evicted).toMatchObject({
+    compact: true,
+    loaded: ['headwear'],
+    decodedLoader: { bytes: 0, pinned: 0 },
+  });
+  expect(result.evicted.partPixels).toBeGreaterThan(0);
+  expect(result.evicted.partPixels).toBeLessThanOrEqual(4 * 256 * 256 * 3);
+  expect(result.peer.loaded).toEqual(['headwear']);
+  expect(result.released.loaded).toEqual([]);
+  expect(result.native).toBe(0);
+});
+
 test('outfit primary and preview selections share pins and release only unused families', async ({
   page,
 }) => {

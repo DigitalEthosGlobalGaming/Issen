@@ -4,7 +4,9 @@ import type { Figure } from './types.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
-import { createMainImageOwner } from '../../platform/main-images.ts';
+import { createMainImageOwner, documentImageBudget } from '../../platform/main-images.ts';
+import { createPreparedFigureAtlas } from './prepared-atlas.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { PixiScenePainter } from '../pixi/scene-painter.ts';
 
 type AtlasKey = 'armour' | 'headwear' | 'cloth' | 'masks' | 'special';
@@ -188,9 +190,11 @@ const FRAMES: Record<AtlasKey, readonly Frame[]> = {
 };
 export function createOutfitKit(doc: Document) {
   const owner = createMainImageOwner(doc);
+  const compact = documentImageBudget(doc) <= 256 * 1024 * 1024;
   type Kit = {
-    lease: ReturnType<typeof owner.acquire>;
-    materials: ReturnType<typeof createAssetMaterials<'atlas'>>;
+    parts?: ReturnType<typeof createPreparedFigureAtlas>;
+    lease?: ReturnType<typeof owner.acquire>;
+    materials?: ReturnType<typeof createAssetMaterials<'atlas'>>;
     pending: Promise<boolean>;
   };
   const kits = new Map<AtlasKey, Kit>();
@@ -206,7 +210,8 @@ export function createOutfitKit(doc: Document) {
   const required = (id?: string): readonly AtlasKey[] =>
     INK_OUTFIT_RECIPES[id ?? '']?.required ?? [];
   function sources(key: AtlasKey, kit: Kit) {
-    const material = kit.materials.material('atlas', [0, 0, 1254, 1254]);
+    if (kit.parts) return kit.parts.textureSources();
+    const material = kit.materials!.material('atlas', [0, 0, 1254, 1254]);
     return [
       images.get(key),
       material?.normal?.source,
@@ -234,8 +239,9 @@ export function createOutfitKit(doc: Document) {
         canvas.width = canvas.height = 0;
         tinted.delete(id);
       }
-    kit.materials.dispose();
-    kit.lease.release();
+    kit.parts?.dispose(preserveFrame);
+    kit.materials?.dispose();
+    kit.lease?.release();
     kits.delete(key);
     images.delete(key);
     loaded.delete(key);
@@ -248,6 +254,26 @@ export function createOutfitKit(doc: Document) {
     for (const [key, kit] of kits) if (!selection.has(key)) release(key, kit);
     for (const key of selection) {
       if (kits.has(key)) continue;
+      if (compact) {
+        const maps = assetMaterialCatalog.find((pack) => pack.source === SOURCES[key])!.maps;
+        const parts = createPreparedFigureAtlas(
+          doc,
+          { ...maps, diffuse: SOURCES[key] },
+          1254,
+          1254,
+          FRAMES[key],
+          true,
+          { images: owner },
+        );
+        const kit: Kit = { parts, pending: Promise.resolve(false) };
+        kits.set(key, kit);
+        kit.pending = parts.prepare().then((ready) => {
+          if (!ready || disposed || kits.get(key) !== kit) return false;
+          loaded.add(key);
+          return true;
+        });
+        continue;
+      }
       const lease = owner.acquire(SOURCES[key]);
       const materials = createAssetMaterials(doc, { atlas: SOURCES[key] }, owner);
       const kit: Kit = { lease, materials, pending: Promise.resolve(false) };
@@ -327,10 +353,13 @@ export function createOutfitKit(doc: Document) {
     );
   }
   function stamp(g: SceneDrawing, a: Attachment, lean: number) {
-    const image = images.get(a.atlas),
+    const kit = kits.get(a.atlas),
       frame = FRAMES[a.atlas][a.frame];
-    if (!image || !frame) return;
-    const [sx, sy, sw, sh] = frame;
+    if (!kit || !frame) return;
+    const colour = kit.parts?.colour(frame);
+    const image = colour?.source ?? images.get(a.atlas);
+    if (!image) return;
+    const [sx, sy, sw, sh] = colour?.frame ?? frame;
     let source: CanvasImageSource = image;
     if (a.tint) {
       const key = a.atlas + ':' + a.frame + ':' + a.tint;
@@ -350,13 +379,13 @@ export function createOutfitKit(doc: Document) {
       }
       source = c;
     }
-    const h = (a.width * sh) / sw;
+    const h = (a.width * frame[3]) / frame[2];
     const x = a.x + lean - a.width * (a.anchorX ?? 0.5),
       y = a.y - h * (a.anchorY ?? 0);
-    const material = kits.get(a.atlas)?.materials.material('atlas', frame);
+    const material = kit.parts?.material(frame) ?? kit.materials?.material('atlas', frame);
     if (material)
       drawMaterialStamp(g, {
-        texture: { source, revision: 0, frame: a.tint ? undefined : frame },
+        texture: { source, revision: 0, frame: a.tint ? undefined : (colour?.frame ?? frame) },
         material,
         x,
         y,
@@ -462,6 +491,15 @@ export function createOutfitKit(doc: Document) {
       }
     },
     snapshot: () => ({
+      compact,
+      partPixels: [...kits.values()].reduce(
+        (pixels, kit) =>
+          pixels +
+          (kit.parts
+            ?.textureSources()
+            .reduce((total, source) => total + source.width * source.height, 0) ?? 0),
+        0,
+      ),
       loaded: [...loaded],
       tints: tinted.size,
       outfits: Object.keys(INK_OUTFIT_RECIPES).filter(ready),

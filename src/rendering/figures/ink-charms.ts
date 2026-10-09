@@ -1,7 +1,9 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
-import { createMainImageOwner } from '../../platform/main-images.ts';
+import { createMainImageOwner, documentImageBudget } from '../../platform/main-images.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+import { createPreparedFigureAtlas } from './prepared-atlas.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
 import { materialTextureUploads, nextVisibleFrame, type TextureUpload } from '../texture-upload.ts';
@@ -48,7 +50,20 @@ const RECIPES: Record<string, readonly [number, string?]> = {
 /** Caller owns position/animation; this renderer only replaces the physical charm. */
 export function createInkCharmRenderer(doc: Document) {
   const images = createMainImageOwner(doc);
-  const materials = createAssetMaterials(doc, { charms: ATLAS_URL }, images);
+  const compact = documentImageBudget(doc) <= 256 * 1024 * 1024;
+  const materials = compact ? undefined : createAssetMaterials(doc, { charms: ATLAS_URL }, images);
+  const pack = assetMaterialCatalog.find((pack) => pack.source === ATLAS_URL)!;
+  const parts = compact
+    ? createPreparedFigureAtlas(
+        doc,
+        { ...pack.maps, diffuse: ATLAS_URL },
+        1536,
+        1024,
+        FRAMES,
+        true,
+        { images, maxSize: 128 },
+      )
+    : undefined;
   let image: HTMLImageElement | undefined;
   let pending: Promise<boolean> | undefined;
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
@@ -57,8 +72,15 @@ export function createInkCharmRenderer(doc: Document) {
     if (state === 'disposed') return Promise.resolve(false);
     if (pending) return pending;
     state = 'loading';
+    if (parts) {
+      return (pending = parts.prepare().then((ready) => {
+        if (state === 'disposed') return false;
+        state = ready ? 'ready' : 'unavailable';
+        return ready;
+      }));
+    }
     const lease = images.acquire(ATLAS_URL);
-    pending = Promise.all([lease.ready, materials.prepare()]).then(
+    pending = Promise.all([lease.ready, materials!.prepare()]).then(
       ([img, maps]) => {
         if (state === 'disposed') return false;
         image = img;
@@ -76,19 +98,23 @@ export function createInkCharmRenderer(doc: Document) {
   }
   const preparation = new AbortController();
   function sprite(id: string, color?: string) {
-    if (!image || state !== 'ready') return;
+    if (state !== 'ready') return;
     const [cell, tone] = RECIPES[id]!;
-    const [sx, sy, sw, sh] = FRAMES[cell]!;
+    const frame = FRAMES[cell]!;
+    const colour = parts?.colour(frame);
+    const source = colour?.source ?? image;
+    if (!source) return;
+    const [sx, sy, sw, sh] = colour?.frame ?? frame;
     const tint = tone ?? color;
     const key = `${cell}:${tint ?? ''}`;
     let sprite = cache.get(key);
     if (!sprite) {
       sprite = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
-      sprite.width = Math.max(1, Math.round((128 * sw) / sh));
+      sprite.width = Math.max(1, Math.round((128 * frame[2]) / frame[3]));
       sprite.height = 128;
       const c = sprite.getContext('2d');
       if (!c) return false;
-      c.drawImage(image, sx, sy, sw, sh, 0, 0, sprite.width, sprite.height);
+      c.drawImage(source, sx, sy, sw, sh, 0, 0, sprite.width, sprite.height);
       if (tint) {
         c.globalCompositeOperation = 'source-atop';
         c.globalAlpha = tone ? 0.46 : 0.16;
@@ -104,7 +130,7 @@ export function createInkCharmRenderer(doc: Document) {
         cache.delete(oldest);
       }
     }
-    return { image: sprite, frame: FRAMES[cell]!, ratio: sw / sh };
+    return { image: sprite, frame: FRAMES[cell]!, ratio: frame[2] / frame[3] };
   }
   async function prepareUploads(
     id: string | undefined,
@@ -119,7 +145,7 @@ export function createInkCharmRenderer(doc: Document) {
     if (!part) return;
     return materialTextureUploads(
       { source: part.image, revision: 0 },
-      materials.material('charms', part.frame),
+      parts?.material(part.frame) ?? materials?.material('charms', part.frame),
     );
   }
   /** x/y is the top suspension point; size is full height in caller coordinates. */
@@ -134,12 +160,12 @@ export function createInkCharmRenderer(doc: Document) {
     if (!id || !Object.hasOwn(RECIPES, id) || ![x, y, size].every(Number.isFinite) || size <= 0)
       return false;
     if (state === 'idle') void prepare();
-    if (state !== 'ready' || !image) return false;
+    if (state !== 'ready') return false;
     const part = sprite(id, color);
     if (!part) return false;
     const { image: texture, frame } = part;
     const width = size * part.ratio;
-    const material = materials.material('charms', frame);
+    const material = parts?.material(frame) ?? materials?.material('charms', frame);
     if (material)
       drawMaterialStamp(g, {
         texture: { source: texture, revision: 0 },
@@ -158,13 +184,19 @@ export function createInkCharmRenderer(doc: Document) {
     draw,
     snapshot: () => ({
       state,
+      compact,
+      partPixels:
+        parts
+          ?.textureSources()
+          .reduce((pixels, source) => pixels + source.width * source.height, 0) ?? 0,
       cached: cache.size,
       supported: Object.keys(RECIPES),
       decodedLoader: images.snapshot(),
     }),
     dispose() {
       preparation.abort();
-      materials.dispose();
+      parts?.dispose();
+      materials?.dispose();
       images.dispose();
       state = 'disposed';
       image = undefined;

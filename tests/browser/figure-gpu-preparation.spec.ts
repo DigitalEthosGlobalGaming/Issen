@@ -161,6 +161,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
   test.setTimeout(60000);
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
     const { createNativeServices } = await import('/src/presentation/native-services.ts');
     const { makeFig, EPOSE } = await import('/src/shared/figure-model.ts');
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');

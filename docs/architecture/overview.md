@@ -837,6 +837,17 @@ yield and disposal cancels pending work. Colour/tone caches and material drawing
 consume those same prepared planes, including after context recovery. Higher
 memory tiers retain original atlas sampling. Gameplay/appearance seed selection
 is independent of this presentation policy.
+On the256MiB decoded tier, outfit families use the existing prepared-figure atlas
+helper: four finite aligned colour/material parts per family, capped256px on the
+longest edge. Primary and preview borrowers share each selected family. Charms use
+the same helper for12parts capped128px, matching their existing128px draw sprites.
+Original colour sources and logical attachment aspect ratios remain authoritative.
+Raw planes use main-image leases and unpin after copies finish; normal main-pool
+pressure can evict them without invalidating parts. Part/tint canvases remain tracked
+and retire on final family release. Higher tiers keep original atlas sampling.
+The helper accepts shared-image ownership and a part-size limit; its original enemy
+policy stays unchanged. Outfit/charm snapshots expose compact status and part pixels.
+
 Scene figure preparation includes the selected player robe and charm alongside
 enemy palettes and weapons. The player renderer captures its actual body/arm/head
 material stamps into a disposable1×1CPU sink, generating its existing outfit tints
