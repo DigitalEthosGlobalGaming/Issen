@@ -27,6 +27,9 @@ const dimensions = new Map<string, number>(
 
 /** Thread-independent policy comes from the renderer's owning document. */
 export function documentImageBudget(doc: Document): number {
+  // Worker documents own an explicit loader policy rather than a Window navigator.
+  const worker = doc as Document & { decodedSnapshot?: () => { budget: number } };
+  if (worker.decodedSnapshot) return worker.decodedSnapshot().budget;
   const navigator = doc.defaultView?.navigator as
     (Navigator & { deviceMemory?: number }) | undefined;
   return decodedImageBudget({

@@ -1,11 +1,18 @@
 # Game asset and PBR inventory
 
-Last reviewed: 9 October 2026. This is a manually maintained inventory of the
+Last reviewed: 10 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
 
 ## Scope and status
+
+As of1.69.38, the256MiB decoded tier limits composed scenery to600,000pixels per
+plane and bamboo foreground to240,000combined pixels, both at most1logical density.
+The shared allocation/admission policy includes the worker's explicit decode tier.
+Scenery detail intentionally softens; authored assets, layouts and PBR coverage
+remain unchanged. Portrait ordinary transferred backing falls28,837,440→15,799,680
+bytes; bamboo33,577,344→17,906,304bytes.
 
 As of1.69.36, Demon mist uses a reusable procedural radial canvas, capped512×512,
 instead of five changing gradient textures per frame. It is explicitly warmed,

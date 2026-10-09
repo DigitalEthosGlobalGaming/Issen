@@ -837,6 +837,14 @@ yield and disposal cancels pending work. Colour/tone caches and material drawing
 consume those same prepared planes, including after context recovery. Higher
 memory tiers retain original atlas sampling. Gameplay/appearance seed selection
 is independent of this presentation policy.
+The shared environment raster policy also uses the owning decoded-image budget,
+including the explicit worker document policy. On the256MiB tier, scenery backing
+uses at most one pixel per logical pixel and600,000pixels per plane; bamboo edge
+backing uses at most one pixel per logical pixel and240,000combined pixels.
+Admission estimates use the same policy as allocation. Higher tiers retain the
+1.5density/1,000,000scenery and2,000,000foreground pixel limits. This intentionally
+softens fine scenery detail without changing layout, recipes or seeds.
+
 The256MiB decode tier bounds the main drawing buffer to about600,000pixels and
 DPR1.5, keeping logical layout/input coordinates unchanged. Scene preparation
 reclaims unpinned main-image cache before work and before readiness, targeting

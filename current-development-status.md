@@ -1,6 +1,41 @@
 # Current development status
 
-## Current handoff — worker bitmap export reservations
+## Current handoff — low-memory scenery backing
+
+App1.69.38 shares scenery raster policy between actual allocation and next-stage
+admission. The256MiB decoded tier caps scenery at1logical density/600,000pixels
+per plane, bamboo foreground at1density/240,000combined pixels. Worker documents
+expose their explicit loader budget. Higher tiers retain prior limits; layouts,
+recipes and seeds stay intact. Fine scenery detail intentionally softens.
+
+Actual low-memory runtime probe previously denied the first next scene. With this
+policy all eight ordinary next stages prepare and promote without recomposition;
+presentation waits9.9–18.2ms. Sampled combined peak509.9MiB within512MiB, with narrow
+first-stage headroom. Probe explicitly supplies quiet samples: it proves real
+owners/assets/promotion, not automatic gameplay pacing or every transient.
+Evidence `tmp/probes/real-next-scene-{before,raster}.json`.
+Representative same-seed daylight/bamboo/fire/coast screenshots reviewed; coherent
+layout, silhouettes and lighting retained. Ordinary transferred backing
+28,837,440→15,799,680bytes; bamboo33,577,344→17,906,304bytes. Control disables only
+compact raster policy. Evidence `tmp/probes/raster-visual-{before,after}.json`
+and associated stage0/4/6/7 screenshots; intentional detail changes accepted.
+
+Strict TypeScript, two admission units and seven prediction/variation units PASS.
+Five focused browser lifecycle checks PASS7.7s/default2workers, including actual
+390×844 output atDPR3, phase accounting, next promotion/admission, busy cancellation
+and inactive-owner suspension. Results `tmp/test-results/browser/low-memory-raster/`.
+Checked production build/strict TypeScript and all four production smoke cases
+PASS18.6s/default2workers, including startup/Armoury/run/landscape, editions and
+offline resize. Results `tmp/test-results/production/low-memory-raster/`.
+
+Still required: automatic quiet-frame cadence across normal/daily/rush modes,
+return8→0, incoming figure variants, viewport/special-loadout memory coverage,
+whole transient/native bounds, historical native colour mismatch and final
+cold/warm/frame/compose matrix/applicable suites. Physical Android/120Hz evidence
+remains unavailable. Goal active; no push/deploy/native build/real-save changes.
+Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — worker bitmap export reservations
 
 App1.69.37 reserves independent bitmap copies before worker export, alongside its
 composed canvases. Counts every plane/foreground copy even with shared sources.

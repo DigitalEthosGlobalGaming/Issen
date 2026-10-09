@@ -1,3 +1,5 @@
+import { documentImageBudget } from '../../platform/main-images.ts';
+import { environmentRasterScale } from './raster-policy.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
@@ -249,13 +251,7 @@ export function createLocalEnvironmentRenderer(
     const { width: w, height: h } = frame;
     const stage = STAGES[frame.stage] ?? STAGES[0]!;
     // Bound backing pixels for tablets/4K desktops without changing world geometry.
-    const scale = Math.min(
-      Math.max(1, frame.dpr),
-      frame.lowQuality ? 1 : 1.5,
-      2560 / w,
-      1920 / h,
-      Math.sqrt(1_000_000 / (w * h)),
-    );
+    const scale = environmentRasterScale(frame, documentImageBudget(doc));
     const canvas = cached ?? doc.createElement('canvas');
     clearCachedMaterial(canvas);
     canvas.width = Math.max(1, Math.round(w * scale));

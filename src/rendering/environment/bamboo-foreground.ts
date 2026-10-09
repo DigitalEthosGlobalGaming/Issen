@@ -1,3 +1,5 @@
+import { documentImageBudget } from '../../platform/main-images.ts';
+import { foregroundRasterDensity } from './raster-policy.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import {
   drawCachedImage,
@@ -38,9 +40,11 @@ export function createBambooForegroundRenderer(doc: Document) {
       return false;
     // Narrower tablet planes leave all central encounter silhouettes unobstructed.
     const edge = width * (height >= width * 0.9 ? 0.2 : 0.24);
-    const density = Math.min(
-      frame.lowQuality ? 1 : 1.5,
-      Math.sqrt(2_000_000 / (2 * edge * height)),
+    const density = foregroundRasterDensity(
+      width,
+      height,
+      frame.lowQuality,
+      documentImageBudget(doc),
     );
     const next = `${width}:${height}:${density}`;
     if (key !== next || source !== atlas) {

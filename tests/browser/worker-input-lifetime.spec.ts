@@ -62,13 +62,13 @@ test('worker phase accounting includes pinned inputs without settling scene read
     try {
       const pending = owner
         .compose({
-          width: 120,
-          height: 180,
-          dpr: 1,
+          width: 390,
+          height: 844,
+          dpr: 3,
           stage: 1,
           stageSeed: 424242,
           time: 0,
-          lowQuality: true,
+          lowQuality: false,
           reducedMotion: true,
           reducedFlashes: true,
         })
@@ -91,6 +91,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
         handoffBytes,
         ready,
         final: owner.memorySnapshot,
+        size: { width: owner.snapshot().width, height: owner.snapshot().height },
       };
     } finally {
       owner.dispose();
@@ -118,6 +119,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
   expect(result.final.canvasBytes).toBe(0);
   expect(result.final.transferredBytes).toBeGreaterThan(0);
   expect(result.handoffBytes).toBe(result.final.transferredBytes);
+  expect(result.size).toEqual({ width: 390, height: 844 });
 });
 
 for (const policy of [
