@@ -1,4 +1,31 @@
-# Mobile performance — Preview room ownership and suspension
+# Mobile performance — Inspection occlusion
+
+App1.69.29 suspends the main scene while expanded equipment inspection covers it.
+Scene flow aborts figure preparation, invalidates pending requests, suspends the
+ordinary worker and releases Demon resources. Main painter targets/textures retire
+to1x1. Closing restores current geometry and prepares the same identity/seed;
+continuations survive and stale failures cannot open recovery. Resize while covered
+does not restart preparation. Preview remains independently animated.
+
+Actual390x844/DPR2/deviceMemory2 title→Demon cinematic→title→inspection→title
+capture: settled inspection614→360MiB; restored title472MiB after waiting for ready.
+Demon477MiB; exit458MiB. Evidence `tmp/probes/realm-preview-memory-restored.json`.
+Nominal combined counters, not physical residency. A558MiB transient after closing
+inspection remains over512MiB; peak includes worker canvases/transferred planes,
+main decoded inputs and GPU allocations. Retiring preview before restoration did
+not help (`realm-preview-memory-retired.json`); experiment removed. Investigate
+required preparation headroom/concurrent room inputs and worker output residency,
+rather than repeating this unchanged capture. No whole-app cap claim.
+
+Two low/high-memory browser inspection cases PASS21.5s: resize, keyboard/back,
+main canvas suspension and restoration; output `tmp/test-results/browser/inspection-occlusion/`.
+New unit verifies aborted/stale failure suppression, idempotent suspension and
+resized same-seed continuation restoration. Checked production build/strict
+TypeScript PASS; metadata/title/changelog1.69.29. Broader integration/final suites,
+copy mismatch and remaining goal measurements still required. Goal active;
+no push/deploy/native build/real save changes. Cancelled work stays cancelled.
+
+## Previous handoff — Preview room ownership and suspension
 
 App1.69.28 loads shared preview room inputs on demand using main-image leases.
 Canonical asset URL fixes previous relative-URL material lookup mismatch; room

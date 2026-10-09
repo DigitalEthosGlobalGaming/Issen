@@ -57,6 +57,20 @@ export interface SceneFlowViews {
  * Renderer operations are explicit ports; drawing never resumes gameplay. */
 export function createSceneFlow(readViews: () => SceneFlowViews) {
   let figurePreparation: AbortController | undefined;
+  let occluded = false;
+  function setOccluded(value: boolean) {
+    if (value === occluded) return;
+    occluded = value;
+    if (!value) return;
+    const views = readViews();
+    figurePreparation?.abort();
+    views.sceneRequest++;
+    views.requestedSceneKey = '';
+    views.sceneLoading = views.sceneReadyToPresent = false;
+    views.environmentRenderer.suspend();
+    views.demonRealmRenderer.release();
+    views.cvs.dataset.sceneState = 'occluded';
+  }
   function retryScene() {
     const views = readViews();
     if (views.lifecycle.disposed) return;
@@ -65,6 +79,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     prepareScene();
   }
   function prepareScene() {
+    if (occluded) return;
     const views = readViews();
     const {
       stageSeed,
@@ -184,5 +199,5 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       frameLoop.resetClock();
     }
   }
-  return { prepareScene, retryScene, deferUntilSceneReady, settlePresentedScene };
+  return { prepareScene, retryScene, deferUntilSceneReady, settlePresentedScene, setOccluded };
 }

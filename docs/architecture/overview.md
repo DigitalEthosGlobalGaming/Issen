@@ -517,6 +517,10 @@ journal and recovery. See [save transfer](../features/save-transfer.md).
   and preview callbacks. Snapshot menus settle after their fade, preserving the
   last complete scene; Armoury previews keep their own animation clock. Resize
   invalidation survives covered inspection until the scene can draw again.
+  Expanded equipment inspection occludes the main scene: scene flow cancels
+  preparation, suspends scenery and retires main drawing resources. Closing
+  inspection restores the current viewport and prepares the same scene identity;
+  resize while covered cannot restart scenery preparation.
   Pausing skips simulation; animated scenes draw at up to 60 fps. Hit-stop/slow
   timers advance with scheduled scene work. Resume resets the scheduler's clock. Guided
   lessons go directly to safe practice using that paused-simulation boundary.

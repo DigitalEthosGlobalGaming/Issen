@@ -31,6 +31,7 @@ const ARM: readonly (readonly [ItemCategory, string])[] = [
 ];
 
 export interface ArmoryOptions {
+  inspectionChanged?: (expanded: boolean) => void;
   items: readonly Item[];
   equipment: Equipment;
   unlocks: ReadonlySet<string>;
@@ -97,7 +98,7 @@ export function createArmoryScreen(root: HTMLElement, options: ArmoryOptions) {
   let detailsOpen = false;
   const tabs = $('armTabs');
   const preview = $('prevC') as HTMLCanvasElement;
-  const inspection = createArmoryInspection(root, preview);
+  const inspection = createArmoryInspection(root, preview, options.inspectionChanged);
   const onPreview = () => {
     if (!inspection.expanded) inspection.open();
     if (armTab === 'fx') events.preview();

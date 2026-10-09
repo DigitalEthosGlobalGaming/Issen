@@ -22,6 +22,7 @@ import type { RunState, Screen } from '../../game/run-state.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
 
 export interface ArmoryViews {
+  readonly inspectionChanged: (expanded: boolean) => void;
   readonly $: (id: string) => HTMLElement;
   readonly META: MetaProgress;
   readonly EQ: Equipment;
@@ -106,6 +107,7 @@ export function createArmoryWiring(views: ArmoryViews) {
     G.runRobe = views.EQ.robe;
   }
   const armory = createArmoryScreen($('armory'), {
+    inspectionChanged: views.inspectionChanged,
     items: ITEMS,
     equipment: views.EQ,
     unlocks: UNL,

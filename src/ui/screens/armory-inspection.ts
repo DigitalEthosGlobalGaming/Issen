@@ -1,6 +1,10 @@
 import { drawingPixelRatio } from '../../presentation/viewport.ts';
 /** One canvas moves into a modal; equipment and preview effects keep their owner. */
-export function createArmoryInspection(root: HTMLElement, canvas: HTMLCanvasElement) {
+export function createArmoryInspection(
+  root: HTMLElement,
+  canvas: HTMLCanvasElement,
+  changed?: (expanded: boolean) => void,
+) {
   const doc = root.ownerDocument,
     win = doc.defaultView!;
   const home = doc.createComment('Armoury preview');
@@ -31,6 +35,7 @@ export function createArmoryInspection(root: HTMLElement, canvas: HTMLCanvasElem
     canvas.setAttribute('aria-expanded', 'false');
     previousFocus?.focus({ preventScroll: true });
     resize();
+    changed?.(false);
   };
   function close() {
     if (!dialog.open) return;
@@ -48,6 +53,7 @@ export function createArmoryInspection(root: HTMLElement, canvas: HTMLCanvasElem
     canvas.setAttribute('aria-expanded', 'true');
     win.history.pushState({ ...win.history.state, issenInspection: token }, '');
     dialog.showModal();
+    changed?.(true);
     closeButton.focus();
     resize();
   }

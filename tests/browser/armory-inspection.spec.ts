@@ -22,6 +22,8 @@ for (const memory of [2, 8])
     await page.locator('#prevC').click();
     const dialog = page.getByRole('dialog', { name: 'Equipment inspection' });
     await expect(dialog).toBeVisible();
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'occluded');
+    await expect(page.locator('#c')).toHaveJSProperty('width', 1);
     expect(await page.locator('#prevC').evaluate((c) => c.parentElement!.className)).toBe(
       'arm-inspection',
     );
@@ -32,10 +34,14 @@ for (const memory of [2, 8])
     await page.screenshot({ path: info.outputPath('inspection-portrait.png') });
     await page.setViewportSize({ width: 844, height: 390 });
     await expect.poll(async () => (await page.locator('#prevC').boundingBox())!.height).toBe(390);
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'occluded');
     await page.screenshot({ path: info.outputPath('inspection-landscape.png') });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.keyboard.press('Escape');
     await expect(dialog).not.toBeVisible();
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 30000,
+    });
     await expect(page.locator('#armory')).toHaveClass(/on/);
     await expect(page.locator('#armInfo details')).toHaveAttribute('open', '');
     await expect(page.locator('#prevC')).toBeFocused();

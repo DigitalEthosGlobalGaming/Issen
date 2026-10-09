@@ -147,6 +147,9 @@ export function createRuntimeControls(
       preview.suspend();
       supportPreview.suspend();
     },
+    get inspectionChanged() {
+      return inspectionChanged;
+    },
     get demoKill() {
       return demoKill;
     },
@@ -158,6 +161,19 @@ export function createRuntimeControls(
     },
   }));
   const { PRESETS, presetScreen, armory, equipArmory, renderArmory } = armoryWiring;
+  function inspectionChanged(expanded: boolean) {
+    if (foundation.lifecycle.disposed) return;
+    if (expanded) {
+      game.sceneFlow.setOccluded(true);
+      foundation.browser.nativeScene.suspend();
+    } else {
+      const { W, H, DPR } = foundation.view.geometry;
+      foundation.browser.cvs.width = Math.max(1, Math.round(W * DPR));
+      foundation.browser.cvs.height = Math.max(1, Math.round(H * DPR));
+      game.sceneFlow.setOccluded(false);
+      game.prepareScene();
+    }
+  }
   function refreshArmoryNew() {
     armoryWiring.refreshArmoryNew();
   }
