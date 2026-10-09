@@ -23,7 +23,8 @@ export interface RuntimeStartupViews extends NativeStartup {
   readonly guided: Disposable;
   readonly runResults: Disposable;
   readonly audio: ReturnType<typeof createAudio>;
-  readonly driftRenderer: { prepare(): Promise<unknown>; readonly ready: boolean };
+  readonly driftRenderer: { prepare(stage: number): Promise<unknown>; readonly ready: boolean };
+  driftStage(): number;
   readonly stageSeed: number;
   readonly W: number;
   readonly H: number;
@@ -156,7 +157,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       reducedFlashes: reducedFlashes(),
       lowQuality: density() <= 0.3,
     }),
-    driftRenderer.prepare(),
+    driftRenderer.prepare(readViews().driftStage()),
   ]).then(() => {
     if (artworkDisposed) return;
     const failed = [

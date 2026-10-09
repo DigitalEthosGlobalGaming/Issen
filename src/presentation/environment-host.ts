@@ -43,7 +43,7 @@ export function createEnvironmentHost(
 
   /* ---------------- ambient ---------------- */
 
-  const driftRenderer = createDriftRenderer();
+  const driftRenderer = createDriftRenderer(ownerDocument);
 
   lifecycle.add(driftRenderer.dispose);
   const {

@@ -129,6 +129,13 @@ export const DRIFT_MIXTURES: readonly Mixture[] = [
 ];
 /** Blossom keeps its original abundance; other scenes leave more open space. Index 9 is Demon. */
 export const DRIFT_DENSITY = [0.4, 0.3, 1, 0.3, 0.4, 0.15, 0.35, 0.25, 0.25, 0.3] as const;
+/** Catalogue preparation remains explicit; runtime scenes need only their mixture's families. */
+export function driftAtlasIds(stage?: number): string[] {
+  if (stage === undefined) return Object.keys(DRIFT_ATLASES);
+  const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
+  const selected = new Set(mixture.map(([id]) => DRIFT_BY_ID.get(id)!.atlas));
+  return Object.keys(DRIFT_ATLASES).filter((id) => selected.has(id));
+}
 export function chooseDriftSprite(stage: number, random: Random): DriftSprite {
   const mixture = DRIFT_MIXTURES[stage] ?? DRIFT_MIXTURES[0]!;
   let roll = random() * mixture.reduce((total, entry) => total + entry[1], 0);

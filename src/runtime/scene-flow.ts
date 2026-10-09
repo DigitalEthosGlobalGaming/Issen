@@ -1,6 +1,7 @@
 import { markScenePhase, measureScenePhase } from '../platform/scene-timing.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { TrialDefinition } from '../game/content/trials.ts';
+import { STAGES } from '../game/content/stages.ts';
 
 export interface ScenePreparationFrame {
   stageSeed: number;
@@ -29,6 +30,7 @@ export interface SceneFlowViews {
   readonly cvs: { readonly dataset: DOMStringMap };
   readonly screenAnimation: { invalidate(): void };
   readonly demonRealmRenderer: { prepare(): Promise<boolean> };
+  readonly driftRenderer: { prepare(stage: number): Promise<boolean> };
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string };
@@ -90,7 +92,10 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     views.sceneReadyToPresent = false;
     cvs.dataset.sceneState = 'loading';
     screenAnimation.invalidate();
-    const pending = demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame);
+    const pending = Promise.all([
+      demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
+      views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
+    ]).then(([sceneReady, driftReady]) => sceneReady && driftReady);
     void pending
       .then((ready) => {
         if (lifecycle.disposed || request !== views.sceneRequest) return;

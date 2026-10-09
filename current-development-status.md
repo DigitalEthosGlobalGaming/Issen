@@ -1,4 +1,55 @@
-# Performance, assets and seamless transitions — Shared drift ownership
+# Performance, assets and seamless transitions — Selected drift families
+
+Checkpoint 61 selects drift families for the restored/current scene, app 1.69.10.
+Meadow now requires six planes / 37,764,912 nominal RGBA bytes, down from
+13 / 81,823,976 (44,059,064 fewer required bytes). Normal scenes require at most
+nine planes; Demon requires four / 25,176,608. These are required-input counts,
+not physical resident-memory measurements. Shared-pool snapshots include every
+document owner. Unpinned cached inputs may remain until ordinary LRU pressure.
+
+Startup selects after restoration. Scene flow awaits incoming drift alongside
+environment composition. Old submitted leaves remain drawable and continue
+analytic cosmetic motion while decoding; generations reject superseded results.
+Departing families retire consumer-local uploads before unpinning. Standalone
+prepare without a stage retains the full-catalog contract. No spawn/RNG, artwork,
+save, density or budget changes. Incoming GPU uploads are not yet explicitly
+warmed by this owner; first-appearance warming and a persistent painter lease
+through promotion remain required before the overall hitch target can be claimed.
+
+Verification passes:476 units,34 related native cases, four checked production
+cases (including offline gameplay resize),140 exact full-catalog comparisons and
+204 exact scene-selected comparisons across all ten mixtures, ember variants,
+two orientations and DPR1/2. New tests hold a required family, verify moving old
+pixels, supersede the request, cycle scenes, preserve peers and verify actual
+runtime readiness. No tolerance changes. A route initially held Vite imports;
+restricting it to fetch requests fixes that fixture. Editing imports during a
+native run caused a reload; the final stable-source34-case run passes.
+
+Five matched title samples per arm:startup median2179.6→2155.8ms, render median
+1.5→1.5ms and frame-p95 median16.9→16.9ms. Startup is essentially unchanged;
+this software60Hz sample proves neither actual120Hz nor the first-two-second
+long-task target. Timing instrumentation is unchanged. Its injected STAGES
+import collided with the new root import; aliasing the root import fixes the
+candidate build. Both successful timing builds use1.69.9 metadata before bump.
+
+Evidence:tmp/probes/drift61/ holds the saved original, full/selected native
+oracles and baseline/current JSON plus unit, browser, production and timing logs.
+Matched reports:tmp/performance/2026-10-09T05-00-49.517Z-24084fc4/ and
+tmp/performance/2026-10-09T05-14-37.332Z-ef039ed4/. Failed import-collision build
+is retained at tmp/performance/2026-10-09T05-13-50.100Z-a1b313e7/ (no samples).
+All verification handles are terminal. Local develop commit only; version,
+package-lock, title and changelog agree.
+
+Next:incoming drift/figure/weapon warming, remaining demon/live-fog cutout-aware
+and selected enemy/weapon ownership, combined decoded/canvas/GPU/copy admission,
+then quiet cancelable worker/local next slots with retained texture leases.
+Local yielded composition still differs in four exact cases; keep its passing
+synchronous control. Full120Hz/cold-warm/first-two-second and Phase5 verification
+remain open. Budgets256/384/512MiB unchanged. Goal active at full scope; no push,
+deployment, native build or real player-save changes. Packing, tight repacking
+and separate lit-only integration stay cancelled.
+
+## Previous handoff — Shared drift ownership
 
 Checkpoint 60 routes drift colour and material maps through the main-image pool,
 app 1.69.9. Four colour atlases plus nine normal/surface/emissive maps become

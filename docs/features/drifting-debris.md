@@ -49,10 +49,15 @@ Blossom remains unchanged. Density applies to gusts as well as ordinary drift.
 - `src/rendering/scene/drift-catalog.ts`: atlas URLs, stable sprite IDs, normalized
   source rectangles, normalized frame-local pivots, size/spin/opacity presets and
   weighted stage mixtures and density. Entries follow `STAGES` order, then Demon.
-- `src/rendering/scene/drift-renderer.ts`: decoded image ownership, original curve,
-  retained Path2D and sprite drawing. Images prepare before frame startup and
-  release with the runtime. No per-frame image decoding, tinting or offscreen
-  buffer allocation occurs.
+- `src/rendering/scene/drift-images.ts`: shared decoded-image leases and selected
+  material families. Startup selects the restored scene; scene flow awaits the
+  incoming set. Superseded requests cannot publish, and departing families unpin
+  and retire their consuming painters' uploads. Standalone preparation without a
+  stage still loads the full catalog.
+- `src/rendering/scene/drift-renderer.ts`: original curve, retained Path2D and
+  sprite drawing. While incoming images load, the previous submitted particles
+  keep moving through their analytic presentation clock. No per-frame image
+  decoding, tinting or offscreen buffer allocation occurs.
 - `src/rendering/scene/ambient.ts`: particles, wind, tumbling, depth, gusts and
   density controls. Sprite identity is selected at spawn with cosmetic randomness
   and stays stable until respawn. Stage changes rebuild particles for the new mix.

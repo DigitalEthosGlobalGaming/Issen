@@ -149,8 +149,11 @@ scene composition, demon and drift prepare their inputs independently. This
 removes36 plain startup sources/226,501,456nominal RGBA bytes, without claiming
 resident savings. Drift sources/maps use pooled leases as of1.69.9:13 planes/
 81,823,976nominal bytes become shared/accounted; disposal releases only its
-consuming painters. All four drift families are still prepared. Selected drift
-families and direct demon/fog ownership still need migration.
+consuming painters. Runtime drift selection as of1.69.10 needs6 planes/
+37,764,912nominal bytes for Meadow, at most9 active planes across normal scenes,
+and4 for Demon. Incoming preparation retains moving old leaves until ready;
+departed families become evictable. Catalogue-only callers can still prepare
+all four. Direct demon/fog ownership still needs migration.
 Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
 weapons use their generated packs. Stage scenery, foreground bamboo, demon realm

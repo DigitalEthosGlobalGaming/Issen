@@ -239,9 +239,13 @@ requests that bypass the compose queue. Worker requests preserve the current
 raw pins and apply the same decoded-byte admission. Denied sets remain cold.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
-Player-base and drift colour/material planes use the same pool; drift owns all
-four atlas families and releases consuming painters before unpinning on disposal.
-Selected drift families remain pending. Startup excludes plain player/charm/world
+Player-base and drift colour/material planes use the same pool. Runtime startup
+and scene-flow preparation select the drift mixture's families. Incoming kits
+prepare beside the drawable set; submitted leaves continue moving while pending.
+Generation checks reject superseded requests, and departing kits retire only
+consuming painters' textures before unpinning. Standalone catalogue preparation
+without a stage explicitly loads all four families.
+Startup excludes plain player/charm/world
 UI sources owned there. Enemy, weapon and other eager startup images remain outside it;
 whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
@@ -583,8 +587,9 @@ owns settlement/invalidation. The runtime connects navigation and resize to that
 policy rather than embedding screen-specific frame caps. Audio keeps a separate
 inactive gate so returning never overrides player pause or mute.
 
-Drifting particle catalogs and drawing belong to `rendering/scene/drift-catalog.ts`
-and `drift-renderer.ts`; ambient simulation owns particle identity and motion.
+Drifting particle catalogs, selected image leases and drawing belong to
+`rendering/scene/drift-catalog.ts`, `drift-images.ts` and `drift-renderer.ts`;
+ambient simulation owns particle identity and motion.
 See [drifting debris](../features/drifting-debris.md) for atlas extension and controls.
 
 `game/phases/standoff.ts` owns challenger setup, draw-window updates and swipe/tap

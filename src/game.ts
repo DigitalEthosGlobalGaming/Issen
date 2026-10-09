@@ -1,3 +1,4 @@
+import { STAGES as sceneStages } from './game/content/stages.ts';
 import { createRuntimeFrames } from './runtime/frames.ts';
 import { createRuntimeControls } from './runtime/controls.ts';
 import { createRuntimeGameplay } from './runtime/gameplay.ts';
@@ -92,6 +93,11 @@ export function startGame(
           runResults: ui.runResults,
           audio: foundation.browser.audio,
           driftRenderer: presentation.driftRenderer,
+          driftStage: () =>
+            foundation.run.activity.activeTrial?.realm === 'demon' ||
+            presentation.environmentState.previewDemon
+              ? sceneStages.length
+              : foundation.run.G.stage,
           reducedMotion: foundation.browser.reducedMotion,
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,

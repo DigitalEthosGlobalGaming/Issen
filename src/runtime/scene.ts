@@ -69,6 +69,7 @@ export function createRuntimeSceneCoordination(
           cvs: foundation.browser.cvs,
           screenAnimation: ui.screenAnimation,
           demonRealmRenderer: foundation.browser.demonRealmRenderer,
+          driftRenderer: presentation.driftRenderer,
           environmentRenderer: foundation.browser.environmentRenderer,
           lifecycle: foundation.lifecycle,
           frameLoop: readClock(),
