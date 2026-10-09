@@ -68,7 +68,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['snapshot']
   > & { images: number };
   canvasSnapshot(): { canvasBytes: number; canvases: number };
-  releaseUnusedImages(): number;
+  releaseUnusedImages(targetBytes?: number, keep?: readonly string[]): number;
   observeMemory(listener: () => void): () => void;
 } {
   const memory = createPixelMemory();
@@ -195,7 +195,14 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
         memoryListeners.delete(listener);
       };
     },
-    releaseUnusedImages: () => loader.trim(),
+    releaseUnusedImages(targetBytes = 0, keep: readonly string[] = []) {
+      const pins = keep.map((url) => loader.pin(url));
+      try {
+        return loader.trim(targetBytes);
+      } finally {
+        for (const release of pins) release();
+      }
+    },
     canvasSnapshot() {
       const { canvasBytes, canvases } = memory.snapshot();
       return { canvasBytes, canvases };

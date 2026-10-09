@@ -105,71 +105,81 @@ scope.onmessage = ({ data }) => {
     try {
       if (cancelled.has(data.id))
         throw new DOMException('Scenery preparation cancelled', 'AbortError');
-      if (data.kind === 'prepare') {
+      if (data.kind === 'trim') {
+        workerDocument.releaseUnusedImages();
+      } else if (data.kind === 'prepare') {
         // An exported current scene owns its pixels; released inputs are not a
         // reason to invalidate its key. Changed compose keys reacquire normally.
         const current = renderer.snapshot();
         if (current.stage !== data.stage || current.backend !== 'layered')
           await renderer.prepare(data.stage);
         assetsAt = composedAt = performance.now();
-      } else if (
-        await renderer.compose(data.frame, () => {
-          if (cancelled.has(data.id))
-            throw new DOMException('Scenery preparation cancelled', 'AbortError');
-          assetsAt = performance.now();
+      } else {
+        // Keep reusable incoming pixels, but never overlap unrelated raw kits.
+        workerDocument.releaseUnusedImages(0, sceneImageUrls(data.frame.stage, false));
+        if (
+          await renderer.compose(data.frame, () => {
+            if (cancelled.has(data.id))
+              throw new DOMException('Scenery preparation cancelled', 'AbortError');
+            assetsAt = performance.now();
+            scope.postMessage(
+              {
+                id: data.id,
+                ok: true,
+                key: data.key,
+                phase: 'assets-ready',
+                layers: [],
+                foreground: [],
+                snapshot: {
+                  ...renderer.snapshot(),
+                  ...workerDocument.canvasSnapshot(),
+                  decodedLoader: workerDocument.decodedSnapshot(),
+                },
+              },
+              [],
+            );
+          })
+        ) {
+          composedAt = performance.now();
+          const completed = renderer.exportLayers();
+          const entries = [...completed.layers, ...completed.foreground];
+          exportBytes = exportedLayerBytes(entries);
           scope.postMessage(
             {
               id: data.id,
               ok: true,
               key: data.key,
-              phase: 'assets-ready',
+              phase: 'composed',
               layers: [],
               foreground: [],
               snapshot: {
                 ...renderer.snapshot(),
                 ...workerDocument.canvasSnapshot(),
                 decodedLoader: workerDocument.decodedSnapshot(),
+                exportBytes,
               },
             },
             [],
           );
-        })
-      ) {
-        composedAt = performance.now();
-        const completed = renderer.exportLayers();
-        const entries = [...completed.layers, ...completed.foreground];
-        exportBytes = exportedLayerBytes(entries);
-        scope.postMessage(
-          {
-            id: data.id,
-            ok: true,
-            key: data.key,
-            phase: 'composed',
-            layers: [],
-            foreground: [],
-            snapshot: {
-              ...renderer.snapshot(),
-              ...workerDocument.canvasSnapshot(),
-              decodedLoader: workerDocument.decodedSnapshot(),
-              exportBytes,
-            },
-          },
-          [],
-        );
-        // Live motion uses transferred planes and the main thread's own raw inputs.
-        renderer.releaseExportInputs();
-        const copied = await copyComposedLayers(entries);
-        layers.push(...copied.slice(0, completed.layers.length));
-        foreground.push(...copied.slice(completed.layers.length));
-        exportedSnapshot = renderer.snapshot();
-        // Independent copies now own these pixels. Retire worker output before
-        // the receiver uploads it, rather than overlapping both representations.
-        renderer.releaseExportLayers();
-        // Transferred copies own their pixels. Raw inputs need no
-        // residency between scenes; reacquisition follows the existing key path.
-        workerDocument.releaseUnusedImages();
-        if (cancelled.has(data.id))
-          throw new DOMException('Scenery preparation cancelled', 'AbortError');
+          // Live motion uses transferred planes and the main thread's own raw inputs.
+          renderer.releaseExportInputs();
+          const copied = await copyComposedLayers(entries);
+          layers.push(...copied.slice(0, completed.layers.length));
+          foreground.push(...copied.slice(completed.layers.length));
+          exportedSnapshot = renderer.snapshot();
+          // Independent copies now own these pixels. Retire worker output before
+          // the receiver uploads it, rather than overlapping both representations.
+          renderer.releaseExportLayers();
+          // Raw inputs are unpinned. Retain only the caller's admitted cache
+          // allowance; low-memory owners still release the complete raw kit.
+          workerDocument.releaseUnusedImages(
+            (data.decodedBudget ?? 0) > 256 * 1024 * 1024
+              ? Math.max(0, Math.min(data.retainedBytes ?? 0, (data.decodedBudget ?? 0) / 2))
+              : 0,
+          );
+          if (cancelled.has(data.id))
+            throw new DOMException('Scenery preparation cancelled', 'AbortError');
+        }
       }
       const snapshot = {
         ...(exportedSnapshot ?? renderer.snapshot()),
@@ -185,7 +195,9 @@ scope.onmessage = ({ data }) => {
       };
       const response: ComposeResponse = {
         id: data.id,
-        ok: snapshot.backend === 'layered' && (data.kind === 'prepare' || layers.length === 3),
+        ok:
+          data.kind === 'trim' ||
+          (snapshot.backend === 'layered' && (data.kind === 'prepare' || layers.length === 3)),
         key: data.kind === 'compose' ? data.key : undefined,
         layers,
         foreground,

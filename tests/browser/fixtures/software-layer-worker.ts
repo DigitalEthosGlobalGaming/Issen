@@ -55,10 +55,13 @@ scope.onmessage = ({ data }) => {
       composedAt = started;
     let exportedSnapshot: ReturnType<typeof renderer.snapshot> | undefined;
     try {
-      if (data.kind === 'prepare') {
+      if (data.kind === 'trim') {
+        workerDocument.releaseUnusedImages();
+      } else if (data.kind === 'prepare') {
         await renderer.prepare(data.stage);
         assetsAt = composedAt = performance.now();
       } else if (
+        (workerDocument.releaseUnusedImages(0, sceneImageUrls(data.frame.stage, false)),
         await renderer.compose(data.frame, () => {
           assetsAt = performance.now();
           scope.postMessage(
@@ -73,7 +76,7 @@ scope.onmessage = ({ data }) => {
             },
             [],
           );
-        })
+        }))
       ) {
         composedAt = performance.now();
         // Live motion uses transferred planes and the main thread's own raw inputs.
@@ -84,7 +87,7 @@ scope.onmessage = ({ data }) => {
         foreground.push(...copied.slice(completed.layers.length));
         exportedSnapshot = renderer.snapshot();
         renderer.releaseExportLayers();
-        workerDocument.releaseUnusedImages();
+        workerDocument.releaseUnusedImages(data.retainedBytes ?? 0);
       }
       const snapshot = {
         ...(exportedSnapshot ?? renderer.snapshot()),
@@ -98,7 +101,9 @@ scope.onmessage = ({ data }) => {
       };
       const response: ComposeResponse = {
         id: data.id,
-        ok: snapshot.backend === 'layered' && (data.kind === 'prepare' || layers.length === 3),
+        ok:
+          data.kind === 'trim' ||
+          (snapshot.backend === 'layered' && (data.kind === 'prepare' || layers.length === 3)),
         key: data.kind === 'compose' ? data.key : undefined,
         layers,
         foreground,

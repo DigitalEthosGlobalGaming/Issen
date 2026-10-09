@@ -86,6 +86,7 @@ export function createWorkerEnvironmentRenderer(
     'decodedLoader' | 'canvasBytes' | 'canvases' | 'exportBytes'
   > = {};
   let resourceRequestId = 0;
+  let cacheTrim: Promise<ComposeResponse> | undefined;
   const nextSlots = new Set<NextSlot>();
   const incomingResponses = new Set<ComposeResponse>();
   let nextSlot: NextSlot | undefined,
@@ -285,6 +286,7 @@ export function createWorkerEnvironmentRenderer(
     request:
       | Omit<Extract<ComposeRequest, { kind: 'prepare' }>, 'id'>
       | Omit<Extract<ComposeRequest, { kind: 'compose' }>, 'id'>
+      | Omit<Extract<ComposeRequest, { kind: 'trim' }>, 'id'>
       | Omit<Extract<ComposeRequest, { kind: 'preload' }>, 'id'>,
     timingPrefix = 'false:',
   ) {
@@ -302,11 +304,30 @@ export function createWorkerEnvironmentRenderer(
       const timer = setTimeout(() => failWorker('Scenery worker timed out'), 45000);
       requests.set(id, { resolve, timer, timingPrefix });
       try {
-        worker!.postMessage({ ...request, id, decodedBudget: documentImageBudget(doc) });
+        const decodedBudget = documentImageBudget(doc);
+        const memory = documentSceneMemory(doc);
+        const estimate =
+          request.kind === 'compose'
+            ? scenePreparationBytes(request.frame, decodedBudget)
+            : undefined;
+        // Retention is optional and must fit beyond the entire incoming peak.
+        const retainedBytes =
+          decodedBudget > 256 * 1024 * 1024 && estimate !== undefined
+            ? Math.max(
+                0,
+                Math.min(decodedBudget / 2, memory.budget - memory.committedBytes - estimate),
+              )
+            : 0;
+        worker!.postMessage({ ...request, id, decodedBudget, retainedBytes });
       } catch (error) {
         failWorker(String(error));
       }
     });
+  }
+  function trimWorkerCache() {
+    return (cacheTrim ??= send({ kind: 'trim' }).finally(() => {
+      cacheTrim = undefined;
+    }));
   }
   function prepareFog(): Promise<void> {
     return (fogPending ??= (async () => {
@@ -427,6 +448,8 @@ export function createWorkerEnvironmentRenderer(
     const memory =
       estimate === undefined ? documentSceneMemory(doc) : reclaimSceneMemory(doc, estimate);
     if (estimate === undefined || memory.committedBytes + estimate > memory.budget) {
+      if (workerResources.decodedLoader?.bytes && !workerResources.decodedLoader.pinned)
+        void trimWorkerCache();
       admissionAt = performance.now() + 250;
       return;
     }
@@ -533,7 +556,14 @@ export function createWorkerEnvironmentRenderer(
         if (estimate !== undefined) {
           const incomingBytes =
             estimate + (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
-          const pressure = reclaimSceneMemory(doc, incomingBytes);
+          let pressure = reclaimSceneMemory(doc, incomingBytes);
+          if (
+            pressure.committedBytes + incomingBytes > pressure.budget &&
+            workerResources.decodedLoader?.bytes
+          ) {
+            await trimWorkerCache();
+            pressure = reclaimSceneMemory(doc, incomingBytes);
+          }
           if (pressure.committedBytes + incomingBytes > pressure.budget) releaseOutgoingMaterials();
         }
       }
@@ -571,7 +601,14 @@ export function createWorkerEnvironmentRenderer(
       const uploadBytes =
         composedLayerBytes([...response.layers, ...response.foreground]) +
         (frame.stage === 0 && fog?.naturalWidth ? 4 * fog.naturalWidth * fog.naturalHeight * 4 : 0);
-      const pressure = reclaimSceneMemory(doc, uploadBytes);
+      let pressure = reclaimSceneMemory(doc, uploadBytes);
+      if (
+        pressure.committedBytes + uploadBytes > pressure.budget &&
+        workerResources.decodedLoader?.bytes
+      ) {
+        await trimWorkerCache();
+        pressure = reclaimSceneMemory(doc, uploadBytes);
+      }
       if (!promoted && pressure.committedBytes + uploadBytes > pressure.budget)
         releaseOutgoingMaterials();
       if (!(await warmLayers(frame, response.layers, response.foreground))) {

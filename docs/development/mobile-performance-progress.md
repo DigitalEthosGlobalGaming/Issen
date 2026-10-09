@@ -8,6 +8,32 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Bounded worker input reuse — 10 October 2026
+
+Version1.69.47 retains unpinned raw inputs on higher tiers only within half their
+decoded budget and whole-app headroom beyond the incoming preparation estimate.
+Low-tier full trimming stays in place. Unrelated cache entries close before the
+next decode; shared incoming sources are temporarily protected. A serialized
+worker trim request updates actual counters before foreground admission/upload
+continues. Optional admission can request reclamation and retry without assuming
+the memory is already free.
+
+Six reuse/lifetime browser checks pass30.2s, including zero new decodes for a
+shared high-tier stage, synthetic pressure reclamation and low-tier reacquisition.
+All27 exact colour/material/native comparisons at both tiers pass1.4m; four
+next-scene promotion/pressure/invalidation/busy cases pass8.5s. Checked production
+startup/offline-resize cases pass9.9s. Evidence under
+`tmp/test-results/browser/bounded-worker-{reuse,copy-parity,admission}/` and
+`tmp/test-results/production/bounded-worker-reuse/`.
+
+Controlled high-tier rush/cat runtime loop prepares/promotes all9 stages, including
+wrap, with14.9–28.7ms waits and sampled committed peak938.07MiB against1024MiB.
+Evidence `tmp/probes/rush-companion-admission-high-worker-cache.json`. Its background
+reservation leaves zero raw-cache allowance. Controlled ordinals/phase entry do
+not establish natural progression, all transient/native memory or physical120Hz.
+The identified unprepared cold regression still needs a production comparison
+after this integration; no universal loading speedup is claimed from fixture reuse.
+
 ## Worker reuse investigation — 10 October 2026
 
 Focused high-tier sequence0→1→2→0 compares full trimming, a disposable256MiB

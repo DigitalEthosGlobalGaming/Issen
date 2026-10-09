@@ -1,5 +1,37 @@
 # Current development status
 
+## Current handoff — bounded worker input reuse integrated
+
+App1.69.47 retains unpinned worker inputs above the256MiB tier, capped at half
+decoded budget and whole-app headroom beyond the conservative incoming peak.
+Low tier still trims completely. Incoming compose temporarily protects only its
+own image URLs while discarding unrelated cache entries before decode. Pressure
+sends a serialized trim request; foreground preparation/uploads await reported
+reclamation, and optional admission retries after actual counters update.
+Software comparison fixture follows the same input/export policy.
+
+Checked TypeScript passes. Six focused reuse/lifetime cases PASS30.2s/default2:
+shared-stage reuse performs no new decodes on high tier, synthetic ledger pressure
+forces confirmed cache eviction, low tier still reacquires, all-stage2/4/8GiB
+input/pin/release checks pass. Exact all27 scene/native-plane comparisons at both
+tiers PASS1.4m; next-scene promotion/pressure/invalidation/busy cancellation four
+cases PASS8.5s. Evidence `tmp/test-results/browser/bounded-worker-{reuse,copy-parity,admission}/`.
+Checked production build/TypeScript plus startup/Armoury/run/landscape and offline
+resize smokes PASS9.9s/default2; `tmp/test-results/production/bounded-worker-reuse/`.
+
+Controlled whole-runtime high-tier rush/cat loop prepares/promotes all9 stages,
+including wrap: waits14.9–28.7ms, sampled committed peak938.07MiB against1024MiB.
+Evidence `tmp/probes/rush-companion-admission-high-worker-cache.json`. Background
+slots in this capture leave no raw cache: their preparation reservation consumes
+the optional retention allowance. This fixture invokes actual nextStep but
+controls pause/between/ordinals; not natural combat/all-transient/native proof.
+
+Next: remeasure affected unprepared production transitions to assess the identified
+cold decode regression; reuse the saved1.69.46 capture. Then final natural
+progression/loadout/transient/native coverage and applicable suites. Historical
+leaf alpha assertion stays strict. All processes terminal; goal active. No
+push/deploy/native build/real-save changes; cancelled packing/lit-only stays cancelled.
+
 ## Current handoff — bounded worker reuse prototype selected
 
 App1.69.46 unchanged. Isolated high-tier worker sequence0→1→2→0 compares existing

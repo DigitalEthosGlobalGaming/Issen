@@ -807,11 +807,16 @@ ownership replaces that temporary handoff owner. Background reservation estimate
 subtract already reported worker backing only for their matching request, avoiding
 duplicate estimates for the same allocation. This is accounting, not an absolute
 physical-memory guarantee.
-Worker export closes unpinned raw decoded inputs after every plane copy settles
-and retires composition/foreground canvases before posting independent bitmaps.
+Worker export retires composition/foreground canvases before posting independent
+bitmaps. The256MiB tier closes all unpinned raw inputs. Higher tiers may retain
+an unpinned LRU capped at half their decoded budget, further bounded by whole-app
+headroom beyond the conservative incoming preparation peak. Before each compose,
+unrelated cached inputs close; shared incoming inputs stay available for reuse.
+Pressure sends an explicit worker trim request: foreground preparation/upload
+waits for actual resource counters, while optional admission retries after reclaim.
 The response keeps completed-scene metadata but reports actual remaining worker
 canvas bytes. Main current/next slots own reusable bitmaps; repeated direct worker
-requests reacquire inputs and rebuild. Explicit loader trimming
+requests reuse available inputs or reacquire evicted ones and rebuild. Explicit loader trimming
 preserves pins and pending required work. Demon artwork starts on `prepare()`
 instead of ordinary startup, and a failed preparation can reacquire inputs on retry.
 Its stage gate builds the existing mountain layer and prop cutouts, captures their
