@@ -1,7 +1,13 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
-import { drawMaterialStamp } from '../scene-material.ts';
+import { drawMaterialStamp, registerMaterialSink } from '../scene-material.ts';
+import {
+  materialTextureUploads,
+  nextVisibleFrame,
+  paceTextureUploads,
+  type TextureUpload,
+} from '../texture-upload.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
@@ -102,6 +108,82 @@ export function createInkPlayerRenderer(doc: Document) {
       prepared = Promise.all([prepareBase(), next]).then(([base, outfit]) => base && outfit);
     }
     return prepared!;
+  }
+  const preparation = new AbortController();
+  let selectedRobe: string | undefined,
+    preparationSequence = 0;
+  let preparedUploads: { robe: string; uploads: TextureUpload[] } | undefined;
+  function select(robe?: string) {
+    if (selectedRobe !== robe) {
+      selectedRobe = robe;
+      preparationSequence++;
+    }
+    return outfits.select(robe);
+  }
+  /** Capture the actual player stamps so outfit tints and attachments warm before presentation. */
+  async function prepareUploads(
+    robe: string,
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    const lifetime = AbortSignal.any([signal, preparation.signal]);
+    if (lifetime.aborted) return;
+    select(robe);
+    const request = preparationSequence;
+    if (
+      preparedUploads?.robe === robe &&
+      preparedUploads.uploads.every(({ texture }) => texture.source.width > 0)
+    )
+      return preparedUploads.uploads;
+    if (!(await prepare()) || lifetime.aborted || request !== preparationSequence) return;
+    if (!supportsInkOutfit(robe)) return [];
+    const canvas = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext('2d')!;
+    const uploads: TextureUpload[] = [];
+    registerMaterialSink(context, {
+      draw: ({ texture, material }) => uploads.push(...materialTextureUploads(texture, material)),
+      lights() {},
+    });
+    const figure: Figure = {
+      x: 0,
+      y: 0,
+      h: 1,
+      fog: 0,
+      back: true,
+      robeId: robe,
+      pose: { gx: 0, gy: -0.5, ang: 0 },
+      d: { hem: [], sl: [[], []], spots: [], grass: [], hair: [], seed: 0 },
+    };
+    const environment: FigureEnvironment = {
+      time: 0,
+      wind: 0,
+      petActive: false,
+      width: 1,
+      height: 1,
+      reducedMotion: true,
+      reducedFlashes: true,
+      palette: () => palettes.robe(robe),
+      random: () => 0,
+    };
+    try {
+      let complete = true;
+      const ready = await paceTextureUploads(['body', 'arms', 'head'] as const, lifetime, {
+        nextFrame: (abort) => nextVisibleFrame(doc, abort),
+        ready: () => !doc.hidden && state !== 'disposed',
+        generation: () => 0,
+        now: () => performance.now(),
+        upload: (part) => {
+          if (request !== preparationSequence || !drawPart(context, part, figure, environment))
+            complete = false;
+        },
+      });
+      if (!ready || !complete || lifetime.aborted || request !== preparationSequence) return;
+      preparedUploads = { robe, uploads };
+      return uploads;
+    } finally {
+      releaseCanvas(context);
+      canvas.width = canvas.height = 0;
+    }
   }
   function stamp(
     g: SceneDrawing,
@@ -258,7 +340,8 @@ export function createInkPlayerRenderer(doc: Document) {
   }
   return {
     prepare,
-    select: outfits.select,
+    select,
+    prepareUploads,
     releaseCanvas,
     borrow() {
       const selection = outfits.borrow();
@@ -291,6 +374,8 @@ export function createInkPlayerRenderer(doc: Document) {
     dispose() {
       if (state === 'disposed') return;
       state = 'disposed';
+      preparation.abort();
+      preparedUploads = undefined;
       for (const g of consumers) releaseCanvas(g);
       outfits.dispose();
       materials.dispose();

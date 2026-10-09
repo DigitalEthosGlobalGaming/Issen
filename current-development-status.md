@@ -1,6 +1,56 @@
 # Current development status
 
-## Current handoff — meadow wrap preparation
+## Current handoff — selected player and charm warming
+
+App1.69.40 includes the selected robe/charm and actual charm colour in scene figure
+readiness. Player preparation captures existing body/arms/head material stamps in
+paced batches with a disposable1×1CPU sink; existing outfit tints/attachments are
+reused, with one last-selection upload list and cancellation/selection/disposal
+checks. Charm preparation shares its normal draw recipe/cache; sprite canvases are
+now tracked and retire GPU consumers before eviction/final disposal. Native figure
+services retain/warm the union through the existing painter. No alternate renderer,
+pose/RNG/simulation advancement, authored asset or texture-detail changes.
+
+Focused daily probe confirms monk robe/omikuji charm. Selected player preparation
+alone did not remove42.5ms first frame. Native call instrumentation identified charm
+sprite21.2ms and normal/surface7.6/10.9ms uploads after figure warming. With selected
+charm preparation, no GPU call above1ms after warming;121automatic quiet samples,
+max2.1ms/median1.3ms, zero over-budget samples (before max42.3ms/one over budget).
+Evidence `tmp/probes/daily-first-uploads{,-prepared}.json`. This isolates first-use
+uploads in one controlled quiet state; not physical120Hz or full gameplay timing.
+Daily next scene now remains denied before starting; sampled peak457.6MiB including
+current resources/reservations. It still lacks current+next headroom; not a passing
+all-mode transition result. Future compact selected outfit/material ownership is
+an actionable candidate rather than raising the512MiB budget.
+
+Rush narrow instrumentation reports changed enemy palette preparation~223ms plus
+~70ms warming in312ms first prepared transition. Probe manually controls paused
+state/ordinals and is not natural boss progression; verify actual boss palette
+selection and future scheduling before changing it. Evidence
+`tmp/probes/mode-preparation-{daily,rush}.json` and
+`mode-preparation-daily-player-warm.json`. Player outfit readiness previously did
+not await the new selected headwear; selection/decoding/warming now participates.
+Companion first-use and future boss palette scheduling still need audit.
+
+Strict TypeScript PASS and scene-occlusion unit PASS. Two native preparation checks
+PASS4.3s/default2workers: monk/yoroi/mino plus omikuji have zero first-use uploads,
+exact repeated pixels and cached player upload reuse; integrated selected artwork
+survives hidden cancellation/context restoration and final native disposal0.
+Results `tmp/test-results/browser/player-charm-warming/`. Three focused integration
+checks PASS7.9s/default2workers: shared player ownership, outfit primary/preview pin
+union and boss readiness while figure preparation is held. Results
+`tmp/test-results/browser/selected-artwork-integration/`. Checked production build/
+strict TypeScript and all four production smoke cases PASS18.7s/default2workers,
+including startup/Armoury/run/landscape, editions and offline resize. Results
+`tmp/test-results/production/selected-player-charm/`.
+
+Goal active: mode/viewport/loadout current+next memory headroom, incoming variants/
+whole transient bounds, historical native colour mismatch, final cold/warm/frame/
+compose measurement matrix and applicable suites remain. Physical Android/120Hz
+evidence unavailable. All probe sessions terminal; no push/deploy/native build/
+real-save changes. Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — meadow wrap preparation
 
 App1.69.39 omits meadow live-fog inputs from static worker composition/preload and
 its admission estimate. Main renderer fog/lighting stays intact; Moonwatch keeps

@@ -7,6 +7,12 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.40, scene readiness warms the selected player outfit and charm through
+their existing material stamps and tint caches. Charm sprite canvases now join
+pixel accounting and notify GPU consumers before eviction/disposal. The temporary
+player capture sink is1×1and cleared after preparation. Authored assets, recipes,
+texture detail and material coverage stay unchanged.
+
 As of1.69.39, static meadow worker composition omits four unused live-fog planes.
 They remain on the main renderer for animated fog; Moonwatch retains its baked fog
 inputs. This avoids6,301,344nominal worker decode bytes on the256MiB tier, or

@@ -95,6 +95,11 @@ export function createRuntimeSceneCoordination(
               [...ENEMY_WEAPON_IDS, foundation.profile.profileEquipment.EQ.blade],
               tones.map((tone) => foundation.view.palette.robe(tone)),
               signal,
+              {
+                robe: foundation.profile.profileEquipment.EQ.robe,
+                charm: foundation.profile.profileEquipment.EQ.charm,
+                charmColor: presentation.CHARMCOL[foundation.profile.profileEquipment.EQ.charm],
+              },
             );
           },
           environmentRenderer: foundation.browser.environmentRenderer,

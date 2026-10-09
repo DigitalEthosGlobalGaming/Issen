@@ -52,16 +52,22 @@ export function createNativeServices(
     ids: readonly string[],
     palettes: readonly Palette[],
     signal: AbortSignal,
+    selection?: { robe: string; charm?: string; charmColor?: string },
   ) {
     const request = ++figureRequest;
     const lifetime = AbortSignal.any([signal, figureLifetime.signal]);
-    const [enemy, weapons] = await Promise.all([
+    const [enemy, weapons, player, charm] = await Promise.all([
       inkEnemy.prepareUploads(palettes, lifetime),
       inkSword.prepareUploads(ids, lifetime),
+      selection === undefined
+        ? Promise.resolve([])
+        : inkPlayer.prepareUploads(selection.robe, lifetime),
+      inkCharm.prepareUploads(selection?.charm, selection?.charmColor, lifetime),
     ]);
-    if (!enemy || !weapons || lifetime.aborted || request !== figureRequest) return false;
+    if (!enemy || !weapons || !player || !charm || lifetime.aborted || request !== figureRequest)
+      return false;
     if (!painter) return true;
-    const uploads = [...enemy, ...weapons];
+    const uploads = [...enemy, ...weapons, ...player, ...charm];
     const release = painter.retainTextureSources(uploads.map(({ texture }) => texture.source));
     let accepted = false;
     try {

@@ -2,6 +2,9 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
+import { materialTextureUploads, nextVisibleFrame, type TextureUpload } from '../texture-upload.ts';
 const ATLAS_URL = new URL('./assets/charm-atlas.webp', import.meta.url).href;
 /** Packed source windows; the generated rows are not equal thirds. */
 const FRAMES = [
@@ -71,26 +74,16 @@ export function createInkCharmRenderer(doc: Document) {
     );
     return pending;
   }
-  /** x/y is the top suspension point; size is full height in caller coordinates. */
-  function draw(
-    g: SceneDrawing,
-    id: string | undefined,
-    x: number,
-    y: number,
-    size: number,
-    color?: string,
-  ): boolean {
-    if (!id || !Object.hasOwn(RECIPES, id) || ![x, y, size].every(Number.isFinite) || size <= 0)
-      return false;
-    if (state === 'idle') void prepare();
-    if (state !== 'ready' || !image) return false;
+  const preparation = new AbortController();
+  function sprite(id: string, color?: string) {
+    if (!image || state !== 'ready') return;
     const [cell, tone] = RECIPES[id]!;
     const [sx, sy, sw, sh] = FRAMES[cell]!;
     const tint = tone ?? color;
     const key = `${cell}:${tint ?? ''}`;
     let sprite = cache.get(key);
     if (!sprite) {
-      sprite = doc.createElement('canvas');
+      sprite = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
       sprite.width = Math.max(1, Math.round((128 * sw) / sh));
       sprite.height = 128;
       const c = sprite.getContext('2d');
@@ -106,26 +99,62 @@ export function createInkCharmRenderer(doc: Document) {
       if (cache.size > 32) {
         const oldest = cache.keys().next().value!;
         const prior = cache.get(oldest)!;
+        retireSceneTexture(prior, true);
         prior.width = prior.height = 0;
         cache.delete(oldest);
       }
     }
-    const width = (size * sw) / sh;
-    const material = materials.material('charms', FRAMES[cell]!);
+    return { image: sprite, frame: FRAMES[cell]!, ratio: sw / sh };
+  }
+  async function prepareUploads(
+    id: string | undefined,
+    color: string | undefined,
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    const lifetime = AbortSignal.any([signal, preparation.signal]);
+    if (lifetime.aborted) return;
+    if (!id || !Object.hasOwn(RECIPES, id)) return [];
+    if (!(await prepare()) || !(await nextVisibleFrame(doc, lifetime)) || lifetime.aborted) return;
+    const part = sprite(id, color);
+    if (!part) return;
+    return materialTextureUploads(
+      { source: part.image, revision: 0 },
+      materials.material('charms', part.frame),
+    );
+  }
+  /** x/y is the top suspension point; size is full height in caller coordinates. */
+  function draw(
+    g: SceneDrawing,
+    id: string | undefined,
+    x: number,
+    y: number,
+    size: number,
+    color?: string,
+  ): boolean {
+    if (!id || !Object.hasOwn(RECIPES, id) || ![x, y, size].every(Number.isFinite) || size <= 0)
+      return false;
+    if (state === 'idle') void prepare();
+    if (state !== 'ready' || !image) return false;
+    const part = sprite(id, color);
+    if (!part) return false;
+    const { image: texture, frame } = part;
+    const width = size * part.ratio;
+    const material = materials.material('charms', frame);
     if (material)
       drawMaterialStamp(g, {
-        texture: { source: sprite, revision: 0 },
+        texture: { source: texture, revision: 0 },
         material,
         x: x - width / 2,
         y,
         width,
         height: size,
       });
-    else g.drawImage(sprite, x - width / 2, y, width, size);
+    else g.drawImage(texture, x - width / 2, y, width, size);
     return true;
   }
   return {
     prepare,
+    prepareUploads,
     draw,
     snapshot: () => ({
       state,
@@ -134,11 +163,15 @@ export function createInkCharmRenderer(doc: Document) {
       decodedLoader: images.snapshot(),
     }),
     dispose() {
+      preparation.abort();
       materials.dispose();
       images.dispose();
       state = 'disposed';
       image = undefined;
-      for (const c of cache.values()) c.width = c.height = 0;
+      for (const c of cache.values()) {
+        retireSceneTexture(c);
+        c.width = c.height = 0;
+      }
       cache.clear();
     },
   };

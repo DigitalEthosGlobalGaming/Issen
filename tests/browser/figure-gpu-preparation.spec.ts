@@ -177,16 +177,23 @@ test('figure preparation cancellation preserves the current lease and disposal r
       drawing,
     );
     const palette = createPalette().robe('sumi');
+    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1' };
     try {
       const prepared = await services.prepareFigureArtwork(
         ['steel'],
         [palette],
         new AbortController().signal,
+        selection,
       );
       const before = drawing.sourceTextureCount;
       Object.defineProperty(document, 'hidden', { configurable: true, value: true });
       const controller = new AbortController();
-      const pending = services.prepareFigureArtwork(['steel'], [palette], controller.signal);
+      const pending = services.prepareFigureArtwork(
+        ['steel'],
+        [palette],
+        controller.signal,
+        selection,
+      );
       await new Promise((resolve) => setTimeout(resolve, 30));
       controller.abort();
       const cancelled = await pending;
@@ -197,6 +204,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
         ['steel'],
         [palette],
         new AbortController().signal,
+        selection,
       );
       const gl = canvas.getContext('webgl2')!;
       const extension = gl.getExtension('WEBGL_lose_context')!;
@@ -215,6 +223,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
         ['steel'],
         [palette],
         new AbortController().signal,
+        selection,
       );
       let restoredUploads = 0;
       const restoredDetails: any[] = [];
@@ -248,6 +257,30 @@ test('figure preparation cancellation preserves the current lease and disposal r
           },
         );
         services.inkSword.draw(drawing, 0, -0.5, 0, palette, undefined, 'steel');
+        services.inkPlayer.draw(
+          drawing,
+          {
+            x: 0,
+            y: 0,
+            h: 1,
+            fog: 0,
+            back: true,
+            robeId: selection.robe,
+            d: makeFig(1),
+            pose: EPOSE.left,
+          },
+          {
+            time: 0,
+            wind: 0,
+            width: 160,
+            height: 100,
+            petActive: false,
+            random: () => 0,
+            palette: () => palette,
+          },
+        );
+        services.inkCharm.draw(drawing, selection.charm, 0, -0.5, 0.1, selection.charmColor);
+
         drawing.restore();
         drawing.flush();
       } finally {
@@ -258,6 +291,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
         ['steel'],
         [palette],
         new AbortController().signal,
+        selection,
       );
       await new Promise((resolve) => setTimeout(resolve, 30));
       for (const dispose of cleanup.splice(0).reverse()) dispose();

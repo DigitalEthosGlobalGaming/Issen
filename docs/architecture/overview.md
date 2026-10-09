@@ -837,6 +837,18 @@ yield and disposal cancels pending work. Colour/tone caches and material drawing
 consume those same prepared planes, including after context recovery. Higher
 memory tiers retain original atlas sampling. Gameplay/appearance seed selection
 is independent of this presentation policy.
+Scene figure preparation includes the selected player robe and charm alongside
+enemy palettes and weapons. The player renderer captures its actual body/arm/head
+material stamps into a disposable1×1CPU sink, generating its existing outfit tints
+and attachment sources in paced batches. A single last-selection upload list reuses
+live sources; selection changes, abort and disposal suppress obsolete results.
+Charm preparation shares the normal draw sprite recipe/cache and actual equipment
+colour. Charm canvases are tracked and retired on eviction/final disposal. Native
+services retain and warm the resulting union through the existing painter before
+scene readiness; context restoration warms the same sources again. No gameplay
+pose, clock or RNG advances during capture. Companion first-use preparation and
+future boss-palette scheduling remain separate audit work.
+
 Worker static composition omits meadow fog inputs: the main worker-renderer owner
 prepares and draws live meadow fog. Moonwatch retains fog inputs for baked scenery.
 The next-slot fog allowance reserves decoded and GPU backing separately from the
