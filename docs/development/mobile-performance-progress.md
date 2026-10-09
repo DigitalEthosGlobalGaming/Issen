@@ -8,6 +8,53 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Incoming figure GPU preparation — 9 October 2026
+
+Version1.69.20 extends the stage gate to prepare regular enemy variants and the
+next boss archetype's possible palettes without choosing identities/advancing RNG.
+The current boss retains its palette during recovery. Enemy preparation uses
+existing bounded sprite/tone caches; unchanged intact source lists reuse without
+another paced CPU pass. Selected enemy/player weapon preparation returns the
+same cutouts/material maps used by drawing, including special/gold recipes.
+One gameplay-painter lease protects current prepared figure sources. Obsolete
+scene requests abort and cancelled/replaced/disposed jobs release their leases.
+
+The shared painter also warms white/empty defaults, geometry/light buffers and
+its existing back-buffer texture. Native comparison initially exposed one1px
+default upload and four160x100target allocations after cold restoration; both
+are now prepared before readiness. A resize-during-shader fixture exposed six
+allocations after warming old-size targets; synchronising dimensions and tracking
+viewport/target/context generations fixes this. No tolerance was relaxed.
+
+Final figure comparison covers38regular/boss appearances and every weapon recipe:
+pixels match the cold renderer (maximum0), drawing readbacks/uploads/program
+creation0. Prepared source lists survive160collection frames. The fixture keeps
+84variant parts4,363,520pixels and40tones1,978,880pixels within the existing8million
+combined pixel allowance. Cancellation retains the previous86GPU sources;
+actual context restore then first draw uploads0; final disposal releases all86.
+Resize during shader preparation also yields first-draw uploads0 and correct
+pixels. Related checks cover nine scenery compositions, held/loading/paused boss
+adoption, failed/hidden warming and next-scene promotion. Fourteen unique focused
+browser checks and11related units pass; full suites remain for larger checkpoints.
+
+The reused390x844/DPR2 first-game probe reports nominal accounted601,477,452bytes:
+decoded243,432,120, main canvas27,874,744, GPU259,072,028, worker canvas35,549,280,
+transferred35,549,280. Browser/native reserve90,092,128 gives committed691,569,580
+against desktop1,073,741,824. All nine conservative next-scene estimates fit that
+snapshot. This is not a physical measurement, low-memory admission proof or
+all-stage peak. Compared with the prior corrected point561,930,484, required
+preparation adds39,546,968 nominal bytes; this cost must participate in final
+combined-memory enforcement.
+
+Evidence: `tmp/probes/figure-gpu-{related,final-related,bosses,restoration,resize,
+units,build}.log`, `tmp/probes/scene-admission-after-figures.json`, and the native
+fixture's `figure-preparation.json` under Playwright output. A fixture return-field
+mistake was corrected before final assertions; rendering tolerances stayed fixed.
+Next: combined required-resource ownership/limits, Demon scenery GPU preparation
+and mode exit lifetime, then all-stage transitions/memory and final measurements.
+Same-stage later boss palettes can still be generated lazily; stage-entry
+preparation does not claim to eliminate every encounter-time variant miss.
+
 ## Budget-aware next scene — 9 October 2026
 
 Version1.69.19 composes and warms one predicted next scene through the existing

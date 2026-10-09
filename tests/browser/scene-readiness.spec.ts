@@ -29,8 +29,8 @@ test.beforeEach(async ({ page }) => {
         },
         holdWeapons() {
           const blocked = new Promise(resolve => { releaseScene = resolve; });
-          const prepareParts = foundation.browser.inkSword.prepareParts.bind(foundation.browser.inkSword);
-          foundation.browser.inkSword.prepareParts = async ids => { await blocked; return prepareParts(ids); };
+          const prepareParts = foundation.browser.prepareFigureArtwork.bind(foundation.browser);
+          foundation.browser.prepareFigureArtwork = async (...args) => { await blocked; return prepareParts(...args); };
         },
         release() { releaseScene(); },
         freezeMenu() { ui.screenAnimation.demand = () => ({ update: false, render: false, afterRender: false }); }

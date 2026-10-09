@@ -1,8 +1,18 @@
-import type { SceneTexture } from './scene-frame.ts';
+import type { SceneTexture, SceneMaterial } from './scene-frame.ts';
 
 export interface TextureUpload {
   texture: SceneTexture;
   data?: boolean;
+}
+/** Use the same colour/data interpretation as material drawing. */
+export function materialTextureUploads(
+  texture: SceneTexture,
+  material?: SceneMaterial | null,
+): TextureUpload[] {
+  const uploads: TextureUpload[] = [{ texture }];
+  for (const kind of ['normal', 'surface', 'mask', 'emissive'] as const)
+    if (material?.[kind]) uploads.push({ texture: material[kind], data: kind !== 'emissive' });
+  return uploads;
 }
 export type WarmSceneTextures = (
   uploads: readonly TextureUpload[],

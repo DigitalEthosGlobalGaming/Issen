@@ -15,6 +15,7 @@ import { createWeatherState } from '../rendering/scene/weather-state.ts';
 import { STAGES } from '../game/content/stages.ts';
 import type { createFrameLoop } from '../platform/frame-loop.ts';
 import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
+import { BOSS_IDENTITIES } from '../game/content/bosses.ts';
 import { mountStartupLoading } from '../ui/startup-loading.ts';
 /** Compose combat/scoring, character positions and kill rules through explicit owners. */
 export function createRuntimeSceneCoordination(
@@ -79,11 +80,23 @@ export function createRuntimeSceneCoordination(
           screenAnimation: ui.screenAnimation,
           demonRealmRenderer: foundation.browser.demonRealmRenderer,
           driftRenderer: presentation.driftRenderer,
-          prepareWeaponParts: () =>
-            foundation.browser.inkSword.prepareParts([
-              ...ENEMY_WEAPON_IDS,
-              foundation.profile.profileEquipment.EQ.blade,
-            ]),
+          prepareFigureArtwork: (signal: AbortSignal) => {
+            const G = foundation.run.G;
+            const current =
+              G.boss && (G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss'))
+                ? G.boss
+                : undefined;
+            const ordinal =
+              foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain] ?? G.bossCount + 1;
+            const tones = current?.def.pal
+              ? [current.def.pal]
+              : BOSS_IDENTITIES[(ordinal - 1) % BOSS_IDENTITIES.length]!.tones;
+            return foundation.browser.prepareFigureArtwork(
+              [...ENEMY_WEAPON_IDS, foundation.profile.profileEquipment.EQ.blade],
+              tones.map((tone) => foundation.view.palette.robe(tone)),
+              signal,
+            );
+          },
           environmentRenderer: foundation.browser.environmentRenderer,
           sceneRecovery: {
             show(retry: () => void) {

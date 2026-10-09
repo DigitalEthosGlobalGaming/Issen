@@ -337,6 +337,55 @@ test('pending sources survive frame collection and reupload after actual context
   });
 });
 
+test('resize during shader preparation warms the replacement targets before readiness', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 32;
+    const painter = await createTestDrawing(canvas);
+    const source = document.createElement('canvas');
+    source.width = source.height = 16;
+    const ink = source.getContext('2d')!;
+    ink.fillStyle = '#f00';
+    ink.fillRect(0, 0, 16, 16);
+    const shaders = painter.warmSceneShaders.bind(painter);
+    let resized = false;
+    painter.warmSceneShaders = async (signal) => {
+      if (!resized) {
+        resized = true;
+        canvas.width = 64;
+        canvas.height = 48;
+        painter.begin();
+      }
+      return shaders(signal);
+    };
+    try {
+      const ready = await painter.warmScene(
+        [{ texture: { source, revision: 0 } }],
+        new AbortController().signal,
+      );
+      const gl = canvas.getContext('webgl2')!;
+      let uploads = 0;
+      const upload = gl.texImage2D;
+      gl.texImage2D = (...args: any[]) => {
+        uploads++;
+        return Reflect.apply(upload, gl, args);
+      };
+      painter.begin();
+      painter.drawImage(source, 0, 0);
+      painter.flush();
+      gl.texImage2D = upload;
+      return { ready, resized, uploads, pixel: Array.from(painter.getImageData(0, 0, 1, 1).data) };
+    } finally {
+      painter.dispose();
+    }
+  });
+  expect(result).toEqual({ ready: true, resized: true, uploads: 0, pixel: [255, 0, 0, 255] });
+});
+
 test('painter disposal aborts a hidden upload wait without any later upload', async ({ page }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {

@@ -1,4 +1,37 @@
-# Mobile performance — Budget-aware next scenery
+# Mobile performance — Incoming figure preparation
+
+App1.69.20 prepares regular enemy cutouts, incoming boss palette alternatives
+and selected enemy/player weapons before stage readiness. The same gameplay
+painter warms colour/data sources and holds one current figure lease. Cache hits
+reuse preparation without a new paced CPU pass; replacement/disposal cancels
+obsolete jobs. Shared white/empty and current geometry/light/back-buffer textures
+also warm before readiness. Viewport, quality, target and context changes restart
+preparation, including resize during shader work. The guarded Pixi8.22 adapter
+borrows the existing back-buffer texture; no alternate rendering cache or draws.
+
+Native38regular/boss comparisons covering every weapon recipe match pixels
+exactly, with drawing readbacks/uploads/program creation0 after160collection
+frames. Hidden cancellation preserves86sources; actual context restore yields
+first-draw uploads0, and final disposal releases all86. Resize warming passes.
+Fourteen unique related browser checks and11units pass; final checked production
+verification build includes strict TypeScript. Version/package/lock/title/changelog
+agree1.69.20. Evidence: [progress](docs/development/mobile-performance-progress.md)
+and `tmp/probes/figure-gpu-*.log`. All verification handles terminal.
+
+Representative390x844/DPR2 first-game nominal accounting601,477,452bytes plus
+90,092,128native/browser reserve =691,569,580 committed. All9next-scene estimates
+fit desktop1GiB at this point. Required preparation costs39,546,968more nominal
+bytes than the previous corrected snapshot; not a low-memory or physical proof.
+
+Next: required-resource ownership/combined limits and Demon GPU preparation/
+mode-exit lifetime, then all-stage transition/memory verification and final
+measurement matrix/suites. Same-stage later boss palette misses remain possible.
+Framebuffer/MSAA/geometry costs remain outside the zero-texture-upload claim.
+Large corrected preload matrix still waits for the transition integration gate.
+Physical Android/120Hz targets remain unproven; full goal incomplete. Cancelled
+general packing/lit-only work stays cancelled. No push/deploy/native builds/saves.
+
+## Previous handoff — Budget-aware next scenery
 
 App1.69.19 composes, retains and warms one predicted next scene through the
 existing worker/painter, then promotes matching identities without recomposition.

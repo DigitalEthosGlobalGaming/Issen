@@ -173,6 +173,27 @@ tone generation while PBR diffuse serves untinted stamps. Player consumers relea
 their own raw/tone GPU textures on preview suspension/disposal and unregister.
 Final disposal releases consumers before leases/owned tone pixels.
 Enemy and weapon decoded ownership remains work.
+
+Stage readiness prepares figure artwork through `native-services.prepareFigureArtwork`.
+Enemy preparation reuses the bounded sprite/tone caches for the four regular
+palettes, uncoloured base parts, headwear and variant heads. Stage entry also
+prepares the incoming boss archetype's three possible cloth tones without
+choosing an identity or consuming RNG; an active boss keeps its current palette
+during resize/recovery. Weapon preparation covers regular enemy recipes and the
+equipped player blade, including special/gold parts. Both owners return the exact
+colour/data sources used by drawing. The gameplay painter retains and warms them;
+only an accepted replacement releases the prior figure lease. New scene requests
+abort obsolete preparation and native-service disposal cancels outstanding waits.
+An unchanged intact enemy preparation reuses its source list immediately.
+
+Painter texture preparation includes shared white/empty textures, current
+geometry/light targets and Pixi's owned back-buffer texture. A guarded Pixi8.22
+`_getBackBufferTexture` adapter prepares that existing target without drawing.
+Paced jobs read replacement target sources dynamically; viewport, quality,
+target and context generations suppress stale readiness. Surface dimensions are
+synchronised before allocation, and source/shader preparation repeats when the
+surface changes while yielding. This does not eliminate framebuffer, MSAA or
+geometry setup costs on a later draw; first-draw latency still needs final profiling.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output

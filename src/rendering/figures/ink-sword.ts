@@ -7,7 +7,12 @@ import { retireSceneTexture } from '../texture-revision.ts';
 import type { SceneMaterial } from '../scene-frame.ts';
 import type { Palette } from '../palette.ts';
 import type { BladeStyle } from './types.ts';
-import { nextVisibleFrame, paceTextureUploads } from '../texture-upload.ts';
+import {
+  nextVisibleFrame,
+  paceTextureUploads,
+  materialTextureUploads,
+  type TextureUpload,
+} from '../texture-upload.ts';
 import {
   BLADE_RECIPES,
   BLADE_PROFILE_FRAMES,
@@ -187,6 +192,47 @@ export function createInkSwordRenderer(doc: Document) {
       fittings.ready('special')
     );
   }
+  async function prepareUploads(
+    ids: readonly string[],
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    if (signal.aborted || !(await prepareParts(ids)) || signal.aborted || disposed) return;
+    const uploads: TextureUpload[] = [];
+    const add = (family: Family, frame: Frame, tint?: string) => {
+      const image = part(family, frame, tint);
+      if (!image) return false;
+      const material =
+        family === 'blades'
+          ? {
+              normal: { source: images.get('normal')!, revision: 0, frame },
+              surface: { source: surface, revision: 0, frame },
+              ...(images.has('emissive')
+                ? { emissive: { source: images.get('emissive')!, revision: 0, frame } }
+                : {}),
+              normalY: -1 as const,
+              lighting: 1,
+              depth: 0,
+              fog: 0,
+              fogColor: [0.53, 0.51, 0.47] as const,
+            }
+          : fittings.material(family, frame);
+      uploads.push(...materialTextureUploads({ source: image, revision: 0 }, material));
+      return true;
+    };
+    for (const id of new Set(ids)) {
+      const recipe = BLADE_RECIPES[id]!;
+      if (recipe.special) {
+        if (!add('special', SPECIAL_FRAMES[recipe.special])) return;
+        if (recipe.special === 'pan' && !add('special', SPECIAL_FRAMES.pan, '#c8a650')) return;
+      } else if (
+        !add('blades', BLADE_PROFILE_FRAMES[recipe.profile]!.frame, recipe.tint) ||
+        !add('hilts', HILT_FRAMES[recipe.hilt]!, recipe.hiltTint) ||
+        !add('hilts', GUARD_PARTS[recipe.guard]!.frame)
+      )
+        return;
+    }
+    return uploads;
+  }
   function draw(
     g: SceneDrawing,
     gx: number,
@@ -311,6 +357,7 @@ export function createInkSwordRenderer(doc: Document) {
   return {
     prepare,
     prepareParts,
+    prepareUploads,
     draw,
     get ready() {
       return ready();

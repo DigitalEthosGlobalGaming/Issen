@@ -31,7 +31,7 @@ export interface SceneFlowViews {
   readonly screenAnimation: { invalidate(): void };
   readonly demonRealmRenderer: { prepare(): Promise<boolean> };
   readonly driftRenderer: { prepare(stage: number): Promise<boolean> };
-  prepareWeaponParts(): Promise<boolean>;
+  prepareFigureArtwork(signal: AbortSignal): Promise<boolean>;
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string; workerFailure?: string };
@@ -50,6 +50,7 @@ export interface SceneFlowViews {
 /** Scene readiness owns stale-request suppression and paused continuation adoption.
  * Renderer operations are explicit ports; drawing never resumes gameplay. */
 export function createSceneFlow(readViews: () => SceneFlowViews) {
+  let figurePreparation: AbortController | undefined;
   function retryScene() {
     const views = readViews();
     if (views.lifecycle.disposed) return;
@@ -92,6 +93,8 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
     const key = `${demon}:${compositionKey(frame)}`;
     if (key === views.requestedSceneKey) return;
+    figurePreparation?.abort();
+    figurePreparation = new AbortController();
     markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
@@ -115,7 +118,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const pending = Promise.all([
       demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
       views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
-      views.prepareWeaponParts(),
+      views.prepareFigureArtwork(figurePreparation.signal),
     ]).then(([sceneReady, driftReady, weaponsReady]) => sceneReady && driftReady && weaponsReady);
     void pending
       .then((ready) => {

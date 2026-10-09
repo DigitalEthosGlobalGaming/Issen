@@ -78,6 +78,7 @@ export function createRuntimeFoundation(
   let g = mainG;
   const {
     memorySnapshot,
+    prepareFigureArtwork,
     environmentRenderer,
     demonRealmRenderer,
     inkCharm,
@@ -187,6 +188,7 @@ export function createRuntimeFoundation(
   return {
     lifecycle,
     browser: {
+      prepareFigureArtwork,
       memorySnapshot,
       $,
       context2d,

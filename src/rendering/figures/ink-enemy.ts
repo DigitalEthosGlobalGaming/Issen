@@ -6,6 +6,14 @@ import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
 import type { Figure, FigureEnvironment, Point, EnemyPart } from './types.ts';
+import type { Palette } from '../palette.ts';
+import {
+  materialTextureUploads,
+  nextVisibleFrame,
+  paceTextureUploads,
+  type TextureUpload,
+} from '../texture-upload.ts';
+import { ENEMY_PALETTES } from './enemy-appearance.ts';
 
 type Part = EnemyPart;
 type Frame = readonly [number, number, number, number];
@@ -113,6 +121,8 @@ export function createInkEnemyRenderer(doc: Document) {
   }
   let disposed = false,
     pending: Promise<boolean> | undefined;
+  const preparation = new AbortController();
+  let preparedParts: { key: string; uploads: TextureUpload[] } | undefined;
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
@@ -143,8 +153,8 @@ export function createInkEnemyRenderer(doc: Document) {
   function sprite(
     key: string,
     frame: Frame,
-    f: Figure,
-    env: FigureEnvironment,
+    f: Pick<Figure, 'fog' | 'pal'>,
+    env: Pick<FigureEnvironment, 'palette'>,
     cloth: boolean,
     applyFog = true,
   ): HTMLCanvasElement | null {
@@ -215,6 +225,77 @@ export function createInkEnemyRenderer(doc: Document) {
     }
     retain(cache, keyFull, c);
     return c;
+  }
+  /** Prepare the finite regular-enemy wardrobe using the same cutouts as paint(). */
+  async function prepareUploads(
+    extraPalettes: readonly Palette[],
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    const lifetime = AbortSignal.any([signal, preparation.signal]);
+    const selected = [
+      ...new Map(
+        [...ENEMY_PALETTES, ...extraPalettes].map((palette) => [
+          palette.robeD + palette.robeL,
+          palette,
+        ]),
+      ).values(),
+    ];
+    const key = selected
+      .map((palette) => palette.robeD + palette.robeL)
+      .sort()
+      .join(':');
+    if (lifetime.aborted) return;
+    if (
+      preparedParts?.key === key &&
+      preparedParts.uploads.every(({ texture }) => texture.source.width > 0)
+    )
+      return preparedParts.uploads;
+    if (!(await prepare()) || lifetime.aborted) return;
+    const stamps: { key: string; frame: Frame; cloth: boolean; palette?: Palette }[] = [];
+    for (const [key, frame] of Object.entries(BASE_FRAMES)) {
+      const cloth = key !== 'head' && key !== 'hand';
+      for (const palette of cloth ? [...selected, undefined] : [undefined])
+        stamps.push({ key, frame, cloth, palette });
+    }
+    for (const [i, frame] of CLOTHING_FRAMES.entries())
+      for (const palette of selected)
+        stamps.push({ key: 'clothing:' + i, frame, cloth: true, palette });
+    for (const [key, frame] of Object.entries(HEAD_FRAMES))
+      stamps.push({ key: 'head:' + key, frame, cloth: false });
+    for (const [i, frame] of VARIANT_HEAD_FRAMES.entries())
+      stamps.push({ key: 'variationHead:' + i, frame, cloth: false });
+    const uploads: TextureUpload[] = [];
+    let complete = true;
+    const ready = await paceTextureUploads(stamps, lifetime, {
+      nextFrame: (abort) => nextVisibleFrame(doc, abort),
+      ready: () => !disposed && !doc.hidden,
+      generation: () => 0,
+      now: () => doc.defaultView!.performance.now(),
+      upload: ({ key, frame, cloth, palette }) => {
+        const image = sprite(
+          key,
+          frame,
+          { fog: 0, pal: palette },
+          { palette: () => ENEMY_PALETTES[0]! },
+          cloth,
+          false,
+        );
+        if (!image) {
+          complete = false;
+          return;
+        }
+        uploads.push(
+          ...materialTextureUploads(
+            { source: image, revision: 0 },
+            pbr[familyFor(key)].material(frame),
+          ),
+        );
+      },
+    });
+    if (ready && complete && uploads.every(({ texture }) => texture.source.width > 0)) {
+      preparedParts = { key, uploads };
+      return uploads;
+    }
   }
   function stamp(
     g: SceneDrawing,
@@ -424,6 +505,7 @@ export function createInkEnemyRenderer(doc: Document) {
   }
   return {
     prepare,
+    prepareUploads,
     drawPart,
     snapshot: () => ({
       ready:
@@ -439,6 +521,8 @@ export function createInkEnemyRenderer(doc: Document) {
     }),
     dispose() {
       disposed = true;
+      preparation.abort();
+      preparedParts = undefined;
       for (const atlas of Object.values(pbr)) atlas.dispose();
       for (const c of [...cache.values(), ...tones.values()]) {
         retireSceneTexture(c);
