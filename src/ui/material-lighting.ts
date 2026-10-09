@@ -8,7 +8,11 @@ import { registerUiTextureRenderer } from './material-textures.ts';
 import { createMainImageOwner } from '../platform/main-images.ts';
 import { observeAssetBackground } from '../platform/asset-background.ts';
 import { trackPixelSource } from '../platform/pixel-memory.ts';
-import { reclaimSceneMemory, registerSceneMemory } from '../platform/scene-memory.ts';
+import {
+  reclaimSceneMemory,
+  reclaimBackgroundSceneMemory,
+  registerSceneMemory,
+} from '../platform/scene-memory.ts';
 
 type Frame = readonly [number, number, number, number];
 type Pack = (typeof assetMaterialCatalog)[number];
@@ -178,8 +182,8 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
         // Publish before reclamation too: evicting an input from this pack moves
         // its bytes back into the plan instead of creating fictitious headroom.
         allocation = plan;
-        const memory = reclaimSceneMemory(doc);
-        if (memory.committedBytes > memory.budget) {
+        const memory = reclaimBackgroundSceneMemory(doc);
+        if (memory.committedBytes > memory.backgroundBudget) {
           allocation = undefined;
           deferred = true;
           retryAt = performance.now() + 250;

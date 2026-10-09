@@ -17,6 +17,9 @@ type SceneOwner = {
 const owners = new WeakMap<Document, Set<WeakRef<SceneOwner>>>();
 const registered = new WeakMap<Document, WeakSet<SceneOwner>>();
 const monitored = new WeakSet<Document>();
+// Matches foreground figure preparation's working allowance. Optional jobs must
+// leave this room for drawing/cache growth while cancelled worker work settles.
+export const sceneGameplayHeadroomBytes = 32 * 1024 * 1024;
 function monitorMainDecodes(doc: Document) {
   if (monitored.has(doc)) return;
   monitored.add(doc);
@@ -29,6 +32,10 @@ export function reclaimSceneMemory(doc: Document, additionalBytes = 0) {
   if (before.committedBytes + additionalBytes <= before.budget) return before;
   trimMainImages(doc, before.committedBytes + additionalBytes - before.budget);
   return documentSceneMemory(doc);
+}
+/** Reclaim for optional work without consuming required gameplay's allowance. */
+export function reclaimBackgroundSceneMemory(doc: Document, additionalBytes = 0) {
+  return reclaimSceneMemory(doc, additionalBytes + sceneGameplayHeadroomBytes);
 }
 export function registerSceneMemory(doc: Document, owner: SceneOwner) {
   monitorMainDecodes(doc);
@@ -81,6 +88,8 @@ export function documentSceneMemory(doc: Document) {
     reservedBytes,
     overheadBytes,
     budget,
+    gameplayHeadroomBytes: sceneGameplayHeadroomBytes,
+    backgroundBudget: budget - sceneGameplayHeadroomBytes,
     committedBytes: accountedBytes + reservedBytes + overheadBytes,
   };
 }

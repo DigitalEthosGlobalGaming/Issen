@@ -281,6 +281,13 @@ pending reservations. Next-scene admission uses twice the document image budget
 (512MiB low-memory,768MiB mobile,1024MiB desktop), with64MiB native headroom plus
 12bytes per painter output pixel reserved for browser drawing buffers. The scene
 estimate includes its decoded kit, canvas/copy/upload planes and20MiB scratch.
+Optional next scenes, background figures and UI exports must also leave 32MiB
+for ordinary gameplay allocations, matching foreground figure preparation's
+working allowance. `backgroundBudget` exposes this lower admission ceiling;
+required preparation can use the full `budget`. This allowance is separate from
+the opaque native-overhead estimate and is not counted as an actual allocation.
+Reclamation preserves it before optional admission; active next slots cancel
+when growth consumes it, retaining cancelled work until settlement.
 Reservations persist until cancelled work settles. A slot cancelled before
 worker transport retains only its unfinished main-thread fog input allowance:
 its aborted continuation cannot compose or upload. Already-sent work retains its

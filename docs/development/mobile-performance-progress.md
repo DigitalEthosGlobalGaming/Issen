@@ -1,5 +1,31 @@
 # Mobile performance continuation
 
+## Gameplay headroom for optional work — 10 October 2026
+
+Version 1.69.55 leaves a 32MiB gameplay allowance when admitting next scenes,
+background figures and UI exports. It matches the existing foreground figure
+working allowance; required preparation still uses the full combined budget.
+This is separate from opaque native overhead and does not remove or relabel any
+actual allocation. Active next slots cancel when growth consumes the allowance,
+while their pending resources remain accounted until real settlement.
+
+Four focused memory/admission unit cases and all 13 next-scene, figure and UI
+browser cases pass (18.7s); strict TypeScript passes. The next-scene regression
+now denies a request that fits the total cap but would consume gameplay headroom,
+then prepares normally once pressure is released.
+
+The heavier live low-tier Rush loadout completes all nine stages and wraps with
+no page errors: 17,152 sampled frame/worker boundaries, peak 518,470,468 against
+536,870,912 bytes, 18,400,444 bytes (17.5MiB) headroom. Previously only 4,396 bytes
+remained. Eight transitions promote prepared slots; the wrap uses foreground
+loading and returns at 396,983,184 tracked bytes. The peak is required initial
+loading, which may consume the optional allowance. These manual-clock captures
+prove neither frame delivery nor every transient/native allocation. Evidence:
+`tmp/test-results/browser/natural-rush-gameplay-headroom-16954/`. Broader mode,
+loadout and transient coverage plus strict restoration failures remain open.
+Checked production 1.69.55 and all four production cases pass in 31.5s, including
+strict TypeScript, startup, armory/run, landscape and offline sprite resize.
+
 ## Ordinary drawing upload reservations — 10 October 2026
 
 Version 1.69.54 extends painter upload accounting to submitted frame textures and

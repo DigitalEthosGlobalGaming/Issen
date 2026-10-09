@@ -12,6 +12,8 @@ import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
 import {
   documentSceneMemory,
   reclaimSceneMemory,
+  reclaimBackgroundSceneMemory,
+  sceneGameplayHeadroomBytes,
   registerSceneMemory,
 } from '../platform/scene-memory.ts';
 import type { Palette } from '../rendering/palette.ts';
@@ -87,8 +89,8 @@ export function createNativeServices(
       // Both bounded enemy tone/variant stores (8M pixels) plus GPU variants.
       // Keep the full reserve until completion; actual allocations remain counted too.
       const reserve = 64 * 1024 * 1024;
-      const memory = reclaimSceneMemory(ownerDocument, reserve);
-      if (memory.committedBytes + reserve > memory.budget) return false;
+      const memory = reclaimBackgroundSceneMemory(ownerDocument, reserve);
+      if (memory.committedBytes + reserve > memory.backgroundBudget) return false;
       background = backgroundLifetime = new AbortController();
       backgroundReservation = reserve;
       signal.addEventListener(
@@ -172,7 +174,7 @@ export function createNativeServices(
       registerSceneMemory(ownerDocument, backgroundOwner);
       return documentSceneMemory(ownerDocument);
     },
-    reclaimMemory: () => reclaimSceneMemory(ownerDocument, 32 * 1024 * 1024),
+    reclaimMemory: () => reclaimSceneMemory(ownerDocument, sceneGameplayHeadroomBytes),
     prepareFigureArtwork,
     environmentRenderer,
     demonRealmRenderer,

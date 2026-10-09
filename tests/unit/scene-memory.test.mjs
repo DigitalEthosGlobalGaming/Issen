@@ -35,6 +35,8 @@ test('scene admission includes peer workers, transient reservations and browser 
   assert.equal(snapshot.overheadBytes, 64 * 1024 * 1024 + 600);
   assert.equal(snapshot.committedBytes, 6000 + snapshot.overheadBytes);
   assert.equal(snapshot.budget, 512 * 1024 * 1024);
+  assert.equal(snapshot.gameplayHeadroomBytes, 32 * 1024 * 1024);
+  assert.equal(snapshot.backgroundBudget, 480 * 1024 * 1024);
   image.width = canvas.width = 0;
   gpu.memorySnapshot = { sources: 0, bytes: 0 };
   live.memorySnapshot = preview.memorySnapshot = {

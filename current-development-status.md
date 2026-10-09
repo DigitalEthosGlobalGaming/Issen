@@ -1,5 +1,33 @@
 # Current development status
 
+## Current handoff — gameplay allowance for optional preparation (1.69.55)
+
+Optional next scenes, background figures and UI exports now reclaim/admit against
+the total budget minus a 32MiB gameplay working allowance. This matches foreground
+figure preparation and is separate from native-overhead estimates, without
+removing actual allocations. Required preparation retains the full budget.
+Active next slots cancel when growth consumes the allowance; cancelled resources
+still count until settlement.
+
+Four focused memory/admission unit cases and all 13 next-scene/figure/UI browser
+cases pass (18.7s); strict TypeScript passes. The next-scene test now proves a
+request fitting the total cap is denied if it would consume gameplay headroom,
+then recovers when external pressure clears.
+
+Heavier live Rush pan/hisshou/mystic-rock/sumi completes nine stages and wraps,
+no page errors, 17,152 sampled boundaries. Peak 518,470,468 against 536,870,912
+bytes leaves 18,400,444 (17.5MiB), versus 4,396 previously. Eight prepared slots
+promote; the wrap uses required loading, returns at 396,983,184. Peak is required
+initial loading. Manual clocks establish no frame-time delivery target; nominal
+samples do not prove all transients or physical native residency. Evidence:
+`tmp/test-results/browser/natural-rush-gameplay-headroom-16954/`.
+
+Next: broader mode/loadout/transient accounting, two strict restoration failures,
+and final requirement/report verification. Checked production 1.69.55 (including
+strict TypeScript) and all four production cases pass (31.5s), covering the recent
+memory chunks together. Goal active, incomplete. Graphics processes terminal;
+no push/deploy/native build/real-save edits.
+
 ## Current handoff — ordinary drawing upload reservation (1.69.54)
 
 Submitted frame textures and gradients now join the painter's deduplicated

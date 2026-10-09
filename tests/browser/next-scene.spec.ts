@@ -224,6 +224,8 @@ test('next-scene admission denies pressure and releases invalidated transferred 
     const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
     const { documentPixelMemory } = await import('/src/platform/pixel-memory.ts');
     const { documentSceneMemory } = await import('/src/platform/scene-memory.ts');
+    const { scenePreparationBytes } = await import('/src/rendering/environment/scene-admission.ts');
+    const { documentImageBudget } = await import('/src/platform/main-images.ts');
     const NativeWorker = window.Worker;
     const planes: ImageBitmap[] = [];
     let compositions = 0;
@@ -271,7 +273,16 @@ test('next-scene admission denies pressure and releases invalidated transferred 
     try {
       if (!(await owner.compose(frame))) throw Error('Current scene failed');
       const currentCount = planes.length;
+      const available = documentSceneMemory(document);
+      const estimate = scenePreparationBytes(next, documentImageBudget(document))!;
+      pressure.memorySnapshot.bytes =
+        available.budget -
+        available.committedBytes -
+        estimate -
+        available.gameplayHeadroomBytes / 2;
       documentPixelMemory(document).trackGpu(pressure);
+      const fitsTotalBudget =
+        documentSceneMemory(document).committedBytes + estimate <= available.budget;
       sample();
       const denied = owner.snapshot();
       const deniedCompositions = compositions;
@@ -290,6 +301,7 @@ test('next-scene admission denies pressure and releases invalidated transferred 
       return {
         denied,
         deniedCompositions,
+        fitsTotalBudget,
         ready,
         invalidated,
         nextClosed,
@@ -307,6 +319,7 @@ test('next-scene admission denies pressure and releases invalidated transferred 
   expect(result.denied.imagePreload?.status).toBe('denied');
   expect(result.denied.nextScene.reservedBytes).toBe(0);
   expect(result.deniedCompositions).toBe(1);
+  expect(result.fitsTotalBudget).toBe(true);
   expect(result.ready.imagePreload?.status).toBe('ready');
   expect(result.invalidated.imagePreload?.status).toBe('none');
   expect(result.nextClosed).toBe(true);

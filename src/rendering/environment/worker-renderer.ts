@@ -12,6 +12,7 @@ import { documentImageBudget } from '../../platform/main-images.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import {
   reclaimSceneMemory,
+  reclaimBackgroundSceneMemory,
   registerSceneMemory,
   documentSceneMemory,
 } from '../../platform/scene-memory.ts';
@@ -464,8 +465,10 @@ export function createWorkerEnvironmentRenderer(
         ? undefined
         : preparationBytes + (next.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
     const memory =
-      estimate === undefined ? documentSceneMemory(doc) : reclaimSceneMemory(doc, estimate);
-    if (estimate === undefined || memory.committedBytes + estimate > memory.budget) {
+      estimate === undefined
+        ? documentSceneMemory(doc)
+        : reclaimBackgroundSceneMemory(doc, estimate);
+    if (estimate === undefined || memory.committedBytes + estimate > memory.backgroundBudget) {
       if (workerResources.decodedLoader?.bytes && !workerResources.decodedLoader.pinned)
         void trimWorkerCache();
       admissionAt = performance.now() + 250;
@@ -546,7 +549,7 @@ export function createWorkerEnvironmentRenderer(
         if (slot.foreground || performance.now() < memoryCheckAt) return true;
         memoryCheckAt = performance.now() + 250;
         const current = documentSceneMemory(doc);
-        return current.committedBytes <= current.budget;
+        return current.committedBytes <= current.backgroundBudget;
       },
     };
   }
