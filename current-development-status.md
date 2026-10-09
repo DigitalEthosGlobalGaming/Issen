@@ -1,5 +1,21 @@
 # Current development status
 
+## Current handoff — consolidated completion report drafted
+
+Added `docs/development/mobile-performance-final-report.md`, linked from the
+index. It is explicitly incomplete: records implemented drift/worker/admission
+behavior, historical timing, directly verified preview cap results and current
+production/unit/tool passes, with narrow-evidence and hardware limits.
+No implementation/version or acceptance policy changed.
+
+Browser session63888 remains live:211 cases pass, no reported failures at this
+checkpoint. Both original strict restoration cases passed in this execution;
+this does not resolve the leaf's earlier intermittent failures. Resume this
+handle until terminal, then inspect the full result. Sources remain untouched
+while graphics work is live. Next use existing gameplay tooling for combined
+Demon Mirror/Inferno memory and capture the stable final timing matrix. Goal
+active; leaf rounding proposal remains unapproved; no push/deploy/native/save work.
+
 ## Current handoff — production integration green; browser suite live
 
 App1.69.56 unchanged. Current checked production build/typecheck and all four

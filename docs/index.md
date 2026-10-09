@@ -3,6 +3,7 @@
 # Repository documentation
 
 - [Performance and seamless transitions](development/performance-goal-progress.md): active goal checkpoints, measured baselines and verification.
+- [Mobile performance completion report](development/mobile-performance-final-report.md): consolidated evidence, measurement limits and remaining verification; currently incomplete.
 
 - [Support and progression](features/support-progression.md): implemented support
   screens, Second Wind, Ember rewards, Temple collections, Awakening purchases the Seven Dawns crest and Armoury presets.
