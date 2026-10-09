@@ -1,5 +1,38 @@
 # Current development status
 
+## Current handoff — stable local data-plane backing (1.69.56)
+
+Local normal/surface Canvas planes now request CPU backing when first created.
+Their GPU-canvas uploads without premultiplication previously changed native
+texture bytes across WebGL restoration. Colour uploads remained exact. Main
+cached Demon/preview material planes share the fix; worker documents retain
+their GPU composition/bitmap transfer. No extra plane, copy cache or gameplay
+readback is added. Package/lock/title/changelog synchronized.
+
+Before: local stage0 g0/g1 differ3317/427 channels; stage4 2523/549, while albedo
+g2 stays exact. HDR differences follow those altered inputs. Direct native input
+reads then identify hundreds of one-byte normal/surface changes, colour exact.
+After: both affected stages have exact inputs, G0/G1/G2, diffuse/specular HDR and
+resolved back buffer (18/21 checked textures/targets); restored display max0.
+The unchanged all-eleven-row local input-lifetime test passes33.3s, with all
+raw/live/replay comparisons exact. The diagnostic also passes20.9s. Seven related
+local/environment/Demon/preview lifecycle cases pass8.4s; strict TypeScript passes.
+No tolerances or tests changed. The separate intermittent leaf alpha failure is
+still open; its exact native input/mip evidence suggests a separate cause.
+
+Evidence: `tmp/test-results/browser/context-local-{targets,input-texels}-16955/`,
+`tmp/test-results/browser/context-cpu-data-{planes,input-texels}-16955/`, and
+`tmp/test-results/browser/cpu-data-lifecycle-16955/`. Ignored diagnostic fixture:
+`tmp/probes/restoration-local-inputs.spec.ts`. Current production verification
+remains1.69.55 and predates this backing change; defer broad/final checks until
+the remaining leaf issue/integration is ready. All processes terminal.
+
+Next: the leaf restoration failure, broader mode/loadout/transient accounting,
+and final requirement/report verification. Consider whether constant per-instance
+leaf tint/alpha need smooth interpolation before another leaf experiment.
+Do not resume rejected dithering/invariance/second-AA/sampler approaches without
+new causal evidence. Goal active, incomplete; no push/deploy/native build/save edits.
+
 ## Current handoff — restoration experiments rejected (1.69.55 unchanged)
 
 Two targeted renderer experiments remain unsuccessful and are fully reverted:

@@ -215,7 +215,7 @@ function materialLayer(canvas: HTMLCanvasElement, owner: Owner): Layer {
     layer = undefined;
   }
   if (!layer) {
-    const map = () => {
+    const map = (data = false) => {
       const c = trackPixelSource(
         canvas.ownerDocument,
         canvas.ownerDocument.createElement('canvas'),
@@ -223,9 +223,20 @@ function materialLayer(canvas: HTMLCanvasElement, owner: Owner): Layer {
       );
       c.width = canvas.width;
       c.height = canvas.height;
+      // Local data maps upload without premultiplication. CPU backing avoids
+      // native GPU-canvas unpremultiplication changing bytes on context restore.
+      // Worker composition keeps its GPU planes and transfers prepared bitmaps.
+      if (data && canvas.ownerDocument.defaultView)
+        c.getContext('2d', { willReadFrequently: true });
       return c;
     };
-    layer = { owner, normal: map(), surface: map(), emissive: map(), revision: ++revisionSequence };
+    layer = {
+      owner,
+      normal: map(true),
+      surface: map(true),
+      emissive: map(),
+      revision: ++revisionSequence,
+    };
     layers.set(canvas, layer);
     owner.layers.add(canvas);
   }

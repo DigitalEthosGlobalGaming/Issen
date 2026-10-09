@@ -1,5 +1,26 @@
 # Mobile performance continuation
 
+## Stable local normal/surface backing — 10 October 2026
+
+Version1.69.56 requests CPU backing at creation for main-document cached normal
+and surface canvases. Their straight-data native uploads previously changed by
+one byte across context recreation, while premultiplied colour stayed exact.
+Those altered inputs changed G0/G1, HDR lighting and final local display.
+Worker documents keep GPU composition and prepared bitmap transfers; main
+Demon/preview cached maps share the backing fix. No new plane/copy cache or
+gameplay readback is introduced.
+
+The unchanged local input-lifetime case passes33.3s: all11 raw/live/replay rows
+remain exact, both affected restored displays now max0. The native-input/target
+diagnostic passes20.9s, with all18 stage0 and21 stage4 inputs/targets exact,
+including normals, surface, encoded geometry, HDR and resolved back buffer.
+Seven related local/environment/Demon/preview cases pass8.4s; strict TypeScript
+passes. Assertions remain unchanged. Evidence under
+`tmp/test-results/browser/context-{local-targets,local-input-texels,cpu-data-planes,
+cpu-data-input-texels}-16955/` and `tmp/test-results/browser/cpu-data-lifecycle-16955/`.
+The separate leaf alpha failure and broader memory/final verification remain.
+Latest production evidence1.69.55 predates this change; no broad suite repetition.
+
 ## Restoration follow-up; no retained renderer change — 10 October 2026
 
 App1.69.55 unchanged. Removing browser AA while retaining Pixi back-buffer AA

@@ -788,6 +788,12 @@ Live weather hazards, hit stop, slow motion and player records remain rule-owned
 `platform/pixel-memory.ts` weakly observes decoded images and canvas backing
 sizes without extending their lifetimes. Native services expose nominal main
 image/canvas, worker image/canvas, transferred-plane and source-texture bytes.
+Local cached normal/surface planes request CPU Canvas backing at creation, avoiding
+GPU-canvas unpremultiplication rounding during straight-data texture reuploads.
+Colour/emissive canvases retain their existing backing policy. Worker documents
+keep GPU plane composition and prepared bitmap transfer; no extra plane or
+readback cache is introduced. This also covers cached Demon/preview materials.
+
 Painter managed-texture estimates include mip levels, HDR/filter/history/back-buffer
 targets and all registered preview painters; they are separate from decoded pixels.
 A Pixi8.22 descriptor adapter adds stencil/MSAA renderbuffers without GL queries.
