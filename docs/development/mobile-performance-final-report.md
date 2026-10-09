@@ -1,8 +1,8 @@
 # Mobile performance and transitions — completion report in progress
 
 App 1.69.56. **The goal is not complete.** Current production verification is
-green; the full browser integration run and remaining mode-memory/timing work
-are outstanding. This report separates implementation evidence from targets
+green, including the full browser integration. The final timing capture exposes
+a cold-transition regression and one task above 16 ms. This report separates implementation evidence from targets
 that have not been demonstrated. See [current handoff](../../current-development-status.md)
 and [recorded checkpoints](mobile-performance-progress.md).
 
@@ -42,16 +42,27 @@ continues to use GPU planes and bitmap transfers.
 | Drift encoded bytes | 4,378,340 | 155,694 | Colour/emissive replacement; 96.44% reduction |
 | Calm CPU render median, CPU rate 4 | 10.5 ms | 9.6 ms | Saved current vs new application; not isolated GPU timing |
 | Gust CPU render median, CPU rate 4 | 10.9 ms | 10.4 ms | Controlled sustained gust, population/host variance documented |
-| Cold transition median | 548.1 ms | 487.8 ms | Historical compatible control vs app 1.69.49, desktop 900×600/DPR1 |
-| Warm transition median | 547.4 ms | 457.2 ms | Same retained comparison; current 1.69.56 timing still required |
+| Cold transition median | 548.1 ms | 594.0 ms | Compatible historical control vs app 1.69.56, desktop 900×600/DPR1; 8.4% slower |
+| Warm transition median | 547.4 ms | 459.4 ms | Same retained comparison; 16.1% faster |
 
-The app 1.69.49 capture records title/first gameplay at 2137.4/2608.0 ms,
-CPU render p95 3.0 ms and delivered-frame p95 17 ms. Eighteen post-presentation
-two-second windows have no tasks above 16 ms (maximum 9.35 ms). Meadow compose
-is 526.7 ms cold / 568.1 ms warm; other stages are below 500 ms. The older
-meadow profile attributes most drawing time to native canvas uploads, but is
-not a profile of the current build. These timings must remain labelled historical
-until the stable final matrix is captured. They do not demonstrate 120 Hz.
+The current capture records title/first gameplay at 2251.7/2915.1 ms,
+CPU render p95 3.0 ms and delivered-frame p95 17 ms (600 intervals; 208 above
+16.7 ms). CPU renders have three samples above 8.3 ms and none above 16.7 ms.
+Cold load range is 412.1–695.4 ms; warm is 286.1–808.4 ms. Composition maxima
+are 369.8 ms cold / 477.1 ms warm, now below 500 ms in all eighteen samples.
+One of eighteen post-presentation two-second windows has a task above 16 ms:
+17.257 ms, 1.331 seconds after cold stage 8 presentation. It contains a
+16.615 ms animation callback, mapped through the saved source map to
+`src/platform/frame-loop.ts`; the trace does not localize its inner cost.
+This is a real open result, not excluded as a presumed host outlier.
+
+Earlier app 1.69.49 medians were 487.8/457.2 ms with zero above-16-ms tasks.
+The current cold median fails the no-slower-than-baseline target. Its cause,
+including host variance versus changed application cost, needs focused diagnosis.
+Evidence: `tmp/performance-scene-final-16956/results.json` and per-stage traces.
+The older meadow profile is historical context; no extra composition profile
+is needed solely for a threshold that the current samples meet. Desktop timing
+does not demonstrate physical 120 Hz delivery.
 
 The combined ledger counts registered main decoded images/canvases/GPU storage,
 worker decoded/canvas storage, transferred planes and pending reservations. Its
@@ -68,12 +79,26 @@ Second and third settled cycles are stable. The latter use 50 ms sampling plus
 phase snapshots; they do not cover every transient, Demon Mirror combat,
 Inferno gameplay or all loadouts.
 
+A separate thirty-second active-gameplay capture using the existing seeded
+performance driver records Demon Mirror through wave 4 (622 samples) and
+Inferno through wave 3 (629 samples). Both have zero page errors or over-budget
+samples. Peaks are 493,437,632 and 502,989,576 of 536,870,912 bytes; settled
+end values are 490,323,796 and 407,895,072. Demon uses the game's fixed trial
+loadout; Inferno uses pan/hisshou/mystic-rock/sumi. The first probe incorrectly
+required the normal equipment in Demon and was corrected after checking the
+trial's owning code. Saved samples are
+`tmp/probes/gameplay-mode-memory-DPR2-16956-second.json`. These 50 ms samples
+do not prove every transient, complete trials or every loadout. Corresponding
+`mode-memory-{demon,film-inferno}-DPR2-16956.png` captures were reviewed: attack
+cues, figures and scene atmosphere remain legible and coherent.
+
 ## Verification, visuals and open work
 
 Current evidence: 500 unit tests, nine performance-tool tests and all four
 checked production cases pass, including strict TypeScript, startup/run,
-landscape and offline sprite resize. The 419-case browser suite is running;
-do not describe its partial results as a pass. Logs are under ignored
+landscape and offline sprite resize. All 419 browser cases pass in 20.2 minutes,
+including original strict leaf/local restoration checks. The leaf pass does not
+erase previously established intermittency. Logs are under ignored
 `tmp/{unit,performance-tools,production,browser}-integration-16956.log`.
 
 Representative before/after daylight, dark, fire and gust screenshots are under
@@ -88,10 +113,9 @@ outputs, second-AA removal, sampler precision, flat colour and opacity rounding
 experiments were rejected and reverted. No assertion was relaxed. The bounded
 native-rounding proposal remains review-only and requires explicit approval.
 
-Remaining work: terminal browser results and focused failure diagnosis; combined
-memory observations during Demon Mirror and Inferno gameplay; current stable
-startup/cold/warm/compose/frame measurements including upload-reservation cost;
-final requirement audit and report completion. Physical 120 Hz delivery,
+Remaining work: focused cold-transition and slow-frame diagnosis; final
+requirement audit and report completion, retaining the limits of sampled memory
+and the unresolved intermittent leaf restoration result. Physical 120 Hz delivery,
 Android WebView execution and native residency remain hardware evidence gaps.
 Grass geometry bandwidth/maps are a possible separate opportunity and were
 not changed. No push, deployment, native package build or real-save modification

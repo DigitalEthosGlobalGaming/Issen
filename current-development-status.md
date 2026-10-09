@@ -1,5 +1,38 @@
 # Current development status
 
+## Current handoff — all browser checks green; final timing gaps exposed
+
+App1.69.56 unchanged. Full419-case browser suite passes20.2m/default2workers,
+including unchanged leaf and local restoration assertions; previously established
+leaf intermittency remains open. Unit500/tool9/checked production4 passes are
+current and reusable. Do not repeat broad suites on unchanged source.
+
+Existing seeded gameplay driver plus combined memory ledger, low tier390×844/
+DPR2,30seconds each: Demon622 samples peak493,437,632; Inferno629 peak502,989,576
+of536,870,912bytes. Zero over-budget samples/page errors; wave4/3 respectively.
+Demon legitimately substitutes its fixed steel/no-charm/no-pet trial loadout;
+the first probe's normal-loadout assertion was wrong, corrected from run-start
+ownership. Inferno uses pan/hisshou/mystic-rock/sumi. Captures reviewed coherent.
+This50ms sampling is not every transient, complete trials or all loadouts.
+Evidence: `tmp/probes/gameplay-mode-memory-DPR2-16956-second.{json,log}`;
+script `gameplay-mode-memory-16956.mjs` reuses performancePlugin/configure/driver.
+
+Stable current production timing matrix passes the tool but exposes requirement
+gaps: cold median594ms (baseline548.1;8.4% slower), warm459.4 (baseline547.4),
+title2251.7/first2915.1ms, CPU render p953ms/delivered p9517ms. Composition maxima
+369.8cold/477.1warm, all18below500. One cold stage8 post-present task17.257ms,
+starts1331.32ms after presentation; innerFireAnimationFrame16.615ms and function
+maps to `src/platform/frame-loop.ts:63`. Trace lacks inner cost attribution;
+do not dismiss it as host noise or claim the no-above16ms target is met.
+Evidence: `tmp/performance-scene-final-16956/{results.json,cold-8.trace.json}`,
+log `tmp/performance-scene-final-16956.log`; saved source map resolves the frame
+callback with sourcemap-codec (trace line numbers are one-based).
+
+Completion report updated. Next: focused cold-phase/slow-frame diagnosis that can
+change implementation, then final audit; do not rerun the full matrix blindly.
+Leaf rounding proposal remains unapproved. All process handles terminal; no
+push/deploy/native build/real-save edits. Goal active and incomplete.
+
 ## Current handoff — consolidated completion report drafted
 
 Added `docs/development/mobile-performance-final-report.md`, linked from the
