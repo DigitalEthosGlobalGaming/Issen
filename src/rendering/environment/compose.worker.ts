@@ -21,7 +21,13 @@ function createService(decodedBudget?: number) {
 }
 let pending = Promise.resolve();
 let imagePreload: ReturnType<ReturnType<typeof createWorkerDocument>['prefetchImages']>;
+const queued = new Set<number>(),
+  cancelled = new Set<number>();
 scope.onmessage = ({ data }) => {
+  if (data.kind === 'cancel') {
+    if (queued.has(data.requestId)) cancelled.add(data.requestId);
+    return;
+  }
   const { workerDocument, renderer } = (service ??= createService(data.decodedBudget));
   // Cancellation and policy changes bypass the compose queue.
   imagePreload?.release();
@@ -51,6 +57,7 @@ scope.onmessage = ({ data }) => {
     });
     return;
   }
+  queued.add(data.id);
   pending = pending.then(async () => {
     const layers: ComposedLayer[] = [],
       foreground: ComposedLayer[] = [];
@@ -58,6 +65,8 @@ scope.onmessage = ({ data }) => {
     let assetsAt = started,
       composedAt = started;
     try {
+      if (cancelled.has(data.id))
+        throw new DOMException('Scenery preparation cancelled', 'AbortError');
       if (data.kind === 'prepare') {
         // An exported current scene owns its pixels; released inputs are not a
         // reason to invalidate its key. Changed compose keys reacquire normally.
@@ -67,6 +76,8 @@ scope.onmessage = ({ data }) => {
         assetsAt = composedAt = performance.now();
       } else if (
         await renderer.compose(data.frame, () => {
+          if (cancelled.has(data.id))
+            throw new DOMException('Scenery preparation cancelled', 'AbortError');
           assetsAt = performance.now();
           scope.postMessage(
             {
@@ -92,6 +103,8 @@ scope.onmessage = ({ data }) => {
         // Copies and composed canvases own their pixels. Raw inputs need no
         // residency between scenes; reacquisition follows the existing key path.
         workerDocument.releaseUnusedImages();
+        if (cancelled.has(data.id))
+          throw new DOMException('Scenery preparation cancelled', 'AbortError');
       }
       const snapshot = {
         ...renderer.snapshot(),
@@ -120,6 +133,10 @@ scope.onmessage = ({ data }) => {
       scope.postMessage(response, bitmaps);
     } catch (error) {
       closeLayers([...layers, ...foreground]);
+      if (cancelled.has(data.id)) {
+        renderer.releaseExportInputs();
+        workerDocument.releaseUnusedImages();
+      }
       scope.postMessage(
         {
           id: data.id,
@@ -131,6 +148,9 @@ scope.onmessage = ({ data }) => {
         },
         [],
       );
+    } finally {
+      queued.delete(data.id);
+      cancelled.delete(data.id);
     }
   });
 };

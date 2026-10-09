@@ -10,7 +10,18 @@ test('worker quiet preload resumes after explicit preparation and waits for its 
     const { createWorkerEnvironmentRenderer } =
       await import('/src/rendering/environment/worker-renderer.ts');
     const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
-    const renderer = createWorkerEnvironmentRenderer(document);
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 100;
+    const drawing = await createTestDrawing(canvas);
+    const renderer = createWorkerEnvironmentRenderer(
+      document,
+      (sources, signal) => drawing.warmScene(sources, signal),
+      {
+        retainWorkerSources: (sources) => drawing.retainTextureSources(sources),
+      },
+    );
     const frame = {
       width: 160,
       height: 100,
@@ -47,6 +58,7 @@ test('worker quiet preload resumes after explicit preparation and waits for its 
       return { during, beforeCompose, ready, changed, resumed };
     } finally {
       renderer.dispose();
+      drawing.dispose();
     }
   });
   expect(result.during).toBe('none');
@@ -79,12 +91,16 @@ for (const [worker, memory] of [
         async ({ enabled, worker, memory }) => {
           Object.defineProperty(navigator, 'deviceMemory', { configurable: true, value: memory });
           const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
+          const { createLocalEnvironmentRenderer } =
+            await import('/src/rendering/environment/local-renderer.ts');
+          const { compositionKey } = await import('/src/rendering/environment/worker-types.ts');
           const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
           const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
           const { sceneImageUrls } = await import('/src/rendering/environment/asset-sources.ts');
           const NativeWorker = window.Worker;
           const workerUrls: string[] = [];
-          let transferred: any[] = [],
+          const transferred = new Map<string, any[]>();
+          let activeKey = '',
             decodes = 0;
           if (worker)
             window.Worker = class extends NativeWorker {
@@ -98,7 +114,7 @@ for (const [worker, memory] of [
                 super(workerUrl, options);
                 this.addEventListener('message', ({ data }) => {
                   if (data.ok && data.layers?.length)
-                    transferred = [...data.layers, ...data.foreground];
+                    transferred.set(data.key, [...data.layers, ...data.foreground]);
                 });
               }
             };
@@ -107,18 +123,25 @@ for (const [worker, memory] of [
             decodes++;
             return originalDecode.call(this);
           };
-          const renderer = createEnvironmentRenderer(document, { worker });
           const canvas = document.createElement('canvas');
           canvas.width = 390;
           canvas.height = 844;
           const g = await createTestDrawing(canvas);
+          const renderer = worker
+            ? createEnvironmentRenderer(document, {
+                warmWorkerScene: (sources, signal) => g.warmScene(sources, signal),
+                retainWorkerSources: (sources) => g.retainTextureSources(sources),
+              })
+            : createLocalEnvironmentRenderer(document);
           const digest = async (rgba: Uint8ClampedArray) =>
             Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', rgba)))
               .map((v) => v.toString(16).padStart(2, '0'))
               .join('');
           const hashes = async () => {
             const output = !worker ? (renderer as any).exportLayers() : undefined;
-            const layers = worker ? transferred : [...output.layers, ...output.foreground];
+            const layers = worker
+              ? transferred.get(activeKey)!
+              : [...output.layers, ...output.foreground];
             const values = [];
             for (const layer of layers)
               for (const kind of ['colour', 'normal', 'surface', 'emissive']) {
@@ -158,6 +181,7 @@ for (const [worker, memory] of [
                 };
                 const beforeDecode = decodes;
                 if (!(await renderer.compose(frame))) throw Error('Scene failed to compose');
+                activeKey = compositionKey(frame);
                 const enteredDecodes = decodes - beforeDecode;
                 const before = renderer.snapshot(),
                   planes = await hashes();
@@ -187,7 +211,7 @@ for (const [worker, memory] of [
                 const preloaded = renderer.snapshot(),
                   held = await hashes(),
                   afterPixels = await draw();
-                // Busy and invalid geometry must drop the speculative lease immediately.
+                // Busy frames stop pending work; completed worker scenes can remain ready.
                 sampleAssetBackground(stage, false, 1, 8.3, next.stage, next);
                 const cancelled = renderer.snapshot().imagePreload?.status;
                 sampleAssetBackground(stage, true, 1, 8.3, next.stage, {
@@ -255,7 +279,9 @@ for (const [worker, memory] of [
       expect(row.afterPixels).toEqual(original[i]!.afterPixels);
       expect(row.preloaded.builds).toBe(row.before.builds);
       expect(row.preloaded.stage).toBe(row.stage);
-      expect(row.cancelled).toBe('none');
+      expect(row.cancelled).toBe(
+        worker && row.preloaded.imagePreload?.status === 'ready' ? 'ready' : 'none',
+      );
       expect(row.invalid).toBe('none');
       if (worker) {
         expect(row.before.worker).toBe(true);

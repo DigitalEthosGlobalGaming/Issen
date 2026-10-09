@@ -36,69 +36,86 @@ test('startup worker failure offers one reload retry and preserves saved values'
   expect(await page.evaluate(() => localStorage.getItem('issen.best'))).toBe('123');
 });
 
-test('scene worker retry holds combat and adopts the same stage seed without reload', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    const NativeWorker = window.Worker;
-    window.Worker = class extends NativeWorker {
-      postMessage(message: any, ...rest: any[]) {
-        if ((window as any).failNextScenery && message.kind === 'compose') {
-          (window as any).failNextScenery = false;
-          this.dispatchEvent(new ErrorEvent('error', { message: 'fixture stage worker failure' }));
-          return;
+for (const failure of ['transition', 'presented'] as const)
+  test(`${failure} scene worker retry holds combat and adopts the same stage seed without reload`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const NativeWorker = window.Worker;
+      window.Worker = class extends NativeWorker {
+        constructor(url: string | URL, options?: WorkerOptions) {
+          super(url, options);
+          if (options?.name === 'issen-scenery') (window as any).fixtureSceneryWorker = this;
         }
-        return Reflect.apply(NativeWorker.prototype.postMessage, this, [message, ...rest]);
-      }
-    };
-  });
-  await page.route('**/src/game.ts*', async (route) => {
-    const response = await route.fetch();
-    await route.fulfill({
-      response,
-      body: (await response.text()).replace(
-        'artworkReady = true;',
-        'window.__workerRecovery = { foundation, game }; artworkReady = true;',
-      ),
-    });
-  });
-  await page.goto('/');
-  await page.waitForFunction(() => !!(window as any).__workerRecovery);
-  await page.locator('#bPlay').click();
-  await page.locator('#bBegin').click();
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 30000 });
-  const snapshot = () =>
-    page.evaluate(() => {
-      const { foundation: f } = (window as any).__workerRecovery;
-      return {
-        state: f.run.G.state,
-        runTime: f.run.G.runTime,
-        seed: f.view.stageState.stageSeed,
-        random: f.run.activity.runRandom.state(),
-        saved: localStorage.getItem('issen.runCheckpoint'),
+        postMessage(message: any, ...rest: any[]) {
+          if ((window as any).failNextScenery && message.kind === 'compose') {
+            (window as any).failNextScenery = false;
+            this.dispatchEvent(
+              new ErrorEvent('error', { message: 'fixture stage worker failure' }),
+            );
+            return;
+          }
+          return Reflect.apply(NativeWorker.prototype.postMessage, this, [message, ...rest]);
+        }
       };
     });
-  await page.evaluate(() => {
-    (window as any).failNextScenery = true;
-    (window as any).__workerRecovery.game.setStage(1, false);
+    await page.route('**/src/game.ts*', async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({
+        response,
+        body: (await response.text()).replace(
+          'artworkReady = true;',
+          'window.__workerRecovery = { foundation, game }; artworkReady = true;',
+        ),
+      });
+    });
+    await page.goto('/');
+    await page.waitForFunction(() => !!(window as any).__workerRecovery);
+    await page.locator('#bPlay').click();
+    await page.locator('#bBegin').click();
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 30000,
+    });
+    const snapshot = () =>
+      page.evaluate(() => {
+        const { foundation: f } = (window as any).__workerRecovery;
+        return {
+          state: f.run.G.state,
+          runTime: f.run.G.runTime,
+          seed: f.view.stageState.stageSeed,
+          random: f.run.activity.runRandom.state(),
+          saved: localStorage.getItem('issen.runCheckpoint'),
+        };
+      });
+    await page.evaluate((failure) => {
+      if (failure === 'presented')
+        (window as any).fixtureSceneryWorker.dispatchEvent(
+          new ErrorEvent('error', { message: 'fixture active worker failure' }),
+        );
+      else {
+        (window as any).failNextScenery = true;
+        (window as any).__workerRecovery.game.setStage(1, false);
+      }
+    }, failure);
+    await expect(page.getByRole('heading', { name: 'Scene unavailable' })).toBeVisible();
+    const held = await snapshot();
+    await page.waitForTimeout(300);
+    expect(await snapshot()).toEqual(held);
+    await page.getByRole('button', { name: 'Retry', exact: true }).click();
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 30000,
+    });
+    await expect(page.locator('.startup-loading')).toHaveCount(0);
+    const recovered = await snapshot();
+    expect(recovered.seed).toBe(held.seed);
+    expect(recovered.saved).toBe(held.saved);
+    expect(
+      await page.evaluate(
+        () =>
+          (window as any).__workerRecovery.foundation.browser.environmentRenderer.snapshot().worker,
+      ),
+    ).toBe(true);
   });
-  await expect(page.getByRole('heading', { name: 'Scene unavailable' })).toBeVisible();
-  const held = await snapshot();
-  await page.waitForTimeout(300);
-  expect(await snapshot()).toEqual(held);
-  await page.getByRole('button', { name: 'Retry', exact: true }).click();
-  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', { timeout: 30000 });
-  await expect(page.locator('.startup-loading')).toHaveCount(0);
-  const recovered = await snapshot();
-  expect(recovered.seed).toBe(held.seed);
-  expect(recovered.saved).toBe(held.saved);
-  expect(
-    await page.evaluate(
-      () =>
-        (window as any).__workerRecovery.foundation.browser.environmentRenderer.snapshot().worker,
-    ),
-  ).toBe(true);
-});
 
 test('missing worker, offscreen canvas or bitmap capability cannot activate local scenery', async ({
   page,

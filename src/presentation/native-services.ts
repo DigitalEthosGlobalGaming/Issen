@@ -9,7 +9,7 @@ import { createLightingRig } from '../rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from '../ui/material-lighting.ts';
 import { disposeUiArt } from '../rendering/ui-art.ts';
 import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
-import { documentPixelMemory } from '../platform/pixel-memory.ts';
+import { documentSceneMemory } from '../platform/scene-memory.ts';
 
 export interface PreparedLighting {
   rig: ReturnType<typeof createLightingRig>;
@@ -20,10 +20,11 @@ export function createNativeServices(
   ownerDocument: Document,
   lifecycle: { add(cleanup: () => void): void },
   lighting?: PreparedLighting,
-  painter?: Pick<PixiScenePainter, 'warmScene'>,
+  painter?: Pick<PixiScenePainter, 'warmScene' | 'retainTextureSources'>,
 ) {
   const environmentRenderer = createEnvironmentRenderer(ownerDocument, {
     warmWorkerScene: painter ? (sources, signal) => painter.warmScene(sources, signal) : undefined,
+    retainWorkerSources: painter ? (sources) => painter.retainTextureSources(sources) : undefined,
   });
   lifecycle.add(environmentRenderer.dispose);
   const demonRealmRenderer = createDemonRealmRenderer(ownerDocument);
@@ -43,26 +44,7 @@ export function createNativeServices(
   lifecycle.add(inkPlayer.dispose);
   lifecycle.add(inkSword.dispose);
   return {
-    memorySnapshot() {
-      const main = documentPixelMemory(ownerDocument).snapshot();
-      const scene = environmentRenderer.snapshot();
-      const workerDecodedBytes = scene.decodedLoader?.bytes ?? 0;
-      const workerCanvasBytes = scene.canvasBytes ?? 0;
-      const transferredBytes = scene.transferredBytes;
-      return {
-        ...main,
-        workerDecodedBytes,
-        workerCanvasBytes,
-        transferredBytes,
-        accountedBytes:
-          main.decodedBytes +
-          main.canvasBytes +
-          main.gpuBytes +
-          workerDecodedBytes +
-          workerCanvasBytes +
-          transferredBytes,
-      };
-    },
+    memorySnapshot: () => documentSceneMemory(ownerDocument),
     environmentRenderer,
     demonRealmRenderer,
     inkCharm,

@@ -1314,8 +1314,11 @@ export class PixiScenePainter implements SceneDrawing {
 
   get memorySnapshot() {
     return this.disposed
-      ? { sources: 0, bytes: 0, textureBytes: 0, renderbufferBytes: 0 }
-      : rendererGpuMemory(this.renderer);
+      ? { sources: 0, bytes: 0, textureBytes: 0, renderbufferBytes: 0, browserReserveBytes: 0 }
+      : {
+          ...rendererGpuMemory(this.renderer),
+          browserReserveBytes: this.canvas.width * this.canvas.height * 12,
+        };
   }
 
   get sourceRetirementSnapshot(): { sources: number; bytes: number } {

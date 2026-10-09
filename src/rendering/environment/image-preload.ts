@@ -7,7 +7,8 @@ type Preload = { ready: Promise<boolean>; release(): void; active?(): boolean };
 export function createSceneImagePreload(
   doc: Document,
   current: () => CompositionIdentity | undefined,
-  start: (stage: number) => Preload | undefined,
+  start: (stage: number, next: CompositionIdentity) => Preload | undefined,
+  options: { retainReadyWhenBusy?: boolean } = {},
 ) {
   let key: string | undefined, lease: Preload | undefined;
   let status: 'none' | 'pending' | 'ready' | 'denied' = 'none';
@@ -22,11 +23,10 @@ export function createSceneImagePreload(
     const active = current();
     if (
       doc.hidden ||
-      !quiet ||
+      ((!quiet || work > budget * 0.75) && !(options.retainReadyWhenBusy && status === 'ready')) ||
       !Number.isFinite(work) ||
       !Number.isFinite(budget) ||
       budget <= 0 ||
-      work > budget * 0.75 ||
       !active ||
       active.stage !== stage ||
       !next ||
@@ -43,10 +43,10 @@ export function createSceneImagePreload(
       return;
     }
     const nextKey = compositionKey(next);
-    if (key === nextKey) return;
+    if (key === nextKey && (lease || status === 'ready')) return;
     cancel();
     key = nextKey;
-    const incoming = start(next.stage);
+    const incoming = start(next.stage, next);
     if (!incoming) {
       status = 'denied';
       return;
@@ -75,6 +75,13 @@ export function createSceneImagePreload(
   };
   doc.addEventListener('visibilitychange', visibility);
   return {
+    consume(matchingKey: string) {
+      if (key !== matchingKey || !lease) return false;
+      lease = undefined;
+      key = undefined;
+      status = 'none';
+      return true;
+    },
     cancel,
     snapshot: () => ({ key, status }),
     dispose() {

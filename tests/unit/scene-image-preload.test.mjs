@@ -2,6 +2,45 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { sampleAssetBackground } from '../../src/platform/asset-background.ts';
 import { createSceneImagePreload } from '../../src/rendering/environment/image-preload.ts';
+import { compositionKey } from '../../src/rendering/environment/worker-types.ts';
+
+test('ready scene ownership survives busy frames and transfers only to its exact identity', async () => {
+  const doc = new EventTarget();
+  doc.hidden = false;
+  const current = { width: 100, height: 100, dpr: 1, lowQuality: true, stage: 0, stageSeed: 1 };
+  const next = { ...current, stage: 1, stageSeed: 2 };
+  let releases = 0;
+  const preloader = createSceneImagePreload(
+    doc,
+    () => current,
+    () => ({
+      ready: Promise.resolve(true),
+      release() {
+        releases++;
+      },
+    }),
+    { retainReadyWhenBusy: true },
+  );
+  const sample = (quiet = true) => sampleAssetBackground(0, quiet, 1, 8.3, 1, next);
+  try {
+    sample();
+    await Promise.resolve();
+    sample(false);
+    assert.equal(preloader.snapshot().status, 'ready');
+    assert.equal(preloader.consume(compositionKey({ ...next, stageSeed: 3 })), false);
+    assert.equal(preloader.consume(compositionKey(next)), true);
+    preloader.cancel();
+    assert.equal(releases, 0, 'promoted ownership belongs to the consumer');
+    sample();
+    await Promise.resolve();
+    doc.hidden = true;
+    doc.dispatchEvent(new Event('visibilitychange'));
+    assert.equal(releases, 1);
+    assert.equal(preloader.snapshot().status, 'none');
+  } finally {
+    preloader.dispose();
+  }
+});
 
 test('scene image preloading requires a settled matching quiet scene and invalidates every identity field', async () => {
   const doc = new EventTarget();

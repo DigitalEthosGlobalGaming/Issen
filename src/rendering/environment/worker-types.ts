@@ -44,6 +44,7 @@ export type EnvironmentSnapshot = {
   texturesWarmed?: boolean;
 };
 export type ComposeRequest = { decodedBudget?: number } & (
+  | { id: number; kind: 'cancel'; requestId: number }
   | { id: number; kind: 'preload'; stage?: number }
   | { id: number; kind: 'prepare'; stage: number }
   | { id: number; kind: 'compose'; key: string; frame: EnvironmentFrame }

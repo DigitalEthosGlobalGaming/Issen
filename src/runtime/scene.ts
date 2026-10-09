@@ -100,6 +100,13 @@ export function createRuntimeSceneCoordination(
       ),
     ),
   );
+  foundation.lifecycle.add(
+    foundation.browser.environmentRenderer.observeFailure(() => {
+      if (!readArtworkReady()) return;
+      foundation.run.sceneState.requestedSceneKey = '';
+      sceneFlow.prepareScene();
+    }),
+  );
   function prepareScene() {
     return sceneFlow.prepareScene();
   }

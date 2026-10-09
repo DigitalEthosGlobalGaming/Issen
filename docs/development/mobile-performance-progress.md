@@ -8,6 +8,45 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Budget-aware next scene — 9 October 2026
+
+Version1.69.19 composes and warms one predicted next scene through the existing
+worker/painter. Current transferred planes stay drawable. An exact identity
+promotes the prepared scene without another worker composition. Texture leases
+survive collection; busy frames retain completed slots and cancel pending work.
+Hidden state, geometry/quality/seed mismatch, context loss, explicit preparation
+and disposal invalidate speculative ownership. Cancellation checks surround
+worker building/copying; a synchronous native canvas call cannot be interrupted.
+
+Combined nominal admission sums registered main/preview/worker resources and
+pending reservations. Optional work uses512/768/1024MiB low-memory/mobile/desktop
+ceilings,64MiB native reserve and12bytes per painter output pixel for browser
+buffers. Estimation includes decoded stage inputs, canvas/copy/GPU planes and
+20MiB scratch, plus first fog preparation. This limits speculative work, not the
+whole app. Required resources, unregistered canvases, actual driver allocations
+and all-stage combined peaks still need final verification.
+
+Native tests prove exact held current pixels through160draws, promotion with
+only two worker compositions total, and zero uploads/program creation on the
+incoming first draw. Pressure denial creates no speculative composition;
+geometry invalidation closes next planes while current planes survive. Busy
+cancellation during warming closes pending planes and releases reservations
+without failing current rendering. Three focused next-scene cases pass.
+Explicit preparation lifecycle passes. Worker regression files pass9cases,
+including all nine compositions, peer/pending disposal, visibility and startup,
+transition and already-presented failure recovery. Active failure notification
+now holds combat/RNG/checkpoint and retries the same seed. Older image-preload
+matrix fixtures now explicitly choose the local diagnostic builder and select
+current transferred planes by key; the large matrix remains for integration.
+
+Focused units16pass; checked verification build/strict TypeScript pass. Logs:
+`tmp/probes/next-scene-{units,build,recovery}.log`. Restricted Vite spawning initially
+failed withEPERM; the approved subprocess build passes. Full suites remain reserved
+for the transition integration checkpoint/final gate. Next: incoming figure GPU
+warming, required-resource ownership/combined limits, representative runtime
+admission and cold/warm transition measurements. Physical120Hz/Android evidence
+and complete final measurement matrix remain unproven.
+
 ## Reclaimed scenery headroom and target accounting — 9 October 2026
 
 App1.69.18 trims unpinned worker decoded images after all independent plane

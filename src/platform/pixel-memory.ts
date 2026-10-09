@@ -5,7 +5,9 @@ type Pixels = {
   naturalHeight?: number;
 };
 type Kind = 'decoded' | 'canvas';
-type GpuMemory = { readonly memorySnapshot: { sources: number; bytes: number } };
+type GpuMemory = {
+  readonly memorySnapshot: { sources: number; bytes: number; browserReserveBytes?: number };
+};
 
 export function rgbaMipBytes(width: number, height: number, mipmaps = false): number {
   if (!(width > 0 && height > 0)) return 0;
@@ -62,7 +64,8 @@ export function createPixelMemory() {
         }
       }
       let gpuBytes = 0,
-        gpuSources = 0;
+        gpuSources = 0,
+        browserReserveBytes = 0;
       for (const entry of gpuOwners) {
         const owner = entry.deref();
         if (!owner) {
@@ -72,8 +75,17 @@ export function createPixelMemory() {
         const gpu = owner.memorySnapshot;
         gpuBytes += gpu.bytes;
         gpuSources += gpu.sources;
+        browserReserveBytes += gpu.browserReserveBytes ?? 0;
       }
-      return { decodedBytes, canvasBytes, decoded, canvases, gpuBytes, gpuSources };
+      return {
+        decodedBytes,
+        canvasBytes,
+        decoded,
+        canvases,
+        gpuBytes,
+        gpuSources,
+        browserReserveBytes,
+      };
     },
   };
 }

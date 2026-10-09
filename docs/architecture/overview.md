@@ -233,18 +233,34 @@ preserving the required batch's eviction order without decoding it again.
 `sceneImageUrls` enumerates data maps before colours, matching preparation and
 excluding unused diffuse maps.
 
-`environment/image-preload.ts` requests the predicted stage's decoded images
-after a settled matching scene receives a visible quiet frame grant. It holds
-an independent lease keyed by all six composition identity fields; busy frames,
-hidden pages, invalid geometry, changed predictions, preparation and disposal
-cancel it. It never changes the active renderer bindings or builds scene planes.
-Local renderers use the main pool; worker renderers send cancellable image-only
-requests that bypass the compose queue. Worker requests preserve the current
-raw pins and apply the same decoded-byte admission. Denied sets remain cold.
+`environment/image-preload.ts` grants speculative work after a settled matching
+scene receives a visible quiet frame. Its lease uses all six composition identity
+fields. Local diagnostic renderers preload decoded inputs through the main pool.
+The runtime worker composes one next scene and warms its sources and shaders
+through the existing painter. Current transferred planes remain drawable while
+worker composition changes. Explicit texture leases protect the next scene from
+frame collection. Exact-key composition promotes the slot without recomposition;
+foreground warming rechecks readiness for the current graphics context.
+Busy frames cancel pending work but retain a completed slot. Hidden pages,
+invalid geometry, changed predictions, explicit preparation, context loss and
+disposal cancel it. Cancellation prevents stale publication and closes copies;
+worker cancellation checks before building and after asynchronous copying, but
+cannot interrupt a synchronous native canvas call already in progress.
 Worker requests carry the owning document's device-class image budget. The worker
 creates its loader on the first request, using the same256/384/512MiB policy as
 the main pool rather than independently selecting a different worker default.
 These remain per-pool bounds, not a combined whole-application memory allowance.
+
+`platform/scene-memory.ts` sums weakly observed main-thread pixels/GPU resources
+and registered live/preview worker owners, including transferred planes and
+pending reservations. Next-scene admission uses twice the document image budget
+(512MiB low-memory,768MiB mobile,1024MiB desktop), with64MiB native headroom plus
+12bytes per painter output pixel reserved for browser drawing buffers. The scene
+estimate includes its decoded kit, canvas/copy/upload planes and20MiB scratch.
+Reservations persist until cancelled work settles. These conservative nominal
+estimates govern optional work; they do not enforce a whole-app cap or measure
+physical driver allocations. Required current resources and unregistered
+auxiliary canvases still need the final combined-memory audit.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
 Player-base and drift colour/emissive planes use the same pool. Drift's four
@@ -301,9 +317,9 @@ identity (stage, seed, width, height, DPR and low quality). It caches a frozen
 identity until one of those fields changes, clearing it for unknown visits or
 invalid geometry. Background diagnostics write `assetNextScene` only when that
 reference changes. Prediction neither enters a visit nor consumes combat randomness.
-Decoded prefetch consumes this identity during quiet frames. Worker/local
-next-scene slots remain pending; prediction and image prefetch do not themselves
-compose or promote a scene.
+Quiet-frame worker preparation consumes this identity for its next-scene slot.
+Local diagnostic owners retain image-only prefetch. Prediction itself neither
+composes a scene nor changes the current visit.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader

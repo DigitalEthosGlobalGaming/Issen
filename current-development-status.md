@@ -1,4 +1,32 @@
-# Mobile performance — Reclaimed scenery headroom
+# Mobile performance — Budget-aware next scenery
+
+App1.69.19 composes, retains and warms one predicted next scene through the
+existing worker/painter, then promotes matching identities without recomposition.
+Busy frames cancel pending work and retain completed slots. Hidden state,
+geometry/DPR/quality/seed changes, context loss and disposal invalidate the slot.
+Combined nominal admission includes peer owners and transient reservations with
+512/768/1024MiB ceilings,64MiB native reserve and browser buffer headroom. These
+limits govern optional preparation, not all required app resources.
+
+Three native next-scene tests pass: held pixels after160draws, no promoted first
+draw uploads/program creation, denied pressure and invalidation, pending warming
+cancellation/resource closure. Explicit preparation lifecycle passes. Worker
+regression9cases pass22.4s, including all-stage output and active worker-crash
+recovery holding combat/RNG/checkpoint while retry restores the same seed.
+Focused units16pass; checked verification build/strict TypeScript and changed
+formatting pass. Version/package/lock/title/changelog agree1.69.19. Evidence:
+[progress](docs/development/mobile-performance-progress.md), logs under
+`tmp/probes/next-scene-*.log`. All check handles terminal.
+
+Next: incoming enemy/weapon GPU warming, required-resource ownership and combined
+memory enforcement, then representative runtime admission/cold-warm measurements.
+The larger preload matrix fixtures were corrected but not rerun yet; reserve it
+for the transition integration gate. Full final suites/measurement matrix and
+physical Android/120Hz targets remain outstanding. Do not claim the full goal
+complete. General packing/lit-only work stays cancelled. No push/deploy/native
+build or real-save changes.
+
+## Previous handoff — Reclaimed scenery headroom
 
 App1.69.18 releases unpinned worker decoded inputs after independent plane copies
 finish; completed canvases/bitmaps survive and changed keys reacquire normally.
