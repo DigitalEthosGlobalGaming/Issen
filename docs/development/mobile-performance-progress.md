@@ -8,6 +8,26 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Worker comparison resource lifetime — 10 October 2026
+
+The historical software/GPU full-layer colour mismatch came from a comparison
+fixture with different resource lifetime. The software worker retained output
+canvases and raw inputs across compositions; production retires exported planes
+and trims released images. It also kept the older live-motion policy. Aligning
+only live motion still reproduced the stage0/7 colour differences. Matching
+production's export ownership then passed the focused cases at2/8GiB.
+
+The corrected fixture isolates software versus GPU material baking with the same
+static-scene/resource lifetime. Complete exact comparisons pass27 compositions
+per backend/tier, covering all nine stages, three cycles, portrait/landscape and
+quality/accessibility settings. Held planes, rendered frames, speculative
+cancellation, decoded budgets and warning assertions remain unchanged. Removing
+redundant warm-up histories reduces this check from six full captures to two per
+tier. Two cases pass in1.5m; evidence
+`tmp/test-results/browser/worker-copy-lifetime-parity/`. No application behavior,
+version or tolerance changed. Broader native memory and physical-device evidence
+remain separate requirements.
+
 ## Preview room ownership and suspension — 9 October 2026
 
 Version1.69.28 loads room colour/material images through shared main-image leases

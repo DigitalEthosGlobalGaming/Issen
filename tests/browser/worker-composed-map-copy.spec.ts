@@ -175,13 +175,9 @@ for (const [worker, memory] of [
       if (/feedback loop|destroyed while still bound|GL_INVALID_OPERATION/i.test(m.text()))
         warnings.push(m.text());
     });
-    // Native sampling can change across capture ordinals even without preload.
-    // Match both contexts' history, retaining exact plane/frame equality.
-    await capture(false);
-    await capture(false);
+    // Both workers use the same static-scene and export lifetime. One complete
+    // run per backend covers identical history without redundant warm-up runs.
     const original = await capture(false);
-    await capture(false, candidatePage);
-    await capture(false, candidatePage);
     let candidate;
     try {
       candidate = await capture(true, candidatePage);

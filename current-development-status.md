@@ -1,5 +1,29 @@
 # Current development status
 
+## Current handoff — worker colour comparison fixture corrected
+
+App remains1.69.46. Software comparison worker now uses production's static-scene
+policy, releases export inputs, retires copied output planes and trims unused raw
+images after transfer. Previously it retained canvases/raw sources across stages;
+the comparison varied resource lifetime as well as material baking. Focused stages
+0/7 in normal/reduced quality reproduced colour-only differences at both memory
+tiers. Aligning live-motion alone did not fix them; matching export lifetime then
+passed exact colour/material/native-frame checks at both tiers.
+
+The complete comparison now passes all27 compositions per backend/tier: nine
+stages, three cycles, portrait/landscape and quality/accessibility settings, plus
+unchanged held-plane/native-frame, cancellation, decoded-budget and warning checks.
+Two cases PASS1.5m,45.1s/44.2s. Redundant two warm-up captures per context removed;
+one full history per backend preserves every assertion. Results
+`tmp/test-results/browser/worker-copy-lifetime-parity/`. Test-only change: no app
+version bump or repeat production build. All graphics processes terminal.
+
+Next: broader natural progression/viewport/special-loadout/transient/native memory
+coverage, then stable final cold/warm/frame/compose matrix and applicable suites.
+Historical full-suite native leaf restoration alpha mismatch remains unproven;
+retain its strict assertion at final verification. Goal active. No push/deploy/
+native build/real-save changes; cancelled packing/lit-only stays cancelled.
+
 ## Current handoff — compact ordinary weapon maps unblock wrap
 
 App 1.69.46 copies ordinary weapon normal/surface/emissive windows on the 256 MiB

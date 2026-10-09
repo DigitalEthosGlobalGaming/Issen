@@ -14,7 +14,12 @@ const scope = globalThis as unknown as {
   postMessage(message: ComposeResponse, transfer: Transferable[]): void;
 };
 const workerDocument = createWorkerDocument();
-const renderer = createLocalEnvironmentRenderer(workerDocument, { gpuComposedLayers: false });
+// Compare only the material bake backend. Match production's static scenery and
+// exported resource lifetime so reused native canvases do not change sampling.
+const renderer = createLocalEnvironmentRenderer(workerDocument, {
+  gpuComposedLayers: false,
+  liveMotion: false,
+});
 let pending = Promise.resolve();
 let imagePreload: ReturnType<typeof workerDocument.prefetchImages>;
 scope.onmessage = ({ data }) => {
@@ -25,7 +30,7 @@ scope.onmessage = ({ data }) => {
   if (data.kind === 'preload') {
     const lease =
       data.stage !== undefined && Number.isInteger(data.stage) && data.stage >= 0 && data.stage <= 8
-        ? workerDocument.prefetchImages(sceneImageUrls(data.stage))
+        ? workerDocument.prefetchImages(sceneImageUrls(data.stage, false))
         : undefined;
     imagePreload = lease;
     void (lease?.ready ?? Promise.resolve(false)).then((ready) => {
@@ -48,6 +53,7 @@ scope.onmessage = ({ data }) => {
     const started = performance.now();
     let assetsAt = started,
       composedAt = started;
+    let exportedSnapshot: ReturnType<typeof renderer.snapshot> | undefined;
     try {
       if (data.kind === 'prepare') {
         await renderer.prepare(data.stage);
@@ -71,14 +77,17 @@ scope.onmessage = ({ data }) => {
       ) {
         composedAt = performance.now();
         // Live motion uses transferred planes and the main thread's own raw inputs.
-        renderer.releaseCompletedCutouts(false);
+        renderer.releaseExportInputs();
         const completed = renderer.exportLayers();
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
+        exportedSnapshot = renderer.snapshot();
+        renderer.releaseExportLayers();
+        workerDocument.releaseUnusedImages();
       }
       const snapshot = {
-        ...renderer.snapshot(),
+        ...(exportedSnapshot ?? renderer.snapshot()),
         decodedBytes: workerDocument.decodedSnapshot().bytes,
         decodedLoader: workerDocument.decodedSnapshot(),
         timings: {
