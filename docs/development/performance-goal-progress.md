@@ -2515,3 +2515,50 @@ or composed-plane snapshotting as a proven remedy. Full next-slot implementation
 whole-budget admission,exact promotion/invalidation,quiet pacing,figure/startup
 ownership,120Hz/CPU budgets and fullPhase5 remain required. Full goal active;
 no push/deploy/native build/player saves.
+
+## Checkpoint 51 — Bounded draw-slot reuse, 9 October 2026
+
+Version 1.69.2 swaps an unsubmitted matching-kind slot into the requested draw
+position before allocating a replacement. The existing array remains bounded by
+its prior peak size; submitted objects retain their order and are never reused
+within the same frame. The original missing-kind replacement/disposal path stays
+in place. No texture sampling, shader, simulation, seed or save changes.
+
+The standard harness passes five timing samples and a separate diagnostic for
+Demon and Inferno before/after, with matching instrumentation and geometry.
+Alternating normal-combat samples reuse those exact saved builds and the standard
+measure() workload. Pooled CPU render times, milliseconds:
+
+| Workload | Before median / p95 / p99 | After median / p95 / p99 | Before / after renders over16.7ms |
+| --- | --- | --- | --- |
+| Combat | 2.5 / 3.6 / 4.5 | 2.2 / 3.2 / 4.0 | 3/1504 / 1/1503 |
+| Demon | 6.8 / 10.0 / 14.5 | 5.8 / 7.2 / 10.1 | 4/1505 / 0/1503 |
+| Inferno | 11.2 / 20.8 / 34.3 | 9.4 / 14.0 / 21.4 | 202/1466 / 32/1495 |
+
+Combat update median/p95/p99 stays0.1/0.2/0.3ms. Sampled removeListener self time
+in separate diagnostic windows falls303.4 to64.5ms for Demon and604.3 to412.9ms
+for Inferno. These sampled costs do not replace headline timing. Gameplay has a
+120fps cap and60fps simulation; near16.7ms headless desktop callback intervals
+do not prove120Hz display delivery. Inferno still exceeds the8.3ms CPU target.
+
+The saved original/current40-frame native comparison is exact. The permanent
+regression retains all12 original meshes across changing draw order, keeps peak12,
+verifies root submission order and final disposal, and checks GL/binding warnings.
+All475 unit tests,34 related native browser tests, strict/checked production build
+and four production browsers pass. Version/lock/title/changelog and ownership
+notes are synchronized. All capture/verification processes are terminal.
+
+Linear-gradient ramp sharing was tried first and fully reverted. Matrices match
+exactly, but34/35 native frames change (11,203 channels,max3); original/original
+controls change only one frame (five channels,max1). No tolerance is relaxed.
+
+Before/after evidence: tmp/performance/2026-10-09T02-17-21.471Z-e941054d and
+2026-10-09T02-26-12.404Z-7c5cceab, including source maps/profiles, traces, saved
+builds and frame-budgets.json. Exact oracle, rejected trial, alternating combat
+comparison and verification logs: tmp/performance-gameplay-checkpoint51/.
+
+Next target remaining measured Inferno resource-binding/gradient preparation
+without the rejected sampling change. Next-scene slots, quiet composition/uploads,
+local paused differences, cancellation, whole-memory/figure/startup admission and
+all Phase5 metrics/traces/suites remain required. Full goal active; no deployment,
+native build or real player-save changes.

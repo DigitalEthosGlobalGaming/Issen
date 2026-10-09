@@ -32,6 +32,11 @@ keys; destroyed or revision-changed frames are reacquired. Matrix operations
 compose numeric coefficients directly. Unchanged transforms are skipped and
 axis-aligned sprites use position/scale directly.
 
+Version 1.69.2 also reuses an unsubmitted slot of the requested kind when changing
+cue counts shift later stamps. It swaps slots within the existing pool, preserving
+the pool's size bound and explicit draw order. Submitted slots are never reused
+within the same frame; missing kinds retain the original replacement/disposal path.
+
 Unclipped frames retain their root draw order; surplus children are detached when
 a frame uses fewer slots. Clipping and film grouping leave this fast path and
 keep the existing scoped tree lifecycle. Solid full ellipses can use the painter's

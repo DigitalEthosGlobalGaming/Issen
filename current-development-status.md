@@ -1,4 +1,65 @@
-# Performance, assets and seamless transitions — Mask sampling costs isolated
+# Performance, assets and seamless transitions — Bounded draw-slot reuse verified
+
+Checkpoint 51: app 1.69.2 reuses an unsubmitted draw slot of the requested kind
+before destroying/replacing a mismatched mesh. A swap within the existing slot
+array preserves its size bound and submission order; already-submitted slots
+are excluded. Missing kinds retain the original disposal/replacement path.
+No shader, source texture, gradient sampling, simulation or seed changes.
+
+The existing standard harness measures five fresh-context samples per workload,
+390x844/DPR2, seed424242, three-second warmup and five-second windows. Separate
+CPU/heap/tracing captures resolve to source files. Before/after pooled render
+median/p95/p99, ms:
+- Demon6.8/10.0/14.5 ->5.8/7.2/10.1; over8.3ms305/1505 ->36/1503;
+  over16.7ms4 ->0.
+- Inferno11.2/20.8/34.3 ->9.4/14.0/21.4; over8.3ms1277/1466 ->1121/1495;
+  over16.7ms202 ->32.
+Both complete runs pass with the unchanged instrumentation fingerprint.
+Sampled removeListener self time falls303.4 ->64.5ms in Demon and604.3 ->412.9ms
+in Inferno's separate diagnostic window. These sampled costs are not headline
+timing. Gameplay's configured cap is120fps with60fps simulation; headless desktop
+callbacks remain near16.7ms and do not demonstrate120Hz display delivery.
+Inferno still misses the8.3ms CPU target; this is not goal completion.
+
+Original/current native pool comparison passes40 changing-order frames exactly.
+The permanent regression verifies all12 original meshes are reused across40
+frames, pool peak stays12, root order matches submission order, final disposal
+destroys each item and no GL/binding warnings occur. All475 units,34 related
+native browser cases, checked production build/strict TypeScript and four bundled
+production browsers pass. Five alternating normal-combat samples per arm reuse
+the exact saved before/after bundles and standard workload: render median/p95/p99
+2.5/3.6/4.5 ->2.2/3.2/4.0ms, over8.3ms6/1504 ->5/1503, over16.7ms3 ->1.
+Update median/p95/p99 remains0.1/0.2/0.3ms. Both arms pass all workload guards.
+All capture/verification handles are terminal; format and diff checks pass.
+Package/lock/title/changelog are synchronized at1.69.2.
+
+A preceding linear-gradient ramp-sharing trial is rejected and fully reverted.
+Its matrices match Pixi exactly, but34/35 animated Inferno frames change across
+11,203 channels, maximum3; unchanged original/original controls change only one
+frame across five channels, maximum1. Raw ramp readback maximum1 is not proof
+of native parity. No tolerance relaxation, smoothing or gradient change is kept.
+
+Evidence/source are under tmp/performance-gameplay-checkpoint51/:
+scene-painter-original.ts, rejected scene-painter-gradient-trial.ts and
+linear-gradient-ramps.ts, gradient-ramp-trial/control.json, slot-reuse.json,
+verification logs and combat-control/. Before/after standard runs are
+tmp/performance/2026-10-09T02-17-21.471Z-e941054d and
+tmp/performance/2026-10-09T02-26-12.404Z-7c5cceab, including source-cpu-summary.json,
+frame-budgets.json, saved instrumented builds, CPU/heap profiles and traces.
+The ignored combat adapter reuses those exact builds and standard measure()
+in alternating arms; it does not rebuild or alter workload rules.
+
+Next investigate remaining Inferno resource-binding and gradient-preparation
+costs with source-mapped controls. Preserve the original native sampling rejected
+by ramp sharing. Then resume admitted worker/local next slots and exact quiet
+promotion/upload pacing, generator cancellation, fractional terrain bakes and
+local paused pixel differences. Whole-memory admission and figure/startup
+ownership remain open; next-slot warming must retain the existing texture-store
+lease through promotion/invalidation and context-generation readiness. Full
+Phase5 metrics/traces/suites remain required. Goal active; no push/deploy/native
+build or player saves.
+
+## Previous handoff — Mask sampling costs isolated
 
 Checkpoint 50 is diagnostic only; application remains 1.69.1 at checkpoint 48.
 Software map destinations do not improve the existing worker prototype: three

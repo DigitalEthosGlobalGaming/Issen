@@ -885,6 +885,18 @@ export class PixiScenePainter implements SceneDrawing {
     | ReturnType<typeof createLeafMesh>['mesh'] {
     this.invalidateLighting();
     let slot = this.slots[this.cursor];
+    // A varying cue count shifts later draw kinds. Reuse an unsubmitted slot
+    // before replacing its mesh; swapping keeps the existing pool size bound.
+    if (slot && slot.kind !== kind) {
+      const available = this.slots.findIndex(
+        (candidate, index) => index > this.cursor && candidate.kind === kind,
+      );
+      if (available !== -1) {
+        this.slots[this.cursor] = this.slots[available]!;
+        this.slots[available] = slot;
+        slot = this.slots[this.cursor];
+      }
+    }
     if (!slot || slot.kind !== kind) {
       for (const filter of slot?.filters ?? []) filter.destroy();
       slot?.lookup?.dispose();
