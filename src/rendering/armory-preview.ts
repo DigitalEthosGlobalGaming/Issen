@@ -3,6 +3,7 @@ import type { SceneSurface } from './scene-surface.ts';
 import { invalidateSceneTexture, retireSceneTexture } from './texture-revision.ts';
 import { trackPixelSource } from '../platform/pixel-memory.ts';
 import { createMainImageOwner } from '../platform/main-images.ts';
+import { reclaimSceneMemory } from '../platform/scene-memory.ts';
 import { drawingPixelRatio } from '../presentation/viewport.ts';
 import { createInkCompanionRenderer } from './figures/ink-companions.ts';
 import { createInkEnemyRenderer } from './figures/ink-enemy.ts';
@@ -106,6 +107,8 @@ export function createArmoryPreview(
   let roomLease: ReturnType<typeof roomImages.acquire> | undefined;
   let roomPending: Promise<boolean> | undefined;
   let roomReady = false;
+  let roomCacheReady = false;
+  let roomDimensions: { width: number; height: number } | undefined;
   function prepareRoom() {
     if (roomDisposed) return Promise.resolve(false);
     if (roomPending) return roomPending;
@@ -117,6 +120,7 @@ export function createArmoryPreview(
         if (roomDisposed || generation !== roomGeneration || !roomMaterials.ready('room'))
           return false;
         room = image;
+        roomDimensions = { width: image.naturalWidth, height: image.naturalHeight };
         cachedMaterials.bind(room, (frame) => roomMaterials.material('room', frame));
         roomReady = true;
         roomCache.width = 0;
@@ -125,18 +129,23 @@ export function createArmoryPreview(
       })
       .catch(() => false));
   }
-  function releaseRoom() {
-    roomGeneration++;
-    roomReady = false;
-    roomPending = undefined;
+  function releaseRoomInputs() {
     cachedMaterials.releaseSources();
-    clearCachedMaterial(roomCache, false);
-    retireSceneTexture(roomCache);
-    roomCache.width = roomCache.height = 0;
     roomMaterials.select({});
     roomLease?.release();
     roomLease = undefined;
     room = canvas.ownerDocument.createElement('img');
+    roomReady = false;
+    roomPending = undefined;
+  }
+  function releaseRoom() {
+    roomGeneration++;
+    releaseRoomInputs();
+    roomCacheReady = false;
+    roomDimensions = undefined;
+    clearCachedMaterial(roomCache, false);
+    retireSceneTexture(roomCache);
+    roomCache.width = roomCache.height = 0;
   }
   const fx = createEffects();
   let dummy = makeFig(4242);
@@ -203,7 +212,8 @@ export function createArmoryPreview(
       suspendedSize = undefined;
     }
     lastFrame = frame;
-    void prepareRoom();
+    if (!roomCacheReady || roomCache.width !== canvas.width || roomCache.height !== canvas.height)
+      void prepareRoom();
     if (outfitRobe !== frame.appearance.robeId) {
       outfitRobe = frame.appearance.robeId;
       if (outfitSelection.select(outfitRobe)) {
@@ -247,15 +257,21 @@ export function createArmoryPreview(
     if (frame.lighting) setSceneLighting(g, frame.lighting);
     const width = canvas.width,
       height = canvas.height;
+    let bakedRoom = false;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, width, height);
-    if (roomCache.width !== width || roomCache.height !== height) {
+    if (
+      roomReady ||
+      (!roomCacheReady && (roomCache.width !== width || roomCache.height !== height))
+    ) {
       clearCachedMaterial(roomCache);
       roomCache.width = width;
       roomCache.height = height;
       const background = cachedMaterialContext(roomCache.getContext('2d')!);
       if ((roomReady || room.complete) && room.naturalWidth) {
         cachedMaterials.withBindings(() => drawArmoryRoom(background, room, width, height));
+        roomCacheReady = true;
+        bakedRoom = true;
       }
       const gradient = background.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, 'rgba(10,10,9,.1)');
@@ -263,20 +279,13 @@ export function createArmoryPreview(
       background.fillStyle = gradient;
       background.fillRect(0, 0, width, height);
       invalidateSceneTexture(roomCache);
+      if (roomCacheReady) releaseRoomInputs();
     }
-    drawCachedImage(
-      g,
-      roomCache,
-      [0, 0, roomCache.width, roomCache.height],
-      0,
-      0,
-      roomCache.width,
-      roomCache.height,
-    );
-    if (room.naturalWidth)
+    drawCachedImage(g, roomCache, [0, 0, roomCache.width, roomCache.height], 0, 0, width, height);
+    if (roomDimensions)
       drawRoomWind(
         g,
-        roomWindow(width, height, room.naturalWidth, room.naturalHeight),
+        roomWindow(width, height, roomDimensions.width, roomDimensions.height),
         roomTime,
         !!frame.reducedMotion,
       );
@@ -364,6 +373,7 @@ export function createArmoryPreview(
       reducedFlashes: frame.reducedFlashes,
     });
     surface?.native?.flush();
+    if (bakedRoom) reclaimSceneMemory(canvas.ownerDocument, 32 * 1024 * 1024);
   }
 
   return {

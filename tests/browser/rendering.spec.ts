@@ -120,12 +120,29 @@ for (const shared of [false, true])
   test(`armory preview effects stay local with ${shared ? 'shared' : 'owned'} artwork`, async ({
     page,
   }) => {
+    await page.route('**/src/platform/main-images.ts*', async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({
+        response,
+        body: (await response.text()).replace(
+          /image\.decoding\s*=\s*['"]async['"];?/,
+          "image.decoding = 'async'; image.dataset.roomFixture = String(url.includes('armoury-room'));",
+        ),
+      });
+    });
     await page.goto('/');
     const result = await page.evaluate(async (shared) => {
       const previewPath = '/src/rendering/armory-preview.ts';
       const modelPath = '/src/shared/figure-model.ts';
       const palettePath = '/src/rendering/palette.ts';
       const { createArmoryPreview } = await import(previewPath);
+      const { trimMainImages } = await import('/src/platform/main-images.ts');
+      const decode = HTMLImageElement.prototype.decode;
+      const roomInputs: HTMLImageElement[] = [];
+      HTMLImageElement.prototype.decode = async function () {
+        await decode.call(this);
+        if (this.dataset.roomFixture === 'true') roomInputs.push(this);
+      };
       const { makeFig } = await import(modelPath);
       const { createPalette } = await import(palettePath);
       let now = 1000,
@@ -198,6 +215,13 @@ for (const shared of [false, true])
       canvases[1].toDataURL();
       second.draw(frame);
       const before = canvases[1].toDataURL();
+      trimMainImages(document, 1024 * 1024 * 1024);
+      const roomInputsClosed =
+        roomInputs.length === 4 && roomInputs.every((image) => !image.naturalWidth);
+      const roomInputCount = roomInputs.length;
+      const roomInputAlive = roomInputs.filter((image) => image.naturalWidth).length;
+      second.draw(frame);
+      const cachedRoomPreserved = canvases[1].toDataURL() === before;
       first.demo('petals', false);
       now += 16;
       first.draw({
@@ -211,6 +235,10 @@ for (const shared of [false, true])
         slices,
         gpuBefore: surfaces[0].native!.memorySnapshot.bytes,
         gpuAfter: 0,
+        roomInputsClosed,
+        cachedRoomPreserved,
+        roomInputCount,
+        roomInputAlive,
       };
       first.suspend();
       result.gpuAfter = surfaces[0].native!.memorySnapshot.bytes;
@@ -231,9 +259,13 @@ for (const shared of [false, true])
       second.dispose();
       for (const surface of surfaces) surface.dispose();
       for (const renderer of Object.values(artwork)) renderer.dispose();
+      HTMLImageElement.prototype.decode = decode;
       return result;
     }, shared);
     expect(result).toMatchObject({ unaffected: true, different: true, slices: 1 });
+    expect(result.roomInputCount).toBe(4);
+    expect(result.roomInputAlive).toBe(0);
+    expect(result).toMatchObject({ roomInputsClosed: true, cachedRoomPreserved: true });
     expect(result.gpuAfter).toBeLessThan(result.gpuBefore / 4);
   });
 

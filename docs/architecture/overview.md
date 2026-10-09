@@ -521,6 +521,10 @@ journal and recovery. See [save transfer](../features/save-transfer.md).
   preparation, suspends scenery and retires main drawing resources. Closing
   inspection restores the current viewport and prepares the same scene identity;
   resize while covered cannot restart scenery preparation.
+  Baked preview-room colour/material planes outlive their source leases. After
+  baking, the preview unpins source inputs and reclaims cache against32MiB of
+  preparation headroom. Resize reacquires inputs while drawing the previous baked
+  room scaled to the new canvas; stored dimensions keep window animation aligned.
   Pausing skips simulation; animated scenes draw at up to 60 fps. Hit-stop/slow
   timers advance with scheduled scene work. Resume resets the scheduler's clock. Guided
   lessons go directly to safe practice using that paused-simulation boundary.

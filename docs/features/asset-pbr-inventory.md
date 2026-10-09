@@ -7,6 +7,11 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.31, preview room inputs unpin after baking independent colour/material
+planes. Resize reacquires the same shared pack; cached room planes remain drawable
+after raw inputs are evicted. Post-bake reclamation includes32MiB of preparation
+headroom. Assets and material coverage remain unchanged.
+
 As of1.69.28, equipment-preview room colour/normal/surface/emissive inputs share
 main-image leases and load on demand. Canonical URL lookup restores the room's
 previously missing material binding. Room/baked-cache backing is tracked;

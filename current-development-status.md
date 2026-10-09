@@ -1,4 +1,37 @@
-# Mobile performance — Worker output retirement
+# Mobile performance — Preview baked-input lifetime
+
+App1.69.31 releases shared room colour/material input leases after baking its
+independent room planes. Source bindings/cutouts retire while cached room planes
+stay intact. Stored source dimensions preserve window animation. Resize reacquires
+inputs while scaling the previous room; pending/disposal generation checks remain.
+Post-bake main-cache reclamation targets32MiB of preparation headroom, once per
+bake rather than every preview frame. Assets and quality policy unchanged.
+
+Same low-memory Demon/inspection flow: peak560,699,176→536,215,040bytes
+(535→511.4MiB), restored title420MiB. Evidence
+`tmp/probes/realm-preview-memory-room-reclaimed.json`; unpin-only control
+`realm-preview-memory-room-unpinned.json` still533MiB. This sample is barely
+below512MiB, not a whole-app/transient/physical cap proof. Final viewport/mode
+matrix and required preparation reservations/native scratch accounting remain.
+
+Two owned/shared native preview cases PASS10.5s: all4room inputs close under
+forced eviction; cached and peer pixels remain exact. Initial dimension-only
+instrumentation counted26figure/room inputs; URL-specific marker fixed it, then
+Vite quoting matcher fixed. Assertions unchanged. Results
+`tmp/test-results/browser/preview-input-verified/`. Original peer lease case and
+two inspection resize/reopen cases PASS; their captures/results preserved under
+`preview-input-retirement/`. Reviewed low-memory portrait: coherent room lighting
+and readable figure. Strict checked build PASS
+(`tmp/probes/preview-input-retirement-build.log`); synchronized metadata/title/
+changelog1.69.31.
+
+Next: complete combined required-work admission/progress/native scratch accounting,
+then broader integration/final tests and the measurement matrix. Historical
+software/GPU copy mismatch remains for focused diagnosis. Physical Android/120Hz
+unproven. Goal active; no push/deploy/native build/save changes; cancelled work stays
+cancelled.
+
+## Previous handoff — Worker output retirement
 
 App1.69.30 retires composition/material/foreground canvases after all bitmap
 copies settle, before the worker posts them for GPU warming. Completed-scene
