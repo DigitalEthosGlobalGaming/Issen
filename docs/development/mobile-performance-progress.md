@@ -8,6 +8,46 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Compact low-memory worker inputs — 9 October 2026
+
+Version1.69.26 decodes catalogue scenery colour and aligned material inputs at
+half width/height on the256MiB decoded tier. It asks native bitmap decoding for
+high-quality resizing without retaining a separate full-sized bitmap. Worker
+images expose original logical dimensions; drawImage adapts source rectangles,
+implicit destination sizes and pattern transforms to the smaller backing.
+This preserves atlas layout, landmark validation and existing stage geometry.
+Higher tiers keep the original decode interpretation. Required composition now
+reclaims unpinned main images against the incoming estimate before loading fog
+or sending work; next-slot reservations use the actual compact decode dimensions.
+
+The same390x844/DPR2/deviceMemory2 all-stage diagnostic observes worker input
+residency108–204MiB→27–51MiB (approximately75% lower). With compaction alone,
+maximum observed committed memory654→522MiB; with required pre-compose cache
+reclamation it reaches516MiB. The remaining peak is540,926,164bytes during
+incoming texture warming, with current+incoming transferred planes57,674,880bytes.
+All settled samples fit512MiB; a whole-app/transient cap remains unproven and
+the observed return-to-meadow peak still exceeds it. Native decoder scratch is
+opaque, and event/sampling observations cannot prove an absolute peak.
+
+Evidence: `tmp/probes/all-stage-memory-compact{,-reclaimed}.json`.
+Reviewed actual composited screenshots
+`tmp/probes/compact-worker-visuals-stage-{0,4,6,7}.png`: meadow/bamboo/temple/coast
+retain coherent ink detail, atmosphere and lighting. Direct canvas.toDataURL
+captures were black because the drawing buffer is discarded; these are not
+visual evidence. The usable captures use browser element screenshots.
+
+Three decoded-tier all-stage lifetime checks and phase accounting pass. Ten
+focused promotion/recovery/suspension/accounting checks pass22.6s. Unit checks
+cover fractional crop coordinates, implicit/explicit destinations, decode sizes
+and reservations. The strict software-vs-GPU copy matrix fails on colour-plane
+hashes in later cycles at both2GiB and8GiB. Low-tier report inspection found only
+stage0/7 colour differences; material-plane hashes match throughout that report.
+Later focused browser checks overwrote those default-suite artifacts; observed
+failure details are retained in `tmp/probes/compact-worker-copy-failures.md`.
+High-tier decode is unchanged, but this does not establish a
+baseline failure. Keep assertions intact and diagnose the mismatch at integration
+checkpoint before final completion. No repeated full matrix ran.
+
 ## Worker preparation phase accounting — 9 October 2026
 
 Version1.69.25 reports decoded-loader and tracked-canvas ownership at assets-ready

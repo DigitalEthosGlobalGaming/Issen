@@ -2,11 +2,13 @@ import { createDecodedImageLoader, decodedImageBudget } from '../../platform/dec
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { readCompressedAsset } from '../../platform/compressed-assets.ts';
 import { createPixelMemory } from '../../platform/pixel-memory.ts';
+import { workerDecodeSize } from './decode-size.ts';
 
 /** Cache native bindings; only image consumers need decoded-source adaptation. */
 export function createWorkerContextProxy(
   native: OffscreenCanvasRenderingContext2D,
   unwrap: (source: unknown) => unknown,
+  sourceSize?: (source: unknown) => { width: number; height: number } | undefined,
 ): OffscreenCanvasRenderingContext2D {
   const methods = new Map<PropertyKey, (...args: unknown[]) => unknown>();
   return new Proxy(native, {
@@ -17,8 +19,34 @@ export function createWorkerContextProxy(
       if (!method) {
         method =
           property === 'drawImage' || property === 'createPattern'
-            ? (...args: unknown[]) =>
-                Reflect.apply(value, target, [unwrap(args[0]), ...args.slice(1)])
+            ? (...args: unknown[]) => {
+                const source = unwrap(args[0]);
+                const nominal = sourceSize?.(args[0]);
+                const bitmap = source as { width: number; height: number } | undefined;
+                const scaled =
+                  nominal &&
+                  bitmap &&
+                  (nominal.width !== bitmap.width || nominal.height !== bitmap.height);
+                const adapted = [source, ...args.slice(1)];
+                if (scaled && property === 'drawImage') {
+                  if (args.length === 3) adapted.push(nominal.width, nominal.height);
+                  else if (args.length === 9) {
+                    for (const index of [1, 3])
+                      adapted[index] = (Number(args[index]) * bitmap.width) / nominal.width;
+                    for (const index of [2, 4])
+                      adapted[index] = (Number(args[index]) * bitmap.height) / nominal.height;
+                  }
+                }
+                const result = Reflect.apply(value, target, adapted);
+                if (scaled && property === 'createPattern' && result)
+                  (result as CanvasPattern).setTransform(
+                    new DOMMatrix().scale(
+                      nominal.width / bitmap.width,
+                      nominal.height / bitmap.height,
+                    ),
+                  );
+                return result;
+              }
             : value.bind(target);
         methods.set(property, method!);
       }
@@ -43,29 +71,42 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   releaseUnusedImages(): number;
 } {
   const memory = createPixelMemory();
-  const expectedBytes = new Map(
+  const dimensions = new Map(
     assetMaterialCatalog.flatMap((pack) =>
-      [pack.source, ...Object.values(pack.maps)].map(
-        (url) => [url, pack.dimensions[0] * pack.dimensions[1] * 4] as const,
-      ),
+      [pack.source, ...Object.values(pack.maps)].map((url) => [url, pack.dimensions] as const),
     ),
   );
+  const budget =
+    decodedBudget ??
+    decodedImageBudget({
+      mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
+      deviceMemory:
+        typeof navigator === 'undefined'
+          ? 8
+          : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
+    });
   const loader = createDecodedImageLoader({
-    expectedBytes: (url) => expectedBytes.get(url),
-    budget:
-      decodedBudget ??
-      decodedImageBudget({
-        mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
-        deviceMemory:
-          typeof navigator === 'undefined'
-            ? 8
-            : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
-      }),
+    expectedBytes: (url) => {
+      const size = dimensions.get(url);
+      if (!size) return;
+      const decoded = workerDecodeSize(...size, budget);
+      return decoded.width * decoded.height * 4;
+    },
+    budget,
     async decode(url, signal) {
       const response = await readCompressedAsset(url, signal);
-      // Preserve the existing worker decode interpretation. Data-map options
-      // must change only after the complete material-plane parity check.
-      return createImageBitmap(await response.blob());
+      const size = dimensions.get(url);
+      const decoded = size && workerDecodeSize(...size, budget);
+      return createImageBitmap(
+        await response.blob(),
+        decoded && size && (decoded.width !== size[0] || decoded.height !== size[1])
+          ? {
+              resizeWidth: decoded.width,
+              resizeHeight: decoded.height,
+              resizeQuality: 'high',
+            }
+          : undefined,
+      );
     },
   });
   class DecodedImage {
@@ -81,10 +122,10 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     private controller?: AbortController;
     private pending: Promise<void> = Promise.resolve();
     get naturalWidth() {
-      return this.bitmap?.width ?? 0;
+      return this.bitmap ? this.width : 0;
     }
     get naturalHeight() {
-      return this.bitmap?.height ?? 0;
+      return this.bitmap ? this.height : 0;
     }
     get src() {
       return this.source;
@@ -103,8 +144,9 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
             return;
           }
           this.bitmap = bitmap;
-          this.width = bitmap.width;
-          this.height = bitmap.height;
+          const nominal = dimensions.get(value);
+          this.width = nominal?.[0] ?? bitmap.width;
+          this.height = nominal?.[1] ?? bitmap.height;
           this.complete = true;
           this.onload?.();
         } catch (error) {
@@ -170,7 +212,9 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
           if (!native) return null;
           let proxy = contexts.get(native);
           if (!proxy) {
-            proxy = createWorkerContextProxy(native, unwrap);
+            proxy = createWorkerContextProxy(native, unwrap, (source) =>
+              source instanceof DecodedImage ? source : undefined,
+            );
             contexts.set(native, proxy);
           }
           return proxy;

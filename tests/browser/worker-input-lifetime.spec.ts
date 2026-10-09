@@ -5,7 +5,20 @@ test('worker phase accounting includes pinned inputs without settling scene read
 }) => {
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
+    const { sceneImageUrls } = await import('/src/rendering/environment/asset-sources.ts');
+    const { assetMaterialCatalog } = await import('/src/rendering/asset-material-catalog.ts');
+    const { workerDecodeSize } = await import('/src/rendering/environment/decode-size.ts');
+    const dimensions = new Map(
+      assetMaterialCatalog.flatMap((pack) =>
+        [pack.source, ...Object.values(pack.maps)].map((url) => [url, pack.dimensions] as const),
+      ),
+    );
+    const expectedBytes = sceneImageUrls(1).reduce((sum, url) => {
+      const size = workerDecodeSize(...dimensions.get(url)!, 256 * 1024 * 1024);
+      return sum + size.width * size.height * 4;
+    }, 0);
     const NativeWorker = window.Worker;
     let releaseResponse: (() => void) | undefined;
     const phases: Array<{ phase: string; decoded: number; canvas: number }> = [];
@@ -60,7 +73,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
       const settledBeforeResponse = settled;
       releaseResponse();
       const ready = await pending;
-      return { phases, settledBeforeResponse, ready, final: owner.memorySnapshot };
+      return { phases, expectedBytes, settledBeforeResponse, ready, final: owner.memorySnapshot };
     } finally {
       owner.dispose();
       window.Worker = NativeWorker;
@@ -68,6 +81,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
   });
   expect(result.phases.map((row) => row.phase)).toEqual(['assets-ready', 'composed']);
   expect(result.phases.every((row) => row.decoded > 0)).toBe(true);
+  expect(result.phases.every((row) => row.decoded === result.expectedBytes)).toBe(true);
   expect(result.phases[1].canvas).toBeGreaterThan(0);
   expect(result.settledBeforeResponse).toBe(false);
   expect(result.ready).toBe(true);

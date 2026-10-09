@@ -392,7 +392,7 @@ export function createWorkerEnvironmentRenderer(
       performance.now() < admissionAt
     )
       return;
-    const preparationBytes = scenePreparationBytes(next);
+    const preparationBytes = scenePreparationBytes(next, documentImageBudget(doc));
     const estimate =
       preparationBytes === undefined
         ? undefined
@@ -498,6 +498,14 @@ export function createWorkerEnvironmentRenderer(
     let incoming: ComposeResponse | undefined,
       accepted = false;
     try {
+      if (!prepared) {
+        const estimate = scenePreparationBytes(frame, documentImageBudget(doc));
+        if (estimate !== undefined)
+          reclaimSceneMemory(
+            doc,
+            estimate + (frame.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0),
+          );
+      }
       if (frame.stage === 0) await prepareFog();
       if (disposed || workerFailure || generation !== workerGeneration) return;
       const timingKey = 'false:' + key;

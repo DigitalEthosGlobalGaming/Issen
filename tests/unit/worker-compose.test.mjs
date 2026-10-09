@@ -3,6 +3,31 @@ import assert from 'node:assert/strict';
 import { setImmediate as nextTurn } from 'node:timers/promises';
 import { createWorkerContextProxy } from '../../src/rendering/environment/worker-canvas.ts';
 import { copyComposedLayers } from '../../src/rendering/environment/layer-transfer.ts';
+import { workerDecodeSize } from '../../src/rendering/environment/decode-size.ts';
+
+test('compact worker planes retain logical draw size and adapt fractional crop coordinates', () => {
+  const bitmap = { width: 887, height: 444 };
+  const source = { width: 1774, height: 887, bitmap };
+  const calls = [];
+  const native = {
+    drawImage(...args) {
+      calls.push(args);
+    },
+  };
+  const ctx = createWorkerContextProxy(
+    native,
+    (image) => image.bitmap,
+    (image) => image,
+  );
+  ctx.drawImage(source, 5, 6);
+  ctx.drawImage(source, 5, 6, 120, 180);
+  ctx.drawImage(source, 443.5, 443.5, 443.5, 443.5, 5, 6, 120, 180);
+  assert.deepEqual(calls[0], [bitmap, 5, 6, 1774, 887]);
+  assert.deepEqual(calls[1], [bitmap, 5, 6, 120, 180]);
+  assert.deepEqual(calls[2], [bitmap, 221.75, 222, 221.75, 222, 5, 6, 120, 180]);
+  assert.deepEqual(workerDecodeSize(1774, 887, 256 * 1024 * 1024), bitmap);
+  assert.deepEqual(workerDecodeSize(1254, 1254, 384 * 1024 * 1024), { width: 1254, height: 1254 });
+});
 
 test('worker context retains bound native methods and unwraps only image consumers', () => {
   const calls = [];

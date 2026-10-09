@@ -1,4 +1,45 @@
-# Mobile performance — Worker transient accounting
+# Mobile performance — Compact low-memory worker inputs
+
+App1.69.26 decodes aligned catalogue scenery colour/material planes at half
+width/height on the256MiB decoded tier using native high-quality bitmap resize.
+Logical dimensions/crop geometry remain original via worker source adaptation;
+landmark size validation and stage layouts stay intact. Higher tiers retain the
+original decode path. Required compose reclaims unpinned main cache against its
+incoming estimate; next-slot admission now estimates compact decoded dimensions.
+
+Same390x844/DPR2/deviceMemory2 all-stage0–8→0 diagnostic: worker input ownership
+108–204MiB→27–51MiB (~75% reduction). Observed combined peak654→522MiB with
+compaction; required pre-compose reclamation further lowers it to516MiB
+(540,926,164bytes). Final samples fit512MiB, but return-to-meadow warming remains
+over budget. Peak has old+incoming transferred planes57,674,880bytes and GPU
+188,651,348bytes; worker inputs already released. No absolute/physical cap proof.
+Evidence: `tmp/probes/all-stage-memory-compact{,-reclaimed}.json`.
+
+Reviewed actual element screenshots
+`tmp/probes/compact-worker-visuals-stage-{0,4,6,7}.png`: meadow/bamboo/temple/coast
+look coherent. Direct toDataURL captures were black due discarded drawing buffer
+and are unusable evidence. Visual-capture probe includes explicit extra rendering;
+use the earlier no-capture reports for comparable memory observations.
+
+Thirteen unique focused browser cases pass (three-tier all-stage input lifetime,
+compact phase bytes, next promotion, recovery and suspension);19units pass.
+Checked production verification build/strict TypeScript passes; log
+`tmp/probes/compact-worker-build.log`. Strict software-vs-GPU full copy matrix
+fails2/2 tiers on later-cycle colour hashes; low-tier inspection finds only
+stage0/7 colour differences with material hashes matching throughout.
+The8GiB original decode path also fails; baseline cause remains unverified.
+Assertions unchanged. Later browser checks overwrote the default results directory;
+observed failure/inspection notes retained in `tmp/probes/compact-worker-copy-failures.md`.
+
+Next: enforce combined required work/texture-warming budget including current+
+incoming resources; cover decode progress/intermediate native scratch properly.
+Fix copy mismatch with a focused native pixel diagnostic/baseline before final
+verification. Preview/Demon ownership/peaks, integration checkpoint and final
+suites/matrix remain. Do not revive cancelled packing/lit-only work. Physical
+Android/120Hz unproven. Goal active; no push/deploy/native builds/real-save changes.
+Version metadata/changelog1.69.26; all processes terminal.
+
+## Previous handoff — Worker transient accounting
 
 App1.69.25 publishes decoded-loader/canvas ownership at assets-ready and composed
 phases before releasing inputs. Main worker owners update memory counters without

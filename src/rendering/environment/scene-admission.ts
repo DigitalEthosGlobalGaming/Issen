@@ -1,17 +1,29 @@
 import { runtimeAssets } from '../../platform/runtime-assets.ts';
 import { sceneImageUrls } from './asset-sources.ts';
 import type { CompositionIdentity } from './worker-types.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+import { workerDecodeSize } from './decode-size.ts';
 
 const bytes = new Map(runtimeAssets.map((asset) => [asset.url, asset.width * asset.height * 4]));
+const dimensions = new Map(
+  assetMaterialCatalog.flatMap((pack) =>
+    [pack.source, ...Object.values(pack.maps)].map((url) => [url, pack.dimensions] as const),
+  ),
+);
 /** Conservative peak: decoded kit, new canvases, copied planes, uploads and cutout scratch. */
-export function scenePreparationBytes(frame: CompositionIdentity): number | undefined {
+export function scenePreparationBytes(
+  frame: CompositionIdentity,
+  decodedBudget = Infinity,
+): number | undefined {
   const { width, height } = frame;
   if (![width, height, frame.dpr].every((value) => Number.isFinite(value) && value > 0)) return;
   let inputBytes = 0;
   for (const url of sceneImageUrls(frame.stage)) {
     const size = bytes.get(url);
     if (!size) return;
-    inputBytes += size;
+    const nominal = dimensions.get(url);
+    const decoded = nominal && workerDecodeSize(...nominal, decodedBudget);
+    inputBytes += decoded ? decoded.width * decoded.height * 4 : size;
   }
   const scale = Math.min(
     Math.max(1, frame.dpr),
