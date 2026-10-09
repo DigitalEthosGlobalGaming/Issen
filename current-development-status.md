@@ -1,4 +1,33 @@
-# Mobile performance — Inspection occlusion
+# Mobile performance — Worker output retirement
+
+App1.69.30 retires composition/material/foreground canvases after all bitmap
+copies settle, before the worker posts them for GPU warming. Completed-scene
+response metadata remains intact; canvas accounting now reflects actual0bytes.
+Main current/next slots reuse their independent bitmaps. Direct repeated worker
+requests rebuild; exported bitmaps remain alive and exact across rebuilds.
+
+Actual low-memory Demon/inspection flow peak585,356,488→560,699,176bytes
+(558→535MiB); restored title448MiB. Evidence
+`tmp/probes/realm-preview-memory-worker-retired.json`. Still over512MiB at
+restoration; main decoded161,092,440/GPU246,141,836/canvas47,552,128bytes and
+transferred28,837,440bytes contribute. Worker canvases0 at this peak. Counters
+are nominal, not physical residency proof; whole-app cap remains incomplete.
+Next investigate concurrent room/main inputs and GPU preparation headroom.
+
+27native stage/quality/viewport cases preserve exact held and rebuilt planes.
+Initial failure expected retained worker dimensions; updated lifetime expectations
+keep exact pixel gates. Final2phase/lifetime cases PASS47.2s; low-tier18stage
+reacquisition case PASS15.2s;5promotion/pressure/cancellation cases PASS7.8s;
+5copy/proxy units PASS. Browser evidence
+`tmp/test-results/browser/worker-output-{final,integration}/` and prior
+`worker-output-retirement/`. No unrelated suites repeated. Strict checked build
+PASS (`tmp/probes/worker-output-retirement-build.log`); synchronized
+metadata/title/changelog1.69.30.
+Goal active; broader integration/final suites, copy mismatch, measurements and
+physical Android/120Hz evidence remain. No push/deploy/native build/save changes.
+Cancelled work stays cancelled.
+
+## Previous handoff — Inspection occlusion
 
 App1.69.29 suspends the main scene while expanded equipment inspection covers it.
 Scene flow aborts figure preparation, invalidates pending requests, suspends the

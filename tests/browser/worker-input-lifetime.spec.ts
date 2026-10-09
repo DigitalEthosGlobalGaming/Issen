@@ -86,6 +86,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
   expect(result.settledBeforeResponse).toBe(false);
   expect(result.ready).toBe(true);
   expect(result.final.decodedBytes).toBe(0);
+  expect(result.final.canvasBytes).toBe(0);
   expect(result.final.transferredBytes).toBeGreaterThan(0);
 });
 
@@ -162,6 +163,7 @@ for (const policy of [
     for (const row of result.rows) {
       expect(row.ready).toBe(true);
       expect(row.snapshot.worker).toBe(true);
+      expect(row.snapshot.canvasBytes).toBe(0);
       const decoded = row.snapshot.decodedLoader!;
       expect(decoded.budget).toBe(policy.budget * 1024 * 1024);
       expect(decoded.peakBytes).toBeLessThanOrEqual(decoded.budget);

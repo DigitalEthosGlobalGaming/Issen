@@ -719,6 +719,18 @@ export function createLocalEnvironmentRenderer(
     releaseCompletedCutouts,
     // Exported planes own every pixel; live motion belongs to the receiving renderer.
     releaseExportInputs: () => releaseCompositionInputs(preparedStage, false),
+    releaseExportLayers() {
+      for (const layer of [cached, distant, nearby]) {
+        if (!layer) continue;
+        clearCachedMaterial(layer, false);
+        layer.width = layer.height = 0;
+      }
+      foreground.release();
+      cached = distant = nearby = undefined;
+      cacheKey = '';
+      completedFrame = undefined;
+      ready = false;
+    },
     dispose,
     get backend(): EnvironmentBackend {
       return status;

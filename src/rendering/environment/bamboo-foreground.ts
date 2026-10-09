@@ -116,6 +116,7 @@ export function createBambooForegroundRenderer(doc: Document) {
   return {
     draw,
     prepare,
+    release,
     get layers() {
       return layers;
     },

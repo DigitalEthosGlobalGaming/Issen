@@ -770,8 +770,11 @@ These counters exclude default browser drawing buffers, driver overhead and
 unregistered auxiliary canvases. They are groundwork
 for combined admission, not an enforced whole-app cap or physical residency proof.
 
-Worker export closes unpinned raw decoded inputs after every plane copy settles;
-completed canvas/bitmap pixels remain independent. Explicit loader trimming
+Worker export closes unpinned raw decoded inputs after every plane copy settles
+and retires composition/foreground canvases before posting independent bitmaps.
+The response keeps completed-scene metadata but reports actual remaining worker
+canvas bytes. Main current/next slots own reusable bitmaps; repeated direct worker
+requests reacquire inputs and rebuild. Explicit loader trimming
 preserves pins and pending required work. Demon artwork starts on `prepare()`
 instead of ordinary startup, and a failed preparation can reacquire inputs on retry.
 Its stage gate builds the existing mountain layer and prop cutouts, captures their

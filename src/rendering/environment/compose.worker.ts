@@ -64,6 +64,7 @@ scope.onmessage = ({ data }) => {
     const started = performance.now();
     let assetsAt = started,
       composedAt = started;
+    let exportedSnapshot: ReturnType<typeof renderer.snapshot> | undefined;
     try {
       if (cancelled.has(data.id))
         throw new DOMException('Scenery preparation cancelled', 'AbortError');
@@ -120,14 +121,18 @@ scope.onmessage = ({ data }) => {
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
-        // Copies and composed canvases own their pixels. Raw inputs need no
+        exportedSnapshot = renderer.snapshot();
+        // Independent copies now own these pixels. Retire worker output before
+        // the receiver uploads it, rather than overlapping both representations.
+        renderer.releaseExportLayers();
+        // Transferred copies own their pixels. Raw inputs need no
         // residency between scenes; reacquisition follows the existing key path.
         workerDocument.releaseUnusedImages();
         if (cancelled.has(data.id))
           throw new DOMException('Scenery preparation cancelled', 'AbortError');
       }
       const snapshot = {
-        ...renderer.snapshot(),
+        ...(exportedSnapshot ?? renderer.snapshot()),
         ...workerDocument.canvasSnapshot(),
         decodedBytes: workerDocument.decodedSnapshot().bytes,
         decodedLoader: workerDocument.decodedSnapshot(),

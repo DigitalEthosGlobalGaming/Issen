@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
-test('worker retained planes preserve exact unchanged-key copies', async ({ page }, testInfo) => {
+test('worker retires exported canvases and preserves exact reacquired and held planes', async ({
+  page,
+}, testInfo) => {
   test.setTimeout(180000);
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
@@ -150,16 +152,18 @@ test('worker retained planes preserve exact unchanged-key copies', async ({ page
   );
   expect(result).toHaveLength(27);
   for (const row of result) {
-    expect(row.prepared.width).toBe(row.first.width);
-    expect(row.prepared.height).toBe(row.first.height);
-    expect(row.prepared.pixels).toBe(row.first.pixels);
-    expect(row.prepared.foreground.pixels).toBe(row.first.foreground.pixels);
+    expect(row.first.canvasBytes).toBe(0);
+    expect(row.repeat.canvasBytes).toBe(0);
+    expect(row.prepared.width).toBe(0);
+    expect(row.prepared.height).toBe(0);
+    expect(row.prepared.pixels).toBe(0);
+    expect(row.prepared.foreground.pixels).toBe(0);
     expect(row.prepared.materialCutouts.pixels).toBe(0);
-    expect(row.prepared.decodedLoader.pinned).toBe(0);
-    expect(row.prepared.decodedLoader.pinnedBytes).toBe(0);
+    expect(row.prepared.decodedLoader.pinned).toBeGreaterThan(0);
+    expect(row.prepared.decodedLoader.pinnedBytes).toBe(row.prepared.decodedLoader.bytes);
     expect(row.first.decodedLoader.bytes).toBe(0);
     expect(row.repeat.decodedLoader.bytes).toBe(0);
-    expect(row.repeat.builds).toBe(row.first.builds);
+    expect(row.repeat.builds).toBe(row.first.builds + 1);
     expect(row.rebuilt).toEqual(row.before);
     expect(row.held).toEqual(row.before);
     expect(row.repeat.decodedLoader.peakBytes).toBeLessThanOrEqual(256 * 1024 * 1024);
