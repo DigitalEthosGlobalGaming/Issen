@@ -719,6 +719,14 @@ figures and post history have their own presentation owners. Graphics recovery
 and viewport orchestration belong to `graphics-lifecycle.ts` and `viewport.ts`.
 Live weather hazards, hit stop, slow motion and player records remain rule-owned.
 
+`platform/pixel-memory.ts` weakly observes decoded images and canvas backing
+sizes without extending their lifetimes. Native services expose nominal main
+image/canvas, worker image/canvas, transferred-plane and source-texture bytes.
+Painter source estimates include mip levels and all registered preview painters;
+they are separate from decoded pixels. These counters currently exclude render
+targets, driver overhead and unregistered auxiliary canvases. They are groundwork
+for combined admission, not an enforced whole-app cap or physical residency proof.
+
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence
 at documented synchronous boundaries. Rule event payloads expose neither mutable

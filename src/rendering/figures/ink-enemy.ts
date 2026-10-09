@@ -1,5 +1,6 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { enemyAppearance } from './enemy-appearance.ts';
@@ -168,7 +169,7 @@ export function createInkEnemyRenderer(doc: Document) {
       return found;
     }
     const [sx, sy, sw, sh] = frame,
-      c = doc.createElement('canvas');
+      c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
     const ratio = 256 / Math.max(sw, sh);
     c.width = Math.max(1, Math.round(sw * ratio));
     c.height = Math.max(1, Math.round(sh * ratio));
@@ -181,7 +182,7 @@ export function createInkEnemyRenderer(doc: Document) {
         tones.delete(toneKey);
         tones.set(toneKey, tone);
       } else {
-        tone = doc.createElement('canvas');
+        tone = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
         tone.width = c.width;
         tone.height = c.height;
         const tg = tone.getContext('2d', { willReadFrequently: true });

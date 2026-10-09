@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import type { Figure } from './types.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
@@ -335,7 +336,7 @@ export function createOutfitKit(doc: Document) {
       const key = a.atlas + ':' + a.frame + ':' + a.tint;
       let c = tinted.get(key);
       if (!c) {
-        c = doc.createElement('canvas');
+        c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
         c.width = sw;
         c.height = sh;
         const cg = c.getContext('2d');

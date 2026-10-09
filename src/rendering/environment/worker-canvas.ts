@@ -1,6 +1,7 @@
 import { createDecodedImageLoader, decodedImageBudget } from '../../platform/decoded-images.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { readCompressedAsset } from '../../platform/compressed-assets.ts';
+import { createPixelMemory } from '../../platform/pixel-memory.ts';
 
 /** Cache native bindings; only image consumers need decoded-source adaptation. */
 export function createWorkerContextProxy(
@@ -38,7 +39,9 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   decodedSnapshot(): ReturnType<
     ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['snapshot']
   > & { images: number };
+  canvasSnapshot(): { canvasBytes: number; canvases: number };
 } {
+  const memory = createPixelMemory();
   const expectedBytes = new Map(
     assetMaterialCatalog.flatMap((pack) =>
       [pack.source, ...Object.values(pack.maps)].map(
@@ -138,6 +141,10 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   >();
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
+    canvasSnapshot() {
+      const { canvasBytes, canvases } = memory.snapshot();
+      return { canvasBytes, canvases };
+    },
     prefetchImages(urls: readonly string[]) {
       loader.policy({ busy: false });
       return loader.prefetch(urls);
@@ -152,7 +159,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     createElement(kind: string) {
       if (kind === 'img') return new DecodedImage();
       if (kind !== 'canvas') throw Error(`Unsupported worker element: ${kind}`);
-      const canvas = new OffscreenCanvas(1, 1);
+      const canvas = memory.track(new OffscreenCanvas(1, 1), 'canvas');
       Object.defineProperty(canvas, 'ownerDocument', { value: doc });
       const getContext = canvas.getContext.bind(canvas);
       Object.defineProperty(canvas, 'getContext', {
@@ -179,5 +186,6 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     prefetchImages: typeof doc.prefetchImages;
     stopImagePreload: typeof doc.stopImagePreload;
     decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };
+    canvasSnapshot: typeof doc.canvasSnapshot;
   };
 }

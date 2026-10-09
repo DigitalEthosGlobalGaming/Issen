@@ -24,6 +24,7 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     let firstDraw = false,
       uploads = 0,
       links = 0;
+    let transferredBytes = 0;
     const gl = warmed.canvas.getContext('webgl2')!,
       texImage = gl.texImage2D.bind(gl);
     gl.texImage2D = ((...args: any[]) => {
@@ -38,7 +39,18 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       link(program);
     };
     const owner = createEnvironmentRenderer(document, {
-      warmWorkerScene: (sources, signal) => warmed.warmScene(sources, signal),
+      warmWorkerScene: (sources, signal) => {
+        const bitmaps = new Set(
+          sources
+            .map((source) => source.texture.source)
+            .filter((source) => source instanceof ImageBitmap),
+        );
+        transferredBytes = [...bitmaps].reduce(
+          (total, source) => total + source.width * source.height * 4,
+          0,
+        );
+        return warmed.warmScene(sources, signal);
+      },
     });
     const rows = [];
     for (let stage = 0; stage < 9; stage++) {
@@ -70,17 +82,43 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
       let max = 0;
       for (let i = 0; i < actual.length; i++)
         max = Math.max(max, Math.abs(actual[i]! - expected[i]!));
-      rows.push({ stage, ready, uploads, links, max });
+      const memory = owner.snapshot();
+      rows.push({
+        stage,
+        ready,
+        uploads,
+        links,
+        max,
+        transferredBytes,
+        accountedTransferred: memory.transferredBytes,
+        workerCanvasBytes: memory.canvasBytes,
+        workerCanvases: memory.canvases,
+        gpuBytes: warmed.sourceMemorySnapshot.bytes,
+      });
     }
     owner.dispose();
     warmed.dispose();
     baseline.dispose();
-    return rows;
+    return {
+      rows,
+      disposedGpuBytes: warmed.sourceMemorySnapshot.bytes + baseline.sourceMemorySnapshot.bytes,
+      disposedTransferredBytes: owner.snapshot().transferredBytes,
+    };
   });
-  expect(result).toHaveLength(9);
+  expect(result.disposedGpuBytes).toBe(0);
+  expect(result.disposedTransferredBytes).toBe(0);
+  expect(result.rows).toHaveLength(9);
   expect(
-    result.every((row) => row.ready && row.uploads === 0 && row.links === 0 && row.max === 0),
+    result.rows.every((row) => row.ready && row.uploads === 0 && row.links === 0 && row.max === 0),
   ).toBe(true);
+  for (const row of result.rows) {
+    expect(row.accountedTransferred, `stage ${row.stage} transferred planes`).toBe(
+      row.transferredBytes,
+    );
+    expect(row.workerCanvasBytes).toBeGreaterThanOrEqual(row.transferredBytes);
+    expect(row.workerCanvases).toBeGreaterThan(0);
+    expect(row.gpuBytes).toBeGreaterThanOrEqual(row.transferredBytes);
+  }
   expect(warnings).toEqual([]);
 });
 

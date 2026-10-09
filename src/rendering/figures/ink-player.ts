@@ -1,5 +1,6 @@
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { createSurfaceMapLibrary } from '../surface-maps.ts';
 import { createPbrAtlas } from '../pbr-atlas.ts';
@@ -47,7 +48,7 @@ export function createInkPlayerRenderer(doc: Document) {
       prior = tones.get(id);
     if (prior) return prior;
     const [sx, sy, sw, sh] = PLAYER_FRAMES[key],
-      c = doc.createElement('canvas');
+      c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
     // Keep source detail for the large foreground and Armoury crops.
     c.width = sw;
     c.height = sh;

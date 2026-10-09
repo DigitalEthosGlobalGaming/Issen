@@ -1,4 +1,5 @@
 import type { SceneDrawing } from './scene-drawing.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
 import type { SceneMaterial, SceneTexture } from './scene-frame.ts';
 import { normalTransform } from './scene-frame.ts';
 import { drawMaterialStamp } from './scene-material.ts';
@@ -211,7 +212,11 @@ function materialLayer(canvas: HTMLCanvasElement, owner: Owner): Layer {
   }
   if (!layer) {
     const map = () => {
-      const c = canvas.ownerDocument.createElement('canvas');
+      const c = trackPixelSource(
+        canvas.ownerDocument,
+        canvas.ownerDocument.createElement('canvas'),
+        'canvas',
+      );
       c.width = canvas.width;
       c.height = canvas.height;
       return c;

@@ -8,6 +8,34 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Combined resource accounting groundwork — 9 October 2026
+
+App1.69.17 introduces weak observation of main decoded images and canvas backing
+sizes, including shared decode leases, direct PBR/weapon/Demon inputs, startup
+images, figure tone/crop caches and material cutouts. Observation does not pin
+pixels. Worker documents report every created canvas's current backing size;
+this includes colour/data layers, material scratch and temporary copies still
+alive before garbage collection. Transferred ImageBitmaps are counted separately
+by actual dimensions, with shared references counted once. Painter source stores
+report nominal RGBA texture backing with exact mip chains; all registered
+document painters contribute, including previews. Native services expose these
+components and their `accountedBytes` sum.
+
+This is not yet whole-app admission: render targets, driver overhead and some
+auxiliary canvases remain outside the counters, and decode budgets remain per
+pool. Worker data describes the last response rather than a continuous reading.
+Next complete those estimates and use reservations before composing/warming a
+next slot; do not treat the existing loader limit as a combined cap.
+
+Ten focused unit cases pass (accounting/mips, plane copying and PBR lifetime).
+The existing nine-stage native warming case verifies transferred-byte equality,
+worker canvas and source GPU estimates, identical scenery, no first-draw upload
+or link, and zero transferred/source-GPU bytes after disposal. It passes in7.5s.
+Logs: `tmp/probes/scene-memory-{units,browser,typecheck}.log`.
+Checked production verification build/strict TypeScript passes; build log is
+`tmp/probes/scene-memory-build.log`. Changed formatting/diff checks pass.
+No additional performance run or full suite is required for these counters.
+
 ## Drift runtime integration — 9 October 2026
 
 App1.69.15 installs the two1024×512 WebP planes and128px cells. At DPR3,

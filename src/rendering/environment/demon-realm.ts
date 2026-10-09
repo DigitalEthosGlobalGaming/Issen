@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import {
   createCachedMaterials,
@@ -21,14 +22,14 @@ export function createDemonRealmRenderer(doc: Document) {
     mountains: mountainUrl,
   });
   const cachedMaterials = createCachedMaterials();
-  const landmarks = doc.createElement('img'),
-    terrain = doc.createElement('img'),
-    mountains = doc.createElement('img');
+  const landmarks = trackPixelSource(doc, doc.createElement('img'), 'decoded'),
+    terrain = trackPixelSource(doc, doc.createElement('img'), 'decoded'),
+    mountains = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   landmarks.decoding = terrain.decoding = mountains.decoding = 'async';
   landmarks.src = landmarkUrl;
   terrain.src = terrainUrl;
   mountains.src = mountainUrl;
-  const mountainLayer = doc.createElement('canvas');
+  const mountainLayer = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
   let mountainKey = '';
   let disposed = false;
   void materials.prepare().then(() => {

@@ -6,9 +6,10 @@ import { createAssetMaterials } from '../asset-materials.ts';
 import { createCachedMaterials } from '../cached-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
-import { closeLayers, compositionKey } from './worker-types.ts';
+import { closeLayers, compositionKey, composedLayerBytes } from './worker-types.ts';
 import { createSceneImagePreload } from './image-preload.ts';
 import { documentImageBudget } from '../../platform/main-images.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import type {
   ComposedLayer,
   ComposeRequest,
@@ -190,7 +191,7 @@ export function createWorkerEnvironmentRenderer(
   }
   function prepareFog(): Promise<void> {
     return (fogPending ??= (async () => {
-      fog = doc.createElement('img');
+      fog = trackPixelSource(doc, doc.createElement('img'), 'decoded');
       fog.src = FOG_URL;
       try {
         await Promise.all([fog.decode(), fogMaps.prepare()]);
@@ -464,6 +465,7 @@ export function createWorkerEnvironmentRenderer(
     },
     snapshot: () => ({
       ...snapshot,
+      transferredBytes: composedLayerBytes([...layers, ...foreground]),
       imagePreload: imagePreload.snapshot(),
       worker: !!worker && !workerFailure && !disposed,
       pending: running,

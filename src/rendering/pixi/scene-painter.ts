@@ -29,6 +29,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
+import { documentPixelMemory, trackPixelSource } from '../../platform/pixel-memory.ts';
 import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
 import { sceneTextureRevision } from '../texture-revision.ts';
@@ -292,6 +293,7 @@ export class PixiScenePainter implements SceneDrawing {
     private readonly renderer: WebGLRenderer<HTMLCanvasElement>,
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
+    documentPixelMemory(canvas.ownerDocument).trackGpu(this.textures);
     this.geometryBuffer.resize(canvas.width, canvas.height);
     this.artworkMaterials = new ArtworkMaterials(renderer);
     this.lightBuffer = new LightBuffer(renderer);
@@ -299,7 +301,11 @@ export class PixiScenePainter implements SceneDrawing {
     canvas.addEventListener('webglcontextlost', this.loseContext);
     canvas.addEventListener('webglcontextrestored', this.restoreContext);
     canvas.dataset.contextState = 'ready';
-    this.measure = canvas.ownerDocument.createElement('canvas').getContext('2d')!;
+    this.measure = trackPixelSource(
+      canvas.ownerDocument,
+      canvas.ownerDocument.createElement('canvas'),
+      'canvas',
+    ).getContext('2d')!;
     registerLeafSink(this, (frame) => {
       const item = this.submit('leaf');
       const slot = this.slots[this.cursor - 1]!;
@@ -1273,7 +1279,11 @@ export class PixiScenePainter implements SceneDrawing {
         padding = this.lineWidth + 2;
       const left = Math.ceil(m.actualBoundingBoxLeft + padding),
         top = Math.ceil(m.actualBoundingBoxAscent + padding);
-      const c = this.canvas.ownerDocument.createElement('canvas');
+      const c = trackPixelSource(
+        this.canvas.ownerDocument,
+        this.canvas.ownerDocument.createElement('canvas'),
+        'canvas',
+      );
       c.width = Math.max(1, Math.ceil(left + m.actualBoundingBoxRight + padding));
       c.height = Math.max(1, Math.ceil(top + m.actualBoundingBoxDescent + padding));
       const ink = c.getContext('2d')!;
@@ -1295,6 +1305,10 @@ export class PixiScenePainter implements SceneDrawing {
   /** Nominal uploaded-source count for ownership diagnostics. */
   get sourceTextureCount(): number {
     return this.textures.size;
+  }
+
+  get sourceMemorySnapshot(): { sources: number; bytes: number } {
+    return this.textures.memorySnapshot;
   }
 
   get sourceRetirementSnapshot(): { sources: number; bytes: number } {

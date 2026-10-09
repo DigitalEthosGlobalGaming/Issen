@@ -7,6 +7,7 @@ import { readCompressedAsset } from './compressed-assets.ts';
 import { runtimeAssets } from './runtime-assets.ts';
 import { observeAssetBackground } from './asset-background.ts';
 import { retireSceneTexture } from '../rendering/texture-revision.ts';
+import { trackPixelSource } from './pixel-memory.ts';
 
 type Resource = { image: HTMLImageElement; width: number; height: number; close(): void };
 type Pool = {
@@ -34,7 +35,7 @@ async function decode(doc: Document, url: string, signal: AbortSignal): Promise<
   const blob = await response.blob();
   if (signal.aborted) throw new DOMException('Image decode aborted', 'AbortError');
   const objectUrl = URL.createObjectURL(blob);
-  const image = doc.createElement('img');
+  const image = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   image.decoding = 'async';
   let closed = false;
   const close = () => {

@@ -9,6 +9,7 @@ import { createLightingRig } from '../rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from '../ui/material-lighting.ts';
 import { disposeUiArt } from '../rendering/ui-art.ts';
 import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
+import { documentPixelMemory } from '../platform/pixel-memory.ts';
 
 export interface PreparedLighting {
   rig: ReturnType<typeof createLightingRig>;
@@ -42,6 +43,26 @@ export function createNativeServices(
   lifecycle.add(inkPlayer.dispose);
   lifecycle.add(inkSword.dispose);
   return {
+    memorySnapshot() {
+      const main = documentPixelMemory(ownerDocument).snapshot();
+      const scene = environmentRenderer.snapshot();
+      const workerDecodedBytes = scene.decodedLoader?.bytes ?? 0;
+      const workerCanvasBytes = scene.canvasBytes ?? 0;
+      const transferredBytes = scene.transferredBytes;
+      return {
+        ...main,
+        workerDecodedBytes,
+        workerCanvasBytes,
+        transferredBytes,
+        accountedBytes:
+          main.decodedBytes +
+          main.canvasBytes +
+          main.gpuBytes +
+          workerDecodedBytes +
+          workerCanvasBytes +
+          transferredBytes,
+      };
+    },
     environmentRenderer,
     demonRealmRenderer,
     inkCharm,

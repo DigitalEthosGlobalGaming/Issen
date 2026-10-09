@@ -40,7 +40,11 @@ scope.onmessage = ({ data }) => {
           ok: ready,
           layers: [],
           foreground: [],
-          snapshot: { ...renderer.snapshot(), decodedLoader: workerDocument.decodedSnapshot() },
+          snapshot: {
+            ...renderer.snapshot(),
+            decodedLoader: workerDocument.decodedSnapshot(),
+            ...workerDocument.canvasSnapshot(),
+          },
         },
         [],
       );
@@ -88,6 +92,7 @@ scope.onmessage = ({ data }) => {
       }
       const snapshot = {
         ...renderer.snapshot(),
+        ...workerDocument.canvasSnapshot(),
         decodedBytes: workerDocument.decodedSnapshot().bytes,
         decodedLoader: workerDocument.decodedSnapshot(),
         timings: {

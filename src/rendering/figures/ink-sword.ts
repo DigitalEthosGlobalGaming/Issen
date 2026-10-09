@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { assetMaterialCatalog } from '../asset-material-catalog.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
@@ -33,7 +34,7 @@ const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: st
 export function createInkSwordRenderer(doc: Document) {
   const fittings = createAssetMaterials(doc, { hilts: SOURCES.hilts, special: SOURCES.special });
   const materials = new Map<number, SceneMaterial>();
-  const surface = doc.createElement('img');
+  const surface = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   const images = new Map<SourceKind, HTMLImageElement>(),
     loaded = new Set<SourceKind>(),
     cache = new Map<string, HTMLCanvasElement>(),
@@ -55,7 +56,10 @@ export function createInkSwordRenderer(doc: Document) {
         .map(
           (family) =>
             new Promise<void>((resolve) => {
-              const im = family === 'surface' ? surface : doc.createElement('img');
+              const im =
+                family === 'surface'
+                  ? surface
+                  : trackPixelSource(doc, doc.createElement('img'), 'decoded');
               images.set(family, im);
               const done = () => {
                 im.onload = null;
@@ -105,7 +109,7 @@ export function createInkSwordRenderer(doc: Document) {
     const im = images.get(family);
     if (!im) return null;
     const [sx, sy, sw, sh] = frame,
-      c = doc.createElement('canvas'),
+      c = trackPixelSource(doc, doc.createElement('canvas'), 'canvas'),
       s = Math.min(1, (family === 'blades' ? 1024 : 512) / Math.max(sw, sh));
     c.width = Math.max(1, Math.round(sw * s));
     c.height = Math.max(1, Math.round(sh * s));

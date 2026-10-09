@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { drawCachedImage } from '../cached-materials.ts';
 /** Shared cached-composition helper. Source atlases remain untouched. */
 export interface SpritePlacement {
@@ -89,7 +90,11 @@ export function drawAtlasSprite(
     ].join(':');
     cutout = cache.get(key) ?? null;
     if (!cutout) {
-      cutout = ctx.canvas.ownerDocument.createElement('canvas');
+      cutout = trackPixelSource(
+        ctx.canvas.ownerDocument,
+        ctx.canvas.ownerDocument.createElement('canvas'),
+        'canvas',
+      );
       cutout.width = Math.ceil(sw);
       cutout.height = Math.ceil(sh);
       const g = cutout.getContext('2d');

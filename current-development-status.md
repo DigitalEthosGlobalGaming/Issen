@@ -1,4 +1,29 @@
-# Mobile performance — Required workers and retry integrated
+# Mobile performance — Combined resource accounting groundwork
+
+App1.69.17 adds weak, identity-deduplicated decoded-image/canvas observation,
+worker canvas backing counters, actual transferred-plane bytes and painter source
+GPU estimates including mipmaps. Main shared pools, direct PBR/weapon/Demon
+inputs, startup images and figure/material caches participate. Native services
+expose component counts and `accountedBytes`; all document source stores count,
+including registered previews. Weak observation adds no pins or strong lifetime
+references. Worker-required/retry integration is committed as `fba4d9b`.
+
+Ten focused unit cases pass. Native nine-stage warming verifies transferred-byte
+equality, worker/source estimates, unchanged pixels/no first-draw uploads or links,
+and zero transferred/source bytes after disposal. All sessions terminal.
+Checked production verification build passes, including strict TypeScript;
+changed formatting/diff checks pass. Package/lock/title/changelog agree1.69.17.
+See [evidence](docs/development/mobile-performance-progress.md) for scope and logs.
+This does not enforce a whole-app budget: render targets, driver overhead and
+some auxiliary canvases remain uncounted; worker numbers are last-response values.
+
+Next: finish those estimates and reserve combined headroom for next-scene
+composition/warming/promotion; complete incoming figure GPU warming and remaining
+ownership. Do not mistake per-pool decode limits for a whole-app cap. Full goal
+remains incomplete; physical Android/120Hz targets remain unproven. Cancelled
+packing/lit-only work stays cancelled. No push/deploy/native build/save changes.
+
+## Previous handoff — Required workers and retry integrated
 
 App1.69.16 requires worker scenery and removes automatic main-thread fallback.
 Shared composition remains inside the worker and diagnostic comparisons.

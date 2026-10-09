@@ -1,6 +1,7 @@
 import type { SceneMaterial } from './scene-frame.ts';
 import type { MainImageOwner } from '../platform/main-images.ts';
 import { retireSceneTexture } from './texture-revision.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
 
 type MapKind = 'diffuse' | 'normal' | 'surface' | 'emissive';
 export type PbrAtlasSources = Record<Exclude<MapKind, 'emissive'>, string> & { emissive?: string };
@@ -38,7 +39,7 @@ export function createPbrAtlas(
               return false;
             }
           }
-          const image = doc.createElement('img');
+          const image = trackPixelSource(doc, doc.createElement('img'), 'decoded');
           images.set(kind, image);
           image.src = sources[kind]!;
           try {

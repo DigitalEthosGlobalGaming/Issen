@@ -1,4 +1,5 @@
 import type { SceneTexture } from './scene-frame.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
 
 type Frame = readonly [number, number, number, number];
 export type CutoutRequest = {
@@ -108,8 +109,8 @@ export function createMaterialCutouts(doc: Document, pixelBudget = 4_000_000) {
       // Bake directly into the retained entry. Copying a freshly baked canvas
       // forces its pending rasterization and costs more than the cache saves.
       const working = cacheable
-        ? (reusable ?? doc.createElement('canvas'))
-        : (scratch ??= doc.createElement('canvas'));
+        ? (reusable ?? trackPixelSource(doc, doc.createElement('canvas'), 'canvas'))
+        : (scratch ??= trackPixelSource(doc, doc.createElement('canvas'), 'canvas'));
       if (working.width !== request.width) working.width = request.width;
       if (working.height !== request.height) working.height = request.height;
       // Atlas downsampling retains software rasterization. Owners may opt into

@@ -2,6 +2,7 @@ import { Rectangle, Texture } from 'pixi.js';
 import type { TextureSource } from 'pixi.js';
 import type { SceneTexture } from '../scene-frame.ts';
 import { observeSceneTextureRetirement } from '../texture-revision.ts';
+import { rgbaMipBytes } from '../../platform/pixel-memory.ts';
 
 interface PreparedSource {
   texture: Texture;
@@ -133,6 +134,17 @@ export class SceneTextureStore {
 
   get size(): number {
     return this.sources.size + this.dataSources.size;
+  }
+
+  /** Source backing estimate, including mip levels; excludes render targets and driver overhead. */
+  get memorySnapshot(): { sources: number; bytes: number } {
+    const sources = new Set<TextureSource>();
+    for (const store of [this.sources, this.dataSources])
+      for (const prepared of store.values()) sources.add(prepared.texture.source);
+    let bytes = 0;
+    for (const source of sources)
+      bytes += rgbaMipBytes(source.pixelWidth, source.pixelHeight, source.autoGenerateMipmaps);
+    return { sources: sources.size, bytes };
   }
 
   /** Queued/replay sources retire when that frame ends or is abandoned. */

@@ -28,6 +28,8 @@ export type EnvironmentSnapshot = {
   layers: number;
   pixels: number;
   decodedBytes?: number;
+  canvasBytes?: number;
+  canvases?: number;
   decodedLoader?: {
     queued: number;
     decoded: number;
@@ -77,4 +79,13 @@ export function closeLayers(layers: readonly ComposedLayer[]) {
         retireSceneTexture(bitmap);
         bitmap.close();
       }
+}
+
+/** Transferred pixels are independent copies of the worker's composed canvases. */
+export function composedLayerBytes(layers: readonly ComposedLayer[]): number {
+  const sources = new Set<ImageBitmap>();
+  for (const layer of layers)
+    for (const source of [layer.colour, layer.normal, layer.surface, layer.emissive])
+      if (source) sources.add(source);
+  return [...sources].reduce((bytes, source) => bytes + source.width * source.height * 4, 0);
 }
