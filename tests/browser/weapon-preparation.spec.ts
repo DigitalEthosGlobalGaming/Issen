@@ -263,7 +263,8 @@ test('low-memory special cutouts release raw inputs and survive catalogue change
   });
   await writeFile(testInfo.outputPath('compact-special.json'), JSON.stringify(result, null, 2));
   expect(result.snapshot.specialCompacted).toBe(true);
-  expect(result.before.decodedBytes - result.after.decodedBytes).toBe(18_882_456);
+  expect(result.before.decodedBytes - result.after.decodedBytes).toBe(18_882_456 + 25_160_256);
+  expect(result.snapshot.regularCompacted).toBe(true);
   expect(result.snapshot.specialPixels).toBeLessThan(600_000);
   expect(result.uploads).toBeGreaterThan(0);
   expect(result.maximum).toBe(0);
@@ -272,4 +273,84 @@ test('low-memory special cutouts release raw inputs and survive catalogue change
   expect(result.final.decodedBytes).toBe(0);
   expect(result.final.canvasBytes).toBe(result.before.canvasBytes);
   expect(result.textures).toBe(0);
+});
+
+test('low-memory regular material planes cover the catalogue and retire full maps', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { configurable: true, value: 2 });
+    const { createInkSwordRenderer } = await import('/src/rendering/figures/ink-sword.ts');
+    const { BLADE_RECIPES } = await import('/src/rendering/figures/blade-recipes.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { createPalette } = await import('/src/rendering/palette.ts');
+    const { documentPixelMemory } = await import('/src/platform/pixel-memory.ts');
+    const owner = createInkSwordRenderer(document);
+    const canvas = document.createElement('canvas');
+    canvas.width = 240;
+    canvas.height = 160;
+    const painter = await createTestDrawing(canvas);
+    try {
+      await owner.prepare(['steel']);
+      const before = documentPixelMemory(document).snapshot();
+      const ids = Object.keys(BLADE_RECIPES).filter((id) => !BLADE_RECIPES[id]!.special);
+      const uploads = await owner.prepareUploads(ids, new AbortController().signal);
+      if (!uploads) throw Error('Regular artwork preparation failed');
+      await painter.warmScene(uploads, new AbortController().signal);
+      const after = documentPixelMemory(document).snapshot();
+      const snapshot = owner.snapshot();
+      const gl = canvas.getContext('webgl2')!;
+      const upload = gl.texImage2D;
+      let firstUse = 0;
+      gl.texImage2D = (...args: any[]) => {
+        firstUse++;
+        return Reflect.apply(upload, gl, args);
+      };
+      const drawn: boolean[] = [];
+      const palette = createPalette().robe('sumi');
+      try {
+        for (const id of ids) {
+          painter.begin();
+          painter.save();
+          painter.translate(35, 80);
+          painter.scale(200, 200);
+          drawn.push(owner.draw(painter, 0, 0, 0, palette, undefined, id));
+          painter.restore();
+          painter.flush();
+        }
+      } finally {
+        gl.texImage2D = upload;
+      }
+      const late = await owner.prepareUploads(
+        ['pan', 'koken', 'steel'],
+        new AbortController().signal,
+      );
+      const retained = owner.snapshot();
+      owner.dispose();
+      return {
+        before,
+        after,
+        snapshot,
+        firstUse,
+        drawn,
+        late: !!late,
+        retained,
+        final: documentPixelMemory(document).snapshot(),
+        sources: painter.sourceTextureCount,
+      };
+    } finally {
+      owner.dispose();
+      painter.dispose();
+    }
+  });
+  expect(result.before.decodedBytes - result.after.decodedBytes).toBe(25_160_256);
+  expect(result.snapshot.regularCompacted).toBe(true);
+  expect(result.snapshot.regularMapPixels).toBeLessThan(700_000);
+  expect(result.drawn.every(Boolean)).toBe(true);
+  expect(result.firstUse).toBe(0);
+  expect(result.late).toBe(true);
+  expect(result.retained.regularMapPixels).toBe(result.snapshot.regularMapPixels);
+  expect(result.final.decodedBytes).toBe(0);
+  expect(result.sources).toBe(0);
 });

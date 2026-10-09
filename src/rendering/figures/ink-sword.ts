@@ -40,6 +40,10 @@ const SOURCES: Record<Exclude<SourceKind, 'emissive'>, string> & { emissive?: st
 export function createInkSwordRenderer(doc: Document) {
   const fittings = createAssetMaterials<string>(doc, { hilts: SOURCES.hilts });
   const compactSpecial = documentImageBudget(doc) <= 256 * 1024 * 1024;
+  const regularMaterials = new Map<string, SceneMaterial>();
+  const regularPlanes = new Set<HTMLCanvasElement>();
+  let regularCompacted = false,
+    regularCompaction: Promise<boolean> | undefined;
   const specialMaterials = new Map<string, SceneMaterial>();
   const specialParts = new Map<string, HTMLCanvasElement>();
   const specialPlanes = new Set<HTMLCanvasElement>();
@@ -69,7 +73,7 @@ export function createInkSwordRenderer(doc: Document) {
     if (prior) return prior;
     specialRequested ||= special;
     fittings.select({
-      hilts: SOURCES.hilts,
+      ...(regularCompacted ? {} : { hilts: SOURCES.hilts }),
       ...(specialRequested && !specialCompacted ? { special: SOURCES.special } : {}),
     });
     const pending = Promise.all(
@@ -166,7 +170,94 @@ export function createInkSwordRenderer(doc: Document) {
   function fittingMaterial(family: 'hilts' | 'special', frame: Frame) {
     return family === 'special' && specialCompacted
       ? (specialMaterials.get(frame.join(',')) ?? null)
-      : fittings.material(family, frame);
+      : family === 'hilts' && regularCompacted
+        ? (regularMaterials.get('hilts:' + frame.join(',')) ?? null)
+        : fittings.material(family, frame);
+  }
+  function bladeMaterial(frame: Frame): SceneMaterial | null {
+    if (regularCompacted) return regularMaterials.get('blades:' + frame.join(',')) ?? null;
+    return {
+      normal: { source: images.get('normal')!, revision: 0, frame },
+      surface: { source: surface, revision: 0, frame },
+      ...(images.has('emissive')
+        ? { emissive: { source: images.get('emissive')!, revision: 0, frame } }
+        : {}),
+      normalY: -1,
+      lighting: 1,
+      depth: 0,
+      fog: 0,
+      fogColor: [0.53, 0.51, 0.47],
+    };
+  }
+  /** Finite regular map planes preserve original colour cutouts and authored geometry. */
+  function compactRegularMaterials(): Promise<boolean> {
+    if (!compactSpecial || regularCompacted) return Promise.resolve(true);
+    return (regularCompaction ??= (async () => {
+      const frames: { family: 'blades' | 'hilts'; frame: Frame }[] = [
+        ...Object.values(BLADE_PROFILE_FRAMES).map((profile) => ({
+          family: 'blades' as const,
+          frame: profile.frame,
+        })),
+        ...Object.values(HILT_FRAMES).map((frame) => ({ family: 'hilts' as const, frame })),
+        ...Object.values(GUARD_PARTS).map((guard) => ({
+          family: 'hilts' as const,
+          frame: guard.frame,
+        })),
+      ];
+      let complete = true;
+      const ready = await paceTextureUploads(frames, preparation.signal, {
+        nextFrame: (signal) => nextVisibleFrame(doc, signal),
+        ready: () => !disposed && !doc.hidden,
+        generation: () => 0,
+        now: () => doc.defaultView!.performance.now(),
+        upload: ({ family, frame }) => {
+          const original =
+            family === 'blades' ? bladeMaterial(frame) : fittings.material('hilts', frame);
+          if (!original) {
+            complete = false;
+            return;
+          }
+          const material = { ...original };
+          const scale = Math.min(
+            1,
+            (family === 'blades' ? 512 : 256) / Math.max(frame[2], frame[3]),
+          );
+          for (const kind of ['normal', 'surface', 'emissive'] as const) {
+            const input = original[kind];
+            if (!input) continue;
+            const plane = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
+            plane.width = Math.max(1, Math.round(frame[2] * scale));
+            plane.height = Math.max(1, Math.round(frame[3] * scale));
+            regularPlanes.add(plane);
+            plane
+              .getContext('2d')!
+              .drawImage(input.source, ...frame, 0, 0, plane.width, plane.height);
+            material[kind] = {
+              source: plane,
+              revision: 0,
+              frame: [0, 0, plane.width, plane.height],
+            };
+          }
+          regularMaterials.set(family + ':' + frame.join(','), material);
+        },
+      });
+      if (!ready || !complete || disposed) return false;
+      regularCompacted = true;
+      materials.clear();
+      for (const kind of ['normal', 'surface', 'emissive'] as const) {
+        const image = images.get(kind);
+        if (image) {
+          retireSceneTexture(image, true);
+          image.removeAttribute('src');
+          image.width = image.height = 0;
+        }
+      }
+      fittings.select(
+        specialRequested && !specialCompacted ? { special: SOURCES.special } : {},
+        true,
+      );
+      return true;
+    })());
   }
   /** Keep the finite special catalogue independent of the ordinary tint LRU. */
   function compactSpecialParts(): Promise<boolean> {
@@ -237,7 +328,7 @@ export function createInkSwordRenderer(doc: Document) {
         raw.removeAttribute('src');
         images.delete('special');
       }
-      fittings.select({ hilts: SOURCES.hilts }, true);
+      fittings.select(regularCompacted ? {} : { hilts: SOURCES.hilts }, true);
       return true;
     })());
   }
@@ -253,6 +344,7 @@ export function createInkSwordRenderer(doc: Document) {
       if (disposed || !ready(selected)) return false;
       if (selected.some((id) => BLADE_RECIPES[id]?.special) && !(await compactSpecialParts()))
         return false;
+      if (!(await compactRegularMaterials())) return false;
       const stamps: { family: Family; frame: Frame; tint?: string }[] = [];
       for (const id of selected) {
         const recipe = BLADE_RECIPES[id]!;
@@ -293,7 +385,7 @@ export function createInkSwordRenderer(doc: Document) {
         .filter((kind) => SOURCES[kind] && kind !== 'special')
         .every((kind) => loaded.has(kind)) &&
       pbrReady() &&
-      fittings.ready('hilts') &&
+      (regularCompacted || fittings.ready('hilts')) &&
       (!special || (loaded.has('special') && (specialCompacted || fittings.ready('special'))))
     );
   }
@@ -306,21 +398,7 @@ export function createInkSwordRenderer(doc: Document) {
     const add = (family: Family, frame: Frame, tint?: string) => {
       const image = part(family, frame, tint);
       if (!image) return false;
-      const material =
-        family === 'blades'
-          ? {
-              normal: { source: images.get('normal')!, revision: 0, frame },
-              surface: { source: surface, revision: 0, frame },
-              ...(images.has('emissive')
-                ? { emissive: { source: images.get('emissive')!, revision: 0, frame } }
-                : {}),
-              normalY: -1 as const,
-              lighting: 1,
-              depth: 0,
-              fog: 0,
-              fogColor: [0.53, 0.51, 0.47] as const,
-            }
-          : fittingMaterial(family, frame);
+      const material = family === 'blades' ? bladeMaterial(frame) : fittingMaterial(family, frame);
       uploads.push(...materialTextureUploads({ source: image, revision: 0 }, material));
       return true;
     };
@@ -432,18 +510,7 @@ export function createInkSwordRenderer(doc: Document) {
       if (pbrReady()) {
         let material = materials.get(recipe.profile);
         if (!material) {
-          material = {
-            normal: { source: images.get('normal')!, revision: 0, frame: profile.frame },
-            surface: { source: surface, revision: 0, frame: profile.frame },
-            ...(images.has('emissive')
-              ? { emissive: { source: images.get('emissive')!, revision: 0, frame: profile.frame } }
-              : {}),
-            normalY: -1,
-            lighting: 1,
-            depth: 0,
-            fog: 0,
-            fogColor: [0.53, 0.51, 0.47],
-          };
+          material = bladeMaterial(profile.frame)!;
           materials.set(recipe.profile, material);
         }
         drawMaterialStamp(g, {
@@ -471,6 +538,8 @@ export function createInkSwordRenderer(doc: Document) {
     snapshot: () => ({
       loaded: [...loaded],
       specialCompacted,
+      regularCompacted,
+      regularMapPixels: [...regularPlanes].reduce((n, c) => n + c.width * c.height, 0),
       specialPixels: [...specialPlanes, ...specialParts.values()].reduce(
         (n, c) => n + c.width * c.height,
         0,
@@ -500,10 +569,17 @@ export function createInkSwordRenderer(doc: Document) {
       }
       surface.width = surface.height = 0;
       for (const f of [...finish]) f();
-      for (const c of [...cache.values(), ...specialParts.values(), ...specialPlanes]) {
+      for (const c of [
+        ...cache.values(),
+        ...specialParts.values(),
+        ...specialPlanes,
+        ...regularPlanes,
+      ]) {
         retireSceneTexture(c);
         c.width = c.height = 0;
       }
+      regularMaterials.clear();
+      regularPlanes.clear();
       specialMaterials.clear();
       specialParts.clear();
       specialPlanes.clear();

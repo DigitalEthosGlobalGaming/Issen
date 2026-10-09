@@ -1,6 +1,45 @@
 # Current development status
 
-## Current handoff — compact low-memory companions
+## Current handoff — compact ordinary weapon maps unblock wrap
+
+App 1.69.46 copies ordinary weapon normal/surface/emissive windows on the 256 MiB
+tier: blades cap512px, hilt/guard maps256px. Both warming and drawing use the same
+material accessor. Colour/tint cutouts, authored geometry, high-tier sampling and
+special policy remain unchanged. Four full ordinary map planes retire after paced
+copying:25,160,256 decoded bytes replaced by670,720 map pixels/2,682,880 bytes.
+Later special selection does not reopen ordinary maps; disposal closes all planes.
+
+Controlled actual-frame-sampled rush/cat loop now prepares/promotes all nine
+stages, including the denied8→0 wrap. Promotion waits15.5–28.4ms; sampled committed
+peak508.65MiB, wrap506.98MiB. Evidence
+`tmp/probes/rush-companion-admission-compact-weapons.json`. The fixture invokes
+runtime `nextStep` but controls pause/between/ordinal entry; not natural combat,
+all-transient/native residency or physical120Hz proof. Run seeds vary between
+captures, so don't interpret these as exact before/after timing baselines.
+
+Six ordinary weapon appearances reviewed before/after with the same low tier;
+control disables only ordinary map compaction. Silhouettes/colour and shading
+remain coherent. Evidence `tmp/probes/weapon-material-visual-{before,after}.{png,json}`.
+Fixture decoded37,740,384→12,580,128bytes; GPU59,878,304→37,400,928bytes; canvas
+4,946,040→7,628,920bytes. Combined accounted102,564,728→57,609,976bytes. Original
+colour caches unchanged. This isolated fixture is not a whole-app cap.
+
+Eight focused weapon/native-figure browser checks PASS7.7s/default2workers:
+new whole regular catalogue first draws upload0 after warming, exact decoded map
+retirement, bounded plane pixels, late special selections/final GPU0; existing
+higher-tier pixel parity/readback checks, hidden/disposal, low special context
+restore, low figure cancellation/current retention/context recovery and promotion.
+The special decoded-saving assertion now includes the deliberately retired regular
+maps. Results `tmp/test-results/browser/compact-weapon-maps/`. Checked production
+build/strict TypeScript plus startup/Armoury/run/landscape and offline-resize smokes
+PASS10.9s/default2workers; `tmp/test-results/production/compact-weapon-maps/`.
+
+Next: broader natural progression/viewport/special-loadout/transient/native memory
+coverage and historical native colour mismatch, then final stable cold/warm/frame/
+compose matrix and applicable suites. Goal active; all processes terminal. No
+push/deploy/native build/real-save changes. Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — compact low-memory companions
 
 App 1.69.45 reuses prepared-figure copying on the 256 MiB tier for 16 companion
 parts capped256px and one rock plane capped512px. Original plain colour, aligned

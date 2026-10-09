@@ -214,6 +214,12 @@ equipment rule. Preview closure releases its pins/native textures; full-catalogu
 preparation remains explicit for standalone callers. Other figure/startup inputs
 still need migration; this is not a whole-application memory guarantee.
 
+Ordinary weapon map backing on the 256 MiB tier uses finite blade-profile planes
+capped at 512 px and hilt/guard planes capped at 256 px: 670,720 plane pixels
+(2,682,880 bytes) replace 25,160,256 decoded bytes. Colour/tint cutouts and authored
+geometry stay unchanged; higher-tier atlas sampling and special-weapon policy
+remain. `ink-sword.ts` shares the copied material lookup between warming/drawing.
+
 On the 256 MiB tier, companion planes copy plain colour plus aligned maps through
 the prepared-figure helper: 16 parts capped at 256 px use 10,407,936 bytes, and rock
 capped at 512 px uses 2,623,488 bytes. These replace raw backing after eviction;

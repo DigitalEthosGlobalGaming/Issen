@@ -864,6 +864,15 @@ creates no pose, tint cache or alternate rendering path. Procedural/no-pet choic
 need no companion atlas uploads. Cancellation, changed kit and disposal suppress
 obsolete results; native services include the companion in their warmed union.
 
+Low-memory ordinary weapons copy finite normal/surface/emissive map windows:
+blade profiles cap at 512 px and hilt/guard maps at 256 px. Original colour/tint
+cutouts and logical geometry stay unchanged. Both preparation and drawing use
+one material accessor; after copying, full blade maps and hilt material inputs
+retire. Later special selections reuse the finite ordinary maps without reopening
+them. Disposal retires all copied planes; higher tiers retain atlas sampling.
+This releases 25,160,256 decoded bytes and replaces those maps with 2,682,880 bytes
+of planes, independent of existing colour caches.
+
 On the 256 MiB decoded tier, companion kits reuse prepared-figure copying:
 16 aligned parts capped at 256 px, and a mystic-rock plane capped at 512 px.
 Copies keep the original plain colour and logical joint geometry; normal/surface
