@@ -794,6 +794,9 @@ unpinned main cache without resolving readiness. Equal-byte updates coalesce;
 assets-ready/composed/final responses retain their existing readiness semantics.
 Painter warming reserves deduplicated, not-yet-initialized texture storage across
 concurrent jobs, including source formats/mips and existing surface targets.
+Ordinary submitted textures and gradients share that reservation, deduplicated
+against warming jobs. Before a drawing flush with pending textures, reclaim
+unpinned main-image backing while their future GPU storage is still visible.
 Native initialization replaces each reservation with measured managed-texture
 bytes; cancellation/disposal clears it. Reclamation runs before paced uploads and
 at main decode byte changes. Resident-cache trim targets exclude pending decode

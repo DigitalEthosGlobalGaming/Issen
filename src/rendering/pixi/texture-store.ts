@@ -136,6 +136,13 @@ export class SceneTextureStore {
     return this.sources.size + this.dataSources.size;
   }
 
+  /** Submitted sources may upload implicitly when Pixi draws the current frame. */
+  *frameTextureSources(): IterableIterator<TextureSource> {
+    for (const store of [this.sources, this.dataSources])
+      for (const prepared of store.values())
+        if (prepared.lastFrame === this.frame) yield prepared.texture.source;
+  }
+
   /** Source backing estimate, including mip levels; excludes render targets and driver overhead. */
   get memorySnapshot(): { sources: number; bytes: number } {
     const sources = new Set<TextureSource>();

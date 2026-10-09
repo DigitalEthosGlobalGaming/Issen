@@ -1,5 +1,27 @@
 # Mobile performance continuation
 
+## Ordinary drawing upload reservations — 10 October 2026
+
+Version 1.69.54 extends painter upload accounting to submitted frame textures and
+gradients, deduplicated against concurrent warming. Before native drawing uploads,
+reclamation sees the pending storage and releases unused main-image backing.
+The focused browser regression fills combined headroom, submits a new texture,
+and proves reservation before upload, cache reclamation and replacement by GPU
+residency; both upload-reservation cases pass, as does strict TypeScript.
+All 13 focused texture-retirement/material-colour cases pass in 9.3s.
+
+The heavier live Rush loadout (pan, hisshou, mystic-rock, sumi; low-memory tier,
+portrait DPR2) previously completed all nine stages but exceeded the 512 MiB
+tracked cap by 113,876 bytes. The new capture completes 0 through 8 and back to 0
+without page errors, peaking at 536,866,516 of 536,870,912 bytes. Only 4,396 bytes
+remain: this sampled result does not establish a robust universal bound, native
+residency or every transient. Returned stage 0 uses 413,349,096 tracked bytes.
+The capture samples 16,280 boundaries (15,992 frames and 288 worker messages).
+Manual animation clocks establish no frame-delivery claim. Evidence remains in
+`tmp/test-results/browser/natural-rush-{heavy-cycle,draw-reservation}-16953/`.
+Broader coverage, admission headroom, strict restoration failures and final checks
+remain open. No additional profiling or full-suite repetition for this chunk.
+
 ## Pre-transport cancellation reservation — 10 October 2026
 
 Version1.69.53 distinguishes a cancelled next slot waiting on main-thread fog

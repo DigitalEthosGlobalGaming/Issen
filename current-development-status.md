@@ -1,5 +1,30 @@
 # Current development status
 
+## Current handoff — ordinary drawing upload reservation (1.69.54)
+
+Submitted frame textures and gradients now join the painter's deduplicated
+pending-upload ledger. Drawing flush reclaims unused main images before pending
+sources become GPU-resident. A deterministic browser case fills headroom, submits
+a texture, and verifies its reservation, reclamation and native replacement.
+Both upload-reservation cases pass; strict TypeScript passes.
+All 13 focused texture-retirement/material-colour cases pass (9.3s), covering
+peer leases, cache eviction, queued frames and context-loss/disposal retirement.
+
+Heavier live Rush (pan/hisshou/mystic-rock/sumi, low-memory portrait DPR2) previously
+completed nine stages but peaked 536,984,788 bytes, 113,876 above 512 MiB. This
+chunk completes all nine and wraps with no page errors, peak 536,866,516 against
+536,870,912 (4,396 bytes headroom), returned stage0 413,349,096. This is sampled
+at 16,280 frame/worker-message boundaries (15,992/288),
+tracked storage, not a universal bound or physical residency; manual clocks prove
+no frame-time delivery target. Preserve the earlier failure and tiny-headroom
+result. Evidence: `tmp/test-results/browser/natural-rush-heavy-cycle-16953/` and
+`tmp/test-results/browser/natural-rush-draw-reservation-16953/`.
+
+Next: robust optional-work headroom, broader loadout/mode/transient accounting,
+two strict restoration failures, and final requirement/report verification.
+Latest checked production remains 1.69.52. Goal active, incomplete. Graphics
+processes terminal; no push/deploy/native build/real-save edits.
+
 ## Current handoff — pre-transport next-slot cancellation (1.69.53)
 
 The slot trace shows stage8→0 next preparation can wait on main-thread fog with

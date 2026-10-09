@@ -305,6 +305,8 @@ export class PixiScenePainter implements SceneDrawing {
         const sources = [...painter.pendingUploads].flatMap(([signal, sources]) =>
           signal.aborted || painter.disposed || painter.contextLost ? [] : [...sources],
         );
+        if (!painter.disposed && !painter.contextLost)
+          sources.push(...painter.drawingTextureSources());
         return {
           decodedBytes: 0,
           canvasBytes: 0,
@@ -566,6 +568,10 @@ export class PixiScenePainter implements SceneDrawing {
 
   flush(): void {
     if (this.disposed || this.contextLost) return;
+    // Ordinary drawing uploads text, patterns and effects too. Publish their
+    // pending storage before reclaiming, rather than waiting for native residency.
+    if (pendingTextureBytes(this.drawingTextureSources(), this.renderer.uid))
+      reclaimSceneMemory(this.canvas.ownerDocument);
     this.lightPass();
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
@@ -622,6 +628,14 @@ export class PixiScenePainter implements SceneDrawing {
     }
     for (const key of this.patterns.keys())
       if (!this.usedPatterns.has(key)) this.patterns.delete(key);
+  }
+
+  private *drawingTextureSources(): IterableIterator<TextureSource> {
+    yield* this.textures.frameTextureSources();
+    for (const key of this.usedGradients) {
+      const gradient = this.gradients.get(key);
+      if (gradient) yield gradient.texture.source;
+    }
   }
 
   private drawGeometry(): void {
