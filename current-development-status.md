@@ -1,4 +1,55 @@
-# Performance, assets and seamless transitions — Worker interference measured
+# Performance, assets and seamless transitions — World UI ownership
+
+Checkpoint56 integrates world UI artwork into the shared main-image loader;
+app1.69.5. The three768×640 plain/normal/surface planes total5,898,240nominal
+RGBA bytes (5.625MiB). They were directly decoded outside loader accounting;
+they now share promises/images with UI material exporters, acquire pins and
+unpin on disposal. Peer images remain usable; the pool evicts/retire-closes
+sources. The document-level UI state remains one owner, without acquiring
+additional pins from snapshot inspection or repeated drawing.
+
+Seal tint canvases now retire on cache eviction and disposal. Eviction preserves
+queued frame replay until the next frame boundary. Baseline native painter
+sources after26 UI draws were8→6 on disposal. New UI disposal with an independent
+pool owner gives8→3: five owned tints release while the three unpinned raw planes
+remain cacheable. Final pool-owner disposal releases the remaining sources.
+This is improved ownership/accounting, not5.625MiB less resident memory or a
+whole-game memory bound. Budgets remain256/384/512MiB.
+
+Original/current strict native oracle passes all26 visible captures: five seal
+materials and eight crests under two lighting states, max channel difference0.
+Initial probe setup used a nonexistent lighting API; then a reused painter's
+first-frame initialization differed by1 channel value before any code changes.
+Separate fresh canvas/painter lifetimes make the original/original baseline
+exact, and the same corrected setup verifies the pooled candidate. No tolerance
+was relaxed. Cache eviction similarly uses a warmed control before comparison.
+Evidence: tmp/probes/ui-ownership56/{original-ui-art.ts,oracle.spec.ts,
+playwright.config.ts,baseline.json,pooled.json}; native outputs under
+tmp/test-results/ui-ownership56/. Production sources and assets are unchanged
+apart from UI lifetime handling. No seed/save/gameplay changes.
+
+New ui-art-ownership.spec.ts covers pin/byte accounting, non-initialising
+snapshots, shared-peer survival, pending disposal/restart, owned tint disposal,
+40-entry cache eviction and exact queued/replayed pixels. All475 units,
+14 related native browser tests and4 checked production tests pass, including
+strict TypeScript and production source-map build. Changed-file formatting and
+git diff whitespace checks pass. All browser/build handles are terminal.
+Package/lock/title/changelog versions agree; this checkpoint is a local commit.
+
+Audit also confirms figures presentation eagerly prepares all enemy/player/
+weapon packs on first figure draw. Charms and selected companions already use
+the pool; enemy, player, outfit and weapon direct images remain outside it.
+Outfit preparation eagerly loads all five colour/material families. Do not
+blindly pin all of these alongside current/next scenery: stage0 raw images alone
+are213,952,112bytes and enemy maps add75,489,120. Next implement selected family
+lifetimes and account for canvas/GPU/copy overlap before retained next scenes.
+Worker pacing evidence remains in checkpoint55 below. Persistent texture-store
+leases, quiet grants, cancellation, next-slot promotion/invalidation, unresolved
+local yielding differences and allPhase5 metrics/traces/suites remain open.
+Full goal active. No push/deploy/native build; cancelled packing/tight repacking
+and separate lit-only work remain cancelled.
+
+## Previous handoff — Worker interference measured
 
 Checkpoint55 is diagnostic only; app remains1.69.4 at checkpoint53. The repaired
 atomic worker now has direct main-gameplay interference measurements, rather

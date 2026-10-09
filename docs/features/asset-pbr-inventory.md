@@ -48,6 +48,14 @@ disposal. Shared image leases only unpin on atlas disposal; peers and warm cache
 entries survive until the shared loader evicts or closes them. This covers atlas
 planes; prepared figure cutout/tone canvases and selected-kit ownership remain
 separate performance-goal work.
+
+World UI artwork uses the shared main-thread decoded-image pool as of1.69.5:
+plain colour plus normal/surface, three768×640planes (5,898,240nominal RGBA
+bytes). Disposal unpins those planes without clearing peers; loader eviction
+retires their GPU consumers. Owned seal tints retire on disposal and cache
+eviction, preserving queued frame replay until the next frame boundary.
+Enemy/player/outfit/weapon direct image ownership still needs integration;
+the shared loader snapshot is not a whole-game memory bound.
 Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
 (1.68.29). Current-frame textures survive replay until that painter's next begin,
 context loss or disposal; older-frame entries retire immediately. Diagnostics

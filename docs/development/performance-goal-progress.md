@@ -2752,3 +2752,49 @@ suite changes. Next implement whole-memory admission and selected figure/UI
 ownership, then retained worker/local slots with quiet grants, cancellation,
 existing texture-store leases and uploads. Local yielding differences, actual
 120Hz delivery and allPhase5 metrics/traces/suites remain open. Full goal active.
+
+## Checkpoint56 — World UI images and tint lifetime (1.69.5)
+
+`ui-art.ts` now acquires its plain colour and material maps through the shared
+main-image pool. Actual browser preparation creates three768×640planes,
+5,898,240nominal RGBA bytes (5.625MiB). The baseline loader reported0 of these;
+the candidate reports3 decoded/3 pinned and the correct bytes. Disposal releases
+all UI pins while an independent owner keeps cacheable sources alive; disposal
+of the last owner closes all sources and returns loader/native counts to0.
+No budget increase, new image conversion or separate texture cache.
+
+Owned tint canvases notify native consumers before disposal. The existing40
+entry limit now retires evicted GPU sources while preserving queued replay.
+Native baseline after26 captures:8 sources,6 left after UI disposal. Candidate:
+8 sources,3 left after UI disposal with a pool peer; all five owned tints retire,
+raw planes remain unpinned cache entries. Remaining3 close with the last owner.
+This does not assert a resident5.625MiB saving: it accounts for and shares those
+sources, while allowing eviction. Raw figures/outfits/weapons and canvas/GPU
+overlap still prevent a whole-game memory claim or safe retained-next admission.
+
+Strict original/current native oracle:26/26 visible captures exact, max channel
+difference0, no GL/binding warnings. It covers five seals and eight crests under
+two lighting states, using independent fresh painter/canvas lifetimes. A probe
+first used a nonexistent lighting API, then compared unequal initialization
+lifetimes and saw a1-value first-frame difference before production edits.
+Corrected original/original baseline is exact; the same setup gates candidate.
+Tint eviction compares warmed frames and also has exact queued/replayed pixels.
+No tolerance was relaxed. Evidence is under tmp/probes/ui-ownership56/ with
+baseline.json, pooled.json, saved original, oracle and dedicated config; native
+reports under tmp/test-results/ui-ownership56/. No timing inference from this
+instrumented ownership oracle.
+
+New permanent ui-art-ownership.spec.ts verifies accounting, shared-peer survival,
+pending cancellation/restart, non-initialising snapshots, tint retirement and
+40-entry eviction with six queued retirees released at the next frame boundary.
+Audit confirms charms/selected companions already use the pool, while enemy,
+player, all five outfit families and weapons still decode directly. Runtime
+figures.ts starts eager enemy/player/weapon preparation on first figure draw.
+Selected family lifetimes remain the next step before whole-memory admission.
+
+Verification:475 unit tests,14 related native tests (UI art ownership, UI material
+lighting, main-image budget and figure texture retirement),4 production tests
+with strict checked source-map build, changed-file formatting and diff whitespace
+checks all pass. The low-memory stage-cycling regression remains a pool bound,
+not a whole-game bound. All handles terminal. Package/lock/title/changelog agree
+at1.69.5; local develop commit only, no push/deploy/native build. Goal active.
