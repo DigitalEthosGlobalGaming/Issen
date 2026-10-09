@@ -19,7 +19,7 @@ export function scenePreparationBytes(
   const { width, height } = frame;
   if (![width, height, frame.dpr].every((value) => Number.isFinite(value) && value > 0)) return;
   let inputBytes = 0;
-  for (const url of sceneImageUrls(frame.stage)) {
+  for (const url of sceneImageUrls(frame.stage, false)) {
     const size = bytes.get(url);
     if (!size) return;
     const nominal = dimensions.get(url);

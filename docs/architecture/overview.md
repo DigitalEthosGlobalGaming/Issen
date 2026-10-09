@@ -837,6 +837,14 @@ yield and disposal cancels pending work. Colour/tone caches and material drawing
 consume those same prepared planes, including after context recovery. Higher
 memory tiers retain original atlas sampling. Gameplay/appearance seed selection
 is independent of this presentation policy.
+Worker static composition omits meadow fog inputs: the main worker-renderer owner
+prepares and draws live meadow fog. Moonwatch retains fog inputs for baked scenery.
+The next-slot fog allowance reserves decoded and GPU backing separately from the
+worker kit; already decoded fog replaces its decode reservation, including partial
+PBR preparation. Once the worker response arrives, painter warming owns pending GPU
+uploads. PBR atlas/material owners expose decoded backing before readiness for this
+accounting; this does not change scene readiness or allocate another cache.
+
 The shared environment raster policy also uses the owning decoded-image budget,
 including the explicit worker document policy. On the256MiB tier, scenery backing
 uses at most one pixel per logical pixel and600,000pixels per plane; bamboo edge

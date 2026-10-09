@@ -38,3 +38,16 @@ test('low-memory raster admission matches bounded scenery and foreground backing
     assert.ok(2 * edge * height * density * density <= 240_000 + 1);
   }
 });
+
+test('static worker kits omit live meadow fog but retain baked moonwatch fog', async () => {
+  const { sceneAssetIndices, sceneImageUrls } =
+    await import('../../src/rendering/environment/asset-sources.ts');
+  assert.ok(sceneAssetIndices(0).includes(9));
+  assert.ok(!sceneAssetIndices(0, false).includes(9));
+  assert.ok(sceneAssetIndices(8, false).includes(9));
+  assert.equal(sceneImageUrls(0).length - sceneImageUrls(0, false).length, 4);
+  assert.ok(sceneImageUrls(0, false).every((url) => !url.includes('fog-wisps')));
+  assert.ok(sceneImageUrls(8, false).some((url) => url.includes('fog-wisps')));
+  for (let stage = 1; stage < 9; stage++)
+    assert.deepEqual(sceneImageUrls(stage, false), sceneImageUrls(stage));
+});

@@ -38,6 +38,7 @@ test('owned PBR images notify all consumers before closing and dispose only once
     observeSceneTextureRetirement(source, () => widths.push(source.naturalWidth));
   atlas.dispose();
   atlas.dispose();
+  assert.equal(atlas.decodedBytes, 0);
   assert.deepEqual(widths, [8, 8, 8, 8]);
   assert.equal(
     images.every(
@@ -91,7 +92,10 @@ test('disposing a pending owned PBR atlas prevents late readiness and repeated r
     sources,
     8,
   );
+  assert.equal(atlas.decodedBytes, 0);
   const pending = atlas.prepare();
+  assert.equal(atlas.decodedBytes, 4 * 8 * 8 * 4);
+  assert.equal(atlas.ready, false);
   let retirements = 0;
   for (const source of images) observeSceneTextureRetirement(source, () => retirements++);
   atlas.dispose();

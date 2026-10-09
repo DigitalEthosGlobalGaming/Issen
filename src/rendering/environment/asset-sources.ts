@@ -49,8 +49,9 @@ export const environmentAssetUrls = [
 ];
 
 /** Decode only the current scene's kit; shared images survive a scene switch. */
-export function sceneAssetIndices(stage: number): number[] {
-  if (stage === 0) return [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27];
+export function sceneAssetIndices(stage: number, liveMotion = true): number[] {
+  if (stage === 0)
+    return liveMotion ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 27] : [2, 3, 4, 5, 6, 7, 8, 10, 25, 27];
   if (stage === 1) return [2, 3, 4, 5, 6, 25, 27];
   if (stage === 2) return [3, 4, 5, 6, 11, 12, 27, 29];
   if (stage === 3) return [2, 3, 4, 5, 6, 7, 13, 25, 27];
@@ -63,10 +64,10 @@ export function sceneAssetIndices(stage: number): number[] {
 }
 
 /** Same colour and aligned maps as prepare(), without creating active bindings. */
-export function sceneImageUrls(stage: number): string[] {
+export function sceneImageUrls(stage: number, liveMotion = true): string[] {
   return [
     ...new Set(
-      sceneAssetIndices(stage)
+      sceneAssetIndices(stage, liveMotion)
         .flatMap((index) => {
           const source = environmentAssetUrls[index]!;
           const maps = materialPacks.get(source)?.maps;
@@ -74,7 +75,7 @@ export function sceneImageUrls(stage: number): string[] {
             (url): url is string => !!url,
           );
         })
-        .concat(sceneAssetIndices(stage).map((index) => environmentAssetUrls[index]!)),
+        .concat(sceneAssetIndices(stage, liveMotion).map((index) => environmentAssetUrls[index]!)),
     ),
   ];
 }

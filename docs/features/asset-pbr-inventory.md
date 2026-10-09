@@ -7,6 +7,12 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.39, static meadow worker composition omits four unused live-fog planes.
+They remain on the main renderer for animated fog; Moonwatch retains its baked fog
+inputs. This avoids6,301,344nominal worker decode bytes on the256MiB tier, or
+25,176,608at original size. Next-scene fog reservations reconcile partial decoded
+backing rather than counting it twice. Assets and visible fog are unchanged.
+
 As of1.69.38, the256MiB decoded tier limits composed scenery to600,000pixels per
 plane and bamboo foreground to240,000combined pixels, both at most1logical density.
 The shared allocation/admission policy includes the worker's explicit decode tier.

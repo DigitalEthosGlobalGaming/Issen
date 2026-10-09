@@ -38,6 +38,9 @@ export function createAssetMaterials<K extends string>(
   return {
     select,
     prepare: () => Promise.all([...atlases.values()].map((atlas) => atlas.prepare())),
+    get decodedBytes() {
+      return [...atlases.values()].reduce((bytes, atlas) => bytes + atlas.decodedBytes, 0);
+    },
     ready: (key: K) => atlases.get(key)?.ready === true,
     material: (key: K, frame: readonly [number, number, number, number]) =>
       atlases.get(key)?.material(frame) ?? null,

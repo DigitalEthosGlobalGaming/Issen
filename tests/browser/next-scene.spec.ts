@@ -1,120 +1,121 @@
 import { test, expect } from '@playwright/test';
 
-test('a warmed next scene survives current draws and promotes without recomposition', async ({
-  page,
-}) => {
-  test.setTimeout(60000);
-  await page.goto('/privacy/index.html');
-  const result = await page.evaluate(async () => {
-    const { createWorkerEnvironmentRenderer } =
-      await import('/src/rendering/environment/worker-renderer.ts');
-    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
-    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
-    const NativeWorker = window.Worker;
-    const compositions: string[] = [];
-    window.Worker = class extends NativeWorker {
-      postMessage(message: any, transfer?: any) {
-        if (message.kind === 'compose')
-          compositions.push(`${message.frame.stage}:${message.frame.stageSeed}`);
-        super.postMessage(message, transfer);
-      }
-    };
-    const canvas = document.createElement('canvas');
-    canvas.width = 160;
-    canvas.height = 100;
-    document.body.append(canvas);
-    const drawing = await createTestDrawing(canvas);
-    const owner = createWorkerEnvironmentRenderer(
-      document,
-      (items, options) => drawing.warmScene(items, options),
-      {
-        ownsUploadReservation: true,
-        retainWorkerSources: (sources) => drawing.retainTextureSources(sources),
-      },
-    );
-    const frame = {
-      width: 160,
-      height: 100,
-      dpr: 1,
-      time: 0,
-      stage: 1,
-      stageSeed: 10,
-      lowQuality: false,
-      reducedMotion: true,
-      reducedFlashes: true,
-    };
-    const next = { ...frame, stage: 2, stageSeed: 11 };
-    const draw = () => {
-      drawing.begin();
-      owner.draw(drawing, frame);
-      drawing.flush();
-      return canvas.toDataURL();
-    };
-    try {
-      if (!(await owner.compose(frame))) throw Error('Current scene failed');
-      const before = draw();
-      sampleAssetBackground(1, true, 1, 8.3, 2, next);
-      const deadline = performance.now() + 30000;
-      while (owner.snapshot().imagePreload?.status === 'pending' && performance.now() < deadline)
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      const prepared = owner.snapshot();
-      for (let i = 0; i < 160; i++) draw();
-      sampleAssetBackground(1, false, 7, 8.3, 2, next);
-      const busy = owner.snapshot().imagePreload?.status;
-      const unchanged = before === draw();
-      const count = compositions.length;
-      const promoted = await owner.compose(next);
-      let uploads = 0,
-        programs = 0;
-      const gl = canvas.getContext('webgl2')!;
-      const upload = gl.texImage2D,
-        program = gl.createProgram;
-      gl.texImage2D = (...args: any[]) => {
-        uploads++;
-        return Reflect.apply(upload, gl, args);
+for (const nextStage of [2, 0])
+  test(`a warmed next scene ${nextStage} survives current draws and promotes without recomposition`, async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto('/privacy/index.html');
+    const result = await page.evaluate(async (nextStage) => {
+      const { createWorkerEnvironmentRenderer } =
+        await import('/src/rendering/environment/worker-renderer.ts');
+      const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+      const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+      const NativeWorker = window.Worker;
+      const compositions: string[] = [];
+      window.Worker = class extends NativeWorker {
+        postMessage(message: any, transfer?: any) {
+          if (message.kind === 'compose')
+            compositions.push(`${message.frame.stage}:${message.frame.stageSeed}`);
+          super.postMessage(message, transfer);
+        }
       };
-      gl.createProgram = () => {
-        programs++;
-        return program.call(gl);
+      const canvas = document.createElement('canvas');
+      canvas.width = 160;
+      canvas.height = 100;
+      document.body.append(canvas);
+      const drawing = await createTestDrawing(canvas);
+      const owner = createWorkerEnvironmentRenderer(
+        document,
+        (items, options) => drawing.warmScene(items, options),
+        {
+          ownsUploadReservation: true,
+          retainWorkerSources: (sources) => drawing.retainTextureSources(sources),
+        },
+      );
+      const frame = {
+        width: 160,
+        height: 100,
+        dpr: 1,
+        time: 0,
+        stage: nextStage === 0 ? 8 : 1,
+        stageSeed: 10,
+        lowQuality: false,
+        reducedMotion: true,
+        reducedFlashes: true,
+      };
+      const next = { ...frame, stage: nextStage, stageSeed: 11 };
+      const draw = () => {
+        drawing.begin();
+        owner.draw(drawing, frame);
+        drawing.flush();
+        return canvas.toDataURL();
       };
       try {
-        drawing.begin();
-        owner.draw(drawing, next);
-        drawing.flush();
+        if (!(await owner.compose(frame))) throw Error('Current scene failed');
+        const before = draw();
+        sampleAssetBackground(frame.stage, true, 1, 8.3, nextStage, next);
+        const deadline = performance.now() + 30000;
+        while (owner.snapshot().imagePreload?.status === 'pending' && performance.now() < deadline)
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        const prepared = owner.snapshot();
+        for (let i = 0; i < 160; i++) draw();
+        sampleAssetBackground(frame.stage, false, 7, 8.3, nextStage, next);
+        const busy = owner.snapshot().imagePreload?.status;
+        const unchanged = before === draw();
+        const count = compositions.length;
+        const promoted = await owner.compose(next);
+        let uploads = 0,
+          programs = 0;
+        const gl = canvas.getContext('webgl2')!;
+        const upload = gl.texImage2D,
+          program = gl.createProgram;
+        gl.texImage2D = (...args: any[]) => {
+          uploads++;
+          return Reflect.apply(upload, gl, args);
+        };
+        gl.createProgram = () => {
+          programs++;
+          return program.call(gl);
+        };
+        try {
+          drawing.begin();
+          owner.draw(drawing, next);
+          drawing.flush();
+        } finally {
+          gl.texImage2D = upload;
+          gl.createProgram = program;
+        }
+        return {
+          prepared,
+          busy,
+          unchanged,
+          promoted,
+          count,
+          compositions,
+          uploads,
+          programs,
+          after: owner.snapshot(),
+        };
       } finally {
-        gl.texImage2D = upload;
-        gl.createProgram = program;
+        owner.dispose();
+        drawing.dispose();
+        canvas.remove();
+        window.Worker = NativeWorker;
       }
-      return {
-        prepared,
-        busy,
-        unchanged,
-        promoted,
-        count,
-        compositions,
-        uploads,
-        programs,
-        after: owner.snapshot(),
-      };
-    } finally {
-      owner.dispose();
-      drawing.dispose();
-      canvas.remove();
-      window.Worker = NativeWorker;
-    }
+    }, nextStage);
+    expect(result.prepared.imagePreload?.status).toBe('ready');
+    expect(result.prepared.stage).toBe(nextStage === 0 ? 8 : 1);
+    expect(result.unchanged).toBe(true);
+    expect(result.busy).toBe('ready');
+    expect(result.promoted).toBe(true);
+    expect(result.compositions).toEqual([`${nextStage === 0 ? 8 : 1}:10`, `${nextStage}:11`]);
+    expect(result.count).toBe(2);
+    expect(result.after.stage).toBe(nextStage);
+    expect(result.after.nextScene.promotions).toBe(1);
+    expect(result.uploads).toBe(0);
+    expect(result.programs).toBe(0);
   });
-  expect(result.prepared.imagePreload?.status).toBe('ready');
-  expect(result.prepared.stage).toBe(1);
-  expect(result.unchanged).toBe(true);
-  expect(result.busy).toBe('ready');
-  expect(result.promoted).toBe(true);
-  expect(result.compositions).toEqual(['1:10', '2:11']);
-  expect(result.count).toBe(2);
-  expect(result.after.stage).toBe(2);
-  expect(result.after.nextScene.promotions).toBe(1);
-  expect(result.uploads).toBe(0);
-  expect(result.programs).toBe(0);
-});
 
 test('next-scene admission denies pressure and releases invalidated transferred planes', async ({
   page,

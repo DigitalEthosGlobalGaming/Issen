@@ -1,6 +1,53 @@
 # Current development status
 
-## Current handoff — low-memory scenery backing
+## Current handoff — meadow wrap preparation
+
+App1.69.39 omits meadow live-fog inputs from static worker composition/preload and
+its admission estimate. Main renderer fog/lighting stays intact; Moonwatch keeps
+baked fog. Avoids four unused worker planes:6,301,344nominal bytes on256MiB tier,
+25,176,608at original resolution. Initial omission alone still cancelled return
+preparation: decoded fog was counted both as real backing and future reservation.
+PBR owners now expose partial decoded bytes; next-slot allowance subtracts actual
+fog decode backing while preserving future GPU backing. Response handoff leaves
+pending GPU upload accounting with the painter. No asset, layout or seed changes.
+
+Actual frame-loop probe observes background samples without injecting them, in a
+controlled paused state with rendering active. Before: ordinary1–8 promote,8→0
+admission denied. After: all nine prepare/promote, waits11.7–20.2ms, sampled combined
+peak511.15MiB within512MiB; wrap prepares1083.6ms including downloads/decodes/warmup.
+This is controlled quiet cadence, not natural complete combat progression or all
+transients/native residency. Evidence `tmp/probes/automatic-next-scene-low.json`,
+`automatic-next-scene-static-fog.json` and `automatic-next-scene-fog-accounted.json`.
+
+Mode probes start actual rush/daily through setup, then control ordinal/stage
+progression. Rush first transition282.8ms, later10.2–16.2ms; eight promote, return
+admission denied. First rush attempt had a locked fresh profile; disposable
+unlocked profile corrects that fixture. Daily confirmed active: first preparation
+starts then cancels; nine observed samples/two over budget, max frame work41.9ms,
+accounted reservation snapshot529.6MiB with cancelled work still settling. These
+are unresolved mode/figure pressure and first-use concerns, not passing cap proof.
+Evidence `tmp/probes/automatic-next-scene-{rush,daily}.json`. Next investigate first
+rush figure preparation and daily overlap, then tighten headroom/viewport/loadout
+coverage without raising budget or repeatedly running unchanged full matrices.
+
+Strict TypeScript PASS; three admission, six worker composition and four PBR
+lifetime units PASS. Five focused browser cases PASS16.8s/default2workers:
+meadow worker-phase decode/export accounting, two-cycle low-memory all-stage
+lifetime/reacquisition, promotion, pressure and busy cancellation. Results
+`tmp/test-results/browser/static-worker-fog/`. Four final next-scene cases PASS9.4s
+(default single-file worker), including new8→0 promotion with unchanged outgoing
+pixels and zero first-use uploads/programs; pressure/cancellation retained.
+Results `tmp/test-results/browser/fog-reservations/`. Checked production build/
+strict TypeScript plus startup/Armoury/run/landscape and offline-resize smoke cases
+PASS10.9s/default2workers (`tmp/test-results/production/static-worker-fog/`).
+
+Goal active: incoming variants/whole transient bounds, mode/viewport/loadout
+coverage, historical native colour mismatch, final timing/memory matrix and
+applicable suites remain. Physical Android/120Hz evidence unavailable. All probe
+sessions terminal; no push/deploy/native build/real-save changes. Cancelled
+packing/lit-only stays cancelled.
+
+## Previous handoff — low-memory scenery backing
 
 App1.69.38 shares scenery raster policy between actual allocation and next-stage
 admission. The256MiB decoded tier caps scenery at1logical density/600,000pixels

@@ -37,6 +37,7 @@ type NextSlot = {
   response?: ComposeResponse;
   ready: Promise<boolean>;
   reservedBytes: number;
+  fogReservedBytes?: number;
   releaseSources?: () => void;
   foreground: boolean;
   adopted: boolean;
@@ -437,6 +438,7 @@ export function createWorkerEnvironmentRenderer(
       controller: new AbortController(),
       ready: Promise.resolve(false),
       reservedBytes: estimate,
+      fogReservedBytes: estimate - preparationBytes!,
       foreground: false,
       adopted: false,
       finished: false,
@@ -468,6 +470,7 @@ export function createWorkerEnvironmentRenderer(
         incomingResponses.delete(response);
         // Worker inputs are released before this response; reserve the remaining GPU upload.
         slot.reservedBytes = composedLayerBytes([...response.layers, ...response.foreground]);
+        slot.fogReservedBytes = 0;
         if (
           slot.controller.signal.aborted ||
           generation !== workerGeneration ||
@@ -745,15 +748,20 @@ export function createWorkerEnvironmentRenderer(
           [...nextSlots].reduce(
             (bytes, slot) =>
               bytes +
-              (!slot.response && slot.requestId === resourceRequestId
-                ? Math.max(
-                    0,
-                    slot.reservedBytes -
-                      (workerResources.decodedLoader?.bytes ?? 0) -
-                      (workerResources.canvasBytes ?? 0) -
-                      (workerResources.exportBytes ?? 0),
-                  )
-                : slot.reservedBytes),
+              Math.max(
+                0,
+                slot.reservedBytes -
+                  // Newly decoded fog is already counted in the main pixel registry.
+                  Math.min(
+                    (slot.fogReservedBytes ?? 0) / 2,
+                    (fog ? fog.naturalWidth * fog.naturalHeight * 4 : 0) + fogMaps.decodedBytes,
+                  ) -
+                  (!slot.response && slot.requestId === resourceRequestId
+                    ? (workerResources.decodedLoader?.bytes ?? 0) +
+                      (workerResources.canvasBytes ?? 0) +
+                      (workerResources.exportBytes ?? 0)
+                    : 0),
+              ),
             0,
           ),
       };

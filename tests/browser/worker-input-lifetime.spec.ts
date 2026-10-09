@@ -15,7 +15,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
         [pack.source, ...Object.values(pack.maps)].map((url) => [url, pack.dimensions] as const),
       ),
     );
-    const expectedBytes = sceneImageUrls(1).reduce((sum, url) => {
+    const expectedBytes = sceneImageUrls(0, false).reduce((sum, url) => {
       const size = workerDecodeSize(...dimensions.get(url)!, 256 * 1024 * 1024);
       return sum + size.width * size.height * 4;
     }, 0);
@@ -65,7 +65,7 @@ test('worker phase accounting includes pinned inputs without settling scene read
           width: 390,
           height: 844,
           dpr: 3,
-          stage: 1,
+          stage: 0,
           stageSeed: 424242,
           time: 0,
           lowQuality: false,

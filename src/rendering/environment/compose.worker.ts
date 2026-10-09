@@ -17,7 +17,10 @@ let service:
   | undefined;
 function createService(decodedBudget?: number) {
   const workerDocument = createWorkerDocument(decodedBudget);
-  return { workerDocument, renderer: createLocalEnvironmentRenderer(workerDocument) };
+  return {
+    workerDocument,
+    renderer: createLocalEnvironmentRenderer(workerDocument, { liveMotion: false }),
+  };
 }
 function observeDecodeProgress(
   workerDocument: ReturnType<typeof createWorkerDocument>,
@@ -67,7 +70,7 @@ scope.onmessage = ({ data }) => {
     const stopProgress = observeDecodeProgress(workerDocument, renderer, data);
     const lease =
       data.stage !== undefined && Number.isInteger(data.stage) && data.stage >= 0 && data.stage <= 8
-        ? workerDocument.prefetchImages(sceneImageUrls(data.stage))
+        ? workerDocument.prefetchImages(sceneImageUrls(data.stage, false))
         : undefined;
     imagePreload = lease;
     void (lease?.ready ?? Promise.resolve(false)).then((ready) => {

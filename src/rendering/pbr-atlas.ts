@@ -56,6 +56,12 @@ export function createPbrAtlas(
   }
   return {
     prepare,
+    get decodedBytes() {
+      return [...images.values()].reduce(
+        (bytes, image) => bytes + image.naturalWidth * image.naturalHeight * 4,
+        0,
+      );
+    },
     get ready() {
       return ready;
     },

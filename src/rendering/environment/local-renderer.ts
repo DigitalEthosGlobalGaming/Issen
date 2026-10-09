@@ -57,7 +57,7 @@ export interface EnvironmentFrame {
 /** Instance-owned image loading and caches; safe for independent previews. */
 export function createLocalEnvironmentRenderer(
   doc: Document,
-  options: { gpuComposedLayers?: boolean } = {},
+  options: { gpuComposedLayers?: boolean; liveMotion?: boolean } = {},
 ) {
   // Worker documents supply their own managed image wrappers.
   const mapImages = doc.defaultView ? createMainImageOwner(doc) : undefined;
@@ -86,7 +86,7 @@ export function createLocalEnvironmentRenderer(
     ? createSceneImagePreload(
         doc,
         () => (!disposed && cacheKey && status === 'layered' ? completedFrame : undefined),
-        (stage) => mapImages.prefetch(sceneImageUrls(stage)),
+        (stage) => mapImages.prefetch(sceneImageUrls(stage, options.liveMotion)),
       )
     : undefined;
 
@@ -133,7 +133,8 @@ export function createLocalEnvironmentRenderer(
     preparedStage = stage;
     ready = false;
     failed = false;
-    const required = sceneAssets(stage);
+    // The worker exports static planes; live meadow fog belongs to the main renderer.
+    const required = sceneAssets(stage, options.liveMotion);
     cacheKey = '';
     cachedMaterials.releaseSources();
     materials ??= createAssetMaterials<string>(doc, {}, mapImages);
@@ -601,7 +602,7 @@ export function createLocalEnvironmentRenderer(
                 frame.width,
                 frame.height,
               );
-            drawEnvironmentMotion(ctx, frame, images[9]);
+            if (options.liveMotion !== false) drawEnvironmentMotion(ctx, frame, images[9]);
             return true;
           }
         }
