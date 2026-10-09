@@ -811,8 +811,12 @@ Ordinary submitted textures and gradients share that reservation, deduplicated
 against warming jobs. Before a drawing flush with pending textures, reclaim
 unpinned main-image backing while their future GPU storage is still visible.
 Native initialization replaces each reservation with measured managed-texture
-bytes; cancellation/disposal clears it. Reclamation runs before paced uploads and
-at main decode byte changes. Resident-cache trim targets exclude pending decode
+bytes; cancellation/disposal clears it. Warming publishes the whole job before
+waiting, then refreshes admission once per synchronous upload batch after each
+yield or context change. Admission work consumes the existing batch time budget;
+uploads within that batch replace reserved storage with residency without
+repeating the whole-app ledger scan. Reclamation also runs at main decode byte
+changes. Resident-cache trim targets exclude pending decode
 reservations. Native next-scene warming hands upload estimation to the painter;
 other supplied warmers retain their explicit next-slot estimate. This is headroom
 management, not a guarantee that all pinned resources fit or native scratch is covered.

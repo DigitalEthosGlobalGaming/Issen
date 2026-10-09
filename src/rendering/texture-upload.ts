@@ -27,6 +27,8 @@ export async function paceTextureUploads<T>(
     nextFrame(signal: AbortSignal): Promise<boolean>;
     ready(): boolean;
     generation(): number;
+    /** Refresh allocation admission after each yield, within the batch budget. */
+    beforeBatch?(): void;
     upload(value: T): void;
     now(): number;
   },
@@ -42,6 +44,7 @@ export async function paceTextureUploads<T>(
       cursor = 0;
     }
     const started = ports.now();
+    ports.beforeBatch?.();
     do {
       if (signal.aborted || !ports.ready()) break;
       ports.upload(uploads[cursor++]!);

@@ -1447,10 +1447,10 @@ export class PixiScenePainter implements SceneDrawing {
         nextFrame: (abort) => nextVisibleFrame(this.canvas.ownerDocument, abort),
         ready,
         generation: () => this.textureUploadGeneration(),
-        upload: (source) => {
-          reserve();
-          this.renderer.texture.initSource(source());
-        },
+        // The full job is reserved already. Synchronous uploads consume that
+        // reservation; refresh once after each yield/context change, not per source.
+        beforeBatch: reserve,
+        upload: (source) => this.renderer.texture.initSource(source()),
         now: () => performance.now(),
       });
     } finally {

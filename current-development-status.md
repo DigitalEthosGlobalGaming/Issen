@@ -1,5 +1,41 @@
 # Current development status
 
+## Current handoff — upload admission batched (1.69.57)
+
+Painter warming still reserves its whole job before waiting, but now refreshes
+that admission once per synchronous batch after each yield/context change,
+instead of scanning whole-app memory per texture. Admission is inside the4ms
+budget; callback cancellation can stop before native allocation. Existing GPU
+reservation/residency accounting stays authoritative throughout the batch.
+Package/lock/title/changelog synchronized; architecture/report updated.
+
+Focused10 unit checks and13 native warming/reservation/next-scene checks pass;
+checked production/typecheck plus4 cases pass17.4s. Logs:
+`tmp/upload-batch-{units,browser,production}-16957.log`. Broad419/500/tool9
+integration remains the1.69.56 checkpoint; do not repeat on unchanged portions.
+
+Current measurement: cold486.7/warm503.7ms medians, warming35.0/35.2ms medians,
+title2210.9/first2971.9, renderCPU p953.2/delivered p9517ms. All18 post-present
+windows below16ms, maximum11.214; Meadow compose509.2cold/504.4warm. Evidence:
+`tmp/performance-scene-batch-admission-16957/`. Do not attribute the entire median
+difference to batching: counterbalanced contemporaneous baseline medians515.2/
+457.3 vs preceding current528.1/534.5 show variance and cold preparation cost.
+Baseline has226/269 above16ms tasks, current zero, in these cycles.
+
+Four-slot experiment rejected: first override did not reach Vite's separate
+worker bundle and is explicitly marked invalid-experiment (actual2slots).
+Corrected worker verified4slots, median1118.6ms/nine slow tasks/max26.431,
+no benefit to integrate. Worker stays2. Current Meadow diagnostic with existing
+profiler identifies213 software→GPU draws costing437–716ms per instrumented
+compose; intrusive profile is attribution, not headline timing. Evidence:
+`tmp/probes/cold-paired-16956/`, `tmp/performance-scene-four-slots{,-verified}-16956/`,
+`tmp/performance-compose-final-16956/`. Ignored generator/capture scripts saved.
+
+Next: final requirement audit/report, including sampled whole-app memory limits,
+hardware gaps and prior intermittent leaf restoration. Native rounding proposal
+remains unapproved; no tests relaxed. All process handles terminal. Goal active;
+no push/deploy/native package build/real-save edits.
+
 ## Current handoff — all browser checks green; final timing gaps exposed
 
 App1.69.56 unchanged. Full419-case browser suite passes20.2m/default2workers,

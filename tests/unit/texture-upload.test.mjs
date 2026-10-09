@@ -4,7 +4,8 @@ import { paceTextureUploads, nextVisibleFrame } from '../../src/rendering/textur
 
 test('uploads yield in bounded batches without changing order or repeating sources', async () => {
   let time = 0,
-    frames = 0;
+    frames = 0,
+    admissions = 0;
   const order = [],
     controller = new AbortController();
   const ready = await paceTextureUploads([1, 2, 3, 4, 5], controller.signal, {
@@ -15,6 +16,7 @@ test('uploads yield in bounded batches without changing order or repeating sourc
     ready: () => true,
     generation: () => 0,
     now: () => time,
+    beforeBatch: () => admissions++,
     upload: (value) => {
       order.push(value);
       time += 3;
@@ -22,6 +24,7 @@ test('uploads yield in bounded batches without changing order or repeating sourc
   });
   assert.equal(ready, true);
   assert.equal(frames, 3);
+  assert.equal(admissions, 3);
   assert.deepEqual(order, [1, 2, 3, 4, 5]);
 });
 
@@ -71,6 +74,50 @@ test('cancellation stops after the current native upload and never publishes rea
     false,
   );
   assert.deepEqual(order, [1]);
+});
+
+test('batch admission can cancel before native allocation and its work consumes the budget', async () => {
+  const controller = new AbortController();
+  let allocations = 0;
+  assert.equal(
+    await paceTextureUploads([1], controller.signal, {
+      nextFrame: async () => true,
+      ready: () => true,
+      generation: () => 0,
+      now: () => 0,
+      beforeBatch: () => controller.abort(),
+      upload: () => allocations++,
+    }),
+    false,
+  );
+  assert.equal(allocations, 0);
+
+  let time = 0,
+    frames = 0,
+    admittedGeneration = -1;
+  const order = [];
+  assert.equal(
+    await paceTextureUploads([1, 2], new AbortController().signal, {
+      nextFrame: async () => {
+        frames++;
+        return true;
+      },
+      ready: () => true,
+      generation: () => (frames >= 2 ? 1 : 0),
+      now: () => time,
+      beforeBatch: () => {
+        admittedGeneration = frames;
+        time += 4;
+      },
+      upload: (value) => {
+        assert.equal(admittedGeneration, frames);
+        order.push(value);
+      },
+    }),
+    true,
+  );
+  assert.deepEqual(order, [1, 1, 2]);
+  assert.equal(frames, 3);
 });
 
 test('visibility waits retain no frame while hidden and cancel listeners on abort', async () => {
