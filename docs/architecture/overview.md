@@ -872,8 +872,12 @@ both current and incoming GPU leases until foreground preparation replaces them.
 Hidden/busy pending work, identity/equipment changes, pressure, foreground scene
 preparation and disposal cancel the optional lease. Ready work survives busy
 frames. The selected equipment is already prepared; future boss tones are the new
-allocation. Fixed trials and same-stage boss forecasting remain outside this
-next-scene path; no run RNG or visit ledger entries are consumed.
+allocation. Fixed boss trials forecast their next roster entry on the current
+scene, with an encounter key separate from the composition identity. At entry,
+the scene readiness key includes the trial roster ordinal, so an unfinished
+preparation delays the new boss while cosmetics continue; environment composition
+reuses its unchanged key. Normal same-stage bosses are covered by initial stage
+preparation. No run RNG or visit ledger entries are consumed.
 
 Worker static composition omits meadow fog inputs: the main worker-renderer owner
 prepares and draws live meadow fog. Moonwatch retains fog inputs for baked scenery.

@@ -8,7 +8,14 @@ export function createSceneImagePreload(
   doc: Document,
   current: () => CompositionIdentity | undefined,
   start: (stage: number, next: CompositionIdentity) => Preload | undefined,
-  options: { retainReadyWhenBusy?: boolean } = {},
+  options: {
+    retainReadyWhenBusy?: boolean;
+    allowCurrentScene?: boolean;
+    predict?: (
+      current: CompositionIdentity,
+      next?: Readonly<CompositionIdentity>,
+    ) => { identity: Readonly<CompositionIdentity>; key: string } | undefined;
+  } = {},
 ) {
   let key: string | undefined, lease: Preload | undefined;
   let status: 'none' | 'pending' | 'ready' | 'denied' = 'none';
@@ -21,6 +28,8 @@ export function createSceneImagePreload(
   const stop = observeAssetBackground((stage, quiet, work, budget, _nextStage, next) => {
     if (lease?.active?.() === false) cancel();
     const active = current();
+    const predicted = active && options.predict ? options.predict(active, next) : undefined;
+    if (options.predict) next = predicted?.identity;
     if (
       doc.hidden ||
       ((!quiet || work > budget * 0.75) && !(options.retainReadyWhenBusy && status === 'ready')) ||
@@ -37,12 +46,12 @@ export function createSceneImagePreload(
       !Number.isInteger(next.stage) ||
       next.stage < 0 ||
       next.stage > 8 ||
-      compositionKey(next) === compositionKey(active)
+      (!options.allowCurrentScene && compositionKey(next) === compositionKey(active))
     ) {
       cancel();
       return;
     }
-    const nextKey = compositionKey(next);
+    const nextKey = predicted?.key ?? compositionKey(next);
     if (key === nextKey && (lease || status === 'ready')) return;
     cancel();
     key = nextKey;

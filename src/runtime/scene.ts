@@ -54,6 +54,11 @@ export function createRuntimeSceneCoordination(
     buildWeather();
     prepareScene();
   }
+  function incomingTrialOrdinal() {
+    const { G, activity } = foundation.run;
+    const inBoss = G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss');
+    return activity.activeTrial?.bosses?.[G.bossesSlain + (inBoss ? 1 : 0)];
+  }
   function prepareFigures(signal: AbortSignal, background = false) {
     if (!background) figurePreload.cancel();
     const G = foundation.run.G;
@@ -63,7 +68,10 @@ export function createRuntimeSceneCoordination(
       (G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss'))
         ? G.boss
         : undefined;
-    const ordinal = foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain] ?? G.bossCount + 1;
+    const ordinal =
+      (background
+        ? incomingTrialOrdinal()
+        : foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain]) ?? G.bossCount + 1;
     const tones = current?.def.pal
       ? [current.def.pal]
       : BOSS_IDENTITIES[(ordinal - 1) % BOSS_IDENTITIES.length]!.tones;
@@ -83,7 +91,7 @@ export function createRuntimeSceneCoordination(
   const figurePreload = createSceneImagePreload(
     foundation.browser.cvs.ownerDocument,
     () =>
-      !foundation.run.sceneState.sceneLoading && !foundation.run.activity.activeTrial
+      !foundation.run.sceneState.sceneLoading
         ? {
             stage: foundation.run.G.stage,
             stageSeed: foundation.view.stageState.stageSeed,
@@ -94,7 +102,12 @@ export function createRuntimeSceneCoordination(
           }
         : undefined,
     () => {
-      if (foundation.browser.environmentRenderer.snapshot().imagePreload?.status !== 'ready')
+      const environment = foundation.browser.environmentRenderer.snapshot();
+      if (
+        foundation.run.activity.activeTrial?.bosses
+          ? environment.backend !== 'layered'
+          : environment.imagePreload?.status !== 'ready'
+      )
         return;
       const controller = new AbortController();
       const count = foundation.run.G.bossCount;
@@ -118,7 +131,25 @@ export function createRuntimeSceneCoordination(
         },
       };
     },
-    { retainReadyWhenBusy: true },
+    {
+      retainReadyWhenBusy: true,
+      allowCurrentScene: true,
+      predict: (current, next) => {
+        const trial = foundation.run.activity.activeTrial;
+        if (trial) {
+          const ordinal = incomingTrialOrdinal();
+          return ordinal
+            ? { identity: current, key: compositionKey(current) + ':boss:' + ordinal }
+            : undefined;
+        }
+        return next
+          ? {
+              identity: next,
+              key: compositionKey(next) + ':boss:' + (foundation.run.G.bossCount + 1),
+            }
+          : undefined;
+      },
+    },
   );
   foundation.lifecycle.add(figurePreload.dispose);
   const sceneFlow = createSceneFlow(() =>
@@ -136,6 +167,14 @@ export function createRuntimeSceneCoordination(
         foundation.view.geometry,
         ['W', 'H', 'DPR'],
         stateView(foundation.view.stageState, ['stageSeed'], {
+          get figureIdentity() {
+            const { activity, G } = foundation.run;
+            return activity.activeTrial?.bosses
+              ? activity.activeTrial.id +
+                  ':' +
+                  (activity.activeTrial.bosses[G.bossesSlain] ?? 'done')
+              : '';
+          },
           presentationState: foundation.view.presentationState,
           G: foundation.run.G,
           reducedMotion: foundation.browser.reducedMotion,
@@ -177,6 +216,7 @@ export function createRuntimeSceneCoordination(
     return sceneFlow.prepareScene();
   }
   function deferUntilSceneReady(action: () => void) {
+    if (foundation.run.activity.activeTrial?.bosses) sceneFlow.prepareScene();
     return sceneFlow.deferUntilSceneReady(action);
   }
   function setupAttract() {

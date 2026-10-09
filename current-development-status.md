@@ -1,6 +1,42 @@
 # Current development status
 
-## Current handoff — selected companion warming
+## Current handoff — same-stage trial boss readiness
+
+App 1.69.44 closes the fixed boss-trial gap. Normal same-stage bosses already use
+initial stage identity-tone preparation. Three Masters instead enters roster
+ordinals1/4/6 on unchanged scenery; later entries previously bypassed preparation.
+The existing quiet-frame preload controller now accepts an explicit artwork
+forecast/key on the current scene. Trial forecasts select the next roster entry
+while a boss is active, or the pending entry after defeat. Stage seeds/visit
+entries remain untouched. Optional work retains the existing64MiB reservation,
+current/incoming leases, busy/hidden/pressure/geometry/equipment cancellation.
+
+Scene readiness includes a trial roster key; trial encounter deferral checks it
+before resetting the old encounter. Unfinished artwork now holds the next boss
+behind the responsive cosmetic loading flow; unchanged environment composition
+is reused. Cold and prepared entries remain distinct from physical frame timing.
+Legacy trial combat tests now await the scene gate rather than spinning through
+synchronous updates while asynchronous preparation is pending.
+
+Five preload/occlusion units PASS, including same-scene forecast changes,
+geometry invalidation, ready retention and no-forecast cancellation. Fifteen
+relevant browser checks PASS1.2m/default2workers: new cold/prepared boss4 entry
+on stage0 retains its seed; existing held scenery/weapons/paused readiness and
+cosmetic-versus-gameplay loading invariants; trial profile preservation and all
+eight encounters completing via combat/reward persistence. Results
+`tmp/test-results/browser/trial-artwork/`. Checked production build/strict
+TypeScript plus startup/Armoury/run/landscape and offline-resize smokes PASS10.5s/
+default2workers; `tmp/test-results/production/trial-artwork/`.
+
+Next: natural progression/viewport/special-loadout/transient/native memory
+coverage, historical native colour mismatch diagnosis, then final stable
+cold/warm/frame/compose matrix and applicable suites. In particular, measure
+whether equipped companions leave enough next-scene headroom across all stages;
+first-use warming alone does not prove the whole-app memory requirement.
+Goal active; all processes terminal. No push/deploy/native build/real-save changes.
+Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — selected companion warming
 
 App 1.69.43 includes the visible companion in scene figure readiness and optional
 incoming warming. Companion `prepareUploads` selects only the required kit,

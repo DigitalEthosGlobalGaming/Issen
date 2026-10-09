@@ -142,3 +142,57 @@ test('an obsolete preload completion cannot mark a replacement ready', async () 
     preloader.dispose();
   }
 });
+
+test('same-scene artwork forecasts use their own identity and cancel changed encounters', async () => {
+  const doc = new EventTarget();
+  doc.hidden = false;
+  const current = { width: 100, height: 100, dpr: 1, lowQuality: true, stage: 0, stageSeed: 1 };
+  let ordinal = 4,
+    starts = 0,
+    releases = 0;
+  const preload = createSceneImagePreload(
+    doc,
+    () => current,
+    () => {
+      starts++;
+      return {
+        ready: Promise.resolve(true),
+        release() {
+          releases++;
+        },
+      };
+    },
+    {
+      allowCurrentScene: true,
+      retainReadyWhenBusy: true,
+      predict: (active) =>
+        ordinal
+          ? { identity: active, key: compositionKey(active) + ':boss:' + ordinal }
+          : undefined,
+    },
+  );
+  const sample = (quiet) => sampleAssetBackground(0, quiet, 1, 8.3);
+  try {
+    sample(true);
+    await Promise.resolve();
+    assert.equal(preload.snapshot().status, 'ready');
+    sample(false);
+    assert.equal(starts, 1);
+    ordinal = 6;
+    sample(true);
+    await Promise.resolve();
+    assert.equal(starts, 2);
+    assert.equal(releases, 1);
+    current.dpr = 2;
+    sample(true);
+    await Promise.resolve();
+    assert.equal(starts, 3);
+    assert.equal(releases, 2);
+    ordinal = 0;
+    sample(true);
+    assert.equal(preload.snapshot().status, 'none');
+    assert.equal(releases, 3);
+  } finally {
+    preload.dispose();
+  }
+});

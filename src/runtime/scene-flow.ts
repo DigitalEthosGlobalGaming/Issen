@@ -16,6 +16,7 @@ export interface ScenePreparationFrame {
 }
 export interface SceneFlowViews {
   readonly stageSeed: number;
+  readonly figureIdentity?: string;
   readonly W: number;
   readonly H: number;
   readonly DPR: number;
@@ -112,7 +113,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       lowQuality: density() <= 0.3,
     };
     const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
-    const key = `${demon}:${compositionKey(frame)}`;
+    const key = `${demon}:${compositionKey(frame)}${views.figureIdentity ? ':' + views.figureIdentity : ''}`;
     if (key === views.requestedSceneKey) return;
     figurePreparation?.abort();
     figurePreparation = new AbortController();

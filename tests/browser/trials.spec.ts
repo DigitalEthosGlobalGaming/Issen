@@ -47,7 +47,10 @@ async function saves(page: Page) {
 async function instrument(page: Page) {
   await page.route(/\/src\/game\.ts(?:\?|$)/, async (route) => {
     const response = await route.fetch();
-    const body = ("import { bossShownDirection } from '/src/game/encounters/boss-openings.ts';\n" + (await response.text())).replace(
+    const body = (
+      "import { bossShownDirection } from '/src/game/encounters/boss-openings.ts';\n" +
+      (await response.text())
+    ).replace(
       'artworkReady = true;',
       `
       window.__trialHarness = { G: foundation.run.G, step: frames.update, swipe: game.onSwipe, tap: game.onTap,
@@ -207,7 +210,7 @@ test('All eight encounters complete through combat and persist exclusive rewards
   ]) {
     await page.locator(`[data-trial="${id}"]`).click();
     await page.evaluate(() => (window as any).__trialHarness.settleScene());
-    const completed = await page.evaluate(() => {
+    const completed = await page.evaluate(async () => {
       const h = (window as any).__trialHarness;
       if (
         h.G.knives !== 0 ||
@@ -218,6 +221,8 @@ test('All eight encounters complete through combat and persist exclusive rewards
         throw new Error('Trial inherited player powers');
       for (let step = 0; step < 150000 && h.G.state !== 'title'; step++) {
         h.step(0.02, 0.02);
+        if (document.querySelector<HTMLCanvasElement>('#c')!.dataset.sceneState === 'loading')
+          await h.settleScene();
         if (h.G.state === 'playing' && h.G.attacker?.p >= 0.82) h.swipe(h.G.attacker.dir);
         const b = h.G.boss;
         if (h.G.state === 'boss' && b?.state === 'flash') h.tap();
