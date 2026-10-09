@@ -1,4 +1,33 @@
-# Mobile performance — Demon preparation and realm exit
+# Mobile performance — Ordinary worker suspension in Demon
+
+App1.69.22 suspends ordinary scenery on Demon entry: terminate the worker,
+abort current/next warming, settle callers without failure notification and
+release current/next transferred planes plus main-thread fog inputs/cutouts.
+Generation guards suppress obsolete publication and background completion.
+Ordinary prepare/compose/draw or explicit retry starts a fresh required worker.
+Hidden state/background sampling alone cannot restart it. Disposal shares cleanup.
+
+Native160x100 stage0 plus a retained next scene releases worker canvases768,000,
+transferred1,536,000 and main fog decoded25,176,608bytes to0; artwork GPU sources
+and reservations also0. Re-entry matches exact pixels and next preparation works
+again. Pending request cancellation settlesfalse with no recovery notification.
+Two new cases pass5.8s;16related browser checks pass35.3s, covering all9ordinary
+compositions, worker recovery, promotion, cinematic switching and Demon modes.
+Nine related units pass; checked production build includes strict TypeScript.
+Version/package/lock/title/changelog agree1.69.22. Evidence:
+`tmp/test-results/browser/worker-suspension-*/worker-suspension.json` and
+`tmp/probes/worker-suspension-build.log`. All verification handles terminal.
+
+Next: enforce combined required-resource limits and reduce resident ownership
+as needed, then transition integration and final all-stage/startup/cold-warm
+measurements/suites. Existing first-game desktop commitment691,569,580bytes still
+exceeds the512MiB low-memory ceiling; next-scene admission does not enforce the
+whole app. Ordinary-to-ordinary fog lifetime may retain unused inputs. Demon
+CPU capture needs mobile-size timing; animated gradients/later boss palettes
+remain possible costs. Physical Android/120Hz targets unproven, full goal active.
+Cancelled packing/lit-only work stays cancelled. No push/deploy/native builds/saves.
+
+## Previous handoff — Demon preparation and realm exit
 
 App1.69.21 builds existing Demon mountain/prop caches before readiness, captures
 their actual material sources without a GPU draw, and warms/retains them through

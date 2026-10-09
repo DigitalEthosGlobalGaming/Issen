@@ -776,6 +776,12 @@ painter. A current-source lease survives texture collection. Demon preparation
 also warms its blur/grayscale programs; ordinary preparation omits these programs.
 Realm exit cancels pending work and retires Demon inputs, cutouts and layer maps.
 Generation checks prevent obsolete work from publishing after re-entry/disposal.
+Entering Demon suspends the ordinary scenery owner: it terminates its worker,
+releases current/next scene planes and fog inputs, aborts warming and settles
+pending requests without failure notification. Ordinary preparation/drawing
+starts a fresh worker on demand. Its stage seed is unchanged; failure still uses
+explicit recovery. Hidden state and background sampling cannot restart a suspended
+owner by themselves.
 
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence

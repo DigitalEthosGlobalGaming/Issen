@@ -12,6 +12,8 @@ import { documentImageBudget } from '../../platform/main-images.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { documentSceneMemory, registerSceneMemory } from '../../platform/scene-memory.ts';
 import { scenePreparationBytes } from './scene-admission.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
+import { releaseSceneryCutouts } from './scene-kit.ts';
 import type {
   ComposedLayer,
   ComposeRequest,
@@ -55,12 +57,14 @@ export function createWorkerEnvironmentRenderer(
 ) {
   let worker: Worker | undefined;
   let workerGeneration = 0;
-  const fogMaps = createAssetMaterials(doc, { fog: FOG_URL });
+  const fogMaps = createAssetMaterials<string>(doc, { fog: FOG_URL });
   const fogBindings = createCachedMaterials();
   let fog: HTMLImageElement | undefined;
   let fogPending: Promise<void> | undefined;
   let disposed = false,
     running = false;
+  let suspended = false,
+    fogGeneration = 0;
   let sequence = 0,
     preparedStage = -1;
   let preparePending: Promise<void> | undefined;
@@ -192,11 +196,52 @@ export function createWorkerEnvironmentRenderer(
   }
   function retry() {
     if (disposed) return false;
-    if (!workerFailure) return !!worker;
+    if (!workerFailure) return suspended ? resume() : !!worker;
     workerFailure = undefined;
     preparedStage = -1;
     preparePending = undefined;
     snapshot = emptySnapshot();
+    suspended = false;
+    return startWorker();
+  }
+  function suspend() {
+    if (disposed || suspended) return;
+    suspended = true;
+    workerGeneration++;
+    imagePreload.cancel();
+    cancelNext();
+    cancelUploads();
+    worker?.terminate();
+    worker = undefined;
+    desired = undefined;
+    running = preparing = false;
+    backgroundPending = false;
+    preparedStage = -1;
+    preparePending = undefined;
+    release();
+    for (const request of requests.values()) {
+      clearTimeout(request.timer);
+      request.resolve({ id: 0, ok: false, layers: [], foreground: [], snapshot: emptySnapshot() });
+    }
+    requests.clear();
+    for (const key of waiters.keys()) settle(key, false);
+    fogGeneration++;
+    fogBindings.releaseSources();
+    fogMaps.select({});
+    if (fog) {
+      releaseSceneryCutouts([fog]);
+      retireSceneTexture(fog);
+      fog.removeAttribute('src');
+    }
+    fog = undefined;
+    fogPending = undefined;
+    snapshot = emptySnapshot();
+    workerResources = {};
+  }
+  function resume() {
+    if (!suspended) return true;
+    if (disposed || workerFailure) return false;
+    suspended = false;
     return startWorker();
   }
   function send(
@@ -228,14 +273,22 @@ export function createWorkerEnvironmentRenderer(
   }
   function prepareFog(): Promise<void> {
     return (fogPending ??= (async () => {
-      fog = trackPixelSource(doc, doc.createElement('img'), 'decoded');
-      fog.src = FOG_URL;
+      const generation = fogGeneration;
+      const image = trackPixelSource(doc, doc.createElement('img'), 'decoded');
+      fog = image;
+      fogMaps.select({ fog: FOG_URL });
+      image.src = FOG_URL;
       try {
-        await Promise.all([fog.decode(), fogMaps.prepare()]);
-        if (!disposed && fogMaps.ready('fog'))
-          fogBindings.bind(fog, (frame) => fogMaps.material('fog', frame));
+        await Promise.all([image.decode(), fogMaps.prepare()]);
+        if (!disposed && generation === fogGeneration && fogMaps.ready('fog'))
+          fogBindings.bind(image, (frame) => fogMaps.material('fog', frame));
       } catch {
         /* Keep the unavailable-image path visible through the scene owner. */
+      } finally {
+        if (disposed || generation !== fogGeneration) {
+          retireSceneTexture(image);
+          image.removeAttribute('src');
+        }
       }
     })());
   }
@@ -393,7 +446,7 @@ export function createWorkerEnvironmentRenderer(
         return false;
       } finally {
         slot.finished = true;
-        backgroundPending = false;
+        if (generation === workerGeneration) backgroundPending = false;
         if (!accepted) closeNext(slot);
       }
     })();
@@ -509,7 +562,7 @@ export function createWorkerEnvironmentRenderer(
       !Number.isFinite(frame.dpr)
     )
       return false;
-    if (disposed || workerFailure) return false;
+    if (disposed || workerFailure || !resume()) return false;
     const nextKey = compositionKey(frame);
     desired = { ...frame };
     if (nextKey !== currentKey && nextSlot?.key !== nextKey) {
@@ -523,7 +576,7 @@ export function createWorkerEnvironmentRenderer(
   }
   async function prepare(stage = 0): Promise<void> {
     imagePreload.cancel();
-    if (disposed) return;
+    if (disposed || !resume()) return;
     if (preparePending && preparedStage === stage) return preparePending;
     preparedStage = stage;
     preparing = true;
@@ -604,6 +657,7 @@ export function createWorkerEnvironmentRenderer(
     prepare,
     compose,
     retry,
+    suspend,
     observeFailure(listener: () => void) {
       failureListeners.add(listener);
       return () => {
@@ -691,12 +745,14 @@ export function createWorkerEnvironmentRenderer(
       transferredBytes: composedLayerBytes([...layers, ...foreground]),
       imagePreload: imagePreload.snapshot(),
       worker: !!worker && !workerFailure && !disposed,
+      suspended,
       pending: running,
       workerFailure,
       stage: completed?.stage,
     }),
     dispose() {
       if (disposed) return;
+      suspend();
       disposed = true;
       imagePreload.dispose();
       cancelNext();

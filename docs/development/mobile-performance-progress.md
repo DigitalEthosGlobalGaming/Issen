@@ -8,6 +8,36 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Ordinary worker suspension during Demon — 9 October 2026
+
+Version1.69.22 terminates the ordinary scenery worker on Demon entry rather than
+retaining its canvas backing indefinitely. It aborts warming/preparation, releases
+current and next transferred planes plus main fog inputs/cutouts, and settles
+pending callers without reporting a worker failure. Ordinary scenery restarts a
+required worker on demand, using the requested unchanged seed. Hidden state and
+background sampling cannot restart the suspended owner. Generation guards also
+prevent old background completion from changing a restarted owner's state.
+
+Native160x100 stage0 with a warmed next scene: worker canvas768,000bytes,
+transferred1,536,000bytes and main decoded fog25,176,608bytes all become0 on
+suspension; artwork GPU sources/reservations0. Worker instances1→2 on return,
+both terminated by final disposal. Re-entry pixels match exactly and the next
+scene can prepare again. Pending requests settlefalse without failure listeners.
+These are ownership estimates, not physical driver residency measurements.
+
+Two new cases PASS5.8s;16related browser checks PASS35.3s/default2workers cover
+all9ordinary compositions, next promotion/cancellation, startup/presented worker
+recovery, cinematic switching, Demon Mirror and Inferno. Nine related units PASS;
+checked production verification build/strict TypeScript PASS. Evidence:
+`tmp/test-results/browser/worker-suspension-*/worker-suspension.json` and
+`tmp/probes/worker-suspension-build.log`. No full suites repeated.
+
+This removes simultaneous realm residency, not the whole-app memory limit gap.
+Required first-game desktop accounting still exceeds the low-memory admission
+ceiling; selected figure/startup/target ownership and combined enforcement need
+completion before final all-stage verification. No push/deployment/native build
+or real save changes.
+
 ## Demon preparation and realm exit — 9 October 2026
 
 Version1.69.21 prepares the existing mountain/prop caches through a tiny CPU

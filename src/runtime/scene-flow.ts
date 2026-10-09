@@ -40,6 +40,7 @@ export interface SceneFlowViews {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string; workerFailure?: string };
     retry?(): boolean;
+    suspend(): void;
   };
   readonly sceneRecovery?: { show(retry: () => void): void; clear(): void };
   readonly lifecycle: { readonly disposed: boolean };
@@ -100,6 +101,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     figurePreparation?.abort();
     figurePreparation = new AbortController();
     if (!demon) demonRealmRenderer.release();
+    else environmentRenderer.suspend();
     markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
