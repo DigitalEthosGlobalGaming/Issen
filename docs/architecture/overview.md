@@ -51,7 +51,8 @@ prepares scene surfaces, then calls `startGame()` in `src/game.ts`.
 Startup loading/progress and retry use
 `platform/artwork-preload.ts` and `ui/startup-loading.ts`; retry calls the same
 instance's `begin()` without mounting a second root.
-Catalogued runtime PBR maps are excluded from this lifetime preloader. Material
+Catalogued runtime PBR maps, selected companion sources and outfit family sources
+are excluded from this lifetime preloader. Material
 owners
 decode selected packs, release departed packs, and retain shared scenery packs
 across scene changes. UI textures use a separate owned shader surface and share
@@ -159,8 +160,14 @@ and nominal RGBA bytes are exposed through sourceRetirementSnapshot; this exclud
 render targets, wrappers and driver allocations. CPU cache budgets are unchanged.
 Player/outfit tones and tints, base atlas images, and weapon raw maps/cached parts
 notify ordinary immediate retirement before final source clearing. Independent
-renderer owners do not retire a peer's separate images or canvases. Catalogue
-selection and shared decoded-budget integration remain separate work.
+renderer owners do not retire a peer's separate images or canvases.
+Outfit kits use shared main-image leases for equipped and borrowed recipe families.
+Runtime startup selects the equipped robe; previews borrow independently and
+release selections on suspension/disposal. Unused family sources retire in each
+consuming painter with queued-frame preservation, without closing shared decoded
+images. Final disposal remains immediate. Closed preview painters unregister
+from the outfit owner; standalone catalogue preparation uses all families through
+the same kit path. Player-base, enemy and weapon decoded ownership remains work.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output
@@ -226,7 +233,8 @@ Local renderers use the main pool; worker renderers send cancellable image-only
 requests that bypass the compose queue. Worker requests preserve the current
 raw pins and apply the same decoded-byte admission. Denied sets remain cold.
 
-Main figure/startup owners are not yet routed through this loader;
+Charms, selected companions/outfits and world UI artwork use this loader.
+Player-base, enemy, weapon and other eager startup images remain outside it;
 whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the budgeted loader. One pool-level quiet-frame/visibility subscription pauses

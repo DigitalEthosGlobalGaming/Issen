@@ -33,6 +33,7 @@ export interface RuntimeStartupViews extends NativeStartup {
   reducedFlashes(): boolean;
   density(): number;
   petOf(): string;
+  robeOf(): string;
   computeMods(): unknown;
   applySeal(): void;
   resize(): void;
@@ -137,6 +138,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
   });
   const { stageSeed, W, H, DPR, presentationState } = readViews();
   inkCompanion.select(readViews().petOf());
+  inkPlayer.select(readViews().robeOf());
   void Promise.all([
     inkCharm.prepare(),
     inkCompanion.prepare(),
@@ -161,7 +163,8 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       inkCharm.snapshot().state !== 'ready' ? 'charms' : null,
       !inkCompanion.ready ? 'companions' : null,
       !inkEnemy.snapshot().ready || inkEnemy.snapshot().loaded.length < 4 ? 'enemies' : null,
-      !inkPlayer.snapshot().ready || inkPlayer.snapshot().outfits.outfits.length < 20
+      !inkPlayer.snapshot().ready ||
+      !inkPlayer.snapshot().outfits.outfits.includes(readViews().robeOf())
         ? 'outfits'
         : null,
       !inkSword.ready ? 'weapons' : null,

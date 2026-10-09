@@ -145,8 +145,17 @@ export class SceneTextureStore {
   }
 
   /** A completed offscreen export no longer needs its source textures. */
-  releaseSources(inputs: Iterable<SceneTexture['source']>): void {
+  releaseSources(inputs: Iterable<SceneTexture['source']>, preserveFrame = false): void {
     for (const source of inputs) {
+      if (
+        preserveFrame &&
+        this.frameStarted &&
+        (this.sources.get(source)?.lastFrame === this.frame ||
+          this.dataSources.get(source)?.lastFrame === this.frame)
+      ) {
+        this.retired.add(source);
+        continue;
+      }
       this.retired.delete(source);
       for (const store of [this.sources, this.dataSources]) {
         const prepared = store.get(source);

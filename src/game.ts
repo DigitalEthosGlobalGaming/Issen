@@ -96,6 +96,7 @@ export function startGame(
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,
           petOf: presentation.petOf,
+          robeOf: () => foundation.profile.profileEquipment.EQ.robe,
           computeMods: game.computeMods,
           applySeal: foundation.view.applySeal,
           resize: frames.resize,

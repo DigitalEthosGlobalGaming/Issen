@@ -72,6 +72,7 @@ export function createFiguresPresentation(readViews: () => FigureViews) {
       void inkCharm.prepare();
       inkCompanion.select(visiblePet(EQ));
       void inkEnemy.prepare();
+      inkPlayer.select(EQ.robe);
       void inkPlayer.prepare();
       void inkSword.prepare();
     }

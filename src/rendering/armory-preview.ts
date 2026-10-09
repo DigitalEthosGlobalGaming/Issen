@@ -83,7 +83,9 @@ export function createArmoryPreview(
   let companionPet = '',
     companionAppearance = '';
   void inkEnemy.prepare();
-  void inkPlayer.prepare();
+  const outfitSelection = inkPlayer.borrow();
+  let outfitGeneration = 0;
+  let outfitRobe: string | undefined;
   void inkSword.prepare();
   const roomCache = canvas.ownerDocument.createElement('canvas');
   let roomDisposed = false;
@@ -143,6 +145,16 @@ export function createArmoryPreview(
   function draw(frame: PreviewFrame, repaint = false): void {
     if (roomDisposed) return;
     lastFrame = frame;
+    if (outfitRobe !== frame.appearance.robeId) {
+      outfitRobe = frame.appearance.robeId;
+      if (outfitSelection.select(outfitRobe)) {
+        const generation = ++outfitGeneration;
+        void outfitSelection.prepare().then((ready) => {
+          if (ready && !roomDisposed && generation === outfitGeneration && lastFrame)
+            draw(lastFrame, true);
+        });
+      }
+    }
     const appearancePet = frame.appearance.pet ?? '';
     if (companionPet !== frame.pet || companionAppearance !== appearancePet) {
       companionPet = frame.pet;
@@ -303,12 +315,16 @@ export function createArmoryPreview(
         inkCharm.prepare(),
         companionSelection.prepare(),
         inkEnemy.prepare(),
-        inkPlayer.prepare(),
+        outfitSelection.prepare(),
         inkSword.prepare(),
       ]),
     demo,
     draw,
     suspend() {
+      if (context) inkPlayer.releaseCanvas(context);
+      outfitGeneration++;
+      outfitRobe = undefined;
+      outfitSelection.select();
       lastFrame = undefined;
       companionPet = companionAppearance = '';
       companionGeneration++;
@@ -316,6 +332,9 @@ export function createArmoryPreview(
       companionSelection.select('');
     },
     dispose() {
+      if (context) inkPlayer.releaseCanvas(context);
+      outfitGeneration++;
+      outfitSelection.dispose();
       roomDisposed = true;
       lastFrame = undefined;
       companionGeneration++;

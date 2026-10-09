@@ -1381,8 +1381,8 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   /** Release uploaded sources after an offscreen export has copied its pixels. */
-  releaseTextureSources(sources: Iterable<SceneTexture['source']>): void {
-    this.textures.releaseSources(sources);
+  releaseTextureSources(sources: Iterable<SceneTexture['source']>, preserveFrame = false): void {
+    this.textures.releaseSources(sources, preserveFrame);
   }
 
   dispose(): void {

@@ -54,7 +54,13 @@ plain colour plus normal/surface, three768×640planes (5,898,240nominal RGBA
 bytes). Disposal unpins those planes without clearing peers; loader eviction
 retires their GPU consumers. Owned seal tints retire on disposal and cache
 eviction, preserving queued frame replay until the next frame boundary.
-Enemy/player/outfit/weapon direct image ownership still needs integration;
+Outfit colour/material planes use the shared pool as of1.69.6. Runtime selection
+pins equipped recipe families; previews borrow their own families and release
+them on suspension/disposal. The default robe needs no outfit planes, avoiding
+15 eager1254²planes (94,350,960nominal bytes/about90MiB); a family requires three
+planes/18,870,192bytes. Unpinned raw images remain cacheable within the pool,
+while consuming painters retire unused GPU sources at the frame boundary.
+Enemy/player-base/weapon direct image ownership still needs integration;
 the shared loader snapshot is not a whole-game memory bound.
 Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
 (1.68.29). Current-frame textures survive replay until that painter's next begin,

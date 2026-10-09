@@ -2798,3 +2798,61 @@ with strict checked source-map build, changed-file formatting and diff whitespac
 checks all pass. The low-memory stage-cycling regression remains a pool bound,
 not a whole-game bound. All handles terminal. Package/lock/title/changelog agree
 at1.69.5; local develop commit only, no push/deploy/native build. Goal active.
+
+## Checkpoint57 — Selected outfit ownership (1.69.6)
+
+Runtime startup/figures select the equipped robe, and each preview borrows its
+own required families. The five outfit families now acquire shared main-image
+colour/material leases. Switching selection unpins unused families, retires
+owned tint canvases and retires raw GPU consumers in only the using painters.
+Frame-preserving release uses the existing SceneTextureStore; queued/replayed
+pixels survive until beginFrame, while final disposal remains immediate. Preview
+suspension/disposal unregisters its consumer. Stale async completion cannot
+publish removed kits; generation guards prevent repainting a closed preview.
+
+Measured original/player preparation:19 decoded image objects and119,511,216
+nominal RGBA bytes. Selected sumi:4 unchanged base-player planes/25,160,256bytes.
+Avoided15 outfit planes:94,350,960bytes (about90MiB). A selected family needs
+3planes/18,870,192bytes; supported equipped recipes need zero, one or two families.
+Multiple previews union their needs with the equipped selection. Unpinned raw
+images remain cacheable within the unchanged256/384/512MiB budgets. This proves
+selected ownership and source accounting, not whole-game/physical memory bounds.
+
+The actual runtime test with all outfit URLs blocked first timed out before game
+startup: MainGame's global preloader still eagerly decoded five plain atlases.
+Exclude those URLs there, just as selected companions are excluded. Compressed
+background fetching remains comprehensive. The preloader stops retaining five
+plain image objects, but do not add their nominal bytes to the measured saving:
+browser sharing of same-URL decodes between HTML images is not measured. Startup
+now completes with unused outfit sources unavailable. A second test setup wrongly
+assumed preview uses armory.selected; existing preview uses equipped appearance.
+The final case supplies a distinct appearance through the existing preview API,
+then verifies panel-close releases that borrowed family. No product behavior or
+visual tolerance changed to satisfy the tests.
+
+Native original/current oracle:all20 outfits × two mirrored transforms exact,
+40 visible captures, max channel difference0, with wind, cloth, fog and posed
+arms. Original/original control was exact before edits. Ignored saved originals,
+maker, oracle/config and baseline.json/selected.json are under
+tmp/probes/outfit-ownership57/; reports under tmp/test-results/outfit-ownership57/.
+New permanent outfit-selection.spec.ts covers primary/borrowed sharing, selected
+pins/bytes, stale/pending cancellation, disposal, queued/replayed equality, native
+peer survival and actual startup/preview close. Preparation caches promises for
+unchanged selections; standalone full-catalogue consumers use the same kit path.
+
+Player-base, enemy and weapon sources still decode directly. Whole-memory
+admission must include these, worker/main overlap, canvases/copies and GPU sources
+before retained next scenes. Near-zero stage changes, quiet/cancelable worker/
+local slots, persistent texture leases and Phase5 measurements/traces/full suites
+remain open. No seed, save, artwork, budget or cancelled-work changes. Goal active.
+
+Verification:475 units;45 broader native cases covering companion/figure/UI
+ownership, main-image budgets, armory/outfit powers, catalogue and Pixi lifecycle;
+21 final selected-outfit/texture-retirement/warming cases (3 overlapping with
+the broader run,63 unique native cases total); final40-capture strict original
+oracle;4 final checked production tests. All pass, including strict TypeScript,
+source-map build, changed-file formatting and diff whitespace. The initial
+production run also passed, but final startup exclusion/guard changes justified
+the final build/test rerun. All process handles terminal. Logs are under
+tmp/probes/outfit-ownership57/{unit.log,related.log,production-final.log}.
+Version metadata/changelog/title agree at1.69.6; local develop commit only.

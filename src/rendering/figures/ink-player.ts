@@ -68,10 +68,9 @@ export function createInkPlayerRenderer(doc: Document) {
   let state: 'idle' | 'loading' | 'ready' | 'unavailable' | 'disposed' = 'idle';
   let pending: Promise<boolean> | null = null;
   let settle: ((ready: boolean) => void) | undefined;
-  function prepare(): Promise<boolean> {
+  function prepareBase(): Promise<boolean> {
     if (pending) return pending;
     if (state === 'disposed') return Promise.resolve(false);
-    void outfits.prepare();
     void pbr.prepare();
     state = 'loading';
     const image = doc.createElement('img');
@@ -92,12 +91,20 @@ export function createInkPlayerRenderer(doc: Document) {
     });
     image.src = ATLAS_URL;
     pending = pending.then(async (ready) => {
-      await outfits.prepare();
       const pbrReady = await pbr.prepare();
       if (!pbrReady && state !== 'disposed') state = 'unavailable';
       return ready && pbrReady;
     });
     return pending;
+  }
+  let outfitPreparation: Promise<boolean> | undefined, prepared: Promise<boolean> | undefined;
+  function prepare(): Promise<boolean> {
+    const next = outfits.prepare();
+    if (next !== outfitPreparation) {
+      outfitPreparation = next;
+      prepared = Promise.all([prepareBase(), next]).then(([base, outfit]) => base && outfit);
+    }
+    return prepared!;
   }
   function stamp(
     g: SceneDrawing,
@@ -236,6 +243,16 @@ export function createInkPlayerRenderer(doc: Document) {
   }
   return {
     prepare,
+    select: outfits.select,
+    releaseCanvas: outfits.releaseCanvas,
+    borrow() {
+      const selection = outfits.borrow();
+      return {
+        select: selection.select,
+        prepare: async () => (await prepareBase()) && (await selection.prepare()),
+        dispose: selection.dispose,
+      };
+    },
     drawPart,
     draw(g: SceneDrawing, f: Figure, env: FigureEnvironment) {
       if (state !== 'ready') {

@@ -1,4 +1,60 @@
-# Performance, assets and seamless transitions — World UI ownership
+# Performance, assets and seamless transitions — Selected outfit ownership
+
+Checkpoint57 integrates selected outfit families, app1.69.6. Runtime startup and
+figure presentation select the equipped robe; startup checks that robe rather
+than requiring all20 recipes. Armory/support previews borrow their own families,
+prepare/repaint asynchronously with a stale-generation guard, and release them
+on suspension/disposal. The global startup preloader now excludes the five plain
+outfit atlases; a runtime test with every outfit URL blocked exposed that second
+eager owner. Background compressed fetching still covers runtime assets.
+
+Outfit plain/normal/surface sources use the shared main-image pool. One family
+pins3planes/18,870,192nominal RGBA bytes. Default sumi requires none. Browser
+baseline player preparation creates19 images/119,511,216nominal bytes; selected
+sumi creates4 base-player images/25,160,256, avoiding15 unused outfit planes and
+94,350,960bytes (about90MiB). The excluded preloader also stops retaining five
+plain1254²image objects. Do not add those objects as a separate physical saving:
+browser URL decode sharing is not measured. Unpinned raw images remain LRU cache
+entries; this is selected pin/source accounting, not whole-game resident proof.
+
+Every20 outfit under both mirrored transforms matches the saved original native
+renderer exactly (40 visible captures, max channel difference0). The original/
+original baseline passed before edits. Evidence: tmp/probes/outfit-ownership57/
+{make-original.mjs,original-ink-player.ts,original-outfit-kit.ts,oracle.spec.ts,
+playwright.config.ts,baseline.json,selected.json}, plus native reports under
+tmp/test-results/outfit-ownership57/. Player base/PBR/tone painting is unchanged.
+
+Outfit owners record consuming painters and retire only their unused raw GPU
+sources. The existing texture store accepts optional frame-preserving release;
+selection changes retain queued/replayed textures through the next beginFrame,
+while final disposal remains immediate. Other painters sharing decoded images
+survive. Preview suspension/disposal unregisters its consumer, avoiding a strong
+reference to closed preview painters. Owned family tint canvases retire too.
+Standalone catalogue prepare still selects all families through the same loader.
+Repeated selection/prepare reuses promises rather than rebuilding work per draw.
+
+New outfit-selection.spec.ts covers selected/borrowed pins, sharing, cancellation,
+stale completion, queued/replayed native equality, peer survival and actual
+startup with unused sources blocked, plus panel-close borrower release. Its first
+runtime case exposed the global preloader; another test setup assumed preview
+uses armory.selected, but it actually shows equipped equipment. The corrected
+case passes a distinct appearance through the existing preview API. No gameplay
+behavior or tolerance was changed to satisfy either test.
+
+Verification:475 units,63 unique related native browser cases (45 broader cases
+and21 lifetime/selection cases with3 overlapping), the final40-capture original
+oracle and4 checked production tests pass. Strict TypeScript/source-map build,
+changed-file formatting and diff whitespace checks pass. All handles terminal.
+Package/lock/title/changelog agree; this checkpoint is a local develop commit.
+Next route player-base/weapon/enemy ownership and select their required families,
+then admit retained scenes using total decoded/canvas/GPU/copy overlap. Worker
+pacing and unresolved local differences remain in earlier handoffs. Persistent
+texture-store leases, quiet grants, cancellation, promotion/invalidation and all
+Phase5 metrics/traces/full suites are still required. Budgets remain256/384/512MiB;
+no seed/save/assets changes, push, deployment or native build. Cancelled packing/
+tight repacking and separate lit-only work stay cancelled. Full goal active.
+
+## Previous handoff — World UI ownership
 
 Checkpoint56 integrates world UI artwork into the shared main-image loader;
 app1.69.5. The three768×640 plain/normal/surface planes total5,898,240nominal

@@ -13,6 +13,7 @@ import { startBackgroundAssets } from './platform/background-assets.ts';
 import { runtimeAssets } from './platform/runtime-assets.ts';
 import { INK_ENEMY_DEBUG_SOURCES } from './rendering/figures/ink-enemy.ts';
 import { INK_COMPANION_SOURCES } from './rendering/figures/ink-companions.ts';
+import { INK_OUTFIT_SOURCES } from './rendering/figures/outfit-kit.ts';
 
 const artwork = import.meta.glob<string>(
   [
@@ -32,6 +33,7 @@ const materialMaps = new Set(assetMaterialCatalog.flatMap((pack) => Object.value
 const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
 const enemyDebugSources = new Set<string>(Object.values(INK_ENEMY_DEBUG_SOURCES));
 const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
+const outfitSources = new Set<string>(Object.values(INK_OUTFIT_SOURCES));
 const urls = [
   ...Object.values(artwork),
   ...Object.keys(publicArtwork).map(
@@ -42,6 +44,7 @@ const urls = [
   return (
     !materialMaps.has(canonical) &&
     !companionSources.has(canonical) &&
+    !outfitSources.has(canonical) &&
     !enemyDebugSources.has(canonical) &&
     runtimeUrlSet.has(canonical)
   );
