@@ -73,6 +73,7 @@ export function createRuntimeSceneCoordination(
       signal,
       {
         robe: foundation.profile.profileEquipment.EQ.robe,
+        pet: presentation.petOf(),
         charm: foundation.profile.profileEquipment.EQ.charm,
         charmColor: presentation.CHARMCOL[foundation.profile.profileEquipment.EQ.charm],
       },
@@ -98,8 +99,8 @@ export function createRuntimeSceneCoordination(
       const controller = new AbortController();
       const count = foundation.run.G.bossCount;
       const selectedEquipment = () => {
-        const { blade, robe, charm } = foundation.profile.profileEquipment.EQ;
-        return `${blade}:${robe}:${charm}`;
+        const { blade, robe, charm, pet } = foundation.profile.profileEquipment.EQ;
+        return `${blade}:${robe}:${charm}:${pet}`;
       };
       const equipment = selectedEquipment();
       let memoryCheckAt = 0;

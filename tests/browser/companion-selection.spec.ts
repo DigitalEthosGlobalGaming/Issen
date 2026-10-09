@@ -594,3 +594,64 @@ test('all companion poses preserve direct HTML colour and material decoding', as
   await writeFile(path, JSON.stringify(result, null, 2));
   await testInfo.attach('companion-html-parity', { path, contentType: 'application/json' });
 });
+
+test('selected companion warming covers first idle and active draws without uploading unused kits', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const results = await page.evaluate(async () => {
+    const { createInkCompanionRenderer } = await import('/src/rendering/figures/ink-companions.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const rows = [];
+    for (const type of ['shiba', 'cat', 'crow', 'mystic-rock']) {
+      const owner = createInkCompanionRenderer(document);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 160;
+      const painter = await createPixiScenePainter(canvas);
+      const signal = new AbortController().signal;
+      try {
+        const uploads = await owner.prepareUploads(type, signal);
+        const ready = !!uploads && (await painter.warmScene(uploads, signal));
+        const snapshot = owner.snapshot();
+        const gl = canvas.getContext('webgl2')!;
+        const upload = gl.texImage2D;
+        let firstUse = 0;
+        gl.texImage2D = (...args: any[]) => {
+          firstUse++;
+          return Reflect.apply(upload, gl, args);
+        };
+        const drawn: boolean[] = [];
+        try {
+          for (const active of [false, true]) {
+            painter.begin();
+            drawn.push(owner.draw(type, painter, 80, 145, 75, 1.25, active, false));
+            painter.flush();
+          }
+        } finally {
+          gl.texImage2D = upload;
+        }
+        owner.dispose();
+        rows.push({ type, ready, snapshot, drawn, firstUse, disposed: painter.sourceTextureCount });
+      } finally {
+        owner.dispose();
+        painter.dispose();
+      }
+    }
+    const empty = createInkCompanionRenderer(document);
+    const none = await empty.prepareUploads('nopet', new AbortController().signal);
+    const unloaded = empty.snapshot().decodedLoader;
+    empty.dispose();
+    return { rows, none: none?.length, unloaded };
+  });
+  for (const row of results.rows) {
+    expect(row.ready).toBe(true);
+    expect(row.snapshot.selected).toEqual([row.type === 'mystic-rock' ? 'rock' : 'parts']);
+    expect(row.snapshot.decodedLoader.pinned).toBe(3);
+    expect(row.drawn).toEqual([true, true]);
+    expect(row.firstUse).toBe(0);
+    expect(row.disposed).toBe(0);
+  }
+  expect(results.none).toBe(0);
+  expect(results.unloaded.pinned).toBe(0);
+  expect(results.unloaded.bytes).toBe(0);
+});

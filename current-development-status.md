@@ -1,6 +1,36 @@
 # Current development status
 
-## Current handoff — background incoming boss artwork
+## Current handoff — selected companion warming
+
+App 1.69.43 includes the visible companion in scene figure readiness and optional
+incoming warming. Companion `prepareUploads` selects only the required kit,
+awaits its existing image/material leases and lists the colour/normal/surface/
+optional emissive sources used by ordinary drawing. No extra canvases, pose
+simulation, tint caches, gameplay RNG or visual changes. Unsupported/procedural
+pets return no uploads; the runtime uses `petOf()` so scarecrow's implicit crow
+is covered. Changed kit, abort and renderer disposal reject stale results.
+Native services retain/warm the companion in the existing union; pet changes
+invalidate pending background artwork.
+
+Four focused browser checks PASS6.0s/default2workers: all four atlas-backed pets'
+first idle/active draws upload0 after warming, only the selected kit is pinned,
+no-pet loads nothing, final GPU0; existing hidden decode/pixel-identical context
+restoration; native figure cancellation/restoration/disposal now includes cat;
+background reservation/cancellation/upload-free promotion now includes cat.
+Results `tmp/test-results/browser/companion-warming/`. Checked production build/
+strict TypeScript plus startup/Armoury/run/landscape and offline-resize smokes
+PASS9.9s/default2workers; `tmp/test-results/production/companion-warming/`.
+No new performance matrix: no atlas or shader change, and first-use upload counts
+are the specific behavior being checked. Whole-run special-loadout memory remains
+unproven; adding earlier warming does not establish a lower memory bound.
+
+Next: verify actual normal/fixed-trial boss readiness and same-stage gaps, then
+natural progression/viewport/special-loadout/transient/native memory coverage,
+native colour mismatch, final stable cold/warm/frame/compose matrix and suites.
+Goal active. All processes terminal; no push/deploy/native build/real-save changes.
+Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — background incoming boss artwork
 
 App 1.69.42 connects figure warming to the existing quiet-frame preload controller
 once the next environment is ready. Incoming boss identity tones use the existing

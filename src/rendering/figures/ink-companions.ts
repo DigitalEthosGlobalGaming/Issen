@@ -1,6 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
+import { materialTextureUploads, type TextureUpload } from '../texture-upload.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
 export const INK_COMPANION_SOURCES = {
   parts: new URL('./assets/companion-parts-atlas.webp', import.meta.url).href,
@@ -42,6 +43,7 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
   let primary = 0,
     managed = false,
     disposed = false;
+  const preparation = new AbortController();
   const mask = (type: string) =>
     type === 'mystic-rock' ? 2 : type === 'crow' || type === 'shiba' || type === 'cat' ? 1 : 0;
   const keys = (selection: number): Key[] => [
@@ -128,6 +130,30 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     let selection = primary;
     for (const borrowed of borrowers.values()) selection |= borrowed;
     return prepared(selection);
+  }
+  /** Selected artwork uses the same sources and material interpretation as draw(). */
+  async function prepareUploads(
+    type: string,
+    signal: AbortSignal,
+  ): Promise<TextureUpload[] | undefined> {
+    const lifetime = AbortSignal.any([signal, preparation.signal]);
+    if (lifetime.aborted) return;
+    select(type);
+    const selection = primary;
+    if (!(await prepared(selection)) || lifetime.aborted || primary !== selection) return;
+    const uploads: TextureUpload[] = [];
+    for (const key of keys(selection)) {
+      const kit = kits.get(key);
+      if (!kit?.ready || !kit.image) return;
+      const [width, height] = dimensions(key);
+      uploads.push(
+        ...materialTextureUploads(
+          { source: kit.image, revision: 0 },
+          kit.materials.material('atlas', [0, 0, width, height]),
+        ),
+      );
+    }
+    return uploads;
   }
   function borrow() {
     managed = true;
@@ -283,6 +309,7 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
   function dispose() {
     if (disposed) return;
     disposed = true;
+    preparation.abort();
     for (const kit of kits.values()) {
       kit.materials.dispose();
       kit.lease.release();
@@ -294,6 +321,7 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
   }
   return {
     prepare,
+    prepareUploads,
     select,
     borrow,
     draw,

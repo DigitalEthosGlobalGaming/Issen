@@ -178,7 +178,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
       drawing,
     );
     const palette = createPalette().robe('sumi');
-    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1' };
+    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1', pet: 'cat' };
     try {
       const prepared = await services.prepareFigureArtwork(
         ['steel'],
@@ -283,6 +283,7 @@ test('figure preparation cancellation preserves the current lease and disposal r
         services.inkCharm.draw(drawing, selection.charm, 0, -0.5, 0.1, selection.charmColor);
 
         drawing.restore();
+        services.inkCompanion.draw(selection.pet, drawing, 120, 95, 30, 0, false, true);
         drawing.flush();
       } finally {
         gl.texImage2D = upload;
@@ -351,7 +352,7 @@ test('background figures reserve memory, preserve current sources and promote wi
     const palette = createPalette();
     const current = [palette.robe('sumi')];
     const next = [palette.robe('helm'), palette.robe('yoroi'), palette.robe('hai')];
-    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1' };
+    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1', pet: 'cat' };
     let final = -1;
     try {
       const prepared = await services.prepareFigureArtwork(

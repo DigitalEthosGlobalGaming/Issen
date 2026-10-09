@@ -78,7 +78,7 @@ export function createNativeServices(
     ids: readonly string[],
     palettes: readonly Palette[],
     signal: AbortSignal,
-    selection?: { robe: string; charm?: string; charmColor?: string },
+    selection?: { robe: string; charm?: string; charmColor?: string; pet?: string },
     options: { background?: boolean } = {},
   ) {
     cancelBackgroundFigures();
@@ -108,22 +108,33 @@ export function createNativeServices(
     let accepted = false;
     let release: (() => void) | undefined;
     try {
-      const [enemy, weapons, player, charm] = await Promise.all([
+      const [enemy, weapons, player, charm, companion] = await Promise.all([
         inkEnemy.prepareUploads(palettes, lifetime),
         inkSword.prepareUploads(ids, lifetime),
         selection === undefined
           ? Promise.resolve([])
           : inkPlayer.prepareUploads(selection.robe, lifetime),
         inkCharm.prepareUploads(selection?.charm, selection?.charmColor, lifetime),
+        selection === undefined
+          ? Promise.resolve([])
+          : inkCompanion.prepareUploads(selection.pet ?? 'nopet', lifetime),
       ]);
-      if (!enemy || !weapons || !player || !charm || lifetime.aborted || request !== figureRequest)
+      if (
+        !enemy ||
+        !weapons ||
+        !player ||
+        !charm ||
+        !companion ||
+        lifetime.aborted ||
+        request !== figureRequest
+      )
         return false;
       if (!painter) {
         accepted = true;
         backgroundReservation = 0;
         return true;
       }
-      const uploads = [...enemy, ...weapons, ...player, ...charm];
+      const uploads = [...enemy, ...weapons, ...player, ...charm, ...companion];
       release = painter.retainTextureSources(uploads.map(({ texture }) => texture.source));
       if (
         !(await painter.warmScene(uploads, lifetime)) ||

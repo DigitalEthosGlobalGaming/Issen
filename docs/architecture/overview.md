@@ -857,7 +857,12 @@ Charm preparation shares the normal draw sprite recipe/cache and actual equipmen
 colour. Charm canvases are tracked and retired on eviction/final disposal. Native
 services retain and warm the resulting union through the existing painter before
 scene readiness; context restoration warms the same sources again. No gameplay
-pose, clock or RNG advances during capture. Companion first-use remains audit work.
+pose, clock or RNG advances during capture. Companion preparation selects the
+visible pet (including the scarecrow robe's implicit crow), awaits only its kit,
+and lists the same colour/material sources used by idle and active drawing. It
+creates no pose, tint cache or alternate rendering path. Procedural/no-pet choices
+need no companion atlas uploads. Cancellation, changed kit and disposal suppress
+obsolete results; native services include the companion in their warmed union.
 
 Runtime scene coordination reuses the quiet-frame preload controller for incoming
 boss identity tones once the next environment is ready. Optional figure work
