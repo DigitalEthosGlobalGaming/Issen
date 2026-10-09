@@ -4,6 +4,7 @@ import type { SceneMaterial, SceneTexture } from './scene-frame.ts';
 import { normalTransform } from './scene-frame.ts';
 import { drawMaterialStamp } from './scene-material.ts';
 import { createMaterialCutouts, cutoutNormalTransform } from './material-cutouts.ts';
+import { retireSceneTexture } from './texture-revision.ts';
 
 type Frame = readonly [number, number, number, number];
 type Layer = {
@@ -173,7 +174,7 @@ export function createCachedMaterials(
     },
     dispose() {
       releaseSources();
-      for (const canvas of owner.layers) clearCachedMaterial(canvas);
+      for (const canvas of owner.layers) clearCachedMaterial(canvas, false);
       owner.layers.clear();
     },
     snapshot() {
@@ -193,14 +194,17 @@ export function createCachedMaterials(
     },
   };
 }
-export function clearCachedMaterial(canvas: HTMLCanvasElement) {
+export function clearCachedMaterial(canvas: HTMLCanvasElement, preserveFrame = true) {
   const layer = layers.get(canvas);
   if (!layer) return;
   for (const cache of layer.owner.cutouts.values()) {
     cache.invalidate(canvas);
     for (const map of [layer.normal, layer.surface, layer.emissive]) cache.invalidate(map);
   }
-  for (const map of [layer.normal, layer.surface, layer.emissive]) map.width = map.height = 0;
+  for (const map of [layer.normal, layer.surface, layer.emissive]) {
+    retireSceneTexture(map, preserveFrame);
+    map.width = map.height = 0;
+  }
   layer.owner.layers.delete(canvas);
   layers.delete(canvas);
 }

@@ -8,6 +8,37 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Demon preparation and realm exit — 9 October 2026
+
+Version1.69.21 prepares the existing mountain/prop caches through a tiny CPU
+capture surface and warms the captured material sources through the gameplay
+painter. It retains current sources across texture collection. Only Demon
+preparation additionally compiles its blur/grayscale programs; ordinary startup
+omits them. Realm exit cancels stale work and retires raw inputs, prop cutouts
+and cached layer maps. Re-entry uses the same artwork builders. Scene timing
+marks assets ready, CPU cache capture duration and actual prewarmed readiness.
+
+Native240x320 before/after, re-entry and actual context restoration match exactly.
+After160collection frames, first-draw artwork uploads and program links remain0;
+restored first draw also0. Realm exit releases16artwork textures and all9decoded
+inputs56,622,840bytes. Tracked CPU canvases fall18,627,800 to360,000bytes (painter
+defaults remain). Solo desktop capture4.2ms is not mobile-scale evidence; the
+final related suite capture4.6ms ran alongside another browser worker.
+Obsolete warming cannot publish after release/re-entry/disposal.
+
+Focused browser10PASS18.2s/default2workers: new preparation/context/cancellation
+cases, Demon Mirror, Inferno, cinematic switching, mist repetition and affected
+material coverage/cutout caches. Related units8PASS; checked verification build
+includes strict TypeScript. No full suite repeated. Evidence under
+`tmp/test-results/browser/demon-preparation-*/demon-preparation.json` and
+`tmp/probes/demon-preparation-build.log`. Version metadata/changelog synchronized.
+
+Remaining: ordinary worker output still lives during Demon activity; required
+combined memory enforcement and all-stage peak verification remain unfinished.
+Demon CPU capture is synchronous and needs representative mobile-size timing;
+animated gradient churn has not been investigated. Physical targets and final
+matrix/suites remain unproven. No push/deploy/native build/save mutation.
+
 ## Incoming figure GPU preparation — 9 October 2026
 
 Version1.69.20 extends the stage gate to prepare regular enemy variants and the

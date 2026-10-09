@@ -1,4 +1,35 @@
-# Mobile performance — Incoming figure preparation
+# Mobile performance — Demon preparation and realm exit
+
+App1.69.21 builds existing Demon mountain/prop caches before readiness, captures
+their actual material sources without a GPU draw, and warms/retains them through
+the gameplay painter. Demon-only blur/grayscale shader warming avoids first-draw
+compilation without adding ordinary startup work. Realm exit cancels preparation
+and retires nine decoded inputs, cutouts and layer maps; stale generations cannot
+publish after re-entry/disposal. Timing now reports Demon prewarming accurately.
+
+Native240x320 comparisons are exact on first presentation, re-entry and actual
+context restoration. First-draw artwork uploads/program links0, including after
+restoration. Exit reduces artwork textures16 to0, decoded56,622,840bytes to0 and
+tracked canvases18,627,800 to360,000bytes (remaining painter defaults). A solo
+desktop CPU capture took4.2ms; this is not mobile-scale responsiveness proof.
+Cancellation/re-entry/disposal passes. Ten focused browser checks pass18.2s,
+including Demon Mirror, Inferno, cinematic switching, mist and material caches;
+eight related units pass. Checked production build includes strict TypeScript.
+Version/package/lock/title/changelog agree1.69.21. Evidence:
+`tmp/test-results/browser/demon-preparation-*/demon-preparation.json` and
+`tmp/probes/demon-preparation-build.log`. All check handles terminal.
+
+Next: release/park ordinary worker output during Demon activity and enforce
+required-resource combined limits, then the transition integration checkpoint
+and final measurements/suites. Demon CPU cache capture is currently synchronous;
+measure representative mobile dimensions before deciding on further pacing.
+Animated Demon gradients and later same-stage boss palette misses remain possible
+costs. Existing desktop first-game committed estimate691,569,580bytes exceeds
+the512MiB low-memory admission ceiling; optional admission is not whole-app
+enforcement. Full goal incomplete; physical Android/120Hz targets unproven.
+Cancelled packing/lit-only work stays cancelled. No push/deploy/native builds/saves.
+
+## Previous handoff — Incoming figure preparation
 
 App1.69.20 prepares regular enemy cutouts, incoming boss palette alternatives
 and selected enemy/player weapons before stage readiness. The same gameplay

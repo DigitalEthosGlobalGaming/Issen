@@ -1,6 +1,7 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import { drawCachedImage } from '../cached-materials.ts';
+import { retireSceneTexture } from '../texture-revision.ts';
 /** Shared cached-composition helper. Source atlases remain untouched. */
 export interface SpritePlacement {
   frame?: { x: number; y: number; width: number; height: number };
@@ -27,18 +28,19 @@ const retained = new Map<
   { cache: Map<string, HTMLCanvasElement>; key: string }
 >();
 let retainedPixels = 0;
-function releaseCutout(canvas: HTMLCanvasElement) {
+function releaseCutout(canvas: HTMLCanvasElement, preserveFrame = true) {
   const entry = retained.get(canvas);
   if (!entry) return;
   entry.cache.delete(entry.key);
   retained.delete(canvas);
   retainedPixels -= canvas.width * canvas.height;
+  retireSceneTexture(canvas, preserveFrame);
   canvas.width = canvas.height = 0;
 }
 export function releaseSceneryCutouts(images: Iterable<HTMLImageElement>) {
   for (const image of images) {
     const cache = cutouts.get(image);
-    if (cache) for (const canvas of cache.values()) releaseCutout(canvas);
+    if (cache) for (const canvas of cache.values()) releaseCutout(canvas, false);
     cutouts.delete(image);
   }
 }

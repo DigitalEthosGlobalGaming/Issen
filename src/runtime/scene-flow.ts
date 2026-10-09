@@ -29,7 +29,11 @@ export interface SceneFlowViews {
   readonly compositionKey: (frame: ScenePreparationFrame) => string;
   readonly cvs: { readonly dataset: DOMStringMap };
   readonly screenAnimation: { invalidate(): void };
-  readonly demonRealmRenderer: { prepare(): Promise<boolean> };
+  readonly demonRealmRenderer: {
+    prepare(frame?: ScenePreparationFrame, signal?: AbortSignal): Promise<boolean>;
+    release(): void;
+    snapshot?(): { texturesWarmed?: boolean };
+  };
   readonly driftRenderer: { prepare(stage: number): Promise<boolean> };
   prepareFigureArtwork(signal: AbortSignal): Promise<boolean>;
   readonly environmentRenderer: {
@@ -95,6 +99,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     if (key === views.requestedSceneKey) return;
     figurePreparation?.abort();
     figurePreparation = new AbortController();
+    if (!demon) demonRealmRenderer.release();
     markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
@@ -116,7 +121,9 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       screenAnimation.invalidate();
     };
     const pending = Promise.all([
-      demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
+      demon
+        ? demonRealmRenderer.prepare(frame, figurePreparation.signal)
+        : environmentRenderer.compose(frame),
       views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
       views.prepareFigureArtwork(figurePreparation.signal),
     ]).then(([sceneReady, driftReady, weaponsReady]) => sceneReady && driftReady && weaponsReady);
@@ -143,7 +150,10 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const { cvs, G, frameLoop } = views;
     if (views.sceneLoading && views.sceneReadyToPresent) {
       const key = views.requestedSceneKey;
-      if (!views.environmentRenderer.snapshot?.().texturesWarmed || key.startsWith('true:'))
+      const prewarmed = key.startsWith('true:')
+        ? views.demonRealmRenderer.snapshot?.().texturesWarmed
+        : views.environmentRenderer.snapshot?.().texturesWarmed;
+      if (!prewarmed)
         markScenePhase('textures-warmed', key, {
           mode: 'first-present-submission',
           prewarmed: false,

@@ -28,7 +28,12 @@ export function createNativeServices(
     retainWorkerSources: painter ? (sources) => painter.retainTextureSources(sources) : undefined,
   });
   lifecycle.add(environmentRenderer.dispose);
-  const demonRealmRenderer = createDemonRealmRenderer(ownerDocument);
+  const demonRealmRenderer = createDemonRealmRenderer(ownerDocument, {
+    warmScene: painter
+      ? (sources, signal) => painter.warmScene(sources, signal, { sceneryFilters: true })
+      : undefined,
+    retainSources: painter ? (sources) => painter.retainTextureSources(sources) : undefined,
+  });
   lifecycle.add(demonRealmRenderer.dispose);
   const inkCharm = createInkCharmRenderer(ownerDocument);
   const inkCompanion = createInkCompanionRenderer(ownerDocument);

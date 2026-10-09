@@ -770,6 +770,12 @@ Worker export closes unpinned raw decoded inputs after every plane copy settles;
 completed canvas/bitmap pixels remain independent. Explicit loader trimming
 preserves pins and pending required work. Demon artwork starts on `prepare()`
 instead of ordinary startup, and a failed preparation can reacquire inputs on retry.
+Its stage gate builds the existing mountain layer and prop cutouts, captures their
+material sources without drawing a GPU frame, and warms them through the gameplay
+painter. A current-source lease survives texture collection. Demon preparation
+also warms its blur/grayscale programs; ordinary preparation omits these programs.
+Realm exit cancels pending work and retires Demon inputs, cutouts and layer maps.
+Generation checks prevent obsolete work from publishing after re-entry/disposal.
 
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence
