@@ -208,9 +208,20 @@ pending decodes and preserves promoted/shared consumers. Late cancelled results
 close instead of publishing over a replacement request. The main image owner
 exposes this API with owner disposal and peer lifetime protection. Admission covers
 nominal decoded bytes only; composition canvases, copies and GPU memory are outside
-it. Automatic next-scene decode remains disabled: the integration trial changed
-repeated-visit colour planes. `sceneImageUrls` enumerates the same colour and data
-maps as environment preparation, excluding unused diffuse maps.
+it. Speculative requests do not refresh residency age. First required use of a
+new speculative resource receives completion-order recency after cached hits,
+preserving the required batch's eviction order without decoding it again.
+`sceneImageUrls` enumerates data maps before colours, matching preparation and
+excluding unused diffuse maps.
+
+`environment/image-preload.ts` requests the predicted stage's decoded images
+after a settled matching scene receives a visible quiet frame grant. It holds
+an independent lease keyed by all six composition identity fields; busy frames,
+hidden pages, invalid geometry, changed predictions, preparation and disposal
+cancel it. It never changes the active renderer bindings or builds scene planes.
+Local renderers use the main pool; worker renderers send cancellable image-only
+requests that bypass the compose queue. Worker requests preserve the current
+raw pins and apply the same decoded-byte admission. Denied sets remain cold.
 
 Main figure/startup owners are not yet routed through this loader;
 whole-application memory remains unbounded.
@@ -254,8 +265,9 @@ identity (stage, seed, width, height, DPR and low quality). It caches a frozen
 identity until one of those fields changes, clearing it for unknown visits or
 invalid geometry. Background diagnostics write `assetNextScene` only when that
 reference changes. Prediction neither enters a visit nor consumes combat randomness.
-Decoded prefetch and worker/local next-scene slots remain pending; this identity
-does not itself compose or promote a scene.
+Decoded prefetch consumes this identity during quiet frames. Worker/local
+next-scene slots remain pending; prediction and image prefetch do not themselves
+compose or promote a scene.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader

@@ -20,6 +20,8 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     resource?: T;
     bytes: number;
     touched: number;
+    queued: number;
+    speculativeOnly: boolean;
     controller?: AbortController;
   };
   const entries = new Map<string, Entry>();
@@ -77,7 +79,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
               !entry.resource &&
               (entry.priority === 'now' || (!hidden && !busy && !overFrameBudget)),
           )
-          .sort((a, b) => rank[a.priority] - rank[b.priority] || a.touched - b.touched)[0];
+          .sort((a, b) => rank[a.priority] - rank[b.priority] || a.queued - b.queued)[0];
         if (!entry) break;
         try {
           const expected = options.expectedBytes?.(entry.url) ?? 0;
@@ -109,7 +111,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           entry.resource = resource;
           reservedBytes = 0;
           entry.bytes = size;
-          entry.touched = ++sequence;
+          if (!entry.speculativeOnly) entry.touched = ++sequence;
           bytes += size;
           peakBytes = Math.max(peakBytes, bytes);
           entry.resolve(resource);
@@ -124,11 +126,23 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
       running = false;
     }
   }
-  function load(url: string, priority: ImagePriority = 'now'): Promise<T> {
+  function request(url: string, priority: ImagePriority = 'now', speculative = false): Promise<T> {
     if (disposed) return Promise.reject(Error('Decoded image loader disposed'));
     let entry = entries.get(url);
     if (entry) {
-      entry.touched = ++sequence;
+      // Queue priority is independent of residency age. Prediction is not use.
+      if (!entry.resource) entry.queued = ++sequence;
+      if (!speculative) {
+        if (entry.resource && entry.speculativeOnly) {
+          // Match a cold batch: fresh requests complete after its cached hits.
+          // A microtask retains that ordering without another decode or task.
+          const promoted = entry;
+          queueMicrotask(() => {
+            if (!disposed && entries.get(url) === promoted) promoted.touched = ++sequence;
+          });
+        } else entry.touched = ++sequence;
+        entry.speculativeOnly = false;
+      }
       if (rank[priority] < rank[entry.priority]) entry.priority = priority;
     } else {
       let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -136,7 +150,18 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         resolve = yes;
         reject = no;
       });
-      entry = { url, priority, promise, resolve, reject, bytes: 0, touched: ++sequence };
+      const queued = ++sequence;
+      entry = {
+        url,
+        priority,
+        promise,
+        resolve,
+        reject,
+        bytes: 0,
+        queued,
+        touched: speculative ? 0 : queued,
+        speculativeOnly: speculative,
+      };
       entries.set(url, entry);
     }
     // A required consumer wins over speculation, including a shared queued URL.
@@ -145,7 +170,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     return entry.promise;
   }
   return {
-    load,
+    load: (url: string, priority: ImagePriority = 'now') => request(url, priority),
     pin,
     /** Hold one admitted future image set without mutating renderer bindings. */
     prefetch(urls: readonly string[]) {
@@ -175,7 +200,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         }
       };
       preloads.add(release);
-      const ready = Promise.all(unique.map((url) => load(url, 'soon'))).then(
+      const ready = Promise.all(unique.map((url) => request(url, 'soon', true))).then(
         () => !released,
         () => {
           release();

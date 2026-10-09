@@ -10,6 +10,57 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('speculation does not refresh the LRU age of previously used images', async () => {
+  const closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    decode: async (url) => resource(url, closed),
+    yield: turn,
+  });
+  await loader.load('older');
+  await loader.load('recent');
+  const future = loader.prefetch(['older']);
+  assert.ok(future);
+  assert.equal(await future.ready, true);
+  future.release();
+  await loader.load('incoming');
+  assert.deepEqual(closed, ['older'], 'prediction must not displace the recent consumer');
+  loader.dispose();
+});
+
+test('first required use of prefetched images preserves cold request completion recency', async () => {
+  const run = async (prefetch) => {
+    const closed = [];
+    const loader = createDecodedImageLoader({
+      budget: 1200,
+      expectedBytes: () => 400,
+      decode: async (url) => resource(url, closed),
+      yield: turn,
+    });
+    await loader.load('older');
+    await loader.load('recent');
+    if (prefetch) {
+      const future = loader.prefetch(['incoming']);
+      assert.ok(future);
+      assert.equal(await future.ready, true);
+      future.release();
+    }
+    const incoming = loader.load('incoming');
+    const recent = loader.load('recent');
+    await Promise.all([incoming, recent]);
+    await loader.load('next');
+    await loader.load('last');
+    const evicted = [...closed];
+    loader.dispose();
+    return evicted;
+  };
+  const cold = await run(false),
+    warmed = await run(true);
+  assert.deepEqual(cold, ['older', 'recent']);
+  assert.deepEqual(warmed, cold, 'warm completion must retain the same next victims');
+});
+
 test('queued requests share a promise, bump priority and bypass blocked idle work', async () => {
   const calls = [],
     closed = [];

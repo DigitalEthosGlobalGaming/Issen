@@ -31,6 +31,10 @@ export function createWorkerContextProxy(
 
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
 export function createWorkerDocument(): Document & {
+  prefetchImages(
+    urls: readonly string[],
+  ): ReturnType<ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['prefetch']>;
+  stopImagePreload(): void;
   decodedSnapshot(): ReturnType<
     ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['snapshot']
   > & { images: number };
@@ -132,6 +136,13 @@ export function createWorkerDocument(): Document & {
   >();
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
+    prefetchImages(urls: readonly string[]) {
+      loader.policy({ busy: false });
+      return loader.prefetch(urls);
+    },
+    stopImagePreload() {
+      loader.policy({ busy: true });
+    },
     decodedSnapshot() {
       const snapshot = loader.snapshot();
       return { ...snapshot, images: snapshot.decoded };
@@ -163,6 +174,8 @@ export function createWorkerDocument(): Document & {
     HTMLCanvasElement: { value: OffscreenCanvas },
   });
   return doc as unknown as Document & {
+    prefetchImages: typeof doc.prefetchImages;
+    stopImagePreload: typeof doc.stopImagePreload;
     decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };
   };
 }

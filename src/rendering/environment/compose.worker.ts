@@ -2,6 +2,7 @@ import { createLocalEnvironmentRenderer } from './local-renderer.ts';
 import { createWorkerDocument } from './worker-canvas.ts';
 import { copyComposedLayers } from './layer-transfer.ts';
 import { closeLayers } from './worker-types.ts';
+import { sceneImageUrls } from './asset-sources.ts';
 import type { ComposedLayer, ComposeRequest, ComposeResponse } from './worker-types.ts';
 
 const scope = globalThis as unknown as {
@@ -11,7 +12,32 @@ const scope = globalThis as unknown as {
 const workerDocument = createWorkerDocument();
 const renderer = createLocalEnvironmentRenderer(workerDocument);
 let pending = Promise.resolve();
+let imagePreload: ReturnType<typeof workerDocument.prefetchImages>;
 scope.onmessage = ({ data }) => {
+  // Cancellation and policy changes bypass the compose queue.
+  imagePreload?.release();
+  imagePreload = undefined;
+  workerDocument.stopImagePreload();
+  if (data.kind === 'preload') {
+    const lease =
+      data.stage !== undefined && Number.isInteger(data.stage) && data.stage >= 0 && data.stage <= 8
+        ? workerDocument.prefetchImages(sceneImageUrls(data.stage))
+        : undefined;
+    imagePreload = lease;
+    void (lease?.ready ?? Promise.resolve(false)).then((ready) => {
+      scope.postMessage(
+        {
+          id: data.id,
+          ok: ready,
+          layers: [],
+          foreground: [],
+          snapshot: { ...renderer.snapshot(), decodedLoader: workerDocument.decodedSnapshot() },
+        },
+        [],
+      );
+    });
+    return;
+  }
   pending = pending.then(async () => {
     const layers: ComposedLayer[] = [],
       foreground: ComposedLayer[] = [];

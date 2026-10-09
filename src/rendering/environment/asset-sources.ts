@@ -66,13 +66,15 @@ export function sceneAssetIndices(stage: number): number[] {
 export function sceneImageUrls(stage: number): string[] {
   return [
     ...new Set(
-      sceneAssetIndices(stage).flatMap((index) => {
-        const source = environmentAssetUrls[index]!;
-        const maps = materialPacks.get(source)?.maps;
-        return [source, maps?.normal, maps?.surface, maps?.emissive].filter(
-          (url): url is string => !!url,
-        );
-      }),
+      sceneAssetIndices(stage)
+        .flatMap((index) => {
+          const source = environmentAssetUrls[index]!;
+          const maps = materialPacks.get(source)?.maps;
+          return [maps?.normal, maps?.surface, maps?.emissive].filter(
+            (url): url is string => !!url,
+          );
+        })
+        .concat(sceneAssetIndices(stage).map((index) => environmentAssetUrls[index]!)),
     ),
   ];
 }

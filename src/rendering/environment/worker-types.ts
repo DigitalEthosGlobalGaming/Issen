@@ -8,6 +8,7 @@ export type ComposedLayer = {
   emissive?: ImageBitmap;
 };
 export type EnvironmentSnapshot = {
+  imagePreload?: { key?: string; status: 'none' | 'pending' | 'ready' | 'denied' };
   materialCutouts?: {
     entries: number;
     pixels: number;
@@ -40,6 +41,7 @@ export type EnvironmentSnapshot = {
   texturesWarmed?: boolean;
 };
 export type ComposeRequest =
+  | { id: number; kind: 'preload'; stage?: number }
   | { id: number; kind: 'prepare'; stage: number }
   | { id: number; kind: 'compose'; key: string; frame: EnvironmentFrame };
 export type ComposeResponse = {

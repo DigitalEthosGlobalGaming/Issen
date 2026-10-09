@@ -7,6 +7,7 @@ import { createCachedMaterials } from '../cached-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
 import { closeLayers, compositionKey } from './worker-types.ts';
+import { createSceneImagePreload } from './image-preload.ts';
 import type {
   ComposedLayer,
   ComposeRequest,
@@ -48,6 +49,7 @@ export function createWorkerEnvironmentRenderer(
   let sequence = 0,
     preparedStage = -1;
   let preparePending: Promise<void> | undefined;
+  let preparing = false;
   let desired: EnvironmentFrame | undefined, completed: EnvironmentFrame | undefined;
   let currentKey = '';
   let layers: ComposedLayer[] = [],
@@ -60,6 +62,24 @@ export function createWorkerEnvironmentRenderer(
   >();
   const waiters = new Map<string, Set<(success: boolean) => void>>();
   const uploads = new Map<AbortController, string>();
+  const imagePreload = createSceneImagePreload(
+    doc,
+    () =>
+      !disposed &&
+      !fallback &&
+      !running &&
+      !preparing &&
+      preparedStage === completed?.stage &&
+      snapshot.backend === 'layered'
+        ? completed
+        : undefined,
+    (stage) => ({
+      ready: send({ kind: 'preload', stage }).then((response) => response.ok),
+      release: () => {
+        if (!disposed && !fallback && !workerFailure) void send({ kind: 'preload' });
+      },
+    }),
+  );
   const cancelUploads = (key?: string) => {
     for (const [controller, pendingKey] of uploads) if (pendingKey !== key) controller.abort();
   };
@@ -77,6 +97,7 @@ export function createWorkerEnvironmentRenderer(
   function failWorker(reason: string) {
     if (disposed || fallback) return;
     workerFailure = reason;
+    imagePreload.cancel();
     cancelUploads();
     worker.terminate();
     release();
@@ -109,7 +130,8 @@ export function createWorkerEnvironmentRenderer(
   function send(
     request:
       | Omit<Extract<ComposeRequest, { kind: 'prepare' }>, 'id'>
-      | Omit<Extract<ComposeRequest, { kind: 'compose' }>, 'id'>,
+      | Omit<Extract<ComposeRequest, { kind: 'compose' }>, 'id'>
+      | Omit<Extract<ComposeRequest, { kind: 'preload' }>, 'id'>,
   ) {
     return new Promise<ComposeResponse>((resolve) => {
       const id = ++sequence;
@@ -188,6 +210,7 @@ export function createWorkerEnvironmentRenderer(
     const frame = { ...desired },
       key = compositionKey(frame);
     if (key === currentKey) return;
+    imagePreload.cancel();
     running = true;
     snapshot.backend = 'loading';
     let incoming: ComposeResponse | undefined,
@@ -225,6 +248,10 @@ export function createWorkerEnvironmentRenderer(
       layers = response.layers;
       foreground = response.foreground;
       completed = frame;
+      if (!preparing && preparedStage !== frame.stage) {
+        preparedStage = frame.stage;
+        preparePending = undefined;
+      }
       currentKey = key;
       snapshot = { ...response.snapshot, texturesWarmed: !!warmWorkerScene };
       accepted = true;
@@ -255,14 +282,21 @@ export function createWorkerEnvironmentRenderer(
     return true;
   }
   async function prepare(stage = 0): Promise<void> {
+    imagePreload.cancel();
     if (disposed) return;
     if (fallback) return fallback.prepare(stage);
     if (preparePending && preparedStage === stage) return preparePending;
     preparedStage = stage;
-    preparePending = send({ kind: 'prepare', stage }).then(async (response) => {
-      if (fallback) return fallback.prepare(stage);
-      if (!disposed && !running) snapshot = response.snapshot;
-    });
+    preparing = true;
+    const request = send({ kind: 'prepare', stage })
+      .then(async (response) => {
+        if (fallback) return fallback.prepare(stage);
+        if (!disposed && !running) snapshot = response.snapshot;
+      })
+      .finally(() => {
+        if (preparePending === request) preparing = false;
+      });
+    preparePending = request;
     return preparePending;
   }
   async function compose(frame: EnvironmentFrame): Promise<boolean> {
@@ -370,6 +404,7 @@ export function createWorkerEnvironmentRenderer(
     },
     snapshot: () => ({
       ...(fallback?.snapshot() ?? snapshot),
+      imagePreload: fallback?.snapshot().imagePreload ?? imagePreload.snapshot(),
       worker: !fallback && !disposed,
       pending: running,
       workerFailure,
@@ -378,6 +413,7 @@ export function createWorkerEnvironmentRenderer(
     dispose() {
       if (disposed) return;
       disposed = true;
+      imagePreload.dispose();
       cancelUploads();
       worker.terminate();
       fallback?.dispose();

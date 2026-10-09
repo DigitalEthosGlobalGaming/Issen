@@ -1,4 +1,46 @@
-# Performance, assets and seamless transitions — Continuous map controls isolated
+# Performance, assets and seamless transitions — Quiet decoded preload integrated
+
+Checkpoint 46: app version 1.69.0 enables admitted quiet-frame
+next-stage decoded-image leases in local and worker renderers. Queue order is
+separate from decoded residency age; speculative requests do not count as use.
+First required use preserves cold-batch completion recency. This fixes the pine
+source lifetime difference isolated in checkpoint 45 follow-up diagnostics.
+No source normalization, pixel tolerance, atlas or decode option changes.
+
+All four continuous 27-visit local/worker configurations pass exact incoming/held
+planes and both corresponding native draws: 256 MiB and 512 MiB, all nine stages at
+portrait, low-quality portrait and landscape. Every prediction is ready;
+required local entries following a ready set do no new decodes. Peaks are
+264,275,216 and 534,788,792 bytes, within their configured decoded-only budgets.
+Comparisons use independent contexts with identical two disabled primer captures
+before the measured third capture. Three unchanged controls proved sampling can
+vary by capture ordinal; equal-ordinal disabled/enabled traces match exactly.
+Across 108 visits, 1,392 incoming plane comparisons and 216 corresponding native
+frames match exactly; all held planes remain unchanged. Worker 256/512 budgets
+and worker backend are verified. Explicit-prepare lifecycle verification passes:
+no preload before composition, ready afterward, and cancellation at the next
+prepare. The worker caches its preparation promise separately from an in-flight
+flag; compose-only stage changes clear an obsolete preparation promise.
+
+All 474 units pass (2.22s), all four continuous parity cases pass (6.4m), and
+all 17 related browser cases pass (53.0s): explicit preparation, worker fallback,
+coalescing, visibility, peer disposal, pending cancellation, stage-cycle decoded
+bounds and retained planes. Formatting and strict TypeScript pass. The final
+checked production build and all four production tests pass (21.2s).
+Checkpoint 46 implementation is committed; all verification handles are terminal.
+Continuous exact comparisons are archived under
+tmp/performance-scene-image-preload/checkpoint46/. Source lifetime and three-arm
+controls remain under tmp/performance-scene-image-preload/matched-history/.
+
+Next implement worker/local pre-composed next slots with whole-budget admission,
+exact promotion/invalidation and quiet compose/upload pacing. Plan for retained
+current worker canvases/raw pins and transient transfer copies; the decoded pool
+budget alone cannot admit a scene slot. Figure/startup ownership, 120Hz/CPU
+budgets and full Phase 5 remain required. Decoded pool bounds are not
+whole-game/GPU bounds.
+Full goal active; no push/deploy/native build or player saves.
+
+## Previous handoff — Continuous map controls isolated
 
 Latest checkpoint 45 is diagnostic only; app remains 1.68.35. An unchanged
 continuous27-visit local256 MiB control reproduces19 normal/surface differences
