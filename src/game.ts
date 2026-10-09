@@ -40,6 +40,7 @@ export function startGame(
   );
 
   const ui = createRuntimeUIBase(foundation, () => game.shrinePhase);
+  let artworkReady = false;
   const game = createRuntimeGameplay(
     foundation,
     presentation,
@@ -50,9 +51,8 @@ export function startGame(
       refreshArmoryNew: () => controls.refreshArmoryNew(),
     }),
     () => ({ resetClock: () => frames.frameLoop.resetClock() }),
+    () => artworkReady,
   );
-
-  let artworkReady = false;
 
   const controls = createRuntimeControls(
     foundation,
@@ -82,6 +82,7 @@ export function startGame(
         ['W', 'H', 'DPR'],
         stateView(foundation.view.stageState, ['stageSeed'], {
           lifecycle: foundation.lifecycle,
+          cvs: foundation.browser.cvs,
           frameLoop: frames.frameLoop,
           G: foundation.run.G,
           cinematic: controls.cinematic,

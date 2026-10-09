@@ -170,7 +170,7 @@ test('hidden stale warming preserves the old scene and closes partially uploaded
   });
 });
 
-test('failed texture warming closes the worker response and settles through local composition', async ({
+test('failed texture warming closes the worker response and reports unavailable scenery', async ({
   page,
 }) => {
   await page.goto('/privacy/index.html');
@@ -200,7 +200,7 @@ test('failed texture warming closes the worker response and settles through loca
     return { ready, worker: snapshot.worker, failure: snapshot.workerFailure, width };
   });
   expect(result).toEqual({
-    ready: true,
+    ready: false,
     worker: false,
     failure: 'Error: fixture warm failure',
     width: 0,

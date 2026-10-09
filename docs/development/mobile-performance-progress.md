@@ -3,7 +3,7 @@
 The [active objective](../../goal-objective.md) supersedes the earlier exact-pixel
 performance goal. Intentional rendering simplifications are allowed when the
 game's feel and readability remain good. Worker scenery is required on supported
-platforms; automatic local fallback will be replaced with error/retry recovery.
+platforms; automatic local fallback is replaced with error/retry recovery.
 Cancelled general packing and the separate lit-only integration remain cancelled.
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
@@ -111,6 +111,35 @@ floor with bundled JavaScript and perform actual worker/canvas capability checks
 plus visible failure/retry for constructor, message and composition failures.
 Android version alone cannot establish those capabilities. No physical Android
 WebView validation has been performed for the new requirement yet.
+
+## Required-worker recovery integration — 9 October 2026
+
+App1.69.16 removes factory/owner automatic local fallback. The shared
+composition module remains inside the worker and in diagnostic comparisons.
+The owner checks required APIs, handles constructor/error/messageerror/post/
+compose/upload/timeout failures, aborts uploads, terminates the worker, releases
+planes and settles callers. Retry starts a fresh generation; stale preparation,
+response or warming cannot publish or settle new callers. Scene flow retries
+the same identity without advancing the visit seed or clearing its continuation.
+Startup reports scene failure with reload retry; later failures use a concise
+scene retry panel and keep simulation held. Disposal removes the error panel.
+
+Capacitor now declares WebView111, matching installed Vite8.3.1's Chrome111
+baseline. This is a capability/build alignment, not physical-device proof.
+The native error path serves a static offline startup message without JavaScript
+or plugins; the configured floor alone would only log an error in Capacitor.
+Strict TypeScript and16 focused unit/tool cases pass. Initial21-case browser
+selection passes18 and fails3: startup's unavailable diagnostic was absent in
+two cases, and the new gameplay test remained on setup without pressing Begin.
+The startup diagnostic and test flow are corrected; those three cases pass the
+focused rerun in14.8s. The failure/retry case also passes with a silent-worker
+timeout added, using a shortened fixture timer instead of waiting45seconds.
+The native error page passes with JavaScript disabled. Logs are under
+`tmp/probes/worker-{required-browser,required-repair,required-timeout,native-error-page}.log`.
+Checked production verification build passes and contains the static page;
+`tmp/probes/worker-required-build.log` records the build. Formatting/diff checks pass.
+No full suite is repeated for this iteration. Next-scene promotion,
+figure warming and combined memory ownership remain incomplete.
 
 ## Drift baseline tooling and trial atlas — 9 October 2026
 

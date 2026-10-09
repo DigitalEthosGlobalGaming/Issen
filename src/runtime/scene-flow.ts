@@ -34,8 +34,10 @@ export interface SceneFlowViews {
   prepareWeaponParts(): Promise<boolean>;
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
-    snapshot?(): { texturesWarmed?: boolean; backend?: string };
+    snapshot?(): { texturesWarmed?: boolean; backend?: string; workerFailure?: string };
+    retry?(): boolean;
   };
+  readonly sceneRecovery?: { show(retry: () => void): void; clear(): void };
   readonly lifecycle: { readonly disposed: boolean };
   readonly frameLoop: { resetClock(): void };
   requestedSceneKey: string;
@@ -48,6 +50,13 @@ export interface SceneFlowViews {
 /** Scene readiness owns stale-request suppression and paused continuation adoption.
  * Renderer operations are explicit ports; drawing never resumes gameplay. */
 export function createSceneFlow(readViews: () => SceneFlowViews) {
+  function retryScene() {
+    const views = readViews();
+    if (views.lifecycle.disposed) return;
+    views.environmentRenderer.retry?.();
+    views.requestedSceneKey = '';
+    prepareScene();
+  }
   function prepareScene() {
     const views = readViews();
     const {
@@ -86,6 +95,8 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
+    views.sceneRecovery?.clear();
+    delete cvs.dataset.sceneError;
     const identity = `${demon}:${G.stage}:${stageSeed}`;
     if (identity !== views.requestedSceneIdentity) views.sceneContinuation = undefined;
     views.requestedSceneIdentity = identity;
@@ -93,6 +104,14 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     views.sceneReadyToPresent = false;
     cvs.dataset.sceneState = 'loading';
     screenAnimation.invalidate();
+    const unavailable = () => {
+      if (lifecycle.disposed || request !== views.sceneRequest) return;
+      cvs.dataset.sceneState = 'unavailable';
+      cvs.dataset.sceneError =
+        views.environmentRenderer.snapshot?.().workerFailure ?? 'Scene preparation failed';
+      views.sceneRecovery?.show(retryScene);
+      screenAnimation.invalidate();
+    };
     const pending = Promise.all([
       demon ? demonRealmRenderer.prepare() : environmentRenderer.compose(frame),
       views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
@@ -102,16 +121,13 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       .then((ready) => {
         if (lifecycle.disposed || request !== views.sceneRequest) return;
         if (!ready) {
-          cvs.dataset.sceneState = 'unavailable';
+          unavailable();
           return;
         }
         views.sceneReadyToPresent = true;
         screenAnimation.invalidate();
       })
-      .catch(() => {
-        if (!lifecycle.disposed && request === views.sceneRequest)
-          cvs.dataset.sceneState = 'unavailable';
-      });
+      .catch(unavailable);
   }
   function deferUntilSceneReady(action: () => void) {
     const views = readViews();
@@ -150,5 +166,5 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       frameLoop.resetClock();
     }
   }
-  return { prepareScene, deferUntilSceneReady, settlePresentedScene };
+  return { prepareScene, retryScene, deferUntilSceneReady, settlePresentedScene };
 }

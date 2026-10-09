@@ -1,4 +1,33 @@
-# Mobile performance — Drift checkpoint verified
+# Mobile performance — Required workers and retry integrated
+
+App1.69.16 requires worker scenery and removes automatic main-thread fallback.
+Shared composition remains inside the worker and diagnostic comparisons.
+Constructor, runtime, message, post, composition, upload and timeout failures
+settle callers, abort warming, terminate the worker and release scene planes.
+Explicit retry starts a new generation; stale work cannot publish a scene.
+Startup offers reload retry; later-scene retry keeps combat held and preserves
+the visit seed and continuation. Missing required APIs report unavailability.
+Capacitor declares WebView111 to match the installed build baseline and uses a
+bundled static error page for native startup errors, readable without JavaScript.
+Physical Android WebView behavior remains unverified; no native build was run.
+
+Strict TypeScript and16 focused unit/tool cases pass. Browser selection passes18
+of21 initially; missing startup diagnostics and a setup-only fixture explain the
+three failures. Corrections pass all3 focused reruns. Extended worker failure/
+timeout/retry passes, and the static error page passes without JavaScript.
+Checked production verification build passes and includes the static error page.
+Changed formatting and diff checks pass. All verification sessions are terminal.
+No unchanged full suite repeated.
+See [evidence](docs/development/mobile-performance-progress.md) for logs and gaps.
+Drift checkpoint is committed as `c392fef`; its original full-run restoration
+alpha mismatch remains unexplained despite passing focused restoration checks.
+
+Next: budget-aware next-scene composition/warming/promotion, incoming figure GPU
+warming and combined memory ownership/admission. The full goal stays incomplete.
+General packing and separate lit-only integration remain cancelled. No push,
+deployment, native build or real-save changes. Package/lock/title/changelog1.69.16.
+
+## Previous handoff — Drift checkpoint verified
 
 Worktree app1.69.15 installs the merged128px-cell colour/emissive WebPs and
 single-pass lit drift. No geometry-buffer writes or normal/surface sampling;

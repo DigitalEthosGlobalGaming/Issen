@@ -1,7 +1,7 @@
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
 import type { TextureUpload, WarmSceneTextures } from '../texture-upload.ts';
-import type { EnvironmentFrame, createLocalEnvironmentRenderer } from './local-renderer.ts';
+import type { EnvironmentFrame } from './local-renderer.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { createCachedMaterials } from '../cached-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
@@ -16,7 +16,6 @@ import type {
   EnvironmentSnapshot,
 } from './worker-types.ts';
 
-type LocalRenderer = ReturnType<typeof createLocalEnvironmentRenderer>;
 const FOG_URL = new URL('./assets/fog-wisps-atlas.webp', import.meta.url).href;
 const emptySnapshot = (): EnvironmentSnapshot => ({
   foreground: { layers: 0, pixels: 0 },
@@ -32,19 +31,14 @@ const emptySnapshot = (): EnvironmentSnapshot => ({
 /** One worker and one completed scene per owner; queued changes replace older requests. */
 export function createWorkerEnvironmentRenderer(
   doc: Document,
-  createLocal: () => LocalRenderer,
   warmWorkerScene?: WarmSceneTextures,
 ) {
-  const worker = new Worker(new URL('./compose.worker.ts', import.meta.url), {
-    type: 'module',
-    name: 'issen-scenery',
-  });
+  let worker: Worker | undefined;
+  let workerGeneration = 0;
   const fogMaps = createAssetMaterials(doc, { fog: FOG_URL });
   const fogBindings = createCachedMaterials();
   let fog: HTMLImageElement | undefined;
   let fogPending: Promise<void> | undefined;
-  let fallback: LocalRenderer | undefined;
-  const getFallback = () => fallback;
   let disposed = false,
     running = false;
   let sequence = 0,
@@ -67,7 +61,7 @@ export function createWorkerEnvironmentRenderer(
     doc,
     () =>
       !disposed &&
-      !fallback &&
+      !workerFailure &&
       !running &&
       !preparing &&
       preparedStage === completed?.stage &&
@@ -77,7 +71,7 @@ export function createWorkerEnvironmentRenderer(
     (stage) => ({
       ready: send({ kind: 'preload', stage }).then((response) => response.ok),
       release: () => {
-        if (!disposed && !fallback && !workerFailure) void send({ kind: 'preload' });
+        if (!disposed && !workerFailure) void send({ kind: 'preload' });
       },
     }),
   );
@@ -96,13 +90,16 @@ export function createWorkerEnvironmentRenderer(
     currentKey = '';
   }
   function failWorker(reason: string) {
-    if (disposed || fallback) return;
+    if (disposed || workerFailure) return;
     workerFailure = reason;
+    workerGeneration++;
+    running = preparing = false;
     imagePreload.cancel();
     cancelUploads();
-    worker.terminate();
+    worker?.terminate();
+    worker = undefined;
     release();
-    fallback = createLocal();
+    snapshot = { ...emptySnapshot(), backend: 'unavailable', texturesWarmed: false };
     for (const [id, request] of requests) {
       clearTimeout(request.timer);
       request.resolve({ id, ok: false, layers: [], foreground: [], snapshot: emptySnapshot() });
@@ -110,36 +107,82 @@ export function createWorkerEnvironmentRenderer(
     requests.clear();
     for (const key of waiters.keys()) settle(key, false);
   }
-  worker.addEventListener('error', (event) => {
-    event.preventDefault();
-    failWorker(event.message || 'Scenery worker failed');
-  });
-  worker.addEventListener('message', ({ data }: MessageEvent<ComposeResponse>) => {
-    if (data.phase === 'assets-ready') {
-      if (requests.has(data.id)) markScenePhase('assets-ready', 'false:' + data.key);
-      return;
+  function startWorker() {
+    if (disposed) return false;
+    workerGeneration++;
+    try {
+      if (
+        typeof Worker === 'undefined' ||
+        typeof OffscreenCanvas === 'undefined' ||
+        typeof createImageBitmap === 'undefined'
+      )
+        throw Error('This browser does not support worker scenery preparation');
+      const incoming = new Worker(new URL('./compose.worker.ts', import.meta.url), {
+        type: 'module',
+        name: 'issen-scenery',
+      });
+      worker = incoming;
+      incoming.addEventListener('error', (event) => {
+        event.preventDefault();
+        if (worker === incoming) failWorker(event.message || 'Scenery worker failed');
+      });
+      incoming.addEventListener('messageerror', () => {
+        if (worker === incoming) failWorker('Scenery worker response could not be read');
+      });
+      incoming.addEventListener('message', ({ data }: MessageEvent<ComposeResponse>) => {
+        if (worker !== incoming || disposed) {
+          closeLayers([...data.layers, ...data.foreground]);
+          return;
+        }
+        if (data.phase === 'assets-ready') {
+          if (requests.has(data.id)) markScenePhase('assets-ready', 'false:' + data.key);
+          return;
+        }
+        const request = requests.get(data.id);
+        if (!request) {
+          closeLayers([...data.layers, ...data.foreground]);
+          return;
+        }
+        clearTimeout(request.timer);
+        requests.delete(data.id);
+        request.resolve(data);
+      });
+      return true;
+    } catch (error) {
+      failWorker(String(error));
+      return false;
     }
-    const request = requests.get(data.id);
-    if (!request) {
-      closeLayers([...data.layers, ...data.foreground]);
-      return;
-    }
-    clearTimeout(request.timer);
-    requests.delete(data.id);
-    request.resolve(data);
-  });
+  }
+  function retry() {
+    if (disposed) return false;
+    if (!workerFailure) return !!worker;
+    workerFailure = undefined;
+    preparedStage = -1;
+    preparePending = undefined;
+    snapshot = emptySnapshot();
+    return startWorker();
+  }
   function send(
     request:
       | Omit<Extract<ComposeRequest, { kind: 'prepare' }>, 'id'>
       | Omit<Extract<ComposeRequest, { kind: 'compose' }>, 'id'>
       | Omit<Extract<ComposeRequest, { kind: 'preload' }>, 'id'>,
   ) {
+    if (disposed || workerFailure || !worker)
+      return Promise.resolve<ComposeResponse>({
+        id: ++sequence,
+        ok: false,
+        layers: [],
+        foreground: [],
+        snapshot,
+        error: workerFailure,
+      });
     return new Promise<ComposeResponse>((resolve) => {
       const id = ++sequence;
       const timer = setTimeout(() => failWorker('Scenery worker timed out'), 45000);
       requests.set(id, { resolve, timer });
       try {
-        worker.postMessage({ ...request, id, decodedBudget: documentImageBudget(doc) });
+        worker!.postMessage({ ...request, id, decodedBudget: documentImageBudget(doc) });
       } catch (error) {
         failWorker(String(error));
       }
@@ -207,9 +250,10 @@ export function createWorkerEnvironmentRenderer(
     }
   }
   async function pump() {
-    if (running || disposed || fallback || doc.hidden || !desired) return;
+    if (running || disposed || workerFailure || doc.hidden || !desired) return;
     const frame = { ...desired },
-      key = compositionKey(frame);
+      key = compositionKey(frame),
+      generation = workerGeneration;
     if (key === currentKey) return;
     imagePreload.cancel();
     running = true;
@@ -218,7 +262,7 @@ export function createWorkerEnvironmentRenderer(
       accepted = false;
     try {
       if (frame.stage === 0) await prepareFog();
-      if (disposed || fallback) return;
+      if (disposed || workerFailure || generation !== workerGeneration) return;
       const timingKey = 'false:' + key;
       markScenePhase('compose-sent', timingKey, { stage: frame.stage });
       const response = await send({ kind: 'compose', key, frame });
@@ -233,7 +277,8 @@ export function createWorkerEnvironmentRenderer(
         'issen:compose-received:' + timingKey,
         timingKey,
       );
-      if (disposed || fallback || !desired || compositionKey(desired) !== key) {
+      if (generation !== workerGeneration) return;
+      if (disposed || workerFailure || !desired || compositionKey(desired) !== key) {
         settle(key, false);
         return;
       }
@@ -242,9 +287,16 @@ export function createWorkerEnvironmentRenderer(
         return;
       }
       if (!(await warmLayers(frame, response.layers, response.foreground))) {
-        settle(key, false);
+        if (generation === workerGeneration) settle(key, false);
         return;
       }
+      if (
+        generation !== workerGeneration ||
+        disposed ||
+        !desired ||
+        compositionKey(desired) !== key
+      )
+        return;
       release();
       layers = response.layers;
       foreground = response.foreground;
@@ -258,12 +310,16 @@ export function createWorkerEnvironmentRenderer(
       accepted = true;
       settle(key, true);
     } catch (error) {
-      failWorker(String(error));
-      settle(key, false);
+      if (generation === workerGeneration) {
+        failWorker(String(error));
+        settle(key, false);
+      }
     } finally {
       if (incoming && !accepted) closeLayers([...incoming.layers, ...incoming.foreground]);
-      running = false;
-      if (desired && compositionKey(desired) !== key) void pump();
+      if (generation === workerGeneration) {
+        running = false;
+        if (desired && compositionKey(desired) !== key) void pump();
+      }
     }
   }
   function queue(frame: EnvironmentFrame) {
@@ -275,6 +331,7 @@ export function createWorkerEnvironmentRenderer(
       !Number.isFinite(frame.dpr)
     )
       return false;
+    if (disposed || workerFailure) return false;
     const nextKey = compositionKey(frame);
     desired = { ...frame };
     cancelUploads(nextKey);
@@ -285,13 +342,17 @@ export function createWorkerEnvironmentRenderer(
   async function prepare(stage = 0): Promise<void> {
     imagePreload.cancel();
     if (disposed) return;
-    if (fallback) return fallback.prepare(stage);
     if (preparePending && preparedStage === stage) return preparePending;
     preparedStage = stage;
     preparing = true;
+    const generation = workerGeneration;
     const request = send({ kind: 'prepare', stage })
       .then(async (response) => {
-        if (fallback) return fallback.prepare(stage);
+        if (disposed || generation !== workerGeneration) return;
+        if (!response.ok) {
+          failWorker(response.error || 'Scenery worker could not prepare the selected scene');
+          return;
+        }
         if (!disposed && !running) snapshot = response.snapshot;
       })
       .finally(() => {
@@ -301,16 +362,16 @@ export function createWorkerEnvironmentRenderer(
     return preparePending;
   }
   async function compose(frame: EnvironmentFrame): Promise<boolean> {
-    if (disposed) return false;
-    if (fallback) return fallback.compose(frame);
-    const key = compositionKey(frame);
+    if (disposed || workerFailure) return false;
+    const key = compositionKey(frame),
+      generation = workerGeneration;
     if (key === currentKey) {
       queue(frame);
       try {
-        return await warmLayers(frame, layers, foreground);
+        return (await warmLayers(frame, layers, foreground)) && generation === workerGeneration;
       } catch (error) {
-        failWorker(String(error));
-        return getFallback()?.compose(frame) ?? false;
+        if (generation === workerGeneration) failWorker(String(error));
+        return false;
       }
     }
     const result = new Promise<boolean>((resolve) => {
@@ -319,9 +380,7 @@ export function createWorkerEnvironmentRenderer(
       waiters.set(key, group);
     });
     if (!queue(frame)) settle(key, false);
-    const ready = await result;
-    const local = getFallback();
-    return local && !disposed ? local.compose(frame) : ready;
+    return await result;
   }
   function stamp(
     ctx: SceneDrawing,
@@ -354,12 +413,13 @@ export function createWorkerEnvironmentRenderer(
     if (!doc.hidden) void pump();
   };
   doc.addEventListener('visibilitychange', onVisibility);
+  startWorker();
   return {
     prepare,
     compose,
+    retry,
     draw(ctx: SceneDrawing, frame: EnvironmentFrame): boolean {
       if (disposed) return false;
-      if (fallback) return fallback.draw(ctx, frame);
       if (!queue(frame) || !layers.length || !completed) return false;
       ctx.save();
       try {
@@ -385,7 +445,6 @@ export function createWorkerEnvironmentRenderer(
     },
     drawForeground(ctx: SceneDrawing, frame: EnvironmentFrame): boolean {
       if (disposed) return false;
-      if (fallback) return fallback.drawForeground(ctx, frame);
       if (frame.stage !== 4 || completed?.stage !== 4 || !foreground.length) return false;
       const edge = frame.width * (frame.height >= frame.width * 0.9 ? 0.2 : 0.24);
       const time = frame.reducedMotion || frame.reducedFlashes ? 0 : frame.time;
@@ -401,23 +460,24 @@ export function createWorkerEnvironmentRenderer(
       }
     },
     get backend() {
-      return fallback?.backend ?? snapshot.backend;
+      return snapshot.backend;
     },
     snapshot: () => ({
-      ...(fallback?.snapshot() ?? snapshot),
-      imagePreload: fallback?.snapshot().imagePreload ?? imagePreload.snapshot(),
-      worker: !fallback && !disposed,
+      ...snapshot,
+      imagePreload: imagePreload.snapshot(),
+      worker: !!worker && !workerFailure && !disposed,
       pending: running,
       workerFailure,
-      stage: fallback?.snapshot().stage ?? completed?.stage,
+      stage: completed?.stage,
     }),
     dispose() {
       if (disposed) return;
       disposed = true;
       imagePreload.dispose();
       cancelUploads();
-      worker.terminate();
-      fallback?.dispose();
+      workerGeneration++;
+      worker?.terminate();
+      worker = undefined;
       doc.removeEventListener('visibilitychange', onVisibility);
       release();
       fogBindings.dispose();

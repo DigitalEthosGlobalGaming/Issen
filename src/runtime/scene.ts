@@ -15,6 +15,7 @@ import { createWeatherState } from '../rendering/scene/weather-state.ts';
 import { STAGES } from '../game/content/stages.ts';
 import type { createFrameLoop } from '../platform/frame-loop.ts';
 import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
+import { mountStartupLoading } from '../ui/startup-loading.ts';
 /** Compose combat/scoring, character positions and kill rules through explicit owners. */
 export function createRuntimeSceneCoordination(
   foundation: ReturnType<typeof createRuntimeFoundation>,
@@ -22,7 +23,14 @@ export function createRuntimeSceneCoordination(
   ui: ReturnType<typeof createRuntimeUIBase>,
   combat: Pick<ReturnType<typeof createRuntimeCombat>, 'spawnEnemy'>,
   readClock: () => Pick<ReturnType<typeof createFrameLoop>, 'resetClock'>,
+  readArtworkReady: () => boolean,
 ) {
+  let sceneError: ReturnType<typeof mountStartupLoading> | undefined;
+  const clearSceneError = () => {
+    sceneError?.remove();
+    sceneError = undefined;
+  };
+  foundation.lifecycle.add(clearSceneError);
   function buildWeather(resetSimulation = true) {
     presentation.buildWeatherArtwork();
     if (resetSimulation)
@@ -77,6 +85,15 @@ export function createRuntimeSceneCoordination(
               foundation.profile.profileEquipment.EQ.blade,
             ]),
           environmentRenderer: foundation.browser.environmentRenderer,
+          sceneRecovery: {
+            show(retry: () => void) {
+              // Startup owns its loading/reload screen until artwork is published.
+              if (!readArtworkReady()) return;
+              sceneError ??= mountStartupLoading(retry);
+              sceneError.scene();
+            },
+            clear: clearSceneError,
+          },
           lifecycle: foundation.lifecycle,
           frameLoop: readClock(),
         }),

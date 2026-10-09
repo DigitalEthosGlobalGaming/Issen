@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
 for (const fallback of [false, true])
-  test(`startup leaves future environment images to their owners (${fallback ? 'local fallback' : 'worker'})`, async ({
+  test(`startup leaves future environment images to their owners (${fallback ? 'failed worker' : 'worker'})`, async ({
     page,
   }, info) => {
     test.setTimeout(60000);
@@ -38,6 +38,14 @@ for (const fallback of [false, true])
       await route.fulfill({ response, body });
     });
     await page.goto('/');
+    if (fallback) {
+      await expect(page.getByRole('heading', { name: 'Scene unavailable' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Retry', exact: true })).toHaveCount(1);
+      await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'unavailable');
+      expect(errors).toEqual([]);
+      expect(blocked).toEqual([]);
+      return;
+    }
     await page.waitForFunction(() => !!(window as any).__sceneStartup);
     const result = await page.evaluate(async () => {
       const { foundation: f, frames, presentation: p } = (window as any).__sceneStartup;

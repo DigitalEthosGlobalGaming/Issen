@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('worker construction, runtime and composition errors settle through the owned local fallback', async ({
+test('worker failures settle without local composition and explicit retry starts a fresh worker', async ({
   page,
 }) => {
   await page.goto('/privacy/index.html');
@@ -8,6 +8,7 @@ test('worker construction, runtime and composition errors settle through the own
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
     const original = window.Worker;
+    const originalTimeout = window.setTimeout;
     const frame = {
       width: 160,
       height: 100,
@@ -21,14 +22,30 @@ test('worker construction, runtime and composition errors settle through the own
     };
     const results = [];
     try {
-      for (const failure of ['construction', 'runtime', 'composition']) {
+      for (const failure of [
+        'construction',
+        'runtime',
+        'composition',
+        'message',
+        'post',
+        'timeout',
+      ]) {
         let terminated = 0;
+        if (failure === 'timeout')
+          window.setTimeout = ((handler: TimerHandler, delay?: number, ...args: any[]) =>
+            originalTimeout(handler, delay === 45000 ? 0 : delay, ...args)) as typeof setTimeout;
         (window as any).Worker = class extends EventTarget {
           constructor() {
             super();
             if (failure === 'construction') throw Error('fixture constructor failure');
           }
           postMessage(request: { id: number }) {
+            if (failure === 'timeout') return;
+            if (failure === 'post') throw Error('fixture post failure');
+            if (failure === 'message') {
+              this.dispatchEvent(new MessageEvent('messageerror'));
+              return;
+            }
             if (failure === 'composition') {
               this.dispatchEvent(
                 new MessageEvent('message', {
@@ -52,11 +69,19 @@ test('worker construction, runtime and composition errors settle through the own
         };
         const renderer = createEnvironmentRenderer(document);
         const ready = await renderer.compose(frame);
+        window.setTimeout = originalTimeout;
         const canvas = document.createElement('canvas');
         canvas.width = 160;
         canvas.height = 100;
-        const drawn = renderer.draw(await createTestDrawing(canvas), frame);
+        const drawing = await createTestDrawing(canvas);
+        const drawn = renderer.draw(drawing, frame);
         const snapshot = renderer.snapshot();
+        window.Worker = original;
+        const restarted = renderer.retry();
+        const recovered = await renderer.compose(frame);
+        const recoveryDrawn = renderer.draw(drawing, frame);
+        const recoveryStage = renderer.snapshot().stage;
+        drawing.dispose();
         renderer.dispose();
         results.push({
           ready,
@@ -65,23 +90,35 @@ test('worker construction, runtime and composition errors settle through the own
           stage: snapshot.stage,
           failure: snapshot.workerFailure,
           terminated,
+          restarted,
+          recovered,
+          recoveryDrawn,
+          recoveryStage,
         });
       }
     } finally {
       window.Worker = original;
+      window.setTimeout = originalTimeout;
     }
     return results;
   });
   for (const row of result) {
-    expect(row.ready).toBe(true);
-    expect(row.drawn).toBe(true);
+    expect(row.ready).toBe(false);
+    expect(row.drawn).toBe(false);
     expect(row.worker).toBe(false);
-    expect(row.stage).toBe(1);
+    expect(row.stage).toBeUndefined();
+    expect(row.failure).toBeTruthy();
+    expect(row.restarted).toBe(true);
+    expect(row.recovered).toBe(true);
+    expect(row.recoveryDrawn).toBe(true);
+    expect(row.recoveryStage).toBe(1);
   }
   expect(result[1]!.failure).toContain('fixture runtime failure');
   expect(result[1]!.terminated).toBeGreaterThan(0);
   expect(result[2]!.failure).toContain('fixture composition failure');
   expect(result[2]!.terminated).toBeGreaterThan(0);
+  expect(result[5]!.failure).toContain('timed out');
+  expect(result[5]!.terminated).toBeGreaterThan(0);
 });
 
 test('worker scenery preserves all nine lit compositions and foreground materials', async ({
@@ -91,9 +128,11 @@ test('worker scenery preserves all nine lit compositions and foreground material
   const result = await page.evaluate(async () => {
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createEnvironmentRenderer } = await import('/src/rendering/environment/index.ts');
+    const { createLocalEnvironmentRenderer } =
+      await import('/src/rendering/environment/local-renderer.ts');
     const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
     const { setSceneLighting } = await import('/src/rendering/scene-material.ts');
-    const local = createEnvironmentRenderer(document, { worker: false });
+    const local = createLocalEnvironmentRenderer(document);
     const worker = createEnvironmentRenderer(document);
     const canvas = document.createElement('canvas');
     canvas.width = 180;
@@ -117,7 +156,7 @@ test('worker scenery preserves all nine lit compositions and foreground material
         lowQuality: true,
       };
       await Promise.all([local.compose(frame), worker.compose(frame)]);
-      const draw = (owner: typeof worker, enabled = true) => {
+      const draw = (owner: typeof worker | typeof local, enabled = true) => {
         painter.begin();
         setSceneLighting(painter, {
           materialLighting: enabled ? 1 : 0,

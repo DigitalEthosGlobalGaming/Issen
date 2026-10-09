@@ -563,13 +563,22 @@ the active scene atlas kit and owns bounded cached depth planes; scene-kit.ts
 handles native-aspect frames, ground anchors and contact fades. Runtime weather
 and final film grading remain separate from image assets.
 
-Since 1.66.0, `environment/index.ts` selects a renderer-owned module worker when
-Worker and OffscreenCanvas are available. `local-renderer.ts` composes colour and
+Since1.69.16, `environment/index.ts` requires a renderer-owned scenery worker.
+Worker, OffscreenCanvas and createImageBitmap are checked before construction;
+the first real composition verifies worker canvas/decode/transfer capabilities.
+`local-renderer.ts` remains the shared composition implementation used inside
+the worker and by diagnostic comparison tools; it is not a runtime fallback.
+It composes colour and
 material depth planes; `compose.worker.ts` transfers owned ImageBitmaps back to
 `worker-renderer.ts`. One completed composition remains drawable while the latest
 queued stage/size is prepared. Superseded requests coalesce, inactive owners defer
-new work, and disposal closes bitmaps and terminates the worker. The explicit local
-renderer remains the unsupported/failed-worker fallback. Cosmetic motion stays on
+new work, and disposal closes bitmaps and terminates the worker. Constructor,
+runtime, unreadable-message, post, timeout, compose and upload failures mark the
+owner unavailable, terminate the worker, abort uploads and settle pending callers.
+Explicit retry starts a fresh worker generation; late old results cannot publish
+or settle the replacement's callers. Startup offers reload recovery. Later scene
+failures offer retry through scene flow, retaining its stage identity and pending
+encounter while combat remains held. Cosmetic motion stays on
 the presentation clock; the worker does not own gameplay or animation loops.
 
 Since 1.66.1, the runtime explicitly prepares a selected scene and presents its

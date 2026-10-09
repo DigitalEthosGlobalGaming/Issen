@@ -13,6 +13,7 @@ type NativeStartup = Pick<
 >;
 export interface RuntimeStartupViews extends NativeStartup {
   readonly lifecycle: ReturnType<typeof createLifecycle>;
+  readonly cvs: { readonly dataset: DOMStringMap };
   readonly frameLoop: ReturnType<typeof createFrameLoop>;
   readonly G: RunState;
   readonly cinematic: { readonly restores: boolean; restore(): void };
@@ -175,6 +176,13 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       !driftRenderer.ready ? 'drifting debris' : null,
     ].filter((name): name is string => !!name);
     if (failed.length) {
+      if (environmentRenderer.snapshot().workerFailure) {
+        const { cvs } = readViews();
+        cvs.dataset.sceneState = 'unavailable';
+        cvs.dataset.sceneError = environmentRenderer.snapshot().workerFailure;
+        artworkLoading.scene();
+        return;
+      }
       artworkLoading.update({ loaded: 7 - failed.length, total: 7, pending: 0, failed });
       return;
     }
