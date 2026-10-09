@@ -30,7 +30,7 @@ export function createWorkerContextProxy(
 }
 
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
-export function createWorkerDocument(): Document & {
+export function createWorkerDocument(decodedBudget?: number): Document & {
   prefetchImages(
     urls: readonly string[],
   ): ReturnType<ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['prefetch']>;
@@ -48,13 +48,15 @@ export function createWorkerDocument(): Document & {
   );
   const loader = createDecodedImageLoader({
     expectedBytes: (url) => expectedBytes.get(url),
-    budget: decodedImageBudget({
-      mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
-      deviceMemory:
-        typeof navigator === 'undefined'
-          ? 8
-          : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
-    }),
+    budget:
+      decodedBudget ??
+      decodedImageBudget({
+        mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
+        deviceMemory:
+          typeof navigator === 'undefined'
+            ? 8
+            : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
+      }),
     async decode(url, signal) {
       const response = await readCompressedAsset(url, signal);
       // Preserve the existing worker decode interpretation. Data-map options

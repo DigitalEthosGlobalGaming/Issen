@@ -8,6 +8,7 @@ import { drawMaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
 import { closeLayers, compositionKey } from './worker-types.ts';
 import { createSceneImagePreload } from './image-preload.ts';
+import { documentImageBudget } from '../../platform/main-images.ts';
 import type {
   ComposedLayer,
   ComposeRequest,
@@ -138,7 +139,7 @@ export function createWorkerEnvironmentRenderer(
       const timer = setTimeout(() => failWorker('Scenery worker timed out'), 45000);
       requests.set(id, { resolve, timer });
       try {
-        worker.postMessage({ ...request, id });
+        worker.postMessage({ ...request, id, decodedBudget: documentImageBudget(doc) });
       } catch (error) {
         failWorker(String(error));
       }

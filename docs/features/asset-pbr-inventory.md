@@ -114,7 +114,10 @@ coverage and all nine stage caches. Visual approval is pending.
 Shared loading belongs to [asset-materials.ts](../../src/rendering/asset-materials.ts).
 Worker decoded resources now share the priority/pin/LRU loader in
 `src/platform/decoded-images.ts`, with catalog-sized pre-decode reservations and
-device-class budgets. Main figure/UI/startup loader migration remains pending;
+device-class budgets. As of1.69.12 requests propagate the owning document's
+256/384/512MiB policy; completed worker exports release all raw input pins while
+keeping their independently owned output planes. Warm decodes remain evictable.
+Enemy/weapon and remaining figure/UI/startup loader migration remains pending;
 the inventory total is not a configured whole-application residency budget.
 Local-fallback PBR maps now use the shared native main-image pool through explicit
 leases; old-stage maps unpin, warm maps remain until LRU pressure, and independent

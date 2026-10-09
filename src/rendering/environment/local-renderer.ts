@@ -100,11 +100,10 @@ export function createLocalEnvironmentRenderer(
     releaseSceneryCutouts(images.filter((image, index) => image && !live.includes(index)));
   }
 
-  function releaseCompositionInputs(stage: number) {
-    if (!mapImages) return;
-    releaseCompletedCutouts();
+  function releaseCompositionInputs(stage: number, retainLive = true) {
+    releaseCompletedCutouts(retainLive);
     // Output planes own their pixels; only live fog and bamboo still need raw inputs.
-    const live = stage === 0 ? [9] : stage === 4 ? [0] : [];
+    const live = retainLive ? (stage === 0 ? [9] : stage === 4 ? [0] : []) : [];
     materials?.select(Object.fromEntries(live.map((index) => [String(index), ASSET_URLS[index]!])));
     for (const [index, lease] of sourceLeases) {
       if (live.includes(index)) continue;
@@ -114,6 +113,13 @@ export function createLocalEnvironmentRenderer(
       sourceLeases.delete(index);
       delete images[index];
     }
+    if (!mapImages)
+      images.forEach((image, index) => {
+        if (live.includes(index)) return;
+        cachedMaterials.unbind(image);
+        image.removeAttribute('src');
+        delete images[index];
+      });
     pending = undefined;
   }
 
@@ -711,6 +717,8 @@ export function createLocalEnvironmentRenderer(
     },
     prepare,
     releaseCompletedCutouts,
+    // Exported planes own every pixel; live motion belongs to the receiving renderer.
+    releaseExportInputs: () => releaseCompositionInputs(preparedStage, false),
     dispose,
     get backend(): EnvironmentBackend {
       return status;

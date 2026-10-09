@@ -194,7 +194,11 @@ and retains live fog/bamboo colour cutouts. The worker clears all stamp cutouts
 before parallel bitmap copies (1.68.34); live motion uses transferred planes and
 main-thread inputs. Completed worker planes remain cached for exact-key requests.
 Retiring those planes and rebuilding on demand failed the colour parity guard.
-Worker raw image pins and decode semantics remain unchanged.
+Worker export composition now releases all raw colour/material image pins after
+its completed planes are built (1.69.12). Exported planes own their pixels; live
+motion uses transferred planes and the receiving renderer's inputs. Exact-key
+exports reuse those planes, while changed keys reacquire their inputs from the
+worker's bounded LRU cache. Decode interpretation is unchanged.
 Repeated draws/compose calls with the same composition key reuse that output.
 A changed size, DPR, quality, seed or stage reacquires compose inputs; obsolete
 pending requests cannot publish over a newer generation. Source binding release
@@ -237,6 +241,10 @@ cancel it. It never changes the active renderer bindings or builds scene planes.
 Local renderers use the main pool; worker renderers send cancellable image-only
 requests that bypass the compose queue. Worker requests preserve the current
 raw pins and apply the same decoded-byte admission. Denied sets remain cold.
+Worker requests carry the owning document's device-class image budget. The worker
+creates its loader on the first request, using the same256/384/512MiB policy as
+the main pool rather than independently selecting a different worker default.
+These remain per-pool bounds, not a combined whole-application memory allowance.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
 Player-base and drift colour/material planes use the same pool. Runtime startup

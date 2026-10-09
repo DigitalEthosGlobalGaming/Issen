@@ -9,11 +9,20 @@ const scope = globalThis as unknown as {
   onmessage: ((event: MessageEvent<ComposeRequest>) => void) | null;
   postMessage(message: ComposeResponse, transfer: Transferable[]): void;
 };
-const workerDocument = createWorkerDocument();
-const renderer = createLocalEnvironmentRenderer(workerDocument);
+let service:
+  | {
+      workerDocument: ReturnType<typeof createWorkerDocument>;
+      renderer: ReturnType<typeof createLocalEnvironmentRenderer>;
+    }
+  | undefined;
+function createService(decodedBudget?: number) {
+  const workerDocument = createWorkerDocument(decodedBudget);
+  return { workerDocument, renderer: createLocalEnvironmentRenderer(workerDocument) };
+}
 let pending = Promise.resolve();
-let imagePreload: ReturnType<typeof workerDocument.prefetchImages>;
+let imagePreload: ReturnType<ReturnType<typeof createWorkerDocument>['prefetchImages']>;
 scope.onmessage = ({ data }) => {
+  const { workerDocument, renderer } = (service ??= createService(data.decodedBudget));
   // Cancellation and policy changes bypass the compose queue.
   imagePreload?.release();
   imagePreload = undefined;
@@ -67,7 +76,7 @@ scope.onmessage = ({ data }) => {
       ) {
         composedAt = performance.now();
         // Live motion uses transferred planes and the main thread's own raw inputs.
-        renderer.releaseCompletedCutouts(false);
+        renderer.releaseExportInputs();
         const completed = renderer.exportLayers();
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));

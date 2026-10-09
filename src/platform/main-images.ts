@@ -19,6 +19,16 @@ const dimensions = new Map<string, number>(
   runtimeAssets.map((asset) => [asset.url, asset.width * asset.height * 4]),
 );
 
+/** Thread-independent policy comes from the renderer's owning document. */
+export function documentImageBudget(doc: Document): number {
+  const navigator = doc.defaultView?.navigator as
+    (Navigator & { deviceMemory?: number }) | undefined;
+  return decodedImageBudget({
+    mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
+    deviceMemory: navigator?.deviceMemory,
+  });
+}
+
 async function decode(doc: Document, url: string, signal: AbortSignal): Promise<Resource> {
   const response = await readCompressedAsset(url, signal);
   const blob = await response.blob();
@@ -53,13 +63,8 @@ async function decode(doc: Document, url: string, signal: AbortSignal): Promise<
 export function createMainImageOwner(doc: Document) {
   let pool = pools.get(doc);
   if (!pool) {
-    const navigator = doc.defaultView?.navigator as
-      (Navigator & { deviceMemory?: number }) | undefined;
     const loader = createDecodedImageLoader<Resource>({
-      budget: decodedImageBudget({
-        mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
-        deviceMemory: navigator?.deviceMemory,
-      }),
+      budget: documentImageBudget(doc),
       expectedBytes: (url) => dimensions.get(url),
       decode: (url, signal) => decode(doc, url, signal),
     });

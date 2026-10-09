@@ -1,4 +1,71 @@
-# Performance, assets and seamless transitions — Drift texture warming
+# Performance, assets and seamless transitions — Worker input lifetime
+
+Checkpoint63 aligns worker image policy and releases completed composition inputs,
+app1.69.12. Actual low-memory startup audit succeeds both with worker and forced
+local fallback. Before the change the page's pool reports256MiB but the worker
+reports512MiB; requests now carry the owning document's256/384/512MiB policy and
+the worker creates its loader on the first request. This is a per-pool policy,
+not a combined whole-application allowance.
+
+Before, completed Meadow pins34 worker planes/213,952,112nominal RGBA bytes.
+Worker composition now clears cutouts and releases all input pins before copying
+its independently owned output planes. All stages finish with0 worker input pins.
+Warm decodes remain LRU-cacheable; this does not claim213.95MB of physical memory
+was freed. Exact-key exports retain their completed planes; changed stage, size,
+DPR, quality or seed reacquires inputs. The local drawing path still retains its
+live fog4planes/25,176,608bytes or bamboo3/18,870,192. Main-thread live motion uses
+its own inputs and transferred planes. Decode interpretation, assets, RNG and
+save formats unchanged.
+
+Enemy audit confirms regular figures can use all four families during a run.
+Blindly pooling all of them is still inappropriate before combined admission:
+the initial audit already measures main/worker decoded caches119,714,160 plus
+213,952,112bytes (333,666,272 combined), before direct enemy/weapon/demon inputs,
+canvases, copies and GPU resources. Independent pool caps do not prove the goal's
+whole-memory bound. Worker unpinning is a prerequisite, not its completion.
+
+All27 saved original/candidate native worker captures match exact SHA256 output
+across nine stages, two orientations and DPR1/2. New256/384/512MiB tests cycle
+every stage twice, assert0 exported input pins, bounded pool peaks, low-budget
+LRU evictions and key-change reacquisition. Their initial first-versus-rebuilt
+native assertion fails (501/501/822channels); the saved original's matching512MiB
+sequence also differs822channels. Do not relax tolerance: compare settled repeated
+submissions of one completed key, and retain separate original/candidate oracles.
+This does not resolve the existing native sampling/rebuild variation.
+
+Preliminary live-input-only trial passes all eight preload/lifetime cases,
+including216 exact original/candidate native preload comparisons across worker/
+local and memory2/8. Final export-only worker run passes14 cases, including108
+worker preload comparisons, fallback, coalescing, hidden/disposed upload waits
+and actual context restoration. Final476 unit tests and14 runtime cases pass,
+including scene-load gameplay/RNG isolation, cinematic restoration and drift
+readiness. Checked production/strict TypeScript passes all four cases, including
+offline gameplay resize. Final actual low-memory worker/local startup both pass;
+worker readiness reports256MiB and0 input pins. Formatting and diff checks pass;
+package/lock/title/changelog agree. All process handles are terminal. Local
+develop commit only.
+
+Five matched title samples per arm:startup median2106.3→2144.1ms (+1.8%, roughly
+unchanged), render median1.6→1.5ms and frame-p95 median16.9→17.0ms. Reports pass
+compatibility/workload checks; builds use1.69.10/1.69.11 metadata before their
+patch bumps. No physical-memory, actual120Hz or first-two-second-long-task claim.
+
+Evidence:tmp/probes/owners63/ retains saved original/rebased control and candidate
+sources, actual worker/local startup reports,27-case baseline/live-only/export
+native oracles, failed/control/repaired lifetime logs, preload and unit logs.
+Matched title timing compares tmp/performance/2026-10-09T05-30-15.101Z-01e6d230/
+with tmp/performance/2026-10-09T06-02-12.492Z-b9871a84/.
+
+Remaining:enemy/weapon selected ownership, incoming figure/weapon variants and
+warming, demon/live-fog cutout-aware ownership, combined decoded/canvas/GPU/copy
+admission, quiet cancelable worker/local next slots and persistent texture leases
+through their promotion. Full120Hz/cold-warm/first-two-second and Phase5 checks
+remain open. Local yielded composition still differs in four exact cases; retain
+the passing synchronous control. Goal active at full scope; no push/deployment,
+native build or real player-save changes. Cancelled packing, tight repacking and
+separate lit-only integration remain cancelled.
+
+## Previous handoff — Drift texture warming
 
 Checkpoint62 warms runtime drift before publication, app1.69.11. Colour/emissive
 and normal/surface data sources use the existing painter texture store and paced
