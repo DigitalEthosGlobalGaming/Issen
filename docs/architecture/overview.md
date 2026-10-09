@@ -810,7 +810,12 @@ Its stage gate builds the existing mountain layer and prop cutouts, captures the
 material sources without drawing a GPU frame, and warms them through the gameplay
 painter. A current-source lease survives texture collection. Demon preparation
 also warms its blur/grayscale programs; ordinary preparation omits these programs.
-Realm exit cancels pending work and retires Demon inputs, cutouts and layer maps.
+Moving Demon mist samples one size-keyed radial field instead of creating five
+changing native gradients every frame. Its canvas is capped at512px per dimension,
+warmed/retained with the realm sources, and replaced on resize. Fractional crop
+positions preserve sinusoidal drift; rounded destination strip edges and reduced
+motion remain. Realm exit cancels pending work and retires Demon inputs, cutouts,
+layer maps and the mist field.
 Generation checks prevent obsolete work from publishing after re-entry/disposal.
 Entering Demon suspends the ordinary scenery owner: it terminates its worker,
 releases current/next scene planes and fog inputs, aborts warming and settles

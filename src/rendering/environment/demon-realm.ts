@@ -44,6 +44,38 @@ export function createDemonRealmRenderer(
   landmarks.decoding = terrain.decoding = mountains.decoding = 'async';
   const mountainLayer = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
   let mountainKey = '';
+  let mistLayer = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
+  let mistKey = '';
+  function mistSource(width: number, height: number) {
+    const key = `${width}:${height}`;
+    if (mistKey === key) return mistLayer;
+    retireSceneTexture(mistLayer, true);
+    mistLayer.width = mistLayer.height = 0;
+    mistLayer = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
+    const scale = Math.min(512 / (width * 1.2), 512 / (height * 0.12 + 2));
+    mistLayer.width = Math.min(512, Math.max(1, Math.ceil(width * 1.2 * scale)));
+    mistLayer.height = Math.min(512, Math.max(1, Math.ceil((height * 0.12 + 2) * scale)));
+    const context = mistLayer.getContext('2d');
+    if (!context) return null;
+    // Extra horizontal reach covers the full sinusoidal shift; vertical padding
+    // keeps rounded strip edges inside the field without a clipping container.
+    const centerX = width * 0.6 * scale,
+      centerY = (height * 0.06 + 1) * scale;
+    const gradient = context.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      width * 0.6 * scale,
+    );
+    gradient.addColorStop(0, 'rgba(146,96,153,.045)');
+    gradient.addColorStop(1, 'rgba(146,96,153,0)');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, mistLayer.width, mistLayer.height);
+    mistKey = key;
+    return mistLayer;
+  }
   let disposed = false;
   let pending: Promise<boolean> | undefined;
   let generation = 0,
@@ -128,6 +160,7 @@ export function createDemonRealmRenderer(
         capturing = false;
         canvas.width = canvas.height = 0;
       }
+      if (mistKey) uploads.push({ texture: { source: mistLayer, revision: 0 } });
       markScenePhase('demon-artwork-built', `true:${key}`, {
         duration: performance.now() - captureStart,
       });
@@ -154,7 +187,7 @@ export function createDemonRealmRenderer(
     })();
   }
   function release() {
-    if (!pending && !warming && !mountainKey && !preparedKey) return;
+    if (!pending && !warming && !mountainKey && !preparedKey && !mistKey) return;
     generation++;
     warming?.abort();
     warming = undefined;
@@ -172,6 +205,9 @@ export function createDemonRealmRenderer(
       image.removeAttribute('src');
     }
     mountainLayer.width = mountainLayer.height = 0;
+    retireSceneTexture(mistLayer);
+    mistLayer.width = mistLayer.height = 0;
+    mistKey = '';
     if (!disposed)
       materials.select({ landmarks: landmarkUrl, terrain: terrainUrl, mountains: mountainUrl });
   }
@@ -218,7 +254,10 @@ export function createDemonRealmRenderer(
   const owner = {
     prepare,
     release,
-    snapshot: () => ({ texturesWarmed: preparedKey !== '' }),
+    snapshot: () => ({
+      texturesWarmed: preparedKey !== '',
+      mistPixels: mistLayer.width * mistLayer.height,
+    }),
     draw(
       g: SceneDrawing,
       width: number,
@@ -227,7 +266,8 @@ export function createDemonRealmRenderer(
       reducedMotion = false,
       seed = 131304,
     ): boolean {
-      if (disposed) return false;
+      if (disposed || ![width, height].every((value) => Number.isFinite(value) && value > 0))
+        return false;
       const variation = (i: number) => {
         const n = Math.sin(seed * 0.731 + i * 12.9898) * 43758.5453;
         return n - Math.floor(n);
@@ -354,25 +394,26 @@ export function createDemonRealmRenderer(
         );
       }
       const t = reducedMotion ? 0 : time;
-      for (let i = 0; i < 5; i++) {
-        const y = height * (0.43 + i * 0.074);
-        const shift = Math.sin(t * 0.12 + i) * width * 0.05;
-        const mist = g.createRadialGradient(
-          width * 0.5 + shift,
-          y,
-          0,
-          width * 0.5 + shift,
-          y,
-          width * 0.6,
-        );
-        mist.addColorStop(0, 'rgba(146,96,153,.045)');
-        mist.addColorStop(1, 'rgba(146,96,153,0)');
-        g.fillStyle = mist;
-        // Keep the mist's clipping edges on logical pixels. Fractional strip
-        // edges can resolve differently on the first native MSAA composite.
-        const top = Math.round(y - height * 0.06),
-          bottom = Math.round(y + height * 0.06);
-        g.fillRect(0, top, width, bottom - top);
+      const mist = mistSource(width, height);
+      if (mist) {
+        const scale = Math.min(512 / (width * 1.2), 512 / (height * 0.12 + 2));
+        for (let i = 0; i < 5; i++) {
+          const y = height * (0.43 + i * 0.074),
+            shift = Math.sin(t * 0.12 + i) * width * 0.05,
+            top = Math.round(y - height * 0.06),
+            bottom = Math.round(y + height * 0.06);
+          g.drawImage(
+            mist,
+            (width * 0.1 - shift) * scale,
+            (top - y + height * 0.06 + 1) * scale,
+            width * scale,
+            (bottom - top) * scale,
+            0,
+            top,
+            width,
+            bottom - top,
+          );
+        }
       }
       for (let i = 0; i < 18; i++) {
         const rise = (t * 0.04 + i / 18) % 1;

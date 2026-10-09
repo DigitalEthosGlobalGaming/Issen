@@ -1,5 +1,37 @@
 # Current development status
 
+## Current handoff — Demon mist upload churn removed
+
+App1.69.36 Demon mist samples one bounded radial field with fractional crops;
+five strips retain original continuous sinusoidal shift and rounded clipping edges.
+Field max512×512, size-keyed, explicitly warmed/retained, tracked as canvas backing;
+resize retires old field and release/disposal clears it. Reduced motion keeps t0.
+Sky/halo/props/embers unchanged. Procedural mist interpolation is an intentional
+visual approximation; representative same-seed before/after appearance accepted.
+
+Targeted isolated native527×1140/40frames: texImage2D200→0, radial gradient objects
+240→40 (static halo remains), CPU render-call median1.4→0.9ms,p952.8→1.9ms.
+Nominal managed GPU bytes95,413,456→94,334,160; field57,856pixels. These are render
+calls/nominal bytes, not120Hz frame delivery or physical residency. Evidence
+`tmp/probes/demon-mist-{before,after}.{json,png}`; original source saved with probe.
+
+Strict TypeScript PASS, Demon lifetime unit PASS,3focused native browser cases
+PASS5.0s: zero moving-frame uploads, exact reduced-motion replay, closed resize/exit
+fields, native source count0 on release; existing preparation/first-use/context
+restoration/re-entry and obsolete/disposed preparation checks pass. Evidence
+`tmp/test-results/browser/demon-mist-lifecycle/`. Actual beam low-memory Demon/
+inspection/title integration succeeds, sampled peak501,811,064bytes/478.6MiB;
+Demon field57,856pixels. Screenshot reviewed; no missing lighting/mist/artwork.
+Evidence `tmp/probes/realm-preview-memory-mist.json` and associated screenshots.
+No broad suites repeated for this local chunk.
+
+Goal active: whole transient/admission bounds, historical native colour mismatch,
+all-stage/viewport/mode and final cold/warm/frame/compose measurement matrix,
+final applicable suites and physical Android/120Hz evidence remain outstanding.
+No push/deploy/native build/save changes; cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — compact special weapons
+
 ## Current handoff — compact special weapons
 
 App1.69.35 low-memory special preparation retains finite pan/beam/gold-pan colour

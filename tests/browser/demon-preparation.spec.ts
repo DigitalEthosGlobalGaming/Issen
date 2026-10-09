@@ -237,3 +237,93 @@ test('released Demon preparation cannot publish after re-entry or disposal', asy
     afterDispose: false,
   });
 });
+
+test('moving Demon mist reuses warmed storage and reduced motion freezes its sampled field', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createDemonRealmRenderer } = await import('/src/rendering/environment/demon-realm.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 240;
+    canvas.height = 320;
+    const painter = await createTestDrawing(canvas);
+    let mist;
+    const owner = createDemonRealmRenderer(document, {
+      warmScene: (uploads, signal) => {
+        mist = uploads.at(-1).texture.source;
+        return painter.warmScene(uploads, signal, { sceneryFilters: true });
+      },
+      retainSources: (sources) => painter.retainTextureSources(sources),
+    });
+    const frame = {
+      width: 240,
+      height: 320,
+      dpr: 1,
+      stage: 0,
+      stageSeed: 123,
+      time: 0,
+      reducedMotion: false,
+      reducedFlashes: false,
+      lowQuality: false,
+    };
+    const draw = (time, reducedMotion = false) => {
+      painter.begin();
+      owner.draw(painter, frame.width, frame.height, time, reducedMotion, 123);
+      painter.flush();
+    };
+    const gl = canvas.getContext('webgl2');
+    const nativeUpload = gl.texImage2D;
+    try {
+      if (!(await owner.prepare(frame))) throw Error('Demon preparation failed');
+      draw(0);
+      draw(0);
+      const field = mist;
+      let uploads = 0;
+      gl.texImage2D = (...args) => {
+        uploads++;
+        return Reflect.apply(nativeUpload, gl, args);
+      };
+      for (let i = 1; i <= 20; i++) draw(i / 120);
+      gl.texImage2D = nativeUpload;
+      draw(0, true);
+      const fixed = painter.getImageData(0, 0, 240, 320).data;
+      draw(12, true);
+      const later = painter.getImageData(0, 0, 240, 320).data;
+      const reducedMaximum = fixed.reduce(
+        (n, value, i) => Math.max(n, Math.abs(value - later[i])),
+        0,
+      );
+      if (!(await owner.prepare({ ...frame, width: 120, height: 400 })))
+        throw Error('Resized preparation failed');
+      const oldClosed = field.width === 0 && field.height === 0;
+      const resized = owner.snapshot().mistPixels;
+      const fieldAfterResize = mist;
+      owner.release();
+      painter.begin();
+      return {
+        uploads,
+        reducedMaximum,
+        oldClosed,
+        resized,
+        released: owner.snapshot().mistPixels,
+        fieldClosed: fieldAfterResize.width === 0 && fieldAfterResize.height === 0,
+        textures: painter.sourceTextureCount,
+      };
+    } finally {
+      gl.texImage2D = nativeUpload;
+      owner.dispose();
+      painter.dispose();
+    }
+  });
+  await writeFile(testInfo.outputPath('demon-mist.json'), JSON.stringify(result, null, 2));
+  expect(result.uploads).toBe(0);
+  expect(result.reducedMaximum).toBe(0);
+  expect(result.oldClosed).toBe(true);
+  expect(result.resized).toBeGreaterThan(0);
+  expect(result.resized).toBeLessThanOrEqual(512 * 512);
+  expect(result.released).toBe(0);
+  expect(result.fieldClosed).toBe(true);
+  expect(result.textures).toBe(0);
+});

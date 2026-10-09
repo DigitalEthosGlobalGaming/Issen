@@ -7,6 +7,10 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.69.36, Demon mist uses a reusable procedural radial canvas, capped512×512,
+instead of five changing gradient textures per frame. It is explicitly warmed,
+tracked and retired with the realm. No authored asset or PBR map changes.
+
 As of1.69.34, ordinary weapon requests omit special-weapon colour/normal/surface
 inputs (3planes,18,882,456nominal decoded bytes). Pan/beam selections lazily prepare
 the same authored pack and cutouts. Full-catalogue preparation remains available;
