@@ -1,5 +1,100 @@
 import { test, expect } from '@playwright/test';
 
+test('cancelling next-scene fog before transport retains only unfinished decode storage', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createWorkerEnvironmentRenderer } =
+      await import('/src/rendering/environment/worker-renderer.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 100;
+    const drawing = await createTestDrawing(canvas);
+    const decode = HTMLImageElement.prototype.decode;
+    let hold = true,
+      release!: () => void,
+      reached!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const waiting = new Promise<void>((resolve) => {
+      reached = resolve;
+    });
+    HTMLImageElement.prototype.decode = function () {
+      const decoded = decode.call(this);
+      if (hold && this.src.endsWith('/fog-wisps-atlas.webp')) {
+        hold = false;
+        return decoded.then(() => {
+          reached();
+          return blocked;
+        });
+      }
+      return decoded;
+    };
+    const NativeWorker = window.Worker;
+    const sent: number[] = [];
+    window.Worker = class extends NativeWorker {
+      postMessage(message: any, transfer?: any) {
+        if (message.kind === 'compose') sent.push(message.frame.stage);
+        super.postMessage(message, transfer);
+      }
+    };
+    const owner = createWorkerEnvironmentRenderer(
+      document,
+      (items, signal) => drawing.warmScene(items, signal),
+      {
+        ownsUploadReservation: true,
+        retainWorkerSources: (sources) => drawing.retainTextureSources(sources),
+      },
+    );
+    const frame = {
+      width: 160,
+      height: 100,
+      dpr: 1,
+      time: 0,
+      stage: 8,
+      stageSeed: 10,
+      lowQuality: false,
+      reducedMotion: true,
+      reducedFlashes: true,
+    };
+    const next = { ...frame, stage: 0, stageSeed: 11 };
+    try {
+      if (!(await owner.compose(frame))) throw Error('Current scene failed');
+      sampleAssetBackground(8, true, 0, 8.3, 0, next);
+      await waiting;
+      const before = owner.snapshot();
+      sampleAssetBackground(8, false, 7, 8.3, 0, next);
+      const cancelled = owner.snapshot();
+      const foregroundReady = await owner.compose(next);
+      const foreground = owner.snapshot();
+      release();
+      for (let i = 0; i < 40 && owner.snapshot().nextScene.reservedBytes; i++)
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      return { before, cancelled, foregroundReady, foreground, after: owner.snapshot(), sent };
+    } finally {
+      release();
+      HTMLImageElement.prototype.decode = decode;
+      window.Worker = NativeWorker;
+      owner.dispose();
+      drawing.dispose();
+    }
+  });
+  const fogInputs = 4 * 1774 * 887 * 4;
+  expect(result.before.nextScene.reservedBytes).toBeGreaterThan(fogInputs);
+  expect(result.cancelled.nextScene.reservedBytes).toBe(fogInputs);
+  expect(result.foregroundReady).toBe(true);
+  expect(result.foreground.nextScene.reservedBytes).toBe(fogInputs);
+  expect(result.after.nextScene.reservedBytes).toBe(0);
+  expect(result.sent).toEqual([8, 0]);
+  expect(result.after.workerFailure).toBeUndefined();
+});
+
 for (const nextStage of [2, 0])
   test(`a warmed next scene ${nextStage} survives current draws and promotes without recomposition`, async ({
     page,

@@ -1,5 +1,42 @@
 # Current development status
 
+## Current handoff — pre-transport next-slot cancellation (1.69.53)
+
+The slot trace shows stage8→0 next preparation can wait on main-thread fog with
+no worker requestId. Cancellation previously kept the full165,949,584byte compose/
+upload forecast while foreground replacement ran. A cancelled pre-transport slot
+now retains only unfinished fog inputs (25,176,608bytes): its aborted continuation
+cannot compose or upload. The input allowance persists until decode settlement.
+Already-sent work still keeps its forecast until the worker replies; no actual
+allocation is removed from the ledger and CSS backing remains accounted.
+
+New deterministic browser regression holds a native fog decode across cancellation
+and foreground replacement. The current8/incoming0 compositions complete with
+only two worker requests, the blocked cancelled slot reserves24MiB until its
+decode settles, and then clears. All5next-scene browser cases pass9.8s; strict
+TypeScript passes. Live all9cycle without extra worker-event tracing passes1.7min:
+17,109boundaries (16,821frame/288worker), peak536,553,128bytes against536,870,912,
+leaving317,784bytes. Returned stage0/boss10 is ready with next-slot reservation0;
+committed412,653,496bytes. No page errors. Other loadouts/modes/transient/native
+coverage remains required. Manual clocks establish no frame-time delivery claim.
+
+The unchanged1.69.52 slot-traced capture also passes once, peaks536,545,512bytes,
+and promotes all9slots; added observation changes timing. It shows the wrap slot
+is still waiting on fog before transport, but does not itself reproduce the earlier
+failure. Preserve both failures and this passing control; the deterministic
+regression isolates the fixed cancellation case. Do not claim a universal cap.
+
+Evidence: `tmp/test-results/browser/next-fog-cancellation-16952/`,
+`tmp/test-results/browser/natural-rush-{slot-trace,fog-cancellation}-16952/`.
+Diagnostic fixture saved as `tmp/probes/natural-rush-slot-trace.spec.txt`; active
+live fixture has no worker-event route. All processes terminal. No push/deploy/
+native build/real-save edits. Version/package/lock/title/changelog synchronized.
+
+Next: broader loadout/mode and transient accounting, the two strict context-
+restoration failures, and final requirement/report verification. Reuse focused
+checks unless affected; latest checked production evidence is1.69.52 and does
+not include this6line lifecycle change. Goal active, incomplete.
+
 ## Current handoff — budget-aware UI jobs; expanded ledger exposes wrap excess (1.69.52)
 
 UI exports now reserve whole-job input/upload/render-target storage before

@@ -1,5 +1,25 @@
 # Mobile performance continuation
 
+## Pre-transport cancellation reservation — 10 October 2026
+
+Version1.69.53 distinguishes a cancelled next slot waiting on main-thread fog
+from work already sent to the worker. Before transport, its aborted continuation
+cannot compose/upload; retain only unfinished fog input bytes (24MiB), releasing
+the forecast for work that will never start. Keep those input bytes until its
+decode settles. Already-sent work still requires a worker response before release.
+
+The deterministic regression holds one native fog decode across cancellation and
+foreground replacement: only24MiB remain reserved, foreground composition finishes
+independently, settlement releases the old slot, and exactly two worker compositions
+occur (current8/incoming0). All five next-scene cases pass9.8s; strict TypeScript
+passes. A live all9stage cycle with CSS accounting and without extra worker-event
+tracing passes1.7min:17,109boundaries peak536,553,128bytes against512MiB, ending the
+wrap with zero next-slot reservation. This is one nominal sampled low-tier cycle,
+not proof for every loadout/native process. Diagnostic tracing on unchanged1.69.52
+also passed once, demonstrating timing sensitivity; the regression isolates the
+cancelled pre-transport path rather than claiming every earlier excess had one cause.
+Broader memory coverage, strict restoration failures and final verification remain.
+
 ## UI export admission and live wrap — 10 October 2026
 
 Version1.69.52 reserves complete UI jobs, defers them under combined pressure,

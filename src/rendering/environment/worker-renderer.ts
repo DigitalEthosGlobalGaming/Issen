@@ -434,6 +434,12 @@ export function createWorkerEnvironmentRenderer(
     if (!slot) return;
     nextSlot = undefined;
     slot.controller.abort();
+    if (!slot.requestId) {
+      // Only fog decoding can have started before transport. The aborted
+      // continuation cannot compose or upload, so keep its unfinished input
+      // allowance without retaining storage for work which will never start.
+      slot.reservedBytes = Math.min(slot.reservedBytes, (slot.fogReservedBytes ?? 0) / 2);
+    }
     trimFog();
     if (slot.requestId && requests.has(slot.requestId))
       try {
