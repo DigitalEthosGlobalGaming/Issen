@@ -10,7 +10,11 @@ import { closeLayers, compositionKey, composedLayerBytes } from './worker-types.
 import { createSceneImagePreload } from './image-preload.ts';
 import { documentImageBudget } from '../../platform/main-images.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
-import { documentSceneMemory, registerSceneMemory } from '../../platform/scene-memory.ts';
+import {
+  reclaimSceneMemory,
+  registerSceneMemory,
+  documentSceneMemory,
+} from '../../platform/scene-memory.ts';
 import { scenePreparationBytes } from './scene-admission.ts';
 import { retireSceneTexture } from '../texture-revision.ts';
 import { releaseSceneryCutouts } from './scene-kit.ts';
@@ -225,6 +229,11 @@ export function createWorkerEnvironmentRenderer(
     }
     requests.clear();
     for (const key of waiters.keys()) settle(key, false);
+    releaseFog();
+    snapshot = emptySnapshot();
+    workerResources = {};
+  }
+  function releaseFog() {
     fogGeneration++;
     fogBindings.releaseSources();
     fogMaps.select({});
@@ -235,8 +244,9 @@ export function createWorkerEnvironmentRenderer(
     }
     fog = undefined;
     fogPending = undefined;
-    snapshot = emptySnapshot();
-    workerResources = {};
+  }
+  function trimFog() {
+    if (completed?.stage !== 0 && desired?.stage !== 0 && nextSlot?.frame.stage !== 0) releaseFog();
   }
   function resume() {
     if (!suspended) return true;
@@ -356,12 +366,14 @@ export function createWorkerEnvironmentRenderer(
       closeLayers([...slot.response.layers, ...slot.response.foreground]);
     nextSlots.delete(slot);
     if (nextSlot === slot) nextSlot = undefined;
+    trimFog();
   }
   function cancelNext() {
     const slot = nextSlot;
     if (!slot) return;
     nextSlot = undefined;
     slot.controller.abort();
+    trimFog();
     if (slot.requestId && requests.has(slot.requestId))
       try {
         worker?.postMessage({ kind: 'cancel', id: ++sequence, requestId: slot.requestId });
@@ -384,7 +396,8 @@ export function createWorkerEnvironmentRenderer(
       preparationBytes === undefined
         ? undefined
         : preparationBytes + (next.stage === 0 && !fog?.naturalWidth ? 8 * 1774 * 887 * 4 : 0);
-    const memory = documentSceneMemory(doc);
+    const memory =
+      estimate === undefined ? documentSceneMemory(doc) : reclaimSceneMemory(doc, estimate);
     if (estimate === undefined || memory.committedBytes + estimate > memory.budget) {
       admissionAt = performance.now() + 250;
       return;
@@ -536,6 +549,7 @@ export function createWorkerEnvironmentRenderer(
       }
       currentKey = key;
       snapshot = { ...response.snapshot, texturesWarmed: !!warmWorkerScene };
+      trimFog();
       accepted = true;
       if (promoted) promotions++;
       settle(key, true);

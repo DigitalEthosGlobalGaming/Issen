@@ -788,6 +788,15 @@ yield and disposal cancels pending work. Colour/tone caches and material drawing
 consume those same prepared planes, including after context recovery. Higher
 memory tiers retain original atlas sampling. Gameplay/appearance seed selection
 is independent of this presentation policy.
+The256MiB decode tier bounds the main drawing buffer to about600,000pixels and
+DPR1.5, keeping logical layout/input coordinates unchanged. Scene preparation
+reclaims unpinned main-image cache before work and before readiness, targeting
+32MiB of free space within the combined admission budget. Optional next-scene
+admission also reclaims cache against its reservation estimate. Pinned live/preview
+images are never evicted by this operation. Meadow fog inputs/cutouts close when
+neither current, requested nor next scenery needs them; return preparation reloads.
+This is resource reclamation and a bounded drawing policy, not an enforced limit
+on all mandatory resources or proof of transient/all-stage memory peaks.
 
 Combat/encounter cosmetics react through kill, duel, boss, standoff, wave, grunt
 and damage listeners. Progression listeners own profile counters and persistence

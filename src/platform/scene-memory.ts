@@ -1,5 +1,5 @@
 import { documentPixelMemory } from './pixel-memory.ts';
-import { documentImageBudget } from './main-images.ts';
+import { documentImageBudget, trimMainImages } from './main-images.ts';
 
 type SceneOwner = {
   readonly memorySnapshot: {
@@ -11,6 +11,12 @@ type SceneOwner = {
 };
 const owners = new WeakMap<Document, Set<WeakRef<SceneOwner>>>();
 const registered = new WeakMap<Document, WeakSet<SceneOwner>>();
+export function reclaimSceneMemory(doc: Document, additionalBytes = 0) {
+  const before = documentSceneMemory(doc);
+  if (before.committedBytes + additionalBytes <= before.budget) return before;
+  trimMainImages(doc, before.committedBytes + additionalBytes - before.budget);
+  return documentSceneMemory(doc);
+}
 export function registerSceneMemory(doc: Document, owner: SceneOwner) {
   let seen = registered.get(doc);
   if (!seen) registered.set(doc, (seen = new WeakSet()));

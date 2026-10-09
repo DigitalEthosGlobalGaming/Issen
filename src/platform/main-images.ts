@@ -30,6 +30,13 @@ export function documentImageBudget(doc: Document): number {
   });
 }
 
+/** Reclaim only unpinned cached images; live/preview leases remain authoritative. */
+export function trimMainImages(doc: Document, bytesToRelease: number): number {
+  const loader = pools.get(doc)?.loader;
+  if (!loader || !(bytesToRelease > 0)) return 0;
+  return loader.trim(Math.max(0, loader.snapshot().bytes - bytesToRelease));
+}
+
 async function decode(doc: Document, url: string, signal: AbortSignal): Promise<Resource> {
   const response = await readCompressedAsset(url, signal);
   const blob = await response.blob();

@@ -36,6 +36,7 @@ export interface SceneFlowViews {
   };
   readonly driftRenderer: { prepare(stage: number): Promise<boolean> };
   prepareFigureArtwork(signal: AbortSignal): Promise<boolean>;
+  reclaimMemory(): unknown;
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string; workerFailure?: string };
@@ -102,6 +103,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     figurePreparation = new AbortController();
     if (!demon) demonRealmRenderer.release();
     else environmentRenderer.suspend();
+    views.reclaimMemory();
     markScenePhase('prepare-scene', key, { stage: G.stage, seed: stageSeed });
     views.requestedSceneKey = key;
     const request = ++views.sceneRequest;
@@ -136,6 +138,7 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
           unavailable();
           return;
         }
+        views.reclaimMemory();
         views.sceneReadyToPresent = true;
         screenAnimation.invalidate();
       })

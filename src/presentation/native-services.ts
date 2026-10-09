@@ -9,7 +9,7 @@ import { createLightingRig } from '../rendering/lighting-rig.ts';
 import { createUiMaterialLighting } from '../ui/material-lighting.ts';
 import { disposeUiArt } from '../rendering/ui-art.ts';
 import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
-import { documentSceneMemory } from '../platform/scene-memory.ts';
+import { documentSceneMemory, reclaimSceneMemory } from '../platform/scene-memory.ts';
 import type { Palette } from '../rendering/palette.ts';
 
 export interface PreparedLighting {
@@ -89,6 +89,7 @@ export function createNativeServices(
   lifecycle.add(inkSword.dispose);
   return {
     memorySnapshot: () => documentSceneMemory(ownerDocument),
+    reclaimMemory: () => reclaimSceneMemory(ownerDocument, 32 * 1024 * 1024),
     prepareFigureArtwork,
     environmentRenderer,
     demonRealmRenderer,

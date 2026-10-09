@@ -98,6 +98,7 @@ export function createRuntimeSceneCoordination(
             );
           },
           environmentRenderer: foundation.browser.environmentRenderer,
+          reclaimMemory: foundation.browser.reclaimMemory,
           sceneRecovery: {
             show(retry: () => void) {
               // Startup owns its loading/reload screen until artwork is published.

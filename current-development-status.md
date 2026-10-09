@@ -1,4 +1,39 @@
-# Mobile performance — Low-memory enemy part planes
+# Mobile performance — Reclaimed cache and bounded low-memory drawing
+
+App1.69.24 bounds main drawing on the256MiB decode tier to approximately600k
+pixels/DPR1.5 without changing logical layout/input coordinates. Scene preparation
+reclaims only unpinned main-image cache at entry and before readiness, targeting
+32MiB free within the existing combined budget. Next-scene admission reclaims
+against its own estimate. Ordinary fog closes when current/requested/next scenes
+do not need it; return reloads through generation-guarded preparation.
+
+Low-memory390x844/DPR2 first-game: canvas527x1140; committed591,861,324→
+500,847,196bytes (478MiB),35MB below512MiB including81,501,808reserved overhead.
+Main decoded142,777,176/canvas43,594,168/GPU175,299,164;
+worker canvases/transferred28,837,440each. New buffer policy without the32MiB
+reclaim target measured526,008,924; the final threshold trims25MB more decode.
+These are nominal ownership estimates, not physical or all-stage peak proof.
+Reviewed the low-memory gameplay screenshot; atmosphere/text remain readable.
+
+Pinned native peer pixels survive pressure exactly; cached pixels evict/reload.
+Fog0→1→0 releases decoded inputs while away and returns identical native pixels.
+Twelve related browser checks pass20.4s; low-memory responsive Armoury case
+passes7.0s. Eighteen focused units pass; checked build includes strict TypeScript.
+Version/package/lock/title/changelog agree1.69.24. Evidence:
+`tmp/probes/scene-low-memory-reclaimed{,-headroom}.json`, gameplay PNG under
+`tmp/probes/`, browser results and `tmp/probes/memory-reclamation-build.log`.
+All check handles terminal.
+
+Next: measure all-stage mandatory/transient peaks and preview ownership, then
+enforce remaining combined pressure. First-game now fits, but optional admission
+and reclaim do not prove a whole-app cap; incoming worker raw kits/copies can
+temporarily exceed it. Finish transition integration checkpoint, final matrix/
+suites and cold/warm compose explanation. Demon mobile-size CPU capture, gradient
+churn and later boss palette misses remain possible costs. Physical Android/120Hz
+unproven; full goal active. Cancelled general packing/lit-only work stays cancelled.
+No push/deploy/native builds/real-save mutation.
+
+## Previous handoff — Low-memory enemy part planes
 
 App1.69.23 uses bounded aligned colour/normal/surface planes for25enemy part
 frames on the256MiB decode-budget tier. Maximum edge256px matches existing colour

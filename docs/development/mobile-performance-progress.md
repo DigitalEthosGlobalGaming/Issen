@@ -8,6 +8,40 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Cache reclamation and low-memory drawing — 9 October 2026
+
+Version1.69.24 limits the256MiB decode tier's main drawing buffer to roughly600k
+pixels/DPR1.5. Logical viewport, input coordinates and gameplay seed ownership
+stay unchanged. It reclaims unpinned main-image cache before scene work/readiness,
+targeting32MiB free within the existing combined budget. Optional next preparation
+also reclaims against its estimated reservation. Live/preview pins remain intact.
+Fog closes after ordinary stage replacement or next-slot cancellation when no
+current/requested/next identity needs stage0; return reloads normally.
+
+Representative390x844/DPR2 low-memory first-game: drawing527x1140,
+committed591,861,324→500,847,196bytes (478MiB,35MB below512MiB). Main decoded
+142,777,176; tracked canvas43,594,168; GPU estimate175,299,164; worker canvases
+and transferred planes28,837,440each; native/browser reserve81,501,808.
+Without32MiB free-space targeting, the new buffer alone measured526,008,924;
+final cache reclamation removes25MB more decoded bytes. These are nominal
+ownership estimates, not physical residency/all-stage peak evidence. Reviewed
+`tmp/probes/scene-low-memory-reclaimed.png`: atmosphere and text remain coherent.
+
+Focused pressure/native-peer and fog0→1→0 cases pass: pins survive exact pixels,
+evicted cache reloads, fog decoded0 while away and restored native pixels match.
+Related browser12PASS20.4s/default2workers covers scene promotion/cancellation,
+worker suspension, startup ownership, cinematic switching and responsive Armoury.
+Added low-memory variant of the existing Armoury flow PASS7.0s. Focused units
+18PASS; checked build/strict TypeScript PASS. Version metadata/changelog agree.
+Evidence: `tmp/probes/scene-low-memory-reclaimed{,-headroom}.json`, gameplay PNG,
+browser results and `tmp/probes/memory-reclamation-build.log`.
+
+Remaining: combined mandatory/transient enforcement and all-stage peaks. Current
+first-game fit does not prove incoming raw worker kits/copies fit alongside current
+resources, or that preview ownership remains below the total limit. Final
+integration/matrix/suites and physical Android/120Hz proof remain unfinished.
+No push/deployment/native build/real-save changes; cancelled work stays cancelled.
+
 ## Low-memory enemy part preparation — 9 October 2026
 
 Version1.69.23 replaces full enemy atlas residency on the256MiB decode-budget tier

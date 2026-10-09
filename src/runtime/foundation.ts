@@ -78,6 +78,7 @@ export function createRuntimeFoundation(
   let g = mainG;
   const {
     memorySnapshot,
+    reclaimMemory,
     prepareFigureArtwork,
     environmentRenderer,
     demonRealmRenderer,
@@ -190,6 +191,7 @@ export function createRuntimeFoundation(
     browser: {
       prepareFigureArtwork,
       memorySnapshot,
+      reclaimMemory,
       $,
       context2d,
       cvs,
