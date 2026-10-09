@@ -18,6 +18,7 @@ type Owner = {
   cutouts: Map<Document, ReturnType<typeof createMaterialCutouts>>;
   pixelBudget: number;
   normalAngleStep: number;
+  gpuComposedLayers: boolean;
 };
 const sources = new WeakMap<
   HTMLImageElement,
@@ -119,7 +120,7 @@ export function cachedMaterialContext(native: CanvasRenderingContext2D): SceneDr
 
 /** Material data follows the same placement and compositing order as cached colour. */
 export function createCachedMaterials(
-  options: { pixelBudget?: number; normalAngleStep?: number } = {},
+  options: { pixelBudget?: number; normalAngleStep?: number; gpuComposedLayers?: boolean } = {},
 ) {
   const owner: Owner = {
     layers: new Set(),
@@ -127,7 +128,9 @@ export function createCachedMaterials(
     cutouts: new Map(),
     pixelBudget: options.pixelBudget ?? 4_000_000,
     normalAngleStep: options.normalAngleStep ?? 2,
+    gpuComposedLayers: options.gpuComposedLayers ?? false,
   };
+  let retiredGpuBakes = 0;
   function unbind(image: HTMLImageElement) {
     const bindings = sources.get(image);
     bindings?.delete(owner);
@@ -136,7 +139,10 @@ export function createCachedMaterials(
   }
   /** Drop stamp intermediates while preserving bindings and completed layer maps. */
   function clearCutouts() {
-    for (const cache of owner.cutouts.values()) cache.clear();
+    for (const cache of owner.cutouts.values()) {
+      retiredGpuBakes += cache.snapshot().gpuBakes;
+      cache.clear();
+    }
     owner.cutouts.clear();
   }
   function releaseSources() {
@@ -178,6 +184,7 @@ export function createCachedMaterials(
         pixels: total('pixels'),
         pixelBudget: total('pixelBudget'),
         scratchPixels: total('scratchPixels'),
+        gpuBakes: retiredGpuBakes + total('gpuBakes'),
         hits: total('hits'),
         misses: total('misses'),
         evictions: total('evictions'),
@@ -316,6 +323,16 @@ export function drawCachedImage(
       const scratch = cutouts.get(
         {
           kind,
+          gpu:
+            owner.gpuComposedLayers &&
+            !!cached &&
+            alignedNormal &&
+            frame[0] === 0 &&
+            frame[1] === 0 &&
+            frame[2] === source.width &&
+            frame[3] === source.height &&
+            pixelWidth === frame[2] &&
+            pixelHeight === frame[3],
           map,
           frame,
           mask: colour ?? source,

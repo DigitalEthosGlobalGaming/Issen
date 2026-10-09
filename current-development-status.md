@@ -1,4 +1,51 @@
-# Performance, assets and seamless transitions — Cooperative composition measured
+# Performance, assets and seamless transitions — Worker composed-map optimization verified
+
+Checkpoint 48: app version 1.69.1 keeps aligned, full composed-layer map copies
+on GPU-backed worker cutouts when source and bake pixel sizes match exactly.
+Main composition, atlas downsampling and fractional landscape sizes retain
+software baking. Canvas reuse and cache keys separate fixed context modes;
+the shared 4M-pixel cutout budget remains unchanged. Lifetime GPU bake counters
+survive completed-cutout retirement for path-use diagnostics.
+
+All 475 units, strict TypeScript, both permanent worker 256/512 MiB exact-pixel
+cases (3.3m), and 13 related material/ownership/fallback/budget browsers pass.
+The permanent gate covers 54 visits across all nine stages at portrait high,
+portrait low and landscape high quality, exact incoming and held planes, and
+108 native draws. Candidate GPU bakes are positive; software-control bakes are
+zero. The first run failed only because cleanup removed counters; owner-level
+counters repaired diagnostics without weakening any pixel assertion.
+Checked production build/type-check and all four production browsers pass
+(21.4s). All verification and profile processes are terminal.
+
+The existing compose harness records five fresh-worker samples per stage at
+900x600/DPR1 with predecoded assets. All 116 raw plane comparisons are exact.
+Median request times before/after, ms, stages 0–8:
+630.5/522.9, 300.0/250.3, 352.0/330.8, 434.7/399.2, 455.0/420.6,
+300.6/267.5, 364.1/345.8, 324.9/286.8, 302.4/267.8.
+Stage 0 median compose improves 583.4 to 481.9ms; two of five after samples
+remain above 500ms (505.4/619.5). Three instrumented stage 0 profiles explain
+remaining native drawImage wall time: 680 calls total, 213 software-to-GPU calls
+cost 229.1–431.2ms; 95 GPU-to-GPU calls cost 3.3–3.8ms; 32 readbacks cost
+4.3–4.4ms. Source-mapped profiles retain cached-materials and worker-canvas
+locations. Profile overhead is not part of headline timings. These are compose
+measurements, not gameplay frame p95 or physical GPU residency measurements.
+Evidence is under tmp/performance-scene-image-preload/checkpoint48/.
+
+Expanded nested generators remain ignored, not integrated. Synchronous local
+and paused software-worker all-27-visit oracles pass. GPU 1:1 trials also pass
+all 27 worker visits in paused and synchronous schedules. Prototype portrait
+terrain blits improve from 31–80ms to 0.7–4.3ms; fractional landscape remains
+software. Expanded local profiling reaches 50.6ms and worker software chunks
+124.7ms. These prototype chunk times do not establish application pacing.
+Evidence and source remain under tmp/performance-scene-image-preload/cooperative/
+and tmp/probes/scene-image-preload/. No tolerance, atlas or decode-option change.
+
+Next implement admitted worker/local next slots with exact promotion, quiet
+pacing and whole-memory accounting. Local paused pixel differences, remaining
+material-bake chunks, figure/startup ownership, 120Hz/CPU budgets and full
+Phase 5 remain required. Full goal active; no push/deploy/native build or saves.
+
+## Previous handoff — Cooperative composition measured
 
 Checkpoint 47 is diagnostic only; app remains 1.69.0 and checkpoint 46's quiet
 decoded preload remains integrated. A generator prototype preserves the exact

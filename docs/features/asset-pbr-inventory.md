@@ -1,6 +1,6 @@
 # Game asset and PBR inventory
 
-Last reviewed: 8 October 2026. This is a manually maintained inventory of the
+Last reviewed: 9 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
@@ -33,6 +33,11 @@ colour/tone consumers and retained conversion validation. Material-only
 environment, outfit, charm, companion and UI owners use plain colour plus
 normal/surface/optional emissive; they no longer decode the unused diffuse sibling.
 All 86 original authoring PNGs, atlas metadata, recipes and provenance remain.
+
+Worker composition uses GPU baking for aligned full-layer PBR copies whose
+source and bake pixel sizes match exactly. Atlas downsampling, fractional
+backing copies and main-thread composition retain software baking; material
+files and the installed plane set are unchanged.
 Enemy colour/tone painting uses the PBR diffuse atlases. Its four plain colour
 counterparts remain available to material debugging, but are excluded from enemy
 preparation and eager startup decoding as of1.68.27. The enemy catalogue now

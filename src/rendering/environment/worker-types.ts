@@ -14,6 +14,7 @@ export type EnvironmentSnapshot = {
     pixels: number;
     pixelBudget: number;
     scratchPixels: number;
+    gpuBakes?: number;
     hits: number;
     misses: number;
     evictions: number;

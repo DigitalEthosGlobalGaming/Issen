@@ -53,11 +53,16 @@ export interface EnvironmentFrame {
 }
 
 /** Instance-owned image loading and caches; safe for independent previews. */
-export function createLocalEnvironmentRenderer(doc: Document) {
+export function createLocalEnvironmentRenderer(
+  doc: Document,
+  options: { gpuComposedLayers?: boolean } = {},
+) {
   // Worker documents supply their own managed image wrappers.
   const mapImages = doc.defaultView ? createMainImageOwner(doc) : undefined;
   const sourceLeases = new Map<number, ReturnType<NonNullable<typeof mapImages>['acquire']>>();
-  const cachedMaterials = createCachedMaterials();
+  const cachedMaterials = createCachedMaterials({
+    gpuComposedLayers: options.gpuComposedLayers ?? !doc.defaultView,
+  });
   let materials: ReturnType<typeof createAssetMaterials<string>> | undefined;
   const foreground = createBambooForegroundRenderer(doc);
   let disposed = false;

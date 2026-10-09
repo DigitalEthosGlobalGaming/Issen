@@ -164,12 +164,15 @@ selection and shared decoded-budget integration remain separate work.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output
-size and normal basis identify entries. Normal rotation uses two-degree bins,
+size, baking backend and normal basis identify entries. Normal rotation uses two-degree bins,
 preserving reflection, anisotropy and shear; surface/emissive values stay exact.
 Owner disposal clears cutouts and scratch alongside layer maps. Software
-rasterization remains necessary for baseline map/mask alpha parity; GPU scratch
-downsampling failed the raw-plane comparison. Snapshots expose cache pixels,
-hits, misses and evictions separately from decoded assets.
+rasterization remains necessary for atlas map/mask downsampling parity. Worker
+owners opt into GPU scratch only for aligned, full composed-layer copies at
+identical source/bake pixel sizes. Fractional backing sizes retain software
+baking. GPU and software entries cannot recycle each other's fixed-context
+canvases. Main owners retain software baking. Snapshots expose cache pixels,
+GPU bakes, hits, misses and evictions separately from decoded assets.
 Local main-thread composition releases non-live colour/material image leases after
 building its output (1.68.31); stage0 keeps fog and stage4 keeps bamboo. Completed
 colour/data canvases keep their own pixels. Completed composition clears baked

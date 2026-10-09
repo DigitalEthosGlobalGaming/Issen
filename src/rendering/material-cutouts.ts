@@ -2,6 +2,7 @@ import type { SceneTexture } from './scene-frame.ts';
 
 type Frame = readonly [number, number, number, number];
 export type CutoutRequest = {
+  gpu?: boolean;
   kind: 'normal' | 'surface' | 'emissive';
   map?: SceneTexture;
   frame: Frame;
@@ -41,6 +42,7 @@ export function materialCutoutKey(request: CutoutRequest, identity: (source: obj
   const m = request.normalMatrix;
   return JSON.stringify([
     request.kind,
+    request.gpu ?? false,
     request.map ? identity(request.map.source) : 0,
     request.map?.revision ?? 0,
     request.map?.frame ?? request.frame,
@@ -66,10 +68,12 @@ export function createMaterialCutouts(doc: Document, pixelBudget = 4_000_000) {
   };
   const entries = new Map<string, { canvas: HTMLCanvasElement; dependencies: number[] }>();
   let scratch: HTMLCanvasElement | undefined;
+  const gpuCanvases = new WeakSet<HTMLCanvasElement>();
   let pixels = 0,
     hits = 0,
     misses = 0,
     evictions = 0;
+  let gpuBakes = 0;
   function release(key: string) {
     const entry = entries.get(key)!;
     pixels -= entry.canvas.width * entry.canvas.height;
@@ -95,6 +99,12 @@ export function createMaterialCutouts(doc: Document, pixelBudget = 4_000_000) {
         reusable = release(entries.keys().next().value!);
         evictions++;
       }
+      const gpu = request.gpu ?? false;
+      if (reusable && gpuCanvases.has(reusable) !== gpu) reusable = undefined;
+      if (!cacheable && scratch && gpuCanvases.has(scratch) !== gpu) {
+        scratch.width = scratch.height = 0;
+        scratch = undefined;
+      }
       // Bake directly into the retained entry. Copying a freshly baked canvas
       // forces its pending rasterization and costs more than the cache saves.
       const working = cacheable
@@ -102,14 +112,16 @@ export function createMaterialCutouts(doc: Document, pixelBudget = 4_000_000) {
         : (scratch ??= doc.createElement('canvas'));
       if (working.width !== request.width) working.width = request.width;
       if (working.height !== request.height) working.height = request.height;
-      // GPU downsampling changes authored map/mask alpha on this path. Retain the
-      // original software rasterization until a pixel-equivalent GPU path exists.
-      const g = working.getContext('2d', { willReadFrequently: true })!;
+      // Atlas downsampling retains software rasterization. Owners may opt into
+      // GPU baking only for aligned full-layer copies at identical pixel sizes.
+      if (gpu) gpuCanvases.add(working);
+      const g = working.getContext('2d', { willReadFrequently: !gpu })!;
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.globalAlpha = 1;
       g.globalCompositeOperation = 'source-over';
       g.clearRect(0, 0, working.width, working.height);
       bake(g);
+      if (gpu) gpuBakes++;
       if (!cacheable) return working;
       const dependencies = [
         identity(request.mask),
@@ -140,6 +152,7 @@ export function createMaterialCutouts(doc: Document, pixelBudget = 4_000_000) {
       hits,
       misses,
       evictions,
+      gpuBakes,
       scratchPixels: scratch ? scratch.width * scratch.height : 0,
     }),
   };
