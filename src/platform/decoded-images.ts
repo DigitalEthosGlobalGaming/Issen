@@ -172,6 +172,19 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
   return {
     load: (url: string, priority: ImagePriority = 'now') => request(url, priority),
     pin,
+    /** Explicit headroom reclamation never closes pinned pixels or pending required work. */
+    trim(targetBytes = 0) {
+      if (!Number.isFinite(targetBytes) || targetBytes < 0)
+        throw RangeError('Invalid image trim target');
+      const before = bytes;
+      for (const entry of [...entries.values()]
+        .filter((entry) => entry.resource && !pins.has(entry.url))
+        .sort((a, b) => a.touched - b.touched)) {
+        if (bytes <= targetBytes) break;
+        evict(entry);
+      }
+      return before - bytes;
+    },
     /** Hold one admitted future image set without mutating renderer bindings. */
     prefetch(urls: readonly string[]) {
       if (disposed || hidden || busy || overFrameBudget) return undefined;

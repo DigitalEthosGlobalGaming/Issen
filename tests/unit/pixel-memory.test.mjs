@@ -2,6 +2,54 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPixelMemory, rgbaMipBytes } from '../../src/platform/pixel-memory.ts';
 import { composedLayerBytes } from '../../src/rendering/environment/worker-types.ts';
+import { texturePixelBytes, rendererGpuMemory } from '../../src/rendering/pixi/gpu-memory.ts';
+
+test('GPU accounting includes shared HDR/filter targets and stencil without allocating textures', () => {
+  const rgba = {
+    pixelWidth: 10,
+    pixelHeight: 20,
+    format: 'rgba8unorm',
+    autoGenerateMipmaps: false,
+  };
+  const hdr = { ...rgba, format: 'rgba16float' };
+  const renderer = {
+    texture: { managedTextures: [rgba, hdr, hdr, null] },
+    renderTarget: {
+      _gpuRenderTargetHash: {
+        live: {
+          width: 10,
+          height: 20,
+          depthStencilRenderBuffer: {},
+          msaa: false,
+          msaaRenderBuffer: [],
+        },
+        retired: null,
+      },
+    },
+  };
+  assert.deepEqual(rendererGpuMemory(renderer), {
+    sources: 2,
+    textureBytes: 2400,
+    renderbufferBytes: 800,
+    bytes: 3200,
+  });
+  assert.equal(texturePixelBytes('rgba32float'), 16);
+  assert.equal(texturePixelBytes('depth32float-stencil8'), 8);
+  assert.equal(texturePixelBytes('r8unorm'), 1);
+  renderer.renderTarget._gpuRenderTargetHash.live.msaa = true;
+  renderer.renderTarget._gpuRenderTargetHash.live.msaaRenderBuffer = [{}];
+  renderer.renderTarget._renderSurfaceToRenderTargetHash = new Map([
+    [rgba, { uid: 'live', colorAttachments: [{ texture: rgba }] }],
+  ]);
+  assert.equal(
+    rendererGpuMemory(renderer).renderbufferBytes,
+    6400,
+    'RGBA8 four-sample colour and DEPTH24_STENCIL8 storage',
+  );
+  renderer.texture.managedTextures = [];
+  renderer.renderTarget._gpuRenderTargetHash = {};
+  assert.equal(rendererGpuMemory(renderer).bytes, 0);
+});
 
 test('pixel accounting shares identities and follows decoding, resizing and release', () => {
   const memory = createPixelMemory();

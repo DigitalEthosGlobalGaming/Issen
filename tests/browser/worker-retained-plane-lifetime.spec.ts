@@ -157,6 +157,8 @@ test('worker retained planes preserve exact unchanged-key copies', async ({ page
     expect(row.prepared.materialCutouts.pixels).toBe(0);
     expect(row.prepared.decodedLoader.pinned).toBe(0);
     expect(row.prepared.decodedLoader.pinnedBytes).toBe(0);
+    expect(row.first.decodedLoader.bytes).toBe(0);
+    expect(row.repeat.decodedLoader.bytes).toBe(0);
     expect(row.repeat.builds).toBe(row.first.builds);
     expect(row.rebuilt).toEqual(row.before);
     expect(row.held).toEqual(row.before);

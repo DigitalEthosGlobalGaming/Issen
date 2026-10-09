@@ -89,6 +89,9 @@ scope.onmessage = ({ data }) => {
         const copied = await copyComposedLayers([...completed.layers, ...completed.foreground]);
         layers.push(...copied.slice(0, completed.layers.length));
         foreground.push(...copied.slice(completed.layers.length));
+        // Copies and composed canvases own their pixels. Raw inputs need no
+        // residency between scenes; reacquisition follows the existing key path.
+        workerDocument.releaseUnusedImages();
       }
       const snapshot = {
         ...renderer.snapshot(),

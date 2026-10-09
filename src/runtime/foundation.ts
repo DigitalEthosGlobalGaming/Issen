@@ -77,6 +77,7 @@ export function createRuntimeFoundation(
     mainG = nativeScene;
   let g = mainG;
   const {
+    memorySnapshot,
     environmentRenderer,
     demonRealmRenderer,
     inkCharm,
@@ -186,6 +187,7 @@ export function createRuntimeFoundation(
   return {
     lifecycle,
     browser: {
+      memorySnapshot,
       $,
       context2d,
       cvs,

@@ -113,6 +113,7 @@ for (const viewport of [
           await renderer.compose(frame);
           if (!renderer.draw(g, frame)) throw new Error(`Stage ${stage} unavailable`);
         } else {
+          if (!(await demon.prepare())) throw Error('Demon scenery unavailable');
           for (let i = 0; !demon.draw(g, canvas.width, canvas.height, 0, true, 131304); i++) {
             if (i > 40) throw new Error('Demon assets unavailable');
             await new Promise((resolve) => setTimeout(resolve, 50));

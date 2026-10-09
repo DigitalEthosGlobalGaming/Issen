@@ -94,6 +94,8 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
         workerCanvasBytes: memory.canvasBytes,
         workerCanvases: memory.canvases,
         gpuBytes: warmed.sourceMemorySnapshot.bytes,
+        rendererGpuBytes: warmed.memorySnapshot.bytes,
+        workerDecodedBytes: memory.decodedLoader?.bytes,
       });
     }
     owner.dispose();
@@ -118,6 +120,8 @@ test('worker warming uses existing colour/data textures and preserves all-stage 
     expect(row.workerCanvasBytes).toBeGreaterThanOrEqual(row.transferredBytes);
     expect(row.workerCanvases).toBeGreaterThan(0);
     expect(row.gpuBytes).toBeGreaterThanOrEqual(row.transferredBytes);
+    expect(row.rendererGpuBytes).toBeGreaterThan(row.gpuBytes);
+    expect(row.workerDecodedBytes).toBe(0);
   }
   expect(warnings).toEqual([]);
 });

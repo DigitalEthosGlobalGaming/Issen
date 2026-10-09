@@ -29,6 +29,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
+import { rendererGpuMemory } from './gpu-memory.ts';
 import { documentPixelMemory, trackPixelSource } from '../../platform/pixel-memory.ts';
 import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
@@ -293,7 +294,7 @@ export class PixiScenePainter implements SceneDrawing {
     private readonly renderer: WebGLRenderer<HTMLCanvasElement>,
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
-    documentPixelMemory(canvas.ownerDocument).trackGpu(this.textures);
+    documentPixelMemory(canvas.ownerDocument).trackGpu(this);
     this.geometryBuffer.resize(canvas.width, canvas.height);
     this.artworkMaterials = new ArtworkMaterials(renderer);
     this.lightBuffer = new LightBuffer(renderer);
@@ -1309,6 +1310,12 @@ export class PixiScenePainter implements SceneDrawing {
 
   get sourceMemorySnapshot(): { sources: number; bytes: number } {
     return this.textures.memorySnapshot;
+  }
+
+  get memorySnapshot() {
+    return this.disposed
+      ? { sources: 0, bytes: 0, textureBytes: 0, renderbufferBytes: 0 }
+      : rendererGpuMemory(this.renderer);
   }
 
   get sourceRetirementSnapshot(): { sources: number; bytes: number } {

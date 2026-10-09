@@ -40,6 +40,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['snapshot']
   > & { images: number };
   canvasSnapshot(): { canvasBytes: number; canvases: number };
+  releaseUnusedImages(): number;
 } {
   const memory = createPixelMemory();
   const expectedBytes = new Map(
@@ -141,6 +142,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   >();
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
+    releaseUnusedImages: () => loader.trim(),
     canvasSnapshot() {
       const { canvasBytes, canvases } = memory.snapshot();
       return { canvasBytes, canvases };
@@ -187,5 +189,6 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     stopImagePreload: typeof doc.stopImagePreload;
     decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };
     canvasSnapshot: typeof doc.canvasSnapshot;
+    releaseUnusedImages: typeof doc.releaseUnusedImages;
   };
 }

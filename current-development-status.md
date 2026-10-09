@@ -1,4 +1,38 @@
-# Mobile performance — Combined resource accounting groundwork
+# Mobile performance — Reclaimed scenery headroom
+
+App1.69.18 releases unpinned worker decoded inputs after independent plane copies
+finish; completed canvases/bitmaps survive and changed keys reacquire normally.
+Demon's nine decoded inputs now load only on preparation, with shared pending
+work and failed-decode retry. Main decoded300,054,960→243,432,120bytes; worker
+decoded213,952,112→0 at the same390×844/DPR2 first-game snapshot. Combined decoded
+saving270,574,952bytes/52.6%; this is not an all-stage peak or physical measurement.
+
+GPU accounting includes managed HDR/filter/history/back-buffer textures and
+format-aware stencil/MSAA renderbuffers via a guarded Pixi8.22 descriptor adapter.
+Foundation exposes `browser.memorySnapshot()`. Default browser drawing buffers,
+driver overhead and auxiliary unregistered canvases remain outside estimates.
+The initial conservative counter gives900,962,068→629,315,324 nominal total;
+separate corrected-format snapshot must not be counted as an optimization.
+The corrected current sum is561,930,484bytes, including234,168,260 nominal GPU
+bytes across painters. Combined admission still needs explicit headroom limits.
+
+Focused units18 unique cases pass. Native nine-stage warming, Demon cinematic
+entry/resize/reload and mist repetition pass3 cases. Retained-plane fixture passes
+all27 compositions: exact held/repeated copies after raw input eviction, unchanged
+keys avoid rebuilding. Source ready-path pixels/rules unchanged; fixtures now
+explicitly prepare Demon art. All browser/probe handles terminal.
+Checked verification build/strict TypeScript and changed formatting/diff checks
+pass. Package/lock/title/changelog agree1.69.18. Build log:
+`tmp/probes/scene-headroom-build.log`.
+See [evidence](docs/development/mobile-performance-progress.md) for numbers/logs.
+
+Next: enforce combined admission with browser/driver reserves, then next-scene
+compose/warm/promote and incoming figure GPU warming. Do not treat decode-pool
+limits as a whole-app cap. Full goal remains incomplete; physical Android/120Hz
+targets unproven. General packing/lit-only integration stay cancelled. No push,
+deployment, native build or real-save changes. Previous accounting commit899f400.
+
+## Previous handoff — Combined resource accounting groundwork
 
 App1.69.17 adds weak, identity-deduplicated decoded-image/canvas observation,
 worker canvas backing counters, actual transferred-plane bytes and painter source

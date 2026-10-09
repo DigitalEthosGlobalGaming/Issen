@@ -10,6 +10,30 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('explicit headroom trimming evicts unused images in LRU order and preserves pins', async () => {
+  const closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    decode: async (url) => resource(url, closed),
+    yield: turn,
+  });
+  await loader.load('older');
+  const release = loader.pin('live');
+  await loader.load('live');
+  await loader.load('recent');
+  assert.equal(loader.trim(800), 400);
+  assert.deepEqual(closed, ['older']);
+  assert.equal(loader.trim(), 400);
+  assert.deepEqual(closed, ['older', 'recent']);
+  assert.equal(loader.snapshot().bytes, 400);
+  assert.equal(loader.snapshot().pinnedBytes, 400);
+  release();
+  assert.equal(loader.trim(), 400);
+  assert.equal(loader.snapshot().bytes, 0);
+  assert.throws(() => loader.trim(-1), RangeError);
+  loader.dispose();
+});
+
 test('speculation does not refresh the LRU age of previously used images', async () => {
   const closed = [];
   const loader = createDecodedImageLoader({

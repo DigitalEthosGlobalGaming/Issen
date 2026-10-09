@@ -8,6 +8,53 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Reclaimed scenery headroom and target accounting — 9 October 2026
+
+App1.69.18 trims unpinned worker decoded images after all independent plane
+copies settle. Required pins and pending work remain untouched; repeated keys
+still reuse completed canvases and visit/key changes reacquire inputs normally.
+Demon scenery now loads on preparation, shares pending work and can retry failed
+decodes. Ordinary startup does not allocate its nine decoded inputs. Rendering
+and gameplay rules remain unchanged.
+
+Document GPU accounting now uses every painter's Pixi managed textures, including
+HDR, filter/history and back-buffer textures, with format-aware byte sizes/mips.
+A guarded Pixi8.22 descriptor adapter adds stencil/MSAA renderbuffers using their
+actual attachment formats and four samples; missing descriptors reserve RGBA32F.
+Retired null texture entries are ignored. No native queries or allocations are
+introduced. Default browser drawing buffers and driver overhead remain outside
+the nominal sum. Foundation exposes native services' `memorySnapshot()`.
+
+One390×844/DPR2 ordinary-start/first-game snapshot before and after shows main
+decoded300,054,960→243,432,120bytes and worker decoded213,952,112→0bytes. Combined
+decoded saving270,574,952bytes (52.6%). This is a representative snapshot, not an
+all-stage peak or physical-memory claim. With the initial conservative MSAA
+counter, combined nominal sum900,962,068→629,315,324bytes. Correct attachment-format
+accounting is recorded separately in `scene-admission-after-formats.json`; do not
+attribute that counter correction to an optimization. These numbers demonstrate
+why a second scene cannot be admitted from the decode-pool budget alone.
+The corrected current sum is561,930,484bytes, including234,168,260 nominal GPU
+bytes across painters; the main painter's26,332,800 renderbuffer bytes use actual
+RGBA8/depth-stencil storage instead of the initial conservative reserve.
+
+Focused unit coverage passes18 unique cases for decoded trimming, image/canvas/
+GPU/mip accounting and lazy/retry/disposed Demon ownership. Three browser cases
+pass: nine-stage texture warming with zero worker decoded residency and unchanged
+pixels/no first-draw upload/link; Demon cinematic entry/resize/reload; repeated
+Demon mist in both orientations/DPRs. The27-composition retained-plane check
+passes exact held/repeated copies after eviction, with no build for unchanged keys.
+Fixtures now explicitly prepare lazily loaded Demon scenery.
+Logs: `tmp/probes/scene-headroom-{units,browser,plane-lifetime}.log`,
+`demon-lifetime-unit.log`, `scene-gpu-accounting-unit.log`; compatible snapshot
+JSONs are `tmp/probes/scene-admission-{baseline,after,after-formats}.json`.
+No full suite or complete performance matrix is repeated during iteration.
+Checked verification build/strict TypeScript passes; changed formatting/diff
+checks pass. Build log: `tmp/probes/scene-headroom-build.log`.
+
+Next finish combined admission/next-slot composition and promotion, incoming
+figure warming and remaining ownership. No whole-app cap is enforced yet;
+startup/transient overlap, auxiliary canvases and browser/driver reserves remain.
+
 ## Combined resource accounting groundwork — 9 October 2026
 
 App1.69.17 introduces weak observation of main decoded images and canvas backing

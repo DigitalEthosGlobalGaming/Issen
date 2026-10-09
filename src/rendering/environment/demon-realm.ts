@@ -16,7 +16,7 @@ const mountainUrl = new URL('./assets/mountain-atlas.webp', import.meta.url).hre
 
 /** Independently placed atlas props over a procedural sky; no flattened backdrop. */
 export function createDemonRealmRenderer(doc: Document) {
-  const materials = createAssetMaterials(doc, {
+  const materials = createAssetMaterials<string>(doc, {
     landmarks: landmarkUrl,
     terrain: terrainUrl,
     mountains: mountainUrl,
@@ -26,19 +26,50 @@ export function createDemonRealmRenderer(doc: Document) {
     terrain = trackPixelSource(doc, doc.createElement('img'), 'decoded'),
     mountains = trackPixelSource(doc, doc.createElement('img'), 'decoded');
   landmarks.decoding = terrain.decoding = mountains.decoding = 'async';
-  landmarks.src = landmarkUrl;
-  terrain.src = terrainUrl;
-  mountains.src = mountainUrl;
   const mountainLayer = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
   let mountainKey = '';
   let disposed = false;
-  void materials.prepare().then(() => {
-    if (disposed) return;
-    cachedMaterials.bind(landmarks, (frame) => materials.material('landmarks', frame));
-    cachedMaterials.bind(terrain, (frame) => materials.material('terrain', frame));
-    cachedMaterials.bind(mountains, (frame) => materials.material('mountains', frame));
-    mountainKey = '';
-  });
+  let pending: Promise<boolean> | undefined;
+  function prepare(): Promise<boolean> {
+    if (disposed) return Promise.resolve(false);
+    return (pending ??= (async () => {
+      landmarks.src = landmarkUrl;
+      terrain.src = terrainUrl;
+      mountains.src = mountainUrl;
+      try {
+        await Promise.all([
+          landmarks.decode(),
+          terrain.decode(),
+          mountains.decode(),
+          materials.prepare(),
+        ]);
+        if (
+          disposed ||
+          !materials.ready('landmarks') ||
+          !materials.ready('terrain') ||
+          !materials.ready('mountains')
+        )
+          return false;
+        cachedMaterials.bind(landmarks, (frame) => materials.material('landmarks', frame));
+        cachedMaterials.bind(terrain, (frame) => materials.material('terrain', frame));
+        cachedMaterials.bind(mountains, (frame) => materials.material('mountains', frame));
+        mountainKey = '';
+        return true;
+      } catch {
+        return false;
+      }
+    })().then((ready) => {
+      if (!ready) {
+        pending = undefined;
+        if (!disposed) {
+          materials.select({});
+          materials.select({ landmarks: landmarkUrl, terrain: terrainUrl, mountains: mountainUrl });
+          for (const image of [landmarks, terrain, mountains]) image.removeAttribute('src');
+        }
+      }
+      return ready;
+    }));
+  }
   function stamp(
     g: SceneDrawing,
     image: HTMLImageElement,
@@ -80,20 +111,7 @@ export function createDemonRealmRenderer(doc: Document) {
     g.restore();
   }
   return {
-    async prepare() {
-      await Promise.all([
-        landmarks.decode(),
-        terrain.decode(),
-        mountains.decode(),
-        materials.prepare(),
-      ]);
-      return (
-        !disposed &&
-        materials.ready('landmarks') &&
-        materials.ready('terrain') &&
-        materials.ready('mountains')
-      );
-    },
+    prepare,
     draw(
       g: SceneDrawing,
       width: number,
