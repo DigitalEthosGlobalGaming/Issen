@@ -2,7 +2,9 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { drawMaterialStamp } from '../scene-material.ts';
 import { materialTextureUploads, type TextureUpload } from '../texture-upload.ts';
-import { createMainImageOwner } from '../../platform/main-images.ts';
+import { createPreparedFigureAtlas } from './prepared-atlas.ts';
+import { assetMaterialCatalog } from '../asset-material-catalog.ts';
+import { documentImageBudget, createMainImageOwner } from '../../platform/main-images.ts';
 export const INK_COMPANION_SOURCES = {
   parts: new URL('./assets/companion-parts-atlas.webp', import.meta.url).href,
   rock: new URL('./assets/mystic-rock.webp', import.meta.url).href,
@@ -31,12 +33,15 @@ export const INK_COMPANION_FRAMES = [
 /** Owns its source owner; each joint animates without moving the ground anchor. */
 export function createInkCompanionRenderer(doc: Document, images = createMainImageOwner(doc)) {
   type Key = 'parts' | 'rock';
+  type Frame = readonly [number, number, number, number];
+  const compact = documentImageBudget(doc) <= 256 * 1024 * 1024;
   type Kit = {
     image?: HTMLImageElement;
     ready: boolean;
     pending: Promise<boolean>;
-    materials: ReturnType<typeof createAssetMaterials<'atlas'>>;
-    lease: ReturnType<typeof images.acquire>;
+    materials?: ReturnType<typeof createAssetMaterials<'atlas'>>;
+    lease?: ReturnType<typeof images.acquire>;
+    parts?: ReturnType<typeof createPreparedFigureAtlas>;
   };
   const kits = new Map<Key, Kit>();
   const borrowers = new Map<symbol, number>();
@@ -59,13 +64,36 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     const required = keys(selection);
     for (const [key, kit] of kits)
       if (!required.includes(key)) {
-        kit.materials.dispose();
-        kit.lease.release();
+        kit.parts?.dispose();
+        kit.materials?.dispose();
+        kit.lease?.release();
         kits.delete(key);
       }
     for (const key of required) {
       if (kits.has(key)) continue;
       const url = INK_COMPANION_SOURCES[key];
+      if (compact) {
+        const pack = assetMaterialCatalog.find((pack) => pack.source === url)!;
+        const [width, height] = dimensions(key);
+        const frames: readonly Frame[] =
+          key === 'parts' ? INK_COMPANION_FRAMES : [[0, 0, width, height]];
+        const parts = createPreparedFigureAtlas(
+          doc,
+          { ...pack.maps, diffuse: url },
+          width,
+          height,
+          frames,
+          true,
+          { images, maxSize: key === 'parts' ? 256 : 512 },
+        );
+        const kit: Kit = { parts, ready: false, pending: Promise.resolve(false) };
+        kits.set(key, kit);
+        kit.pending = parts.prepare().then((ready) => {
+          if (disposed || kits.get(key) !== kit) return false;
+          return (kit.ready = ready);
+        });
+        continue;
+      }
       const materials = createAssetMaterials(doc, { atlas: url }, images);
       const lease = images.acquire(url);
       const kit: Kit = { materials, lease, ready: false, pending: Promise.resolve(false) };
@@ -98,15 +126,30 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
       requested.every((kit, index) => kit === kits.get(selected[index]!))
     );
   }
+  function colour(kit: Kit, frame: Frame) {
+    return kit.parts
+      ? kit.parts.colour(frame)
+      : kit.image
+        ? { source: kit.image, frame }
+        : undefined;
+  }
+  function material(kit: Kit, frame: Frame) {
+    return kit.parts ? kit.parts.material(frame) : kit.materials?.material('atlas', frame);
+  }
   function sources(selection: number) {
-    const result: HTMLImageElement[] = [];
+    const result: TextureUpload['texture']['source'][] = [];
     for (const key of keys(selection)) {
       const kit = kits.get(key);
-      if (!kit?.ready || !kit.image) continue;
+      if (!kit?.ready) continue;
+      if (kit.parts) {
+        result.push(...kit.parts.textureSources());
+        continue;
+      }
+      if (!kit.image) continue;
       result.push(kit.image);
       const [width, height] = dimensions(key);
-      const material = kit.materials.material('atlas', [0, 0, width, height]);
-      for (const texture of [material?.normal, material?.surface, material?.emissive])
+      const maps = material(kit, [0, 0, width, height]);
+      for (const texture of [maps?.normal, maps?.surface, maps?.emissive])
         if (texture) result.push(texture.source as HTMLImageElement);
     }
     return result;
@@ -144,14 +187,20 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     const uploads: TextureUpload[] = [];
     for (const key of keys(selection)) {
       const kit = kits.get(key);
-      if (!kit?.ready || !kit.image) return;
+      if (!kit?.ready) return;
       const [width, height] = dimensions(key);
-      uploads.push(
-        ...materialTextureUploads(
-          { source: kit.image, revision: 0 },
-          kit.materials.material('atlas', [0, 0, width, height]),
-        ),
-      );
+      const frames: readonly Frame[] =
+        kit.parts && key === 'parts' ? INK_COMPANION_FRAMES : [[0, 0, width, height]];
+      for (const frame of frames) {
+        const image = colour(kit, frame);
+        if (!image) return;
+        uploads.push(
+          ...materialTextureUploads(
+            { source: image.source, revision: 0, frame: image.frame },
+            material(kit, frame),
+          ),
+        );
+      }
     }
     return uploads;
   }
@@ -209,19 +258,19 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     if (!managed) void prepare();
     const parts = kits.get('parts'),
       rockKit = kits.get('rock');
-    const image = parts?.image,
-      rock = rockKit?.image;
+    const rockFrame: Frame = [0, 0, 1145, 1373];
+    const rock = rockKit && colour(rockKit, rockFrame);
     if (type === 'mystic-rock') {
       if (!rockKit?.ready || !rock) return false;
       const factor = size / 1157;
       const bob = reducedMotion ? 0 : Math.sin(time * 1.4) * size * 0.035;
       g.save();
       try {
-        const material = rockKit.materials.material('atlas', [0, 0, 1145, 1373]);
-        if (material)
+        const maps = material(rockKit, rockFrame);
+        if (maps)
           drawMaterialStamp(g, {
-            texture: { source: rock, revision: 0 },
-            material,
+            texture: { source: rock.source, revision: 0, frame: rock.frame },
+            material: maps,
             x: x - 580 * factor,
             y: y - 1350 * factor + bob,
             width: 1145 * factor,
@@ -229,7 +278,8 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
           });
         else
           g.drawImage(
-            rock,
+            rock.source,
+            ...rock.frame,
             x - 580 * factor,
             y - 1350 * factor + bob,
             1145 * factor,
@@ -240,7 +290,7 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
       }
       return true;
     }
-    if (!parts?.ready || !image) return false;
+    if (!parts?.ready) return false;
     const t = reducedMotion ? 0 : time;
     const reaction = active && !reducedMotion;
     const sine = (speed: number, phase = 0) => (reducedMotion ? 0 : Math.sin(t * speed + phase));
@@ -256,23 +306,26 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
       angle = 0,
       stretch = 1,
     ) {
-      const [sx, sy, sw, sh] = INK_COMPANION_FRAMES[index]!;
+      const frame = INK_COMPANION_FRAMES[index]!;
+      const [, , sw, sh] = frame;
+      const image = colour(parts!, frame);
+      if (!image) return;
       g.save();
       try {
         g.translate(ax, ay);
         g.rotate(angle);
         g.scale(scale, scale * stretch);
-        const material = parts!.materials.material('atlas', INK_COMPANION_FRAMES[index]!);
-        if (material)
+        const maps = material(parts!, frame);
+        if (maps)
           drawMaterialStamp(g, {
-            texture: { source: image!, revision: 0, frame: INK_COMPANION_FRAMES[index]! },
-            material,
+            texture: { source: image.source, revision: 0, frame: image.frame },
+            material: maps,
             x: -pivotX,
             y: -pivotY,
             width: sw,
             height: sh,
           });
-        else g.drawImage(image!, sx, sy, sw, sh, -pivotX, -pivotY, sw, sh);
+        else g.drawImage(image.source, ...image.frame, -pivotX, -pivotY, sw, sh);
       } finally {
         g.restore();
       }
@@ -311,8 +364,9 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     disposed = true;
     preparation.abort();
     for (const kit of kits.values()) {
-      kit.materials.dispose();
-      kit.lease.release();
+      kit.parts?.dispose();
+      kit.materials?.dispose();
+      kit.lease?.release();
     }
     kits.clear();
     borrowers.clear();
@@ -328,6 +382,14 @@ export function createInkCompanionRenderer(doc: Document, images = createMainIma
     dispose,
     snapshot: () => ({
       selected: [...kits.keys()],
+      compact,
+      partPixels: [...kits.values()]
+        .flatMap((kit) => kit.parts?.textureSources() ?? [])
+        .reduce(
+          (sum, source) =>
+            sum + ('width' in source ? Number(source.width) * Number(source.height) : 0),
+          0,
+        ),
       equipped: keys(primary),
       borrowed: [...borrowers.values()].filter(Boolean).length,
       ready:

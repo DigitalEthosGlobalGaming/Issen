@@ -213,6 +213,13 @@ kit, including startup. The scarecrow robe selects crow through the existing
 equipment rule. Preview closure releases its pins/native textures; full-catalogue
 preparation remains explicit for standalone callers. Other figure/startup inputs
 still need migration; this is not a whole-application memory guarantee.
+
+On the 256 MiB tier, companion planes copy plain colour plus aligned maps through
+the prepared-figure helper: 16 parts capped at 256 px use 10,407,936 bytes, and rock
+capped at 512 px uses 2,623,488 bytes. These replace raw backing after eviction;
+raw cache entries initially remain unpinned. Original geometry and higher-tier
+sampling stay unchanged. Primary/preview borrowers share finite planes.
+
 The generated `src/platform/runtime-assets.ts` manifest selects275runtime files
 for compressed prefetch and startup filtering; regenerate with
 `node scripts/assets/runtime-manifest.mjs`, then regenerate the inventory.

@@ -655,3 +655,80 @@ test('selected companion warming covers first idle and active draws without uplo
   expect(results.unloaded.pinned).toBe(0);
   expect(results.unloaded.bytes).toBe(0);
 });
+
+test('compact companion planes are shared and survive raw eviction until the final borrower leaves', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createInkCompanionRenderer } = await import('/src/rendering/figures/ink-companions.ts');
+    const { trimMainImages } = await import('/src/platform/main-images.ts');
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const owner = createInkCompanionRenderer(document);
+    owner.select('cat');
+    const a = owner.borrow(),
+      b = owner.borrow();
+    a.select('cat', 'mystic-rock');
+    b.select('cat');
+    const prepared = await owner.prepare();
+    const snapshot = owner.snapshot();
+    const shared = b.sources().every((source) => a.sources().includes(source));
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 180;
+    const painter = await createPixiScenePainter(canvas);
+    try {
+      const draw = () => {
+        painter.begin();
+        painter.fillStyle = '#eee9df';
+        painter.fillRect(0, 0, 180, 180);
+        owner.draw('cat', painter, 50, 165, 60, 1.25, true, false);
+        owner.draw('mystic-rock', painter, 130, 165, 60, 1.25, true, false);
+        painter.flush();
+        const gl = canvas.getContext('webgl2')!;
+        const pixels = new Uint8Array(180 * 180 * 4);
+        gl.readPixels(0, 0, 180, 180, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        return pixels;
+      };
+      draw();
+      const before = draw();
+      trimMainImages(document, 1024 * 1024 * 1024);
+      const evicted = owner.snapshot().decodedLoader;
+      const after = draw();
+      let difference = 0;
+      for (let i = 0; i < before.length; i++)
+        difference = Math.max(difference, Math.abs(before[i]! - after[i]!));
+      owner.select('nopet');
+      a.dispose();
+      const remaining = owner.snapshot().selected;
+      b.dispose();
+      const released = owner.snapshot().selected;
+      const nativeSources = painter.sourceTextureCount;
+      return {
+        prepared,
+        snapshot,
+        shared,
+        evicted,
+        difference,
+        remaining,
+        released,
+        nativeSources,
+      };
+    } finally {
+      a.dispose();
+      b.dispose();
+      owner.dispose();
+      painter.dispose();
+    }
+  });
+  expect(result.prepared).toBe(true);
+  expect(result.snapshot.compact).toBe(true);
+  expect(result.snapshot.partPixels).toBeLessThan(3_300_000);
+  expect(result.snapshot.decodedLoader.pinned).toBe(0);
+  expect(result.shared).toBe(true);
+  expect(result.evicted.bytes).toBe(0);
+  expect(result.difference).toBe(0);
+  expect(result.remaining).toEqual(['parts']);
+  expect(result.released).toEqual([]);
+  expect(result.nativeSources).toBe(0);
+});

@@ -1,6 +1,50 @@
 # Current development status
 
-## Current handoff — same-stage trial boss readiness
+## Current handoff — compact low-memory companions
+
+App 1.69.45 reuses prepared-figure copying on the 256 MiB tier for 16 companion
+parts capped256px and one rock plane capped512px. Original plain colour, aligned
+normal/surface planes, joint geometry, motion and higher-tier sampling remain.
+Primary/preview borrowers share each finite kit; raw images unpin after copying
+and pressure can close them. Parts backing10,407,936bytes replaces18,870,192raw;
+rock2,623,488 replaces18,865,020raw. Additional raw cache entries initially remain
+evictable, not automatically gone. Snapshots expose compact/partPixels.
+
+Original/compact fixed-pose screenshots reviewed at60px gameplay and150px preview
+sizes for all four pets: coherent colour, silhouette and lighting retained;
+small detail softening accepted. `tmp/probes/companion-visual-{before,after}.{png,json}`
+uses the same low tier and disables only companion compaction for the control.
+Two-kit fixture managed GPU67,687,220→42,983,432bytes; decoded37,735,212 remains
+cached at capture but pins6→0. CPU canvases180,000→13,211,424bytes include copies.
+This is not a whole-game memory cap.
+
+The actual-frame-sampled controlled rush/cat loop prepares/promotes stages0–7,
+but8→0 remains denied both before and after compaction. Post-change15.8–24.2ms
+promotions; sampled peak509.98MiB. A six-second quiet-window follow-up still denies
+wrap, ruling out the120-frame unused-GPU grace as the sole cause. Evidence
+`tmp/probes/rush-companion-admission{,-compact,-compact-quiet}.json`; fixture uses
+runtime `nextStep` but controls pause/between/ordinal entry, not natural combat.
+Run seeds differ, so these samples are not strict timing/pixel baselines.
+Compaction is a verified backing reduction, not a claimed wrap fix. Reassess the
+broader resource floor/admission estimate rather than repeatedly shrinking art.
+
+Five focused browser checks PASS6.1s/default2workers: selected first-use warming,
+compact raw eviction with exact repeated pixels, shared borrowers/final GPU0,
+high-tier hidden/context recovery and native low cancellation/restoration/promotion.
+Four additional affected checks PASS8.5s: original higher-tier pixel parity,
+shared/stale selection and27local-scene/pet/charm pool cycles. Results
+`tmp/test-results/browser/compact-companions/` and`compact-companion-coverage/`.
+Checked production build/strict TypeScript plus startup/Armoury/run/landscape and
+offline-resize smokes PASS10.0s/default2workers, results
+`tmp/test-results/production/compact-companions/`.
+
+Next: diagnose required current resources versus optional next-scene reservations
+at wrap; then natural progression/viewport/special-loadout/transient/native memory
+coverage, historical native colour mismatch and final stable measurement/suites.
+Goal active; all processes terminal. No push/deploy/native build/real-save changes.
+Cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — same-stage trial boss readiness
 
 App 1.69.44 closes the fixed boss-trial gap. Normal same-stage bosses already use
 initial stage identity-tone preparation. Three Masters instead enters roster

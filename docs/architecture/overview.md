@@ -864,6 +864,15 @@ creates no pose, tint cache or alternate rendering path. Procedural/no-pet choic
 need no companion atlas uploads. Cancellation, changed kit and disposal suppress
 obsolete results; native services include the companion in their warmed union.
 
+On the 256 MiB decoded tier, companion kits reuse prepared-figure copying:
+16 aligned parts capped at 256 px, and a mystic-rock plane capped at 512 px.
+Copies keep the original plain colour and logical joint geometry; normal/surface
+planes align with each colour cutout. Inputs unpin after copying and may be
+evicted without affecting drawing. Primary and preview borrowers share each kit;
+final release retires its finite planes. Higher tiers retain original sampling.
+Snapshots expose compact status and total plane pixels. This reduces retained
+backing but does not itself guarantee combined next-scene admission.
+
 Runtime scene coordination reuses the quiet-frame preload controller for incoming
 boss identity tones once the next environment is ready. Optional figure work
 reserves 64 MiB in the combined memory ledger until completion, in addition to
