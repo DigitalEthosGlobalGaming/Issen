@@ -1,5 +1,54 @@
 import { expect, test } from '@playwright/test';
 
+test('light passes retain geometry samplers until their generation is replaced or disposed', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createPixiScenePainter } = await import('/src/rendering/pixi/scene-painter.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 32;
+    const painter = await createPixiScenePainter(canvas);
+    const buffer = Reflect.get(painter, 'lightBuffer');
+    const detach = buffer.detachGeometry.bind(buffer);
+    let releases = 0;
+    buffer.detachGeometry = () => {
+      releases++;
+      detach();
+    };
+    const draw = () => {
+      painter.begin();
+      painter.fillStyle = '#7b604e';
+      painter.fillRect(0, 0, canvas.width, canvas.height);
+      painter.flush();
+    };
+    draw();
+    const source = buffer.shader.resources.uG0;
+    draw();
+    draw();
+    const steady = {
+      releases,
+      same: buffer.shader.resources.uG0 === source,
+      live: !source.destroyed,
+    };
+    canvas.width = 33;
+    draw();
+    const resized = {
+      releases,
+      replaced: buffer.shader.resources.uG0 !== source,
+      retired: source.destroyed,
+    };
+    const next = buffer.shader.resources.uG0;
+    painter.dispose();
+    return { steady, resized, final: { releases, retired: next.destroyed } };
+  });
+  expect(result).toEqual({
+    steady: { releases: 0, same: true, live: true },
+    resized: { releases: 1, replaced: true, retired: true },
+    final: { releases: 2, retired: true },
+  });
+});
+
 test('composite shaders borrow the shared light group and release their own listeners', async ({
   page,
 }) => {

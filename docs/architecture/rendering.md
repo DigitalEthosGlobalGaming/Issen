@@ -37,6 +37,10 @@ cue counts shift later stamps. It swaps slots within the existing pool, preservi
 the pool's size bound and explicit draw order. Submitted slots are never reused
 within the same frame; missing kinds retain the original replacement/disposal path.
 
+Version 1.69.3 retains the light pass's geometry sampler bindings during ordinary
+frames. Light outputs still detach before accumulation. Geometry inputs detach
+before resize or context restoration replaces their generation, and on disposal.
+
 Unclipped frames retain their root draw order; surplus children are detached when
 a frame uses fewer slots. Clipping and film grouping leave this fast path and
 keep the existing scoped tree lifecycle. Solid full ellipses can use the painter's

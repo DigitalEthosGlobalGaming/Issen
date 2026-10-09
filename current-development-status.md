@@ -1,4 +1,67 @@
-# Performance, assets and seamless transitions — Bounded draw-slot reuse verified
+# Performance, assets and seamless transitions — Geometry bindings retained
+
+Checkpoint 52: app 1.69.3 retains the light pass's unchanged geometry sampler
+bindings across ordinary frames. Light outputs still detach before accumulation;
+geometry inputs detach before resize/restore replaces their generation and on
+disposal. No shaders, source sampling, draw order, simulation or seed changes.
+The new native regression verifies zero steady-frame geometry detach calls,
+one before resize, replacement/retirement of the old source and final disposal.
+Original/current comparison passes40 lit changing-order frames exactly.
+
+The existing standard five-sample matched Demon/Inferno harness passes, with
+the same instrumentation, geometry, seed, warmup and duration as checkpoint51.
+Pooled render median/p95/p99, ms:
+- Demon5.8/7.2/10.1 ->5.4/6.8/8.6; over8.3ms36/1503 ->20/1503;
+  over16.7ms remains0.
+- Inferno9.4/14.0/21.4 ->8.25/11.1/15.2; over8.3ms1121/1495 ->743/1498;
+  over16.7ms32 ->14.
+Separate sampled removeListener self time is69.5ms Demon and303.5ms Inferno
+(checkpoint51 64.5/412.9ms). CPU samples are not headline timing. Inferno still
+misses8.3ms; headless desktop callbacks do not prove120Hz display delivery.
+All475 units,35 related native browsers, checked production build/strict
+TypeScript and four production browsers pass. Version/package/lock/title/
+changelog and rendering notes are synchronized. Five alternating normal-combat
+samples per arm pass from the exact saved bundles: render median/p95/p99
+2.2/3.1/4.0 ->2.3/3.2/4.3ms; over8.3ms remains5, over16.7ms2 ->1.
+Update median/p95/p99 remains0.1/0.2/0.3ms. This close comparison is not a combat
+gain claim. All measurement/verification handles are terminal; format/diff pass.
+
+A120-frame Inferno lifetime diagnostic finds a separate leak: EMPTY source
+listeners grow296 ->31,712, style290 ->31,706, adding264 per frame; disposal
+leaves31,704/31,705. Slot count60 and active gradient count23 remain bounded.
+Installed Pixi8.22 GraphicsContextSystem._initContextRenderData unconditionally
+calls globally cached getTextureBatchBindGroup, including on WebGL. Its installed
+GlGraphicsAdaptor executes the same batch textures/geometry directly and never
+reads those WebGPU bind groups. This is executable-code evidence plus listener
+measurement, not an estimate of whole-game resident GPU memory.
+
+An ignored instance-local WebGL graphics-data prototype keeps the original
+BigPool data/batcher, transforms, buffer uploads and instructions, skipping only
+unused WebGPU group construction. It holds EMPTY source/style listeners8/2
+through120 frames and returns0/1 baseline on disposal (WHITE0). Original/current
+40 lit Inferno frames are exact, positive72-slot path. It is not integrated:
+strict production typing, peer/resize/restore tests and app timing remain required.
+
+Evidence is under tmp/performance-gameplay-checkpoint52/: original painter,
+geometry-bindings.json, empty-bindings.json, webgl-empty-bindings.json,
+webgl-geometry-bindings.json, verification logs and combat-control/.
+Before standard build is checkpoint51's
+tmp/performance/2026-10-09T02-26-12.404Z-7c5cceab; after is
+tmp/performance/2026-10-09T02-38-40.787Z-fd9dd49b, with frame-budgets.json,
+source-cpu-summary.json and saved source-mapped CPU/heap/traces/build.
+Prototype and reproduction makers are in tmp/probes/scene-image-preload/:
+webgl-graphics-data.ts, webgl-empty-bindings.spec.ts and
+webgl-geometry-bindings.spec.ts. Preserve the exact original gradients; checkpoint51
+ramp sharing remains rejected. No tolerance is relaxed.
+
+Next integrate and verify the WebGL-only graphics-data allocation fix. Recheck
+bounded source/style listeners across peers, disposal and context generations,
+native output and matched gameplay timing. Then resume next-scene slots, quiet
+composition/uploads, local paused differences, generator cancellation, whole-memory
+admission and figure/startup ownership. AllPhase5 metrics/traces/suites remain
+required. Full goal active; no push/deploy/native build or player saves.
+
+## Previous handoff — Bounded draw-slot reuse verified
 
 Checkpoint 51: app 1.69.2 reuses an unsubmitted draw slot of the requested kind
 before destroying/replacing a mismatched mesh. A swap within the existing slot

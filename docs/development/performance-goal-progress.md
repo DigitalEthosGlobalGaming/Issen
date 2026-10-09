@@ -2562,3 +2562,37 @@ without the rejected sampling change. Next-scene slots, quiet composition/upload
 local paused differences, cancellation, whole-memory/figure/startup admission and
 all Phase5 metrics/traces/suites remain required. Full goal active; no deployment,
 native build or real player-save changes.
+
+## Checkpoint 52 — Retained geometry bindings, 9 October 2026
+
+Version 1.69.3 retains the light pass's unchanged geometry inputs across ordinary
+frames. Light outputs detach before accumulation; geometry samplers detach before
+resize/restore generation replacement and disposal. Original/current40-frame lit
+comparison is exact, and the regression verifies steady-frame retention plus old
+source retirement. No source sampling, shader, simulation or seed changes.
+
+Five matched standard samples before/after, pooled render median/p95/p99 in ms:
+Demon5.8/7.2/10.1 ->5.4/6.8/8.6; Inferno9.4/14.0/21.4 ->8.25/11.1/15.2.
+Inferno renders over16.7ms fall32/1495 to14/1498; Demon stays0. Five alternating
+saved-build combat samples per arm are close:2.2/3.1/4.0 ->2.3/3.2/4.3ms, with
+identical0.1/0.2/0.3ms update cost. This is not a claimed combat improvement.
+Inferno still misses8.3ms; desktop callback intervals do not prove120Hz delivery.
+All475 units,35 native browsers, strict/checked build and four production browsers
+pass, with synchronized version/title/changelog. All handles are terminal.
+
+A separate120-frame native Inferno diagnostic reveals264 additional EMPTY source
+and style listeners per frame; disposal leaves31,704/31,705. Pixi8.22's graphics
+context builder unconditionally creates globally cached WebGPU texture bind groups
+on WebGL, whose installed adaptor binds batch textures directly without them.
+An ignored instance-local prototype preserves BigPool/batcher/transforms/buffers/
+instructions and skips that allocation. Its source/style counts stay8/2 and return
+to0/1 baseline on disposal. All40 lit native Inferno frames match the original
+exactly. This prototype still needs production typing, lifecycle/peer/restore
+coverage and matched app timing; it is not integrated or a whole-GPU budget claim.
+
+Evidence: tmp/performance-gameplay-checkpoint52/; standard before/after saved
+bundles and source-mapped captures in tmp/performance/2026-10-09T02-26-12.404Z-7c5cceab
+and2026-10-09T02-38-40.787Z-fd9dd49b. Next integrate that verified WebGL allocation
+fix, then resume deterministic scene slots, quiet composition/upload pacing,
+whole-memory/figure/startup admission and all Phase5 metrics/traces/suites. Full
+goal remains active; no deployment, native build or real player-save changes.

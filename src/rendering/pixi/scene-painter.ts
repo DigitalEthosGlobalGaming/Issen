@@ -485,7 +485,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.beginPath();
   }
 
-  private detachLightingTargets(): void {
+  private detachLightingTargets(detachGeometry = true): void {
     for (let i = 0; i < this.preparedLightingSlots; i++) {
       const slot = this.slots[i]!;
       slot.material?.releaseLightTargets();
@@ -496,7 +496,7 @@ export class PixiScenePainter implements SceneDrawing {
     // A replaced slot may have been the last attached owner; detach centrally too.
     for (let i = 0; i < 3; i++) this.sharedLights.setResource(Texture.EMPTY.source, i);
     this.artworkMaterials.detachTargets();
-    this.lightBuffer.detachGeometry();
+    if (detachGeometry) this.lightBuffer.detachGeometry();
   }
 
   /** Named composer pass; auxiliary flush callers use the same preparation. */
@@ -521,7 +521,9 @@ export class PixiScenePainter implements SceneDrawing {
     this.geometryPass();
     if (this.lightBuffer.targets?.resolution !== this.lightResolution) this.lightDirty = true;
     if (!this.lightDirty) return;
-    this.detachLightingTargets();
+    // Light outputs are about to be written, but their geometry inputs remain
+    // the same generation. Resize/restore/disposal detach those samplers.
+    this.detachLightingTargets(false);
     this.lightBuffer.render(this.geometryBuffer.targets!, {
       ...this.lighting,
       lightResolution: this.lightResolution,
