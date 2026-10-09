@@ -18,8 +18,23 @@ settle/readback before exact replay, no tolerance relaxation. Evidence
 `tmp/test-results/browser/compact-special-recovery/`; earlier checks in
 `tmp/test-results/browser/compact-special/`. No broad suite repeated for this chunk.
 
-Whole-app special-loadout peak and representative visual review remain required.
-Prior regular flow511.5MiB is one viewport, not a universal cap. Native scratch/
+Special-loadout integration/visual review completed using the existing isolated
+Demon→Armoury inspection→title probe,390×844 and844×390 CSSpx,DPR2,deviceMemory2.
+Pan compact portrait peak514,243,448bytes/490.4MiB; same flow with only special
+compaction disabled549,490,000bytes/524.0MiB. Beam compact portrait506,741,560bytes/
+483.3MiB, landscape498,124,232bytes/475.0MiB. Beam/raw-pan rows verify saved selection
+and compact/raw renderer state. Pan compact initial probe predates state columns,
+but actual gold pan is visible and prior lifetime check proves compaction.
+Representative inspection comparison accepts softened pan surface detail while
+preserving shape/gold highlights; beam remains clear with blue-white glow. No
+fringes/missing artwork observed. Evidence `tmp/probes/realm-preview-memory-`
+`{pan-compact,pan-raw,koken-compact,koken-landscape}.json` and corresponding
+`realm-preview-inspection-{pan,koken}-*.png` captures. Probe optional loadout/raw
+control/landscape arguments remain ignored; fresh browser profiles only.
+
+These50ms samples include pending decode/GPU estimates and native target descriptors,
+not physical residency or every transient. Two viewport shapes/special loadouts
+are not a universal cap. Prior regular flow511.5MiB is likewise one viewport. Native scratch/
 renderbuffer headroom, historical software/GPU mismatch, final measurement matrix,
 applicable suites and physical Android/120Hz evidence remain outstanding. Goal active.
 No push/deploy/native build/save changes; cancelled work stays cancelled.
