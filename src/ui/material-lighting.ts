@@ -7,6 +7,8 @@ import { drawMaterialStamp, setSceneLighting } from '../rendering/scene-material
 import { registerUiTextureRenderer } from './material-textures.ts';
 import { createMainImageOwner } from '../platform/main-images.ts';
 import { observeAssetBackground } from '../platform/asset-background.ts';
+import { trackPixelSource } from '../platform/pixel-memory.ts';
+import { reclaimSceneMemory } from '../platform/scene-memory.ts';
 
 type Frame = readonly [number, number, number, number];
 type Pack = (typeof assetMaterialCatalog)[number];
@@ -49,7 +51,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
   const styles = new Map<CSSStyleDeclaration, Map<string, Replacement>>();
   const images = new Map<HTMLImageElement, { source: string; job: Job; rendered?: string }>();
   const variables = new Map<string, string>();
-  const canvas = doc.createElement('canvas');
+  const canvas = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
   canvas.width = canvas.height = 1;
   let painter: PixiScenePainter | null = null;
   let painterPending: Promise<PixiScenePainter | null> | undefined;
@@ -177,6 +179,10 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
         } finally {
           atlas.dispose();
           lease.release();
+          // CSS owns the exported pixels. Do not retain the full-size lighting
+          // targets while waiting for the next quiet frame or after the last job.
+          target.suspend();
+          reclaimSceneMemory(doc);
         }
       }
       for (const [image, entry] of images) {
@@ -297,6 +303,8 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
       disposed,
       decodedLoader: decodedImages.snapshot(),
       sourceTextures: painter?.sourceTextureCount ?? 0,
+      gpuMemory: painter?.memorySnapshot,
+      exportPixels: canvas.width * canvas.height,
     }),
     dispose() {
       if (disposed) return;

@@ -203,7 +203,9 @@ Final main-pool eviction/disposal notifies every native texture consumer before
 clearing source pixels. Releasing a lease alone preserves warm images and peers.
 UI lighting now leases one source/data pack per export and releases pins and GPU
 source textures afterwards. Lit CSS outputs remain available for redraw, while
-background export dispatch yields to busy/loading/hidden frames. The managed
+the export painter shrinks to 1×1 and releases large lighting targets between
+jobs. Its export canvas is tracked and completed jobs reclaim unpinned inputs
+against combined pressure. Background dispatch yields to busy/loading/hidden frames. The managed
 budget covers decoded inputs, excluding browser-owned exported DOM/CSS images.
 Charm renderers now share their18,874,368-byte colour/normal/surface kit through
 main-pool leases; separate previews retain independent tint caches and pins.

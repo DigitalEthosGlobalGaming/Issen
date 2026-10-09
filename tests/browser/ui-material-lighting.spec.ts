@@ -35,6 +35,9 @@ test('background UI exports wait for quiet visible frames and disposal releases 
     document.dispatchEvent(new Event('visibilitychange'));
   });
   await expect.poll(() => page.evaluate(() => (window as any).quietUi.snapshot().rendered)).toBe(1);
+  const idle = await page.evaluate(() => (window as any).quietUi.snapshot());
+  expect(idle.exportPixels).toBe(1);
+  expect(idle.gpuMemory.bytes).toBeLessThan(1024 * 1024);
   await page.evaluate(() => {
     const scope = window as any;
     scope.quietSample(0, false, 0, 8.3);
@@ -113,6 +116,8 @@ test('UI exports release pins and GPU sources while a low-memory local stage rem
   expect(result.samples.every((sample) => sample.rendered === 31)).toBe(true);
   for (const sample of result.samples) {
     expect(sample.sourceTextures).toBe(0);
+    expect(sample.exportPixels).toBe(1);
+    expect(sample.gpuMemory.bytes).toBeLessThan(1024 * 1024);
     expect(sample.decodedLoader.pinned).toBe(result.before.pinned);
     expect(sample.decodedLoader.peakBytes).toBeLessThanOrEqual(256 * 1024 * 1024);
   }

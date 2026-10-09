@@ -347,7 +347,11 @@ composes a scene nor changes the current visit.
 UI material jobs retain pack metadata and exported CSS textures. They lease source
 and map images from the main pool for one export at a time, then unpin them and
 release uploaded sources through the painter's existing texture store. Shader
-bindings detach before source destruction. Background exports wait for quiet
+bindings detach before source destruction. Each completed or failed job suspends
+the export painter to a 1×1 surface, releasing its large lighting targets before
+the next frame grant; the export canvas is included in the shared pixel ledger.
+Unpinned main images are reclaimed against combined pressure after each job.
+Background exports wait for quiet
 visible frame grants before decode and upload; explicit prepare/custom texture
 requests bypass that wait. `asset-background` supports independent subscribers
 for UI exports and compressed prefetch. Exported DOM/CSS images and other figure

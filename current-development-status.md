@@ -1,5 +1,33 @@
 # Current development status
 
+## Current handoff — release idle CSS lighting resources (1.69.51)
+
+The stage-0 source trace identifies four Armoury-room planes acquired by
+`ui/material-lighting.ts`, not `armory-preview.ts` (no preview room calls).
+CSS jobs include hidden-screen styles and can overlap quiet next-scene work.
+Each job previously released uploaded inputs but kept its full-size lighting
+targets while waiting for another grant or after completion. Jobs now suspend
+the painter to 1×1 after success/failure, track their export canvas, and reclaim
+unpinned main images against combined pressure. CSS exports remain available.
+
+Strict TypeScript passes. All three focused UI browser tests pass (11.6s),
+including all 31 packs, alpha/slicing, relighting, peer leases and idle GPU
+backing below 1MiB. Four live duel/shrine transitions (0→1→2→3→4) pass (41.0s):
+6,598 frame/worker boundaries peak536,571,656bytes against536,870,912, leaving
+only299,256bytes. Previous equivalent four-transition capture exceeded the cap
+at538,865,924bytes. These samples are nominal tracked estimates, not all native
+or transient residency; this improvement does not establish a whole-app cap.
+Evidence: `tmp/test-results/browser/ui-export-suspension-16950/` and
+`tmp/test-results/browser/natural-rush-ui-suspension-16950/`. Manual clocks do
+not establish frame-time performance. All processes terminal at this checkpoint.
+
+Next: improve optional-work admission/headroom and finish live all-stage coverage.
+The later manual driver still needs readiness/input diagnosis; do not infer a
+game bug or all-nine completion. Two strict restoration failures remain open
+as described below. Reuse the previous full-suite/production evidence until a
+major integration checkpoint; final verification and requirement report remain
+required. No push/deploy/native build/player-save edits. Goal active, incomplete.
+
 ## Current handoff — approval recovered; live-flow probe exposes headroom gap
 
 Approval review is available again: the unchanged strict leaf case passes once
