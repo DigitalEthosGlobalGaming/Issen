@@ -1,4 +1,49 @@
-# Performance, assets and seamless transitions — Quiet decoded preload integrated
+# Performance, assets and seamless transitions — Cooperative composition measured
+
+Checkpoint 47 is diagnostic only; app remains 1.69.0 and checkpoint 46's quiet
+decoded preload remains integrated. A generator prototype preserves the exact
+original drawing order when drained synchronously: all 27 visits pass incoming
+and held plane hashes and both corresponding native frames in independent
+contexts with matching capture ordinals (1.7m). Restoring material bindings for
+each iterator step also avoids a binding scope spanning a promise.
+
+Pausing at operation boundaries with a nominal 2ms grant changes four of 27
+visits. Quantified matched-context captures reproduce the initial failed hashes:
+portrait Hollow colour max2 across3 channels; surface max255 across1,619
+channels (visible max255, alpha unchanged); native max1 across109 channels.
+Portrait Shore far colour max255 across21,639 channels, alpha max22; native
+max13 across5,348 channels. Landscape Hollow colour max3 across3 channels,
+native exact. Landscape Shore far colour max255 across29,291 channels, alpha
+max23; native max11 across2,976 channels. This is not an acceptable visual pass.
+No generator, task-yielding compose, next slot or pixel tolerance is integrated.
+
+Initial timing labels aggregate declarations with the following operation, so
+do not attribute the full measured chunk to its final blit. A separate
+declaration-boundary profile isolates createBackground at39.5–242.6ms; terrain
+blits still reach79.3ms, meadow89.9ms, midground103.5ms, individual atlas stamps
+51.4ms and completion/variation chunks64.4ms. Every geometry/stage still has at
+least one step over16ms. These are experimental local call/chunk wall times,
+not application frame p95 or isolated GPU timings. The 27-row profile completes
+in18.2s; its green process result asserts no visual equivalence.
+
+All tracked rendering sources remain unchanged from checkpoint 46. Prototypes
+and generators are under tmp/probes/scene-image-preload/cooperative/ with maker,
+verifier and analysis scripts alongside them. Archived synchronous controls,
+paused hashes, gzip RGBA differences, labeled chunks and declaration-separated
+profile are under tmp/performance-scene-image-preload/cooperative/. All process
+handles are terminal; no overlap, production build or full suite was needed for
+this diagnostic-only turn.
+
+Next split createBackground and the nested scenery/material helpers into
+resumable work, preserving the synchronous drain oracle. Investigate native
+source sampling across task boundaries with fresh-decode and unchanged controls
+before enabling the paused path. Then implement admitted worker/local next slots
+and exact promotion/invalidation. A second renderer alone cannot satisfy pacing;
+current canvases/raw pins, transient copies, material scratch and GPU storage
+must enter admission. Figure/startup ownership, 120Hz/CPU budgets and full
+Phase 5 remain required. Full goal active; no push/deploy/native build or saves.
+
+## Previous handoff — Quiet decoded preload integrated
 
 Checkpoint 46: app version 1.69.0 enables admitted quiet-frame
 next-stage decoded-image leases in local and worker renderers. Queue order is
