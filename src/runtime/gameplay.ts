@@ -526,6 +526,7 @@ export function createRuntimeGameplay(
     combatScore: combat.combatScore,
     bumpCombo: combat.bumpCombo,
     sceneFlow: scene.sceneFlow,
+    figurePreload: scene.figurePreload,
     prepareScene: scene.prepareScene,
     deferUntilSceneReady: scene.deferUntilSceneReady,
     checkUnlocks: rules.checkUnlocks,

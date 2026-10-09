@@ -857,8 +857,18 @@ Charm preparation shares the normal draw sprite recipe/cache and actual equipmen
 colour. Charm canvases are tracked and retired on eviction/final disposal. Native
 services retain and warm the resulting union through the existing painter before
 scene readiness; context restoration warms the same sources again. No gameplay
-pose, clock or RNG advances during capture. Companion first-use preparation and
-future boss-palette scheduling remain separate audit work.
+pose, clock or RNG advances during capture. Companion first-use remains audit work.
+
+Runtime scene coordination reuses the quiet-frame preload controller for incoming
+boss identity tones once the next environment is ready. Optional figure work
+reserves 64 MiB in the combined memory ledger until completion, in addition to
+actual allocated bytes. It uses existing renderers and painter warming, retaining
+both current and incoming GPU leases until foreground preparation replaces them.
+Hidden/busy pending work, identity/equipment changes, pressure, foreground scene
+preparation and disposal cancel the optional lease. Ready work survives busy
+frames. The selected equipment is already prepared; future boss tones are the new
+allocation. Fixed trials and same-stage boss forecasting remain outside this
+next-scene path; no run RNG or visit ledger entries are consumed.
 
 Worker static composition omits meadow fog inputs: the main worker-renderer owner
 prepares and draws live meadow fog. Moonwatch retains fog inputs for baked scenery.

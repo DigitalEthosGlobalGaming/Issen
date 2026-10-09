@@ -16,6 +16,7 @@ import { STAGES } from '../game/content/stages.ts';
 import type { createFrameLoop } from '../platform/frame-loop.ts';
 import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
 import { BOSS_IDENTITIES } from '../game/content/bosses.ts';
+import { createSceneImagePreload } from '../rendering/environment/image-preload.ts';
 import { mountStartupLoading } from '../ui/startup-loading.ts';
 /** Compose combat/scoring, character positions and kill rules through explicit owners. */
 export function createRuntimeSceneCoordination(
@@ -53,6 +54,72 @@ export function createRuntimeSceneCoordination(
     buildWeather();
     prepareScene();
   }
+  function prepareFigures(signal: AbortSignal, background = false) {
+    if (!background) figurePreload.cancel();
+    const G = foundation.run.G;
+    const current =
+      !background &&
+      G.boss &&
+      (G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss'))
+        ? G.boss
+        : undefined;
+    const ordinal = foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain] ?? G.bossCount + 1;
+    const tones = current?.def.pal
+      ? [current.def.pal]
+      : BOSS_IDENTITIES[(ordinal - 1) % BOSS_IDENTITIES.length]!.tones;
+    return foundation.browser.prepareFigureArtwork(
+      [...ENEMY_WEAPON_IDS, foundation.profile.profileEquipment.EQ.blade],
+      tones.map((tone) => foundation.view.palette.robe(tone)),
+      signal,
+      {
+        robe: foundation.profile.profileEquipment.EQ.robe,
+        charm: foundation.profile.profileEquipment.EQ.charm,
+        charmColor: presentation.CHARMCOL[foundation.profile.profileEquipment.EQ.charm],
+      },
+      { background },
+    );
+  }
+  const figurePreload = createSceneImagePreload(
+    foundation.browser.cvs.ownerDocument,
+    () =>
+      !foundation.run.sceneState.sceneLoading && !foundation.run.activity.activeTrial
+        ? {
+            stage: foundation.run.G.stage,
+            stageSeed: foundation.view.stageState.stageSeed,
+            width: foundation.view.geometry.W,
+            height: foundation.view.geometry.H,
+            dpr: foundation.view.geometry.DPR,
+            lowQuality: foundation.browser.density() <= 0.3,
+          }
+        : undefined,
+    () => {
+      if (foundation.browser.environmentRenderer.snapshot().imagePreload?.status !== 'ready')
+        return;
+      const controller = new AbortController();
+      const count = foundation.run.G.bossCount;
+      const selectedEquipment = () => {
+        const { blade, robe, charm } = foundation.profile.profileEquipment.EQ;
+        return `${blade}:${robe}:${charm}`;
+      };
+      const equipment = selectedEquipment();
+      let memoryCheckAt = 0;
+      return {
+        ready: prepareFigures(controller.signal, true),
+        release: () => controller.abort(),
+        active: () => {
+          if (count !== foundation.run.G.bossCount || equipment !== selectedEquipment())
+            return false;
+          const now = performance.now();
+          if (now < memoryCheckAt) return true;
+          memoryCheckAt = now + 250;
+          const memory = foundation.browser.memorySnapshot();
+          return memory.committedBytes <= memory.budget;
+        },
+      };
+    },
+    { retainReadyWhenBusy: true },
+  );
+  foundation.lifecycle.add(figurePreload.dispose);
   const sceneFlow = createSceneFlow(() =>
     stateView(
       foundation.run.sceneState,
@@ -80,28 +147,7 @@ export function createRuntimeSceneCoordination(
           screenAnimation: ui.screenAnimation,
           demonRealmRenderer: foundation.browser.demonRealmRenderer,
           driftRenderer: presentation.driftRenderer,
-          prepareFigureArtwork: (signal: AbortSignal) => {
-            const G = foundation.run.G;
-            const current =
-              G.boss && (G.state === 'boss' || (G.state === 'paused' && G.pausedFrom === 'boss'))
-                ? G.boss
-                : undefined;
-            const ordinal =
-              foundation.run.activity.activeTrial?.bosses?.[G.bossesSlain] ?? G.bossCount + 1;
-            const tones = current?.def.pal
-              ? [current.def.pal]
-              : BOSS_IDENTITIES[(ordinal - 1) % BOSS_IDENTITIES.length]!.tones;
-            return foundation.browser.prepareFigureArtwork(
-              [...ENEMY_WEAPON_IDS, foundation.profile.profileEquipment.EQ.blade],
-              tones.map((tone) => foundation.view.palette.robe(tone)),
-              signal,
-              {
-                robe: foundation.profile.profileEquipment.EQ.robe,
-                charm: foundation.profile.profileEquipment.EQ.charm,
-                charmColor: presentation.CHARMCOL[foundation.profile.profileEquipment.EQ.charm],
-              },
-            );
-          },
+          prepareFigureArtwork: (signal: AbortSignal) => prepareFigures(signal),
           environmentRenderer: foundation.browser.environmentRenderer,
           reclaimMemory: foundation.browser.reclaimMemory,
           sceneRecovery: {
@@ -147,6 +193,7 @@ export function createRuntimeSceneCoordination(
     buildWeather,
     setStage,
     sceneFlow,
+    figurePreload,
     prepareScene,
     deferUntilSceneReady,
     setupAttract,

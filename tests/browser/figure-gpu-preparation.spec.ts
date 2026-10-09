@@ -326,3 +326,122 @@ test('figure preparation cancellation preserves the current lease and disposal r
   expect(result.disposed).toBe(false);
   expect(result.remaining).toBe(0);
 });
+
+test('background figures reserve memory, preserve current sources and promote without uploads', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    Object.defineProperty(navigator, 'deviceMemory', { value: 2, configurable: true });
+    const { createNativeServices } = await import('/src/presentation/native-services.ts');
+    const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
+    const { createPalette } = await import('/src/rendering/palette.ts');
+    const { registerSceneMemory } = await import('/src/platform/scene-memory.ts');
+    const canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 100;
+    const drawing = await createTestDrawing(canvas);
+    const cleanup: (() => void)[] = [];
+    const services = createNativeServices(
+      document,
+      { add: (fn) => cleanup.push(fn) },
+      undefined,
+      drawing,
+    );
+    const palette = createPalette();
+    const current = [palette.robe('sumi')];
+    const next = [palette.robe('helm'), palette.robe('yoroi'), palette.robe('hai')];
+    const selection = { robe: 'monk', charm: 'omikuji', charmColor: '#c9bda1' };
+    let final = -1;
+    try {
+      const prepared = await services.prepareFigureArtwork(
+        ['steel'],
+        current,
+        new AbortController().signal,
+        selection,
+      );
+      const before = drawing.sourceTextureCount;
+      Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+      const controller = new AbortController();
+      const pending = services.prepareFigureArtwork(['steel'], next, controller.signal, selection, {
+        background: true,
+      });
+      const reserved = services.memorySnapshot().reservedBytes;
+      controller.abort();
+      const cancelled = await pending;
+      const afterCancel = services.memorySnapshot().reservedBytes;
+      const retained = drawing.sourceTextureCount;
+      Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+      document.dispatchEvent(new Event('visibilitychange'));
+      const incoming = await services.prepareFigureArtwork(
+        ['steel'],
+        next,
+        new AbortController().signal,
+        selection,
+        { background: true },
+      );
+      const gl = canvas.getContext('webgl2')!;
+      const upload = gl.texImage2D;
+      let uploads = 0;
+      gl.texImage2D = (...args: any[]) => {
+        uploads++;
+        return Reflect.apply(upload, gl, args);
+      };
+      let promoted: boolean;
+      try {
+        promoted = await services.prepareFigureArtwork(
+          ['steel'],
+          next,
+          new AbortController().signal,
+          selection,
+        );
+      } finally {
+        gl.texImage2D = upload;
+      }
+      // Mandatory external allocations deny optional preparation before it starts.
+      const pressure = {
+        memorySnapshot: {
+          decodedBytes: 0,
+          canvasBytes: 0,
+          transferredBytes: 0,
+          reservedBytes: services.memorySnapshot().budget,
+        },
+      };
+      registerSceneMemory(document, pressure);
+      const denied = await services.prepareFigureArtwork(
+        ['steel'],
+        current,
+        new AbortController().signal,
+        selection,
+        { background: true },
+      );
+      pressure.memorySnapshot.reservedBytes = 0;
+      return {
+        prepared,
+        before,
+        reserved,
+        cancelled,
+        afterCancel,
+        retained,
+        incoming,
+        promoted,
+        uploads,
+        denied,
+      };
+    } finally {
+      for (const dispose of cleanup.reverse()) dispose();
+      final = drawing.sourceTextureCount;
+      drawing.dispose();
+      if (final !== 0) throw Error('Figure disposal retained native sources');
+    }
+  });
+  expect(result.prepared).toBe(true);
+  expect(result.reserved).toBe(64 * 1024 * 1024);
+  expect(result.cancelled).toBe(false);
+  expect(result.afterCancel).toBe(0);
+  expect(result.retained).toBe(result.before);
+  expect(result.incoming).toBe(true);
+  expect(result.promoted).toBe(true);
+  expect(result.uploads).toBe(0);
+  expect(result.denied).toBe(false);
+});

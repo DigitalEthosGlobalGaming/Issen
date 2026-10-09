@@ -1,6 +1,42 @@
 # Current development status
 
-## Current handoff — rush entry delay confirmed
+## Current handoff — background incoming boss artwork
+
+App 1.69.42 connects figure warming to the existing quiet-frame preload controller
+once the next environment is ready. Incoming boss identity tones use the existing
+enemy renderer; selected weapons/player/charm reuse prepared equipment. Native
+services keep the current GPU lease while holding the optional incoming lease.
+A conservative 64 MiB reservation remains counted alongside actual allocations
+until completion; pressure denies admission/cancels pending work. Foreground,
+hidden/busy pending frames, scene identity, equipment/count changes and disposal
+cancel optional preparation. Ready work survives busy frames. No seeded gameplay,
+visit entry or combat RNG changes. Memory polling is throttled to 250 ms.
+
+Focused corrected rush-entry probe: prepared environment plus incoming figures
+reduces transition 221.7→21.1 ms, boss2/helm enters stage1. Incoming preparation
+finishes during the controlled quiet window; sampled committed peak511.54 MiB
+(536,388,532 bytes) including reservations, below512 MiB but narrow headroom.
+Evidence `tmp/probes/rush-entry-prepared-figures.{mjs,json}`. This uses actual frame
+samples and `nextStep`, but sets the pause/between fixture explicitly; it is not
+natural combat, all-transient residency or physical120Hz proof. Its old textual
+`warmed` instrumentation no longer matches the native branch layout; readiness
+is instead proven by the exposed figure-preload ready state and promotion.
+
+Two focused browser checks PASS5.6s: existing cancellation/context restore/final
+release plus new background reservation, cancellation, current retention,
+zero-upload foreground promotion, pressure denial and final GPU0. Results
+`tmp/test-results/browser/background-figures/`. Seven preload/prediction/occlusion
+units PASS. Checked production build/strict TypeScript plus startup/Armoury/run/
+landscape and offline-resize smokes PASS11.5s/default2workers, results
+`tmp/test-results/production/background-figures/`. No unchanged full-suite reruns.
+
+Next: companion first-use and same-stage/fixed-trial incoming preparation; natural
+progression, viewport/special-loadout and transient/native memory coverage; native
+colour mismatch diagnosis; final stable cold/warm/frame/compose matrix and suites.
+Goal active. All processes terminal. No push/deploy/native build/real-save changes;
+cancelled packing/lit-only stays cancelled.
+
+## Previous handoff — rush entry delay confirmed
 
 App remains 1.69.41; this checkpoint changes evidence/documentation only. A focused
 low-tier 390×844/DPR 2 Edge probe corrected the controlled pause by preserving
