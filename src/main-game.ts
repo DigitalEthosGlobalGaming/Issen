@@ -34,6 +34,18 @@ const runtimeUrlSet = new Set<string>(runtimeAssets.map((asset) => asset.url));
 const enemyDebugSources = new Set<string>(Object.values(INK_ENEMY_DEBUG_SOURCES));
 const companionSources = new Set<string>(Object.values(INK_COMPANION_SOURCES));
 const outfitSources = new Set<string>(Object.values(INK_OUTFIT_SOURCES));
+// These native artwork owners share decode leases instead of lifetime startup images.
+const sharedSources = new Set(
+  assetMaterialCatalog
+    .filter((pack) =>
+      [
+        'src/rendering/figures/assets/player-ronin-simple.png',
+        'src/rendering/figures/assets/charm-atlas.png',
+        'src/ui/assets/world-ui-atlas.png',
+      ].includes(pack.sourcePath),
+    )
+    .map((pack) => pack.source),
+);
 const urls = [
   ...Object.values(artwork),
   ...Object.keys(publicArtwork).map(
@@ -45,6 +57,7 @@ const urls = [
     !materialMaps.has(canonical) &&
     !companionSources.has(canonical) &&
     !outfitSources.has(canonical) &&
+    !sharedSources.has(canonical) &&
     !enemyDebugSources.has(canonical) &&
     runtimeUrlSet.has(canonical)
   );

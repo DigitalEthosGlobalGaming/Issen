@@ -241,12 +241,25 @@ test('runtime startup skips unused companions and panels release their selected 
       snapshot: owner.snapshot(),
       native: surfaces.get('supportPreview').native.sourceTextureCount,
     };
+    // The player owner now also retires its base maps and seven hai tone parts on suspension.
+    f.browser.inkPlayer.releaseCanvas(surfaces.get('supportPreview').drawing);
+    const afterPlayerRelease = surfaces.get('supportPreview').native.sourceTextureCount;
     controls.closePanel();
     const closedRock = {
       snapshot: owner.snapshot(),
       native: surfaces.get('supportPreview').native.sourceTextureCount,
     };
-    return { crow, armory, closedArmory, support, closedSupport, pending, arrived, closedRock };
+    return {
+      crow,
+      armory,
+      closedArmory,
+      support,
+      closedSupport,
+      pending,
+      arrived,
+      afterPlayerRelease,
+      closedRock,
+    };
   });
   expect(result.crow).toMatchObject({ equipped: ['parts'], selected: ['parts'], ready: true });
   expect(result.armory.borrowed).toBe(1);
@@ -256,7 +269,8 @@ test('runtime startup skips unused companions and panels release their selected 
   expect(result.support.native - result.closedSupport.native).toBe(3);
   expect(result.pending).toMatchObject({ selected: ['rock'], borrowed: 1, ready: false });
   expect(result.arrived.snapshot).toMatchObject({ selected: ['rock'], borrowed: 1, ready: true });
-  expect(result.arrived.native - result.closedRock.native).toBe(3);
+  expect(result.arrived.native - result.afterPlayerRelease).toBe(10);
+  expect(result.afterPlayerRelease - result.closedRock.native).toBe(3);
   expect(result.closedRock.snapshot.borrowed).toBe(0);
   expect(errors).toEqual([]);
   const path = testInfo.outputPath('runtime-companion-selection.json');

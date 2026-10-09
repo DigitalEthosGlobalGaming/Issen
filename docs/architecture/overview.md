@@ -167,7 +167,11 @@ release selections on suspension/disposal. Unused family sources retire in each
 consuming painter with queued-frame preservation, without closing shared decoded
 images. Final disposal remains immediate. Closed preview painters unregister
 from the outfit owner; standalone catalogue preparation uses all families through
-the same kit path. Player-base, enemy and weapon decoded ownership remains work.
+the same kit path. Player-base planes also use shared leases; plain colour serves
+tone generation while PBR diffuse serves untinted stamps. Player consumers release
+their own raw/tone GPU textures on preview suspension/disposal and unregister.
+Final disposal releases consumers before leases/owned tone pixels.
+Enemy and weapon decoded ownership remains work.
 `cached-materials.ts` owns per-document masked map cutouts through
 `material-cutouts.ts`: a four-million-pixel LRU, recycled evicted canvases and a
 reused scratch for oversized entries. Source/map revisions, crop, mask, output
@@ -234,7 +238,8 @@ requests that bypass the compose queue. Worker requests preserve the current
 raw pins and apply the same decoded-byte admission. Denied sets remain cold.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
-Player-base, enemy, weapon and other eager startup images remain outside it;
+Player-base planes use the same pool; startup excludes plain player/charm/world
+UI sources owned there. Enemy, weapon and other eager startup images remain outside it;
 whole-application memory remains unbounded.
 `platform/main-images.ts` shares native HTML image decoding per Document through
 the budgeted loader. One pool-level quiet-frame/visibility subscription pauses

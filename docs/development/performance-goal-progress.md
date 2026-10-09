@@ -2856,3 +2856,46 @@ production run also passed, but final startup exclusion/guard changes justified
 the final build/test rerun. All process handles terminal. Logs are under
 tmp/probes/outfit-ownership57/{unit.log,related.log,production-final.log}.
 Version metadata/changelog/title agree at1.69.6; local develop commit only.
+
+## Checkpoint58 — Shared player base and startup ownership (1.69.7)
+
+Four1254²player base planes now use MainImageOwner/PbrAtlas leases:
+25,160,256nominal RGBA bytes. Plain colour generates tones; PBR diffuse serves
+untinted stamps, so both remain. Independent owners share images/promises/pins.
+Disposal cancels pending leases without clearing peers or resurrecting players.
+This accounts/shares required bytes, not a guaranteed physical-byte saving.
+Using painters release their own base/tone GPU sources on preview suspension/
+disposal and unregister. Final disposal releases consumers before unpinning raw
+images/clearing owned tones. Startup excludes plain player/charm/world UI URLs
+already owned by this pool; blocked direct-image requests no longer prevent
+startup, while shared fetch/blob decode succeeds and player/charm are ready.
+
+Native oracle:40 exact visible captures, all20 outfits under both mirrors,
+max channel difference0. A copied checkpoint57 harness initially prepared only
+the candidate's changed outfit, missing kasa in its now-selected original.
+Correct both preparations: original/original baseline passes before edits,
+original/pooled candidate passes after. No tolerance change. Companion suspension
+test originally expected only3 total GPU releases, but now13 retire. The fixed
+test explicitly proves10 player sources (3 base/7 hai tones), then3 companion
+sources, preserving distinct exact ownership gates. Permanent new tests prove
+4 unique planes/25,160,256bytes with a surviving peer, final zero bytes/pins,
+pending cancellation/no resurrection and actual blocked-direct startup.
+
+Passive resource inventory during actual startup finds54 distinct direct-image
+environment URLs/339,779,840nominal bytes, including demon/drift/fog/mountain
+maps. The default250-entry buffer was truncated and incorrectly returned0;
+4000 entries capture the requests. This is requested-source accounting, not
+resident memory or attribution to one owner. Audit remaining eager startup and
+direct environment owners next, preserving selected scene/demon/drift readiness,
+worker fallback and offline paths. Their overlap, enemy/weapon ownership and
+decoded/canvas/GPU/copy admission remain unbounded; no safe next-scene claim.
+
+Evidence: tmp/probes/player-ownership58/ saved originals, maker, oracle/config,
+baseline.json/shared.json, startup.json and logs. Verification:475 units;
+12 figure/outfit/player/UI native cases and18 startup/UI-lighting/main-budget/
+armory/companion cases with2 overlaps (28 unique). One companion assertion was
+corrected/rechecked as described above; all pass. Four checked production tests
+include strict TypeScript/source-map build. Exact oracle, changed formatting and
+diff checks pass; all handles terminal. Version1.69.7 metadata/title/changelog
+agree. Local develop only, no assets/seeds/saves/budget changes or push/deploy/
+native build. Full goal active; cancelled work stays cancelled.

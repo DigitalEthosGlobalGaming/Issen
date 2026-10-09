@@ -1,4 +1,46 @@
-# Performance, assets and seamless transitions — Selected outfit ownership
+# Performance, assets and seamless transitions — Shared player base ownership
+
+Checkpoint58 routes four player base planes through the main-image pool,
+app1.69.7. Plain colour is needed for tone generation; untinted stamps use PBR
+diffuse. Preserve both plus normal/surface (25,160,256nominal RGBA bytes).
+Independent players share the four images/pins; cancelling a pending owner
+preserves peers. These bytes become accounted/shared, not a guaranteed physical
+memory saving. Consuming painters release only their own raw/tone GPU sources
+on preview suspension/disposal and unregister; final disposal releases consumers
+before unpinning images and clearing tones. Startup excludes plain player/charm/
+world UI sources already owned by the pool, avoiding second lifetime owners.
+
+The original/current oracle passes40 exact visible outfit/mirror captures. The
+first copied harness missed kasa because it prepared only the candidate's new
+selection; correct preparation for both gives an exact baseline before edits
+and candidate after edits. Existing companion suspension assertion also assumed
+all retired sources were companion-owned. It now separately proves10 player
+sources (3 base +7 hai tones) and3 companion sources. No tolerance was weakened.
+New player-image-ownership tests cover pending peers,4 unique planes/bytes,
+final zero pins/bytes, no resurrection, and actual startup with direct player/
+charm/world UI requests blocked while shared fetch/blob decoding succeeds.
+
+Passive startup inventory finds54 distinct environment URLs requested directly
+as images,339,779,840nominal bytes, including demon/drift/fog/mountain maps.
+A4000-entry resource buffer is required; default250 was truncated and gave0.
+This is requested-source accounting, not resident memory or one-owner attribution.
+Audit the full remaining eager startup set and direct environment owners next;
+these are larger admission obstacles than the player alone. Preserve selected
+scene/demon/drift readiness, worker fallback and offline paths when removing
+eager sources. Enemy/weapon ownership still remains too.
+
+Evidence: tmp/probes/player-ownership58/ has saved original kit/player, maker,
+oracle/config, baseline.json/shared.json, startup.json and unit/production/
+related logs; native outputs under tmp/test-results/player-ownership58/.
+Verification:475 units,28 unique related native cases,4 checked production tests,
+strict TypeScript/source-map build,40-capture oracle, changed-file formatting
+and diff checks pass. All handles terminal. Package/lock/title/changelog agree;
+local develop commit only. Whole decoded/canvas/GPU/copy admission, persistent
+leases, quiet cancelable next slots, promotion/invalidation and Phase5 remain
+open. Budgets256/384/512MiB unchanged; goal active. No seed/save/asset changes,
+push/deploy/native build. Cancelled packing/tight repacking and lit-only remain.
+
+## Previous handoff — Selected outfit ownership
 
 Checkpoint57 integrates selected outfit families, app1.69.6. Runtime startup and
 figure presentation select the equipped robe; startup checks that robe rather

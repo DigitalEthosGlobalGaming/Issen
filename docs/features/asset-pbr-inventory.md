@@ -60,7 +60,12 @@ them on suspension/disposal. The default robe needs no outfit planes, avoiding
 15 eager1254²planes (94,350,960nominal bytes/about90MiB); a family requires three
 planes/18,870,192bytes. Unpinned raw images remain cacheable within the pool,
 while consuming painters retire unused GPU sources at the frame boundary.
-Enemy/player-base/weapon direct image ownership still needs integration;
+Player base sources use the pool as of1.69.7: four1254²planes/25,160,256nominal
+bytes. Both plain colour (tone generation) and diffuse (untinted PBR stamps) are
+required and retained. Its consuming painters release their own GPU sources on
+preview suspension/disposal. Startup excludes plain player/charm/world UI images
+already owned by the pool, avoiding a second lifetime image owner.
+Enemy/weapon direct image ownership still needs integration;
 the shared loader snapshot is not a whole-game memory bound.
 Enemy variant/tone canvases now notify GPU consumers on eviction/final disposal
 (1.68.29). Current-frame textures survive replay until that painter's next begin,
