@@ -1,5 +1,5 @@
 import { documentPixelMemory } from './pixel-memory.ts';
-import { documentImageBudget, trimMainImages } from './main-images.ts';
+import { documentImageBudget, trimMainImages, mainImageReservation } from './main-images.ts';
 
 type SceneOwner = {
   readonly memorySnapshot: {
@@ -33,7 +33,7 @@ export function documentSceneMemory(doc: Document) {
   let workerDecodedBytes = 0,
     workerCanvasBytes = 0,
     transferredBytes = 0,
-    reservedBytes = 0;
+    reservedBytes = mainImageReservation(doc);
   const entries = owners.get(doc);
   for (const entry of entries ?? []) {
     const owner = entry.deref();

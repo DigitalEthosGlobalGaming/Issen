@@ -21,7 +21,14 @@ test('worker phase accounting includes pinned inputs without settling scene read
     }, 0);
     const NativeWorker = window.Worker;
     let releaseResponse: (() => void) | undefined;
-    const phases: Array<{ phase: string; decoded: number; canvas: number }> = [];
+    const phases: Array<{
+      phase: string;
+      decoded: number;
+      canvas: number;
+      reserved: number;
+      settled: boolean;
+    }> = [];
+    let settled = false;
     let owner: ReturnType<typeof createEnvironmentRenderer>;
     window.Worker = class extends EventTarget {
       native: Worker;
@@ -36,6 +43,8 @@ test('worker phase accounting includes pinned inputs without settling scene read
               phase: data.phase,
               decoded: owner.memorySnapshot.decodedBytes,
               canvas: owner.memorySnapshot.canvasBytes,
+              reserved: data.snapshot.decodedLoader?.reservedBytes ?? 0,
+              settled,
             });
           } else releaseResponse = publish;
         });
@@ -48,7 +57,6 @@ test('worker phase accounting includes pinned inputs without settling scene read
       }
     } as unknown as typeof Worker;
     owner = createEnvironmentRenderer(document);
-    let settled = false;
     try {
       const pending = owner
         .compose({
@@ -79,10 +87,18 @@ test('worker phase accounting includes pinned inputs without settling scene read
       window.Worker = NativeWorker;
     }
   });
-  expect(result.phases.map((row) => row.phase)).toEqual(['assets-ready', 'composed']);
-  expect(result.phases.every((row) => row.decoded > 0)).toBe(true);
-  expect(result.phases.every((row) => row.decoded === result.expectedBytes)).toBe(true);
-  expect(result.phases[1].canvas).toBeGreaterThan(0);
+  const boundaries = result.phases.filter((row) => row.phase !== 'decode-progress');
+  expect(boundaries.map((row) => row.phase)).toEqual(['assets-ready', 'composed']);
+  expect(boundaries.every((row) => row.decoded === result.expectedBytes)).toBe(true);
+  expect(boundaries[1].canvas).toBeGreaterThan(0);
+  const progress = result.phases.filter((row) => row.phase === 'decode-progress');
+  expect(
+    progress.some(
+      (row) => row.decoded > 0 && row.decoded < result.expectedBytes && row.reserved > 0,
+    ),
+  ).toBe(true);
+  expect(progress.at(-1)!.decoded).toBe(0);
+  expect(result.phases.every((row) => !row.settled)).toBe(true);
   expect(result.settledBeforeResponse).toBe(false);
   expect(result.ready).toBe(true);
   expect(result.final.decodedBytes).toBe(0);

@@ -19,6 +19,30 @@ function createService(decodedBudget?: number) {
   const workerDocument = createWorkerDocument(decodedBudget);
   return { workerDocument, renderer: createLocalEnvironmentRenderer(workerDocument) };
 }
+function observeDecodeProgress(
+  workerDocument: ReturnType<typeof createWorkerDocument>,
+  renderer: ReturnType<typeof createLocalEnvironmentRenderer>,
+  data: Exclude<ComposeRequest, { kind: 'cancel' }>,
+) {
+  let previous = -1;
+  return workerDocument.observeMemory(() => {
+    const decodedLoader = workerDocument.decodedSnapshot();
+    if (previous === decodedLoader.bytes) return;
+    previous = decodedLoader.bytes;
+    scope.postMessage(
+      {
+        id: data.id,
+        ok: true,
+        phase: 'decode-progress',
+        key: data.kind === 'compose' ? data.key : undefined,
+        layers: [],
+        foreground: [],
+        snapshot: { ...renderer.snapshot(), ...workerDocument.canvasSnapshot(), decodedLoader },
+      },
+      [],
+    );
+  });
+}
 let pending = Promise.resolve();
 let imagePreload: ReturnType<ReturnType<typeof createWorkerDocument>['prefetchImages']>;
 const queued = new Set<number>(),
@@ -34,12 +58,14 @@ scope.onmessage = ({ data }) => {
   imagePreload = undefined;
   workerDocument.stopImagePreload();
   if (data.kind === 'preload') {
+    const stopProgress = observeDecodeProgress(workerDocument, renderer, data);
     const lease =
       data.stage !== undefined && Number.isInteger(data.stage) && data.stage >= 0 && data.stage <= 8
         ? workerDocument.prefetchImages(sceneImageUrls(data.stage))
         : undefined;
     imagePreload = lease;
     void (lease?.ready ?? Promise.resolve(false)).then((ready) => {
+      stopProgress();
       scope.postMessage(
         {
           id: data.id,
@@ -59,6 +85,7 @@ scope.onmessage = ({ data }) => {
   }
   queued.add(data.id);
   pending = pending.then(async () => {
+    const stopProgress = observeDecodeProgress(workerDocument, renderer, data);
     const layers: ComposedLayer[] = [],
       foreground: ComposedLayer[] = [];
     const started = performance.now();
@@ -178,6 +205,7 @@ scope.onmessage = ({ data }) => {
         [],
       );
     } finally {
+      stopProgress();
       queued.delete(data.id);
       cancelled.delete(data.id);
     }

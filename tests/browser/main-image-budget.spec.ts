@@ -8,6 +8,7 @@ test('shared main decode queue waits for visible quiet frames while required ima
   await page.goto('/privacy/index.html');
   const result = await page.evaluate(async () => {
     const { createMainImageOwner } = await import('/src/platform/main-images.ts');
+    const { documentSceneMemory } = await import('/src/platform/scene-memory.ts');
     const { runtimeAssets } = await import('/src/platform/runtime-assets.ts');
     const { sampleAssetBackground } = await import('/src/platform/asset-background.ts');
     const urls = runtimeAssets
@@ -25,7 +26,11 @@ test('shared main decode queue waits for visible quiet frames while required ima
     const peer = b.acquire(urls[0], 'soon');
     a.dispose();
     const required = b.acquire(urls[1]);
+    const duringRequired = documentSceneMemory(document);
+    const asset = runtimeAssets.find((asset) => asset.url === urls[1])!;
+    const expectedReservation = asset.width * asset.height * 4;
     await required.ready;
+    const settledReservation = documentSceneMemory(document).reservedBytes;
     const initially = b.snapshot();
     sampleAssetBackground(0, true, 9, 10);
     await settle();
@@ -72,6 +77,9 @@ test('shared main decode queue waits for visible quiet frames while required ima
       final,
       disposed,
       restarted,
+      duringRequired,
+      expectedReservation,
+      settledReservation,
     };
   });
   for (const snapshot of [result.initially, result.expensive]) {
@@ -79,6 +87,8 @@ test('shared main decode queue waits for visible quiet frames while required ima
     expect(snapshot.decoded).toBe(1);
   }
   expect(result.peerResult).toBe('AbortError');
+  expect(result.duringRequired.reservedBytes).toBe(result.expectedReservation);
+  expect(result.settledReservation).toBe(0);
   expect(result.hidden).toMatchObject({ queued: 1, decoded: 2 });
   for (const snapshot of [result.hiddenRequired, result.revealed, result.busy])
     expect(snapshot).toMatchObject({ queued: 1, decoded: 3 });

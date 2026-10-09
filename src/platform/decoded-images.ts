@@ -8,6 +8,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
   decode(url: string, signal: AbortSignal): Promise<T>;
   expectedBytes?: (url: string) => number | undefined;
   yield?: () => Promise<void>;
+  onMemoryChange?: () => void;
 }) {
   if (!Number.isFinite(options.budget) || options.budget <= 0)
     throw RangeError('Invalid decoded image budget');
@@ -87,6 +88,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
             throw Error(`Decoded image budget exhausted: ${entry.url}`);
           reservedBytes = expected;
           peakBytes = Math.max(peakBytes, bytes + reservedBytes);
+          options.onMemoryChange?.();
           entry.controller = new AbortController();
           const resource = await options.decode(entry.url, entry.controller.signal);
           const size = resource.width * resource.height * 4;
@@ -114,9 +116,11 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           if (!entry.speculativeOnly) entry.touched = ++sequence;
           bytes += size;
           peakBytes = Math.max(peakBytes, bytes);
+          options.onMemoryChange?.();
           entry.resolve(resource);
         } catch (error) {
           reservedBytes = 0;
+          options.onMemoryChange?.();
           if (entries.get(entry.url) === entry) entries.delete(entry.url);
           entry.reject(error);
         }
@@ -183,6 +187,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         if (bytes <= targetBytes) break;
         evict(entry);
       }
+      if (before !== bytes) options.onMemoryChange?.();
       return before - bytes;
     },
     /** Hold one admitted future image set without mutating renderer bindings. */
@@ -240,6 +245,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           0,
         ),
         bytes: bytes + reservedBytes,
+        reservedBytes,
         peakBytes,
         budget: options.budget,
         evictions,
@@ -258,6 +264,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
       pins.clear();
       bytes = 0;
       reservedBytes = 0;
+      options.onMemoryChange?.();
     },
   };
 }

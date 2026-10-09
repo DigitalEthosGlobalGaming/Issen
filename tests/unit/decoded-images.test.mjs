@@ -10,6 +10,38 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('decode reservations notify before allocation and clear on success, trim and failure', async () => {
+  const changes = [],
+    closed = [];
+  let finish;
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    yield: turn,
+    onMemoryChange: () => changes.push(loader.snapshot()),
+    decode: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  const pending = loader.load('first');
+  assert.equal(changes.at(-1).reservedBytes, 400);
+  assert.equal(changes.at(-1).decoded, 0);
+  finish(resource('first', closed));
+  await pending;
+  assert.equal(changes.at(-1).reservedBytes, 0);
+  assert.equal(changes.at(-1).bytes, 400);
+  loader.trim();
+  assert.equal(changes.at(-1).bytes, 0);
+  await turn();
+  const failed = loader.load('wrong-size');
+  finish(resource('wrong-size', closed, 20));
+  await assert.rejects(failed, /dimensions changed/);
+  assert.equal(changes.at(-1).reservedBytes, 0);
+  assert.equal(changes.at(-1).bytes, 0);
+  loader.dispose();
+});
+
 test('explicit headroom trimming evicts unused images in LRU order and preserves pins', async () => {
   const closed = [];
   const loader = createDecodedImageLoader({

@@ -37,6 +37,11 @@ export function trimMainImages(doc: Document, bytesToRelease: number): number {
   return loader.trim(Math.max(0, loader.snapshot().bytes - bytesToRelease));
 }
 
+/** Pending decode estimates are separate from pixels already visible in the registry. */
+export function mainImageReservation(doc: Document): number {
+  return pools.get(doc)?.loader.snapshot().reservedBytes ?? 0;
+}
+
 async function decode(doc: Document, url: string, signal: AbortSignal): Promise<Resource> {
   const response = await readCompressedAsset(url, signal);
   const blob = await response.blob();

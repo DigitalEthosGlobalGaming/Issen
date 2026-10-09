@@ -773,6 +773,11 @@ A Pixi8.22 descriptor adapter adds stencil/MSAA renderbuffers without GL queries
 These counters exclude default browser drawing buffers, driver overhead and
 unregistered auxiliary canvases. They are groundwork
 for combined admission, not an enforced whole-app cap or physical residency proof.
+The combined ledger includes the main pool's pending decode reservation in
+addition to tracked resident pixels. Worker loaders publish byte-changing decode
+progress before allocation; scenery ownership updates counters and reclaims
+unpinned main cache without resolving readiness. Equal-byte updates coalesce;
+assets-ready/composed/final responses retain their existing readiness semantics.
 
 Worker export closes unpinned raw decoded inputs after every plane copy settles
 and retires composition/foreground canvases before posting independent bitmaps.

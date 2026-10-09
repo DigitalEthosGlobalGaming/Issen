@@ -1,4 +1,36 @@
-# Mobile performance — Preview baked-input lifetime
+# Mobile performance — Pending decode accounting
+
+App1.69.32 exposes loader reservedBytes separately and includes pending main-pool
+decodes in combined committed memory. Worker loaders notify byte changes before
+decode and after completion/failure/trim. Per-request decode-progress messages
+update main counters and reclaim unpinned cache without settling readiness.
+Equal-byte notifications coalesce. Assets-ready/composed/final behavior unchanged;
+observers stop at request completion, including preload completion/cancellation.
+
+15loader/ledger units PASS;5focused main/worker/progression/promotion/admission/
+busy-cancellation browser cases PASS7.3s. New checks cover pre-allocation
+reservations, success/failure/trim cleanup, partial worker progress and no early
+readiness. Evidence `tmp/test-results/browser/decode-progress/`.
+
+Same low-memory Demon/inspection flow now observes555,208,336bytes (529.5MiB),
+including6,291,456bytes of pending decode reservation at peak. Prior511.4MiB
+sample omitted pending main reservations and is not cap proof. Evidence
+`tmp/probes/realm-preview-memory-decode-progress.json`; restored title420MiB.
+Ordinary stage0–8→0 maximum471,082,540bytes (449.3MiB) in samples/phase capture;
+settled return443,195,388bytes. Evidence
+`tmp/probes/all-stage-memory-decode-progress.json`. Phase-observer listener order
+can lag; sampled counters plus browser progress tests verify reporting, not every
+physical transient. Do not equate improved counters with a performance win.
+
+Next: required GPU/compose preparation reservations and transient/native scratch
+headroom, especially preview restoration; current529.5MiB remains over512MiB.
+Broader integration/final matrix, historical software/GPU copy mismatch and
+physical Android/120Hz remain. Synchronized metadata/title/changelog1.69.32;
+strict checked build PASS (`tmp/probes/decode-progress-build.log`).
+Goal active; no push/deploy/native build/save changes; cancelled
+work stays cancelled.
+
+## Previous handoff — Preview baked-input lifetime
 
 App1.69.31 releases shared room colour/material input leases after baking its
 independent room planes. Source bindings/cutouts retire while cached room planes

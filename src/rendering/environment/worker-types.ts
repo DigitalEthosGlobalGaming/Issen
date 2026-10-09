@@ -36,6 +36,7 @@ export type EnvironmentSnapshot = {
     pinned: number;
     pinnedBytes: number;
     bytes: number;
+    reservedBytes?: number;
     peakBytes: number;
     budget: number;
     evictions: number;
@@ -57,7 +58,7 @@ export type ComposeResponse = {
   foreground: ComposedLayer[];
   snapshot: EnvironmentSnapshot;
   error?: string;
-  phase?: 'assets-ready' | 'composed';
+  phase?: 'decode-progress' | 'assets-ready' | 'composed';
 };
 export type CompositionIdentity = Pick<
   EnvironmentFrame,

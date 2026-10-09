@@ -69,8 +69,10 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   > & { images: number };
   canvasSnapshot(): { canvasBytes: number; canvases: number };
   releaseUnusedImages(): number;
+  observeMemory(listener: () => void): () => void;
 } {
   const memory = createPixelMemory();
+  const memoryListeners = new Set<() => void>();
   const dimensions = new Map(
     assetMaterialCatalog.flatMap((pack) =>
       [pack.source, ...Object.values(pack.maps)].map((url) => [url, pack.dimensions] as const),
@@ -86,6 +88,9 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
           : (navigator as Navigator & { deviceMemory?: number }).deviceMemory,
     });
   const loader = createDecodedImageLoader({
+    onMemoryChange: () => {
+      for (const listener of memoryListeners) listener();
+    },
     expectedBytes: (url) => {
       const size = dimensions.get(url);
       if (!size) return;
@@ -184,6 +189,12 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
   >();
   const unwrap = (value: unknown) => (value instanceof DecodedImage ? value.bitmap : value);
   const doc = {
+    observeMemory(listener: () => void) {
+      memoryListeners.add(listener);
+      return () => {
+        memoryListeners.delete(listener);
+      };
+    },
     releaseUnusedImages: () => loader.trim(),
     canvasSnapshot() {
       const { canvasBytes, canvases } = memory.snapshot();
@@ -234,5 +245,6 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };
     canvasSnapshot: typeof doc.canvasSnapshot;
     releaseUnusedImages: typeof doc.releaseUnusedImages;
+    observeMemory: typeof doc.observeMemory;
   };
 }

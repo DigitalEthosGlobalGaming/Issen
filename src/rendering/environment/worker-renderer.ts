@@ -197,6 +197,10 @@ export function createWorkerEnvironmentRenderer(
           canvases: data.snapshot.canvases,
         };
         if (data.phase) {
+          if (data.phase === 'decode-progress') {
+            reclaimSceneMemory(doc);
+            return;
+          }
           if (data.phase === 'assets-ready')
             markScenePhase('assets-ready', request.timingPrefix + data.key);
           else markScenePhase('composed', request.timingPrefix + data.key);
