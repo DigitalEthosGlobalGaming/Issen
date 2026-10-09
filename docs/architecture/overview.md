@@ -247,17 +247,16 @@ the main pool rather than independently selecting a different worker default.
 These remain per-pool bounds, not a combined whole-application memory allowance.
 
 Charms, selected companions/outfits and world UI artwork use this loader.
-Player-base and drift colour/material planes use the same pool. Runtime startup
-and scene-flow preparation select the drift mixture's families. Incoming kits
-prepare beside the drawable set; submitted leaves continue moving while pending.
-Generation checks reject superseded requests, and departing kits retire only
-consuming painters' textures before unpinning. Standalone catalogue preparation
-without a stage explicitly loads all four families.
-Runtime drift preparation uploads colour/emissive and data maps through the same
-painter texture store and compiles its leaf/scenery programs before publication.
+Player-base and drift colour/emissive planes use the same pool. Drift's four
+logical families share one merged two-plane atlas, so surviving particles stay
+drawable across stage changes without reacquiring family-specific maps.
+Generation checks reject superseded requests. Runtime drift preparation uploads
+the mipmapped pair through the consuming painter texture store and compiles its
+single composite program before publication. Leaves never enter the geometry
+pass; lighting samples the scene light with ambient fallback over empty geometry.
 An owner-held texture lease survives frame collection until replacement or
 disposal. Supersession aborts hidden uploads; failed warming keeps the previous
-drawable set, releases incoming pins and permits retry. Standalone owners without
+drawable set and permits retry. Standalone owners without
 a painter retain their decode-only preparation contract.
 Startup excludes plain player/charm/world
 UI sources owned there. Enemy, weapon and other eager startup images remain outside it;

@@ -47,7 +47,13 @@ export async function generateRuntimeCatalog(root = path.resolve(import.meta.dir
       ? job
       : JSON.parse(await readFile(path.join(root, job.output, 'generation.json'), 'utf8'));
     const stem = path.basename(pack.source, '.png');
-    const source = await existing(root, [pack.source.replace(/\.png$/, '.compact.png'), pack.source.replace(/\.png$/, '.webp'), pack.source]);
+    // Drift uses its merged lit atlas. Retain these packs as authoring sources only.
+    if (/^drift-(leaves|petals|debris|fire)-atlas$/.test(stem)) continue;
+    const source = await existing(root, [
+      pack.source.replace(/\.png$/, '.compact.png'),
+      pack.source.replace(/\.png$/, '.webp'),
+      pack.source,
+    ]);
     lines.push(
       `{ sourcePath: ${JSON.stringify(pack.source)}, source: new URL(${JSON.stringify(relative(source))}, import.meta.url).href, dimensions: [${pack.dimensions}] as const, maps: {`,
     );

@@ -8,11 +8,11 @@ test('scene-specific drift preserves held leaves, suppresses superseded sets and
     const { createDriftRenderer } = await import('/src/rendering/scene/drift-renderer.ts');
     const { createTestDrawing } = await import('/tests/browser/fixtures/native-drawing.ts');
     const { createLeafMotion } = await import('/src/rendering/scene/leaf-motion.ts');
-    const owner = createDriftRenderer(document);
-    await owner.prepare(0);
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 96;
     const g = await createTestDrawing(canvas);
+    const owner = createDriftRenderer(document, () => g);
+    await owner.prepare(0);
     const motion = createLeafMotion(),
       leaf = {
         x: 48,
@@ -54,22 +54,25 @@ test('scene-specific drift preserves held leaves, suppresses superseded sets and
       initial: owner.snapshot(),
     };
   });
-  let release!: () => void;
-  const gate = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  let held = 0;
-  await page.route(/drift-debris-atlas\.webp/, async (route) => {
-    if (route.request().resourceType() !== 'fetch') return route.continue();
-    held++;
-    await gate;
-    await route.continue();
+  await page.evaluate(() => {
+    const d = (window as any).__selectedDrift,
+      warm = d.g.warmScene.bind(d.g);
+    let calls = 0;
+    d.g.warmScene = async (uploads: any, signal: AbortSignal) => {
+      if (++calls === 1) {
+        d.entered = true;
+        await new Promise<void>((resolve) => {
+          d.release = resolve;
+        });
+      }
+      return warm(uploads, signal);
+    };
   });
   await page.evaluate(() => {
     const d = (window as any).__selectedDrift;
     d.incoming = d.owner.prepare(4);
   });
-  await expect.poll(() => held).toBe(1);
+  await page.waitForFunction(() => (window as any).__selectedDrift.entered);
   const pending = await page.evaluate(() => {
     const d = (window as any).__selectedDrift;
     const before = d.draw([{ ...d.leaf, sprite: 'debris.splinter' }]);
@@ -84,8 +87,8 @@ test('scene-specific drift preserves held leaves, suppresses superseded sets and
   });
   expect(pending.initial).toMatchObject({
     selected: ['leaves', 'petals'],
-    pinned: 6,
-    pinnedBytes: 37764912,
+    pinned: 2,
+    pinnedBytes: 4194304,
     ready: true,
   });
   expect(pending.pending.selected).toEqual(['leaves', 'petals']);
@@ -93,7 +96,7 @@ test('scene-specific drift preserves held leaves, suppresses superseded sets and
   expect(pending.pending.ready).toBe(false);
   expect(pending.changes).toBe(0);
   expect(pending.motionChanges).toBeGreaterThan(0);
-  release();
+  await page.evaluate(() => (window as any).__selectedDrift.release());
   const done = await page.evaluate(async () => {
     const d = (window as any).__selectedDrift;
     const [stale, ready] = await Promise.all([d.incoming, d.latest]);
@@ -113,13 +116,13 @@ test('scene-specific drift preserves held leaves, suppresses superseded sets and
   expect(done.ready).toBe(true);
   expect(done.fire).toMatchObject({
     selected: ['fire'],
-    pinned: 4,
-    pinnedBytes: 25176608,
+    pinned: 2,
+    pinnedBytes: 4194304,
     ready: true,
   });
-  expect(done.textures).toBe(4);
-  expect(done.rows.every((r) => r.ready && r.pinned <= 9 && r.bytes <= r.budget)).toBe(true);
-  expect(done.rows[0]).toMatchObject({ selected: ['leaves', 'petals'], pinned: 6 });
+  expect(done.textures).toBe(2);
+  expect(done.rows.every((r) => r.ready && r.pinned === 2 && r.bytes <= r.budget)).toBe(true);
+  expect(done.rows[0]).toMatchObject({ selected: ['leaves', 'petals'], pinned: 2 });
   expect(done.final.bytes).toBe(0);
 });
 
@@ -160,32 +163,40 @@ test('runtime startup prepares only the current drift mixture', async ({ page })
   expect(blocked).toEqual([]);
 });
 
-test('runtime scene readiness waits for newly selected drift inputs', async ({ page }) => {
-  await page.addInitScript(() =>
-    Object.defineProperty(navigator, 'connection', {
-      value: { saveData: true, addEventListener() {}, removeEventListener() {} },
-    }),
-  );
+test('runtime scene readiness waits for drift publication', async ({ page }) => {
   await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
-  let release!: () => void;
-  const gate = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  let held = 0;
-  await page.route(/drift-debris-atlas\.webp/, async (route) => {
-    if (route.request().resourceType() !== 'fetch') return route.continue();
-    held++;
-    await gate;
-    await route.continue();
+  await page.route('**/src/game.ts*', async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      body: (await response.text()).replace(
+        'artworkReady = true;',
+        'window.__driftSelection = presentation; artworkReady = true;',
+      ),
+    });
   });
   await page.goto('/');
+  await page.waitForFunction(() => (window as any).__driftSelection);
   await page.locator('#title .t-k').click({ clickCount: 3 });
   const canvas = page.locator('#c');
   await expect(canvas).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
+  await page.evaluate(() => {
+    const d = (window as any).__driftSelection,
+      prepare = d.driftRenderer.prepare.bind(d.driftRenderer);
+    d.driftRenderer.prepare = async (stage: number) => {
+      if (stage === 1 && !d.held) {
+        d.held = true;
+        await new Promise<void>((resolve) => {
+          d.release = resolve;
+        });
+      }
+      return prepare(stage);
+    };
+  });
   await page.getByRole('button', { name: 'Next scene', exact: true }).click();
-  await expect.poll(() => held).toBe(1);
+  await page.waitForFunction(() => (window as any).__driftSelection.held);
   await expect(canvas).toHaveAttribute('data-scene-state', 'loading');
-  release();
+  await page.evaluate(() => (window as any).__driftSelection.release());
   await expect(canvas).toHaveAttribute('data-scene-state', 'ready', { timeout: 15000 });
   await expect(canvas).toHaveAttribute('data-scene', '1');
 });

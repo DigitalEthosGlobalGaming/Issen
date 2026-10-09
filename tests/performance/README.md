@@ -39,8 +39,16 @@ without stopping or reusing the other server.
 
 Drift comparisons use `--suite=drift --drift=off|current|new --mode=timing`.
 The switch exists only in instrumented builds: off skips leaf and ember submission
-while keeping asset preparation and cosmetic simulation. Current uses the existing
-PBR renderer; new fails explicitly until the replacement path is implemented.
+while keeping asset preparation and cosmetic simulation. New (the default) uses
+the shipped cheap lit renderer. Current requires `--control=<saved-run>` pointing
+to a passing current-mode capture from before the replacement. The runner copies
+its checked immutable build and records the original source/tool identity, so
+full PBR does not remain as a duplicate runtime path. For example:
+
+```sh
+npm run test-performance -- --suite=drift --drift=current --control=tmp/performance/<saved-current-run> --mode=timing
+```
+
 Calm suppresses gust particles; gust adds repeated bursts through the normal
 cosmetic spawn function. Guards require leaves in both scenes, zero gust leaves
 in calm and gust leaves in gust. This is a controlled sustained-gust workload,
@@ -49,7 +57,9 @@ and counts above 8.3/16.7 ms. `--cpu-rate=4` applies CDP CPU throttling on web;
 it approximates slower CPU execution, not mobile GPU bandwidth or 120 Hz delivery.
 Record separate off/current/new arms with the same settings. The baseline
 comparison command rejects changed drift modes or throttle rates; cross-mode
-cost comparisons must explicitly identify the differing mode.
+cost comparisons must explicitly identify the differing mode and saved build
+instrumentation. Saved controls are historical application builds, not just a
+shader toggle in the new runtime; report other changes and workload differences.
 
 - `menus`: title, Stats, Options, Armoury, inspection, setup, Temple, Trials,
   pause and reduced-motion title. Only Scroll menus exist in the application.

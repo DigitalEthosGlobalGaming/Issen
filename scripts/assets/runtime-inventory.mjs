@@ -81,7 +81,10 @@ export async function runtimeInventory() {
     }
   }
   for (const file of sourceFiles.filter(
-    (name) => /\.(?:ts|css|html)$/.test(name) && !name.endsWith('asset-material-catalog.ts'),
+    (name) =>
+      /\.(?:ts|css|html)$/.test(name) &&
+      !name.endsWith('asset-material-catalog.ts') &&
+      !name.endsWith('runtime-assets.ts'),
   )) {
     const text = await readFile(file, 'utf8');
     for (const match of text.matchAll(

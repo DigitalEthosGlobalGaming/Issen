@@ -29,7 +29,7 @@ test('drift owners share pending inputs and retire only their consuming painter'
     d.cancelled.dispose();
     return { pool: d.observer.snapshot(), ready: d.cancelled.ready };
   });
-  expect(waiting.pool).toMatchObject({ queued: 4, decoded: 0, pinned: 0 });
+  expect(waiting.pool).toMatchObject({ queued: 2, decoded: 0, pinned: 0 });
   expect(waiting.ready).toBe(false);
   release();
   const result = await page.evaluate(async () => {
@@ -101,12 +101,12 @@ test('drift owners share pending inputs and retire only their consuming painter'
     gs.forEach((g) => g.dispose());
     return { shared, textures, retired, still, changes, ready, unpinned, final, afterCold };
   });
-  expect(result.shared.decoded).toBe(13);
-  expect(result.shared.pinned).toBe(13);
-  expect(result.shared.pinnedBytes).toBe(81823976);
-  expect(result.textures).toEqual([13, 13]);
-  expect(result.retired).toEqual([0, 13]);
-  expect(result.still.pinned).toBe(13);
+  expect(result.shared.decoded).toBe(2);
+  expect(result.shared.pinned).toBe(2);
+  expect(result.shared.pinnedBytes).toBe(4194304);
+  expect(result.textures).toEqual([2, 2]);
+  expect(result.retired).toEqual([0, 2]);
+  expect(result.still.pinned).toBe(2);
   expect(result.changes).toBe(0);
   expect(result.ready).toEqual({ cancelled: false, survivor: false, peer: true });
   expect(result.unpinned.pinned).toBe(0);

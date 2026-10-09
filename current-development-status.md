@@ -1,4 +1,55 @@
-# Mobile performance — Drift baseline and atlas preparation
+# Mobile performance — Drift checkpoint verified
+
+Worktree app1.69.15 installs the merged128px-cell colour/emissive WebPs and
+single-pass lit drift. No geometry-buffer writes or normal/surface sampling;
+drift-only mipmaps/trilinear filtering, scene light with ambient sky fallback,
+fire emission, instancing/motion/order retained. All four logical families share
+two leases/4,194,304nominal decoded bytes. Full historical set81,823,976bytes:
+94.87% reduction; encoded4,378,340→155,694bytes. GPU mip estimate5,592,405bytes
+is not physical residency. Original PNG/PBR sources retained; four unused base
+WebPs removed and old drift packs excluded from runtime catalog.
+
+Focused14 browser checks and476 full unit cases pass. Production checkpoint
+passes all4 cases including strict TypeScript/build/offline resize. Full browser
+checkpoint ends371 pass/3 fail (374 cases,18.7m,two workers). Historical compaction
+checks requested four retired WebPs and preview expected86 rather than82 packs;
+those expectations are corrected, retaining PNG-source and180 exact data checks.
+Native leaf restoration reports one alpha mismatch while geometry/HDR targets
+remain exact; cause unresolved. All5 cases in the three affected files pass the
+focused rerun, including unchanged strict alpha parity and added diagnostics.
+No unchanged full suite repeated after test-only fixes. All handles terminal.
+Logs: `tmp/probes/drift-{units,production,browser-full,focus-final}.log`;
+original failures preserved in `tmp/probes/drift-full-failures/`.
+Package/lock/title/changelog agree at1.69.15; changed formatting/diff checks pass.
+
+All24 replacement timing samples and eight before/after DPR3 captures pass and
+their processes are terminal. Largest-gust controlled review supports128px;
+all quality levels use the cheap path. Captures/evidence are under
+`tmp/probes/drift-scenes/`; controlled lantern/sky/fire/gust PNGs preserved under
+`tmp/probes/drift-new/`. CPU-rate4 current→new render median10.5→9.6ms calm and
+10.9→10.4ms gust; frame-p95 stays17–18ms. No physical mobile GPU/120Hz proof or
+substantial isolated drift-cost claim. See the updated
+[evidence](docs/development/mobile-performance-progress.md) for raw runs,
+populations, caveats, visual decision and out-of-scope grass opportunity.
+
+Next: commit the coherent drift change. Then require workers with
+clear error/retry recovery and finish next-scene/figure warming, ownership and
+combined memory admission. Those remain incomplete. General packing and separate
+lit-only integration stay cancelled. No push/deployment/native build/save changes.
+
+During the live run, a worker-owner candidate was prepared under ignored
+`tmp/probes/worker-required/worker-renderer.ts` by
+`tmp/probes/prepare-worker-required.py`. It removes owner fallback branches and
+adds explicit restart/generation guards, including messageerror. Node syntax
+check passes; it is not applied, type-checked or browser-verified. Review stale
+warm/prepare handling before applying after the drift commit. Factory, startup
+and later-scene error/retry UI still need integration. Shared worker composition
+logic remains required. Capacitor's default WebView floor60 conflicts with
+required module workers80; installed Vite's baseline targets Chrome111. Align
+the declared native floor with that build, retain runtime capability/error checks,
+and distinguish desktop/offline-asset verification from physical WebView proof.
+
+## Previous handoff — Drift baseline and atlas preparation
 
 The new [active goal](goal-objective.md) supersedes the earlier exact-pixel
 performance objective. Visual simplification is authorized when the game's feel

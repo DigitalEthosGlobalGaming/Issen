@@ -19,11 +19,14 @@ def resize_frame(image, bounds, size):
         (size, size), Image.Resampling.LANCZOS).convert('RGBA')
 
 
-def generate(root, output, cell=128, gutter=4):
+def generate(root, output, cell=128, gutter=4, review_output=None):
     if cell not in (128, 192) or not 1 <= gutter < cell // 4:
         raise ValueError('Use 128 or 192px cells and a small positive gutter')
     output.mkdir(parents=True, exist_ok=True)
     assets = root / 'src/rendering/environment/assets'
+    # Removed runtime siblings remain represented by their audited compaction record.
+    compaction = root / 'scripts/assets/compaction-manifest.json'
+    historical = json.loads(compaction.read_text(encoding='utf8'))['files'] if compaction.exists() else []
     colour = Image.new('RGBA', (cell * 8, cell * 4))
     emission = Image.new('RGBA', colour.size)
     content = cell - gutter * 2
@@ -37,6 +40,11 @@ def generate(root, output, cell=128, gutter=4):
         sources.append({'path': source.relative_to(root).as_posix(),
                         'sha256': hashlib.sha256(source.read_bytes()).hexdigest()})
         runtime = assets / f'{name}.webp'
+        if not runtime.exists():
+            record = next((item for item in historical if item.get('newPath') == runtime.relative_to(root).as_posix()), None)
+            if record:
+                before_bytes += record['sizeAfter']
+                before_decoded += image.width * image.height * 4
         # Existing drift renders base colour + normal + surface + optional emission.
         planes = [runtime, *[assets / 'pbr' / name / f'{name}_{kind}.webp'
                             for kind in ('normal', 'surface', 'emissive')]]
@@ -67,8 +75,10 @@ def generate(root, output, cell=128, gutter=4):
     emission.save(output / 'drift-emissive.webp', lossless=True,
                   quality=100, method=6, exact=True)
     # Lossless review references make encoding artefacts inspectable independently.
-    colour.save(output / 'drift-colour-reference.png')
-    emission.save(output / 'drift-emissive-reference.png')
+    review = review_output or output
+    review.mkdir(parents=True, exist_ok=True)
+    colour.save(review / 'drift-colour-reference.png')
+    emission.save(review / 'drift-emissive-reference.png')
     decoded_bytes = colour.width * colour.height * 4 * 2
     report = {'cell': cell, 'gutter': gutter, 'content': content,
               'dimensions': list(colour.size), 'frames': frames, 'sources': sources,
@@ -87,8 +97,9 @@ if __name__ == '__main__':
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument('--output', type=Path, default=Path('tmp/drift-atlas'))
     parser.add_argument('--cell', type=int, default=128)
+    parser.add_argument('--review-output', type=Path, default=Path('tmp/drift-atlas'))
     parser.add_argument('--gutter', type=int, default=4)
     args = parser.parse_args()
-    result = generate(args.root.resolve(), args.output, args.cell, args.gutter)
+    result = generate(args.root.resolve(), args.output, args.cell, args.gutter, args.review_output)
     print(json.dumps({key: result[key] for key in
                       ('dimensions', 'before', 'after', 'decodedReduction')}, indent=2))

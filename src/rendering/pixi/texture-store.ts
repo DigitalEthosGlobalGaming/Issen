@@ -87,9 +87,17 @@ export class SceneTextureStore {
     return this.get(input, true);
   }
   get(input: SceneTexture, data = false): Texture {
-    if (input.frame) return this.getFrame(input.source, input.revision, ...input.frame, data);
-    const prepared = this.prepare(input.source, input.revision, data);
-    return prepared.texture;
+    const texture = input.frame
+      ? this.getFrame(input.source, input.revision, ...input.frame, data)
+      : this.prepare(input.source, input.revision, data).texture;
+    if (input.mipmaps && !texture.source.autoGenerateMipmaps) {
+      texture.source.autoGenerateMipmaps = true;
+      texture.source.style.minFilter = 'linear';
+      texture.source.style.magFilter = 'linear';
+      texture.source.style.mipmapFilter = 'linear';
+      texture.source.update();
+    }
+    return texture;
   }
   getFrame(
     source: SceneTexture['source'],

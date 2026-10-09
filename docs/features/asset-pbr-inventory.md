@@ -160,14 +160,16 @@ Only packs selected by a renderer are decoded. Generated maps are excluded from
 startup decoding. Environment source images are also excluded as of1.69.8;
 scene composition, demon and drift prepare their inputs independently. This
 removes36 plain startup sources/226,501,456nominal RGBA bytes, without claiming
-resident savings. Drift sources/maps use pooled leases as of1.69.9:13 planes/
-81,823,976nominal bytes become shared/accounted; disposal releases only its
-consuming painters. Runtime drift selection as of1.69.10 needs6 planes/
-37,764,912nominal bytes for Meadow, at most9 active planes across normal scenes,
-and4 for Demon. Incoming preparation retains moving old leaves until ready;
-departed families become evictable. Catalogue-only callers can still prepare
-all four. As of1.69.11 runtime drift warms these same colour/emissive and data
-textures before publication, retaining a painter lease until replacement/disposal.
+resident savings. As of1.69.15 all drift families share two1024×512 colour/emissive
+planes,4,194,304nominal decoded bytes versus81,823,976 for the historical full
+set (94.87% reduction). The drift-only mipmapped GPU estimate is5,592,405bytes;
+this is not measured physical residency. All families remain available for moving
+particles during stage changes. Preparation warms the pair through its consuming
+painter before publication; disposal releases its two pooled leases and painter
+textures. The cheap composite path samples scene light, falls back to ambient
+over empty geometry and preserves fire emission without normal/surface maps or
+geometry-buffer writes. Original PNG/PBR authoring sources remain; old generated
+base WebPs are removed and old drift packs excluded from the runtime catalog.
 Direct demon/fog ownership still needs migration.
 Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
@@ -177,7 +179,7 @@ normals and material coverage; procedural paint clears covered material pixels.
 Raster UI backgrounds, borders, symbols, crests and tinted seals use the same
 shader through CSS texture replacement; original slices, crops and alpha remain
 intact. Startup and gameplay share one session-only rig. Canvas comparison keeps
-original colour art. The tilde panel's Material preview exposes all **86** packs,
+original colour art. The tilde panel's Material preview exposes all **82** runtime packs,
 including retained sources without reintroducing them into gameplay.
 
 All 80 previously missing raster packs are installed: 36 environment/debris,
@@ -289,10 +291,10 @@ those in the family and mixed-material tables above.
 | [cherry-trees-atlas.png](../../src/rendering/environment/assets/cherry-trees-atlas.png) | 1254×1254 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/cherry-trees-atlas/README.md) | `wood` |
 | [demon-landmarks-atlas.png](../../src/rendering/environment/assets/demon-landmarks-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-landmarks-atlas/README.md) | `stone` + `wood` |
 | [demon-terrain-atlas.png](../../src/rendering/environment/assets/demon-terrain-atlas.png) | 1254×1254 | [demon-realm.ts](../../src/rendering/environment/demon-realm.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/demon-terrain-atlas/README.md) | `stone` |
-| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
-| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
-| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
-| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | [drift-catalog.ts](../../src/rendering/scene/drift-catalog.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
+| [drift-debris-atlas.png](../../src/rendering/environment/assets/drift-debris-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-debris-atlas/README.md) | `cloth` |
+| [drift-fire-atlas.png](../../src/rendering/environment/assets/drift-fire-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-fire-atlas/README.md) | `default` |
+| [drift-leaves-atlas.png](../../src/rendering/environment/assets/drift-leaves-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-leaves-atlas/README.md) | `cloth` |
+| [drift-petals-atlas.png](../../src/rendering/environment/assets/drift-petals-atlas.png) | 1774×887 | Authoring source for merged drift | [Authoring only](../../src/rendering/environment/assets/pbr/drift-petals-atlas/README.md) | `cloth` |
 | [fallen-bamboo-atlas.png](../../src/rendering/environment/assets/fallen-bamboo-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/fallen-bamboo-atlas/README.md) | `wood` |
 | [field-banks-atlas.png](../../src/rendering/environment/assets/field-banks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-banks-atlas/README.md) | `stone` |
 | [field-rocks-atlas.png](../../src/rendering/environment/assets/field-rocks-atlas.png) | 1774×887 | [index.ts](../../src/rendering/environment/index.ts) | [Yes, connected](../../src/rendering/environment/assets/pbr/field-rocks-atlas/README.md) | `stone` |

@@ -304,7 +304,12 @@ export class PixiScenePainter implements SceneDrawing {
       const item = this.submit('leaf');
       const slot = this.slots[this.cursor - 1]!;
       this.applyTransform(item, this.matrix);
-      slot.leaf!.update(frame, this.textures, this.lighting.materialLighting ?? 1, this.matrix);
+      slot.leaf!.update(
+        frame,
+        this.textures,
+        this.lighting.materialLighting ?? 1,
+        this.lighting.ambient,
+      );
     });
     registerGrassSink(this, (frame) => {
       const item = this.submit('grass');
@@ -615,11 +620,9 @@ export class PixiScenePainter implements SceneDrawing {
       visit(this.root);
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
-        if (slot.material || slot.grass || slot.leaf)
+        if (slot.material || slot.grass)
           restore.push(
-            (slot.material ?? slot.grass ?? slot.leaf)!.beginGeometry(
-              this.geometryBuffer.targets!.depthRange,
-            ),
+            (slot.material ?? slot.grass)!.beginGeometry(this.geometryBuffer.targets!.depthRange),
           );
         else {
           const renderable = slot.item.renderable;

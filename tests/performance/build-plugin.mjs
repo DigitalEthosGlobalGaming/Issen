@@ -21,7 +21,7 @@ export function instrumentRuntime(source, id = 'src/game.ts', buildId = 'test') 
   };
   if (id.endsWith('drift-renderer.ts')) {
     edited.prepend(
-      "const driftProbeMode = new URLSearchParams(location.search).get('drift') ?? 'current';\nif (!['off','current'].includes(driftProbeMode)) throw new Error('New drift path is not implemented');\n",
+      "const driftProbeMode = new URLSearchParams(location.search).get('drift') ?? 'new';\nif (!['off','new'].includes(driftProbeMode)) throw new Error('Full PBR current mode requires a saved control build');\n",
     );
     replace(
       'if (disposed || !inputs.atlases.length) return;',

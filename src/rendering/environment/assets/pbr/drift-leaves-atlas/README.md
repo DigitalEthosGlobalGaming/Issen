@@ -2,10 +2,10 @@
 
 Generated from [drift-leaves-atlas.png](../../drift-leaves-atlas.png) with `cloth`, Sprite/OpenGL.
 
-Runtime planes retain the original atlas dimensions and diffuse alpha.
+Authoring planes retain the original atlas dimensions and diffuse alpha. This pack is excluded from the runtime material catalog as of1.69.15; drift uses the merged colour/emissive pair under `../../drift/`.
 
 <!-- runtime-planes:start -->
-## Runtime plane set
+## Retained authoring plane set
 
 | Source family | Aligned planes |
 | --- | --- |
@@ -18,7 +18,7 @@ material recipes and generation provenance remain available for regeneration.
 
 Exact settings and provenance: [generation.json](generation.json).
 
-Renderer lighting is connected through [drift-renderer.ts](../../../../scene/drift-renderer.ts). Visual review is pending. Source artwork is unchanged.
+Runtime lighting uses the cheap composite path in [drift-renderer.ts](../../../../scene/drift-renderer.ts). These full-resolution maps remain for authoring and regeneration; source artwork is unchanged.
 
 This is a material starting point. Mixed artwork uses the dominant preset; individual material regions may need refinement during visual review.
 

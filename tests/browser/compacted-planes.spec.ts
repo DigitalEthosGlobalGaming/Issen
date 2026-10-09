@@ -8,7 +8,13 @@ test('every converted runtime plane decodes with unchanged placement, alpha and 
   const result = await page.evaluate(async () => {
     const manifest = (await import('/scripts/assets/compaction-manifest.json')).default;
     let count = 0,
-      dataCount = 0;
+      dataCount = 0,
+      authoringCount = 0;
+    const retiredDrift = new Set(
+      ['leaves', 'petals', 'debris', 'fire'].map(
+        (family) => `src/rendering/environment/assets/drift-${family}-atlas.webp`,
+      ),
+    );
     const decode = async (url: string) => {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Failed image request ${url}: ${response.status}`);
@@ -41,6 +47,14 @@ test('every converted runtime plane decodes with unchanged placement, alpha and 
     };
     for (const record of manifest.files) {
       if (!record.newPath) continue;
+      // These historical conversions were replaced by the deliberately resized
+      // merged drift pair. Their PNG authoring sources must remain decodable.
+      if (retiredDrift.has(record.newPath)) {
+        const authoring = await decode('/' + record.originalPath);
+        authoring.close();
+        authoringCount++;
+        continue;
+      }
       const runtime = '/' + record.newPath.replace(/^public\//, '');
       const [original, converted] = await Promise.all([
         decode(
@@ -80,8 +94,9 @@ test('every converted runtime plane decodes with unchanged placement, alpha and 
       if (dataPlane) dataCount++;
     }
     gl.getExtension('WEBGL_lose_context')?.loseContext();
-    return { count, dataCount };
+    return { count, dataCount, authoringCount };
   });
   expect(result.count).toBeGreaterThan(250);
   expect(result.dataCount).toBe(180);
+  expect(result.authoringCount).toBe(4);
 });

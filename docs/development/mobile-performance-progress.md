@@ -8,6 +8,110 @@ Cancelled general packing and the separate lit-only integration remain cancelled
 The requested merged drift atlas is a narrowly scoped exception, not a restart
 of general asset packing.
 
+## Drift runtime integration — 9 October 2026
+
+App1.69.15 installs the two1024×512 WebP planes and128px cells. At DPR3,
+the controlled largest-gust review remains readable;192px is unnecessary.
+Four logical families share the pair, preserving surviving particles during
+stage changes. Runtime ownership holds two leases/4,194,304nominal decoded bytes.
+Encoded size is155,694bytes; full-set reduction is94.87% decoded and96.44% encoded.
+Mipmapped RGBA GPU estimate is5,592,405bytes, not physical GPU measurement.
+Original PNG artwork/PBR recipes remain; four unused generated base WebPs and
+old drift runtime material entries are removed.
+
+Instancing, analytic motion, alpha quantization, folded faces, depth ordering,
+spawn mixtures and density remain. Ambient leaves draw once per layer and weather
+embers use the same cheap instanced composite shader. Drift writes no geometry
+buffers and binds no normal/surface maps. Scene-light lookup samples lighting
+behind the sprite; empty geometry uses scene ambient. Only fire samples emission.
+Drift texture sources alone enable automatic mipmaps with linear min/mipmap filters.
+Full PBR is removed at every quality: small moving paper does not justify its
+extra detail/cost. Saved checked controls retain the old renderer for comparison,
+without a duplicate runtime fallback.
+
+Focused browser checks pass14 cases: all32 frames/all cinematic scenes, warming,
+two-plane ownership, supersession, pending motion/readiness, instanced flutter,
+clipping/order, context restoration, sky lighting/emission and DPR3 review.
+Unit suite passes476 cases; production checkpoint passes all4 cases including
+strict TypeScript/build/offline resize. Full browser checkpoint executes374:
+371 pass/3 fail in18.7m. Historical compaction checks still requested the four
+retired base WebPs; they now verify retained PNG authoring sources and preserve
+all180 exact data-plane checks. Material preview expected86 packs rather than82.
+Those two test expectations are corrected. The native leaf restoration test
+reports one alpha mismatch in the full run, with all geometry/HDR targets exact;
+its cause is not established. All five cases in the affected three files pass
+the focused rerun in16.4s, with the strict alpha assertion retained and added
+restoration diagnostics. No unchanged full suite is repeated after test-only
+corrections. This does not establish the complete mobile/transition goal.
+
+Checkpoint logs: `tmp/probes/drift-{units,production,browser-full,focus-final}.log`.
+Original failures are preserved under `tmp/probes/drift-full-failures/`.
+
+Representative before/after DPR3 captures are under
+`tmp/probes/drift-scenes/{current,new}-{daylight,lantern,fire,gust}-DPR3.png`,
+with requested/rendered scene evidence in `evidence.json`. The file named lantern
+captures the dark Rainwater Hollow; controlled lantern/sky/fire/gust captures
+are under `tmp/probes/drift-new/`. All eight gameplay captures were reviewed:
+ink silhouettes remain coherent and fire remains visible against dark sky.
+Cosmetic timing and preview figure choices vary, so these are representative
+visual comparisons, not deterministic pixel oracles. Controlled DPR3 checks
+isolate lantern lighting and emission and include enlarged90CSSpx gusts.
+
+### Replacement measurements
+
+All24 samples pass across new/rate1 and off/new/saved-current/rate4, with the
+same390×844/DPR2, High, seed424242,3s warmup/5s measurement and three repetitions.
+Statistics below are medians of sample statistics; threshold counts sum intervals.
+
+| CPU rate | Mode | Scene | Render median | Frame p95 | Frame p99 | >8.3ms | >16.7ms |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | new | calm | 2.1 | 16.9 | 17.3 | 900 | 277 |
+| 1 | new | gust | 2.1 | 16.9 | 17.3 | 899 | 254 |
+| 4 | off | calm | 9.3 | 17.4 | 30.2 | 872 | 342 |
+| 4 | new | calm | 9.6 | 17.3 | 30.2 | 875 | 337 |
+| 4 | current | calm | 10.5 | 17.8 | 30.2 | 863 | 339 |
+| 4 | off | gust | 9.7 | 18.2 | 40.3 | 864 | 356 |
+| 4 | new | gust | 10.4 | 17.3 | 29.8 | 863 | 335 |
+| 4 | current | gust | 10.9 | 18.4 | 30.4 | 867 | 338 |
+
+Calm populations are27, gust0. Rate1/new gust starts35/8 in all samples;
+rate4/new/current gust starts55/28, while off starts55/28,55/28,63/36.
+Rate4 current→new CPU render medians improve8.6% calm/4.6% gust. Off subtraction
+suggests smaller incremental calm cost but varies in gust and is not isolated
+GPU timing. Rate1 previous-current→new is5.3→2.1ms, but earlier off results and
+rate4 baseline differences show host variance; do not claim that as a causal
+60% drift speedup. Saved current uses the checked pre-integration application
+build, with original source/instrumentation recorded; comparison includes runtime
+ownership/catalog changes. No physical-mobile GPU or120Hz target is proven.
+The structural single-pass/texture savings are verified; a substantial isolated
+mobile rendering-cost reduction remains a hardware validation gap.
+
+Evidence under `tmp/performance/`:
+
+- `2026-10-09T08-10-22.639Z-2e783e02`: new/rate1.
+- `2026-10-09T08-11-34.575Z-b43d97a9`: off/rate4.
+- `2026-10-09T08-13-10.952Z-7d3464e9`: new/rate4.
+- `2026-10-09T08-14-47.109Z-94027dbf`: saved current/rate4.
+
+All timing/capture processes are terminal. No further desktop drift reruns are
+planned without a concrete question that could change implementation. Grass's
+geometry bandwidth and large maps may offer similar opportunities; unchanged
+because this checkpoint is drift-only.
+
+### Worker capability finding for the next integration
+
+Installed Capacitor8.4.3's `Bridge.DEFAULT_ANDROID_WEBVIEW_VERSION` is60;
+`capacitor.config.json` does not override it. That native floor does not prove
+the required worker compositor can run. Chrome's documentation places
+[OffscreenCanvas](https://web.dev/articles/offscreen-canvas) at69 and
+[module workers](https://developer.chrome.com/blog/new-in-chrome-80) at80.
+[Capacitor's minimum WebView setting](https://capacitorjs.com/docs/config)
+can declare the application's actual floor. Next integration must align that
+floor with bundled JavaScript and perform actual worker/canvas capability checks,
+plus visible failure/retry for constructor, message and composition failures.
+Android version alone cannot establish those capabilities. No physical Android
+WebView validation has been performed for the new requirement yet.
+
 ## Drift baseline tooling and trial atlas — 9 October 2026
 
 The existing opt-in performance runner now supports calm/gust scenes, an

@@ -1,12 +1,12 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
-import { DRIFT_BY_ID } from './drift-catalog.ts';
 import type { WeatherParticle } from './weather-state.ts';
-import { drawMaterialStamp } from '../scene-material.ts';
+import { createLeafMotion } from './leaf-motion.ts';
 import { drawInstancedLeaves } from '../scene-leaves.ts';
 import type { LeafFrame } from '../scene-leaves.ts';
 import type { PixiScenePainter } from '../pixi/scene-painter.ts';
 import { createDriftImages } from './drift-images.ts';
 import type { TextureUpload } from '../texture-upload.ts';
+import type { SceneTexture } from '../scene-frame.ts';
 
 /** Incoming families prepare independently while the last submitted leaves remain drawable. */
 export function createDriftRenderer(doc: Document = document, painter?: () => PixiScenePainter) {
@@ -21,8 +21,6 @@ export function createDriftRenderer(doc: Document = document, painter?: () => Pi
           const g = painter();
           const uploads: TextureUpload[] = atlases.flatMap((atlas) => [
             { texture: atlas.texture },
-            ...(atlas.material.normal ? [{ texture: atlas.material.normal, data: true }] : []),
-            ...(atlas.material.surface ? [{ texture: atlas.material.surface, data: true }] : []),
             ...(atlas.material.emissive ? [{ texture: atlas.material.emissive }] : []),
           ]);
           consumers.add(g);
@@ -43,7 +41,7 @@ export function createDriftRenderer(doc: Document = document, painter?: () => Pi
   let heldLeaves: LeafFrame['leaves'] | undefined;
   function releaseSources(
     g: SceneDrawing,
-    sources: ReturnType<typeof inputs.sources>,
+    sources: SceneTexture['source'][],
     preserveFrame = false,
   ) {
     if ('releaseTextureSources' in g)
@@ -56,32 +54,40 @@ export function createDriftRenderer(doc: Document = document, painter?: () => Pi
     releaseSources(g, inputs.sources());
     consumers.delete(g);
   }
+  const emberMotion = createLeafMotion();
+  const emberLeaves = [
+    {
+      x: 0,
+      y: 0,
+      z: 1,
+      s: 1,
+      rot: 0,
+      vr: 0,
+      fl: 0,
+      vf: 0,
+      vy: 0,
+      ph: 0,
+      col: '#fff',
+      sprite: 'fire.ember',
+      flutter: 0,
+    },
+  ];
+  emberMotion.register(emberLeaves[0]!);
   function paint(g: SceneDrawing, id: string, size: number, opacity: number) {
-    const sprite = DRIFT_BY_ID.get(id)!;
-    const image = inputs.image(sprite.atlas);
-    if (!image) return;
-    const [x, y, w, h] = sprite.frame;
-    const sx = Math.round(x * image.naturalWidth),
-      sy = Math.round(y * image.naturalHeight);
-    const sw = Math.round((x + w) * image.naturalWidth) - sx;
-    const sh = Math.round((y + h) * image.naturalHeight) - sy;
-    const width = size * sprite.size,
-      height = (width * sh) / sw;
-    g.globalAlpha *= opacity * sprite.opacity;
-    const frame = [sx, sy, sw, sh] as const;
-    const material = inputs.material(sprite.atlas, frame);
-    const dx = -width * sprite.pivot[0],
-      dy = -height * sprite.pivot[1];
-    if (material)
-      drawMaterialStamp(g, {
-        texture: { source: image, revision: 0, frame },
-        material,
-        x: dx,
-        y: dy,
-        width,
-        height,
-      });
-    else g.drawImage(image, ...frame, dx, dy, width, height);
+    emberLeaves[0]!.sprite = id;
+    emberLeaves[0]!.s = size / 3;
+    emberMotion.invalidate();
+    g.globalAlpha *= opacity / 0.9;
+    drawInstancedLeaves(g, {
+      leaves: emberLeaves,
+      front: false,
+      motion: emberMotion,
+      spriteMotion: true,
+      scale: 1,
+      width: 1,
+      height: 1,
+      atlases: inputs.atlases,
+    });
   }
   return {
     get ready() {

@@ -2,7 +2,7 @@ import { build, preview } from 'vite';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { cpus, platform, release, totalmem } from 'node:os';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { options, help } from './config.mjs';
@@ -101,32 +101,53 @@ process.on('SIGTERM', () => {
 });
 try {
   if (config.target !== 'web' && config.mode !== 'build') localDoctor(config);
-  const typecheck = spawnSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit'], {
-    encoding: 'utf8',
-    windowsHide: true,
-  });
-  await writeFile(`${out}/logs/typecheck.log`, (typecheck.stdout || '') + (typecheck.stderr || ''));
-  if (typecheck.error) throw typecheck.error;
-  if (typecheck.status !== 0) throw Error(`TypeScript check failed; see ${out}/logs/typecheck.log`);
-  // Android mode supplies bundled local fonts and relative asset URLs. This builds
-  // only web assets; it does not invoke Capacitor, Gradle, signing, or installation.
-  await build({
-    root,
-    logLevel: 'warn',
-    mode: 'android',
-    plugins: [performancePlugin(config.buildId)],
-    define: {
-      'import.meta.env.VITE_GAME_EDITION': JSON.stringify('free'),
-      'import.meta.env.VITE_PREMIUM_ENABLED': JSON.stringify('false'),
-      'import.meta.env.VITE_REVENUECAT_ANDROID_KEY': JSON.stringify(''),
-    },
-    build: {
-      outDir: path.join(out, 'build'),
-      emptyOutDir: false,
-      sourcemap: true,
-      reportCompressedSize: false,
-    },
-  });
+  if (config.control) {
+    if (config.target !== 'web' || config.drift !== 'current')
+      throw Error('--control requires web target and --drift=current');
+    const control = path.resolve(config.control);
+    const saved = JSON.parse(await readFile(path.join(control, 'results.json'), 'utf8'));
+    if (saved.status !== 'passed' || saved.manifest.drift !== 'current')
+      throw Error('Control must be a passing full-PBR current-mode capture');
+    await cp(path.join(control, 'build'), path.join(out, 'build'), { recursive: true });
+    Object.assign(manifest, {
+      revision: saved.manifest.revision,
+      sourceFingerprint: saved.manifest.sourceFingerprint,
+      instrumentation: saved.manifest.instrumentation,
+      dirty: saved.manifest.dirty,
+      controlBuild: path.relative(root, control).replaceAll('\\', '/'),
+    });
+  } else {
+    const typecheck = spawnSync(process.execPath, ['node_modules/typescript/bin/tsc', '--noEmit'], {
+      encoding: 'utf8',
+      windowsHide: true,
+    });
+    await writeFile(
+      `${out}/logs/typecheck.log`,
+      (typecheck.stdout || '') + (typecheck.stderr || ''),
+    );
+    if (typecheck.error) throw typecheck.error;
+    if (typecheck.status !== 0)
+      throw Error(`TypeScript check failed; see ${out}/logs/typecheck.log`);
+    // Android mode supplies bundled local fonts and relative asset URLs. This builds
+    // only web assets; it does not invoke Capacitor, Gradle, signing, or installation.
+    await build({
+      root,
+      logLevel: 'warn',
+      mode: 'android',
+      plugins: [performancePlugin(config.buildId)],
+      define: {
+        'import.meta.env.VITE_GAME_EDITION': JSON.stringify('free'),
+        'import.meta.env.VITE_PREMIUM_ENABLED': JSON.stringify('false'),
+        'import.meta.env.VITE_REVENUECAT_ANDROID_KEY': JSON.stringify(''),
+      },
+      build: {
+        outDir: path.join(out, 'build'),
+        emptyOutDir: false,
+        sourcemap: true,
+        reportCompressedSize: false,
+      },
+    });
+  }
   await writeFile(`${out}/manifest.json`, JSON.stringify(manifest, null, 2));
   if (config.mode === 'build') {
     results.status = 'built';

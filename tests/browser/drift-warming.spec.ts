@@ -68,10 +68,10 @@ test('drift warms and retains the selected family until disposal', async ({ page
     return { prepareMs, prepared, first, idleTextures, disposedTextures };
   });
   expect(result.disposedTextures).toBe(0);
-  expect(result.prepared.uploads).toBe(6);
-  expect(result.prepared.textures).toBe(6);
-  expect(result.first).toMatchObject({ uploads: 0, links: 0, textures: 6 });
-  expect(result.idleTextures).toBe(6);
+  expect(result.prepared.uploads).toBe(2);
+  expect(result.prepared.textures).toBe(2);
+  expect(result.first).toMatchObject({ uploads: 0, links: 0, textures: 2 });
+  expect(result.idleTextures).toBe(2);
 });
 
 test('superseded and disposed drift warming aborts hidden uploads and retires pending sources', async ({
@@ -165,11 +165,11 @@ test('failed drift warming retains the old set and can retry without leaked inco
   expect(result.snapshot).toMatchObject({
     ready: false,
     selected: ['leaves', 'petals'],
-    pinned: 6,
+    pinned: 2,
   });
-  expect(result.failedTextures).toBe(6);
+  expect(result.failedTextures).toBe(2);
   expect(result.retried).toBe(true);
-  expect(result.active).toMatchObject({ ready: true, selected: ['fire'], pinned: 4 });
-  expect(result.textures).toBe(4);
+  expect(result.active).toMatchObject({ ready: true, selected: ['fire'], pinned: 2 });
+  expect(result.textures).toBe(2);
   expect(result.remaining).toBe(0);
 });

@@ -93,7 +93,7 @@ test('test-only runtime transform fails loudly if application anchors drift', ()
   );
   const driftInstrumented = instrumentRuntime(drift, 'src/rendering/scene/drift-renderer.ts');
   assert.match(driftInstrumented.code, /driftProbeMode === 'off'/);
-  assert.match(driftInstrumented.code, /New drift path is not implemented/);
+  assert.match(driftInstrumented.code, /current mode requires a saved control build/);
   assert.doesNotMatch(drift, /driftProbeMode|location.search/);
 });
 test('scenario invariants detect stress drift, dead runs and inactive simulation', () => {
