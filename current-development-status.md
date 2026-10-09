@@ -1,4 +1,57 @@
-# Performance, assets and seamless transitions — Selected drift families
+# Performance, assets and seamless transitions — Drift texture warming
+
+Checkpoint62 warms runtime drift before publication, app1.69.11. Colour/emissive
+and normal/surface data sources use the existing painter texture store and paced
+uploads. Ordinary scene-program preparation now includes both leaf programs.
+The drift owner holds that painter's source lease from warming through active use
+until family replacement/disposal. This is not a parallel GPU cache. Decode-only
+standalone owners retain their existing contract. Hidden/superseded/disposed
+requests abort warming; failure releases incoming pins and allows retry while the
+old drawable set survives. Spawn/RNG, artwork, save formats and budgets unchanged.
+
+Saved native baseline:prepare has0 uploads/0 links/0 textures; first draw has
+6 image uploads/5 shader links/6 textures;150 unused frames collect all6.
+Candidate:prepare has6 uploads/13 links/6 textures; first draw has0 uploads/0
+links;150 unused frames retain6, and disposal retires them to0. The13 preparation
+links include ordinary environment/presentation programs as well as leaves.
+This single cold owner probe moves work into preparation (90.9→466.4ms), not a
+claim that the work is free or every task is below16ms. Runtime environment
+composition and drift preparation proceed together. All204 scene-selected native
+captures remain exact against the saved original, including embers, all mixtures,
+both orientations and DPR1/2. No tolerance changes.
+
+Matched title timing:five samples per arm,3s warmup/5s measurement,390×844/DPR2,
+high/fixed seed. Startup median2155.8→2106.3ms; render median1.5→1.6ms with
+overlapping ranges (1.4–1.6 versus1.5–1.6); frame-p95 median16.9ms in both.
+No gameplay-speedup, actual120Hz, whole-resident-memory or first-two-second
+long-task claim. Baseline/candidate reports pass compatibility/workload checks;
+metadata versions1.69.9/1.69.10 precede their respective patch bumps. The timing
+build precedes the subsequent failure-cleanup/retry addition; its normal successful
+preparation path is unchanged.
+
+Evidence:tmp/probes/drift62/ contains saved before/after source, native baseline/
+candidate counts, the204-case oracle, warming/cancellation/retry tests and logs.
+Matched reports:tmp/performance/2026-10-09T05-14-37.332Z-ef039ed4/ and
+tmp/performance/2026-10-09T05-30-15.101Z-01e6d230/. Initial focused12 pass;
+final476 unit tests pass. Broad native run37PASS/1FAIL:auxiliary WebGL initialization
+fails before any warming invocation. Isolated unchanged six-case repeat passes;
+the final broad repeat passes all38 with default two workers. Failure cause is
+not established; retain the failed log. Checked production/strict TypeScript
+verification passes all four cases, including offline gameplay resize. Formatting
+and diff checks pass; package/lock/title/changelog agree. All process handles are
+terminal. Local develop commit only.
+
+Remaining:incoming enemy/weapon variants and warming, demon/live-fog cutout-aware
+ownership, whole decoded/canvas/GPU/copy admission, quiet cancelable worker/local
+next slots and their own persistent warming-to-promotion leases. Drift's active
+lease does not solve the existing environment/next-slot lifetime. Local yielded
+composition still differs in four exact cases; retain the passing synchronous
+control. Full120Hz/cold-warm/first-two-second and Phase5 verification remain open.
+Goal active at full scope; budgets256/384/512MiB unchanged; local develop only,
+no push/deployment/native build or real player-save changes. Packing, tight
+repacking and separate lit-only integration remain cancelled.
+
+## Previous handoff — Selected drift families
 
 Checkpoint 61 selects drift families for the restored/current scene, app 1.69.10.
 Meadow now requires six planes / 37,764,912 nominal RGBA bytes, down from
@@ -27,7 +80,7 @@ native run caused a reload; the final stable-source34-case run passes.
 
 Five matched title samples per arm:startup median2179.6→2155.8ms, render median
 1.5→1.5ms and frame-p95 median16.9→16.9ms. Startup is essentially unchanged;
-this software60Hz sample proves neither actual120Hz nor the first-two-second
+this sampled60Hz run proves neither actual120Hz nor the first-two-second
 long-task target. Timing instrumentation is unchanged. Its injected STAGES
 import collided with the new root import; aliasing the root import fixes the
 candidate build. Both successful timing builds use1.69.9 metadata before bump.

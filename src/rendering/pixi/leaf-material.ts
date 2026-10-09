@@ -202,6 +202,7 @@ export function createLeafMesh(sharedLights?: BindGroup) {
     }
   };
   return {
+    programs: [shader.glProgram, gShader.glProgram],
     mesh,
     releaseLightTargets,
     releaseTextures,

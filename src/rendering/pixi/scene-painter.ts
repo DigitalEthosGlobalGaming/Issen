@@ -1298,6 +1298,11 @@ export class PixiScenePainter implements SceneDrawing {
     return this.textures.retirementSnapshot;
   }
 
+  /** Keep prepared sources in this painter until their owner promotes or invalidates them. */
+  retainTextureSources(sources: Iterable<SceneTexture['source']>): () => void {
+    return this.textures.retainSources(sources);
+  }
+
   /** Initialize the same sources used by drawing, preserving colour/data interpretation. */
   async warmTextures(uploads: readonly TextureUpload[], signal: AbortSignal): Promise<boolean> {
     const lifetime = AbortSignal.any([signal, this.uploadLifetime.signal]);
@@ -1350,9 +1355,11 @@ export class PixiScenePainter implements SceneDrawing {
     const ready = () => !this.disposed && !this.contextLost && !this.canvas.ownerDocument.hidden;
     if (ready() && this.warmedShaderGeneration === this.contextGeneration) return true;
     const material = createMaterialMesh(),
+      leaf = createLeafMesh(),
       batcher = new DefaultBatcher({ maxTextures: this.renderer.limits.maxBatchableTextures });
     const programs = new Set([
       ...material.programs,
+      ...leaf.programs,
       ...this.artworkMaterials.programs,
       this.lightBuffer.program,
       batcher.shader.glProgram,
@@ -1363,6 +1370,7 @@ export class PixiScenePainter implements SceneDrawing {
     if (presentationShader instanceof Shader) programs.add(presentationShader.glProgram);
     // Shader destruction preserves shared GlPrograms; native programs belong to this renderer.
     material.dispose();
+    leaf.dispose();
     batcher.destroy();
     const shaders = [...programs].map((glProgram) => new Shader({ glProgram }));
     try {

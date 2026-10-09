@@ -17,6 +17,7 @@ type Kit = {
 export function createDriftImages(
   doc: Document,
   retire: (sources: SceneTexture['source'][], preserveFrame: boolean) => void,
+  warm?: (atlases: readonly LeafAtlas[], signal: AbortSignal) => Promise<(() => void) | false>,
 ) {
   const images = createMainImageOwner(doc);
   const kits = new Map<string, Kit>();
@@ -28,7 +29,10 @@ export function createDriftImages(
     requestedKey = '';
   let pending: Promise<boolean> | undefined;
   let atlases: readonly LeafAtlas[] = [];
-  const ready = () => !disposed && selected.length > 0 && selectedKey === requestedKey;
+  let controller: AbortController | undefined;
+  let releaseWarm: (() => void) | undefined;
+  let published = false;
+  const ready = () => !disposed && published && selected.length > 0 && selectedKey === requestedKey;
   function sources(id: string, kit: Kit): SceneTexture['source'][] {
     const image = kit.image;
     const material =
@@ -70,31 +74,51 @@ export function createDriftImages(
     const next = driftAtlasIds(stage);
     const key = next.join(':');
     if (key === requestedKey && pending) return pending;
+    controller?.abort();
+    const incoming = (controller = new AbortController());
+    published = false;
     requestedKey = key;
     requested = next;
     const request = ++generation;
     for (const id of kits.keys())
       if (!selected.includes(id) && !next.includes(id)) release(id, true);
-    return (pending = Promise.all(next.map((id) => acquire(id).pending)).then((loaded) => {
-      if (disposed || request !== generation || !loaded.every(Boolean)) return false;
-      for (const id of kits.keys()) if (!next.includes(id)) release(id, true);
-      selected = next;
-      selectedKey = key;
-      atlases = next.map((id) => {
-        const kit = kits.get(id)!,
-          image = kit.image!,
-          width = image.naturalWidth,
-          height = image.naturalHeight;
-        return {
-          id,
-          texture: { source: image, revision: 0 },
-          material: kit.materials.material(id, [0, 0, width, height])!,
-          width,
-          height,
-        };
-      });
-      return true;
-    }));
+    return (pending = Promise.all(next.map((id) => acquire(id).pending))
+      .then(async (loaded) => {
+        if (disposed || request !== generation || !loaded.every(Boolean)) return false;
+        const prepared = next.map((id) => {
+          const kit = kits.get(id)!,
+            image = kit.image!,
+            width = image.naturalWidth,
+            height = image.naturalHeight;
+          return {
+            id,
+            texture: { source: image, revision: 0 },
+            material: kit.materials.material(id, [0, 0, width, height])!,
+            width,
+            height,
+          };
+        });
+        const releaseIncoming = warm ? await warm(prepared, incoming.signal) : undefined;
+        if (disposed || request !== generation || releaseIncoming === false) {
+          if (releaseIncoming) releaseIncoming();
+          return false;
+        }
+        releaseWarm?.();
+        releaseWarm = releaseIncoming || undefined;
+        for (const id of kits.keys()) if (!next.includes(id)) release(id, true);
+        selected = next;
+        selectedKey = key;
+        atlases = prepared;
+        published = true;
+        return true;
+      })
+      .then((ready) => {
+        if (!ready && !disposed && request === generation) {
+          for (const id of kits.keys()) if (!selected.includes(id)) release(id, true);
+          pending = undefined;
+        }
+        return ready;
+      }));
   }
   return {
     prepare,
@@ -118,6 +142,9 @@ export function createDriftImages(
       if (disposed) return;
       disposed = true;
       generation++;
+      controller?.abort();
+      releaseWarm?.();
+      releaseWarm = undefined;
       for (const id of kits.keys()) release(id, false);
       selected = requested = [];
       selectedKey = requestedKey = '';

@@ -54,6 +54,10 @@ Blossom remains unchanged. Density applies to gusts as well as ordinary drift.
   incoming set. Superseded requests cannot publish, and departing families unpin
   and retire their consuming painters' uploads. Standalone preparation without a
   stage still loads the full catalog.
+  Runtime preparation also awaits paced native texture/program warming and keeps
+  its painter lease across frame collection until replacement or disposal.
+  Superseded/hidden requests abort; failed warming releases incoming pins and
+  allows retry while retaining the previous drawable set.
 - `src/rendering/scene/drift-renderer.ts`: original curve, retained Path2D and
   sprite drawing. While incoming images load, the previous submitted particles
   keep moving through their analytic presentation clock. No per-frame image

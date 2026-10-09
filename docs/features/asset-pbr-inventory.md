@@ -153,7 +153,9 @@ consuming painters. Runtime drift selection as of1.69.10 needs6 planes/
 37,764,912nominal bytes for Meadow, at most9 active planes across normal scenes,
 and4 for Demon. Incoming preparation retains moving old leaves until ready;
 departed families become evictable. Catalogue-only callers can still prepare
-all four. Direct demon/fog ownership still needs migration.
+all four. As of1.69.11 runtime drift warms these same colour/emissive and data
+textures before publication, retaining a painter lease until replacement/disposal.
+Direct demon/fog ownership still needs migration.
 Scene changes retain their shared packs and release
 departed selections. Sword handles, guards and special
 weapons use their generated packs. Stage scenery, foreground bamboo, demon realm

@@ -2,6 +2,7 @@ import { createEnvironmentState } from './environment-state.ts';
 import { createEnvironmentArtwork, type EnvironmentArtworkViews } from './environment-artwork.ts';
 import { createEnvironmentPresentation, type EnvironmentViews } from './environment.ts';
 import { createDriftRenderer } from '../rendering/scene/drift-renderer.ts';
+import type { PixiScenePainter } from '../rendering/pixi/scene-painter.ts';
 import { cacheView, stateView } from '../game/session/state-view.ts';
 export type EnvironmentHostViews = Pick<
   EnvironmentArtworkViews,
@@ -43,7 +44,7 @@ export function createEnvironmentHost(
 
   /* ---------------- ambient ---------------- */
 
-  const driftRenderer = createDriftRenderer(ownerDocument);
+  const driftRenderer = createDriftRenderer(ownerDocument, () => readViews().g as PixiScenePainter);
 
   lifecycle.add(driftRenderer.dispose);
   const {

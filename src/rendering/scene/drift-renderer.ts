@@ -6,13 +6,38 @@ import { drawInstancedLeaves } from '../scene-leaves.ts';
 import type { LeafFrame } from '../scene-leaves.ts';
 import type { PixiScenePainter } from '../pixi/scene-painter.ts';
 import { createDriftImages } from './drift-images.ts';
+import type { TextureUpload } from '../texture-upload.ts';
 
 /** Incoming families prepare independently while the last submitted leaves remain drawable. */
-export function createDriftRenderer(doc: Document = document) {
+export function createDriftRenderer(doc: Document = document, painter?: () => PixiScenePainter) {
   const consumers = new Set<SceneDrawing>();
-  const inputs = createDriftImages(doc, (sources, preserveFrame) => {
-    for (const g of consumers) releaseSources(g, sources, preserveFrame);
-  });
+  const inputs = createDriftImages(
+    doc,
+    (sources, preserveFrame) => {
+      for (const g of consumers) releaseSources(g, sources, preserveFrame);
+    },
+    painter
+      ? async (atlases, signal) => {
+          const g = painter();
+          const uploads: TextureUpload[] = atlases.flatMap((atlas) => [
+            { texture: atlas.texture },
+            ...(atlas.material.normal ? [{ texture: atlas.material.normal, data: true }] : []),
+            ...(atlas.material.surface ? [{ texture: atlas.material.surface, data: true }] : []),
+            ...(atlas.material.emissive ? [{ texture: atlas.material.emissive }] : []),
+          ]);
+          consumers.add(g);
+          const release = g.retainTextureSources(uploads.map((upload) => upload.texture.source));
+          try {
+            if (await g.warmScene(uploads, signal)) return release;
+            release();
+            return false;
+          } catch {
+            release();
+            return false;
+          }
+        }
+      : undefined,
+  );
   let disposed = false;
   let lastLeaves: LeafFrame['leaves'] | undefined;
   let heldLeaves: LeafFrame['leaves'] | undefined;
