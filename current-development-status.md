@@ -1,4 +1,67 @@
-# Performance, assets and seamless transitions — Local yielding isolated
+# Performance, assets and seamless transitions — Worker interference measured
+
+Checkpoint55 is diagnostic only; app remains1.69.4 at checkpoint53. The repaired
+atomic worker now has direct main-gameplay interference measurements, rather
+than inferring frame cost from worker chunk wall time. Five fresh-context samples
+per arm alternate idle-prepared, synchronous-compose and atomic-yielded-compose
+workers against the exact same saved production gameplay bundle. Inferno is active;
+background stage0 inputs are prepared before the standard3s warmup/5s window.
+Both high portrait390x844/DPR2 and landscape900x600/DPR2 complete all workload
+checks. This intentionally forced concurrent diagnostic is not production quiet
+scheduling, memory admission or next-slot integration.
+
+For each repetition, compare the same window in all arms: the larger synchronous/
+yielded compose elapsed time plus100ms. Matched CPU render median/p95/p99, ms:
+- portrait idle4.7/5.8/6.6; synchronous5.2/7.1/18.6; yielded4.7/5.7/7.2.
+  Over16.7ms1/291,3/288,1/289; matched callback interval p99 24.9/27.3/20.5ms.
+- landscape idle4.5/5.6/15.8; synchronous5.0/6.3/18.5; yielded4.7/6.1/17.1.
+  Over16.7ms2/415,5/415,5/414; matched callback interval p99 23.7/26.8/25.8ms.
+Full five-second render p95: portrait5.7/6.1/5.7ms, landscape5.5/6.0/5.9ms.
+Yielding supports portrait responsiveness; landscape tail cost remains. No claim
+of zero interference or actual120Hz delivery (callbacks remain near16.7ms).
+
+Compose elapsed median: portrait synchronous678.5ms vs yielded852.3ms;
+landscape1070.4ms vs1295.1ms. Yielded ranges825.4–928.8ms and1181.4–1351.1ms.
+Portrait records12 GPU bakes/39 task yields; landscape0 GPU bakes/52 yields,
+taking the original software-bake path. The first landscape run's GPU-only guard
+was wrong and is excluded; it was corrected to require a completed layered
+composition, while retaining actual route counters. A preflight synchronous
+worker has a75.4ms callback interval184ms into composition. The five-sample run's
+94.8ms maximum occurs1170ms after worker completion, so it is not attributed
+to that compose interval. Timeline audits retain timestamps and raw timings.
+
+The measured source's protocol adapter passes the strict27-visit worker oracle:
+348 incoming/held planes and both native draws per visit are exact, including
+low portrait and landscape. Positive worker/no-fallback path,264,275,504-byte
+decoded pool peak within268,435,456-byte budget, and no GL/binding warnings.
+That pool bound excludes main images, figures/UI, canvases/copies and GPU storage.
+The timing experiment closes transferred bitmaps; it does not retain/upload a
+next scene. It includes no CPU sampling, traces or allocation-heavy wrappers.
+Timestamped callback pushes add equal overhead to all arms; these numbers are
+an interference diagnostic, not a replacement for unchanged headline baselines.
+
+Evidence: tmp/performance-scene-image-preload/checkpoint55/ contains results.json,
+results-summary.json, results-timeline-audit.json, preflight results/audit,
+landscape/results.json and summary, logs, worker-atomic55.json and oracle-source/.
+portrait-source/ preserves the measured first driver/worker/generator; run.mjs,
+collect.mjs, make-collect.mjs, summarize.mjs and audit.mjs reproduce the experiment.
+The saved gameplay build remains tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e.
+Worker code is in tmp/probes/scene-image-preload/cooperative55-worker.ts and
+cooperative55-oracle-worker.ts, using repaired cooperative54/. All timing/oracle
+handles are terminal. No production code/version, assets, saves or broad checks
+changed; no source/visual tolerance was relaxed.
+
+Next address whole-memory admission and selected figure/UI ownership before
+adding retained next scenes. Preserve quiet/busy gating, generator cancellation
+and the same SceneTextureStore lease through promotion/invalidation/context
+generation; current warmScene releases it in finally. Then integrate worker/local
+slots and paced uploads. Local four-visit yielding differences remain unresolved;
+keep checkpoint54's passing synchronous control when isolating command/source
+lifetime. AllPhase5 metrics/traces/suites and actual120Hz delivery remain required.
+Full goal active; no push/deploy/native build. Cancelled packing/tight repacking
+and separate lit-only work remain cancelled.
+
+## Previous handoff — Local yielding isolated
 
 Checkpoint54 is diagnostic only; app remains1.69.4 at checkpoint53. Repaired
 local generator controls now distinguish transformation correctness from task

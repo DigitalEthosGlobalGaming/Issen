@@ -2697,3 +2697,58 @@ controls, whole-memory admission, generator cancellation and texture-store lease
 requirements before next-slot integration. All Phase5 metrics/traces/suites,
 actual120Hz delivery and whole-game memory bounds remain outstanding. Goal active;
 no deployment, native build or real player-save changes.
+
+## Checkpoint 55 — Worker interference with gameplay, 9 October 2026
+
+Diagnostic only; app remains1.69.4. Five fresh-context samples per arm use the
+same saved production Inferno build, standard3s warmup/5s window and seed424242.
+Arms alternate idle-prepared worker, synchronous composition and repaired atomic
+yielding. Inputs are prepared before warmup. Both portrait390x844/DPR2 and
+landscape900x600/DPR2 pass workload checks. Timestamped callback pushes add the
+same overhead in every arm; no CPU sampling, traces or allocation wrappers run.
+Forced active-play composition measures interference, not production scheduling.
+
+Matched windows use each repetition's larger compose elapsed time plus100ms for
+every arm, preventing five-second averaging from hiding short stalls.
+
+| Geometry / arm | Matched render median / p95 / p99, ms | Renders over16.7ms | Callback interval p99, ms |
+| --- | --- | --- | --- |
+| Portrait idle | 4.7 / 5.8 / 6.6 | 1/291 | 24.9 |
+| Portrait synchronous | 5.2 / 7.1 / 18.6 | 3/288 | 27.3 |
+| Portrait yielded | 4.7 / 5.7 / 7.2 | 1/289 | 20.5 |
+| Landscape idle | 4.5 / 5.6 / 15.8 | 2/415 | 23.7 |
+| Landscape synchronous | 5.0 / 6.3 / 18.5 | 5/415 | 26.8 |
+| Landscape yielded | 4.7 / 6.1 / 17.1 | 5/414 | 25.8 |
+
+Full-window render p95 is5.7/6.1/5.7ms in portrait and5.5/6.0/5.9ms in landscape.
+Portrait results support atomic yielding; landscape tail cost remains. This is
+not proof of zero interference or120Hz delivery; callbacks remain near16.7ms.
+Elapsed compose median synchronous/yielded is678.5/852.3ms in portrait and
+1070.4/1295.1ms in landscape. Yielding has a measured latency cost. Portrait
+records12 GPU bakes and39 yields; landscape takes the original software-bake
+route,0 GPU bakes and52 yields. The first landscape run had an incorrect GPU-only
+guard and is excluded; its replacement verifies completed layered composition
+and records actual route counters, without changing implementation or pixels.
+
+A preflight synchronous sample has a75.4ms callback interval184ms into compose.
+The five-sample run's94.8ms maximum occurs1170ms after worker completion and is
+not attributed to its compose interval. Raw/timestamped records and timeline
+audits preserve this distinction. Extra setup callbacks before the timestamp
+hook remain in full-window raw metrics; matched windows use timestamped records.
+
+The measured worker source's protocol adapter passes all27 strict scene visits:
+348 incoming/held planes and54 native draws match the original, including low
+portrait and landscape. Worker/no-fallback coverage is positive, decoded peak
+264,275,504bytes stays below268,435,456 and no GL/binding warnings occur. Pool
+bytes are not whole-game decoded/GPU bounds. The timing receiver closes bitmaps;
+it does not measure persistent next-slot storage or GPU warming.
+
+Evidence: tmp/performance-scene-image-preload/checkpoint55/: results.json,
+results-summary.json, results-timeline-audit.json, preflight/landscape results,
+logs, worker-atomic55.json and preserved driver/worker/generator/oracle sources.
+The same saved gameplay build is tmp/performance/2026-10-09T02-56-52.936Z-dea9bb1e.
+All handles are terminal; no production code/version, asset, seed, save or broad
+suite changes. Next implement whole-memory admission and selected figure/UI
+ownership, then retained worker/local slots with quiet grants, cancellation,
+existing texture-store leases and uploads. Local yielding differences, actual
+120Hz delivery and allPhase5 metrics/traces/suites remain open. Full goal active.
