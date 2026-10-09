@@ -2126,4 +2126,3 @@ next-slot/loading-state tests, final report and any final push are outstanding.
     Phase5 remain required. Goal active; no push/deploy/native build/player saves.
     Final diff/formatPASS; version/package/lock/title/changelog synchronized.
     All measurement and verification sessions terminal.
-
