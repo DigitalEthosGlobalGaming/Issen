@@ -11,13 +11,24 @@ export function createCompressedAssetStore(
   const fetchAsset = options.fetch ?? globalThis.fetch.bind(globalThis);
   const storage = options.cache === false ? undefined : (options.storage ?? globalThis.caches);
   let cache: Promise<Cache | null> | undefined;
+  const warned = new Set<string>();
   let hits = 0,
     network = 0,
     failures = 0;
+  function warn(operation: string, error: unknown, url?: string) {
+    failures++;
+    if (warned.has(operation)) return;
+    warned.add(operation);
+    console.warn(
+      `[Issen] Asset cache ${operation} failed; continuing without this cache operation.`,
+      { cache: COMPRESSED_ASSET_CACHE, url },
+      error,
+    );
+  }
   const open = () =>
     (cache ??= storage
-      ? storage.open(COMPRESSED_ASSET_CACHE).catch(() => {
-          failures++;
+      ? storage.open(COMPRESSED_ASSET_CACHE).catch((error: unknown) => {
+          warn('open', error);
           return null;
         })
       : Promise.resolve(null));
@@ -28,8 +39,8 @@ export function createCompressedAssetStore(
       let response: Response | undefined;
       try {
         response = await stored?.match(url);
-      } catch {
-        failures++;
+      } catch (error) {
+        warn('read', error, url);
       }
       if (signal?.aborted) throw new DOMException('Asset request aborted', 'AbortError');
       if (response) {
@@ -41,8 +52,8 @@ export function createCompressedAssetStore(
       if (!response.ok) throw Error(`HTTP ${response.status}: ${url}`);
       try {
         await stored?.put(url, response.clone());
-      } catch {
-        failures++;
+      } catch (error) {
+        warn('write', error, url);
       }
       return response;
     },
@@ -53,8 +64,8 @@ export function createCompressedAssetStore(
       try {
         for (const request of await stored.keys())
           if (!keep.has(request.url)) await stored.delete(request);
-      } catch {
-        failures++;
+      } catch (error) {
+        warn('prune', error);
       }
     },
     snapshot: () => ({ hits, network, failures }),

@@ -136,20 +136,46 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     views.sceneReadyToPresent = false;
     cvs.dataset.sceneState = 'loading';
     screenAnimation.invalidate();
-    const unavailable = () => {
+    let failureReason: string | undefined;
+    function reportFailure(step: string, error?: unknown) {
       if (lifecycle.disposed || request !== views.sceneRequest) return;
+      const message =
+        error === undefined ? undefined : error instanceof Error ? error.message : String(error);
+      failureReason ??= `Scene preparation failed: ${step}${message ? ' (' + message + ')' : ''}`;
+      const detail = { step, stage: frame.stage, seed: frame.stageSeed, request, error: message };
+      markScenePhase('scene-preparation-failed', key + ':' + step, detail);
+      console.warn('[Issen] Scene preparation failed.', { ...detail, key }, error);
+    }
+    function trackPreparation(step: string, pending: Promise<boolean>) {
+      return pending.then(
+        (ready) => {
+          if (!ready) reportFailure(step);
+          return ready;
+        },
+        (error: unknown) => {
+          reportFailure(step, error);
+          throw error;
+        },
+      );
+    }
+    const unavailable = (error?: unknown) => {
+      if (lifecycle.disposed || request !== views.sceneRequest) return;
+      if (!failureReason) reportFailure('readiness', error);
       cvs.dataset.sceneState = 'unavailable';
       cvs.dataset.sceneError =
-        views.environmentRenderer.snapshot?.().workerFailure ?? 'Scene preparation failed';
+        views.environmentRenderer.snapshot?.().workerFailure ?? failureReason;
       views.sceneRecovery?.show(retryScene);
       screenAnimation.invalidate();
     };
     const pending = Promise.all([
-      demon
-        ? demonRealmRenderer.prepare(frame, figurePreparation.signal)
-        : environmentRenderer.compose(frame),
-      views.driftRenderer.prepare(demon ? STAGES.length : G.stage),
-      views.prepareFigureArtwork(figurePreparation.signal),
+      trackPreparation(
+        'scenery',
+        demon
+          ? demonRealmRenderer.prepare(frame, figurePreparation.signal)
+          : environmentRenderer.compose(frame),
+      ),
+      trackPreparation('drift', views.driftRenderer.prepare(demon ? STAGES.length : G.stage)),
+      trackPreparation('figures', views.prepareFigureArtwork(figurePreparation.signal)),
     ]).then(([sceneReady, driftReady, weaponsReady]) => sceneReady && driftReady && weaponsReady);
     void pending
       .then((ready) => {

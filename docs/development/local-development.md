@@ -12,12 +12,31 @@ still requires its separate opt-in/key. See
 [edition rules](../features/editions-and-mastery.md).
 
 Use Node 24 (the migration was verified with 24.16.0), then run `npm install` and
-`npm run dev`. Vite prints the local URL. For phone testing use
-`npm run dev -- --host 0.0.0.0` and the computer's LAN address.
+`npm run dev`. Vite prints the local URL. For Android Chrome testing over USB,
+enable USB debugging, accept the computer authorization, and run
+`npm run dev -- --port 5173 --strictPort`. In a second terminal run `adb devices`
+and `adb reverse tcp:5173 tcp:5173`, then open `http://localhost:5173` on the
+phone. This keeps the worker/OffscreenCanvas preparation on a trustworthy local
+origin. The installed APK still loads its bundled files. Remove forwarding with
+`adb reverse --remove tcp:5173` when finished.
 
 The development watcher ignores Android outputs, local toolchains and
 `tmp/` and legacy `.verification*` directories so building or verifying another
 edition does not reload a running game.
+
+## Scene preparation diagnostics
+
+The Console reports `[Issen] Scene preparation failed.` with the failed
+`scenery`, `drift`, or `figures` step, stage, seed, composition key and any
+propagated exception. Superseded or disposed requests do not report failures.
+The main canvas is `#c`; inspect `document.querySelector('#c').dataset` for
+`sceneState` and `sceneError`. Performance marks named
+`issen:scene-preparation-failed:` retain the same step details.
+
+Asset cache failures remain recoverable and warn once per operation per store,
+including the first failing URL and original exception. Unreadable stylesheet
+rules warn once per stylesheet and retain the original UI artwork. These handled
+exceptions can still pause DevTools when **Pause on caught exceptions** is enabled.
 
 ## Commands
 
@@ -28,22 +47,22 @@ copy and saves reports/traces in `tmp/performance/`. Use `-- --suite=menus` or
 measurement limits and the explicit Android test-app adapter. This command does
 not build or install an APK. `npm run test:performance-tools` checks the harness.
 
-| Command | Purpose |
-| --- | --- |
-| `npm run typecheck` | Strict TypeScript check for all application modules |
-| `npm run format` | Apply consistent source/test/config formatting |
-| `npm run format:check` | Check formatting without changing files |
-| `npm run typecheck:watch` | Continuous compiler diagnostics |
-| `npm run build` | Type-check, then bundle into generated `dist/` |
-| `npm run build:pages` | Type-check, then build for the `/Issen/` GitHub Pages path |
-| `npm run preview` | Serve the production build; run build first |
-| `npm test` | Node test runner with native TypeScript stripping for rule tests |
-| `npm run test:browser` | Playwright tests using installed Microsoft Edge |
-| `npm run build:verification` | Type-check, then build into `tmp/.verification-build-production/` |
-| `npm run test:production` | Build into `tmp/`, then test bundled assets through a dedicated Vite preview server |
-| `npm run android:apk` | Build/sync offline assets and assemble the Android test APK |
-| `npm run android:bundle` | Build/sync and produce a signed Play bundle with upload credentials |
-| `npm run test:android-web` | Exercise offline Android assets in a touch-enabled browser |
+| Command                      | Purpose                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `npm run typecheck`          | Strict TypeScript check for all application modules                                 |
+| `npm run format`             | Apply consistent source/test/config formatting                                      |
+| `npm run format:check`       | Check formatting without changing files                                             |
+| `npm run typecheck:watch`    | Continuous compiler diagnostics                                                     |
+| `npm run build`              | Type-check, then bundle into generated `dist/`                                      |
+| `npm run build:pages`        | Type-check, then build for the `/Issen/` GitHub Pages path                          |
+| `npm run preview`            | Serve the production build; run build first                                         |
+| `npm test`                   | Node test runner with native TypeScript stripping for rule tests                    |
+| `npm run test:browser`       | Playwright tests using installed Microsoft Edge                                     |
+| `npm run build:verification` | Type-check, then build into `tmp/.verification-build-production/`                   |
+| `npm run test:production`    | Build into `tmp/`, then test bundled assets through a dedicated Vite preview server |
+| `npm run android:apk`        | Build/sync offline assets and assemble the Android test APK                         |
+| `npm run android:bundle`     | Build/sync and produce a signed Play bundle with upload credentials                 |
+| `npm run test:android-web`   | Exercise offline Android assets in a touch-enabled browser                          |
 
 See [Android development](android.md) for Java/SDK setup, physical-device testing
 and release signing. GitHub Pages continues to use `build:pages`.

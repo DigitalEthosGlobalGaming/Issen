@@ -60,6 +60,7 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
   const styles = new Map<CSSStyleDeclaration, Map<string, Replacement>>();
   const images = new Map<HTMLImageElement, { source: string; job: Job; rendered?: string }>();
   const variables = new Map<string, string>();
+  const warnedStylesheets = new WeakSet<CSSStyleSheet>();
   const canvas = trackPixelSource(doc, doc.createElement('canvas'), 'canvas');
   canvas.width = canvas.height = 1;
   let painter: PixiScenePainter | null = null;
@@ -313,8 +314,16 @@ export function createUiMaterialLighting(doc: Document, rig: ReturnType<typeof c
     for (const sheet of Array.from(doc.styleSheets)) {
       try {
         rules(sheet.cssRules, sheet.href ?? doc.baseURI);
-      } catch {
+      } catch (error) {
         /* External styles retain their source artwork. */
+        if (!warnedStylesheets.has(sheet)) {
+          warnedStylesheets.add(sheet);
+          console.warn(
+            '[Issen] Stylesheet rules could not be read; retaining original UI artwork.',
+            { stylesheet: sheet.href ?? doc.baseURI },
+            error,
+          );
+        }
       }
     }
     for (const element of doc.querySelectorAll<HTMLElement>('[style]')) {

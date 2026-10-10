@@ -1,5 +1,17 @@
 # Current development status
 
+## Scene preparation diagnostics (1.70.19)
+
+Handled cache failures now warn once per operation per store with the original
+exception and first affected URL. Unreadable CSS rules warn once per stylesheet.
+Scene readiness reports failed scenery, drift or figure preparation in Console,
+performance marks and the main canvas error; stale/disposed requests stay quiet.
+These diagnostics identify failures without changing the recovery flow. The
+reported unavailable scene still needs reproduction with the new warnings.
+Strict TypeScript PASS; focused cache/readiness/occlusion units12 PASS; stylesheet
+warning and gameplay-readiness browsers2 PASS. Android USB localhost forwarding
+is documented in the local development guide.
+
 ## Graphics checkpoint — committed and verified with failures (1.70.18)
 
 User requested committing the current work, final tests and a report. Tested

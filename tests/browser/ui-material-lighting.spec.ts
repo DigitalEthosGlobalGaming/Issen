@@ -1,6 +1,48 @@
 import { expect, test } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
+test('unreadable stylesheet rules warn once and leave original artwork available', async ({
+  page,
+}) => {
+  await page.goto('/privacy/index.html');
+  const result = await page.evaluate(async () => {
+    const { createUiMaterialLighting } = await import('/src/ui/material-lighting.ts');
+    const { createLightingRig } = await import('/src/rendering/lighting-rig.ts');
+    const style = document.createElement('style');
+    style.textContent = '.blocked-sheet { color: rgb(255, 0, 0); }';
+    document.head.append(style);
+    const error = new DOMException('Cannot access rules', 'SecurityError');
+    Object.defineProperty(style.sheet!, 'cssRules', {
+      get() {
+        throw error;
+      },
+    });
+    const warnings: unknown[][] = [];
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      warnings.push(args);
+    };
+    try {
+      const lighting = createUiMaterialLighting(document, createLightingRig());
+      lighting.refresh();
+      lighting.refresh();
+      const diagnostic = warnings.filter(([message]) =>
+        String(message).includes('Stylesheet rules'),
+      );
+      const originalRetained = style.textContent;
+      const originalException = diagnostic[0]?.[2] === error;
+      lighting.dispose();
+      return { count: diagnostic.length, originalRetained, originalException };
+    } finally {
+      console.warn = originalWarn;
+      style.remove();
+    }
+  });
+  expect(result.count).toBe(1);
+  expect(result.originalException).toBe(true);
+  expect(result.originalRetained).toContain('rgb(255, 0, 0)');
+});
+
 test('busy frames cancel pending background UI exports without retaining their workspace', async ({
   page,
 }) => {

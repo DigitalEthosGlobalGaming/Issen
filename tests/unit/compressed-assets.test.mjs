@@ -110,6 +110,32 @@ test('prefetch prioritizes/deduplicates URLs, bounds concurrency, yields and pau
   prefetch.dispose();
 });
 
+test('cache write failures preserve downloaded bodies and warn once while counting every failure', async (t) => {
+  const error = new TypeError('Cache.put failed');
+  const warning = t.mock.method(console, 'warn', () => {});
+  const store = createCompressedAssetStore({
+    storage: {
+      async open() {
+        return {
+          async match() {},
+          async put() {
+            throw error;
+          },
+        };
+      },
+    },
+    fetch: async (url) => new Response(url),
+  });
+  assert.equal(await (await store.read('first.webp')).text(), 'first.webp');
+  assert.equal(await (await store.read('second.webp')).text(), 'second.webp');
+  assert.equal(store.snapshot().failures, 2);
+  assert.equal(warning.mock.callCount(), 1);
+  const [message, detail, cause] = warning.mock.calls[0].arguments;
+  assert.match(message, /Asset cache write failed/);
+  assert.equal(detail.url, 'first.webp');
+  assert.equal(cause, error);
+});
+
 test('prefetch disposal aborts pending transport and never dispatches remaining URLs', async () => {
   let signal, finish;
   const calls = [];
