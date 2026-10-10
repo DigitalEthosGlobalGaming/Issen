@@ -40,6 +40,7 @@ import type { TextureUpload } from '../texture-upload.ts';
 import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
+import { ChangeTracker } from './change-tracker.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
 import { createGrassMesh } from './grass-material.ts';
 import { createLeafMesh } from './leaf-material.ts';
@@ -206,6 +207,42 @@ export class PixiScenePainter implements SceneDrawing {
   private preparedLightingSlots = 0;
   private geometryDirty = true;
   private lightDirty = true;
+  private readonly geometryInputs = new ChangeTracker();
+  private readonly lightInputs = new ChangeTracker();
+  private readonly clipPaths = new WeakMap<Graphics, GraphicsPath>();
+  private recordPath(value: unknown): void {
+    if (value instanceof GraphicsPath) {
+      this.geometryInputs.value(value.instructions.length);
+      for (const instruction of value.instructions) {
+        this.geometryInputs.value(instruction.action);
+        this.recordPath(instruction.data);
+      }
+    } else if (value instanceof Matrix) {
+      this.recordMatrix(value);
+    } else if (Array.isArray(value)) {
+      this.geometryInputs.value(value.length);
+      for (const entry of value) this.recordPath(entry);
+    } else this.geometryInputs.value(value);
+  }
+  private recordMatrix(matrix: Matrix): void {
+    this.geometryInputs.value(matrix.a);
+    this.geometryInputs.value(matrix.b);
+    this.geometryInputs.value(matrix.c);
+    this.geometryInputs.value(matrix.d);
+    this.geometryInputs.value(matrix.tx);
+    this.geometryInputs.value(matrix.ty);
+  }
+  private recordGeometry(slot: Slot): void {
+    if (!slot.material && !slot.grass?.geometryEnabled) return;
+    this.geometryInputs.value(slot.item);
+    this.geometryInputs.value(slot.material?.geometryRevision ?? slot.grass!.geometryRevision);
+    slot.item.updateLocalTransform();
+    this.recordMatrix(slot.item.localTransform);
+    this.geometryInputs.value(slot.item.alpha);
+    this.geometryInputs.value(this.activeClips.length);
+    for (const clip of this.activeClips) this.recordPath(this.clipPaths.get(clip));
+    if (this.geometryInputs.pending) this.geometryDirty = this.lightDirty = true;
+  }
   private disposed = false;
   private invalidateLighting(): void {
     this.geometryDirty = this.lightDirty = true;
@@ -363,6 +400,7 @@ export class PixiScenePainter implements SceneDrawing {
         this.lighting.ambient,
         quality === 'low' || quality === 'medium',
       );
+      this.recordGeometry(slot);
     });
     registerGlyphArrowSink(this, (radius, ghost) => {
       const { a, b, c, d } = this.matrix;
@@ -456,7 +494,21 @@ export class PixiScenePainter implements SceneDrawing {
           this.unlitLighting.materialLighting = 0;
           this.lighting = this.unlitLighting;
         } else this.lighting = lighting;
-        this.invalidateLighting();
+        const inputs = this.lightInputs;
+        inputs.begin();
+        inputs.numbers(this.lighting.ambient);
+        inputs.numbers(this.lighting.directional);
+        inputs.numbers(this.lighting.direction);
+        inputs.value(this.lighting.points.length);
+        for (const light of this.lighting.points) {
+          inputs.value(light.x);
+          inputs.value(light.y);
+          inputs.value(light.z);
+          inputs.value(light.radius);
+          inputs.value(light.intensity);
+          inputs.numbers(light.color);
+        }
+        if (inputs.finish()) this.lightDirty = true;
       },
       draw: (stamp) => {
         const mesh = this.submit('material');
@@ -478,6 +530,7 @@ export class PixiScenePainter implements SceneDrawing {
           this.textures,
         );
         mesh.blendMode = this.blend();
+        this.recordGeometry(this.slots[this.cursor - 1]!);
       },
     });
     registerScenePathSink(this, (path) => {
@@ -487,7 +540,6 @@ export class PixiScenePainter implements SceneDrawing {
     });
     registerSceneFilmPass(this, (film, w, h, time, preferences) => {
       if (film !== 'noir' && film !== 'trial-glitch') return false;
-      this.invalidateLighting();
       this.stopRetainingTree();
       this.copyFilm ??= createCopyFilmPass();
       this.copyFilm.update(
@@ -517,7 +569,7 @@ export class PixiScenePainter implements SceneDrawing {
   begin(): void {
     this.applyAntialias();
     if (this.disposed) return;
-    this.invalidateLighting();
+    this.geometryInputs.begin();
     this.retainTree = this.transientGroups.length === 0 && this.clips.length === 0;
     if (!this.retainTree) this.root.removeChildren();
     for (const group of this.transientGroups) {
@@ -584,16 +636,18 @@ export class PixiScenePainter implements SceneDrawing {
   /** Named composer pass; auxiliary flush callers use the same preparation. */
   geometryPass(): void {
     if (this.disposed || this.contextLost) return;
+    if (this.geometryInputs.finish()) this.geometryDirty = true;
     if (this.width !== this.canvas.width || this.height !== this.canvas.height) {
       this.width = this.canvas.width;
       this.height = this.canvas.height;
       this.renderer.resize(Math.max(1, this.width), Math.max(1, this.height), 1);
       this.invalidateLighting();
     }
-    if (!this.geometryDirty) return;
     this.trimRetainedTree();
+    if (!this.geometryDirty) return;
     this.drawGeometry();
     this.geometryDirty = false;
+    this.geometryInputs.acknowledge();
     this.lightDirty = true;
   }
 
@@ -706,6 +760,15 @@ export class PixiScenePainter implements SceneDrawing {
         for (const child of item.children) visit(child);
       };
       visit(this.root);
+      // Unused clip paths are ordinary Graphics, not geometry contributors.
+      // Active masks already have renderable=false and the mask pipe draws them.
+      for (const clip of this.clips) {
+        if (!clip.renderable) continue;
+        clip.renderable = false;
+        restore.push(() => {
+          clip.renderable = true;
+        });
+      }
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
         if (slot.material || slot.grass?.geometryEnabled)
@@ -977,7 +1040,6 @@ export class PixiScenePainter implements SceneDrawing {
     | MeshSimple
     | ReturnType<typeof createGrassMesh>['mesh']
     | ReturnType<typeof createLeafMesh>['mesh'] {
-    this.invalidateLighting();
     let slot = this.slots[this.cursor];
     // A varying cue count shifts later draw kinds. Reuse an unsubmitted slot
     // before replacing its mesh; swapping keeps the existing pool size bound.
@@ -1209,6 +1271,7 @@ export class PixiScenePainter implements SceneDrawing {
       throw new Error('Use scene geometry for clip paths');
     this.stopRetainingTree();
     const mask = new Graphics().path(this.path).fill(0xffffff);
+    this.clipPaths.set(mask, this.path.clone());
     this.root.addChild(mask);
     this.clips.push(mask);
     this.activeClips.push(mask);

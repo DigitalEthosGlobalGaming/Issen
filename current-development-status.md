@@ -1,6 +1,22 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.12)
+## Active goal — Graphics menu and renderer optimizations (1.70.13)
+
+B1 implemented: retained ordered snapshots invalidate geometry for changed lit
+material/High-grass inputs, transforms, clipping, removal and resize. Lights are
+compared by values, including mutable point-light flicker; unchanged geometry
+survives light-only changes. Low/Medium grass and ordinary cosmetics do not
+invalidate either pass. Composite-only fog and film do not invalidate geometry.
+Context loss/restore retains explicit invalidation. Texture snapshots release
+references when shader resources retire. Unused clip paths are hidden during
+geometry to avoid feedback when the last lit submission disappears.
+Focused native reuse browser1 PASS: cached output equals forced redraws exactly
+across stable frames, flicker, camera, clip, alpha, depth, pixel revision, lighting
+modes, grass motion/removal and resize; GL error0. Existing grass quality browser1
+PASS; tracker unit1 PASS; strict TypeScript PASS. Initial focused GL assertion
+failed on an unused clip in the removal case; fixed without weakening the check.
+No full suites/profiles. B2–B5, measured preset/impact labels, heavy previous-frame
+retention and the known Shore comparison remain pending.
 
 AA assessed and integrated. Native four-combination comparison across DPR1/2,
 Off/Half/Full lighting, Medium/High grass, vectors/text/filters and ordinary/noir

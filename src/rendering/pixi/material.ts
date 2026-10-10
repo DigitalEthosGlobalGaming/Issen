@@ -7,6 +7,7 @@ import type { SceneLighting, SceneSprite } from '../scene-frame.ts';
 import type { SceneTextureStore } from './texture-store.ts';
 import { setShaderResource } from './shader-resources.ts';
 import type { BindGroup, TextureSource } from 'pixi.js';
+import { ChangeTracker } from './change-tracker.ts';
 
 const textureNames = ['uDiffuse', 'uNormal', 'uMask', 'uSurface', 'uEmissive'] as const;
 
@@ -66,8 +67,13 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
   const mesh = new Mesh({ geometry, shader });
   const matrix = new Matrix();
   let texturesBound = false;
+  const geometryInputs = new ChangeTracker();
+  let geometryRevision = 0;
   return {
     mesh,
+    get geometryRevision() {
+      return geometryRevision;
+    },
     programs: [geometryMaterial.shader.glProgram, shader.glProgram] as const,
     releaseLightTargets: compositeMaterial.releaseLightTargets,
     prepareComposite(targets: Readonly<LightTargets>): void {
@@ -92,14 +98,21 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
     },
     releaseTextures(source?: TextureSource): void {
       if (!texturesBound) return;
+      let released = false;
       for (const name of textureNames)
-        if (!source || shader.resources[name] === source)
+        if (!source || shader.resources[name] === source) {
+          released = true;
           setShaderResource(
             shader.resources,
             name,
             name === 'uEmissive' ? Texture.EMPTY.source : Texture.WHITE.source,
           );
+        }
       geometryMaterial.releaseTextures(source);
+      if (released) {
+        geometryInputs.clear();
+        geometryRevision++;
+      }
       if (!source) texturesBound = false;
     },
     update(sprite: SceneSprite, lights: SceneLighting, textures: SceneTextureStore): void {
@@ -152,6 +165,27 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
       mesh.alpha = sprite.alpha;
       mesh.tint = sprite.tint;
       mesh.blendMode = sprite.blend;
+      geometryInputs.begin();
+      for (let i = 0; i < 4; i++) {
+        const source = shader.resources[textureNames[i]!] as TextureSource;
+        geometryInputs.value(source);
+        geometryInputs.value(source._resourceId);
+      }
+      geometryInputs.value(sprite.texture.revision);
+      geometryInputs.value(material.normal?.revision);
+      geometryInputs.value(material.mask?.revision);
+      geometryInputs.value(material.surface?.revision);
+      geometryInputs.numbers(u.uDiffuseRect);
+      geometryInputs.numbers(u.uNormalRect);
+      geometryInputs.numbers(u.uMaskRect);
+      geometryInputs.numbers(u.uSurfaceRect);
+      geometryInputs.numbers(u.uNormalMatrix);
+      geometryInputs.numbers(u.uMaterial);
+      geometryInputs.value(u.uHasMask);
+      geometryInputs.value(u.uHasSurface);
+      geometryInputs.value(cutoff);
+      geometryInputs.value(sprite.tint);
+      if (geometryInputs.finish()) geometryRevision++;
     },
     dispose(): void {
       mesh.destroy();

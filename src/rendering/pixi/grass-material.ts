@@ -18,6 +18,7 @@ import { normalTransform } from '../scene-frame.ts';
 import { createLightTargetBinding, setShaderResource } from './shader-resources.ts';
 import { createLightShader } from './shared-light-resources.ts';
 import type { BindGroup } from 'pixi.js';
+import { ChangeTracker } from './change-tracker.ts';
 
 const vertex = `#version 300 es
 precision highp float;
@@ -173,8 +174,13 @@ export function createGrassMesh(sharedLights?: BindGroup) {
   };
   const lightBinding = createLightTargetBinding(shader.resources, Texture.EMPTY.source);
   const releaseLightTargets = lightBinding.detach;
+  const geometryInputs = new ChangeTracker();
+  let geometryRevision = 0;
   return {
     mesh,
+    get geometryRevision() {
+      return geometryRevision;
+    },
     get geometryEnabled() {
       return uniforms.uniforms.uSinglePass === 0;
     },
@@ -246,6 +252,13 @@ export function createGrassMesh(sharedLights?: BindGroup) {
       uniforms.uniforms.uAmbient.set(ambient);
       normalTransform(transform, uniforms.uniforms.uNormalMatrix, 1, 1);
       uniforms.update();
+      geometryInputs.begin();
+      geometryInputs.value(list);
+      geometryInputs.value(layer);
+      geometryInputs.numbers(uniforms.uniforms.uMotion);
+      geometryInputs.numbers(uniforms.uniforms.uNormalMatrix);
+      geometryInputs.value(lighting);
+      if (geometryInputs.finish()) geometryRevision++;
     },
     beginGeometry(depthRange: number) {
       let alpha = mesh.alpha;

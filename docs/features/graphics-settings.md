@@ -1,5 +1,14 @@
 # Graphics settings
 
+Geometry and lighting reuse retained ordered input snapshots. Lit material
+textures/revisions, uniforms, transforms, alpha, clip geometry and ordered
+submission removal invalidate geometry. High grass motion participates; Low
+and Medium grass, ordinary vectors and drifting leaves do not. Numeric light
+changes and light-buffer resolution invalidate only lighting. Composite fog and
+film keep the existing geometry. Resize and context recovery explicitly rebuild
+both buffers. Focused native checks compare reused output exactly with forced
+redraws and verify pass counts, including mutable flicker and live lighting modes.
+
 The Graphics feature batch is in progress on develop. Settings schema 2 replaces
 the old quality/debris fields with a validated `graphics` record. Schema 1 audio,
 bindings, accessibility and vibration preferences survive migration; unknown
