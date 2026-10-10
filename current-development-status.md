@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.1)
+## Active goal — Graphics menu and renderer optimizations (1.70.2)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -36,9 +36,38 @@ was33.3ms; corrected explicit8.3/25ms startup phase, retaining exact simulation
 comparison and steady33.3ms cadence. No renderer investigation or broad runs.
 Package/lock/title/changelog1.70.1. Foundation committed as80b79f2.
 
-Next: effective runtime graphics/adaptive controller, capped resolution, lighting
-and budget/preload control; remaining menu controls and delivered-interval adaptation.
-Live preview/debounce/metrics and all Part B work remain. Full objective and
+Third chunk: `platform/graphics-quality.ts` replaces JS-work-gated quality. Two
+slow one-second delivered-callback windows reduce120->60, Full->Half, resolution
+by10 to50, particles, then grass. Stable cadence probes recovery after10s; failed
+probe steps down again. Effective choices are separate/reused records and never
+saved; loading/menu/cinematic/hidden callbacks suspend sampling. Frame-loop samples
+now retain unclamped intervals while simulation deltas still cap at50ms.
+
+Resolution control50-100 scales capped DPR, coalesces300ms and tracks Applying to
+ready/unavailable. Lighting Off yields flat material colour; Half has half-sized
+HDR targets; existing session debug resolution overrides persist only in memory.
+Off still uses neutral versions of existing passes (not a skipped-pass claim).
+Ambient/grass/weather ports are independent of combat cues. Ambient Off clears
+ordinary/gust leaves. Controls for resolution, lighting, particles, weather and
+adaptive toggle are wired, with active reductions shown. Audio preferences no
+longer callprepareScene. Grass density is wired; cheap path/control remain pending.
+
+Final strictTS PASS at1.70.2; focused scheduler/settings/quality tests
+have22 passing first run plus4/4 effect-quality rerun after correcting recovery
+probe expectation (continuing slow delivery correctly reduces again). Native
+Off/Half/debug override and paused-state browser2 PASS. Integration coalescing/
+independence/audio-no-prepare case PASS8.4s (10.6s command) under
+`tmp/test-results/browser/graphics-resolution-verified/`; portrait reviewed.
+Initial new fixture incorrectly required a gameplay-ready mark on title, then
+used unscopedBack matching hidden screens; both fixture errors corrected without
+relaxing implementation assertions. Original failures retained under
+`graphics-adaptive-controls/` and `graphics-resolution-paused/`. Final controller
+file5/5 PASS includes the additional low-memory capped-resolution unit.
+Package/lock/title/changelog1.70.2. No full suites/profiles run for these chunks.
+
+Next: scenery detail, memory/preload policies, grass cheap pass/control and FPS;
+then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
+Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.
 Goal active, incomplete. No known task-owned graphics processes remain running.
 

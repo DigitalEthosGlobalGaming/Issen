@@ -76,7 +76,8 @@ export function createFrameLoop(
       return;
     }
     if (renderDue) due = Math.max(due + interval, now);
-    const raw = Math.min(0.05, Math.max(0, (now - last) / 1000));
+    const deliveredMs = Math.max(0, now - last);
+    const raw = Math.min(0.05, deliveredMs / 1000);
     if (renderDue) last = now;
     const workStart = scheduler.now();
     const demand = callbacks.demand?.();
@@ -92,7 +93,7 @@ export function createFrameLoop(
     if (renderDue && (!demand || demand.render)) callbacks.render(raw);
     if (renderDue && (!demand || demand.afterRender)) callbacks.afterRender();
     if (renderDue && (!demand || demand.render))
-      callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
+      callbacks.sampleFrame?.(deliveredMs, scheduler.now() - workStart);
     if (running) handle = scheduler.request(frame);
   }
 

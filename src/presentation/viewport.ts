@@ -3,9 +3,13 @@ import type { EnvironmentState } from './environment-state.ts';
 import { documentImageBudget } from '../platform/main-images.ts';
 
 export function drawingPixelRatio(doc: Document, width: number, height: number, ratio: number) {
-  return documentImageBudget(doc) <= 256 * 1024 * 1024
-    ? Math.min(1.5, ratio, Math.sqrt(600_000 / (width * height)))
-    : Math.min(2, ratio);
+  const requested = Number(doc.documentElement?.dataset.graphicsResolution ?? 100);
+  const scale = Number.isFinite(requested) ? Math.max(50, Math.min(100, requested)) / 100 : 1;
+  const capped =
+    documentImageBudget(doc) <= 256 * 1024 * 1024
+      ? Math.min(1.5, ratio, Math.sqrt(600_000 / (width * height)))
+      : Math.min(2, ratio);
+  return capped * scale;
 }
 export interface ViewportViews {
   W: number;
@@ -80,6 +84,8 @@ export function createViewport(readViews: () => ViewportViews) {
     reposition();
   }
   const { lifecycle } = readViews();
+  window.addEventListener('issen:graphics-resolution', resize);
+  lifecycle.add(() => window.removeEventListener('issen:graphics-resolution', resize));
   lifecycle.listen(window, 'resize', () => {
     lifecycle.clearTimeout(rt);
     rt = lifecycle.timeout(resize, 80);

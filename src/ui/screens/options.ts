@@ -15,6 +15,8 @@ import {
   recommendedGraphics,
 } from '../../platform/graphics-settings.ts';
 import type { GraphicsPreset } from '../../platform/graphics-settings.ts';
+import type { GraphicsSettings } from '../../platform/graphics-settings.ts';
+import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
 type Category = 'audio' | 'controls' | 'display' | 'graphics' | 'profile';
 type Page = Category | 'root';
 const TITLES: Record<Page, string> = {
@@ -31,6 +33,7 @@ export function createOptions(
   changed: () => void,
   closed: () => void,
   tutorial?: () => void,
+  graphics?: ReturnType<typeof createGraphicsQuality>,
 ) {
   const doc = root.ownerDocument,
     win = doc.defaultView!;
@@ -65,6 +68,62 @@ export function createOptions(
   }
   function persist() {
     changed();
+  }
+  function setGraphic<K extends Exclude<keyof GraphicsSettings, 'preset'>>(
+    key: K,
+    value: GraphicsSettings[K],
+  ) {
+    settings.graphics = resolveGraphics(settings.graphics, device);
+    setGraphicsOption(settings.graphics, key, value);
+    persist();
+    const preset = content.querySelector<HTMLSelectElement>('#option-graphics-preset');
+    const custom = preset?.querySelector<HTMLOptionElement>('option[value="custom"]');
+    if (custom) custom.disabled = false;
+    if (preset) preset.value = 'custom';
+  }
+  function graphicSelect<K extends 'lighting' | 'particles' | 'weather'>(
+    key: K,
+    label: string,
+    choices: [string, GraphicsSettings[K]][],
+  ) {
+    const row = node('div', '', 'option-row'),
+      labelEl = node('label', label),
+      input = node('select');
+    labelEl.htmlFor = `option-graphics-${key}`;
+    input.id = labelEl.htmlFor;
+    for (const [text, value] of choices) {
+      const option = node('option', text);
+      option.value = value;
+      input.append(option);
+    }
+    input.value = resolveGraphics(settings.graphics, device)[key];
+    input.addEventListener('change', () => setGraphic(key, input.value as GraphicsSettings[K]), {
+      signal: renderEvents.signal,
+    });
+    row.append(labelEl, input);
+    content.append(row);
+  }
+  function updateGraphicsStatus() {
+    const applying = content.querySelector<HTMLElement>('.graphics-applying');
+    if (applying)
+      applying.textContent =
+        doc.documentElement.dataset.graphicsApplying === 'true' ? 'Applying…' : '';
+    const adaptive = content.querySelector<HTMLElement>('.graphics-adaptive');
+    if (!adaptive || !graphics) return;
+    const active = graphics.effective;
+    const labels = {
+      frameRate: `Frame rate ${active.frameRate}`,
+      lighting: `Lighting ${active.lighting}`,
+      resolution: `Resolution ${active.resolution}%`,
+      particles: `Particles ${active.particles}`,
+      grass: `Grass ${active.grass}`,
+    };
+    const keys = new Set(graphics.reductions.map((reduction) => reduction.key));
+    adaptive.textContent = keys.size
+      ? `Adaptive reductions: ${[...keys].map((key) => labels[key]).join(' · ')}`
+      : active.adaptive
+        ? 'Using your selected quality.'
+        : 'Adaptive quality is off.';
   }
   function select<K extends keyof Settings>(
     key: K,
@@ -319,10 +378,76 @@ export function createOptions(
         { signal: renderEvents.signal },
       );
       fpsRow.append(fpsLabel, fpsInput);
+      content.append(fpsRow);
+      const resolutionRow = node('div', '', 'option-volume');
+      const resolutionLabel = node('label', 'Render resolution');
+      resolutionLabel.htmlFor = 'option-graphics-resolution';
+      const resolution = node('input'),
+        resolutionOutput = node('output');
+      resolution.id = resolutionLabel.htmlFor;
+      resolution.type = 'range';
+      resolution.min = '50';
+      resolution.max = '100';
+      resolution.step = '5';
+      resolution.value = String(resolveGraphics(settings.graphics, device).resolution);
+      resolutionOutput.htmlFor = resolution.id;
+      const showResolution = () => {
+        resolutionOutput.value = `${resolution.value}%`;
+        resolution.setAttribute('aria-valuetext', resolutionOutput.value);
+      };
+      showResolution();
+      resolution.addEventListener(
+        'input',
+        () => {
+          showResolution();
+          setGraphic('resolution', Number(resolution.value));
+        },
+        { signal: renderEvents.signal },
+      );
+      resolutionRow.append(resolutionLabel, resolutionOutput, resolution);
+      content.append(resolutionRow);
+      graphicSelect('lighting', 'Lighting', [
+        ['Off', 'off'],
+        ['Half', 'half'],
+        ['Full', 'full'],
+      ]);
+      graphicSelect('particles', 'Ambient particles', [
+        ['Off', 'off'],
+        ['Low', 'low'],
+        ['Medium', 'medium'],
+        ['High', 'high'],
+      ]);
+      graphicSelect('weather', 'Weather effects', [
+        ['Reduced', 'reduced'],
+        ['Full', 'full'],
+      ]);
+      const adaptiveRow = node('div', '', 'option-row'),
+        adaptiveLabel = node('label', 'Adaptive quality'),
+        adaptiveInput = node('input');
+      adaptiveLabel.htmlFor = 'option-graphics-adaptive';
+      adaptiveInput.id = adaptiveLabel.htmlFor;
+      adaptiveInput.type = 'checkbox';
+      adaptiveInput.checked = settings.graphics.adaptive;
+      adaptiveInput.addEventListener(
+        'change',
+        () => {
+          setGraphic('adaptive', adaptiveInput.checked);
+          updateGraphicsStatus();
+        },
+        { signal: renderEvents.signal },
+      );
+      adaptiveRow.append(adaptiveLabel, adaptiveInput);
+      const adaptiveStatus = node('p', '', 'graphics-adaptive'),
+        applying = node('p', '', 'graphics-applying');
+      adaptiveStatus.setAttribute('role', 'status');
+      applying.setAttribute('role', 'status');
       content.append(
-        fpsRow,
+        adaptiveRow,
+        adaptiveStatus,
+        applying,
         button('Motion and flashes', () => navigate('display')),
       );
+      updateGraphicsStatus();
     } else if (page === 'profile') {
       // Persistent controls and modal listeners live outside the rerendered content.
     } else {
@@ -409,6 +534,12 @@ export function createOptions(
     },
     { signal: events.signal },
   );
+  const graphicsObserver = new MutationObserver(updateGraphicsStatus);
+  graphicsObserver.observe(doc.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-graphics-applying', 'data-graphics-reductions'],
+  });
+  const unsubscribeGraphics = graphics?.subscribe(updateGraphicsStatus);
   win.addEventListener(
     'popstate',
     () => {
@@ -491,6 +622,8 @@ export function createOptions(
     },
     back,
     dispose() {
+      graphicsObserver.disconnect();
+      unsubscribeGraphics?.();
       events.abort();
       renderEvents.abort();
       root.hidden = true;

@@ -89,7 +89,9 @@ export function createRuntimePresentation(
       stateView(foundation.view.geometry, ['W', 'H', 'DPR', 'S', 'L'], {
         G: foundation.run.G,
         R: foundation.view.R,
-        density: foundation.browser.density,
+        density: foundation.browser.weatherDensity,
+        ambientDensity: foundation.browser.ambientDensity,
+        grassDensity: foundation.browser.grassDensity,
         context2d: foundation.browser.context2d,
         get activeTrial() {
           return foundation.run.activity.activeTrial;

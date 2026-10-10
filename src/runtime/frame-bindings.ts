@@ -21,7 +21,7 @@ import { STAGES } from '../game/content/stages.ts';
 import type { EnvironmentState } from '../presentation/environment-state.ts';
 import type { createWeatherState } from '../rendering/scene/weather-state.ts';
 import type { createAudio } from '../audio/audio.ts';
-import type { createEffectQuality } from '../rendering/effects/quality.ts';
+import type { createGraphicsQuality } from '../platform/graphics-quality.ts';
 import type { createPostArtwork } from '../presentation/post-artwork.ts';
 import type { createScreenAnimation } from '../ui/screen-animation.ts';
 import type { createEnvironmentPresentation } from '../presentation/environment.ts';
@@ -76,7 +76,7 @@ export type FrameBindingViews = SimulationPorts &
     readonly postArtwork: ReturnType<typeof createPostArtwork>;
     readonly playerFigures: ReturnType<typeof createPlayerFigures>;
     readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
-    readonly effectQuality: ReturnType<typeof createEffectQuality>;
+    readonly effectQuality: ReturnType<typeof createGraphicsQuality>;
     readonly graphicsFrameRate: () => 30 | 60 | 120;
     readonly ambient: ReturnType<typeof createEnvironmentPresentation>['ambient'];
     readonly rebalanceWeather: () => void;
@@ -311,15 +311,7 @@ export function createFrameBindings(
         if (G.panel === 'armory') drawPreview();
       },
       sampleFrame: (interval, work) => {
-        const {
-          sceneLoading,
-          G,
-          effectQuality,
-          ambient,
-          environmentState,
-          density,
-          rebalanceWeather,
-        } = readViews();
+        const { sceneLoading, G, effectQuality, cinematic } = readViews();
         const nextScene = predictScene();
         sampleAssetBackground(
           G.stage,
@@ -329,11 +321,17 @@ export function createFrameBindings(
           nextScene?.stage,
           nextScene,
         );
-        if (sceneLoading) return;
-        if (G.panel || ['title', 'over', 'paused'].includes(G.state) || document.hidden) return;
-        if (!effectQuality.sample(interval, work)) return;
-        ambient().balanceLeaves(environmentState.leaves);
-        if (Math.abs(environmentState.weatherDensity - density()) >= 0.09) rebalanceWeather();
+        if (
+          sceneLoading ||
+          cinematic.active ||
+          G.panel ||
+          ['title', 'over', 'paused'].includes(G.state) ||
+          document.hidden
+        ) {
+          effectQuality.suspend();
+          return;
+        }
+        effectQuality.sample(interval);
       },
     },
   );

@@ -22,6 +22,8 @@ export interface EnvironmentViews {
   readonly L: ReturnType<typeof createLayout>;
   readonly R: Random;
   readonly density: () => number;
+  readonly ambientDensity?: () => number;
+  readonly grassDensity?: () => number;
   readonly driftRenderer: ReturnType<typeof createDriftRenderer>;
   readonly reducedMotion: () => boolean;
   readonly g: SceneDrawing;
@@ -61,7 +63,7 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
       scale: S,
       layout: L,
       random: R,
-      density: density() * (DRIFT_DENSITY[stage] ?? 1),
+      density: (readViews().ambientDensity ?? density)() * (DRIFT_DENSITY[stage] ?? 1),
       stage,
       time,
       motion: environmentState.leafMotion,
@@ -119,7 +121,7 @@ export function createEnvironmentPresentation(readViews: () => EnvironmentViews)
       demonic && reducedMotion() ? 0 : t,
       demonic && reducedMotion() ? 1 : wind,
       list === fg ? 12 : -12,
-      density(),
+      (readViews().grassDensity ?? density)(),
     );
   }
   function drawLeaves(front: boolean) {

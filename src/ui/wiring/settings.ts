@@ -1,6 +1,9 @@
 import { createScrollMenus } from '../scroll-menus.ts';
 import { createLightingDebug } from '../lighting-debug.ts';
 import { createOptions } from '../screens/options.ts';
+import { createGraphicsApplication } from './graphics.ts';
+import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
+import { cosmeticDensity } from '../../platform/graphics-settings.ts';
 import { store } from '../../platform/storage.ts';
 import { PREMIUM_FILM } from '../../platform/premium.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
@@ -23,6 +26,7 @@ export interface SettingsViews {
   readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
   readonly lifecycle: ReturnType<typeof createLifecycle>;
   readonly settings: ReturnType<typeof parseSettings>;
+  readonly graphics: ReturnType<typeof createGraphicsQuality>;
   readonly reducedMotion: () => boolean;
   readonly reducedFlashes: () => boolean;
   readonly prepareScene: () => void;
@@ -76,10 +80,18 @@ export function createSettingsWiring(views: SettingsViews) {
   } = views;
   const scrollMenus = createScrollMenus($('app'));
   lifecycle.add(scrollMenus.dispose);
+  const graphicsApplication = createGraphicsApplication(
+    cvs,
+    views.graphics,
+    lifecycle,
+    screenAnimation.invalidate,
+  );
+  let previousAmbient = -1,
+    previousWeather = -1;
   function applySettings() {
     cvs.dataset.debris = 'sprites';
     screenAnimation.invalidate();
-    if (views.artworkReady) prepareScene();
+    graphicsApplication.apply(!views.artworkReady);
     scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
     audio.setMuted(settings.muted);
@@ -94,10 +106,17 @@ export function createSettingsWiring(views: SettingsViews) {
       presentationState.zoom = 1;
     }
     if (reducedFlashes()) presentationState.flashA = Math.min(presentationState.flashA, 0.035);
-    if (environmentState.bg) {
+    const ambientDensity = cosmeticDensity(views.graphics.effective.particles, reducedMotion());
+    const weatherDensity =
+      views.graphics.effective.weather === 'reduced' || reducedMotion() ? 0.3 : 1;
+    if (environmentState.bg && ambientDensity !== previousAmbient) {
       ambient().balanceLeaves(environmentState.leaves);
+    }
+    if (environmentState.bg && weatherDensity !== previousWeather) {
       rebalanceWeather();
     }
+    previousAmbient = ambientDensity;
+    previousWeather = weatherDensity;
   }
   function saveSettings() {
     store.set('issen.settings', settings);
@@ -126,8 +145,10 @@ export function createSettingsWiring(views: SettingsViews) {
     () => {
       if (G.state === 'title' && views.savedRun?.status !== 'active') launchTutorial();
     },
+    views.graphics,
   );
   lifecycle.add(options.dispose);
+  lifecycle.add(views.graphics.subscribe(applySettings));
   lifecycle.listen(systemMotion, 'change', applySettings);
   applySettings();
 

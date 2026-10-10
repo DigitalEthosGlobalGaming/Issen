@@ -8,7 +8,7 @@ import {
   sensitivityScale,
 } from '../../src/platform/settings.ts';
 import { createHaptics } from '../../src/platform/haptics.ts';
-import { preferredDensity } from '../../src/rendering/effects/quality.ts';
+import { cosmeticDensity } from '../../src/platform/graphics-settings.ts';
 
 test('legacy mute migrates and invalid settings retain safe defaults', () => {
   for (const raw of [null, [], 'bad', { version: 3, muted: false }])
@@ -61,10 +61,11 @@ test('presentation and sensitivity preferences do not require changing combat se
   assert.equal(preferenceEnabled('on', false), true);
   assert.equal(sensitivityScale('normal'), 1);
   assert.ok(sensitivityScale('high') < 1 && sensitivityScale('low') > 1);
-  assert.equal(preferredDensity('low', 1), 0.3);
-  assert.equal(preferredDensity('high', 0.3), 1);
-  assert.equal(preferredDensity('auto', 0.6), 0.6);
-  assert.equal(preferredDensity('high', 1, true), 0.3);
+  assert.equal(cosmeticDensity('low'), 0.3);
+  assert.equal(cosmeticDensity('high'), 1);
+  assert.equal(cosmeticDensity('medium'), 0.6);
+  assert.equal(cosmeticDensity('high', true), 0.3);
+  assert.equal(cosmeticDensity('off', true), 0);
 });
 test('disabled vibration never calls the optional browser capability', () => {
   const previous = Object.getOwnPropertyDescriptor(globalThis, 'navigator');

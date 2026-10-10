@@ -11,25 +11,41 @@ coarse-pointer touch devices or reported memory at most 4 GiB, and High otherwis
 The options root has a Graphics summary; presets are in Graphics and accessibility
 remains in Display, linked from Graphics. Category resets stay independent.
 
-The initial integration applies preset particle density through the existing
-cosmetic-density port. Frame rate is now a live control: 30/60 are always available,
+Ambient particles, grass density, cosmetic weather and combat cues have independent
+runtime ports. Off removes ambient leaves and gusts; combat cues remain visible.
+Frame rate is a live control: 30/60 are always available,
 120 requires a stable bounded rAF observation. An unsupported saved 120 choice
 runs at 60 without overwriting the preference. Simulation remains independently
 scheduled at 60 even with 30 fps rendering; unit checks compare exact update deltas
 and combat time-scale/hit-stop consumption. Manual rate changes become Custom.
-The remaining preset fields are validated storage contracts;
-their renderer integrations and individual controls are still pending. Preset
+Render resolution scales the memory-capped drawing ratio; rapid inputs coalesce
+for 300 ms before a viewport rebuild and show Applying through scene readiness.
+Off lighting forces flat material colour, Half halves HDR accumulation dimensions,
+and session debug resolution still overrides the saved choice. Off currently uses
+the same shader/pass infrastructure with neutral lighting; it is not a claim that
+geometry and light passes have been eliminated. Unrelated audio changes no longer
+request scenery preparation.
+
+`platform/graphics-quality.ts` replaces the JS-work-gated density controller.
+Two sustained one-second slow delivered-callback windows reduce rate, lighting,
+resolution (10 points, minimum 50), particles, then grass. Stable cadence allows
+recovery probes after ten seconds, in reverse order and within exact saved choices.
+The controller reuses its effective record between changes, ignores JS work time,
+resets sampling during loading/menus/cinematics/hidden state, and never saves
+reductions. The Graphics menu shows active reductions. Callback intervals are
+observations of scheduling, not independently verified physical presentation.
+
+Scenery, memory, preload, anti-aliasing and FPS-counter preset fields remain storage
+contracts; their integrations/individual controls are still pending. Grass density
+is connected but the cheap single-pass path and its menu selector are pending. Preset
 starting values match the approved task and have not yet been tuned from new
 measurements. MSAA usefulness has not yet been assessed.
 
 Remaining work:
 
-- Render-resolution scaling under the existing cap; Off/Half/Full lighting.
 - MSAA visual assessment before exposing or dropping its control; independent
-  ambient particles, grass density/cheap lit path, cosmetic weather, compose detail,
+  grass cheap lit path, compose detail,
   preload and memory policies, gameplay FPS counter.
-- Delivered-interval adaptive controller with hysteresis, ordered reductions,
-  bounded recovery and inactive/loading/cinematic suspension.
 - Portrait sheet/landscape panel, visible undimmed frozen-run or title showcase,
   live metrics, measured impact labels, 300 ms heavy-change debounce and Applying.
 - Geometry/light dirtiness, static-filter baking, complete program warmup with

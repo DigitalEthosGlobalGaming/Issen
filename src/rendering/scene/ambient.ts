@@ -54,7 +54,7 @@ export interface AmbientEnvironment {
 export function createAmbient(env: AmbientEnvironment) {
   const { width: W, height: H, scale: S, layout: L, random: R } = env;
   const motion = env.motion ?? createLeafMotion();
-  const count = (n: number) => scaledCount(n, env.density);
+  const count = (n: number) => (env.density === 0 ? 0 : scaledCount(n, env.density));
   function buildGrass(gl: number) {
     const fg: GrassBlade[] = [];
     const n = Math.round(W / 3);
@@ -137,6 +137,11 @@ export function createAmbient(env: AmbientEnvironment) {
     }
   }
   function balanceLeaves(leaves: Leaf[]) {
+    if (env.density === 0) {
+      if (leaves.length) motion.invalidate();
+      leaves.length = 0;
+      return;
+    }
     const target = count(38 + (W * H) / 11000);
     let ordinary = leaves.filter((leaf) => !leaf.gust).length;
     for (let i = leaves.length - 1; i >= 0 && ordinary > target; i--)

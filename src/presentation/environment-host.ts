@@ -8,7 +8,18 @@ export type EnvironmentHostViews = Pick<
   EnvironmentArtworkViews,
   'W' | 'H' | 'DPR' | 'S' | 'L' | 'R' | 'density' | 'context2d'
 > &
-  Pick<EnvironmentViews, 'activeTrial' | 'G' | 'L' | 'reducedMotion' | 'g' | 'cinematic' | 'WX'> & {
+  Pick<
+    EnvironmentViews,
+    | 'activeTrial'
+    | 'G'
+    | 'L'
+    | 'reducedMotion'
+    | 'g'
+    | 'cinematic'
+    | 'WX'
+    | 'ambientDensity'
+    | 'grassDensity'
+  > & {
     readonly presentationState: { readonly time: number; readonly wind: number };
   };
 /** Per-game scenery state, cached artwork and drawing share one explicit binding owner. */
@@ -69,6 +80,8 @@ export function createEnvironmentHost(
           'L',
           'R',
           'density',
+          'ambientDensity',
+          'grassDensity',
           'reducedMotion',
           'g',
           'cinematic',

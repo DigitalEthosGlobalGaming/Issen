@@ -185,6 +185,9 @@ export function createRuntimeMenus(
                 get settings(): MenuBindingViews['settings'] {
                   return foundation.browser.settings;
                 },
+                get graphics(): MenuBindingViews['graphics'] {
+                  return foundation.browser.graphics;
+                },
                 get reducedFlashes(): MenuBindingViews['reducedFlashes'] {
                   return foundation.browser.reducedFlashes;
                 },

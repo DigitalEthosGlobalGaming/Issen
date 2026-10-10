@@ -94,6 +94,13 @@ export function setGraphicsOption<K extends Exclude<keyof GraphicsSettings, 'pre
 export function particleDensity(level: GraphicsSettings['particles']): number {
   return level === 'off' ? 0 : level === 'low' ? 0.3 : level === 'medium' ? 0.6 : 1;
 }
+export function cosmeticDensity(
+  level: GraphicsSettings['particles'],
+  reducedMotion = false,
+): number {
+  const density = particleDensity(level);
+  return reducedMotion ? Math.min(0.3, density) : density;
+}
 /** Validate persisted values independently; never pass malformed limits to renderers. */
 export function parseGraphics(raw: unknown): GraphicsSettings {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return graphicsPreset();

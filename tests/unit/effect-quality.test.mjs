@@ -1,22 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  createEffectQuality,
-  preferredLightResolution,
-} from '../../src/rendering/effects/quality.ts';
+import { preferredLightResolution } from '../../src/rendering/effects/quality.ts';
 import { createAmbient } from '../../src/rendering/scene/ambient.ts';
 import { createWeatherParticles } from '../../src/rendering/scene/weather-particles.ts';
 import { createEffects } from '../../src/rendering/effects/state.ts';
 import { createEffectSpawner } from '../../src/rendering/effects/spawn.ts';
 import { rng } from '../../src/shared/random.ts';
+import { createGraphicsQuality } from '../../src/platform/graphics-quality.ts';
+import { graphicsPreset } from '../../src/platform/graphics-settings.ts';
 
-test('sustained slow frames reduce cosmetic density and fast frames restore it', () => {
-  const quality = createEffectQuality();
-  for (let i = 0; i < 120; i++) quality.sample(24, 18);
-  assert.ok(quality.density < 1);
-  assert.ok(quality.density >= 0.3);
-  for (let i = 0; i < 300; i++) quality.sample(16, 7);
-  assert.equal(quality.density, 1);
+test('sustained slow delivery reduces quality even with negligible JavaScript work', () => {
+  const settings = graphicsPreset('high');
+  const quality = createGraphicsQuality(
+    () => settings,
+    { mobile: false },
+    () => true,
+  );
+  for (let i = 0; i < 120; i++) quality.sample(24, 1);
+  assert.equal(quality.effective.frameRate, 60);
+  assert.equal(settings.frameRate, 120);
+  for (let i = 0; i < 900 && quality.effective.frameRate !== 120; i++) quality.sample(1000 / 60, 1);
+  assert.equal(quality.effective.frameRate, 120);
+  for (let i = 0; i < 120; i++) quality.sample(24, 1);
+  assert.equal(quality.effective.frameRate, 60);
+});
+
+test('Off removes ambient leaves and gusts without disabling combat cues', () => {
+  const ambient = createAmbient({
+    width: 800,
+    height: 600,
+    scale: 1,
+    layout: { groundY: 400, eH: 100 },
+    random: rng(2),
+    density: 0,
+  });
+  const leaves = ambient.buildLeaves();
+  assert.equal(leaves.length, 0);
+  ambient.gustLeaves(leaves, 20);
+  assert.equal(leaves.length, 0);
+  leaves.push({ gust: true });
+  ambient.balanceLeaves(leaves);
+  assert.equal(leaves.length, 0);
 });
 
 test('density scales weather, ambient leaves and combat particles', () => {

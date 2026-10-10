@@ -213,7 +213,12 @@ export class PixiScenePainter implements SceneDrawing {
   private get lightResolution(): 1 | 0.5 {
     return preferredLightResolution(
       this.canvas.dataset.lightResolution,
-      this.lighting.lightResolution ?? 1,
+      (this.canvas.dataset.graphicsLighting ??
+        this.canvas.ownerDocument.documentElement.dataset.graphicsLighting) === 'half' ||
+        (this.canvas.dataset.graphicsLighting ??
+          this.canvas.ownerDocument.documentElement.dataset.graphicsLighting) === 'off'
+        ? 0.5
+        : (this.lighting.lightResolution ?? 1),
     );
   }
   /** Borrowed generation-scoped targets, available only after current G/light preparation. */
@@ -280,6 +285,7 @@ export class PixiScenePainter implements SceneDrawing {
     direction: [-0.4, -0.5, 1],
     points: [],
   };
+  private readonly unlitLighting: SceneLighting = { ...this.lighting, materialLighting: 0 };
 
   private readonly geometryBuffer: GeometryBuffer;
   private readonly pendingUploads = new Map<AbortSignal, Set<TextureSource>>();
@@ -437,7 +443,14 @@ export class PixiScenePainter implements SceneDrawing {
     });
     registerMaterialSink(this, {
       lights: (lighting) => {
-        this.lighting = lighting;
+        const mode =
+          this.canvas.dataset.graphicsLighting ??
+          this.canvas.ownerDocument.documentElement.dataset.graphicsLighting;
+        if (mode === 'off') {
+          Object.assign(this.unlitLighting, lighting);
+          this.unlitLighting.materialLighting = 0;
+          this.lighting = this.unlitLighting;
+        } else this.lighting = lighting;
         this.invalidateLighting();
       },
       draw: (stamp) => {

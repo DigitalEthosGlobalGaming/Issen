@@ -38,8 +38,6 @@ import type { ResultReveal } from '../ui/screens/run-results.ts';
 import { createWeatherState } from '../rendering/scene/weather-state.ts';
 import { createPlayerAnimation } from '../game/player/player.ts';
 
-import { createEffectQuality } from '../rendering/effects/quality.ts';
-
 import { createPalette } from '../rendering/palette.ts';
 
 import { loadStatistics, loadSetup, loadUnlocks, loadEquipment } from '../platform/saves.ts';
@@ -94,7 +92,6 @@ export function createRuntimeFoundation(
   const browserPreferences = createRuntimePreferences({
     lifecycle,
     storage: store,
-    effectDensity: () => effectQuality.density,
     edition: ports.edition,
   });
   const {
@@ -108,6 +105,10 @@ export function createRuntimeFoundation(
     premiumAccess,
     accessible,
     density,
+    ambientDensity,
+    grassDensity,
+    weatherDensity,
+    graphics,
     frameRate: graphicsFrameRate,
   } = browserPreferences;
   const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
@@ -185,7 +186,7 @@ export function createRuntimeFoundation(
   const G = createRunState(store.get('issen.hints', {}));
   const P = createPlayerAnimation();
   const apparelMotion = createSecondaryMotion();
-  const effectQuality = createEffectQuality();
+  const effectQuality = graphics;
   const sceneState = createSceneState();
   return {
     lifecycle,
@@ -219,6 +220,10 @@ export function createRuntimeFoundation(
       premiumAccess,
       accessible,
       density,
+      ambientDensity,
+      grassDensity,
+      weatherDensity,
+      graphics,
       graphicsFrameRate,
       audio,
       audioInit,
