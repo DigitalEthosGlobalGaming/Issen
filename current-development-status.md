@@ -1,5 +1,25 @@
 # Current development status
 
+## Graphics checkpoint — committed and verified with failures (1.70.18)
+
+User requested committing the current work, final tests and a report. Tested
+source `8588a17` on develop; no implementation edits during verification.
+Application units530 PASS; performance-tool units9 PASS; full browser/native
+visual suite421 PASS/21 FAIL (442 total,26 minutes). Checked production build
+and strict TypeScript PASS; bundled tests3 PASS/1 FAIL. Performance integration
+all23 scenarios PASS,46 timing samples/23 diagnostics, no errors, using2 repeats,
+500ms warmup/1000ms samples and the existing cinematic30s minimum. This is short
+integration coverage, not the default release benchmark or mobile FPS proof.
+All verification processes are terminal. No push/deploy/APK/player-save changes.
+
+See [the final verification report](docs/development/graphics-final-verification.md)
+for every failed assertion and evidence. Restoration/clipping/low-memory
+preload/readiness/checkpoint failures remain; some pass-count and resolution
+expectations need review for the new behavior. No assertions were weakened.
+Impact labels and final preset tuning remain unimplemented; the32-arm comparison
+passed but timing variation prevents a confident ranking. The active goal is
+not complete. Failure fixes/reruns and the completion audit remain outstanding.
+
 ## Active goal — Retained Graphics frame (1.70.18)
 
 Heavy Graphics changes capture one complete native frame during the300ms

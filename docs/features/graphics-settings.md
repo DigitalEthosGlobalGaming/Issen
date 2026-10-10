@@ -1,5 +1,9 @@
 # Graphics settings
 
+The current implementation's [final checkpoint report](../development/graphics-final-verification.md)
+records full-suite results and unfinished work. The goal is not complete:
+measured option labels/preset tuning and reported failures remain outstanding.
+
 The renderer retains geometry restore records, sprite inputs and numeric dirty
 snapshots, writes uniforms directly into existing typed arrays, and indexes atlas
 rectangles by numeric coordinates rather than creating frame-key strings. Scene
