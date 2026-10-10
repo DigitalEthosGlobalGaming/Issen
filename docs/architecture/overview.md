@@ -33,6 +33,9 @@ quality changes, context restoration and disposal follow surface ownership.
 The session testing tools offer full/half accumulation with normal/depth-aware
 upsampling; all scene colour providers use the same pipeline. Instanced grass
 and catalogue leaves retain layer positions while computing visual motion on GPU.
+Graphics Low/Medium grass uses one composite draw borrowing scenery light and
+scene ambient, with no geometry writes; High retains its curved-normal geometry
+pass. Both paths use the same retained blades, motion and density selection.
 
 Presentation light-sources.ts owns registration and the deterministic global
 16-light budget. Runtime presentation connects existing persistent visual lights

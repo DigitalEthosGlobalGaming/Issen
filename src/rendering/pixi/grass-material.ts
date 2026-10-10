@@ -88,11 +88,22 @@ in vec2 vPosition;
 in vec4 vColour;
 in float vSelected;
 uniform float uLighting;
+uniform float uSinglePass;
+uniform vec3 uAmbient;
 ${lightingCompositeFunctions}
 out vec4 finalColor;
 void main() {
   if (vSelected<0.5) discard;
-  vec3 colour=mix(vColour.rgb,sceneLightColour(vColour.rgb,vPosition,vec3(0.0)),clamp(uLighting,0.0,1.0));
+  vec3 lit;
+  if (uSinglePass>0.5) {
+    vec2 uv=vPosition/uLightSize;
+    vec3 diffuse,specular;
+    sceneLightLookup(uv,diffuse,specular);
+    // Grass borrows scenery lighting; uncovered sky uses the scene ambient.
+    if(texture(uLightGuide,uv).a<0.001) diffuse=uAmbient;
+    lit=toDisplay(highlightRolloff(toLinear(vColour.rgb)*diffuse));
+  } else lit=sceneLightColour(vColour.rgb,vPosition,vec3(0.0));
+  vec3 colour=mix(vColour.rgb,lit,clamp(uLighting,0.0,1.0));
   finalColor=vec4(colour*vColour.a,vColour.a);
 }`;
 
@@ -127,6 +138,8 @@ export function createGrassMesh(sharedLights?: BindGroup) {
     uMotion: { value: new Float32Array([0, 0, 1]), type: 'vec3<f32>' },
     uNormalMatrix: { value: new Float32Array([1, 0, 0, 1]), type: 'mat2x2<f32>' },
     uLighting: { value: 1, type: 'f32' },
+    uSinglePass: { value: 0, type: 'f32' },
+    uAmbient: { value: new Float32Array([1, 1, 1]), type: 'vec3<f32>' },
     uGeometry: { value: new Float32Array([1, 1, 1]), type: 'vec3<f32>' },
     uLightSize: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
     uLightResolution: { value: new Float32Array([1, 1]), type: 'vec2<f32>' },
@@ -162,6 +175,9 @@ export function createGrassMesh(sharedLights?: BindGroup) {
   const releaseLightTargets = lightBinding.detach;
   return {
     mesh,
+    get geometryEnabled() {
+      return uniforms.uniforms.uSinglePass === 0;
+    },
     releaseLightTargets,
     update(
       blades: readonly GrassBlade[],
@@ -171,6 +187,8 @@ export function createGrassMesh(sharedLights?: BindGroup) {
       density: number,
       lighting: number,
       transform: Matrix,
+      ambient: readonly number[],
+      singlePass: boolean,
     ) {
       if (list !== blades || layer !== depth) {
         list = blades;
@@ -224,6 +242,8 @@ export function createGrassMesh(sharedLights?: BindGroup) {
       }
       uniforms.uniforms.uMotion.set([time, wind, Math.max(0, Math.min(1, density))]);
       uniforms.uniforms.uLighting = lighting;
+      uniforms.uniforms.uSinglePass = singlePass ? 1 : 0;
+      uniforms.uniforms.uAmbient.set(ambient);
       normalTransform(transform, uniforms.uniforms.uNormalMatrix, 1, 1);
       uniforms.update();
     },

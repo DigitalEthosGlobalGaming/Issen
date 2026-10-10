@@ -346,6 +346,9 @@ export class PixiScenePainter implements SceneDrawing {
       );
     });
     registerGrassSink(this, (frame) => {
+      const quality =
+        this.canvas.dataset.graphicsGrass ??
+        this.canvas.ownerDocument.documentElement.dataset.graphicsGrass;
       const item = this.submit('grass');
       const slot = this.slots[this.cursor - 1]!;
       this.applyTransform(item, this.matrix);
@@ -357,6 +360,8 @@ export class PixiScenePainter implements SceneDrawing {
         frame.density,
         this.lighting.materialLighting ?? 1,
         this.matrix,
+        this.lighting.ambient,
+        quality === 'low' || quality === 'medium',
       );
     });
     registerGlyphArrowSink(this, (radius, ghost) => {
@@ -673,7 +678,7 @@ export class PixiScenePainter implements SceneDrawing {
       visit(this.root);
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
-        if (slot.material || slot.grass)
+        if (slot.material || slot.grass?.geometryEnabled)
           restore.push(
             (slot.material ?? slot.grass)!.beginGeometry(this.geometryBuffer.targets!.depthRange),
           );

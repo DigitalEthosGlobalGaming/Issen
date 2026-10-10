@@ -7,6 +7,12 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.70.5, Graphics Low/Medium procedural grass uses one lit composite draw,
+borrowing scenery light with scene ambient on uncovered sky. It does not write
+geometry or own material maps. High retains curved normals and the existing
+geometry/composite path. Blade coverage, alpha and GPU wind are preserved; no
+authored assets or PBR planes changed. Native path/density/lighting checks pass.
+
 As of1.69.41, the256MiB tier copies selected outfit families into four finite parts
 (max256px per part) and charms into12parts (max128px). Original colour planes and
 aligned normal/surface/optional emissive are copied through the existing prepared

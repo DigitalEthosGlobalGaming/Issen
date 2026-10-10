@@ -24,6 +24,8 @@ test('live cosmetics stay independent and resolution changes coalesce while audi
   await page.getByLabel('Ambient particles', { exact: true }).selectOption('off');
   await page.getByLabel('Weather effects', { exact: true }).selectOption('reduced');
   await page.getByLabel('Lighting', { exact: true }).selectOption('half');
+  await page.getByLabel('Grass', { exact: true }).selectOption('medium');
+  await expect(page.locator('html')).toHaveAttribute('data-graphics-grass', 'medium');
   await expect(page.locator('html')).toHaveAttribute('data-graphics-particles', 'off');
   await expect(page.locator('html')).toHaveAttribute('data-graphics-weather', 'reduced');
   const immediate = await page
@@ -56,6 +58,7 @@ test('live cosmetics stay independent and resolution changes coalesce while audi
     particles: 'off',
     weather: 'reduced',
     lighting: 'half',
+    grass: 'medium',
     adaptive: false,
     preload: false,
   });

@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.4)
+## Active goal — Graphics menu and renderer optimizations (1.70.5)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -86,7 +86,19 @@ making the held-message fixture release idempotent.
 No new performance claim about the replacement scene's own compose cost.
 Package/lock/title/changelog1.70.4. No broad suites or profiles run.
 
-Next: scenery detail, memory policies, grass cheap pass/control and FPS;
+Sixth chunk: Grass selector drives independent Low/Medium/High density. Low and
+Medium use one instanced composite draw borrowing scenery light, with scene
+ambient on uncovered sky; they write no geometry. High keeps curved normals and
+geometry/composite passes. GPU wind, authored alpha/coverage and Lighting Off
+remain intact. StrictTS PASS after extending the menu selector's key union.
+Native cheap-path plus unchanged High coverage/motion/context tests3 PASS4s;
+expanded borrowed-light/geometry-identity check and menu persistence2 PASS11.1s
+under `tmp/test-results/browser/graphics-grass-integrated/`. Medium grass capture
+reviewed. Scenery lighting changes grass colour while its geometry stays exact;
+ambient changes preserve alpha. No new performance profile/full suite yet.
+Package/lock/title/changelog1.70.5; renderer coverage/architecture documented.
+
+Next: scenery detail, memory policies and FPS;
 then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
 Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.

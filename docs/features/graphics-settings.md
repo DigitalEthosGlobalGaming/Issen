@@ -50,14 +50,16 @@ worker composition, rather than claiming an in-flight native draw can be aborted
 
 Scenery, memory, anti-aliasing and FPS-counter preset fields remain storage
 contracts; their integrations/individual controls are still pending. Grass density
-is connected but the cheap single-pass path and its menu selector are pending. Preset
+and its selector are connected. Low and Medium use a single instanced composite
+draw with shared scenery lighting and scene ambient on uncovered sky, without
+geometry-buffer writes. High keeps curved normals and geometry/composite passes.
+All choices retain GPU wind, authored coverage and premultiplied alpha. Preset
 starting values match the approved task and have not yet been tuned from new
 measurements. MSAA usefulness has not yet been assessed.
 
 Remaining work:
 
-- MSAA visual assessment before exposing or dropping its control; independent
-  grass cheap lit path, compose detail,
+- MSAA visual assessment before exposing or dropping its control; compose detail,
   memory policies, gameplay FPS counter.
 - Portrait sheet/landscape panel, visible undimmed frozen-run or title showcase,
   live metrics, measured impact labels, 300 ms heavy-change debounce and Applying.
