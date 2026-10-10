@@ -1,5 +1,24 @@
 # Current development status
 
+## Active goal — Retained Graphics frame (1.70.18)
+
+Heavy Graphics changes capture one complete native frame during the300ms
+debounce. A one-shot painter flush callback captures before the non-preserved
+WebGL buffer is discarded. The accounted 2D canvas stays independent of worker
+planes/materials and viewport backing; show only during application, retain
+across superseded requests, release dimensions to0 after the replacement frame
+is presented or lifecycle disposal. If capture has not completed, commit waits
+for it rather than resizing first. Cheap settings and ordinary gameplay do not
+capture. Snapshot sits below menus/HUD and does not intercept input; loading
+treatment uses a general sibling selector to survive its insertion.
+Strict TypeScript PASS; focused retention/controls/memory browsers4 PASS18.9s.
+Native retained pixels stay unchanged across resize and superseded scenery,
+checkpoint unchanged, one tracked colour canvas and final dimensions0 verified.
+Portrait retained-loading screenshot reviewed under
+`tmp/test-results/browser/retention-focused/`. No full suites/profiles.
+Measured option impact/preset tuning, known Shore strict comparison and final
+full integration verification remain pending.
+
 ## Active goal — Shader precision (1.70.17)
 
 B5 uses explicit mediump colour, display response, diffuse light energy, tint,

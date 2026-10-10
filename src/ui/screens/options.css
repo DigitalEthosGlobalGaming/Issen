@@ -1,6 +1,17 @@
 #options[hidden] {
   display: none;
 }
+.graphics-retained-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.graphics-retained-frame[hidden] {
+  display: none;
+}
 #options {
   touch-action: pan-y;
 }

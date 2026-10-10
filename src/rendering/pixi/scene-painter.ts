@@ -42,6 +42,7 @@ import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting, SceneTexture, SceneSprite } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
 import { ChangeTracker } from './change-tracker.ts';
+import { finishPresentedFrame } from '../presented-frame.ts';
 import { StaticFilterCache } from './static-filter-cache.ts';
 import { documentResourceBudget } from '../../platform/main-images.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
@@ -786,6 +787,7 @@ export class PixiScenePainter implements SceneDrawing {
     }
     for (const key of this.patterns.keys())
       if (!this.usedPatterns.has(key)) this.patterns.delete(key);
+    finishPresentedFrame(this.canvas);
   }
 
   private *drawingTextureSources(): IterableIterator<TextureSource> {

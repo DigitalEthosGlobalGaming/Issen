@@ -44,7 +44,7 @@
     4% 44%
   );
 }
-#c:is([data-scene-state='loading'], [data-scene-state='unavailable']) + #sceneLoadingTreatment {
+#c:is([data-scene-state='loading'], [data-scene-state='unavailable']) ~ #sceneLoadingTreatment {
   animation: scene-loading-delay 1ms step-end 150ms forwards;
 }
 @keyframes scene-loading-delay {

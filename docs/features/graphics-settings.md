@@ -206,3 +206,17 @@ The native mixed-versus-highp comparison covers18 lighting/grass/film cases with
 at most2 display-byte rounding steps for this intentional precision change;
 this is not a mobile performance or universal driver guarantee. All-program
 warmup/context recovery checks still pass. Device timing remains separate.
+
+
+### Previous frame during application
+
+Heavy choices request one frame capture during the300ms debounce. The painter
+fulfills it immediately after native presentation, before browser buffer discard.
+An independent, tracked 2D colour canvas remains visible while scenery prepares
+or resource/AA changes settle; incoming changes reuse it. Capturing finishes
+before resize. Worker retirement/admission cannot close this colour copy.
+The scene-ready signal follows replacement presentation, then removes the copy
+and sets its backing dimensions to0. Disposal also cancels capture/releases it.
+The copy sits below menus/HUD and leaves input, simulation and saves unchanged.
+Focused native checks cover resized backing, superseded scenery and final
+release; they do not claim a bound on driver/browser overhead beyond accounting.

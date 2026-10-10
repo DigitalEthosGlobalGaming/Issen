@@ -4,6 +4,7 @@ import type { SceneryDetail } from '../../rendering/environment/scenery-detail.t
 import type { GraphicsSettings } from '../../platform/graphics-settings.ts';
 import { applyMainImageBudget } from '../../platform/main-images.ts';
 import { reclaimSceneMemory } from '../../platform/scene-memory.ts';
+import { createGraphicsFrameRetention } from './graphics-frame.ts';
 
 /** Apply cheap choices immediately; coalesce viewport and scenery rebuilds. */
 export function createGraphicsApplication(
@@ -16,6 +17,7 @@ export function createGraphicsApplication(
   const doc = canvas.ownerDocument,
     win = doc.defaultView!,
     data = doc.documentElement.dataset;
+  const retainedFrame = createGraphicsFrameRetention(canvas);
   let requested = NaN,
     applied = Number(data.graphicsResolution ?? 100),
     timer = 0,
@@ -37,9 +39,18 @@ export function createGraphicsApplication(
   }
   function applying(value: boolean) {
     data.graphicsApplying = String(value);
+    if (!value) retainedFrame.clear();
   }
   function commitHeavyChoices() {
     timer = 0;
+    if (retainedFrame.pending) {
+      retainedFrame.whenCaptured(() => {
+        timer = lifecycle.timeout(commitHeavyChoices, 0);
+      });
+      invalidate();
+      return;
+    }
+    retainedFrame.show();
     const resized = applied !== requested,
       sceneryChanged = appliedScenery !== requestedScenery,
       memoryChanged = appliedMemory !== requestedMemory;
@@ -99,6 +110,7 @@ export function createGraphicsApplication(
         requestedMemory = state.memory;
         requestedAntialias = state.antialias;
         lifecycle.clearTimeout(timer);
+        retainedFrame.cancelCommit();
         timer = 0;
         if (
           requested === applied &&
@@ -109,6 +121,7 @@ export function createGraphicsApplication(
           applying(!settled());
         else if (immediate) commitHeavyChoices();
         else {
+          if (data.graphicsOpen === 'true') retainedFrame.request();
           applying(true);
           timer = lifecycle.timeout(commitHeavyChoices, 300);
         }
