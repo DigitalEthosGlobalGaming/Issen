@@ -120,6 +120,33 @@ export function createCinematicWiring(views: CinematicViews) {
     },
   });
   lifecycle.add(cinematic.dispose);
+  // Graphics borrows stage preparation only, avoiding viewer rewards and visit RNG.
+  let graphicsOrigin: { stage: number; seed: number } | undefined;
+  function syncGraphicsShowcase() {
+    const data = cvs.ownerDocument.documentElement.dataset;
+    const active = data.graphicsOpen === 'true' && G.state === 'title' && !cinematic.active;
+    if (active === !!graphicsOrigin) return;
+    data.graphicsShowcase = String(active);
+    if (active) {
+      graphicsOrigin = { stage: G.stage, seed: views.stageSeed };
+      views.stageSeed = 0x49535345;
+      previewStage(3, false);
+    } else if (graphicsOrigin) {
+      const origin = graphicsOrigin;
+      graphicsOrigin = undefined;
+      views.stageSeed = origin.seed;
+      if (!lifecycle.disposed) previewStage(origin.stage, false);
+    }
+  }
+  const graphicsObserver = new MutationObserver(syncGraphicsShowcase);
+  graphicsObserver.observe(cvs.ownerDocument.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-graphics-open'],
+  });
+  lifecycle.add(() => {
+    graphicsObserver.disconnect();
+    cvs.ownerDocument.documentElement.dataset.graphicsShowcase = 'false';
+  });
   const logo = document.querySelector<HTMLElement>('#title .t-k')!;
   lifecycle.listen(logo, 'keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {

@@ -1,6 +1,23 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.10)
+## Active goal — Graphics menu and renderer optimizations (1.70.11)
+
+Title showcase added: Graphics borrows cinematic stage preparation for Hollow
+Forest with fixed preview seed, no viewer awards/visit mutation/attract spawning.
+Presentation hides attract enemies, reframes for the panel, and adds lantern light,
+embers and periodic cosmetic gusts alongside existing grass, rain and player idle.
+Ambient Off clears motes/leaves; reduced motion suppresses gusts/flicker. Exit
+restores title stage/seed. StrictTS PASS; showcase timing unit1 PASS; focused title
+browser1 PASS9.7s/11.8s command with strict save/run-RNG identity and restoration.
+Portrait capture reviewed under `tmp/test-results/browser/graphics-showcase-title-ready/`;
+final result under `tmp/test-results/browser/graphics-showcase-final/`. Initial
+fixture incorrectly awaited gameplay readiness on title; corrected to the actual
+layered backend indicator. Second fixture encountered existing settings persistence
+initializing `issen.muted` after an intentional particle change; final fixture seeds
+that preference before its strict all-other-saves snapshot. Failures retained.
+MSAA assessment, impact/preset measurements, previous Shore strict comparison and
+all Part B work remain unfinished. No full suites/performance captures.
+Versions/changelog1.70.11.
 
 Graphics live-preview chunk: portrait bottom sheet (max58% height), landscape/
 desktop right panel (max45%, cap420px), no surrounding dimming in either menu

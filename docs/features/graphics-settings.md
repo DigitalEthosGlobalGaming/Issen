@@ -41,8 +41,15 @@ theme. Controls scroll inside the panel and the heading remains visible.
 Rendering uses the selected rate; simulation dispatch advances only presentation
 clocks, ambient particles, cosmetic weather, apparel motion and presentation
 camera/transition. Run time, combat, hazard weather and run randomness stay frozen.
-Closing Graphics restores ordinary menu scheduling. The title-screen lantern,
-embers, gust and idle-player showcase remains pending.
+Closing Graphics restores ordinary menu scheduling. From the title, cinematic
+stage preparation borrows Hollow Forest with a fixed preview seed, without viewer
+rewards, stage-visit mutations or attract-enemy spawning. Closing restores the
+original title stage and seed. Presentation hides attract enemies, reframes the
+scene around the visible preview area and draws an idling player, grass and rain.
+`presentation/graphics-showcase.ts` adds a lantern point light, ember motes and a
+cosmetic leaf gust after two seconds and every six seconds thereafter. Ambient
+particle choices govern the motes/gusts; reduced motion suppresses gusts and
+lantern flicker. The preview shares ordinary lighting, weather and drawing paths.
 
 Ambient particles, grass density, cosmetic weather and combat cues have independent
 runtime ports. Off removes ambient leaves and gusts; combat cues remain visible.

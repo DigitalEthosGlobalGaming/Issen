@@ -71,6 +71,7 @@ export interface SceneViews {
   readonly L: Pick<ReturnType<typeof createLayout>, 'horizonY' | 'groundY' | 'eH'>;
   readonly drawBoss: () => void;
   readonly drawPlayer: () => void;
+  readonly drawGraphicsShowcase?: (g: SceneDrawing) => void;
   readonly drawPet: () => void;
   readonly drawFoxfire: () => void;
   readonly drawFx: () => void;
@@ -88,6 +89,10 @@ interface ComposedFrame extends PresentationFrame {
   demonRealm: boolean;
   inkEnvironment: boolean;
   boss: RunState['boss'];
+}
+
+function cvsShowcase(views: SceneViews) {
+  return views.cvs.ownerDocument.documentElement.dataset.graphicsShowcase === 'true';
 }
 
 export function createRuntimeScene(
@@ -174,7 +179,7 @@ export function createRuntimeScene(
           g.fillStyle = `rgba(0,0,0,${0.2 * k})`;
           g.fillRect(-30, -30, W + 60, H + 60);
         }
-        const back = (sceneLoading ? [] : G.enemies)
+        const back = (sceneLoading || cvsShowcase(views) ? [] : G.enemies)
           .filter((e) => e !== G.attacker && e.state !== 'strike')
           .sort((a, c) => a.pos.y - c.pos.y);
         for (const e of back) drawEnemy(e);
@@ -209,7 +214,7 @@ export function createRuntimeScene(
         } = views;
         const b = frame.boss;
         if (b) drawBoss();
-        if (!sceneLoading)
+        if (!sceneLoading && cvsShowcase(views) === false)
           for (const e of G.enemies) if (e === G.attacker || e.state === 'strike') drawEnemy(e);
         if (!cinematic.active && !sceneLoading) {
           drawPlayer();
@@ -217,6 +222,7 @@ export function createRuntimeScene(
           drawFoxfire();
           drawFx();
           drawFx2();
+          views.drawGraphicsShowcase?.(views.g);
         }
       },
     },
@@ -302,6 +308,10 @@ export function createRuntimeScene(
       g.setTransform(DPR, 0, 0, DPR, 0, 0);
       g.save();
       g.translate(frame.cameraX, frame.cameraY);
+      if (cvsShowcase(views)) {
+        if (W < 768 && H > W) g.translate(0, -H * 0.34);
+        else g.translate(-W * 0.12, 0);
+      }
       if (zoom > 1.001 && !reducedMotion()) {
         g.translate(zoomX, zoomY);
         g.scale(zoom, zoom);

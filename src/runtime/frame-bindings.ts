@@ -1,4 +1,5 @@
 import { createLightSources } from '../presentation/light-sources.ts';
+import { createGraphicsShowcase } from '../presentation/graphics-showcase.ts';
 import { createFrameSimulation, type FrameSimulationViews } from './frame-simulation.ts';
 import { createFrameLoop } from '../platform/frame-loop.ts';
 import {
@@ -68,6 +69,7 @@ export type FrameBindingViews = SimulationPorts &
   ScenePorts &
   PostPorts &
   PreparationPorts & {
+    readonly ambientDensity?: () => number;
     readonly P: ReturnType<typeof createPlayerAnimation>;
     readonly presentationState: PresentationState;
     readonly environmentState: EnvironmentState;
@@ -101,6 +103,17 @@ export function createFrameBindings(
   lightSources = createLightSources(),
 ) {
   const predictScene = createScenePrediction(readViews);
+  const showcase = createGraphicsShowcase(() => ({
+    active: () => document.documentElement.dataset.graphicsShowcase === 'true',
+    width: readViews().W,
+    ground: readViews().L.groundY,
+    figureHeight: readViews().L.eH,
+    time: readViews().presentationState.time,
+    reducedMotion: readViews().reducedMotion,
+    particleDensity: readViews().ambientDensity ?? readViews().density,
+    gustLeaves: readViews().gustLeaves,
+  }));
+  lightSources.register('graphics-showcase', showcase.lights);
   // The parent is a lifetime live view. Overrides keep dynamic selections as getters.
   function frameView<Ports extends object>(ports: Ports) {
     return cacheView(() => {
@@ -173,6 +186,9 @@ export function createFrameBindings(
   let presentationElapsed = 0;
   let preparedFrame: ReturnType<typeof preparePresentation> | undefined;
   function update(dt: number, raw: number) {
+    showcase.update(raw);
+    if (document.documentElement.dataset.graphicsShowcase === 'true' && !readViews().sceneLoading)
+      updatePlayer(raw);
     frameSimulation.update(dt, raw);
     presentationChanged = true;
   }
@@ -251,6 +267,7 @@ export function createFrameBindings(
         return readViews().environmentState.fg;
       },
       drawPlayer,
+      drawGraphicsShowcase: showcase.draw,
       drawPet,
       drawFoxfire,
       drawPost,

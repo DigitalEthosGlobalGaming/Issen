@@ -83,6 +83,7 @@ export function createRuntimeFrames(
                 demonRealmRenderer: foundation.browser.demonRealmRenderer,
                 environmentRenderer: foundation.browser.environmentRenderer,
                 density: foundation.browser.density,
+                ambientDensity: foundation.browser.ambientDensity,
                 blades: presentation.blades,
                 drawStains: presentation.drawStains,
                 drawLeaves: presentation.drawLeaves,
