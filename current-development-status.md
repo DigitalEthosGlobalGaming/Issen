@@ -1,5 +1,74 @@
 # Current development status
 
+## Current handoff — worker-only ownership and faster cadence (1.69.58)
+
+Removed unused main-thread scenery-preload registration from shared composition;
+production already uses it only inside workers. Main diagnostic image ownership
+remains for references. No worker rasterization/backing change. Local tests now
+require absent speculative preparation and retain every exact plane/frame/held
+comparison: both2/8GiB cases,27rows each PASS2.9m. Worker failure/retry and all9
+compositions PASS. Evidence `tmp/composer-worker-only-preload-16958.log` and
+`tmp/shared-composer-preload-removal-16958.log`. First run's two local failures
+were an obsolete unconditional preload-ready assertion; raw captured planes
+already matched. Corrected assertion expects readiness only for workers.
+
+Whole colour-canvas CPU backing did not fix the earlier normal mismatch; atlas
+mask CPU backing passed local cases but failed worker lighting mean2.755 versus
+<1 atstage0. Both experiments fully reverted. Prior painter/upload override
+passed one focused comparison (`tmp/pre-batch-preload-restarted.log`); not causal
+proof. No rasterization change retained. Package/lock/title/changelog now1.69.58.
+
+Checked production/strictTS plus4 cases PASS18.8s; Android web5 PASS17.3s.
+`tmp/worker-only-preload-production-16958.log`,
+`tmp/android-web-worker-only-preload-16958.log`. Android fixture previously
+paused during scene loading, when checkpoint capture deliberately returns;
+now waits for ready encounter, asserts stored checkpoint, and awaits startup
+initialization after reload. Strict pause/HUD checks retained. All disposable
+builds/results under ignoredtmp; no native packaging/install/real saves.
+
+User explicitly requested faster work. AGENTS now persists usable chunks first,
+smallest relevant checks, reuse unchanged passing evidence, full suites at major
+integration/release, two unsuccessful minor investigations then reassess, and
+document small native differences without hiding failures or relaxing assertions.
+Unit501/tool9/broad416 evidence retained with version/scope distinguished. No
+new performance matrix or broad browser repetition. Report/architecture updated.
+
+Remaining: single-pixel/single-byte exact leaf restoration failure from final57
+suite. Five geometry/HDR targets exact, no GL error; native rounding proposal
+still unapproved. Do not restart speculative raster fixes or broad suites. Goal
+active, not complete. All known handles terminal. No push/deploy/native build.
+
+## Current handoff — final integration failures isolated (1.69.57)
+
+Final units501 PASS3.6s (`tmp/unit-final-16957.log`). Full browser416/419 PASS,
+three failures,18.9m/default2workers (`tmp/browser-final-16957.log`): high-tier
+inspection re-entry canvas stays1px past5s, leaf restore alpha differs1byte in
+1pixel with five targets exact, local low-tier preload normal-plane hash differs
+at cycle2/stage6/900×600. Original assertions unchanged. Focused one-worker
+diagnosis passes inspection13.3s but reproduces the same local normal hash.
+Evidence `tmp/browser-final-diagnosis-16957.log` and matching result directory.
+
+Ignored copy of the existing preload test captures raw affected plane bytes:
+631 changed channels, differing rendered hashes; not the leaf rounding issue.
+`tmp/probes/capture-preload-plane.mjs`, `tmp/preload-plane-16957.log`,
+`tmp/test-results/browser/preload-plane-16957/`. One local colour-canvas CPU
+backing experiment gives unchanged failing hashes and is completely reverted;
+`tmp/local-cpu-mask-16957.log`. Tracked source remains719e2d9/1.69.57.
+
+Current comparison uses previous painter/upload modules (HEAD^) via ignored
+Vite override; served modules verified to omit beforeBatch. First launch's
+working directory fixed; a turn interruption stopped the first valid run
+without a terminal result. It is inconclusive, not passing/failing evidence.
+After verifying no comparison processes/server remain, restarted once:
+session40861, `tmp/pre-batch-preload-restarted.log`, configuration generator
+`tmp/probes/compare-pre-batch.mjs`, source provenance JSON alongside it.
+Resume this handle; do not restart on observation timeout or edit rendering/test
+source until terminal. Next finish diagnosis and existing Android web checks.
+
+Report has a concrete requirement/evidence table, startup/render baseline rows
+and scoped prepared-promotion timings. No completion claim, assertion relaxation,
+push/deploy/native package build/save changes. Goal active; leaf proposal pending.
+
 ## Current handoff — upload admission batched (1.69.57)
 
 Painter warming still reserves its whole job before waiting, but now refreshes

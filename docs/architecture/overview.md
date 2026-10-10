@@ -259,7 +259,10 @@ excluding unused diffuse maps.
 
 `environment/image-preload.ts` grants speculative work after a settled matching
 scene receives a visible quiet frame. Its lease uses all six composition identity
-fields. Local diagnostic renderers preload decoded inputs through the main pool.
+fields. Shared composition does not register a main-thread scenery preload owner;
+only the required worker runtime prepares future scenery. Local diagnostic
+composition retains its main image pool for reference inputs, without speculative
+preloading or an alternate runtime path.
 The runtime worker composes one next scene and warms its sources and shaders
 through the existing painter. Current transferred planes remain drawable while
 worker composition changes. Explicit texture leases protect the next scene from

@@ -1,8 +1,10 @@
-# Mobile performance and transitions — completion report in progress
+# Mobile performance and transitions — verification report
 
-App 1.69.57. **The final requirement audit is outstanding.** Current focused
-and production verification is green; the full browser integration checkpoint
-passed on 1.69.56. The batching capture improves cold loading and has no
+App 1.69.58. **Exact leaf restoration remains unresolved.** Current focused,
+checked production and Android web verification passes. The preceding full
+browser run has 416 passes and three failures; two have focused follow-up below.
+The prior integration checkpoint passed on 1.69.56.
+The batching capture improves cold loading and has no
 above-16-ms post-presentation tasks. This report separates implementation evidence from targets
 that have not been demonstrated. See [current handoff](../../current-development-status.md)
 and [recorded checkpoints](mobile-performance-progress.md).
@@ -23,6 +25,9 @@ creation. Failure terminates the worker, cancels pending work, retires resources
 and settles callers. Retry starts a fresh generation with the same scene/seed;
 stale replies cannot replace it. Startup and later failures have visible retry
 treatments. Capacitor declares WebView 111 and an offline static error page.
+The shared composer no longer registers fallback-era main-thread scenery
+preloading. Future scenery belongs to the required worker runtime; local
+reference composition still uses the shared image pool without speculation.
 These configuration and browser-fixture results do not prove physical Android
 compatibility.
 
@@ -48,8 +53,12 @@ remains inside the 4 ms batch budget; cancellations can stop before allocation.
 | Gust CPU render median, CPU rate 4 | 10.9 ms | 10.4 ms | Controlled sustained gust, population/host variance documented |
 | Cold transition median | 548.1 ms | 486.7 ms | Compatible historical control vs app 1.69.57, desktop 900×600/DPR1 |
 | Warm transition median | 547.4 ms | 503.7 ms | Same retained comparison; no uniform per-stage speedup claim |
+| Startup to title | 2897.4 ms | 2210.9 ms | Same desktop capture conditions; single-run comparison |
+| Startup to first gameplay | 4099.6 ms | 2971.9 ms | Includes scene preparation; single-run comparison |
+| Gameplay CPU render p95 | 4.2 ms | 3.2 ms | CPU submission time, not delivered-frame time |
+| Gameplay delivered-frame p95 | 17.0 ms | 17.0 ms | Host does not demonstrate 120 Hz delivery |
 
-The current capture records title/first gameplay at 2210.9/2971.9 ms,
+The retained 1.69.57 capture records title/first gameplay at 2210.9/2971.9 ms,
 CPU render p95 3.2 ms and delivered-frame p95 17 ms (600 intervals; 187 above
 16.7 ms). CPU renders have one sample above 8.3 ms and none above 16.7 ms.
 Cold/warm maxima are 835.9/834.4 ms. Texture warming medians are 35.0/35.2 ms.
@@ -78,6 +87,17 @@ draws in each composition. Total native drawImage is 456–733 ms; measured comp
 is 612–906 ms. This identifies the remaining native-upload cost, not headline
 timing. Evidence: `tmp/performance-compose-final-16956/results.json`.
 Desktop timing does not demonstrate physical 120 Hz delivery.
+
+Prepared promotion is separate from the cold/warm recomposition measurements.
+The saved low-tier controlled nine-stage run records 17.0–26.8 ms transition
+waits, including wrap; its higher-tier companion records 14.0–30.4 ms. These
+precede the final admission changes and control phase entry, so they establish
+the prepared-path behavior rather than current natural-run latency. Evidence:
+`tmp/probes/rush-companion-parallel2-16949.json` and
+`tmp/probes/rush-companion-admission-shared-worker-cache.json`. The later natural
+Rush run confirms eight prepared promotions without measuring physical frame
+delivery. Current browser checks assert no recomposition and no incoming figure
+uploads/program creation after preparation.
 
 An attempted four-slot override initially failed to reach Vite's separate worker
 pipeline; that capture is marked invalid-experiment and is not four-slot evidence.
@@ -116,9 +136,69 @@ cues, figures and scene atmosphere remain legible and coherent.
 
 ## Verification, visuals and open work
 
+The final source audit confirms the runtime asset manifest includes only the
+shared drift colour/emissive pair for airborne drift. Preserved authoring planes
+are not an alternate runtime drift path; petal-ground maps belong to scenery.
+Worker execution has one required-worker factory while retaining shared
+composition. Forecasting uses the exact future visit without consuming it;
+scene flow waits for incoming scene, drift and figure preparation before settling.
+
+| Requirement | Evidence and remaining limit |
+| --- | --- |
+| Cheap drift and representative visuals | Shared padded atlas, associated-alpha generator, mip filtering and single lit pass; off/current/new calm/gust controls and daylight/dark/fire/gust review. Native mobile GPU savings are unmeasured. |
+| Required workers and recovery | Capability rejection, startup/later failure, same-seed retry, stale reply, independent disposal and nine-scene composition fixtures. Physical WebView execution remains unverified. |
+| Prepared transitions and figures | Exact forecast, promotion without recomposition, native figure/weapon preparation, pressure denial and cancellation fixtures. Current natural prepared latency is not a hardware timing claim. |
+| Lifecycle and accessibility | Hidden/busy work, resize/DPR/quality invalidation, actual context loss, disposal, cinematic, reduced motion/flashes and low-quality checks. |
+| Bounded resource ownership | Shared decoded/canvas/GPU/worker/transferred/reserved ledger, native upload admission and retirement checks; natural nine-stage and separate preview/mode samples. Opaque native residency and every transient/loadout are not proven. |
+| Composition and presentation cost | Current maxima approximately 509/504 ms; native software-to-GPU draws profiled and explained. Current eighteen post-presentation windows have no task above 16 ms; the earlier 17.257 ms result remains recorded. |
+| Game feel, saves and modes | Representative visual review plus ordinary browser/production checks; Demon/Inferno active samples and deterministic visit tests. No real saves changed. |
+
 Current change: ten focused pacing/pixel/scene-memory units, thirteen native
 warming/reservation/next-scene cases and four checked production cases pass,
 including strict TypeScript, startup/run, landscape and offline sprite resize.
+The final 1.69.57 unit run passes all 501 cases in 3.6 seconds. The full browser
+run passes 416 of 419 cases in 18.9 minutes with two workers. Its failures are a
+high-tier inspection re-entry readiness timeout, the existing single-pixel leaf
+alpha restoration difference, and a local low-tier preload normal-plane mismatch
+at cycle 2/stage 6/900×600. The inspection case passes in isolation in 13.3 seconds;
+the normal-plane mismatch reproduces with one worker. A disposable extension of
+the same test captures 631 differing channels in the affected normal plane;
+rendered hashes also differ. This is not the leaf's single-byte result. A
+CPU-backed local colour-mask experiment gives the same hashes and was reverted.
+Logs: `tmp/{unit,browser}-final-16957.log`,
+`tmp/browser-final-diagnosis-16957.log`, `tmp/preload-plane-16957.log` and
+`tmp/local-cpu-mask-16957.log`. No assertion was changed and the full suite is
+not reported as green.
+
+The narrower atlas-mask CPU experiment makes the local comparison pass but
+fails the worker lighting comparison (stage 0 mean difference 2.755 against
+the existing below-1 limit); it too was completely reverted. The preceding
+painter/upload modules pass one isolated local comparison, which does not
+establish the cause. Both failed backing approaches were stopped.
+
+The subsequent ownership audit removes the unused main-thread speculative
+registration from shared composition, as required by the worker-only policy.
+The existing local test now asserts that worker-only notifications cannot start
+local preloading; all exact plane, rendered-frame and held-resource checks
+remain. Both memory tiers pass all 27 rows in 2.9 minutes. Worker failure/retry
+and all nine compositions pass. Logs: `tmp/composer-worker-only-preload-16958.log`
+and `tmp/shared-composer-preload-removal-16958.log`. The latter's first run stopped
+at the obsolete preload-ready assertion before it was corrected; it is not
+reported as a fully passing run.
+
+Current checked production/strict TypeScript and four cases pass in 18.8 seconds.
+All five Android web cases pass in 17.3 seconds, including blocked external
+networking, local fonts, preferences, reload recovery and free-edition gates.
+The original Android recovery fixture paused during scene loading, when
+`checkpoint-flow.ts` intentionally declines to save. It now waits for a ready
+encounter, requires a stored checkpoint and waits for runtime initialization
+after reload, retaining the strict paused/HUD assertions. Initial failed and
+focused diagnostic results remain recorded. Current logs:
+`tmp/worker-only-preload-production-16958.log` and
+`tmp/android-web-worker-only-preload-16958.log`. Android web tests are desktop
+execution of the offline bundle, not physical WebView evidence. No broad suite
+or performance matrix was repeated for the unaffected worker composition path.
+
 The 1.69.56 integration evidence is 500 unit tests, nine performance-tool tests
 and 419 browser cases in 20.2 minutes,
 including original strict leaf/local restoration checks. The leaf pass does not
@@ -137,7 +217,7 @@ outputs, second-AA removal, sampler precision, flat colour and opacity rounding
 experiments were rejected and reverted. No assertion was relaxed. The bounded
 native-rounding proposal remains review-only and requires explicit approval.
 
-Remaining work: final requirement audit and report completion, retaining
+Remaining work: resolve the exact leaf restoration acceptance issue, retaining
 the observed cold timing variation, limits of sampled memory
 and the unresolved intermittent leaf restoration result. Physical 120 Hz delivery,
 Android WebView execution and native residency remain hardware evidence gaps.

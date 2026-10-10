@@ -4,11 +4,9 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import { compositionKey } from './worker-types.ts';
-import { createSceneImagePreload } from './image-preload.ts';
 import {
   environmentAssetUrls as ASSET_URLS,
   sceneAssetIndices as sceneAssets,
-  sceneImageUrls,
 } from './asset-sources.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import {
@@ -81,14 +79,6 @@ export function createLocalEnvironmentRenderer(
   let cacheKey = '';
   let builds = 0;
   const settleLoads: Array<() => void> = [];
-  let completedFrame: EnvironmentFrame | undefined;
-  const preload = mapImages
-    ? createSceneImagePreload(
-        doc,
-        () => (!disposed && cacheKey && status === 'layered' ? completedFrame : undefined),
-        (stage) => mapImages.prefetch(sceneImageUrls(stage, options.liveMotion)),
-      )
-    : undefined;
 
   function releaseCompletedCutouts(retainLiveColour = true) {
     cachedMaterials.clearCutouts();
@@ -126,7 +116,6 @@ export function createLocalEnvironmentRenderer(
   }
 
   function prepare(stage = 0): Promise<void> {
-    preload?.cancel();
     if (pending && stage === preparedStage) return pending;
     if (disposed) return Promise.resolve();
     const request = ++generation;
@@ -615,7 +604,6 @@ export function createLocalEnvironmentRenderer(
   }
 
   function dispose() {
-    preload?.dispose();
     materials?.dispose();
     mapImages?.dispose();
     cachedMaterials.dispose();
@@ -679,7 +667,6 @@ export function createLocalEnvironmentRenderer(
       if (frame.stage === 4 && images[0])
         cachedMaterials.withBindings(() => foreground.prepare(images[0]!, frame));
       releaseCompositionInputs(frame.stage);
-      completedFrame = { ...frame };
       if (!assetsReady) {
         markScenePhase('compose-received', timingKey, { backend: 'local' });
         measureScenePhase(
@@ -725,7 +712,6 @@ export function createLocalEnvironmentRenderer(
       foreground.release();
       cached = distant = nearby = undefined;
       cacheKey = '';
-      completedFrame = undefined;
       ready = false;
     },
     dispose,
@@ -733,7 +719,6 @@ export function createLocalEnvironmentRenderer(
       return status;
     },
     snapshot: () => ({
-      imagePreload: preload?.snapshot(),
       ...(mapImages ? { decodedLoader: mapImages.snapshot() } : {}),
       materialCutouts: cachedMaterials.snapshot(),
       foreground: foreground.snapshot(),

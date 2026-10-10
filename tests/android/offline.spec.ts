@@ -50,8 +50,13 @@ test('Android build retains validated encounter recovery after reload', async ({
   await page.goto('/');
   await page.locator('#bPlay').tap();
   await page.locator('#bBegin').tap();
+  await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+    timeout: 30000,
+  });
   await page.locator('#pauseBtn').tap();
+  expect(await page.evaluate(() => localStorage.getItem('issen.runCheckpoint'))).not.toBeNull();
   await page.reload();
+  await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
   await expect(page.locator('#paused')).toHaveClass(/on/);
   await page.locator('#bResume').tap();
   await expect(page.locator('#hud')).toHaveClass(/on/);

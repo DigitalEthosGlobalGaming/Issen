@@ -75,7 +75,7 @@ for (const [worker, memory] of [
   [true, 2],
   [true, 8],
 ] as const)
-  test(`${worker ? 'worker' : 'local'} quiet image preloads preserve scenes at ${memory} GiB`, async ({
+  test(`${worker ? 'worker quiet image preloads preserve scenes' : 'local composition ignores worker-only preload notifications'} at ${memory} GiB`, async ({
     page,
     browser,
   }, testInfo) => {
@@ -270,7 +270,7 @@ for (const [worker, memory] of [
       JSON.stringify({ original, candidate, warnings }, null, 2),
     );
     expect(candidate).toHaveLength(27);
-    expect(candidate.some((row) => row.preloaded.imagePreload?.status === 'ready')).toBe(true);
+    expect(candidate.some((row) => row.preloaded.imagePreload?.status === 'ready')).toBe(worker);
     for (let i = 0; i < candidate.length; i++) {
       const row = candidate[i]!;
       expect(row.planes, `incoming planes ${row.cycle}:${row.stage}`).toEqual(original[i]!.planes);
@@ -280,9 +280,13 @@ for (const [worker, memory] of [
       expect(row.preloaded.builds).toBe(row.before.builds);
       expect(row.preloaded.stage).toBe(row.stage);
       expect(row.cancelled).toBe(
-        worker && row.preloaded.imagePreload?.status === 'ready' ? 'ready' : 'none',
+        worker && row.preloaded.imagePreload?.status === 'ready'
+          ? 'ready'
+          : worker
+            ? 'none'
+            : undefined,
       );
-      expect(row.invalid).toBe('none');
+      expect(row.invalid).toBe(worker ? 'none' : undefined);
       if (worker) {
         expect(row.before.worker).toBe(true);
         expect(row.before.decodedLoader!.budget).toBe((memory === 2 ? 256 : 512) * 1024 * 1024);
@@ -290,8 +294,7 @@ for (const [worker, memory] of [
       expect(row.before.decodedLoader!.peakBytes).toBeLessThanOrEqual(
         row.before.decodedLoader!.budget,
       );
-      if (!worker && i % 9 > 0 && candidate[i - 1]!.preloaded.imagePreload?.status === 'ready')
-        expect(row.enteredDecodes).toBe(0);
+      if (!worker) expect(row.preloaded.imagePreload).toBeUndefined();
     }
     expect(warnings).toEqual([]);
   });
