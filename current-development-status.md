@@ -1,6 +1,19 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.8)
+## Active goal — Graphics menu and renderer optimizations (1.70.9)
+
+Memory usage is now wired through Graphics, the shared main loader, worker loader
+and combined scene ledger. Low uses existing device256/384/512MiB policy; Normal
+adds25%, High50%; combined budget is twice that. Stable device raster/decode limits
+are separate, so memory changes do not alter material dimensions or drawing DPR.
+Changes coalesce300ms, cancel optional next-scene resources, retire unused artwork,
+and wait for worker acknowledgement while retaining the active scene. A fresh
+policy request is sent even if an older cache trim is pending. Focused resource
+units2 PASS, strictTS PASS, live Memory browser1 PASS7.6s/9.8s command, including
+main/worker budgets, debounce, unchanged paused checkpoint/width/preparation count
+and reload persistence. Final browser check after pending-trim correction PASS
+7.7s/9.8s command. Remaining preview/MSAA/measurement work and Part B are unfinished.
+Versions/changelog1.70.9. No full suites or performance captures.
 
 Memory integration foundation: the shared decoded-image loader now accepts live
 budget changes. It cancels speculative leases, evicts unused sources in LRU order,

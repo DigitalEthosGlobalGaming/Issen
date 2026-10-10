@@ -1,6 +1,9 @@
 import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
 import type { SceneryDetail } from '../../rendering/environment/scenery-detail.ts';
+import type { GraphicsSettings } from '../../platform/graphics-settings.ts';
+import { applyMainImageBudget } from '../../platform/main-images.ts';
+import { reclaimSceneMemory } from '../../platform/scene-memory.ts';
 
 /** Apply cheap choices immediately; coalesce viewport and scenery rebuilds. */
 export function createGraphicsApplication(
@@ -15,27 +18,44 @@ export function createGraphicsApplication(
     data = doc.documentElement.dataset;
   let requested = NaN,
     applied = Number(data.graphicsResolution ?? 100),
-    timer = 0;
+    timer = 0,
+    memoryPending = 0;
   let requestedScenery: SceneryDetail | undefined,
     appliedScenery = data.graphicsScenery as SceneryDetail | undefined;
+  let requestedMemory: GraphicsSettings['memory'] | undefined,
+    appliedMemory = data.graphicsMemory as GraphicsSettings['memory'] | undefined;
   function applying(value: boolean) {
     data.graphicsApplying = String(value);
   }
   function commitHeavyChoices() {
     timer = 0;
     const resized = applied !== requested,
-      sceneryChanged = appliedScenery !== requestedScenery;
+      sceneryChanged = appliedScenery !== requestedScenery,
+      memoryChanged = appliedMemory !== requestedMemory;
     applied = requested;
     appliedScenery = requestedScenery;
     data.graphicsResolution = String(applied);
     data.graphicsScenery = appliedScenery!;
+    appliedMemory = requestedMemory;
+    data.graphicsMemory = appliedMemory!;
+    if (memoryChanged) {
+      applyMainImageBudget(doc);
+      const pending: Promise<unknown>[] = [];
+      memoryPending++;
+      doc.dispatchEvent(new CustomEvent('issen:graphics-memory', { detail: { pending } }));
+      reclaimSceneMemory(doc);
+      void Promise.allSettled(pending).then(() => {
+        memoryPending--;
+        if (!timer && !memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
+      });
+    }
     if (resized) win.dispatchEvent(new Event('issen:graphics-resolution'));
     if (sceneryChanged) prepareScene();
     invalidate();
-    if (canvas.dataset.sceneState !== 'loading') applying(false);
+    if (!memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
   }
   const observer = new MutationObserver(() => {
-    if (!timer && canvas.dataset.sceneState !== 'loading') applying(false);
+    if (!timer && !memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
   });
   observer.observe(canvas, { attributes: true, attributeFilter: ['data-scene-state'] });
   lifecycle.add(() => {
@@ -52,12 +72,22 @@ export function createGraphicsApplication(
       data.graphicsReductions = [
         ...new Set(graphics.reductions.map((reduction) => reduction.key)),
       ].join(',');
-      if (requested !== state.resolution || requestedScenery !== state.scenery) {
+      if (
+        requested !== state.resolution ||
+        requestedScenery !== state.scenery ||
+        requestedMemory !== state.memory
+      ) {
         requested = state.resolution;
         requestedScenery = state.scenery;
+        requestedMemory = state.memory;
         lifecycle.clearTimeout(timer);
         timer = 0;
-        if (requested === applied && requestedScenery === appliedScenery) applying(false);
+        if (
+          requested === applied &&
+          requestedScenery === appliedScenery &&
+          requestedMemory === appliedMemory
+        )
+          applying(false);
         else if (immediate) commitHeavyChoices();
         else {
           applying(true);

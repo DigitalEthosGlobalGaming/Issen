@@ -84,11 +84,9 @@ export function createOptions(
     if (custom) custom.disabled = false;
     if (preset) preset.value = 'custom';
   }
-  function graphicSelect<K extends 'lighting' | 'particles' | 'weather' | 'grass' | 'scenery'>(
-    key: K,
-    label: string,
-    choices: [string, GraphicsSettings[K]][],
-  ) {
+  function graphicSelect<
+    K extends 'lighting' | 'particles' | 'weather' | 'grass' | 'scenery' | 'memory',
+  >(key: K, label: string, choices: [string, GraphicsSettings[K]][]) {
     const row = node('div', '', 'option-row'),
       labelEl = node('label', label),
       input = node('select');
@@ -438,6 +436,11 @@ export function createOptions(
         ['High', 'high'],
       ]);
       graphicSelect('scenery', 'Scenery detail', [
+        ['Low', 'low'],
+        ['Normal', 'normal'],
+        ['High', 'high'],
+      ]);
+      graphicSelect('memory', 'Memory usage', [
         ['Low', 'low'],
         ['Normal', 'normal'],
         ['High', 'high'],

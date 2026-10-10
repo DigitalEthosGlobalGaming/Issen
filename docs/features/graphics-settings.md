@@ -5,12 +5,28 @@ the old quality/debris fields with a validated `graphics` record. Schema 1 audio
 bindings, accessibility and vibration preferences survive migration; unknown
 versions retain safe defaults. Runtime/adaptive values must never mutate saves.
 
-Memory integration is in progress. The shared decoded loader supports live budget
-changes, retires unpinned cache entries and cancels speculation. Pinned inputs and
-already-admitted required decodes survive a reduction; pinned overages become
-evictable when their owners release. Future admission uses the new budget. The
-Graphics Memory setting is still awaiting main/worker policy wiring and its menu
-control.
+Memory usage controls the existing main and worker loader budgets and combined
+scene ledger. Changes coalesce for 300 ms; Applying waits for worker acknowledgement.
+Unused cache entries and optional next scenes are released, while pinned inputs and
+already-admitted required decodes survive reductions. Pinned overages become
+evictable when their owners release; future admission uses the new budget. Memory
+changes retain the active scene and do not rebuild its canvases or alter device
+raster/decoded-image resolution limits.
+
+Low uses the existing device budget, Normal adds 25% and High adds 50%. These are
+initial values to revisit during the goal's final measurement checkpoint:
+
+| Device policy | Low | Normal | High |
+| --- | --- | --- | --- |
+| Device memory at most 2 GiB | 256 MiB | 320 MiB | 384 MiB |
+| Other mobile user agents | 384 MiB | 480 MiB | 576 MiB |
+| Desktop | 512 MiB | 640 MiB | 768 MiB |
+
+The combined CPU/GPU scene budget is twice the loader budget and includes the
+existing browser overhead reserve. Higher budgets allow more retained artwork;
+they do not promise higher FPS. Worker requests carry a separate stable device
+decode-size budget so all material planes retain compatible dimensions across a
+live cache-budget change.
 
 `platform/graphics-settings.ts` owns preset records, validation, device
 recommendation and manual-choice transition to Custom. Auto selects Balanced for

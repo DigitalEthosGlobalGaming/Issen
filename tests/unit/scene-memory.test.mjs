@@ -2,6 +2,30 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { documentPixelMemory } from '../../src/platform/pixel-memory.ts';
 import { documentSceneMemory, registerSceneMemory } from '../../src/platform/scene-memory.ts';
+import { documentImageBudget, documentResourceBudget } from '../../src/platform/main-images.ts';
+
+test('memory choices adjust combined resource budgets while preserving device raster limits', () => {
+  for (const [deviceMemory, userAgent, base] of [
+    [2, 'Android', 256],
+    [8, 'Android', 384],
+    [8, 'Desktop', 512],
+  ]) {
+    const doc = {
+      defaultView: { navigator: { deviceMemory, userAgent } },
+      documentElement: { dataset: {} },
+    };
+    for (const [choice, multiplier] of [
+      ['low', 1],
+      ['normal', 1.25],
+      ['high', 1.5],
+    ]) {
+      doc.documentElement.dataset.graphicsMemory = choice;
+      assert.equal(documentImageBudget(doc), base * 1024 * 1024);
+      assert.equal(documentResourceBudget(doc), base * multiplier * 1024 * 1024);
+      assert.equal(documentSceneMemory(doc).budget, base * multiplier * 2 * 1024 * 1024);
+    }
+  }
+});
 
 test('scene admission includes peer workers, transient reservations and browser headroom', () => {
   const doc = { defaultView: { navigator: { deviceMemory: 2, userAgent: 'Android' } } };

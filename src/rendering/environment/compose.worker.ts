@@ -15,8 +15,8 @@ let service:
       renderer: ReturnType<typeof createLocalEnvironmentRenderer>;
     }
   | undefined;
-function createService(decodedBudget?: number) {
-  const workerDocument = createWorkerDocument(decodedBudget);
+function createService(decodedBudget?: number, decodedSizeBudget?: number) {
+  const workerDocument = createWorkerDocument(decodedBudget, decodedSizeBudget);
   return {
     workerDocument,
     renderer: createLocalEnvironmentRenderer(workerDocument, { liveMotion: false }),
@@ -61,7 +61,11 @@ scope.onmessage = ({ data }) => {
     if (queued.has(data.requestId)) cancelled.add(data.requestId);
     return;
   }
-  const { workerDocument, renderer } = (service ??= createService(data.decodedBudget));
+  const { workerDocument, renderer } = (service ??= createService(
+    data.decodedBudget,
+    data.decodedSizeBudget,
+  ));
+  if (data.decodedBudget !== undefined) workerDocument.setDecodedBudget(data.decodedBudget);
   // Cancellation and policy changes bypass the compose queue.
   imagePreload?.release();
   imagePreload = undefined;

@@ -1,6 +1,6 @@
 import { documentPixelMemory } from './pixel-memory.ts';
 import {
-  documentImageBudget,
+  documentResourceBudget,
   trimMainImages,
   mainImageReservation,
   setMainImageReclaimer,
@@ -77,7 +77,7 @@ export function documentSceneMemory(doc: Document) {
     workerCanvasBytes +
     transferredBytes;
   // CPU backing plus GPU backing, with a separate reserve for opaque native overhead.
-  const budget = documentImageBudget(doc) * 2;
+  const budget = documentResourceBudget(doc) * 2;
   const overheadBytes = 64 * 1024 * 1024 + main.browserReserveBytes;
   return {
     ...main,

@@ -28,7 +28,11 @@ const dimensions = new Map<string, number>(
 /** Thread-independent policy comes from the renderer's owning document. */
 export function documentImageBudget(doc: Document): number {
   // Worker documents own an explicit loader policy rather than a Window navigator.
-  const worker = doc as Document & { decodedSnapshot?: () => { budget: number } };
+  const worker = doc as Document & {
+    imageRasterBudget?: number;
+    decodedSnapshot?: () => { budget: number };
+  };
+  if (worker.imageRasterBudget !== undefined) return worker.imageRasterBudget;
   if (worker.decodedSnapshot) return worker.decodedSnapshot().budget;
   const navigator = doc.defaultView?.navigator as
     (Navigator & { deviceMemory?: number }) | undefined;
@@ -36,6 +40,17 @@ export function documentImageBudget(doc: Document): number {
     mobile: /Android|iPhone|iPad/.test(navigator?.userAgent ?? ''),
     deviceMemory: navigator?.deviceMemory,
   });
+}
+
+/** Memory choices change cache headroom independently of device raster limits. */
+export function documentResourceBudget(doc: Document): number {
+  const base = documentImageBudget(doc);
+  const choice = doc.documentElement?.dataset.graphicsMemory;
+  return base * (choice === 'normal' ? 1.25 : choice === 'high' ? 1.5 : 1);
+}
+
+export function applyMainImageBudget(doc: Document) {
+  pools.get(doc)?.loader.setBudget(documentResourceBudget(doc));
 }
 
 /** Reclaim only unpinned cached images; live/preview leases remain authoritative. */
@@ -87,7 +102,7 @@ export function createMainImageOwner(doc: Document) {
   if (!pool) {
     const loader = createDecodedImageLoader<Resource>({
       onMemoryChange: () => reclaimers.get(doc)?.(),
-      budget: documentImageBudget(doc),
+      budget: documentResourceBudget(doc),
       expectedBytes: (url) => dimensions.get(url),
       decode: (url, signal) => decode(doc, url, signal),
     });

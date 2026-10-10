@@ -59,7 +59,12 @@ export function createWorkerContextProxy(
 }
 
 /** Adapt the existing owned Canvas composition vocabulary to a worker realm. */
-export function createWorkerDocument(decodedBudget?: number): Document & {
+export function createWorkerDocument(
+  decodedBudget?: number,
+  decodedSizeBudget?: number,
+): Document & {
+  readonly imageRasterBudget: number;
+  setDecodedBudget(budget: number): void;
   prefetchImages(
     urls: readonly string[],
   ): ReturnType<ReturnType<typeof createDecodedImageLoader<ImageBitmap>>['prefetch']>;
@@ -79,6 +84,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     ),
   );
   const budget =
+    decodedSizeBudget ??
     decodedBudget ??
     decodedImageBudget({
       mobile: typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent),
@@ -98,7 +104,7 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
       const decoded = workerDecodeSize(...size, budget);
       return decoded.width * decoded.height * 4;
     },
-    budget,
+    budget: decodedBudget ?? budget,
     async decode(url, signal) {
       const response = await readCompressedAsset(url, signal);
       const size = dimensions.get(url);
@@ -219,6 +225,8 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
       const snapshot = loader.snapshot();
       return { ...snapshot, images: snapshot.decoded };
     },
+    imageRasterBudget: budget,
+    setDecodedBudget: loader.setBudget,
     createElement(kind: string) {
       if (kind === 'img') return new DecodedImage();
       if (kind !== 'canvas') throw Error(`Unsupported worker element: ${kind}`);
@@ -248,6 +256,8 @@ export function createWorkerDocument(decodedBudget?: number): Document & {
     HTMLCanvasElement: { value: OffscreenCanvas },
   });
   return doc as unknown as Document & {
+    readonly imageRasterBudget: number;
+    setDecodedBudget: typeof loader.setBudget;
     prefetchImages: typeof doc.prefetchImages;
     stopImagePreload: typeof doc.stopImagePreload;
     decodedSnapshot(): ReturnType<typeof loader.snapshot> & { images: number };

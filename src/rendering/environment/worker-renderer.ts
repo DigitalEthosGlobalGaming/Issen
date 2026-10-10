@@ -8,7 +8,7 @@ import { drawMaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
 import { closeLayers, compositionKey, composedLayerBytes } from './worker-types.ts';
 import { createSceneImagePreload } from './image-preload.ts';
-import { documentImageBudget } from '../../platform/main-images.ts';
+import { documentImageBudget, documentResourceBudget } from '../../platform/main-images.ts';
 import { trackPixelSource } from '../../platform/pixel-memory.ts';
 import {
   reclaimSceneMemory,
@@ -306,7 +306,7 @@ export function createWorkerEnvironmentRenderer(
       const timer = setTimeout(() => failWorker('Scenery worker timed out'), 45000);
       requests.set(id, { resolve, timer, timingPrefix });
       try {
-        const decodedBudget = documentImageBudget(doc);
+        const decodedBudget = documentResourceBudget(doc);
         const memory = documentSceneMemory(doc);
         // Foreground raw inputs already belong to its preparation peak. Bound
         // retention by current non-worker backing; the upload gate reclaims if
@@ -326,7 +326,13 @@ export function createWorkerEnvironmentRenderer(
                 ),
               )
             : 0;
-        worker!.postMessage({ ...request, id, decodedBudget, retainedBytes });
+        worker!.postMessage({
+          ...request,
+          id,
+          decodedBudget,
+          decodedSizeBudget: documentImageBudget(doc),
+          retainedBytes,
+        });
       } catch (error) {
         failWorker(String(error));
       }
@@ -782,6 +788,17 @@ export function createWorkerEnvironmentRenderer(
     imagePreload.cancel();
     cancelNext();
   };
+  const onMemoryBudget = (event: Event) => {
+    imagePreload.cancel();
+    cancelNext();
+    if (worker && !disposed && !workerFailure) {
+      // Send the new policy even if a trim carrying the previous budget is pending.
+      const pending = send({ kind: 'trim' });
+      const detail = (event as CustomEvent<{ pending: Promise<unknown>[] }>).detail;
+      detail?.pending.push(pending);
+    }
+  };
+  doc.addEventListener('issen:graphics-memory', onMemoryBudget);
   doc.addEventListener('visibilitychange', onVisibility);
   doc.addEventListener('webglcontextlost', onContextLost, true);
   const owner = {
@@ -912,6 +929,7 @@ export function createWorkerEnvironmentRenderer(
       worker?.terminate();
       worker = undefined;
       doc.removeEventListener('visibilitychange', onVisibility);
+      doc.removeEventListener('issen:graphics-memory', onMemoryBudget);
       doc.removeEventListener('webglcontextlost', onContextLost, true);
       release();
       fogBindings.dispose();
