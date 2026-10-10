@@ -5,6 +5,7 @@ import type { TrialDefinition } from '../game/content/trials.ts';
 import type { DailyRun } from '../game/progression/daily.ts';
 export interface FrameSimulationViews {
   readonly sceneLoading: boolean;
+  readonly graphicsPreview?: boolean;
   readonly sceneRequest?: number;
   readonly requestedSceneKey?: string;
   readonly activeTrial: TrialDefinition | null;
@@ -73,7 +74,7 @@ export function createFrameSimulation(readViews: () => FrameSimulationViews) {
       advanceClock,
       advanceCamera,
     } = views;
-    if (sceneLoading) {
+    if (sceneLoading || views.graphicsPreview) {
       advanceClock(raw);
       updateAmbient(raw);
       updateTransition(raw);

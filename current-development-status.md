@@ -1,6 +1,21 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.9)
+## Active goal — Graphics menu and renderer optimizations (1.70.10)
+
+Graphics live-preview chunk: portrait bottom sheet (max58% height), landscape/
+desktop right panel (max45%, cap420px), no surrounding dimming in either menu
+theme. Cosmetics advance through the existing loading-only ports while Graphics
+is open; scheduler bypasses paused update gating only for that cosmetic branch.
+Run time, score, enemy timers, checkpoint and run RNG remain unchanged. StrictTS
+PASS; cosmetic simulation units3 PASS; focused portrait/landscape/desktop browser
+1 PASS11.3s/13.5s command, captures reviewed under
+`tmp/test-results/browser/graphics-preview-layout/`. Initial test inspected immutable
+leaf spawn coordinates instead of analytic rendered poses; corrected fixture.
+Next run exposed a real scroll-theme selector precedence bug; fixed without
+weakening the no-dimming assertions. Both failures retained in ignored results.
+Title showcase, MSAA assessment, impact/preset measurements, prior Shore strict
+comparison failure and all Part B work remain unfinished. No broad suites or
+performance captures. Versions/changelog1.70.10.
 
 Memory usage is now wired through Graphics, the shared main loader, worker loader
 and combined scene ledger. Low uses existing device256/384/512MiB policy; Normal

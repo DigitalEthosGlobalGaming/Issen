@@ -239,6 +239,7 @@ export function createOptions(
     content.replaceChildren();
     profiles.hidden = page !== 'profile';
     root.scrollTop = 0;
+    root.querySelector('.options-box')!.scrollTop = 0;
     const header = node('div', '', 'options-heading'),
       heading = node('h2', TITLES[page]);
     heading.tabIndex = -1;

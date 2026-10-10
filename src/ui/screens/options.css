@@ -4,6 +4,55 @@
 #options {
   touch-action: pan-y;
 }
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) {
+  padding: 0;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) > .options-box {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  max-height: 58%;
+  margin: 0;
+  padding: 18px 22px max(18px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  pointer-events: auto;
+  border: 0;
+  border-top: 1px solid var(--paper-dim);
+  background: var(--ink);
+  box-shadow: none;
+  animation: none;
+  transform: none;
+}
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) .scroll-paper,
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) > .options-box::before,
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) > .options-box::after {
+  display: none;
+}
+html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) .options-heading {
+  position: sticky;
+  top: -18px;
+  z-index: 1;
+  margin: -18px -22px 12px;
+  padding: 18px 22px 12px;
+  background: var(--ink);
+}
+@media (min-width: 768px), (orientation: landscape) {
+  html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) {
+    align-items: flex-end;
+  }
+  html[data-graphics-open='true'] #app #options:not(#title):not(#cinematic) > .options-box {
+    width: min(420px, 45%);
+    height: 100%;
+    max-height: 100%;
+    border-top: 0;
+    border-left: 1px solid var(--paper-dim);
+  }
+}
 .options-box {
   text-align: left;
   max-width: 540px;

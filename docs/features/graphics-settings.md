@@ -34,6 +34,16 @@ coarse-pointer touch devices or reported memory at most 4 GiB, and High otherwis
 The options root has a Graphics summary; presets are in Graphics and accessibility
 remains in Display, linked from Graphics. Category resets stay independent.
 
+While Graphics is open, its panel is a bottom sheet (58% maximum height) on
+portrait phones and a right side panel (45% maximum width, capped at420px) on
+landscape/desktop. The surrounding scene has no menu veil, including the scroll
+theme. Controls scroll inside the panel and the heading remains visible.
+Rendering uses the selected rate; simulation dispatch advances only presentation
+clocks, ambient particles, cosmetic weather, apparel motion and presentation
+camera/transition. Run time, combat, hazard weather and run randomness stay frozen.
+Closing Graphics restores ordinary menu scheduling. The title-screen lantern,
+embers, gust and idle-player showcase remains pending.
+
 Ambient particles, grass density, cosmetic weather and combat cues have independent
 runtime ports. Off removes ambient leaves and gusts; combat cues remain visible.
 Frame rate is a live control: 30/60 are always available,

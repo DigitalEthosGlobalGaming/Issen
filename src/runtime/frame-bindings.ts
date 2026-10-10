@@ -160,6 +160,9 @@ export function createFrameBindings(
 
   const frameSimulation = createFrameSimulation(
     frameView({
+      get graphicsPreview() {
+        return document.documentElement.dataset.graphicsOpen === 'true';
+      },
       updatePlayer,
       updateWeather,
       advanceClock: (dt: number) => advancePresentationClock(readViews().presentationState, dt),
@@ -301,12 +304,13 @@ export function createFrameBindings(
         const { sceneLoading, cinematic, screenAnimation, G, armory } = readViews();
         if (sceneLoading) return { update: true, render: true, afterRender: false };
         if (document.documentElement.dataset.graphicsOpen === 'true')
-          return { update: false, render: true, afterRender: false };
+          return { update: true, render: true, afterRender: false };
         return cinematic.active
           ? { update: true, render: true, afterRender: false }
           : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded);
       },
       paused: () => {
+        if (document.documentElement.dataset.graphicsOpen === 'true') return false;
         const { sceneLoading, G, guided } = readViews();
         return !sceneLoading && (G.state === 'paused' || guided.frozen);
       },

@@ -33,47 +33,49 @@ test('cosmetic loading weather preserves live hazard fields and never consumes t
   }
 });
 
-test('loading updates only cosmetic ports and preserves run timers and gameplay dispatch', () => {
-  const G = { state: 'playing', stage: 0, runTime: 99, freezeT: 10, petT: 12 };
-  const before = structuredClone(G),
-    calls = [];
-  const record =
-    (name) =>
-    (...args) =>
-      calls.push([name, ...args]);
-  const views = {
-    sceneLoading: true,
-    G,
-    activeTrial: {},
-    trialFailure: 'failure',
-    advanceClock: record('clock'),
-    updateAmbient: record('ambient'),
-    updateTransition: record('transition'),
-    updateWeather: record('weather'),
-    advanceCamera: record('camera'),
-    apparelMotion: { update: record('apparel') },
-    reducedMotion: () => false,
-    finishTrial: () => assert.fail('trial advanced'),
-    updatePlayer: () => assert.fail('player advanced'),
-    updateEnemies: () => assert.fail('enemies advanced'),
-    phaseRouter: { updateFrame: () => assert.fail('phase advanced') },
-  };
-  createFrameSimulation(() => views).update(0, 0.02);
-  assert.deepEqual(G, before);
-  assert.deepEqual(calls, [
-    ['clock', 0.02],
-    ['ambient', 0.02],
-    ['transition', 0.02],
-    ['weather', 0.02, true],
-    ['camera', 0.02],
-    ['apparel', 0.02, false],
-  ]);
-  calls.length = 0;
-  views.reducedMotion = () => true;
-  createFrameSimulation(() => views).update(0, 0.02);
-  assert.deepEqual(
-    calls.find(([name]) => name === 'weather'),
-    ['weather', 0, true],
-  );
-  assert.deepEqual(G, before);
-});
+for (const preview of [false, true])
+  test(`${preview ? 'Graphics preview' : 'loading'} updates only cosmetic ports and preserves run timers and gameplay dispatch`, () => {
+    const G = { state: 'playing', stage: 0, runTime: 99, freezeT: 10, petT: 12 };
+    const before = structuredClone(G),
+      calls = [];
+    const record =
+      (name) =>
+      (...args) =>
+        calls.push([name, ...args]);
+    const views = {
+      sceneLoading: !preview,
+      graphicsPreview: preview,
+      G,
+      activeTrial: {},
+      trialFailure: 'failure',
+      advanceClock: record('clock'),
+      updateAmbient: record('ambient'),
+      updateTransition: record('transition'),
+      updateWeather: record('weather'),
+      advanceCamera: record('camera'),
+      apparelMotion: { update: record('apparel') },
+      reducedMotion: () => false,
+      finishTrial: () => assert.fail('trial advanced'),
+      updatePlayer: () => assert.fail('player advanced'),
+      updateEnemies: () => assert.fail('enemies advanced'),
+      phaseRouter: { updateFrame: () => assert.fail('phase advanced') },
+    };
+    createFrameSimulation(() => views).update(0, 0.02);
+    assert.deepEqual(G, before);
+    assert.deepEqual(calls, [
+      ['clock', 0.02],
+      ['ambient', 0.02],
+      ['transition', 0.02],
+      ['weather', 0.02, true],
+      ['camera', 0.02],
+      ['apparel', 0.02, false],
+    ]);
+    calls.length = 0;
+    views.reducedMotion = () => true;
+    createFrameSimulation(() => views).update(0, 0.02);
+    assert.deepEqual(
+      calls.find(([name]) => name === 'weather'),
+      ['weather', 0, true],
+    );
+    assert.deepEqual(G, before);
+  });
