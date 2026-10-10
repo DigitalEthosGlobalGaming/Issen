@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.0)
+## Active goal — Graphics menu and renderer optimizations (1.70.1)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -25,9 +25,19 @@ the existing Options panel. Android Options fixture follows the moved control;
 its suite has not yet been rerun. Initial sandbox unit worker spawn was blocked;
 authorized rerun passes. No broad suite/performance captures run for this chunk.
 
-Next: effective runtime graphics + rAF display detection, independent30/60/120
-render scheduling with60Hz simulation, capped resolution, lighting and budget/
-preload control; then remaining menu controls and delivered-interval adaptation.
+Second chunk: Frame rate control30/60/120 with bounded48-rAF capability sample;
+120 is offered only with stable high-refresh evidence. Unsupported saved120 runs
+at60 without rewriting its preference. Independent render/update scheduling now
+preserves exact60Hz simulation when rendering30fps; existing120 invariants remain.
+Manual rate selection becomesCustom and persists. StrictTS PASS; scheduler9 PASS,
+refresh2 and graphics4 PASS; new frame-cap persistence/capability and paused-state
+browser2 PASS16.1s. New scheduler test initially assumed the first phase interval
+was33.3ms; corrected explicit8.3/25ms startup phase, retaining exact simulation
+comparison and steady33.3ms cadence. No renderer investigation or broad runs.
+Package/lock/title/changelog1.70.1. Foundation committed as80b79f2.
+
+Next: effective runtime graphics/adaptive controller, capped resolution, lighting
+and budget/preload control; remaining menu controls and delivered-interval adaptation.
 Live preview/debounce/metrics and all Part B work remain. Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.
 Goal active, incomplete. No known task-owned graphics processes remain running.

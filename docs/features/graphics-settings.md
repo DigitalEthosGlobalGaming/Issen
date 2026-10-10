@@ -12,15 +12,19 @@ The options root has a Graphics summary; presets are in Graphics and accessibili
 remains in Display, linked from Graphics. Category resets stay independent.
 
 The initial integration applies preset particle density through the existing
-cosmetic-density port. The remaining preset fields are validated storage contracts;
+cosmetic-density port. Frame rate is now a live control: 30/60 are always available,
+120 requires a stable bounded rAF observation. An unsupported saved 120 choice
+runs at 60 without overwriting the preference. Simulation remains independently
+scheduled at 60 even with 30 fps rendering; unit checks compare exact update deltas
+and combat time-scale/hit-stop consumption. Manual rate changes become Custom.
+The remaining preset fields are validated storage contracts;
 their renderer integrations and individual controls are still pending. Preset
 starting values match the approved task and have not yet been tuned from new
 measurements. MSAA usefulness has not yet been assessed.
 
 Remaining work:
 
-- Frame-rate capability sampling, selected rate with simulation fixed at 60;
-  render-resolution scaling under the existing cap; Off/Half/Full lighting.
+- Render-resolution scaling under the existing cap; Off/Half/Full lighting.
 - MSAA visual assessment before exposing or dropping its control; independent
   ambient particles, grass density/cheap lit path, cosmetic weather, compose detail,
   preload and memory policies, gameplay FPS counter.

@@ -37,6 +37,19 @@ export function graphicsParticleDensity(
       : settings.particles,
   );
 }
+export function graphicsFrameRate(
+  settings: GraphicsSettings,
+  device: GraphicsDevice,
+  supports120: boolean,
+): 30 | 60 | 120 {
+  const selected =
+    settings.preset === 'auto'
+      ? recommendedGraphics(device) === 'high'
+        ? 120
+        : 60
+      : settings.frameRate;
+  return selected === 120 && !supports120 ? 60 : selected;
+}
 export function recommendedGraphics(device: GraphicsDevice): 'balanced' | 'high' {
   return device.mobile || (device.memory !== undefined && device.memory <= 4) ? 'balanced' : 'high';
 }

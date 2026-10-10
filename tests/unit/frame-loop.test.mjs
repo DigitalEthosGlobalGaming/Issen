@@ -220,6 +220,54 @@ test('120 Hz renders preserve the legacy 60 Hz update deltas and hit-stop consum
   assert.ok(legacy.renders >= 120 && legacy.renders <= 121);
 });
 
+test('30 fps rendering retains identical 60 Hz simulation and combat timing', () => {
+  function drive(fps) {
+    let now = 0,
+      callback,
+      renders = 0;
+    const updates = [],
+      samples = [];
+    const timing = { hitStop: 0.12, slowT: 0.2, timeScale: 0.8 };
+    const loop = createFrameLoop(
+      timing,
+      {
+        maxFps: () => fps,
+        maxUpdateFps: () => 60,
+        paused: () => false,
+        update: (dt, raw) => updates.push([dt, raw]),
+        render: () => renders++,
+        afterRender() {},
+        sampleFrame: (interval) => samples.push(interval),
+      },
+      {
+        now: () => now,
+        request(cb) {
+          callback = cb;
+          return 1;
+        },
+        cancel() {},
+      },
+    );
+    loop.start();
+    for (let tick = 1; tick <= 240; tick++) {
+      now = (tick * 1000) / 120;
+      callback(now);
+    }
+    loop.stop();
+    return { updates, timing, renders, samples };
+  }
+  const low = drive(30),
+    normal = drive(60);
+  assert.deepEqual(low.updates, normal.updates);
+  assert.deepEqual(low.timing, normal.timing);
+  assert.ok(low.renders >= 60 && low.renders <= 61);
+  assert.equal(low.samples.length, low.renders);
+  // The first callback is at 8.3 ms; the next render lands on the 33.3 ms phase.
+  assert.ok(Math.abs(low.samples[0] - 1000 / 120) < 0.1);
+  assert.ok(Math.abs(low.samples[1] - 25) < 0.1);
+  assert.ok(low.samples.slice(2).every((interval) => Math.abs(interval - 1000 / 30) < 0.1));
+});
+
 test('independent updates do not accumulate idle time and reset with the render clock', () => {
   let now = 0,
     callback,

@@ -57,6 +57,34 @@ test('Graphics migrates legacy presets, saves separately and links to accessibil
   await page.screenshot({ path: testInfo.outputPath('graphics-presets-portrait.png') });
 });
 
+test('manual frame cap becomes Custom, persists and only offers observed high refresh', async ({
+  page,
+}) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Graphics/ })
+    .click();
+  const highRefresh = await page.evaluate(
+    () => document.documentElement.dataset.supports120 === 'true',
+  );
+  await expect(page.locator('#option-graphics-frameRate option[value="120"]')).toHaveCount(
+    highRefresh ? 1 : 0,
+  );
+  await page.getByLabel('Frame rate', { exact: true }).selectOption('30');
+  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue('custom');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.settings')!));
+  expect(saved.graphics.frameRate).toBe(30);
+  expect(saved.graphics.preset).toBe('custom');
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Graphics/ })
+    .click();
+  await expect(page.getByLabel('Frame rate', { exact: true })).toHaveValue('30');
+  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue('custom');
+});
+
 test('legacy mute, live volume controls, persistence and category reset', async ({ page }) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.settings')) localStorage.setItem('issen.muted', 'true');
@@ -131,6 +159,7 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
     .getByRole('button', { name: /^Graphics/ })
     .click();
   await page.getByLabel('Preset', { exact: true }).selectOption('low');
+  await page.getByLabel('Frame rate', { exact: true }).selectOption('30');
   await page.keyboard.press('Escape');
   await options(page)
     .getByRole('button', { name: /^Display/ })

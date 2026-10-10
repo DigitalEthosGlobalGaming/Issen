@@ -77,6 +77,7 @@ export type FrameBindingViews = SimulationPorts &
     readonly playerFigures: ReturnType<typeof createPlayerFigures>;
     readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
     readonly effectQuality: ReturnType<typeof createEffectQuality>;
+    readonly graphicsFrameRate: () => 30 | 60 | 120;
     readonly ambient: ReturnType<typeof createEnvironmentPresentation>['ambient'];
     readonly rebalanceWeather: () => void;
     readonly armory: { readonly inspectionExpanded: boolean };
@@ -337,9 +338,9 @@ export function createFrameBindings(
     },
   );
   function frameRate() {
-    const { G, cinematic, guided } = readViews();
+    const { G, cinematic, guided, graphicsFrameRate } = readViews();
     return !G.panel && !cinematic.active && !guided.frozen && gameplayStates.includes(G.state)
-      ? 120
+      ? graphicsFrameRate()
       : 60;
   }
   return {

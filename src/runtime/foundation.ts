@@ -108,6 +108,7 @@ export function createRuntimeFoundation(
     premiumAccess,
     accessible,
     density,
+    frameRate: graphicsFrameRate,
   } = browserPreferences;
   const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
   const PZ = 0.78;
@@ -218,6 +219,7 @@ export function createRuntimeFoundation(
       premiumAccess,
       accessible,
       density,
+      graphicsFrameRate,
       audio,
       audioInit,
       tn,

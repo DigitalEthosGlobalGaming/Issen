@@ -1,6 +1,7 @@
 import { parseSettings, preferenceEnabled } from './settings.ts';
 import { createHaptics, createCombatHaptics } from './haptics.ts';
-import { graphicsDevice, graphicsParticleDensity } from './graphics-settings.ts';
+import { graphicsDevice, graphicsParticleDensity, graphicsFrameRate } from './graphics-settings.ts';
+import { createRefreshRateMonitor } from './refresh-rate.ts';
 import { editionAccess, itemAccessible, type GameEdition } from './editions.ts';
 import { premium } from './purchases.ts';
 import { parseTesterPremium, testerPremiumActive } from './tester-premium.ts';
@@ -36,6 +37,9 @@ export function createRuntimePreferences({
     editionAccess(edition, premium.state.owned || testerPremiumActive(testerPremium));
   const accessible = (id: string) => itemAccessible(id, premiumAccess());
   const device = graphicsDevice(window);
+  const refreshRate = createRefreshRateMonitor(document);
+  lifecycle.add(refreshRate.dispose);
+  const frameRate = () => graphicsFrameRate(settings.graphics, device, refreshRate.supports120);
   const density = () => {
     const selected = graphicsParticleDensity(settings.graphics, device);
     const adapted = selected * (settings.graphics.adaptive ? effectDensity() : 1);
@@ -52,6 +56,8 @@ export function createRuntimePreferences({
     premiumAccess,
     accessible,
     density,
+    frameRate,
+    refreshRate,
     initialPurchaseCheck: true,
     get testerPremium() {
       return testerPremium;

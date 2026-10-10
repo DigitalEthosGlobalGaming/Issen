@@ -97,6 +97,7 @@ export function createRuntimeFrames(
                 drawStamps: presentation.drawStamps,
                 screenAnimation: ui.screenAnimation,
                 effectQuality: foundation.view.effectQuality,
+                graphicsFrameRate: foundation.browser.graphicsFrameRate,
                 ambient: presentation.ambient,
                 rebalanceWeather: presentation.rebalanceWeather,
                 armory: controls.armory,

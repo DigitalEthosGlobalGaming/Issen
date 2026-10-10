@@ -69,16 +69,18 @@ export function createFrameLoop(
     if (callbacks.maxUpdateFps && interval > previousInterval && interval === updateInterval)
       due = updateDue;
     previousInterval = interval;
-    if (now + 0.1 < due) {
+    const renderDue = now + 0.1 >= due;
+    const updateReady = now + 0.1 >= updateDue;
+    if (!renderDue && !updateReady) {
       handle = scheduler.request(frame);
       return;
     }
-    due = Math.max(due + interval, now);
+    if (renderDue) due = Math.max(due + interval, now);
     const raw = Math.min(0.05, Math.max(0, (now - last) / 1000));
-    last = now;
+    if (renderDue) last = now;
     const workStart = scheduler.now();
     const demand = callbacks.demand?.();
-    if (now + 0.1 >= updateDue) {
+    if (updateReady) {
       const updateRaw = Math.min(0.05, Math.max(0, (now - lastUpdate) / 1000));
       updateDue = Math.max(updateDue + updateInterval, now);
       lastUpdate = now;
@@ -87,9 +89,10 @@ export function createFrameLoop(
         if (!callbacks.paused()) callbacks.update(delta, updateRaw);
       }
     }
-    if (!demand || demand.render) callbacks.render(raw);
-    if (!demand || demand.afterRender) callbacks.afterRender();
-    if (!demand || demand.render) callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
+    if (renderDue && (!demand || demand.render)) callbacks.render(raw);
+    if (renderDue && (!demand || demand.afterRender)) callbacks.afterRender();
+    if (renderDue && (!demand || demand.render))
+      callbacks.sampleFrame?.(raw * 1000, scheduler.now() - workStart);
     if (running) handle = scheduler.request(frame);
   }
 

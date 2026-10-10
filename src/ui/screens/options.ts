@@ -9,6 +9,9 @@ import type { Settings, ControlAction } from '../../platform/settings.ts';
 import {
   graphicsDevice,
   graphicsPreset,
+  graphicsFrameRate,
+  resolveGraphics,
+  setGraphicsOption,
   recommendedGraphics,
 } from '../../platform/graphics-settings.ts';
 import type { GraphicsPreset } from '../../platform/graphics-settings.ts';
@@ -283,12 +286,41 @@ export function createOptions(
           if (preset === 'custom') return;
           settings.graphics = graphicsPreset(preset, device);
           persist();
+          render();
         },
         { signal: renderEvents.signal },
       );
       row.append(label, input);
+      content.append(row);
+      const fpsRow = node('div', '', 'option-row');
+      const fpsLabel = node('label', 'Frame rate');
+      fpsLabel.htmlFor = 'option-graphics-frameRate';
+      const fpsInput = node('select');
+      fpsInput.id = fpsLabel.htmlFor;
+      const supports120 = doc.documentElement.dataset.supports120 === 'true';
+      for (const fps of supports120 ? [30, 60, 120] : [30, 60]) {
+        const option = node('option', String(fps));
+        option.value = String(fps);
+        fpsInput.append(option);
+      }
+      fpsInput.value = String(graphicsFrameRate(settings.graphics, device, supports120));
+      fpsInput.addEventListener(
+        'change',
+        () => {
+          settings.graphics = resolveGraphics(settings.graphics, device);
+          setGraphicsOption(
+            settings.graphics,
+            'frameRate',
+            Number(fpsInput.value) as 30 | 60 | 120,
+          );
+          persist();
+          render();
+        },
+        { signal: renderEvents.signal },
+      );
+      fpsRow.append(fpsLabel, fpsInput);
       content.append(
-        row,
+        fpsRow,
         button('Motion and flashes', () => navigate('display')),
       );
     } else if (page === 'profile') {
@@ -370,6 +402,13 @@ export function createOptions(
     }
     if (focus) heading.focus({ preventScroll: true });
   }
+  win.addEventListener(
+    'issen:refresh-rate',
+    () => {
+      if (open && page === 'graphics') render();
+    },
+    { signal: events.signal },
+  );
   win.addEventListener(
     'popstate',
     () => {
