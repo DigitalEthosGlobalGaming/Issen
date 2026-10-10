@@ -40,6 +40,20 @@ diagnosing timing-sensitive failures. `test:production` already builds and
 type-checks, so avoid repeating those checks immediately beforehand. Update the
 affected documentation when ownership or behavior changes.
 
+Prefer completing and committing usable chunks before polishing. Choose the
+smallest checks that cover the changed behavior; after they pass, move on unless
+a concrete concern remains. Reuse passing results for unchanged code. Reserve
+full suites for major integration and release checkpoints, and do not duplicate
+build/type-check steps already covered by another command.
+
+Time-box minor visual and performance investigations: after two unsuccessful
+approaches, record the issue and reassess instead of trying further speculative
+fixes. Prioritize gameplay responsiveness, save integrity and stability. Use
+representative screenshots for intentional visual changes; reserve exact pixel
+comparisons for output that should remain identical. Document small native
+rendering differences when further work is not justified; do not hide failures
+or silently weaken existing assertions.
+
 Performance testing and profiling are opt-in: develop or run performance suites,
 benchmarks, CPU/memory/graphics profiles, emulator/device performance captures,
 or performance optimization investigations only when the user specifically asks.
