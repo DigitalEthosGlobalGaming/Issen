@@ -105,8 +105,10 @@ export function createCopyFilmPass() {
       logicalWidth = width,
       logicalHeight = height,
     ) {
-      uniforms.uniforms.uSceneSize.set([width, height]);
-      uniforms.uniforms.uLogicalSize.set([logicalWidth, logicalHeight]);
+      uniforms.uniforms.uSceneSize[0] = width;
+      uniforms.uniforms.uSceneSize[1] = height;
+      uniforms.uniforms.uLogicalSize[0] = logicalWidth;
+      uniforms.uniforms.uLogicalSize[1] = logicalHeight;
       uniforms.uniforms.uTime = reducedMotion || reducedFlashes ? 0 : time;
       uniforms.uniforms.uMotion = reducedMotion ? 0 : 1;
       uniforms.uniforms.uGlitch = film === 'trial-glitch' ? 1 : 0;

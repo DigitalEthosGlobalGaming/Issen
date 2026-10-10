@@ -176,6 +176,13 @@ export function createGrassMesh(sharedLights?: BindGroup) {
   const releaseLightTargets = lightBinding.detach;
   const geometryInputs = new ChangeTracker();
   let geometryRevision = 0;
+  let geometryBlend = mesh.blendMode,
+    geometryStateBlend = mesh.state.blend;
+  const restoreGeometry = () => {
+    mesh.shader = shader;
+    mesh.blendMode = geometryBlend;
+    mesh.state.blend = geometryStateBlend;
+  };
   return {
     mesh,
     programs: [gShader.glProgram, shader.glProgram] as const,
@@ -247,7 +254,10 @@ export function createGrassMesh(sharedLights?: BindGroup) {
         shader.resources.uPalette = palette.source;
         gShader.resources.uPalette = palette.source;
       }
-      uniforms.uniforms.uMotion.set([time, wind, Math.max(0, Math.min(1, density))]);
+      const motion = uniforms.uniforms.uMotion;
+      motion[0] = time;
+      motion[1] = wind;
+      motion[2] = Math.max(0, Math.min(1, density));
       uniforms.uniforms.uLighting = lighting;
       uniforms.uniforms.uSinglePass = singlePass ? 1 : 0;
       uniforms.uniforms.uAmbient.set(ambient);
@@ -264,22 +274,23 @@ export function createGrassMesh(sharedLights?: BindGroup) {
     beginGeometry(depthRange: number) {
       let alpha = mesh.alpha;
       for (let parent = mesh.parent; parent; parent = parent.parent) alpha *= parent.alpha;
-      uniforms.uniforms.uGeometry.set([depthRange, 0.5, alpha]);
+      const geometry = uniforms.uniforms.uGeometry;
+      geometry[0] = depthRange;
+      geometry[1] = 0.5;
+      geometry[2] = alpha;
       uniforms.update();
-      const blend = mesh.blendMode,
-        stateBlend = mesh.state.blend;
+      geometryBlend = mesh.blendMode;
+      geometryStateBlend = mesh.state.blend;
       mesh.shader = gShader;
       mesh.blendMode = 'none';
       mesh.state.blend = false;
-      return () => {
-        mesh.shader = shader;
-        mesh.blendMode = blend;
-        mesh.state.blend = stateBlend;
-      };
+      return restoreGeometry;
     },
     prepareComposite(targets: Readonly<LightTargets>) {
-      uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
-      uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
+      uniforms.uniforms.uLightSize[0] = targets.sceneWidth;
+      uniforms.uniforms.uLightSize[1] = targets.sceneHeight;
+      uniforms.uniforms.uLightResolution[0] = targets.width;
+      uniforms.uniforms.uLightResolution[1] = targets.height;
       uniforms.update();
       lightBinding.attach(targets);
     },

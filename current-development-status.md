@@ -1,6 +1,28 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.15)
+## Active goal — Graphics menu and renderer optimizations (1.70.16)
+
+B4 implemented with opt-in gameplay allocation captures. Identical combat
+diagnostics (1s warmup,3s sample, existing fixed-seed production harness) before
+and after show142,068,688sampled bytes/3.058793s versus121,574,904/3.054944s:
+46.4→39.8MB/s, about14% less overall. Source-mapped project samples fall48.2→31.2MB,
+about35% less; minor GC18→17, one major GC in each. Short sampled captures guide
+fixes, not FPS/mobile claims. Pixi UV/line tessellation remains the largest source.
+Baseline `tmp/performance/2026-10-10T08-34-39.841Z-4c37ceaa/`; final
+`tmp/performance/2026-10-10T08-53-18.228Z-ba73bad1/`; first repeat also retained
+under `tmp/performance/2026-10-10T08-47-40.319Z-2e8dd990/`.
+Removed per-draw sprite objects, geometry restoration closures/arrays, arc point
+tuples, uniform input arrays, per-frame atlas string keys and collection entry
+tuples. Geometry restore records/callbacks and material state are retained.
+Numeric dirty snapshots use growable Float64/Uint8 buffers to avoid numeric boxes.
+Scene-flow and showcase views are cached with getters for mutable trial/geometry.
+Pooled lighting clears absent materialLighting explicitly; the existing grass
+check caught stale flat-mode state on the first focused run, fixed unchanged.
+Tracker/state-view/scene-timing units7 PASS; native geometry/cache checks2 PASS,
+grass check1 PASS after fix; final tracker native1 PASS. Three requested focused
+diagnostic captures PASS and include strict TypeScript checks. No full suites.
+B5, measured preset/impact labels, heavy previous-frame retention and known Shore
+comparison remain pending; full integration verification is still outstanding.
 
 B3 implemented: warmup always includes material geometry/composite, High and
 single-pass grass, drift, vectors/artwork/default batch, HDR light/debug geometry,

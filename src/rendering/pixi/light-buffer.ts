@@ -248,12 +248,10 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
     u.uAmbient.set(lighting.ambient);
     u.uDirectional.set(lighting.directional);
     u.uDirection.set(lighting.direction);
-    u.uFrame.set([
-      geometry.width,
-      geometry.height,
-      geometry.depthRange,
-      lighting.materialLighting ?? 1,
-    ]);
+    u.uFrame[0] = geometry.width;
+    u.uFrame[1] = geometry.height;
+    u.uFrame[2] = geometry.depthRange;
+    u.uFrame[3] = lighting.materialLighting ?? 1;
     const points = selectSceneLights(
       lighting.points.map((light, index) => ({ id: String(index).padStart(3, '0'), light })),
       geometry.width,
@@ -262,10 +260,18 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
     u.uCount = points.length;
     u.uPointPosition.fill(0);
     u.uPointColor.fill(0);
-    points.forEach((light, index) => {
-      u.uPointPosition.set([light.x, light.y, light.z, light.radius], index * 4);
-      u.uPointColor.set([...light.color.map(linear), light.intensity], index * 4);
-    });
+    for (let index = 0; index < points.length; index++) {
+      const light = points[index]!,
+        offset = index * 4;
+      u.uPointPosition[offset] = light.x;
+      u.uPointPosition[offset + 1] = light.y;
+      u.uPointPosition[offset + 2] = light.z;
+      u.uPointPosition[offset + 3] = light.radius;
+      u.uPointColor[offset] = linear(light.color[0]);
+      u.uPointColor[offset + 1] = linear(light.color[1]);
+      u.uPointColor[offset + 2] = linear(light.color[2]);
+      u.uPointColor[offset + 3] = light.intensity;
+    }
     this.uniforms.update();
     this.renderer.render({
       container: this.root,

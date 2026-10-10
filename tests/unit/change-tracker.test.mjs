@@ -24,3 +24,27 @@ test('ordered snapshots detect mutation, removal and submissions after a flush',
   tracker.begin();
   assert.equal(tracker.finish(), true);
 });
+
+test('numeric storage grows and detects type changes without retaining numeric boxes', () => {
+  const tracker = new ChangeTracker();
+  const values = new Float64Array(200).fill(0.123456789);
+  const frame = () => {
+    tracker.begin();
+    tracker.numbers(values);
+    return tracker.finish();
+  };
+  assert.equal(frame(), true);
+  assert.equal(frame(), false);
+  values[150] += 0.000000001;
+  assert.equal(frame(), true);
+  assert.equal(frame(), false);
+  tracker.begin();
+  tracker.value('200');
+  tracker.numbers(values);
+  assert.equal(tracker.finish(), true);
+  assert.equal(frame(), true);
+  assert.equal(frame(), false);
+  tracker.clear();
+  assert.equal(frame(), true);
+  assert.equal(frame(), false);
+});

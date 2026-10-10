@@ -103,16 +103,31 @@ export function createFrameBindings(
   lightSources = createLightSources(),
 ) {
   const predictScene = createScenePrediction(readViews);
-  const showcase = createGraphicsShowcase(() => ({
+  const showcaseViews = {
     active: () => document.documentElement.dataset.graphicsShowcase === 'true',
-    width: readViews().W,
-    ground: readViews().L.groundY,
-    figureHeight: readViews().L.eH,
-    time: readViews().presentationState.time,
-    reducedMotion: readViews().reducedMotion,
-    particleDensity: readViews().ambientDensity ?? readViews().density,
-    gustLeaves: readViews().gustLeaves,
-  }));
+    get width() {
+      return readViews().W;
+    },
+    get ground() {
+      return readViews().L.groundY;
+    },
+    get figureHeight() {
+      return readViews().L.eH;
+    },
+    get time() {
+      return readViews().presentationState.time;
+    },
+    get reducedMotion() {
+      return readViews().reducedMotion;
+    },
+    get particleDensity() {
+      return readViews().ambientDensity ?? readViews().density;
+    },
+    get gustLeaves() {
+      return readViews().gustLeaves;
+    },
+  };
+  const showcase = createGraphicsShowcase(() => showcaseViews);
   lightSources.register('graphics-showcase', showcase.lights);
   // The parent is a lifetime live view. Overrides keep dynamic selections as getters.
   function frameView<Ports extends object>(ports: Ports) {

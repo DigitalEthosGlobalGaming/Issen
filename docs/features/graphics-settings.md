@@ -1,5 +1,15 @@
 # Graphics settings
 
+The renderer retains geometry restore records, sprite inputs and numeric dirty
+snapshots, writes uniforms directly into existing typed arrays, and indexes atlas
+rectangles by numeric coordinates rather than creating frame-key strings. Scene
+flow/showcase views keep mutable selections as getters. The focused allocation
+comparison for1.70.16 observed46.4→39.8MB/s sampled allocations (about14% less),
+with project-attributed samples about35% lower. These3s diagnostic captures include
+collected objects and do not establish mobile FPS gains; Pixi tessellation remains
+the largest allocation source. The existing performance harness and its
+source-map allocation summarizer retain raw profiles and GC events.
+
 Loading warms all material, grass, drift, artwork, light, film, filter, advanced
 blend and presentation programs. Lighting and grass choices share programs and
 change uniforms. A Pixi8.22 adapter submits native links before reflection and

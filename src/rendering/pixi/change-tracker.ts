@@ -1,6 +1,9 @@
 /** Retained ordered values: compare mutable inputs without per-frame snapshots. */
 export class ChangeTracker {
   private readonly previous: unknown[] = [];
+  private numeric = new Float64Array(64);
+  private kinds = new Uint8Array(64);
+  private count = 0;
   private cursor = 0;
   private changed = false;
   get pending(): boolean {
@@ -13,11 +16,27 @@ export class ChangeTracker {
   }
 
   value(value: unknown): void {
-    if (this.cursor >= this.previous.length || this.previous[this.cursor] !== value) {
-      this.previous[this.cursor] = value;
+    const index = this.cursor++;
+    if (index >= this.kinds.length) {
+      const numeric = new Float64Array(this.kinds.length * 2);
+      numeric.set(this.numeric);
+      this.numeric = numeric;
+      const kinds = new Uint8Array(numeric.length);
+      kinds.set(this.kinds);
+      this.kinds = kinds;
+    }
+    if (typeof value === 'number') {
+      if (index >= this.count || this.kinds[index] !== 1 || this.numeric[index] !== value) {
+        this.numeric[index] = value;
+        this.kinds[index] = 1;
+        this.previous[index] = undefined;
+        this.changed = true;
+      }
+    } else if (index >= this.count || this.kinds[index] !== 2 || this.previous[index] !== value) {
+      this.previous[index] = value;
+      this.kinds[index] = 2;
       this.changed = true;
     }
-    this.cursor++;
   }
 
   numbers(values: ArrayLike<number>): void {
@@ -26,8 +45,9 @@ export class ChangeTracker {
   }
 
   finish(): boolean {
-    if (this.previous.length !== this.cursor) {
-      this.previous.length = this.cursor;
+    if (this.count !== this.cursor) {
+      this.previous.length = Math.min(this.previous.length, this.cursor);
+      this.count = this.cursor;
       this.changed = true;
     }
     return this.changed;
@@ -38,7 +58,7 @@ export class ChangeTracker {
   }
 
   clear(): void {
-    this.previous.length = this.cursor = 0;
+    this.previous.length = this.cursor = this.count = 0;
     this.changed = false;
   }
 }

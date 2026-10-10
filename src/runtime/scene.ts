@@ -4,7 +4,7 @@ import { createRuntimeUIBase } from '../runtime/ui-base.ts';
 
 import { createRuntimePresentation } from '../runtime/presentation.ts';
 import { createRuntimeFoundation } from '../runtime/foundation.ts';
-import { stateView } from '../game/session/state-view.ts';
+import { stateView, cacheView } from '../game/session/state-view.ts';
 
 import { createSceneFlow } from './scene-flow.ts';
 
@@ -153,57 +153,61 @@ export function createRuntimeSceneCoordination(
     },
   );
   foundation.lifecycle.add(figurePreload.dispose);
-  const sceneFlow = createSceneFlow(() =>
-    stateView(
-      foundation.run.sceneState,
-      [
-        'requestedSceneKey',
-        'sceneRequest',
-        'requestedSceneIdentity',
-        'sceneContinuation',
-        'sceneLoading',
-        'sceneReadyToPresent',
-      ],
+  const sceneFlow = createSceneFlow(
+    cacheView(() =>
       stateView(
-        foundation.view.geometry,
-        ['W', 'H', 'DPR'],
-        stateView(foundation.view.stageState, ['stageSeed'], {
-          get figureIdentity() {
-            const { activity, G } = foundation.run;
-            return activity.activeTrial?.bosses
-              ? activity.activeTrial.id +
-                  ':' +
-                  (activity.activeTrial.bosses[G.bossesSlain] ?? 'done')
-              : '';
-          },
-          presentationState: foundation.view.presentationState,
-          G: foundation.run.G,
-          reducedMotion: foundation.browser.reducedMotion,
-          reducedFlashes: foundation.browser.reducedFlashes,
-          density: foundation.browser.density,
-          sceneryDetail: foundation.browser.sceneryDetail,
-          activeTrial: foundation.run.activity.activeTrial,
-          environmentState: presentation.environmentState,
-          compositionKey,
-          cvs: foundation.browser.cvs,
-          screenAnimation: ui.screenAnimation,
-          demonRealmRenderer: foundation.browser.demonRealmRenderer,
-          driftRenderer: presentation.driftRenderer,
-          prepareFigureArtwork: (signal: AbortSignal) => prepareFigures(signal),
-          environmentRenderer: foundation.browser.environmentRenderer,
-          reclaimMemory: foundation.browser.reclaimMemory,
-          sceneRecovery: {
-            show(retry: () => void) {
-              // Startup owns its loading/reload screen until artwork is published.
-              if (!readArtworkReady()) return;
-              sceneError ??= mountStartupLoading(retry);
-              sceneError.scene();
+        foundation.run.sceneState,
+        [
+          'requestedSceneKey',
+          'sceneRequest',
+          'requestedSceneIdentity',
+          'sceneContinuation',
+          'sceneLoading',
+          'sceneReadyToPresent',
+        ],
+        stateView(
+          foundation.view.geometry,
+          ['W', 'H', 'DPR'],
+          stateView(foundation.view.stageState, ['stageSeed'], {
+            get figureIdentity() {
+              const { activity, G } = foundation.run;
+              return activity.activeTrial?.bosses
+                ? activity.activeTrial.id +
+                    ':' +
+                    (activity.activeTrial.bosses[G.bossesSlain] ?? 'done')
+                : '';
             },
-            clear: clearSceneError,
-          },
-          lifecycle: foundation.lifecycle,
-          frameLoop: readClock(),
-        }),
+            presentationState: foundation.view.presentationState,
+            G: foundation.run.G,
+            reducedMotion: foundation.browser.reducedMotion,
+            reducedFlashes: foundation.browser.reducedFlashes,
+            density: foundation.browser.density,
+            sceneryDetail: foundation.browser.sceneryDetail,
+            get activeTrial() {
+              return foundation.run.activity.activeTrial;
+            },
+            environmentState: presentation.environmentState,
+            compositionKey,
+            cvs: foundation.browser.cvs,
+            screenAnimation: ui.screenAnimation,
+            demonRealmRenderer: foundation.browser.demonRealmRenderer,
+            driftRenderer: presentation.driftRenderer,
+            prepareFigureArtwork: (signal: AbortSignal) => prepareFigures(signal),
+            environmentRenderer: foundation.browser.environmentRenderer,
+            reclaimMemory: foundation.browser.reclaimMemory,
+            sceneRecovery: {
+              show(retry: () => void) {
+                // Startup owns its loading/reload screen until artwork is published.
+                if (!readArtworkReady()) return;
+                sceneError ??= mountStartupLoading(retry);
+                sceneError.scene();
+              },
+              clear: clearSceneError,
+            },
+            lifecycle: foundation.lifecycle,
+            frameLoop: readClock(),
+          }),
+        ),
       ),
     ),
   );

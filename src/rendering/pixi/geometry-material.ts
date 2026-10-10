@@ -84,7 +84,10 @@ export function createGeometryMaterial(vertex: string, materialUniforms: Uniform
     update(source: Shader, depthRange: number, cutoff: number, alpha: number) {
       for (const name of textureNames)
         setShaderResource(shader.resources, name, source.resources[name]);
-      geometryUniforms.uniforms.uGeometry.set([depthRange, cutoff, alpha]);
+      const geometry = geometryUniforms.uniforms.uGeometry;
+      geometry[0] = depthRange;
+      geometry[1] = cutoff;
+      geometry[2] = alpha;
       geometryUniforms.update();
     },
     releaseTextures(source?: TextureSource) {

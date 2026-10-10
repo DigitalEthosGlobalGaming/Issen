@@ -23,7 +23,7 @@ import {
   DefaultBatcher,
   Shader,
 } from 'pixi.js';
-import type { FillStyle, GradientOptions, BLEND_MODES, TextureSource } from 'pixi.js';
+import type { FillStyle, GradientOptions, BLEND_MODES, TextureSource, Filter } from 'pixi.js';
 import { createCanvasBlendWarmupFilters } from './canvas-blends.ts';
 import { warmShaderPrograms } from './shader-warmup.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
@@ -39,7 +39,7 @@ import { sceneTextureRevision } from '../texture-revision.ts';
 import { paceTextureUploads, nextVisibleFrame } from '../texture-upload.ts';
 import type { TextureUpload } from '../texture-upload.ts';
 import { registerMaterialSink } from '../scene-material.ts';
-import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
+import type { SceneLighting, SceneTexture, SceneSprite } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
 import { ChangeTracker } from './change-tracker.ts';
 import { StaticFilterCache } from './static-filter-cache.ts';
@@ -107,6 +107,7 @@ const styleKeys = [
   'imageSmoothingEnabled',
   'imageSmoothingQuality',
 ] as const;
+const supportedBlends = ['multiply', 'screen', 'overlay', 'soft-light', 'color'];
 type DrawStyle = Pick<SceneDrawing, (typeof styleKeys)[number]>;
 type MaterialMesh = ReturnType<typeof createMaterialMesh>['mesh'];
 type Slot = {
@@ -214,6 +215,15 @@ export class PixiScenePainter implements SceneDrawing {
   private lightingGeneration = 0;
   private readonly geometryInputs = new ChangeTracker();
   private readonly lightInputs = new ChangeTracker();
+  private readonly geometryCallbacks: (() => void)[] = [];
+  private readonly geometryState: {
+    item?: Container;
+    filters?: Container['filters'];
+    renderable: boolean;
+    filter: boolean;
+  }[] = [];
+  private geometryStateCount = 0;
+  private materialSprite?: SceneSprite;
   private readonly clipPaths = new WeakMap<Graphics, GraphicsPath>();
   private recordPath(value: unknown): void {
     if (value instanceof GraphicsPath) {
@@ -346,6 +356,7 @@ export class PixiScenePainter implements SceneDrawing {
     points: [],
   };
   private readonly unlitLighting: SceneLighting = { ...this.lighting, materialLighting: 0 };
+  private readonly lightFrame: SceneLighting = { ...this.lighting };
 
   private readonly geometryBuffer: GeometryBuffer;
   private readonly pendingUploads = new Map<AbortSignal, Set<TextureSource>>();
@@ -537,21 +548,24 @@ export class PixiScenePainter implements SceneDrawing {
         const mesh = this.submit('material');
         const material = this.slots[this.cursor - 1]!.material!;
         const transform = this.composed(1, 0, 0, 1, stamp.x, stamp.y);
-        material.update(
-          {
-            kind: 'sprite',
-            texture: stamp.texture,
-            material: stamp.material,
-            transform,
-            width: stamp.width,
-            height: stamp.height,
-            alpha: this.globalAlpha,
-            tint: 0xffffff,
-            blend: 'normal',
-          },
-          this.lighting,
-          this.textures,
-        );
+        const sprite = (this.materialSprite ??= {
+          kind: 'sprite',
+          texture: stamp.texture,
+          material: stamp.material,
+          transform,
+          width: stamp.width,
+          height: stamp.height,
+          alpha: this.globalAlpha,
+          tint: 0xffffff,
+          blend: 'normal',
+        });
+        sprite.texture = stamp.texture;
+        sprite.material = stamp.material;
+        sprite.transform = transform;
+        sprite.width = stamp.width;
+        sprite.height = stamp.height;
+        sprite.alpha = this.globalAlpha;
+        material.update(sprite, this.lighting, this.textures);
         mesh.blendMode = this.blend();
         this.recordGeometry(this.slots[this.cursor - 1]!);
       },
@@ -683,10 +697,10 @@ export class PixiScenePainter implements SceneDrawing {
     // Light outputs are about to be written, but their geometry inputs remain
     // the same generation. Resize/restore/disposal detach those samplers.
     this.detachLightingTargets(false);
-    this.lightBuffer.render(this.geometryBuffer.targets!, {
-      ...this.lighting,
-      lightResolution: this.lightResolution,
-    });
+    Object.assign(this.lightFrame, this.lighting);
+    this.lightFrame.materialLighting = this.lighting.materialLighting;
+    this.lightFrame.lightResolution = this.lightResolution;
+    this.lightBuffer.render(this.geometryBuffer.targets!, this.lightFrame);
     this.lightDirty = false;
     this.lightingGeneration++;
     this.canvas.dataset.lightBufferSize = `${this.lightBuffer.targets!.width}x${this.lightBuffer.targets!.height}`;
@@ -790,28 +804,16 @@ export class PixiScenePainter implements SceneDrawing {
     if (targets && (targets.width !== this.canvas.width || targets.height !== this.canvas.height))
       this.detachLightingTargets();
     this.geometryBuffer.resize(this.canvas.width, this.canvas.height);
-    const restore: (() => void)[] = [];
+    const restore = this.geometryCallbacks;
+    restore.length = this.geometryStateCount = 0;
     try {
       // Reuse the exact transform and mask hierarchy; film/tint filters belong to composite.
-      const visit = (item: Container) => {
-        if (item.filters) {
-          const filters = item.filters;
-          item.filters = null;
-          restore.push(() => {
-            item.filters = [...filters];
-          });
-        }
-        for (const child of item.children) visit(child);
-      };
-      visit(this.root);
+      this.stripGeometryFilters(this.root);
       // Unused clip paths are ordinary Graphics, not geometry contributors.
       // Active masks already have renderable=false and the mask pipe draws them.
       for (const clip of this.clips) {
         if (!clip.renderable) continue;
-        clip.renderable = false;
-        restore.push(() => {
-          clip.renderable = true;
-        });
+        this.hideGeometryItem(clip);
       }
       for (let i = 0; i < this.cursor; i++) {
         const slot = this.slots[i]!;
@@ -821,24 +823,42 @@ export class PixiScenePainter implements SceneDrawing {
           );
         else {
           const cachedContainer = slot.filterCache?.container;
-          if (cachedContainer) {
-            const renderable = cachedContainer.renderable;
-            cachedContainer.renderable = false;
-            restore.push(() => {
-              cachedContainer.renderable = renderable;
-            });
-          }
-          const renderable = slot.item.renderable;
-          slot.item.renderable = false;
-          restore.push(() => {
-            slot.item.renderable = renderable;
-          });
+          if (cachedContainer) this.hideGeometryItem(cachedContainer);
+          this.hideGeometryItem(slot.item);
         }
       }
       this.geometryBuffer.render(this.root);
     } finally {
       for (let i = restore.length - 1; i >= 0; i--) restore[i]!();
+      restore.length = 0;
+      for (let i = this.geometryStateCount - 1; i >= 0; i--) {
+        const record = this.geometryState[i]!;
+        if (record.filter) record.item!.filters = record.filters as Filter[] | null;
+        else record.item!.renderable = record.renderable;
+        record.item = undefined;
+        record.filters = undefined;
+      }
+      this.geometryStateCount = 0;
     }
+  }
+
+  private geometryRecord(item: Container, filter: boolean) {
+    const index = this.geometryStateCount++;
+    const record = (this.geometryState[index] ??= { renderable: false, filter: false });
+    record.item = item;
+    record.filter = filter;
+    return record;
+  }
+  private hideGeometryItem(item: Container): void {
+    this.geometryRecord(item, false).renderable = item.renderable;
+    item.renderable = false;
+  }
+  private stripGeometryFilters(item: Container): void {
+    if (item.filters) {
+      this.geometryRecord(item, true).filters = item.filters;
+      item.filters = null;
+    }
+    for (const child of item.children) this.stripGeometryFilters(child);
   }
 
   save(): void {
@@ -992,22 +1012,28 @@ export class PixiScenePainter implements SceneDrawing {
     else if (ccw && -sweep >= tau) sweep = -tau;
     else if (ccw && sweep > 0) sweep = (sweep % tau) - tau;
     else if (!ccw && sweep < 0) sweep = (sweep % tau) + tau;
-    const point = (x: number, y: number): [number, number] => [
-      m.a * x + m.c * y + m.tx,
-      m.b * x + m.d * y + m.ty,
-    ];
-    const first = point(Math.cos(start), Math.sin(start));
-    if (this.path.instructions.length) this.path.lineTo(...first);
-    else this.path.moveTo(...first);
+    const firstX = m.a * Math.cos(start) + m.c * Math.sin(start) + m.tx;
+    const firstY = m.b * Math.cos(start) + m.d * Math.sin(start) + m.ty;
+    if (this.path.instructions.length) this.path.lineTo(firstX, firstY);
+    else this.path.moveTo(firstX, firstY);
     const steps = Math.ceil(Math.abs(sweep) / (Math.PI / 2));
     for (let i = 0; i < steps; i++) {
       const a = start + (sweep * i) / steps,
         b = start + (sweep * (i + 1)) / steps;
       const k = (4 / 3) * Math.tan((b - a) / 4);
+      const x1 = Math.cos(a) - k * Math.sin(a),
+        y1 = Math.sin(a) + k * Math.cos(a);
+      const x2 = Math.cos(b) + k * Math.sin(b),
+        y2 = Math.sin(b) - k * Math.cos(b);
+      const x3 = Math.cos(b),
+        y3 = Math.sin(b);
       this.path.bezierCurveTo(
-        ...point(Math.cos(a) - k * Math.sin(a), Math.sin(a) + k * Math.cos(a)),
-        ...point(Math.cos(b) + k * Math.sin(b), Math.sin(b) - k * Math.cos(b)),
-        ...point(Math.cos(b), Math.sin(b)),
+        m.a * x1 + m.c * y1 + m.tx,
+        m.b * x1 + m.d * y1 + m.ty,
+        m.a * x2 + m.c * y2 + m.tx,
+        m.b * x2 + m.d * y2 + m.ty,
+        m.a * x3 + m.c * y3 + m.tx,
+        m.b * x3 + m.d * y3 + m.ty,
       );
     }
   }
@@ -1017,8 +1043,7 @@ export class PixiScenePainter implements SceneDrawing {
     if (this.globalCompositeOperation === 'lighter') return 'add';
     if (this.globalCompositeOperation === 'destination-out') return 'erase';
     if (this.globalCompositeOperation === 'copy') return 'none';
-    const supported = ['multiply', 'screen', 'overlay', 'soft-light', 'color'];
-    if (supported.includes(this.globalCompositeOperation))
+    if (supportedBlends.includes(this.globalCompositeOperation))
       return this.globalCompositeOperation as BLEND_MODES;
     throw new Error(`Scene blend requires an explicit pass: ${this.globalCompositeOperation}`);
   }

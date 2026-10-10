@@ -71,6 +71,15 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
   const compositeInputs = new ChangeTracker();
   let geometryRevision = 0;
   let compositeRevision = 0;
+  let geometryBlend = mesh.blendMode,
+    geometryStateBlend = mesh.state.blend,
+    geometryStateMode = mesh.state.blendMode;
+  const restoreGeometry = () => {
+    mesh.shader = shader;
+    mesh.blendMode = geometryBlend;
+    mesh.state.blendMode = geometryStateMode;
+    mesh.state.blend = geometryStateBlend;
+  };
   return {
     mesh,
     get geometryRevision() {
@@ -88,18 +97,13 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
       let alpha = mesh.alpha;
       for (let parent = mesh.parent; parent; parent = parent.parent) alpha *= parent.alpha;
       geometryMaterial.update(shader, depthRange, cutoff, alpha);
-      const blend = mesh.blendMode;
-      const stateBlend = mesh.state.blend;
-      const stateBlendMode = mesh.state.blendMode;
+      geometryBlend = mesh.blendMode;
+      geometryStateBlend = mesh.state.blend;
+      geometryStateMode = mesh.state.blendMode;
       mesh.shader = geometryMaterial.shader;
       mesh.blendMode = 'none';
       mesh.state.blend = false;
-      return () => {
-        mesh.shader = shader;
-        mesh.blendMode = blend;
-        mesh.state.blendMode = stateBlendMode;
-        mesh.state.blend = stateBlend;
-      };
+      return restoreGeometry;
     },
     releaseTextures(source?: TextureSource): void {
       if (!texturesBound) return;

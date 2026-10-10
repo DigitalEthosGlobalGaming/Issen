@@ -77,8 +77,10 @@ export function createCompositeMaterial(
       for (const name of textureNames)
         setShaderResource(shader.resources, name, source.resources[name]);
       lightBinding.attach(targets);
-      compositeUniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
-      compositeUniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
+      compositeUniforms.uniforms.uLightSize[0] = targets.sceneWidth;
+      compositeUniforms.uniforms.uLightSize[1] = targets.sceneHeight;
+      compositeUniforms.uniforms.uLightResolution[0] = targets.width;
+      compositeUniforms.uniforms.uLightResolution[1] = targets.height;
       compositeUniforms.update();
     },
     releaseLightTargets: lightBinding.detach,

@@ -137,8 +137,10 @@ export class ArtworkMaterials {
     return binding;
   }
   prepare(geometry: Readonly<GeometryTargets>, light: Readonly<LightTargets>): void {
-    this.uniforms.uniforms.uLightSize.set([geometry.width, geometry.height]);
-    this.uniforms.uniforms.uLightResolution.set([light.width, light.height]);
+    this.uniforms.uniforms.uLightSize[0] = geometry.width;
+    this.uniforms.uniforms.uLightSize[1] = geometry.height;
+    this.uniforms.uniforms.uLightResolution[0] = light.width;
+    this.uniforms.uniforms.uLightResolution[1] = light.height;
     this.uniforms.update();
     this.renderer.texture.bind(light.diffuse.source, this.batchTextures);
     this.renderer.texture.bind(light.specular.source, this.batchTextures + 1);

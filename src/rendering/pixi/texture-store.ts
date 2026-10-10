@@ -6,7 +6,8 @@ import { rgbaMipBytes } from '../../platform/pixel-memory.ts';
 
 interface PreparedSource {
   texture: Texture;
-  frames: Map<string, Texture>;
+  frames: Texture[];
+  frameIndex: Map<number, Map<number, Map<number, Map<number, Texture>>>>;
   revision: number;
   lastFrame: number;
   stopRetirement: () => void;
@@ -16,6 +17,7 @@ interface PreparedSource {
 export class SceneTextureStore {
   private readonly sources = new Map<SceneTexture['source'], PreparedSource>();
   private readonly dataSources = new Map<SceneTexture['source'], PreparedSource>();
+  private readonly stores = [this.sources, this.dataSources];
   private frame = 0;
   private readonly retained = new Map<SceneTexture['source'], number>();
   private readonly retired = new Set<SceneTexture['source']>();
@@ -51,7 +53,8 @@ export class SceneTextureStore {
     if (!prepared) {
       prepared = {
         texture: Texture.from(source, true),
-        frames: new Map(),
+        frames: [],
+        frameIndex: new Map(),
         revision,
         lastFrame: this.frame,
         stopRetirement: observeSceneTextureRetirement(source, (preserveFrame) => {
@@ -71,7 +74,8 @@ export class SceneTextureStore {
     prepared.lastFrame = this.frame;
     if (prepared.revision !== revision) {
       for (const texture of prepared.frames.values()) texture.destroy(false);
-      prepared.frames.clear();
+      prepared.frames.length = 0;
+      prepared.frameIndex.clear();
       prepared.texture.source.resize(source.width, source.height);
       prepared.texture.source.update();
       prepared.revision = revision;
@@ -89,7 +93,15 @@ export class SceneTextureStore {
   }
   get(input: SceneTexture, data = false): Texture {
     const texture = input.frame
-      ? this.getFrame(input.source, input.revision, ...input.frame, data)
+      ? this.getFrame(
+          input.source,
+          input.revision,
+          input.frame[0],
+          input.frame[1],
+          input.frame[2],
+          input.frame[3],
+          data,
+        )
       : this.prepare(input.source, input.revision, data).texture;
     if (input.mipmaps && !texture.source.autoGenerateMipmaps) {
       texture.source.autoGenerateMipmaps = true;
@@ -110,27 +122,37 @@ export class SceneTextureStore {
     data = false,
   ): Texture {
     const prepared = this.prepare(source, revision, data);
-    const key = `${x}:${y}:${width}:${height}`;
-    let texture = prepared.frames.get(key);
+    let ys = prepared.frameIndex.get(x);
+    let widths = ys?.get(y);
+    let heights = widths?.get(width);
+    let texture = heights?.get(height);
     if (!texture) {
       texture = new Texture({
         source: prepared.texture.source,
         frame: new Rectangle(x, y, width, height),
       });
-      prepared.frames.set(key, texture);
+      if (!ys) prepared.frameIndex.set(x, (ys = new Map()));
+      if (!widths) ys.set(y, (widths = new Map()));
+      if (!heights) widths.set(width, (heights = new Map()));
+      heights.set(height, texture);
+      prepared.frames.push(texture);
     }
     return texture;
   }
 
   /** Drop unused stage resources, keeping a short grace period for transitions. */
   collect(): void {
-    for (const store of [this.sources, this.dataSources])
-      for (const [source, prepared] of store) {
-        if (this.retained.has(source) || this.frame - prepared.lastFrame <= 120) continue;
-        this.release(prepared);
-        store.delete(source);
-      }
+    for (const store of this.stores) store.forEach(this.collectSource);
   }
+  private readonly collectSource = (
+    prepared: PreparedSource,
+    source: SceneTexture['source'],
+    store: Map<SceneTexture['source'], PreparedSource>,
+  ) => {
+    if (this.retained.has(source) || this.frame - prepared.lastFrame <= 120) return;
+    this.release(prepared);
+    store.delete(source);
+  };
 
   get size(): number {
     return this.sources.size + this.dataSources.size;
@@ -138,7 +160,7 @@ export class SceneTextureStore {
 
   /** Submitted sources may upload implicitly when Pixi draws the current frame. */
   *frameTextureSources(): IterableIterator<TextureSource> {
-    for (const store of [this.sources, this.dataSources])
+    for (const store of this.stores)
       for (const prepared of store.values())
         if (prepared.lastFrame === this.frame) yield prepared.texture.source;
   }
@@ -146,7 +168,7 @@ export class SceneTextureStore {
   /** Source backing estimate, including mip levels; excludes render targets and driver overhead. */
   get memorySnapshot(): { sources: number; bytes: number } {
     const sources = new Set<TextureSource>();
-    for (const store of [this.sources, this.dataSources])
+    for (const store of this.stores)
       for (const prepared of store.values()) sources.add(prepared.texture.source);
     let bytes = 0;
     for (const source of sources)
@@ -163,7 +185,7 @@ export class SceneTextureStore {
   get retirementSnapshot(): { sources: number; bytes: number } {
     let bytes = 0;
     for (const source of this.retired)
-      for (const store of [this.sources, this.dataSources]) {
+      for (const store of this.stores) {
         const prepared = store.get(source);
         if (prepared)
           bytes += prepared.texture.source.pixelWidth * prepared.texture.source.pixelHeight * 4;

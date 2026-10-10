@@ -227,13 +227,19 @@ export function createLeafMesh(sharedLights?: BindGroup) {
       uniforms.uniforms.uAmbient.set(ambient);
       uniforms.uniforms.uLocalAlpha = mesh.alpha;
       const clock = frame.motion.clock;
-      uniforms.uniforms.uMotion.set([clock.elapsed, clock.wind, clock.time, frame.scale]);
+      const motion = uniforms.uniforms.uMotion;
+      motion[0] = clock.elapsed;
+      motion[1] = clock.wind;
+      motion[2] = clock.time;
+      motion[3] = frame.scale;
       uniforms.update();
     },
     prepareComposite(targets: Readonly<LightTargets>) {
       lightBinding.attach(targets);
-      uniforms.uniforms.uLightSize.set([targets.sceneWidth, targets.sceneHeight]);
-      uniforms.uniforms.uLightResolution.set([targets.width, targets.height]);
+      uniforms.uniforms.uLightSize[0] = targets.sceneWidth;
+      uniforms.uniforms.uLightSize[1] = targets.sceneHeight;
+      uniforms.uniforms.uLightResolution[0] = targets.width;
+      uniforms.uniforms.uLightResolution[1] = targets.height;
       uniforms.update();
     },
     dispose() {

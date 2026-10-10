@@ -112,6 +112,20 @@ resident decoded/GPU storage are not counted.
 
 ## Results and interpretation
 
+For a requested gameplay allocation investigation, capture a focused combat
+diagnostic before and after an implementation change using identical options,
+then inspect its source-mapped allocation samples:
+
+```sh
+npm run test-performance -- --scenario=combat --mode=diagnostic --warmup=1000 --duration=3000 --repeats=1
+node tests/performance/benchmarks/summarize-allocations.mjs tmp/performance/<baseline> tmp/performance/<after>
+```
+
+The summarizer writes `allocation-summary.json` alongside the existing CPU,
+heap and GC captures. It reports sampled bytes per second and maps frame
+locations through the capture's own build source maps. This short diagnostic
+guides allocation fixes; it does not establish FPS gains or mobile performance.
+
 For a failed full web run, a bounded recovery can reuse its exact saved build and
 retain every completed sample:
 
