@@ -112,6 +112,23 @@ resident decoded/GPU storage are not counted.
 
 ## Results and interpretation
 
+For an explicitly requested Graphics option comparison:
+
+```sh
+node tests/performance/benchmarks/measure-graphics.mjs tmp/performance-graphics-options
+```
+
+This runs two opposite-order sweeps of sixteen arms using the existing fixed-seed
+gust gameplay fixture, a500ms warmup and3s timing window. Each arm has fresh
+synthetic settings and an isolated context. It records raw frame/render samples,
+preparation timings and the existing nominal pixel-memory ledger. It does not
+measure mobile GPU speed or whole resident memory. Adaptive changes are disabled
+for quality comparisons; the separate adaptive arm enables them.
+After confirming a failed run's process has stopped, pass its folder as a third
+argument to reuse its exact build and completed samples. Revision, tracked-source
+changes and browser version are checked before recovery. Treat noisy short
+results as directional evidence, not precise per-option FPS promises.
+
 For a requested gameplay allocation investigation, capture a focused combat
 diagnostic before and after an implementation change using identical options,
 then inspect its source-mapped allocation samples:
