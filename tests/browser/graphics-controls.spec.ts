@@ -20,6 +20,7 @@ test('live cosmetics stay independent and resolution changes coalesce while audi
     .getByRole('button', { name: /^Graphics/ })
     .click();
   await page.getByLabel('Adaptive quality', { exact: true }).uncheck();
+  await page.getByLabel('Preload next stage', { exact: true }).uncheck();
   await page.getByLabel('Ambient particles', { exact: true }).selectOption('off');
   await page.getByLabel('Weather effects', { exact: true }).selectOption('reduced');
   await page.getByLabel('Lighting', { exact: true }).selectOption('half');
@@ -56,6 +57,7 @@ test('live cosmetics stay independent and resolution changes coalesce while audi
     weather: 'reduced',
     lighting: 'half',
     adaptive: false,
+    preload: false,
   });
   await page.screenshot({ path: testInfo.outputPath('graphics-controls-portrait.png') });
   await page.locator('#options').getByRole('button', { name: 'Back', exact: true }).click();

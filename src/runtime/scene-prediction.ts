@@ -12,6 +12,7 @@ interface PredictionViews {
   readonly H: number;
   readonly DPR: number;
   density(): number;
+  preload?(): boolean;
 }
 
 /** Forecast the actual visit ledger without entering it or spending combat randomness. */
@@ -19,6 +20,10 @@ export function createScenePrediction(readViews: () => PredictionViews) {
   let cached: UpcomingScene | undefined;
   return (): UpcomingScene | undefined => {
     const views = readViews();
+    if (views.preload?.() === false) {
+      cached = undefined;
+      return undefined;
+    }
     const stage = predictNextStage(views.G, !!views.activeTrial, views.cinematic.active);
     const { W: width, H: height, DPR: dpr } = views;
     if (

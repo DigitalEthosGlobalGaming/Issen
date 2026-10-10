@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.2)
+## Active goal — Graphics menu and renderer optimizations (1.70.3)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -65,7 +65,16 @@ relaxing implementation assertions. Original failures retained under
 file5/5 PASS includes the additional low-memory capped-resolution unit.
 Package/lock/title/changelog1.70.2. No full suites/profiles run for these chunks.
 
-Next: scenery detail, memory/preload policies, grass cheap pass/control and FPS;
+Fourth chunk: Preload next stage toggle controls actual forecasting. Off returns
+before visit-ledger peek and causes pending/ready next-scene leases to release on
+the next background sample, even when ready retention is enabled on busy frames.
+Re-enabling predicts the same seed without advancing visits. Same-scene figure
+preparation remains independent. StrictTS PASS; prediction/lease units9 PASS;
+focused browser controls/persistence case PASS8.7s (10.9s command), under
+`tmp/test-results/browser/graphics-preload-toggle/`. Package/lock/title/changelog
+are synchronized at1.70.3. No broad suites or profiles run.
+
+Next: scenery detail, memory policies, grass cheap pass/control and FPS;
 then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
 Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.

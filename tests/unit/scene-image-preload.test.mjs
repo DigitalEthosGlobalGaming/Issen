@@ -4,6 +4,58 @@ import { sampleAssetBackground } from '../../src/platform/asset-background.ts';
 import { createSceneImagePreload } from '../../src/rendering/environment/image-preload.ts';
 import { compositionKey } from '../../src/rendering/environment/worker-types.ts';
 
+test('removing the forecast releases pending and ready next scenes even during busy frames', async () => {
+  for (const ready of [false, true]) {
+    const doc = new EventTarget();
+    doc.hidden = false;
+    const current = { width: 100, height: 100, dpr: 1, lowQuality: false, stage: 0, stageSeed: 1 };
+    const next = { ...current, stage: 1, stageSeed: 2 };
+    let finish,
+      releases = 0,
+      starts = 0;
+    const preloader = createSceneImagePreload(
+      doc,
+      () => current,
+      () => {
+        starts++;
+        return {
+          ready: new Promise((resolve) => {
+            finish = resolve;
+          }),
+          release() {
+            releases++;
+          },
+        };
+      },
+      { retainReadyWhenBusy: true },
+    );
+    try {
+      sampleAssetBackground(0, true, 1, 8.3, 1, next);
+      if (ready) {
+        finish(true);
+        await Promise.resolve();
+      }
+      assert.equal(preloader.snapshot().status, ready ? 'ready' : 'pending');
+      sampleAssetBackground(0, false, 1, 8.3);
+      assert.equal(releases, 1);
+      assert.deepEqual(preloader.snapshot(), { key: undefined, status: 'none' });
+      finish(true);
+      await Promise.resolve();
+      assert.equal(
+        preloader.snapshot().status,
+        'none',
+        'cancelled completion cannot restore ownership',
+      );
+      sampleAssetBackground(0, true, 1, 8.3);
+      assert.equal(starts, 1, 'disabled forecast cannot restart preparation');
+      sampleAssetBackground(0, true, 1, 8.3, 1, next);
+      assert.equal(starts, 2, 'reenabling the same forecast creates a new lease');
+    } finally {
+      preloader.dispose();
+    }
+  }
+});
+
 test('ready scene ownership survives busy frames and transfers only to its exact identity', async () => {
   const doc = new EventTarget();
   doc.hidden = false;

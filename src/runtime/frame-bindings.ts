@@ -78,6 +78,7 @@ export type FrameBindingViews = SimulationPorts &
     readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
     readonly effectQuality: ReturnType<typeof createGraphicsQuality>;
     readonly graphicsFrameRate: () => 30 | 60 | 120;
+    readonly preload: () => boolean;
     readonly ambient: ReturnType<typeof createEnvironmentPresentation>['ambient'];
     readonly rebalanceWeather: () => void;
     readonly armory: { readonly inspectionExpanded: boolean };

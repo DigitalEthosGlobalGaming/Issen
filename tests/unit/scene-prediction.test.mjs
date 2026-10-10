@@ -20,6 +20,30 @@ function fixture(seed = 19) {
   };
   return { views, visits, predict: createScenePrediction(() => views) };
 }
+test('disabled preload suppresses prediction without peeking or advancing the visit ledger', () => {
+  const f = fixture();
+  const original = f.visits.peek(1);
+  let enabled = true,
+    peeks = 0;
+  const peek = f.views.stageVisits.peek.bind(f.views.stageVisits);
+  f.views.stageVisits = {
+    peek(stage) {
+      peeks++;
+      return peek(stage);
+    },
+  };
+  f.views.preload = () => enabled;
+  const next = f.predict();
+  assert.ok(next);
+  enabled = false;
+  const before = peeks;
+  assert.equal(f.predict(), undefined);
+  assert.equal(peeks, before);
+  assert.equal(f.visits.peek(1), original);
+  enabled = true;
+  assert.deepEqual(f.predict(), next);
+});
+
 test('exact upcoming composition identities preserve normal/daily/rush visit sequences through ten laps', () => {
   for (const initial of [19, 0xffffffff])
     for (const rush of [false, true]) {

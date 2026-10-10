@@ -437,12 +437,24 @@ export function createOptions(
         { signal: renderEvents.signal },
       );
       adaptiveRow.append(adaptiveLabel, adaptiveInput);
+      const preloadRow = node('div', '', 'option-row'),
+        preloadLabel = node('label', 'Preload next stage'),
+        preloadInput = node('input');
+      preloadLabel.htmlFor = 'option-graphics-preload';
+      preloadInput.id = preloadLabel.htmlFor;
+      preloadInput.type = 'checkbox';
+      preloadInput.checked = settings.graphics.preload;
+      preloadInput.addEventListener('change', () => setGraphic('preload', preloadInput.checked), {
+        signal: renderEvents.signal,
+      });
+      preloadRow.append(preloadLabel, preloadInput);
       const adaptiveStatus = node('p', '', 'graphics-adaptive'),
         applying = node('p', '', 'graphics-applying');
       adaptiveStatus.setAttribute('role', 'status');
       applying.setAttribute('role', 'status');
       content.append(
         adaptiveRow,
+        preloadRow,
         adaptiveStatus,
         applying,
         button('Motion and flashes', () => navigate('display')),
