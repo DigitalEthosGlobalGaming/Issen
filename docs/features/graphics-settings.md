@@ -48,7 +48,17 @@ already executing in the worker is still allowed to finish; its obsolete result
 cannot be presented. This prevents stale preflight work from creating additional
 worker composition, rather than claiming an in-flight native draw can be aborted.
 
-Scenery, memory, anti-aliasing and FPS-counter preset fields remain storage
+`platform/frame-metrics.ts` reports mean delivered-render intervals over at least
+500 ms, reusing a snapshot and publishing at most twice a second. FPS is the
+reciprocal of that mean, and ms is the interval per frame, not CPU/GPU work time.
+Loading/hidden state and scheduler clock resets discard stale samples. Graphics
+shows the readout at the top and requests continuous rendering at the selected
+cap; it still freezes simulation. The optional gameplay counter is shown below
+the HUD's lives, with change-only text writes and no per-frame formatting.
+Its manual toggle becomes Custom and persists. The showcase and cosmetic preview
+animation still remain pending.
+
+Scenery, memory and anti-aliasing preset fields remain storage
 contracts; their integrations/individual controls are still pending. Grass density
 and its selector are connected. Low and Medium use a single instanced composite
 draw with shared scenery lighting and scene ambient on uncovered sky, without
@@ -60,9 +70,10 @@ measurements. MSAA usefulness has not yet been assessed.
 Remaining work:
 
 - MSAA visual assessment before exposing or dropping its control; compose detail,
-  memory policies, gameplay FPS counter.
+  memory policies.
 - Portrait sheet/landscape panel, visible undimmed frozen-run or title showcase,
-  live metrics, measured impact labels, 300 ms heavy-change debounce and Applying.
+  cosmetic preview animation, measured impact labels, remaining heavy-change
+  debounce and previous-frame retention.
 - Geometry/light dirtiness, static-filter baking, complete program warmup with
   parallel-compile support and context recovery; allocation profiling/fixes and
   selective shader-precision changes.

@@ -22,6 +22,7 @@ import type { EnvironmentState } from '../presentation/environment-state.ts';
 import type { createWeatherState } from '../rendering/scene/weather-state.ts';
 import type { createAudio } from '../audio/audio.ts';
 import type { createGraphicsQuality } from '../platform/graphics-quality.ts';
+import type { createFrameMetrics } from '../platform/frame-metrics.ts';
 import type { createPostArtwork } from '../presentation/post-artwork.ts';
 import type { createScreenAnimation } from '../ui/screen-animation.ts';
 import type { createEnvironmentPresentation } from '../presentation/environment.ts';
@@ -78,6 +79,7 @@ export type FrameBindingViews = SimulationPorts &
     readonly screenAnimation: ReturnType<typeof createScreenAnimation>;
     readonly effectQuality: ReturnType<typeof createGraphicsQuality>;
     readonly graphicsFrameRate: () => 30 | 60 | 120;
+    readonly frameMetrics: ReturnType<typeof createFrameMetrics>;
     readonly preload: () => boolean;
     readonly ambient: ReturnType<typeof createEnvironmentPresentation>['ambient'];
     readonly rebalanceWeather: () => void;
@@ -290,6 +292,7 @@ export function createFrameBindings(
       maxFps: frameRate,
       maxUpdateFps: () => 60,
       clockReset: () => {
+        readViews().frameMetrics.suspend();
         presentationElapsed = 0;
         presentationChanged = false;
         preparedFrame = undefined;
@@ -297,6 +300,8 @@ export function createFrameBindings(
       demand: () => {
         const { sceneLoading, cinematic, screenAnimation, G, armory } = readViews();
         if (sceneLoading) return { update: true, render: true, afterRender: false };
+        if (document.documentElement.dataset.graphicsOpen === 'true')
+          return { update: false, render: true, afterRender: false };
         return cinematic.active
           ? { update: true, render: true, afterRender: false }
           : screenAnimation.demand(G.panel === 'armory' && armory.inspectionExpanded);
@@ -312,7 +317,9 @@ export function createFrameBindings(
         if (G.panel === 'armory') drawPreview();
       },
       sampleFrame: (interval, work) => {
-        const { sceneLoading, G, effectQuality, cinematic } = readViews();
+        const { sceneLoading, G, effectQuality, cinematic, frameMetrics } = readViews();
+        if (sceneLoading || document.hidden) frameMetrics.suspend();
+        else frameMetrics.sample(interval);
         const nextScene = predictScene();
         sampleAssetBackground(
           G.stage,
@@ -338,6 +345,7 @@ export function createFrameBindings(
   );
   function frameRate() {
     const { G, cinematic, guided, graphicsFrameRate } = readViews();
+    if (document.documentElement.dataset.graphicsOpen === 'true') return graphicsFrameRate();
     return !G.panel && !cinematic.active && !guided.frozen && gameplayStates.includes(G.state)
       ? graphicsFrameRate()
       : 60;

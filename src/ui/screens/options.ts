@@ -17,6 +17,8 @@ import {
 import type { GraphicsPreset } from '../../platform/graphics-settings.ts';
 import type { GraphicsSettings } from '../../platform/graphics-settings.ts';
 import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
+import type { createFrameMetrics } from '../../platform/frame-metrics.ts';
+import { frameMetricsText } from '../frame-metrics.ts';
 type Category = 'audio' | 'controls' | 'display' | 'graphics' | 'profile';
 type Page = Category | 'root';
 const TITLES: Record<Page, string> = {
@@ -34,6 +36,7 @@ export function createOptions(
   closed: () => void,
   tutorial?: () => void,
   graphics?: ReturnType<typeof createGraphicsQuality>,
+  frameMetrics?: ReturnType<typeof createFrameMetrics>,
 ) {
   const doc = root.ownerDocument,
     win = doc.defaultView!;
@@ -222,6 +225,7 @@ export function createOptions(
   function finish() {
     renderEvents.abort();
     open = false;
+    doc.documentElement.dataset.graphicsOpen = 'false';
     capture = null;
     root.hidden = true;
     closed();
@@ -231,6 +235,7 @@ export function createOptions(
     action?.();
   }
   function render(focus = false) {
+    doc.documentElement.dataset.graphicsOpen = String(open && page === 'graphics');
     renderEvents.abort();
     renderEvents = new AbortController();
     content.replaceChildren();
@@ -322,6 +327,12 @@ export function createOptions(
         }),
       );
     } else if (page === 'graphics') {
+      const metrics = node('p', '', 'graphics-metrics');
+      metrics.id = 'graphicsFrameMetrics';
+      metrics.textContent = frameMetricsText(
+        frameMetrics?.snapshot ?? { active: false, fps: 0, frameMs: 0 },
+      );
+      content.append(metrics);
       const row = node('div', '', 'option-row');
       const label = node('label', 'Preset');
       label.htmlFor = 'option-graphics-preset';
@@ -453,6 +464,19 @@ export function createOptions(
         signal: renderEvents.signal,
       });
       preloadRow.append(preloadLabel, preloadInput);
+      const counterRow = node('div', '', 'option-row'),
+        counterLabel = node('label', 'Show FPS counter'),
+        counterInput = node('input');
+      counterLabel.htmlFor = 'option-graphics-fps-counter';
+      counterInput.id = counterLabel.htmlFor;
+      counterInput.type = 'checkbox';
+      counterInput.checked = settings.graphics.fpsCounter;
+      counterInput.addEventListener(
+        'change',
+        () => setGraphic('fpsCounter', counterInput.checked),
+        { signal: renderEvents.signal },
+      );
+      counterRow.append(counterLabel, counterInput);
       const adaptiveStatus = node('p', '', 'graphics-adaptive'),
         applying = node('p', '', 'graphics-applying');
       adaptiveStatus.setAttribute('role', 'status');
@@ -460,6 +484,7 @@ export function createOptions(
       content.append(
         adaptiveRow,
         preloadRow,
+        counterRow,
         adaptiveStatus,
         applying,
         button('Motion and flashes', () => navigate('display')),
@@ -557,6 +582,12 @@ export function createOptions(
     attributeFilter: ['data-graphics-applying', 'data-graphics-reductions'],
   });
   const unsubscribeGraphics = graphics?.subscribe(updateGraphicsStatus);
+  const unsubscribeMetrics = frameMetrics?.subscribe(() => {
+    if (!open || page !== 'graphics') return;
+    const readout = content.querySelector('#graphicsFrameMetrics');
+    const text = frameMetricsText(frameMetrics.snapshot);
+    if (readout && readout.textContent !== text) readout.textContent = text;
+  });
   win.addEventListener(
     'popstate',
     () => {
@@ -641,10 +672,12 @@ export function createOptions(
     dispose() {
       graphicsObserver.disconnect();
       unsubscribeGraphics?.();
+      unsubscribeMetrics?.();
       events.abort();
       renderEvents.abort();
       root.hidden = true;
       open = false;
+      doc.documentElement.dataset.graphicsOpen = 'false';
     },
   };
 }

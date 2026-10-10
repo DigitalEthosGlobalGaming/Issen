@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.5)
+## Active goal — Graphics menu and renderer optimizations (1.70.6)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -98,7 +98,22 @@ reviewed. Scenery lighting changes grass colour while its geometry stays exact;
 ambient changes preserve alpha. No new performance profile/full suite yet.
 Package/lock/title/changelog1.70.5; renderer coverage/architecture documented.
 
-Next: scenery detail, memory policies and FPS;
+Seventh chunk: delivered FPS/mean frame interval readout at the top of Graphics,
+and persisted optional gameplay counter below lives. Metrics reuse a snapshot,
+publish at most twice per second and discard stale samples on loading/hidden/
+clock reset. Text formats only for visible readouts and writes only when changed.
+Graphics now continuously renders at the selected cap with simulation frozen;
+cosmetic/title preview animation and layout remain pending. StrictTS PASS;
+scheduler9 PASS, metrics3 PASS after correcting alternating10/30ms test-window
+count (threshold crosses at520ms, not500ms). Live-cap/counter persistence and
+unchanged paused encounter/RNG/checkpoint browser2 PASS14.1s under
+`tmp/test-results/browser/graphics-frame-metrics/`. Visual case PASS10.5s under
+`graphics-frame-metrics-visual-final/`; gameplay counter capture reviewed.
+Earlier visual command was interrupted and its process confirmed absent before
+retry; no successful result claimed for that attempt. Package/lock/title/notes
+1.70.6. No broad suite or performance profile run.
+
+Next: scenery detail and memory policies;
 then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
 Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.

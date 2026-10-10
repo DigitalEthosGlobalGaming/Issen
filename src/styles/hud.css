@@ -15,6 +15,16 @@
 #hud.on {
   opacity: 1;
 }
+#fpsCounter {
+  display: block;
+  margin-top: 7px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 4px #000;
+}
+#fpsCounter[hidden] {
+  display: none;
+}
 #score {
   font-weight: 800;
   font-size: 30px;

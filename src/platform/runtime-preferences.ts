@@ -3,6 +3,7 @@ import { createHaptics, createCombatHaptics } from './haptics.ts';
 import { graphicsDevice, particleDensity } from './graphics-settings.ts';
 import { createGraphicsQuality } from './graphics-quality.ts';
 import { createRefreshRateMonitor } from './refresh-rate.ts';
+import { createFrameMetrics } from './frame-metrics.ts';
 import { editionAccess, itemAccessible, type GameEdition } from './editions.ts';
 import { premium } from './purchases.ts';
 import { parseTesterPremium, testerPremiumActive } from './tester-premium.ts';
@@ -40,6 +41,7 @@ export function createRuntimePreferences({ lifecycle, storage, edition }: Runtim
     () => refreshRate.supports120,
   );
   const frameRate = () => graphics.effective.frameRate;
+  const frameMetrics = createFrameMetrics();
   // Combat cues remain independent of optional ambient particles.
   const density = () => (reducedMotion() ? 0.3 : 1);
   const ambientDensity = () => {
@@ -64,6 +66,7 @@ export function createRuntimePreferences({ lifecycle, storage, edition }: Runtim
     grassDensity,
     weatherDensity,
     graphics,
+    frameMetrics,
     frameRate,
     refreshRate,
     initialPurchaseCheck: true,

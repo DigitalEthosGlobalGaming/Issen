@@ -4,6 +4,8 @@ import { createOptions } from '../screens/options.ts';
 import { createGraphicsApplication } from './graphics.ts';
 import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
 import { cosmeticDensity } from '../../platform/graphics-settings.ts';
+import type { createFrameMetrics } from '../../platform/frame-metrics.ts';
+import { frameMetricsText } from '../frame-metrics.ts';
 import { store } from '../../platform/storage.ts';
 import { PREMIUM_FILM } from '../../platform/premium.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
@@ -27,6 +29,7 @@ export interface SettingsViews {
   readonly lifecycle: ReturnType<typeof createLifecycle>;
   readonly settings: ReturnType<typeof parseSettings>;
   readonly graphics: ReturnType<typeof createGraphicsQuality>;
+  readonly frameMetrics: ReturnType<typeof createFrameMetrics>;
   readonly reducedMotion: () => boolean;
   readonly reducedFlashes: () => boolean;
   readonly prepareScene: () => void;
@@ -88,10 +91,24 @@ export function createSettingsWiring(views: SettingsViews) {
   );
   let previousAmbient = -1,
     previousWeather = -1;
+  const fpsCounter = $('fpsCounter');
+  function updateFrameCounter() {
+    const hidden =
+      !views.graphics.effective.fpsCounter ||
+      !!G.panel ||
+      !['playing', 'boss', 'between', 'standoff', 'shrine', 'dead'].includes(G.state);
+    if (fpsCounter.hidden !== hidden) fpsCounter.hidden = hidden;
+    if (!hidden) {
+      const text = frameMetricsText(views.frameMetrics.snapshot);
+      if (fpsCounter.textContent !== text) fpsCounter.textContent = text;
+    }
+  }
+  lifecycle.add(views.frameMetrics.subscribe(updateFrameCounter));
   function applySettings() {
     cvs.dataset.debris = 'sprites';
     screenAnimation.invalidate();
     graphicsApplication.apply(!views.artworkReady);
+    updateFrameCounter();
     scrollMenus.update(settings.menuStyle, reducedMotion());
     if (!settings.vibration) combatHaptics.stop();
     audio.setMuted(settings.muted);
@@ -146,6 +163,7 @@ export function createSettingsWiring(views: SettingsViews) {
       if (G.state === 'title' && views.savedRun?.status !== 'active') launchTutorial();
     },
     views.graphics,
+    views.frameMetrics,
   );
   lifecycle.add(options.dispose);
   lifecycle.add(views.graphics.subscribe(applySettings));

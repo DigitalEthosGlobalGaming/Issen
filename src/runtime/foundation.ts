@@ -110,6 +110,7 @@ export function createRuntimeFoundation(
     weatherDensity,
     graphics,
     frameRate: graphicsFrameRate,
+    frameMetrics,
   } = browserPreferences;
   const FONT = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
   const PZ = 0.78;
@@ -225,6 +226,7 @@ export function createRuntimeFoundation(
       weatherDensity,
       graphics,
       graphicsFrameRate,
+      frameMetrics,
       audio,
       audioInit,
       tn,
