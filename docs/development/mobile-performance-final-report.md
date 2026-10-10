@@ -1,6 +1,7 @@
 # Mobile performance and transitions — verification report
 
-App 1.69.58. **Exact leaf restoration remains unresolved.** Current focused,
+App 1.69.58. **Local implementation is finished with a documented native
+restoration difference and hardware verification gaps.** Current focused,
 checked production and Android web verification passes. The preceding full
 browser run has 416 passes and three failures; two have focused follow-up below.
 The prior integration checkpoint passed on 1.69.56.
@@ -215,12 +216,29 @@ and resolved output all matching. A separate leaf restore intermittently differs
 by one alpha byte despite exact inputs/geometry/HDR. Dithering, invariant shader
 outputs, second-AA removal, sampler precision, flat colour and opacity rounding
 experiments were rejected and reverted. No assertion was relaxed. The bounded
-native-rounding proposal remains review-only and requires explicit approval.
+native-rounding proposal remains review-only; it has not been applied. Changing
+the assertion would require a separate decision. Keeping the observed failure
+documented does not require changing its acceptance criteria.
 
-Remaining work: resolve the exact leaf restoration acceptance issue, retaining
-the observed cold timing variation, limits of sampled memory
-and the unresolved intermittent leaf restoration result. Physical 120 Hz delivery,
-Android WebView execution and native residency remain hardware evidence gaps.
+The completion audit follows the current goal's visual guardrails and the
+repository instruction to document small native rendering differences when
+further work is unjustified. The intermittent one-pixel, one-byte alpha result
+is retained as a known limitation, with its strict test unchanged. The full
+browser result remains 416/419, with the two other failures followed up above;
+this is not an all-green release certification. No further speculative pixel
+experiments or unchanged broad suites are warranted for this checkpoint.
+
+All requested implementation areas, representative visual reviews, measurement
+comparisons and applicable final suites have evidence recorded above. The latest
+ownership cleanup has focused browser, checked production/TypeScript and Android
+web evidence; unchanged unit and worker timing results are reused. Version,
+changelog and architecture documentation agree with app 1.69.58. The measured
+cold median improves against the compatible historical baseline, while paired
+captures show variation; a universal per-stage improvement is not established.
+
+Physical 120 Hz delivery, Android WebView execution and native residency remain
+hardware evidence gaps. These need a suitable device rather than more captures
+on the current host. The sampled memory and mode/loadout limits remain as stated.
 Grass geometry bandwidth/maps are a possible separate opportunity and were
 not changed. No push, deployment, native package build or real-save modification
 has been performed for this goal checkpoint.

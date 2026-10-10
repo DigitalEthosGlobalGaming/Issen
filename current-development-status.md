@@ -33,10 +33,17 @@ document small native differences without hiding failures or relaxing assertions
 Unit501/tool9/broad416 evidence retained with version/scope distinguished. No
 new performance matrix or broad browser repetition. Report/architecture updated.
 
-Remaining: single-pixel/single-byte exact leaf restoration failure from final57
-suite. Five geometry/HDR targets exact, no GL error; native rounding proposal
-still unapproved. Do not restart speculative raster fixes or broad suites. Goal
-active, not complete. All known handles terminal. No push/deploy/native build.
+Completion audit: requested local implementation, measurements, visual review
+and applicable suites are recorded in the final report. The final57 single-pixel,
+single-byte leaf alpha restoration failure remains a documented native rendering
+limitation under the user's updated cadence guidance. Five geometry/HDR targets
+are exact, with no GL error. Its strict assertion is unchanged; the optional
+rounding proposal is not applied. Full browser evidence remains416/419, not an
+all-green release certification. Do not restart speculative fixes or broad suites.
+Physical120Hz delivery, Android WebView execution and native GPU residency need
+suitable hardware; sampled memory/loadout coverage limits remain explicit.
+Local goal work is finished with those limitations. All known handles terminal.
+No push/deploy/native build. See the final report for evidence and follow-up scope.
 
 ## Current handoff — final integration failures isolated (1.69.57)
 
