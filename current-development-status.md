@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.3)
+## Active goal — Graphics menu and renderer optimizations (1.70.4)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -74,6 +74,18 @@ focused browser controls/persistence case PASS8.7s (10.9s command), under
 `tmp/test-results/browser/graphics-preload-toggle/`. Package/lock/title/changelog
 are synchronized at1.70.3. No broad suites or profiles run.
 
+Fifth chunk: foreground pump checks desired identity after awaited cache trims,
+fog preparation and next-slot readiness, before dispatch. Superseded work exits
+and the latest request proceeds without composing the obsolete scene. Already
+dispatched native work still finishes; response identity checks remain. StrictTS
+PASS; real-worker fog regression PASS1.6s and trim regression PASS1.3s, retaining
+successful replacement composition and fog-case texture warming. Evidence under
+`tmp/test-results/browser/worker-supersession/` and `worker-supersession-trim/`.
+Final combined regressions2 PASS4.6s under `worker-supersession-final/` after
+making the held-message fixture release idempotent.
+No new performance claim about the replacement scene's own compose cost.
+Package/lock/title/changelog1.70.4. No broad suites or profiles run.
+
 Next: scenery detail, memory policies, grass cheap pass/control and FPS;
 then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
 Full objective and
@@ -82,8 +94,8 @@ Goal active, incomplete. No known task-owned graphics processes remain running.
 
 User's real trace: stage3 load5110ms,3112ms before dispatch while superseded
 stage0 composes,1931ms stage3 roundtrip,67ms warming/presentation. Foreground
-obsolete requests are rejected after response rather than before every awaited
-preflight. Preserve this evidence for heavy-change/cancellation integration.
+obsolete preflight dispatch is now guarded as described above. Composition already
+executing remains non-interruptible; own-stage composition cost remains unresolved.
 
 ## Current handoff — worker-only ownership and faster cadence (1.69.58)
 

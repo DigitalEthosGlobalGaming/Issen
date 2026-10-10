@@ -41,6 +41,13 @@ next background sample, including busy frames. Re-enabling restores the same
 forecast without advancing visits or changing seeds. Current-scene and same-scene
 figure preparation remain available.
 
+Foreground composition rechecks its requested identity after asynchronous cache
+trimming, fog preparation and waiting for a prepared scene. A superseded request
+is skipped before dispatch, allowing the latest scene to proceed. Composition
+already executing in the worker is still allowed to finish; its obsolete result
+cannot be presented. This prevents stale preflight work from creating additional
+worker composition, rather than claiming an in-flight native draw can be aborted.
+
 Scenery, memory, anti-aliasing and FPS-counter preset fields remain storage
 contracts; their integrations/individual controls are still pending. Grass density
 is connected but the cheap single-pass path and its menu selector are pending. Preset

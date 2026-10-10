@@ -571,11 +571,18 @@ export function createWorkerEnvironmentRenderer(
     snapshot.backend = 'loading';
     let incoming: ComposeResponse | undefined,
       accepted = false;
+    const obsolete = () =>
+      disposed ||
+      workerFailure ||
+      generation !== workerGeneration ||
+      !desired ||
+      compositionKey(desired) !== key;
     try {
       if (!prepared) {
         const estimate = scenePreparationBytes(frame, documentImageBudget(doc));
         if (estimate !== undefined) {
           if (workerResources.decodedLoader?.bytes) await trimWorkerCache(frame.stage);
+          if (obsolete()) return;
           // Acknowledged remaining inputs now all belong to this incoming kit.
           const sharedBytes = workerResources.decodedLoader?.bytes ?? 0;
           const incomingBytes =
@@ -587,16 +594,18 @@ export function createWorkerEnvironmentRenderer(
             workerResources.decodedLoader?.bytes
           ) {
             await trimWorkerCache();
+            if (obsolete()) return;
             pressure = reclaimSceneMemory(doc, incomingBytes);
           }
           if (pressure.committedBytes + incomingBytes > pressure.budget) releaseOutgoingMaterials();
         }
       }
       if (frame.stage === 0) await prepareFog();
-      if (disposed || workerFailure || generation !== workerGeneration) return;
+      if (obsolete()) return;
       const timingKey = 'false:' + key;
-      markScenePhase('compose-sent', timingKey, { stage: frame.stage });
       const promoted = prepared && (await prepared.ready);
+      if (obsolete()) return;
+      markScenePhase('compose-sent', timingKey, { stage: frame.stage });
       const response = promoted ? prepared.response! : await send({ kind: 'compose', key, frame });
       incoming = response;
       incomingResponses.add(response);
