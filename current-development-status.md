@@ -1,5 +1,17 @@
 # Current development status
 
+## Saved-run scenery startup fix (1.70.20)
+
+Startup artwork composition omitted scenery detail after checkpoint restoration
+had requested the applied detail. The different worker keys cancelled the saved
+scene's readiness waiter, leaving the canvas unavailable while composition kept
+running. Startup now forwards scenery detail and uses the shared low-quality
+calculation, matching runtime readiness and presentation.
+The strengthened playing-checkpoint browser reproduced unavailable before the
+fix. Afterward all four checkpoint phases and gameplay-readiness browsers5 PASS;
+checkpoint units12 PASS; strict TypeScript PASS. Existing broader graphics
+verification failures still require their separate audit.
+
 ## Scene preparation diagnostics (1.70.19)
 
 Handled cache failures now warn once per operation per store with the original
@@ -7,7 +19,7 @@ exception and first affected URL. Unreadable CSS rules warn once per stylesheet.
 Scene readiness reports failed scenery, drift or figure preparation in Console,
 performance marks and the main canvas error; stale/disposed requests stay quiet.
 These diagnostics identify failures without changing the recovery flow. The
-reported unavailable scene still needs reproduction with the new warnings.
+reported unavailable scene was subsequently reproduced and fixed in1.70.20.
 Strict TypeScript PASS; focused cache/readiness/occlusion units12 PASS; stylesheet
 warning and gameplay-readiness browsers2 PASS. Android USB localhost forwarding
 is documented in the local development guide.

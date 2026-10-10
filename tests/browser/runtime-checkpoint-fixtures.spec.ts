@@ -8,13 +8,21 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine']) {
   test(`pre-extraction ${phase} checkpoint resumes through the real runtime`, async ({ page }) => {
     test.setTimeout(60000);
     const errors: string[] = [];
+    const sceneFailures: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      if (message.text().includes('[Issen] Scene preparation failed.'))
+        sceneFailures.push(message.text());
+    });
     await page.addInitScript((checkpoint) => {
       localStorage.setItem('issen.runCheckpoint', JSON.stringify(checkpoint));
       localStorage.setItem('issen.meta', JSON.stringify(checkpoint.meta));
     }, fixture);
     await page.goto('/');
     await expect(page.locator('.startup-loading')).toHaveCount(0, { timeout: 30000 });
+    await expect(page.locator('#c')).toHaveAttribute('data-scene-state', 'ready', {
+      timeout: 15000,
+    });
     await expect(page.locator('#paused')).toHaveClass(/on/);
     await expect(page.locator('#pauseSeed')).toHaveText(`Seed ${fixture.seed}`);
     await page.locator('#bResume').click();
@@ -24,5 +32,6 @@ for (const phase of ['playing', 'boss', 'standoff', 'shrine']) {
       await expect(page.locator('#blessList button')).toHaveCount(fixture.offers.length);
     } else await expect(page.locator('#hud')).toHaveClass(/on/);
     expect(errors).toEqual([]);
+    expect(sceneFailures).toEqual([]);
   });
 }

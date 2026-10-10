@@ -102,6 +102,7 @@ export function startGame(
           reducedMotion: foundation.browser.reducedMotion,
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,
+          sceneryDetail: foundation.browser.sceneryDetail,
           petOf: presentation.petOf,
           robeOf: () => foundation.profile.profileEquipment.EQ.robe,
           bladeOf: () => foundation.profile.profileEquipment.EQ.blade,

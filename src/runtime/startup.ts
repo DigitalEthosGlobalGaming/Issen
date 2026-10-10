@@ -6,6 +6,7 @@ import type { RunState } from '../game/run-state.ts';
 import type { RunCheckpoint } from '../platform/run-checkpoint.ts';
 import type { createAudio } from '../audio/audio.ts';
 import { ENEMY_WEAPON_IDS } from '../rendering/figures/enemy-presence.ts';
+import { sceneryLowQuality, type SceneryDetail } from '../rendering/environment/scenery-detail.ts';
 type Disposable = { dispose(): void };
 type NativeStartup = Pick<
   ReturnType<typeof createNativeServices>,
@@ -35,6 +36,7 @@ export interface RuntimeStartupViews extends NativeStartup {
   reducedMotion(): boolean;
   reducedFlashes(): boolean;
   density(): number;
+  sceneryDetail(): SceneryDetail | undefined;
   petOf(): string;
   robeOf(): string;
   bladeOf(): string;
@@ -73,6 +75,7 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
     reducedMotion,
     reducedFlashes,
     density,
+    sceneryDetail,
     computeMods,
     applySeal,
     resize,
@@ -158,7 +161,8 @@ export function startRuntime(readViews: () => RuntimeStartupViews) {
       stage: G.stage,
       reducedMotion: reducedMotion(),
       reducedFlashes: reducedFlashes(),
-      lowQuality: density() <= 0.3,
+      lowQuality: sceneryLowQuality(sceneryDetail(), density() <= 0.3),
+      sceneryDetail: sceneryDetail(),
     }),
     driftRenderer.prepare(readViews().driftStage()),
   ]).then(([, , , , weaponsReady]) => {

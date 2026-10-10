@@ -33,6 +33,10 @@ The main canvas is `#c`; inspect `document.querySelector('#c').dataset` for
 `sceneState` and `sceneError`. Performance marks named
 `issen:scene-preparation-failed:` retain the same step details.
 
+Startup artwork composition uses the same applied scenery detail and low-quality
+calculation as runtime readiness and drawing. Missing detail changes the worker's
+composition identity and can cancel a checkpoint's pending scene request.
+
 Asset cache failures remain recoverable and warn once per operation per store,
 including the first failing URL and original exception. Unreadable stylesheet
 rules warn once per stylesheet and retain the original UI artwork. These handled
