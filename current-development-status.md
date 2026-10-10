@@ -1,6 +1,28 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.14)
+## Active goal — Graphics menu and renderer optimizations (1.70.15)
+
+B3 implemented: warmup always includes material geometry/composite, High and
+single-pass grass, drift, vectors/artwork/default batch, HDR light/debug geometry,
+film copy variants, blur/grayscale, Canvas advanced blends and presentation copy.
+Part A lighting/grass modes vary uniforms and use the same warmed programs.
+The Pixi8.22 adapter submits native compile/link jobs in paced batches, polls
+KHR_parallel_shader_compile when available, then uses Pixi's exported reflection
+helpers to adopt completed programs into the renderer cache. Driver attribute
+locations avoid an unnecessary ES100 relink. Without KHR, reflection stays in
+loading. Cancellation/context generations discard unadopted jobs. Actual KHR
+support confirmed in focused evidence;
+zero reflection before completion. Restore reports warming, suppresses native
+draws, and awaits recoveryReady before enabling Resume/restarting frames.
+Shader-path browser2 PASS with native KHR and forced unavailable branch, all14
+film variants, Off/Half/Full and Medium/High grass, drift/debug paths and actual
+context loss/restore: zero gameplay compile/link calls and GL error0. Actual
+gameplay browser1 PASS with tracing from loading completion through first frame
+and a1s sample: zero main-canvas compile/link calls. Existing pending-source
+restore browser1 PASS. Strict TypeScript PASS. CPU traces/native event evidence
+saved under `tmp/test-results/browser/shader-warmup-final/`. No full suites.
+B4/B5, measured preset/impact labels, heavy previous-frame retention and known
+Shore comparison remain pending.
 
 B2 implemented: filtered sprites, vectors and material stamps use identity
 viewport-sized cache containers after consecutive unchanged submissions. Retained

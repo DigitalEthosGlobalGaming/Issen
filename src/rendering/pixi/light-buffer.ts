@@ -171,6 +171,9 @@ void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=
   get program() {
     return this.shader.glProgram;
   }
+  get programs() {
+    return [this.shader.glProgram, this.debugShader.glProgram] as const;
+  }
   /** Detach geometry samplers before their owner releases a generation. */
   detachGeometry(): void {
     if (!this.geometryAttached) return;

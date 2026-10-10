@@ -178,6 +178,7 @@ export function createGrassMesh(sharedLights?: BindGroup) {
   let geometryRevision = 0;
   return {
     mesh,
+    programs: [gShader.glProgram, shader.glProgram] as const,
     get geometryRevision() {
       return geometryRevision;
     },

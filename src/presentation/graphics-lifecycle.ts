@@ -22,7 +22,19 @@ export interface GraphicsLifecycleViews {
 }
 /** Own graphics failure, restore deadlines and activity suspension. */
 export function bindGraphicsLifecycle(readViews: () => GraphicsLifecycleViews) {
-  const { lifecycle, frameLoop, combatHaptics, audio, G, showPauseScreen, cvs, nativeScene, $, screenAnimation, visitToday } = readViews();
+  const {
+    lifecycle,
+    frameLoop,
+    combatHaptics,
+    audio,
+    G,
+    showPauseScreen,
+    cvs,
+    nativeScene,
+    $,
+    screenAnimation,
+    visitToday,
+  } = readViews();
   let graphicsFailed = false;
   lifecycle.listen(document, GRAPHICS_ERROR_EVENT, () => {
     graphicsFailed = true;
@@ -55,8 +67,9 @@ export function bindGraphicsLifecycle(readViews: () => GraphicsLifecycleViews) {
         reportGraphicsError(cvs);
       }, 8000);
     });
-    lifecycle.listen(cvs, 'webglcontextrestored', () => {
+    lifecycle.listen(cvs, 'webglcontextrestored', async () => {
       if (!nativeScene) return;
+      if (!(await nativeScene.recoveryReady)) return;
       if (recoveryTimer !== undefined) lifecycle.clearTimeout(recoveryTimer);
       ($('bResume') as HTMLButtonElement).disabled = false;
       screenAnimation.invalidate();
@@ -74,5 +87,4 @@ export function bindGraphicsLifecycle(readViews: () => GraphicsLifecycleViews) {
       } else if (readViews().artworkReady && !nativeScene?.contextLost) resumeFrames();
     }),
   );
-
 }

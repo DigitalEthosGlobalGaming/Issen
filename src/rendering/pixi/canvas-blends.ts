@@ -66,3 +66,7 @@ class CanvasOverlay {
   }
 }
 extensions.add(CanvasColor, CanvasSoftLight, CanvasOverlay);
+
+export function createCanvasBlendWarmupFilters(): Filter[] {
+  return [new CanvasColor(), new CanvasSoftLight(), new CanvasOverlay()] as unknown as Filter[];
+}

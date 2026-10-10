@@ -1,5 +1,14 @@
 # Graphics settings
 
+Loading warms all material, grass, drift, artwork, light, film, filter, advanced
+blend and presentation programs. Lighting and grass choices share programs and
+change uniforms. A Pixi8.22 adapter submits native links before reflection and
+polls KHR_parallel_shader_compile when available; the unavailable branch still
+finishes during loading. Context restoration suppresses draws while programs
+warm, and Resume/frame restart waits for `recoveryReady`. Native program event
+checks and Chrome CPU traces cover every film/lighting mode, real context
+restoration, and the first presented gameplay frame plus a1s live sample.
+
 Static filtered sprites, vectors and material stamps bake into retained Pixi
 cache textures after two unchanged submissions. Identity viewport coordinates
 preserve authored blur radii and lighting lookup positions. Content/pixel

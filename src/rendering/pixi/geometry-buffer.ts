@@ -22,6 +22,9 @@ export function requireGeometryBuffers(gl: WebGL2RenderingContext): void {
 
 /** One owner per painter; textures are read-only extension inputs, never caller-owned. */
 export class GeometryBuffer {
+  get programs() {
+    return [this.debugShader.glProgram] as const;
+  }
   private target?: RenderTarget;
   private snapshot?: Readonly<GeometryTargets>;
   private generation = 0;
