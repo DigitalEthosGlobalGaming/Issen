@@ -50,8 +50,8 @@ void main() {
   gl_Position = vec4((uProjectionMatrix*world).xy,0.0,1.0);
   vPosition = world.xy;
   int index = int(aColourIndex);
-  vec4 colour = texelFetch(uPalette,ivec2(index%uPaletteWidth,index/uPaletteWidth),0);
-  vec4 tint = uColor*uWorldColorAlpha;
+  highp vec4 colour = texelFetch(uPalette,ivec2(index%uPaletteWidth,index/uPaletteWidth),0);
+  mediump vec4 tint = uColor*uWorldColorAlpha;
   vColour = vec4(colour.rgb*tint.rgb/max(tint.a,0.0001),colour.a*tint.a);
   vec3 normal = vec3(-aPosition.x*0.65, t*0.3+sway*0.15,1.0);
   vNormal = normalize(vec3(uNormalMatrix*normal.xy,normal.z));
@@ -95,16 +95,16 @@ ${lightingCompositeFunctions}
 out vec4 finalColor;
 void main() {
   if (vSelected<0.5) discard;
-  vec3 lit;
+  mediump vec3 lit;
   if (uSinglePass>0.5) {
     vec2 uv=vPosition/uLightSize;
-    vec3 diffuse,specular;
+    mediump vec3 diffuse,specular;
     sceneLightLookup(uv,diffuse,specular);
     // Grass borrows scenery lighting; uncovered sky uses the scene ambient.
     if(texture(uLightGuide,uv).a<0.001) diffuse=uAmbient;
     lit=toDisplay(highlightRolloff(toLinear(vColour.rgb)*diffuse));
   } else lit=sceneLightColour(vColour.rgb,vPosition,vec3(0.0));
-  vec3 colour=mix(vColour.rgb,lit,clamp(uLighting,0.0,1.0));
+  mediump vec3 colour=mix(vColour.rgb,lit,clamp(uLighting,0.0,1.0));
   finalColor=vec4(colour*vColour.a,vColour.a);
 }`;
 

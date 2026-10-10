@@ -1,5 +1,25 @@
 # Current development status
 
+## Active goal — Shader precision (1.70.17)
+
+B5 uses explicit mediump colour, display response, diffuse light energy, tint,
+emission and film/blend calculations. Highp remains the default for positions,
+large-atlas UVs, animation time, depth, octahedral normals, coverage thresholds,
+bilateral weights and narrow GGX denominators. No blanket precision downgrade.
+Native comparison against shaders promoted back to highp passes all18 cases
+(Off/Half/Full, Medium/High grass, ordinary/noir/glitch film, 2048px atlas,
+subpixel placement, point light, metallic/rough surfaces, emissive/fog): exact
+display pixels and GL error0 on this browser. This does not establish mobile
+GPU speed or precision equivalence on every driver. Three shader warmup checks
+PASS, including actual gameplay trace and context restoration with/without KHR.
+Strict TypeScript PASS. Initial comparison failed only on a favicon404; route
+fixture fixed, assertions unchanged, comparison rerun PASS. Evidence under
+`tmp/test-results/browser/precision-focused/` and
+`tmp/test-results/browser/precision-reference-final/`.
+Measured impact/preset tuning, heavy previous-frame retention, known Shore
+strict comparison and final full integration verification remain pending.
+No full suites or additional allocation profiles run for this chunk.
+
 ## Active goal — Graphics menu and renderer optimizations (1.70.16)
 
 B4 implemented with opt-in gameplay allocation captures. Identical combat

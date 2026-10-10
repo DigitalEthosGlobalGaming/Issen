@@ -41,7 +41,7 @@ void main(){
   vec3 world=uWorldTransformMatrix*uTransformMatrix*vec3(mat2(c,s,-s,c)*local+origin,1.0);
   gl_Position=vec4((uProjectionMatrix*world).xy,0.0,1.0);
   vPosition=world.xy;vUV=aFrame.xy+aPosition*aFrame.zw;
-  float alpha=floor(clamp(uLocalAlpha*aParams.z,0.0,1.0)*255.0)/255.0;
+  highp float alpha=floor(clamp(uLocalAlpha*aParams.z,0.0,1.0)*255.0)/255.0;
   vColour=vec4(uColor.rgb/max(uColor.a,.0001)*alpha,alpha)*uWorldColorAlpha;
   vFire=aParams.w;
   vAtlas=int(aParams.y);
@@ -58,19 +58,19 @@ uniform vec3 uAmbient;
 ${lightingCompositeFunctions}
 out vec4 finalColor;
 void main(){
-  vec4 colour=texture(uDiffuse,vUV);
-  float alpha=colour.a*vColour.a;
-  vec3 tint=vColour.rgb/max(vColour.a,.0001);
-  vec3 original=clamp(colour.rgb/max(colour.a,.0001)*tint,0.0,1.0);
-  vec4 emission=vFire>0.5?texture(uEmissive,vUV):vec4(0.0);
-  vec3 emissive=toLinear(clamp(emission.rgb/max(emission.a,.0001)*tint,0.0,1.0));
+  mediump vec4 colour=texture(uDiffuse,vUV);
+  mediump float alpha=colour.a*vColour.a;
+  mediump vec3 tint=vColour.rgb/max(vColour.a,.0001);
+  mediump vec3 original=clamp(colour.rgb/max(colour.a,.0001)*tint,0.0,1.0);
+  mediump vec4 emission=vFire>0.5?texture(uEmissive,vUV):vec4(0.0);
+  mediump vec3 emissive=toLinear(clamp(emission.rgb/max(emission.a,.0001)*tint,0.0,1.0));
   vec2 uv=vPosition/uLightSize;
-  vec3 diffuse,specular;
+  mediump vec3 diffuse,specular;
   sceneLightLookup(uv,diffuse,specular);
   // No drift coverage in G0: sky uses scene ambient, never a fixed brightness.
   if(texture(uLightGuide,uv).a<0.001) diffuse=uAmbient;
-  vec3 lit=toDisplay(highlightRolloff(toLinear(original)*diffuse+emissive));
-  vec3 display=mix(original,lit,clamp(uAmounts[vAtlas],0.0,1.0));
+  mediump vec3 lit=toDisplay(highlightRolloff(toLinear(original)*diffuse+emissive));
+  mediump vec3 display=mix(original,lit,clamp(uAmounts[vAtlas],0.0,1.0));
   finalColor=vec4(display*alpha,alpha);
 }`;
 /** One merged atlas and one lit instanced draw per depth layer; no geometry writes. */

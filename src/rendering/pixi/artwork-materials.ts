@@ -55,8 +55,8 @@ export class ArtworkMaterials {
       },
       fragment: {
         header: `in vec2 vScenePosition; uniform float uArtworkLighting; ${lightingCompositeFunctions}`,
-        end: `vec3 original = clamp(finalColor.rgb / max(finalColor.a, 0.0001), 0.0, 1.0);
-          vec3 display = sceneLightColour(original, vScenePosition, vec3(0.0));
+        end: `mediump vec3 original = clamp(finalColor.rgb / max(finalColor.a, 0.0001), 0.0, 1.0);
+          mediump vec3 display = sceneLightColour(original, vScenePosition, vec3(0.0));
           finalColor.rgb = mix(finalColor.rgb, display * finalColor.a, clamp(uArtworkLighting, 0.0, 1.0));`,
       },
     };

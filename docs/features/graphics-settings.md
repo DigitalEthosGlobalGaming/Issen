@@ -193,3 +193,16 @@ Remaining work:
 - Focused checks per chunk, then one final unit/browser/visual/performance pass,
   failure fixes as a batch and reruns of failed suites. Preserve and report any
   remaining failure instead of weakening assertions.
+
+
+### Selective shader precision
+
+Colour/tint/emission, display conversion, diffuse energy and film/blend colour
+math use explicit mediump qualifiers. Default highp preserves positions and
+large-atlas UVs, animation, depth/coverage decisions, octahedral normals,
+bilateral reconstruction weights and narrow GGX specular denominators.
+The native mixed-versus-highp comparison covers18 lighting/grass/film cases with
+2048px atlas crops and reports exact output on the tested browser. It permits
+at most2 display-byte rounding steps for this intentional precision change;
+this is not a mobile performance or universal driver guarantee. All-program
+warmup/context recovery checks still pass. Device timing remains separate.

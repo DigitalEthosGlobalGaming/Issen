@@ -33,12 +33,12 @@ vec2 octEncode(vec3 n) {
   return xy * 0.5 + 0.5;
 }
 void main() {
-  vec4 colour = texture(uDiffuse,uDiffuseRect.xy + vUV * uDiffuseRect.zw);
+  highp vec4 colour = texture(uDiffuse,uDiffuseRect.xy + vUV * uDiffuseRect.zw);
   // Pixi packs colour alpha to a byte; cutoff uses the original effective alpha.
   float coverage = colour.a * uGeometry.z;
   if (coverage < uGeometry.y) discard;
-  vec3 tint = vColor.rgb / max(vColor.a,0.0001);
-  vec3 albedo = toLinear(clamp(colour.rgb / max(colour.a,0.0001) * tint,0.0,1.0));
+  mediump vec3 tint = vColor.rgb / max(vColor.a,0.0001);
+  mediump vec3 albedo = toLinear(clamp(colour.rgb / max(colour.a,0.0001) * tint,0.0,1.0));
   vec3 normal = vec3(0.0,0.0,1.0);
   if (uMaterial.y > 0.5) {
     vec3 decoded = texture(uNormal,uNormalRect.xy + vUV * uNormalRect.zw).rgb * 2.0 - 1.0;

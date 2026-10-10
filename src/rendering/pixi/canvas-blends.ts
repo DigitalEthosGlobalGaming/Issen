@@ -2,15 +2,15 @@ import { extensions, ExtensionType, Filter, GlProgram } from 'pixi.js';
 import { sceneFilterVertex } from './film-pass.ts';
 
 const functions = `
-float luminance(vec3 c) { return dot(c, vec3(0.3, 0.59, 0.11)); }
-vec3 setLuminance(vec3 c, float l) {
+mediump float luminance(mediump vec3 c) { return dot(c, vec3(0.3, 0.59, 0.11)); }
+mediump vec3 setLuminance(mediump vec3 c, mediump float l) {
   c += l - luminance(c);
   float low = min(c.r, min(c.g, c.b)), high = max(c.r, max(c.g, c.b));
   if (low < 0.0) c = l + (c - l) * l / max(l - low, 0.00001);
   if (high > 1.0) c = l + (c - l) * (1.0 - l) / max(high - l, 0.00001);
   return c;
 }
-float softLight(float b, float s) {
+mediump float softLight(mediump float b, mediump float s) {
   float d = b <= 0.25 ? ((16.0 * b - 12.0) * b + 4.0) * b : sqrt(b);
   return s <= 0.5 ? b - (1.0 - 2.0 * s) * b * (1.0 - b) : b + (2.0 * s - 1.0) * (d - b);
 }`;
@@ -31,9 +31,9 @@ uniform sampler2D uBackTexture;
 out vec4 finalColor;
 ${functions}
 void main() {
-  vec4 front = texture(uTexture, vTextureCoord), back = texture(uBackTexture, vTextureCoord);
-  vec3 s = front.rgb / max(front.a, 0.00001), b = back.rgb / max(back.a, 0.00001);
-  vec3 blended = ${expression};
+  mediump vec4 front = texture(uTexture, vTextureCoord), back = texture(uBackTexture, vTextureCoord);
+  mediump vec3 s = front.rgb / max(front.a, 0.00001), b = back.rgb / max(back.a, 0.00001);
+  mediump vec3 blended = ${expression};
   finalColor = vec4((1.0 - front.a) * back.rgb + (1.0 - back.a) * front.rgb + front.a * back.a * blended,
     front.a + back.a * (1.0 - front.a));
 }`,

@@ -25,8 +25,8 @@ uniform float uTime;
 uniform float uMotion;
 uniform float uGlitch;
 out vec4 finalColor;
-float lum(vec3 c) { return dot(c, vec3(0.3, 0.59, 0.11)); }
-vec3 setLum(vec3 c, float l) {
+mediump float lum(mediump vec3 c) { return dot(c, vec3(0.3, 0.59, 0.11)); }
+mediump vec3 setLum(mediump vec3 c, mediump float l) {
   c += l - lum(c);
   float n = min(c.r, min(c.g, c.b)), x = max(c.r, max(c.g, c.b));
   if (n < 0.0) c = l + (c - l) * l / max(l - n, 0.00001);
@@ -43,14 +43,14 @@ vec3 palette(float index) {
 vec4 sampleScene(vec2 p) {
   return texture(uTexture, clamp(p * uSceneSize * uInputSize.zw, uInputClamp.xy, uInputClamp.zw));
 }
-vec3 overlay(vec3 base, vec3 blend) {
+mediump vec3 overlay(mediump vec3 base, mediump vec3 blend) {
   return mix(2.0 * base * blend, 1.0 - 2.0 * (1.0 - base) * (1.0 - blend), step(vec3(0.5), base));
 }
 vec4 stripPass(vec2 p) {
   float row = min(63.0, floor(p.y * 64.0));
   float shift = (0.005 * sin(row * 0.24 + uTime * 1.7) + 0.002 * sin(row * 0.71 - uTime * 2.3)) * uMotion;
   vec4 c = sampleScene(vec2(0.008 + shift + p.x * 0.984, p.y));
-  vec3 rgb = c.rgb / max(c.a, 0.0001);
+  mediump vec3 rgb = c.rgb / max(c.a, 0.0001);
   rgb = mix(rgb, setLum(palette(floor(p.y * 18.0) * 7.0), lum(rgb)), 0.32);
   return vec4(rgb * c.a, c.a);
 }
@@ -58,7 +58,7 @@ void main() {
   vec2 p = vTextureCoord * uInputSize.xy / uSceneSize;
   if (uGlitch < 0.5) {
     vec4 c = texture(uTexture, vTextureCoord);
-    vec3 rgb = c.rgb / max(c.a, 0.0001);
+    mediump vec3 rgb = c.rgb / max(c.a, 0.0001);
     finalColor = vec4(mix(rgb, overlay(rgb, rgb), 0.55) * c.a, c.a);
     return;
   }
@@ -70,7 +70,7 @@ void main() {
       if (p.x - shift >= 0.0 && p.x - shift <= 1.0) c = mix(c, stripPass(vec2(p.x - shift, p.y)), 0.35);
     }
   }
-  vec3 rgb = c.rgb / max(c.a, 0.0001);
+  mediump vec3 rgb = c.rgb / max(c.a, 0.0001);
   if (mod(floor(p.y * uLogicalSize.y), 4.0) < 1.0) rgb = mix(rgb, overlay(rgb, vec3(7.0, 0.0, 21.0) / 255.0), 0.09);
   for (int j = 0; j < 24; ++j) {
     float b = float(j);

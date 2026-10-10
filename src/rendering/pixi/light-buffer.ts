@@ -62,8 +62,9 @@ vec3 decodeNormal(vec2 encoded) {
   if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * mix(vec2(-1.0), vec2(1.0), step(vec2(0.0), n.xy));
   return safeNormal(n);
 }
-void addLight(vec3 normal, vec3 direction, vec3 light, vec3 albedo, vec3 surface,
-              inout vec3 diffuse, inout vec3 specular) {
+// GGX denominators stay highp: roughness 0.08 produces values below mediump range.
+void addLight(vec3 normal, vec3 direction, mediump vec3 light, mediump vec3 albedo, mediump vec3 surface,
+              inout mediump vec3 diffuse, inout mediump vec3 specular) {
   float ndl = max(dot(normal, direction), 0.0);
   float ndv = max(normal.z, 0.0);
   if (ndl <= 0.0 || ndv <= 0.0) return;
@@ -78,8 +79,8 @@ void addLight(vec3 normal, vec3 direction, vec3 light, vec3 albedo, vec3 surface
   float k = (roughness + 1.0) * (roughness + 1.0) / 8.0;
   float geometryL = ndl / (ndl * (1.0 - k) + k);
   float geometryV = ndv / (ndv * (1.0 - k) + k);
-  vec3 f0 = mix(vec3(0.04), albedo, metallic);
-  vec3 fresnel = f0 + (1.0 - f0) * pow(1.0 - vdh, 5.0);
+  mediump vec3 f0 = mix(vec3(0.04), albedo, metallic);
+  mediump vec3 fresnel = f0 + (1.0 - f0) * pow(1.0 - vdh, 5.0);
   diffuse += light * (1.0 - metallic) * (1.0 - fresnel) * ndl;
   specular += light * distribution * geometryL * geometryV * fresnel
     / max(4.0 * ndl * ndv, 0.000001) * ndl * 3.14159265;
@@ -87,23 +88,23 @@ void addLight(vec3 normal, vec3 direction, vec3 light, vec3 albedo, vec3 surface
 void main() {
   vec4 geometry = texture(uG0, vUV);
   vec4 surface = texture(uG1, vUV);
-  vec3 albedo = texture(uG2, vUV).rgb;
+  mediump vec3 albedo = texture(uG2, vUV).rgb;
   if (geometry.a <= 0.0 || surface.a <= 0.0 || uFrame.w <= 0.0) {
     diffuseTarget = vec4(1.0); specularTarget = vec4(0.0,0.0,0.0,1.0); return;
   }
   vec3 normal = decodeNormal(geometry.xy);
   // Canonical zero depth is byte 128, avoiding a half-step offset for flat artwork.
   float depth = (geometry.z - 128.0 / 255.0) * (2.0 * uFrame.z);
-  vec3 diffuse = uAmbient * surface.b * (1.0 - surface.g);
+  mediump vec3 diffuse = uAmbient * surface.b * (1.0 - surface.g);
   // Existing ambient metal energy is retained as an albedo-tinted specular approximation.
-  vec3 specular = albedo * uAmbient * surface.b * surface.g;
+  mediump vec3 specular = albedo * uAmbient * surface.b * surface.g;
   addLight(normal, safeNormal(uDirection), uDirectional, albedo, surface.rgb, diffuse, specular);
   vec2 position = vUV * uFrame.xy;
   for (int i = 0; i < 16; ++i) {
     if (float(i) >= uCount) break;
     vec3 offset = vec3(uPointPosition[i].xy - position, uPointPosition[i].z + depth);
     float falloff = max(0.0, 1.0 - length(offset.xy) / max(uPointPosition[i].w, 0.001));
-    float strength = falloff * falloff * uPointColor[i].a;
+    mediump float strength = falloff * falloff * uPointColor[i].a;
     if (strength > 0.0)
       addLight(normal, safeNormal(offset), uPointColor[i].rgb * strength, albedo, surface.rgb, diffuse, specular);
   }
@@ -153,7 +154,7 @@ in vec2 aPosition; in vec2 aUV; out vec2 vUV;
 void main() { vUV=aUV; gl_Position=vec4(aPosition.x*2.0-1.0,1.0-aPosition.y*2.0,0.0,1.0); }`,
       fragment: `#version 300 es
 precision highp float; in vec2 vUV; uniform sampler2D uBuffer; out vec4 finalColor;
-void main() { vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=vec4(radiance/(vec3(1.0)+radiance),1.0); }`,
+void main() { mediump vec3 radiance=max(texture(uBuffer,vUV).rgb,vec3(0.0)); finalColor=vec4(radiance/(vec3(1.0)+radiance),1.0); }`,
       name: 'issen-light-debug',
     },
     resources: { uBuffer: Texture.EMPTY.source },
