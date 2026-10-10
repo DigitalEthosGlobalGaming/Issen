@@ -1,6 +1,16 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.7)
+## Active goal — Graphics menu and renderer optimizations (1.70.8)
+
+Memory integration foundation: the shared decoded-image loader now accepts live
+budget changes. It cancels speculative leases, evicts unused sources in LRU order,
+preserves pinned artwork and lets already-admitted required decodes finish after
+a reduction. Temporary pinned overages are reclaimed when pins release; later
+requests still obey the lower budget. Focused loader units22 PASS (three new live
+budget cases); strict TypeScript PASS. Initial sandbox test-worker spawn EPERM was
+resolved by the authorized rerun. Graphics Memory control and worker/main policy
+wiring remain pending; this does not claim the stored setting controls budgets.
+No full suites or performance captures. Versions/changelog1.70.8.
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.

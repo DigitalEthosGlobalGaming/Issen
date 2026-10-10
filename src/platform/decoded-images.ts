@@ -13,6 +13,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
 }) {
   if (!Number.isFinite(options.budget) || options.budget <= 0)
     throw RangeError('Invalid decoded image budget');
+  let budget = options.budget;
   const concurrency = options.concurrency ?? 1;
   if (
     !Number.isInteger(concurrency) ||
@@ -59,6 +60,11 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
       const count = pins.get(url) ?? 0;
       if (count <= 1) pins.delete(url);
       else pins.set(url, count - 1);
+      if (bytes + reservedBytes > budget) {
+        const before = bytes;
+        makeRoom(0);
+        if (before !== bytes) options.onMemoryChange?.();
+      }
     };
   }
   function cancelPreloads() {
@@ -74,10 +80,10 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     for (const entry of [...entries.values()]
       .filter((entry) => entry.resource && !pins.has(entry.url))
       .sort((a, b) => a.touched - b.touched)) {
-      if (bytes + reservedBytes + size <= options.budget) break;
+      if (bytes + reservedBytes + size <= budget) break;
       evict(entry);
     }
-    return bytes + reservedBytes + size <= options.budget;
+    return bytes + reservedBytes + size <= budget;
   }
   async function pump() {
     if (running >= concurrency || disposed) return;
@@ -94,6 +100,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           .sort((a, b) => rank[a.priority] - rank[b.priority] || a.queued - b.queued)[0];
         if (!entry) break;
         let reservation = 0;
+        let admittedBudget = budget;
         const unreserve = () => {
           reservedBytes = Math.max(0, reservedBytes - reservation);
           entry.reservedBytes = 0;
@@ -105,15 +112,10 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
             throw Error(`Unknown decoded image size: ${entry.url}`);
           // Another pending decode can own the last free bytes. Wait for that
           // slot rather than failing a request which fits after it settles.
-          if (
-            expected <= options.budget &&
-            expected > 0 &&
-            !makeRoom(expected) &&
-            reservedBytes > 0
-          )
-            break;
-          if (expected > options.budget || (expected > 0 && !makeRoom(expected)))
+          if (expected <= budget && expected > 0 && !makeRoom(expected) && reservedBytes > 0) break;
+          if (expected > budget || (expected > 0 && !makeRoom(expected)))
             throw Error(`Decoded image budget exhausted: ${entry.url}`);
+          admittedBudget = budget;
           reservation = expected;
           reservedBytes += reservation;
           entry.reservedBytes = reservation;
@@ -125,14 +127,18 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
           const resource = await pending;
           unreserve();
           const size = resource.width * resource.height * 4;
+          // A lower live budget cannot revoke required pixels already admitted
+          // for a pinned consumer. Reclaim them when that consumer releases.
+          const retainedAdmission =
+            budget < admittedBudget && entry.priority === 'now' && pins.has(entry.url);
           if (
             disposed ||
             entry.controller.signal.aborted ||
             !Number.isFinite(size) ||
             size <= 0 ||
             (expected && expected !== size) ||
-            size > options.budget ||
-            !makeRoom(size)
+            (!retainedAdmission && size > budget) ||
+            (!makeRoom(size) && !retainedAdmission)
           ) {
             resource.close();
             throw Error(
@@ -207,6 +213,16 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
     return entry.promise;
   }
   return {
+    /** Lowering a budget retires unused pixels, never the current frame's inputs. */
+    setBudget(next: number) {
+      if (!Number.isFinite(next) || next <= 0) throw RangeError('Invalid decoded image budget');
+      if (disposed || next === budget) return;
+      budget = next;
+      cancelPreloads();
+      makeRoom(0);
+      options.onMemoryChange?.();
+      void pump();
+    },
     load: (url: string, priority: ImagePriority = 'now') => request(url, priority),
     /** Storage already accounted for by the pool, including active decodes. */
     bytesFor(urls: readonly string[]) {
@@ -250,7 +266,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         if (!size || !Number.isFinite(size) || size <= 0) return undefined;
         mandatory += size;
       }
-      if (mandatory > options.budget) return undefined;
+      if (mandatory > budget) return undefined;
       const unique = [...new Set(urls)],
         releases = unique.map(pin);
       let released = false;
@@ -297,7 +313,7 @@ export function createDecodedImageLoader<T extends DecodedResource>(options: {
         bytes: bytes + reservedBytes,
         reservedBytes,
         peakBytes,
-        budget: options.budget,
+        budget,
         evictions,
       };
     },

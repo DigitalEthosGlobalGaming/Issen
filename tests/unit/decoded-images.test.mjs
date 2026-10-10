@@ -10,6 +10,87 @@ const resource = (name, closed, width = 10) => ({
   },
 });
 
+test('live budgets evict unused images and preserve pinned pixels until release', async () => {
+  const closed = [];
+  const loader = createDecodedImageLoader({
+    budget: 1200,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: async (url) => resource(url, closed),
+  });
+  const releaseA = loader.pin('visible-a'),
+    releaseB = loader.pin('visible-b');
+  await loader.load('cached');
+  await loader.load('visible-a');
+  await loader.load('visible-b');
+  loader.setBudget(400);
+  assert.equal(loader.snapshot().budget, 400);
+  assert.equal(loader.snapshot().bytes, 800);
+  assert.deepEqual(closed, ['cached']);
+  releaseA();
+  assert.equal(loader.snapshot().bytes, 400);
+  assert.deepEqual(closed, ['cached', 'visible-a']);
+  assert.equal(loader.snapshot().pinned, 1);
+  releaseB();
+  loader.setBudget(1200);
+  await loader.load('new');
+  assert.equal(loader.snapshot().bytes, 800);
+  for (const invalid of [0, -1, NaN, Infinity])
+    assert.throws(() => loader.setBudget(invalid), RangeError);
+  loader.dispose();
+});
+
+test('lowering a live budget lets an admitted required decode finish without admitting more', async () => {
+  const closed = [];
+  let finish;
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  const release = loader.pin('visible');
+  const pending = loader.load('visible');
+  loader.setBudget(200);
+  assert.equal(loader.snapshot().reservedBytes, 400);
+  finish(resource('visible', closed));
+  await pending;
+  assert.equal(loader.snapshot().bytes, 400);
+  assert.deepEqual(closed, []);
+  await assert.rejects(loader.load('unadmitted'), /budget exhausted/);
+  release();
+  assert.equal(loader.snapshot().bytes, 0);
+  assert.deepEqual(closed, ['visible']);
+  loader.dispose();
+});
+
+test('lowering a live budget cancels speculative pins and prevents late residency', async () => {
+  const closed = [];
+  let finish;
+  const loader = createDecodedImageLoader({
+    budget: 800,
+    expectedBytes: () => 400,
+    yield: turn,
+    decode: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  const preload = loader.prefetch(['next']);
+  assert.ok(preload);
+  loader.setBudget(200);
+  assert.equal(await preload.ready, false);
+  assert.equal(preload.active(), false);
+  finish(resource('next', closed));
+  await turn();
+  assert.equal(loader.snapshot().bytes, 0);
+  assert.deepEqual(closed, ['next']);
+  loader.dispose();
+});
+
 test('abandoned requests cancel after the last pin and retain reservation until decode settles', async () => {
   const closed = [];
   let finish;

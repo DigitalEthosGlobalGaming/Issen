@@ -5,6 +5,13 @@ the old quality/debris fields with a validated `graphics` record. Schema 1 audio
 bindings, accessibility and vibration preferences survive migration; unknown
 versions retain safe defaults. Runtime/adaptive values must never mutate saves.
 
+Memory integration is in progress. The shared decoded loader supports live budget
+changes, retires unpinned cache entries and cancels speculation. Pinned inputs and
+already-admitted required decodes survive a reduction; pinned overages become
+evictable when their owners release. Future admission uses the new budget. The
+Graphics Memory setting is still awaiting main/worker policy wiring and its menu
+control.
+
 `platform/graphics-settings.ts` owns preset records, validation, device
 recommendation and manual-choice transition to Custom. Auto selects Balanced for
 coarse-pointer touch devices or reported memory at most 4 GiB, and High otherwise.
