@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import type { SceneryDetail } from './scenery-detail.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -39,6 +40,7 @@ export function drawEmberCourtyard(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   function piece(
     g: SceneDrawing,
@@ -168,7 +170,12 @@ export function drawEmberCourtyard(
     alpha: 0.58,
     angle: 0.025,
   });
-  for (const [i, x] of (lowQuality ? [0.05, 0.92] : [0.05, 0.27, 0.87, 0.96]).entries()) {
+  for (const [i, x] of (lowQuality
+    ? [0.05, 0.92]
+    : sceneryDetail === 'normal'
+      ? [0.05, 0.27, 0.96]
+      : [0.05, 0.27, 0.87, 0.96]
+  ).entries()) {
     drawAtlasSprite(far, atlases.rocks!, i % 4, width * x, foot + height * 0.024, unit * 0.09, {
       alpha: 0.5,
       angle: i % 2 ? 0.04 : -0.04,

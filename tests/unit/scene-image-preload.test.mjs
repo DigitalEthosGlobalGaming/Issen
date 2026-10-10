@@ -142,6 +142,7 @@ test('scene image preloading requires a settled matching quiet scene and invalid
       { height: 800 },
       { dpr: 1 },
       { lowQuality: true },
+      { sceneryDetail: 'normal' },
       { stage: 3 },
       { stageSeed: 12 },
     ]) {

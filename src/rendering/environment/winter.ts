@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { createBackground } from '../scene/background.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite as sprite } from './scene-kit.ts';
@@ -14,6 +15,7 @@ export function drawWhiteSilencePass(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const { horizonY, groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
@@ -96,7 +98,7 @@ export function drawWhiteSilencePass(
   base.fill();
   base.strokeStyle = 'rgba(249,247,232,.18)';
   base.lineWidth = Math.max(1, unit * 0.002);
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < sceneryCount(lowQuality, sceneryDetail, 3, 4, 5, 5); i++) {
     const y = snowTop + (height - snowTop) * (0.13 + i * 0.17);
     base.beginPath();
     base.moveTo(width * (i % 2 ? 0.53 : -0.05), y);

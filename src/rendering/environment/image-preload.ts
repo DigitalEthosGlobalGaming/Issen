@@ -43,6 +43,7 @@ export function createSceneImagePreload(
       next.height !== active.height ||
       next.dpr !== active.dpr ||
       next.lowQuality !== active.lowQuality ||
+      next.sceneryDetail !== active.sceneryDetail ||
       !Number.isInteger(next.stage) ||
       next.stage < 0 ||
       next.stage > 8 ||

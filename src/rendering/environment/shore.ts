@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -38,6 +39,7 @@ export function drawBrokenShore(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const stage = STAGES[7]!,
     { horizonY, groundY } = createLayout(width, height),
@@ -60,7 +62,7 @@ export function drawBrokenShore(
       ocean.addColorStop(1, '#273639');
       g.fillStyle = ocean;
       g.fillRect(0, horizonY, width, height - horizonY);
-      const rows = lowQuality ? 18 : 34;
+      const rows = sceneryCount(lowQuality, sceneryDetail, 18, 26, 34);
       for (let i = 0; i < rows; i++) {
         const u = i / rows,
           y = horizonY + (groundY - horizonY + height * 0.09) * u * u;
@@ -100,7 +102,7 @@ export function drawBrokenShore(
     });
   }
   // Diagonal shore foam follows the local coast tangent, below readable enemy silhouettes.
-  const count = lowQuality ? 5 : 8;
+  const count = sceneryCount(lowQuality, sceneryDetail, 5, 6, 8);
   for (let i = 0; i < count; i++) {
     const x = ((i - 0.2) * width) / (count - 1),
       y = coastline(x, width, height);

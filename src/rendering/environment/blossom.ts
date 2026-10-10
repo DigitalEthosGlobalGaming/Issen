@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -62,6 +63,7 @@ export function drawFallingBlossomPath(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const stage = STAGES[2]!;
   const { horizonY, groundY, eH } = createLayout(width, height);
@@ -177,7 +179,11 @@ export function drawFallingBlossomPath(
     base.restore();
   }
   track.width = track.height = 0;
-  const orchard = lowQuality ? [0.29, 0.7, 0.92] : [0.23, 0.34, 0.62, 0.77, 0.95];
+  const orchard = lowQuality
+    ? [0.29, 0.7, 0.92]
+    : sceneryDetail === 'normal'
+      ? [0.23, 0.34, 0.62, 0.95]
+      : [0.23, 0.34, 0.62, 0.77, 0.95];
   for (const [i, x] of orchard.entries()) {
     sprite(
       distant,
@@ -233,7 +239,7 @@ export function drawFallingBlossomPath(
     { cell: 1, x: 0.42, foot: groundY + height * 0.045, size: 0.14, angle: -0.06 },
     { cell: 3, x: 0.91, foot: height * 0.97, size: 0.28, angle: 0.04 },
   ];
-  for (const patch of deposits.slice(0, lowQuality ? 2 : 4)) {
+  for (const patch of deposits.slice(0, sceneryCount(lowQuality, sceneryDetail, 2, 3, 4))) {
     sprite(
       base,
       atlases.petals,

@@ -88,6 +88,9 @@ export function createSettingsWiring(views: SettingsViews) {
     views.graphics,
     lifecycle,
     screenAnimation.invalidate,
+    () => {
+      if (views.artworkReady) prepareScene();
+    },
   );
   let previousAmbient = -1,
     previousWeather = -1;

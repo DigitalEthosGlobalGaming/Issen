@@ -4,6 +4,7 @@ import { graphicsDevice, particleDensity } from './graphics-settings.ts';
 import { createGraphicsQuality } from './graphics-quality.ts';
 import { createRefreshRateMonitor } from './refresh-rate.ts';
 import { createFrameMetrics } from './frame-metrics.ts';
+import { documentSceneryDetail } from '../rendering/environment/scenery-detail.ts';
 import { editionAccess, itemAccessible, type GameEdition } from './editions.ts';
 import { premium } from './purchases.ts';
 import { parseTesterPremium, testerPremiumActive } from './tester-premium.ts';
@@ -67,6 +68,7 @@ export function createRuntimePreferences({ lifecycle, storage, edition }: Runtim
     weatherDensity,
     graphics,
     frameMetrics,
+    sceneryDetail: () => documentSceneryDetail(document),
     frameRate,
     refreshRate,
     initialPurchaseCheck: true,

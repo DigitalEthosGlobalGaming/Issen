@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import type { SceneryDetail } from './scenery-detail.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
@@ -23,6 +24,7 @@ export function drawLastLightRidge(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const stage = STAGES[1]!;
   const { horizonY, groundY, eH, sunX } = createLayout(width, height);
@@ -177,7 +179,16 @@ export function drawLastLightRidge(
       unit * 0.075,
       0.42,
     );
-    sprite(distant, atlases.shrubs, 0, width * 0.14, hillBase + height * 0.01, unit * 0.055, 0.45);
+    if (sceneryDetail !== 'normal')
+      sprite(
+        distant,
+        atlases.shrubs,
+        0,
+        width * 0.14,
+        hillBase + height * 0.01,
+        unit * 0.055,
+        0.45,
+      );
   }
   // A small, static edge anchor; no right-hand vegetation closes the exposed valley.
   sprite(nearby, atlases.rocks, 2, -width * 0.008, height * 0.94, unit * 0.3, 0.73);

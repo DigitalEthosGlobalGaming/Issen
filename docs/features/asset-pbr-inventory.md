@@ -7,6 +7,12 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.70.7, scenery detail changes decorative density in all nine ordinary
+worker compositions; terrain and seeded landmarks remain. Normal is a distinct
+middle tier. Authored atlases and material coverage are unchanged. Native tier
+differences are verified; the strict High/legacy Broken Shore comparison still
+fails in its distant colour plane and is recorded in Graphics feature notes.
+
 As of1.70.5, Graphics Low/Medium procedural grass uses one lit composite draw,
 borrowing scenery light with scene ambient on uncovered sky. It does not write
 geometry or own material maps. High retains curved normals and the existing

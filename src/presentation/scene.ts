@@ -13,6 +13,7 @@ import type { GrassBlade } from '../rendering/scene/ambient.ts';
 import type { PostFrame } from '../rendering/effects/post-frame.ts';
 import type { Enemy } from '../game/combat/enemy.ts';
 import type { RunState } from '../game/run-state.ts';
+import { sceneryLowQuality, type SceneryDetail } from '../rendering/environment/scenery-detail.ts';
 
 export interface PresentationFrame {
   readonly cameraX: number;
@@ -39,6 +40,7 @@ export interface SceneViews {
   readonly reducedMotion: () => boolean;
   readonly reducedFlashes: () => boolean;
   readonly density: () => number;
+  readonly sceneryDetail?: () => SceneryDetail | undefined;
   readonly activeTrial: { realm?: string; seed: number } | null;
   readonly cinematic: { readonly active: boolean };
   readonly previewDemon: boolean;
@@ -134,7 +136,8 @@ export function createRuntimeScene(
               stage: G.stage,
               reducedMotion: reducedMotion(),
               reducedFlashes: reducedFlashes(),
-              lowQuality: density() <= 0.3,
+              lowQuality: sceneryLowQuality(views.sceneryDetail?.(), density() <= 0.3),
+              sceneryDetail: views.sceneryDetail?.(),
             }));
         cvs.dataset.renderer = 'ink';
         cvs.dataset.scene = String(
@@ -244,7 +247,8 @@ export function createRuntimeScene(
             stage: G.stage,
             reducedMotion: reducedMotion(),
             reducedFlashes: reducedFlashes(),
-            lowQuality: density() <= 0.3,
+            lowQuality: sceneryLowQuality(views.sceneryDetail?.(), density() <= 0.3),
+            sceneryDetail: views.sceneryDetail?.(),
           });
         blades(fg, time, !demonRealm && inkEnvironment && G.stage === 5, demonRealm);
       },

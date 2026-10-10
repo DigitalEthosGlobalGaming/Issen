@@ -84,7 +84,7 @@ export function createOptions(
     if (custom) custom.disabled = false;
     if (preset) preset.value = 'custom';
   }
-  function graphicSelect<K extends 'lighting' | 'particles' | 'weather' | 'grass'>(
+  function graphicSelect<K extends 'lighting' | 'particles' | 'weather' | 'grass' | 'scenery'>(
     key: K,
     label: string,
     choices: [string, GraphicsSettings[K]][],
@@ -435,6 +435,11 @@ export function createOptions(
       graphicSelect('grass', 'Grass', [
         ['Low', 'low'],
         ['Medium', 'medium'],
+        ['High', 'high'],
+      ]);
+      graphicSelect('scenery', 'Scenery detail', [
+        ['Low', 'low'],
+        ['Normal', 'normal'],
         ['High', 'high'],
       ]);
       const adaptiveRow = node('div', '', 'option-row'),

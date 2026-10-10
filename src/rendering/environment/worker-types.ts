@@ -65,17 +65,19 @@ export type ComposeResponse = {
 };
 export type CompositionIdentity = Pick<
   EnvironmentFrame,
-  'width' | 'height' | 'dpr' | 'stage' | 'stageSeed' | 'lowQuality'
+  'width' | 'height' | 'dpr' | 'stage' | 'stageSeed' | 'lowQuality' | 'sceneryDetail'
 >;
 export function compositionKey(frame: CompositionIdentity) {
-  return JSON.stringify([
+  const identity: (number | boolean | string)[] = [
     frame.width,
     frame.height,
     frame.dpr,
     frame.stage,
     frame.stageSeed ?? 0,
     frame.lowQuality,
-  ]);
+  ];
+  if (frame.sceneryDetail) identity.push(frame.sceneryDetail);
+  return JSON.stringify(identity);
 }
 export function closeLayers(layers: readonly ComposedLayer[]) {
   for (const layer of layers)

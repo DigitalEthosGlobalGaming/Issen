@@ -100,6 +100,28 @@ test('prediction reuses immutable identities and invalidates every composition i
   f.views.G.state = 'between';
   assert.notEqual(f.predict(), previous);
 });
+test('changing scenery detail invalidates the forecast without advancing seeds or tying it to reduced motion', () => {
+  const f = fixture();
+  let detail = 'high';
+  f.views.sceneryDetail = () => detail;
+  f.views.density = () => 0.3;
+  const high = f.predict();
+  assert.equal(high.lowQuality, false);
+  const visits = f.visits.visits,
+    seed = f.visits.seed;
+  detail = 'normal';
+  const normal = f.predict();
+  detail = 'low';
+  const low = f.predict();
+  assert.equal(normal.lowQuality, false);
+  assert.equal(low.lowQuality, true);
+  assert.notEqual(compositionKey(normal), compositionKey(high));
+  assert.notEqual(compositionKey(low), compositionKey(normal));
+  assert.equal(low.stageSeed, high.stageSeed);
+  assert.equal(f.visits.visits, visits);
+  assert.equal(f.visits.seed, seed);
+});
+
 test('unknown choices, fixed trials, inactive and invalid geometry have no next scene', () => {
   const f = fixture();
   for (const trial of TRIALS) {

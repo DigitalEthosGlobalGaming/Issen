@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { drawAtlasSprite } from './scene-kit.ts';
 import { createLayout } from '../layout.ts';
 
@@ -15,11 +16,13 @@ export function drawFieldMidground(
   width: number,
   height: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const { groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
   const baseline = groundY - eH * 0.33;
-  const count = Math.ceil(width / (unit * (lowQuality ? 0.58 : 0.42))) + 1;
+  const count =
+    Math.ceil(width / (unit * sceneryCount(lowQuality, sceneryDetail, 0.58, 0.5, 0.42))) + 1;
   function sprite(
     image: HTMLImageElement,
     cell: number,

@@ -58,7 +58,25 @@ the HUD's lives, with change-only text writes and no per-frame formatting.
 Its manual toggle becomes Custom and persists. The showcase and cosmetic preview
 animation still remain pending.
 
-Scenery, memory and anti-aliasing preset fields remain storage
+Scenery detail changes decorative populations in all nine ordinary scenes:
+meadow patches/treelines, ridge shrubs, blossom trees/petal deposits, hollow
+shrubs, bamboo depths, snow strokes, courtyard shrubs, shore waves/foam, and
+Moonwatch mist. Terrain, combat space and seeded landmarks remain. An explicit
+detail is included in composition identity, prediction and live drawing; absent
+detail retains legacy caller keys. Detail is independent of reduced motion.
+Resolution and scenery changes share a 300 ms debounce, with the applied choice
+read consistently during preparation and presentation. Scenery-only changes do
+not resize the viewport. Next-scene leases invalidate on detail mismatch.
+
+The native comparison shows distinct tiers in all nine scenes and exact legacy
+High output in eight. Broken Shore has an unresolved strict equality failure:
+460 displayed channels differ, maximum 28, isolated to its worker distant colour
+plane; all eleven other plane hashes match. This is not classified as harmless
+rounding. The assertion remains strict for the final failure pass. Existing
+output retention is used; guaranteed previous-frame retention under memory
+pressure and viewport resize remains pending.
+
+Memory and anti-aliasing preset fields remain storage
 contracts; their integrations/individual controls are still pending. Grass density
 and its selector are connected. Low and Medium use a single instanced composite
 draw with shared scenery lighting and scene ambient on uncovered sky, without
@@ -69,7 +87,7 @@ measurements. MSAA usefulness has not yet been assessed.
 
 Remaining work:
 
-- MSAA visual assessment before exposing or dropping its control; compose detail,
+- MSAA visual assessment before exposing or dropping its control;
   memory policies.
 - Portrait sheet/landscape panel, visible undimmed frozen-run or title showcase,
   cosmetic preview animation, measured impact labels, remaining heavy-change

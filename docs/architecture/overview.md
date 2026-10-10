@@ -36,6 +36,10 @@ and catalogue leaves retain layer positions while computing visual motion on GPU
 Graphics Low/Medium grass uses one composite draw borrowing scenery light and
 scene ambient, with no geometry writes; High retains its curved-normal geometry
 pass. Both paths use the same retained blades, motion and density selection.
+Scenery detail is a separate applied composition input, carried through runtime
+preparation, prediction, worker identity and live drawing. Stage builders vary
+decorative populations while keeping terrain and seeded landmarks; resolution
+and scenery rebuild requests share the Graphics heavy-choice debounce.
 
 Presentation light-sources.ts owns registration and the deterministic global
 16-light budget. Runtime presentation connects existing persistent visual lights

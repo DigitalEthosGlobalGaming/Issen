@@ -98,7 +98,8 @@ export function createRuntimeSceneCoordination(
             width: foundation.view.geometry.W,
             height: foundation.view.geometry.H,
             dpr: foundation.view.geometry.DPR,
-            lowQuality: foundation.browser.density() <= 0.3,
+            lowQuality: foundation.browser.sceneryDetail() === 'low',
+            sceneryDetail: foundation.browser.sceneryDetail(),
           }
         : undefined,
     () => {
@@ -180,6 +181,7 @@ export function createRuntimeSceneCoordination(
           reducedMotion: foundation.browser.reducedMotion,
           reducedFlashes: foundation.browser.reducedFlashes,
           density: foundation.browser.density,
+          sceneryDetail: foundation.browser.sceneryDetail,
           activeTrial: foundation.run.activity.activeTrial,
           environmentState: presentation.environmentState,
           compositionKey,

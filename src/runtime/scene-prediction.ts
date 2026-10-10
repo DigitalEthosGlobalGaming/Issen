@@ -1,8 +1,11 @@
 import { predictNextStage } from '../game/session/stage-progression.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { CompositionIdentity } from '../rendering/environment/worker-types.ts';
+import { sceneryLowQuality, type SceneryDetail } from '../rendering/environment/scenery-detail.ts';
 
-export type UpcomingScene = Readonly<Required<CompositionIdentity>>;
+export type UpcomingScene = Readonly<
+  Required<Omit<CompositionIdentity, 'sceneryDetail'>> & Pick<CompositionIdentity, 'sceneryDetail'>
+>;
 interface PredictionViews {
   readonly G: Pick<RunState, 'state' | 'wave' | 'stage' | 'rush'>;
   readonly activeTrial: unknown;
@@ -13,6 +16,7 @@ interface PredictionViews {
   readonly DPR: number;
   density(): number;
   preload?(): boolean;
+  sceneryDetail?(): SceneryDetail | undefined;
 }
 
 /** Forecast the actual visit ledger without entering it or spending combat randomness. */
@@ -39,16 +43,26 @@ export function createScenePrediction(readViews: () => PredictionViews) {
       return undefined;
     }
     const stageSeed = views.stageVisits.peek(stage),
-      lowQuality = views.density() <= 0.3;
+      sceneryDetail = views.sceneryDetail?.(),
+      lowQuality = sceneryLowQuality(sceneryDetail, views.density() <= 0.3);
     if (
       cached?.stage === stage &&
       cached.stageSeed === stageSeed &&
       cached.width === width &&
       cached.height === height &&
       cached.dpr === dpr &&
-      cached.lowQuality === lowQuality
+      cached.lowQuality === lowQuality &&
+      cached.sceneryDetail === sceneryDetail
     )
       return cached;
-    return (cached = Object.freeze({ stage, stageSeed, width, height, dpr, lowQuality }));
+    return (cached = Object.freeze({
+      stage,
+      stageSeed,
+      width,
+      height,
+      dpr,
+      lowQuality,
+      sceneryDetail,
+    }));
   };
 }

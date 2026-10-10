@@ -1,12 +1,14 @@
 import type { createGraphicsQuality } from '../../platform/graphics-quality.ts';
 import type { createLifecycle } from '../../platform/lifecycle.ts';
+import type { SceneryDetail } from '../../rendering/environment/scenery-detail.ts';
 
-/** Apply cheap choices immediately; coalesce changes that rebuild the viewport. */
+/** Apply cheap choices immediately; coalesce viewport and scenery rebuilds. */
 export function createGraphicsApplication(
   canvas: HTMLCanvasElement,
   graphics: ReturnType<typeof createGraphicsQuality>,
   lifecycle: ReturnType<typeof createLifecycle>,
   invalidate: () => void,
+  prepareScene: () => void,
 ) {
   const doc = canvas.ownerDocument,
     win = doc.defaultView!,
@@ -14,14 +16,21 @@ export function createGraphicsApplication(
   let requested = NaN,
     applied = Number(data.graphicsResolution ?? 100),
     timer = 0;
+  let requestedScenery: SceneryDetail | undefined,
+    appliedScenery = data.graphicsScenery as SceneryDetail | undefined;
   function applying(value: boolean) {
     data.graphicsApplying = String(value);
   }
-  function commitResolution() {
+  function commitHeavyChoices() {
     timer = 0;
+    const resized = applied !== requested,
+      sceneryChanged = appliedScenery !== requestedScenery;
     applied = requested;
+    appliedScenery = requestedScenery;
     data.graphicsResolution = String(applied);
-    win.dispatchEvent(new Event('issen:graphics-resolution'));
+    data.graphicsScenery = appliedScenery!;
+    if (resized) win.dispatchEvent(new Event('issen:graphics-resolution'));
+    if (sceneryChanged) prepareScene();
     invalidate();
     if (canvas.dataset.sceneState !== 'loading') applying(false);
   }
@@ -43,15 +52,16 @@ export function createGraphicsApplication(
       data.graphicsReductions = [
         ...new Set(graphics.reductions.map((reduction) => reduction.key)),
       ].join(',');
-      if (requested !== state.resolution) {
+      if (requested !== state.resolution || requestedScenery !== state.scenery) {
         requested = state.resolution;
+        requestedScenery = state.scenery;
         lifecycle.clearTimeout(timer);
         timer = 0;
-        if (requested === applied) applying(false);
-        else if (immediate) commitResolution();
+        if (requested === applied && requestedScenery === appliedScenery) applying(false);
+        else if (immediate) commitHeavyChoices();
         else {
           applying(true);
-          timer = lifecycle.timeout(commitResolution, 300);
+          timer = lifecycle.timeout(commitHeavyChoices, 300);
         }
       }
       invalidate();

@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -15,6 +16,7 @@ export function drawHollowBambooRoad(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const stage = STAGES[4]!;
   const { horizonY, groundY, eH } = createLayout(width, height);
@@ -52,7 +54,7 @@ export function drawHollowBambooRoad(
   base.fillRect(0, 0, width, groundY);
   for (const side of [0, 1]) {
     const sign = side === 0 ? 1 : -1;
-    for (let i = (lowQuality ? 3 : 5) - 1; i >= 0; i--) {
+    for (let i = sceneryCount(lowQuality, sceneryDetail, 3, 4, 5) - 1; i >= 0; i--) {
       const x = side === 0 ? width * (0.06 + i * 0.055) : width * (0.94 - i * 0.05);
       drawAtlasSprite(
         far,

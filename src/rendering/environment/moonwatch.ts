@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { createBackground } from '../scene/background.ts';
 import { createLayout } from '../layout.ts';
 import { drawAtlasSprite as sprite } from './scene-kit.ts';
@@ -14,6 +15,7 @@ export function drawMoonwatchClearing(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const { horizonY, groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
@@ -64,7 +66,7 @@ export function drawMoonwatchClearing(
       fadeTo: 0.95,
     });
   // Low separate mist stays below the landmark opening and leaves the moon's sky clear.
-  for (let i = 0; i < (lowQuality ? 2 : 3); i++)
+  for (let i = 0; i < sceneryCount(lowQuality, sceneryDetail, 1, 2, 3, 2); i++)
     sprite(
       far,
       atlases.fogWisps!,

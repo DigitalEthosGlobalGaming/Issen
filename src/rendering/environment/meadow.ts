@@ -1,4 +1,5 @@
 import type { SceneDrawing } from '../scene-drawing.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import { drawCachedImage } from '../cached-materials.ts';
 import { createLayout } from '../layout.ts';
 import type { EnvironmentFrame } from './index.ts';
@@ -40,11 +41,13 @@ export function drawMeadowTransition(
   width: number,
   height: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const { groundY, eH } = createLayout(width, height);
   const unit = Math.min(height, width * 1.3);
   const start = groundY - eH * 0.18;
-  const count = Math.ceil(width / (unit * (lowQuality ? 0.34 : 0.24))) + 1;
+  const count =
+    Math.ceil(width / (unit * sceneryCount(lowQuality, sceneryDetail, 0.34, 0.28, 0.24))) + 1;
   for (let i = 0; i < count; i++) {
     const v = ((i * 53 + 23) % 101) / 101;
     const x = (width * (i + 0.3 + Math.sin(i * 2.7) * 0.17)) / count;

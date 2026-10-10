@@ -1,5 +1,6 @@
 import { drawCachedImage, clearCachedMaterial } from '../cached-materials.ts';
 import type { SceneDrawing } from '../scene-drawing.ts';
+import type { SceneryDetail } from './scenery-detail.ts';
 import { STAGES } from '../../game/content/stages.ts';
 import { createLayout } from '../layout.ts';
 import { createBackground } from '../scene/background.ts';
@@ -45,6 +46,7 @@ export function drawRainwaterHollow(
   height: number,
   scale: number,
   lowQuality: boolean,
+  sceneryDetail?: SceneryDetail,
 ) {
   const stage = STAGES[3]!,
     { horizonY, groundY, eH } = createLayout(width, height);
@@ -88,7 +90,7 @@ export function drawRainwaterHollow(
       unit * (0.13 + (i % 3) * 0.018),
       { alpha: 0.22, anchorY: 0.94, fadeFrom: 0.61 },
     );
-    if (!lowQuality)
+    if (!lowQuality && (sceneryDetail !== 'normal' || i % 2 === 0))
       stamp(far, atlases.shrubs!, i % 4, x + unit * 0.035, bankY + height * 0.017, unit * 0.1, {
         alpha: 0.22,
         fadeFrom: 0.6,

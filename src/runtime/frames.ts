@@ -99,6 +99,7 @@ export function createRuntimeFrames(
                 effectQuality: foundation.view.effectQuality,
                 graphicsFrameRate: foundation.browser.graphicsFrameRate,
                 frameMetrics: foundation.browser.frameMetrics,
+                sceneryDetail: foundation.browser.sceneryDetail,
                 preload: () => foundation.browser.graphics.effective.preload,
                 ambient: presentation.ambient,
                 rebalanceWeather: presentation.rebalanceWeather,

@@ -1,6 +1,6 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.6)
+## Active goal — Graphics menu and renderer optimizations (1.70.7)
 
 New approved task has Part A Graphics/settings/live-preview/adaptive quality and
 Part B dirty passes, filter baking, shader preparation, allocations and precision.
@@ -113,7 +113,25 @@ Earlier visual command was interrupted and its process confirmed absent before
 retry; no successful result claimed for that attempt. Package/lock/title/notes
 1.70.6. No broad suite or performance profile run.
 
-Next: scenery detail and memory policies;
+Eighth chunk: Scenery detail selector changes decorative composition populations
+in all9 ordinary scenes. Terrain/seeded landmarks remain; High retains authored
+counts. Detail travels through worker keys, runtime preparation, drawing and
+forecasting, independently of motion accessibility. Absent detail preserves
+legacy caller keys/counts. Next-scene leases reject mismatched detail. Resolution
+and scenery share300ms debounce; scenery-only rebuild keeps viewport size.
+StrictTS PASS; focused prediction/preload/landmark/helper units16 unique PASS.
+Debounce/persistence/paused-checkpoint browser case PASS8.2s. Native all9 tiers
+are distinct;8 High/legacy comparisons are exact. Strict stage7 High equality
+FAIL:460 displayed channels/max28, isolated to distant colour plane; all11 other
+worker-plane hashes match. No assertion weakened and no harmless-rounding claim.
+Evidence `tmp/test-results/browser/graphics-scenery-plane-check/` contains plane
+hashes and all9 Normal captures. After magnitude and plane-isolation checks,
+recorded/reassessed instead of speculative renderer fixes. Retain this failure
+for final batch; guarantee of previous-frame retention under pressure remains
+pending. Final fixture gallery removes privacy text for clearer future captures;
+its capture-only layout edit has not been rerun. Package/lock/title/notes1.70.7.
+
+Next: memory policies;
 then MSAA assessment and live preview/metrics/impact labels. All Part B remains.
 Full objective and
 remaining checklist are summarized in `docs/features/graphics-settings.md`.

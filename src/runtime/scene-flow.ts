@@ -2,6 +2,7 @@ import { markScenePhase, measureScenePhase } from '../platform/scene-timing.ts';
 import type { RunState } from '../game/run-state.ts';
 import type { TrialDefinition } from '../game/content/trials.ts';
 import { STAGES } from '../game/content/stages.ts';
+import { sceneryLowQuality, type SceneryDetail } from '../rendering/environment/scenery-detail.ts';
 
 export interface ScenePreparationFrame {
   stageSeed: number;
@@ -13,6 +14,7 @@ export interface ScenePreparationFrame {
   reducedMotion: boolean;
   reducedFlashes: boolean;
   lowQuality: boolean;
+  sceneryDetail?: SceneryDetail;
 }
 export interface SceneFlowViews {
   readonly stageSeed: number;
@@ -25,6 +27,7 @@ export interface SceneFlowViews {
   readonly reducedMotion: () => boolean;
   readonly reducedFlashes: () => boolean;
   readonly density: () => number;
+  readonly sceneryDetail?: () => SceneryDetail | undefined;
   readonly activeTrial: TrialDefinition | null;
   readonly environmentState: { readonly previewDemon: boolean };
   readonly compositionKey: (frame: ScenePreparationFrame) => string;
@@ -110,7 +113,8 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       stage: G.stage,
       reducedMotion: reducedMotion(),
       reducedFlashes: reducedFlashes(),
-      lowQuality: density() <= 0.3,
+      lowQuality: sceneryLowQuality(views.sceneryDetail?.(), density() <= 0.3),
+      sceneryDetail: views.sceneryDetail?.(),
     };
     const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
     const key = `${demon}:${compositionKey(frame)}${views.figureIdentity ? ':' + views.figureIdentity : ''}`;

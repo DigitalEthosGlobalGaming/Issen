@@ -4,6 +4,7 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { createMainImageOwner } from '../../platform/main-images.ts';
 import { markScenePhase, measureScenePhase } from '../../platform/scene-timing.ts';
 import { compositionKey } from './worker-types.ts';
+import { sceneryCount, type SceneryDetail } from './scenery-detail.ts';
 import {
   environmentAssetUrls as ASSET_URLS,
   sceneAssetIndices as sceneAssets,
@@ -50,6 +51,7 @@ export interface EnvironmentFrame {
   reducedMotion: boolean;
   reducedFlashes: boolean;
   lowQuality: boolean;
+  sceneryDetail?: SceneryDetail;
 }
 
 /** Instance-owned image loading and caches; safe for independent previews. */
@@ -311,6 +313,7 @@ export function createLocalEnvironmentRenderer(
         h,
         scale,
         frame.lowQuality,
+        frame.sceneryDetail,
       );
       return finish();
     }
@@ -331,6 +334,7 @@ export function createLocalEnvironmentRenderer(
         h,
         scale,
         frame.lowQuality,
+        frame.sceneryDetail,
       );
       return finish();
     }
@@ -378,6 +382,7 @@ export function createLocalEnvironmentRenderer(
         h,
         scale,
         frame.lowQuality,
+        frame.sceneryDetail,
       );
       return finish();
     }
@@ -403,7 +408,16 @@ export function createLocalEnvironmentRenderer(
       clearCachedMaterial(field);
       field.width = field.height = 0;
     }
-    if (openField) drawMeadowTransition(ctx, images[7]!, images[8]!, w, h, frame.lowQuality);
+    if (openField)
+      drawMeadowTransition(
+        ctx,
+        images[7]!,
+        images[8]!,
+        w,
+        h,
+        frame.lowQuality,
+        frame.sceneryDetail,
+      );
     if (openField) drawForegroundBoulders(ctx, images[10]!, w, h);
     const bamboo = images[0]!,
       rocks = images[1]!,
@@ -415,15 +429,20 @@ export function createLocalEnvironmentRenderer(
         w,
         h,
         frame.lowQuality,
+        frame.sceneryDetail,
       );
     }
     // Scale the treeline population with the world width, not a fixed screen image.
     const unit = Math.min(h, w * 1.3);
     const count = openField
-      ? Math.round((Math.ceil(w / (unit * (frame.lowQuality ? 0.55 : 0.4))) + 1) * 1.5)
-      : frame.lowQuality
-        ? 7
-        : 13;
+      ? Math.round(
+          (Math.ceil(
+            w / (unit * sceneryCount(frame.lowQuality, frame.sceneryDetail, 0.55, 0.48, 0.4)),
+          ) +
+            1) *
+            1.5,
+        )
+      : sceneryCount(frame.lowQuality, frame.sceneryDetail, 7, 10, 13);
     for (let i = 0; i < count; i++) {
       const variation = ((i * 37 + 11) % 101) / 101;
       const x = ((i + 0.25 + (openField ? Math.sin(i * 2.7) * 0.23 : 0)) / count) * w;
