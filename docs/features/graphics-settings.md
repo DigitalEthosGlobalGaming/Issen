@@ -1,5 +1,14 @@
 # Graphics settings
 
+Static filtered sprites, vectors and material stamps bake into retained Pixi
+cache textures after two unchanged submissions. Identity viewport coordinates
+preserve authored blur radii and lighting lookup positions. Content/pixel
+revision, transform, alpha, filter, viewport/context or material-light changes
+release the bake; dynamic grass/leaves remain live. Active admission is capped
+at min(32 MiB, resource budget/32) using colour/MSAA backing estimates. Cached
+textures participate in the ordinary GPU ledger and return to Pixi's texture
+pool when released. Geometry passes use original submissions, never baked colour.
+
 Geometry and lighting reuse retained ordered input snapshots. Lit material
 textures/revisions, uniforms, transforms, alpha, clip geometry and ordered
 submission removal invalidate geometry. High grass motion participates; Low

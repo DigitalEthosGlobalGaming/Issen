@@ -68,11 +68,16 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
   const matrix = new Matrix();
   let texturesBound = false;
   const geometryInputs = new ChangeTracker();
+  const compositeInputs = new ChangeTracker();
   let geometryRevision = 0;
+  let compositeRevision = 0;
   return {
     mesh,
     get geometryRevision() {
       return geometryRevision;
+    },
+    get compositeRevision() {
+      return compositeRevision;
     },
     programs: [geometryMaterial.shader.glProgram, shader.glProgram] as const,
     releaseLightTargets: compositeMaterial.releaseLightTargets,
@@ -112,6 +117,8 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
       if (released) {
         geometryInputs.clear();
         geometryRevision++;
+        compositeInputs.clear();
+        compositeRevision++;
       }
       if (!source) texturesBound = false;
     },
@@ -186,6 +193,14 @@ export function createMaterialMesh(sharedLights?: BindGroup) {
       geometryInputs.value(cutoff);
       geometryInputs.value(sprite.tint);
       if (geometryInputs.finish()) geometryRevision++;
+      compositeInputs.begin();
+      compositeInputs.value(geometryRevision);
+      compositeInputs.value(emissive.source);
+      compositeInputs.value(material.emissive?.revision);
+      compositeInputs.numbers(u.uEmissiveRect);
+      compositeInputs.numbers(u.uFog);
+      compositeInputs.value(u.uHasEmissive);
+      if (compositeInputs.finish()) compositeRevision++;
     },
     dispose(): void {
       mesh.destroy();

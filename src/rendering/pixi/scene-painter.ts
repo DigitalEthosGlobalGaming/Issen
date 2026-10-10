@@ -41,6 +41,8 @@ import { registerMaterialSink } from '../scene-material.ts';
 import type { SceneLighting, SceneTexture } from '../scene-frame.ts';
 import { createMaterialMesh } from './material.ts';
 import { ChangeTracker } from './change-tracker.ts';
+import { StaticFilterCache } from './static-filter-cache.ts';
+import { documentResourceBudget } from '../../platform/main-images.ts';
 import { ArtworkMaterials } from './artwork-materials.ts';
 import { createGrassMesh } from './grass-material.ts';
 import { createLeafMesh } from './leaf-material.ts';
@@ -129,6 +131,7 @@ type Slot = {
   leaf?: ReturnType<typeof createLeafMesh>;
   filterKey?: string;
   filters?: (BlurFilter | ColorMatrixFilter)[];
+  filterCache?: StaticFilterCache;
   image?: HTMLImageElement | HTMLCanvasElement;
   revision?: number;
   sx?: number;
@@ -207,6 +210,7 @@ export class PixiScenePainter implements SceneDrawing {
   private preparedLightingSlots = 0;
   private geometryDirty = true;
   private lightDirty = true;
+  private lightingGeneration = 0;
   private readonly geometryInputs = new ChangeTracker();
   private readonly lightInputs = new ChangeTracker();
   private readonly clipPaths = new WeakMap<Graphics, GraphicsPath>();
@@ -665,6 +669,7 @@ export class PixiScenePainter implements SceneDrawing {
       lightResolution: this.lightResolution,
     });
     this.lightDirty = false;
+    this.lightingGeneration++;
     this.canvas.dataset.lightBufferSize = `${this.lightBuffer.targets!.width}x${this.lightBuffer.targets!.height}`;
   }
 
@@ -703,6 +708,24 @@ export class PixiScenePainter implements SceneDrawing {
         if (slot.lookup) slot.lookup.update((slot.item as MeshSimple).texture);
       }
       this.preparedLightingSlots = this.cursor;
+      let filterAllowance = Math.min(
+        32 * 1024 * 1024,
+        documentResourceBudget(this.canvas.ownerDocument) / 32,
+      );
+      for (let i = 0; i < this.slots.length; i++) {
+        const slot = this.slots[i]!;
+        if (i >= this.cursor || !slot.filters?.length) slot.filterCache?.reset();
+        else if (slot.filterCache)
+          filterAllowance -= slot.filterCache.prepare(
+            this.canvas.width,
+            this.canvas.height,
+            slot.filterKey!,
+            slot.material ? this.lightingGeneration : -this.contextGeneration - 1,
+            slot.material?.compositeRevision ?? slot.revision ?? 0,
+            filterAllowance,
+            this.renderer.view.antialias,
+          );
+      }
       this.renderer.render({ container: this.root, clear: true });
     }
     this.canvas.dataset.lightingFrameView = view;
@@ -741,6 +764,8 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   private drawGeometry(): void {
+    // Cached colour must never substitute for a material's geometry outputs.
+    for (const slot of this.slots) if (slot.material) slot.filterCache?.release();
     // Generation changes must release borrowed guide sources before their owner destroys them.
     const targets = this.geometryBuffer.targets;
     if (targets && (targets.width !== this.canvas.width || targets.height !== this.canvas.height))
@@ -776,6 +801,14 @@ export class PixiScenePainter implements SceneDrawing {
             (slot.material ?? slot.grass)!.beginGeometry(this.geometryBuffer.targets!.depthRange),
           );
         else {
+          const cachedContainer = slot.filterCache?.container;
+          if (cachedContainer) {
+            const renderable = cachedContainer.renderable;
+            cachedContainer.renderable = false;
+            restore.push(() => {
+              cachedContainer.renderable = renderable;
+            });
+          }
           const renderable = slot.item.renderable;
           slot.item.renderable = false;
           restore.push(() => {
@@ -1054,6 +1087,7 @@ export class PixiScenePainter implements SceneDrawing {
       }
     }
     if (!slot || slot.kind !== kind) {
+      slot?.filterCache?.dispose();
       for (const filter of slot?.filters ?? []) filter.destroy();
       slot?.lookup?.dispose();
       if (slot?.leaf) slot.leaf.dispose();
@@ -1123,6 +1157,9 @@ export class PixiScenePainter implements SceneDrawing {
       slot.filterKey = this.filter;
       item.filters = slot.filters?.length ? slot.filters : null;
     }
+    if (slot.filters?.length && !slot.grass && !slot.leaf)
+      slot.filterCache ??= new StaticFilterCache(item);
+    const node = slot.filterCache?.container ?? item;
     item.alpha = this.globalAlpha;
     item.blendMode = this.blend();
     // World-space paths only need to clear a prior shadow offset. Other draw
@@ -1141,9 +1178,9 @@ export class PixiScenePainter implements SceneDrawing {
     }
     if (this.retainTree && parent === this.root) {
       const index = this.cursor - 1;
-      if (parent.children[index] !== item)
-        parent.addChildAt(item, Math.min(index, parent.children.length));
-    } else parent.addChild(item);
+      if (parent.children[index] !== node)
+        parent.addChildAt(node, Math.min(index, parent.children.length));
+    } else parent.addChild(node);
     return item;
   }
   private paint(
@@ -1690,6 +1727,7 @@ export class PixiScenePainter implements SceneDrawing {
       group.destroy();
     }
     for (const slot of this.slots) {
+      slot.filterCache?.dispose();
       slot.lookup?.dispose();
       if (slot.leaf) slot.leaf.dispose();
       else if (slot.grass) slot.grass.dispose();

@@ -1,6 +1,24 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.13)
+## Active goal — Graphics menu and renderer optimizations (1.70.14)
+
+B2 implemented: filtered sprites, vectors and material stamps use identity
+viewport-sized cache containers after consecutive unchanged submissions. Retained
+snapshots cover content, texture/pixel revisions, material fog/emissive uniforms,
+transform, alpha, filter, viewport/context and lighting generation. Geometry
+passes release material caches and hide neutral cached colour without discarding
+its bake; moving grass/leaves and non-normal
+blends stay live. Cache admission is capped at min(32 MiB, resource budget/32),
+including estimated colour/MSAA backing; native allocations remain in the existing
+GPU ledger. Unused/disabled caches release and reset their snapshots; disposal
+destroys wrappers. Pixi owns returned cache textures in its existing texture pool.
+Focused static-filter browser1 PASS: unchanged frames issue zero filter passes;
+mutation refreshes match uncached output within the declared2/255 tolerance;
+vector/material paths and oversized admission refusal covered, GL error0.
+Geometry/light reuse browser1 PASS. First check exposed missing explicit canvas
+pixel-revision tracking; fixed rather than weakening the refresh assertion.
+No full suites/profiles. B3–B5, measured preset/impact labels, heavy previous-frame
+retention and known Shore comparison remain pending.
 
 B1 implemented: retained ordered snapshots invalidate geometry for changed lit
 material/High-grass inputs, transforms, clipping, removal and resize. Lights are
