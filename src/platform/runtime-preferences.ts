@@ -1,6 +1,6 @@
 import { parseSettings, preferenceEnabled } from './settings.ts';
 import { createHaptics, createCombatHaptics } from './haptics.ts';
-import { preferredDensity } from '../rendering/effects/quality.ts';
+import { graphicsDevice, graphicsParticleDensity } from './graphics-settings.ts';
 import { editionAccess, itemAccessible, type GameEdition } from './editions.ts';
 import { premium } from './purchases.ts';
 import { parseTesterPremium, testerPremiumActive } from './tester-premium.ts';
@@ -35,7 +35,12 @@ export function createRuntimePreferences({
   const premiumAccess = () =>
     editionAccess(edition, premium.state.owned || testerPremiumActive(testerPremium));
   const accessible = (id: string) => itemAccessible(id, premiumAccess());
-  const density = () => preferredDensity(settings.quality, effectDensity(), reducedMotion());
+  const device = graphicsDevice(window);
+  const density = () => {
+    const selected = graphicsParticleDensity(settings.graphics, device);
+    const adapted = selected * (settings.graphics.adaptive ? effectDensity() : 1);
+    return reducedMotion() ? Math.min(0.3, adapted) : adapted;
+  };
   return {
     settings,
     systemMotion,

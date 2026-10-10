@@ -1,8 +1,14 @@
+import {
+  graphicsPreset,
+  migrateGraphics,
+  parseGraphics,
+  type GraphicsSettings,
+} from './graphics-settings.ts';
 export type Preference = 'system' | 'on' | 'off';
 export type ControlAction = 'up' | 'down' | 'left' | 'right' | 'tap' | 'pause';
 export type Bindings = Record<ControlAction, string[]>;
 export interface Settings {
-  version: 1;
+  version: 2;
   muted: boolean;
   effectsVolume: number;
   ambienceVolume: number;
@@ -12,8 +18,7 @@ export interface Settings {
   reducedFlashes: Preference;
   textSize: 'normal' | 'large';
   menuStyle: 'scroll';
-  quality: 'auto' | 'low' | 'high';
-  debrisStyle: 'sprites';
+  graphics: GraphicsSettings;
   vibration: boolean;
   vibrationStrength: 'light' | 'full';
 }
@@ -28,7 +33,7 @@ export const CONTROL_LABELS: Record<ControlAction, string> = {
 export const CONTROL_ACTIONS = Object.keys(CONTROL_LABELS) as ControlAction[];
 export function defaultSettings(muted = false): Settings {
   return {
-    version: 1,
+    version: 2,
     muted,
     effectsVolume: 1,
     ambienceVolume: 1,
@@ -45,8 +50,7 @@ export function defaultSettings(muted = false): Settings {
     reducedFlashes: 'system',
     textSize: 'normal',
     menuStyle: 'scroll',
-    quality: 'auto',
-    debrisStyle: 'sprites',
+    graphics: graphicsPreset(),
     vibration: true,
     vibrationStrength: 'full',
   };
@@ -65,7 +69,7 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
   const defaults = defaultSettings(legacyMuted);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return defaults;
   const value = raw as Record<string, unknown>;
-  if (value.version !== 1) return defaults;
+  if (value.version !== 1 && value.version !== 2) return defaults;
   const fraction = (key: 'effectsVolume' | 'ambienceVolume') =>
     typeof value[key] === 'number' && Number.isFinite(value[key])
       ? Math.max(0, Math.min(1, value[key] as number))
@@ -108,9 +112,10 @@ export function parseSettings(raw: unknown, legacyMuted = false): Settings {
     reducedFlashes: choice('reducedFlashes', ['system', 'on', 'off'], 'system'),
     textSize: choice('textSize', ['normal', 'large'], 'normal'),
     menuStyle: 'scroll',
-    quality: choice('quality', ['auto', 'low', 'high'], 'auto'),
-    // Preserve the field for save compatibility; legacy choices migrate to stage sprites.
-    debrisStyle: 'sprites',
+    graphics:
+      value.version === 1
+        ? migrateGraphics(value.quality, value.debrisStyle)
+        : parseGraphics(value.graphics),
     vibration: typeof value.vibration === 'boolean' ? value.vibration : true,
     vibrationStrength: choice('vibrationStrength', ['light', 'full'], 'full'),
   };

@@ -128,11 +128,13 @@ and Low/Normal/High swipe sensitivity. Escape remains reserved for pause and men
 navigation. Settings input never becomes combat input. Closing Options from a
 paused run returns to pause; Continue resumes it.
 
-Options groups Audio, Controls, and Display and Accessibility into submenus.
+Options groups Audio, Controls, Graphics, and Display and Accessibility into submenus.
 Sound effects and ambience have independent volume; master mute also matches the
 HUD button and retains legacy `issen.muted` compatibility. Display preferences
 cover reduced motion/flashes (System follows the OS reduced-motion preference),
-Normal/Large interface text, Auto/Low/High cosmetic density and optional vibration.
+Normal/Large interface text and optional vibration. Graphics owns preset density
+choices and links back to motion/flashes. Its remaining runtime controls and live
+preview are in progress; see [Graphics settings](../features/graphics-settings.md).
 `issen.settings` is validated, profile-aware and included in profile reset;
 testing sessions use `issen.testing.settings`. Category Restore defaults changes
 only that category. Test live controls, binding conflicts, Back/Escape and reload

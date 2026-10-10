@@ -11,7 +11,7 @@ import { createHaptics } from '../../src/platform/haptics.ts';
 import { preferredDensity } from '../../src/rendering/effects/quality.ts';
 
 test('legacy mute migrates and invalid settings retain safe defaults', () => {
-  for (const raw of [null, [], 'bad', { version: 2, muted: false }])
+  for (const raw of [null, [], 'bad', { version: 3, muted: false }])
     assert.equal(parseSettings(raw, true).muted, true);
   const parsed = parseSettings(
     {
@@ -29,7 +29,10 @@ test('legacy mute migrates and invalid settings retain safe defaults', () => {
   assert.equal(parsed.effectsVolume, 0);
   assert.equal(parsed.ambienceVolume, 1);
   assert.equal(parsed.reducedMotion, 'system');
-  assert.equal(parsed.quality, 'auto');
+  assert.equal(parsed.graphics.preset, 'auto');
+  assert.equal(parsed.version, 2);
+  assert.equal('quality' in parsed, false);
+  assert.equal('debrisStyle' in parsed, false);
   assert.equal(parsed.vibration, true);
   assert.equal(parseSettings({ version: 1, effectsVolume: NaN }).effectsVolume, 1);
 });
@@ -89,6 +92,7 @@ test('legacy artwork preferences are ignored without changing other saved settin
   for (const renderer of ['classic', 'ink', 'invalid']) {
     const loaded = parseSettings({
       ...defaultSettings(),
+      version: 1,
       renderer,
       characterRenderer: 'classic',
       muted: true,
@@ -98,7 +102,7 @@ test('legacy artwork preferences are ignored without changing other saved settin
     assert.equal('renderer' in loaded, false);
     assert.equal('characterRenderer' in loaded, false);
     assert.equal(loaded.muted, true);
-    assert.equal(loaded.quality, 'low');
+    assert.equal(loaded.graphics.preset, 'low');
     assert.equal(loaded.reducedMotion, 'on');
     assert.deepEqual(loaded.bindings, defaultSettings().bindings);
   }

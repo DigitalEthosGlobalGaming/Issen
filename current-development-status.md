@@ -1,5 +1,42 @@
 # Current development status
 
+## Active goal — Graphics menu and renderer optimizations (1.70.0)
+
+New approved task has Part A Graphics/settings/live-preview/adaptive quality and
+Part B dirty passes, filter baking, shader preparation, allocations and precision.
+Work on develop; checkout was clean main at the same commit and switched before
+editing. No push/deploy/native package work. Previous performance goal's native
+one-byte leaf restoration limitation remains; its assertion is unchanged.
+
+First usable chunk: settings schema2 with validated graphics presets and Custom
+records, schema1 quality/debris migration and preserved audio/bindings/accessibility.
+Graphics category/summary owns preset selection; Display retains accessibility,
+linked from Graphics. Reset to recommended changes Graphics only. Auto chooses
+Balanced for coarse-pointer touch or deviceMemory<=4, High otherwise. Preset
+particle density is wired through existing cosmetic density; other fields are
+storage contracts awaiting integration, not claims of working controls. All old
+quality/debris reads are removed except migration. Versions/changelog1.70.0.
+
+Strict TypeScript PASS; focused settings/graphics/drift/quality units17 PASS;
+Options browser12 PASS58.7s, including new migration/reload/category-isolation
+case and unchanged paused-state integrity checks. Portrait capture reviewed at
+`tmp/test-results/browser/graphics-settings-foundation/`; current layout is still
+the existing Options panel. Android Options fixture follows the moved control;
+its suite has not yet been rerun. Initial sandbox unit worker spawn was blocked;
+authorized rerun passes. No broad suite/performance captures run for this chunk.
+
+Next: effective runtime graphics + rAF display detection, independent30/60/120
+render scheduling with60Hz simulation, capped resolution, lighting and budget/
+preload control; then remaining menu controls and delivered-interval adaptation.
+Live preview/debounce/metrics and all Part B work remain. Full objective and
+remaining checklist are summarized in `docs/features/graphics-settings.md`.
+Goal active, incomplete. No known task-owned graphics processes remain running.
+
+User's real trace: stage3 load5110ms,3112ms before dispatch while superseded
+stage0 composes,1931ms stage3 roundtrip,67ms warming/presentation. Foreground
+obsolete requests are rejected after response rather than before every awaited
+preflight. Preserve this evidence for heavy-change/cancellation integration.
+
 ## Current handoff — worker-only ownership and faster cadence (1.69.58)
 
 Removed unused main-thread scenery-preload registration from shared composition;

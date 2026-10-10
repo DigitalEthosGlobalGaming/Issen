@@ -28,7 +28,12 @@ test('offline touch Options saves preferences and returns a paused run without r
     .getByRole('button', { name: /^Display/ })
     .tap();
   await page.getByLabel('Interface text', { exact: true }).selectOption('large');
-  await page.getByLabel('Effects quality', { exact: true }).selectOption('low');
+  await page.locator('#options').getByRole('button', { name: 'Back', exact: true }).tap();
+  await page
+    .locator('#options')
+    .getByRole('button', { name: /^Graphics/ })
+    .tap();
+  await page.getByLabel('Preset', { exact: true }).selectOption('low');
   await page.setViewportSize({ width: 915, height: 412 });
   await page.evaluate(() => window.dispatchEvent(new Event('issen:back')));
   await expect(
@@ -38,7 +43,7 @@ test('offline touch Options saves preferences and returns a paused run without r
   await expect(page.locator('#paused')).toHaveClass(/on/);
   await expect(page.locator('#bResume')).toBeInViewport();
   expect(
-    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.settings')!).quality),
+    await page.evaluate(() => JSON.parse(localStorage.getItem('issen.settings')!).graphics.preset),
   ).toBe('low');
   expect(errors).toEqual([]);
 });

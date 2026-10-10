@@ -6,13 +6,20 @@ import {
   keyLabel,
 } from '../../platform/settings.ts';
 import type { Settings, ControlAction } from '../../platform/settings.ts';
-type Category = 'audio' | 'controls' | 'display' | 'profile';
+import {
+  graphicsDevice,
+  graphicsPreset,
+  recommendedGraphics,
+} from '../../platform/graphics-settings.ts';
+import type { GraphicsPreset } from '../../platform/graphics-settings.ts';
+type Category = 'audio' | 'controls' | 'display' | 'graphics' | 'profile';
 type Page = Category | 'root';
 const TITLES: Record<Page, string> = {
   root: 'Options',
   audio: 'Audio',
   controls: 'Controls',
   display: 'Display and Accessibility',
+  graphics: 'Graphics',
   profile: 'Profile Management',
 };
 export function createOptions(
@@ -25,6 +32,11 @@ export function createOptions(
   const doc = root.ownerDocument,
     win = doc.defaultView!;
   const content = root.querySelector<HTMLElement>('#optionsContent')!;
+  const device = graphicsDevice(win);
+  const presetLabel = () =>
+    settings.graphics.preset === 'auto'
+      ? `Auto (${recommendedGraphics(device) === 'high' ? 'High' : 'Balanced'})`
+      : settings.graphics.preset[0]!.toUpperCase() + settings.graphics.preset.slice(1);
   const profiles = root.querySelector<HTMLElement>('#profileManagement')!;
   const events = new AbortController();
   let renderEvents = new AbortController();
@@ -176,10 +188,11 @@ export function createOptions(
           ? 'Muted'
           : `Effects ${Math.round(settings.effectsVolume * 100)}% · Ambience ${Math.round(settings.ambienceVolume * 100)}%`,
         controls: `${settings.sensitivity[0]!.toUpperCase() + settings.sensitivity.slice(1)} swipe sensitivity · Keyboard bindings`,
-        display: `${settings.textSize === 'large' ? 'Large' : 'Normal'} text · ${settings.quality === 'auto' ? 'Automatic' : settings.quality === 'low' ? 'Low' : 'High'} effects`,
+        display: `${settings.textSize === 'large' ? 'Large' : 'Normal'} text · Motion and flashes`,
+        graphics: presetLabel(),
         profile: 'Profiles · Save backups',
       };
-      for (const category of ['audio', 'controls', 'display', 'profile'] as const) {
+      for (const category of ['audio', 'controls', 'display', 'graphics', 'profile'] as const) {
         const el = button('', () => navigate(category), 'btn option-category');
         el.append(node('strong', TITLES[category]), node('small', summaries[category]));
         content.append(el);
@@ -246,6 +259,38 @@ export function createOptions(
           render(true);
         }),
       );
+    } else if (page === 'graphics') {
+      const row = node('div', '', 'option-row');
+      const label = node('label', 'Preset');
+      label.htmlFor = 'option-graphics-preset';
+      const input = node('select');
+      input.id = label.htmlFor;
+      for (const preset of ['auto', 'low', 'balanced', 'high', 'custom'] as const) {
+        const title =
+          preset === 'auto'
+            ? `Auto (${recommendedGraphics(device) === 'high' ? 'High' : 'Balanced'})`
+            : preset[0]!.toUpperCase() + preset.slice(1);
+        const option = node('option', title);
+        option.value = preset;
+        option.disabled = preset === 'custom' && settings.graphics.preset !== 'custom';
+        input.append(option);
+      }
+      input.value = settings.graphics.preset;
+      input.addEventListener(
+        'change',
+        () => {
+          const preset = input.value as GraphicsPreset;
+          if (preset === 'custom') return;
+          settings.graphics = graphicsPreset(preset, device);
+          persist();
+        },
+        { signal: renderEvents.signal },
+      );
+      row.append(label, input);
+      content.append(
+        row,
+        button('Motion and flashes', () => navigate('display')),
+      );
     } else if (page === 'profile') {
       // Persistent controls and modal listeners live outside the rerendered content.
     } else {
@@ -271,16 +316,6 @@ export function createOptions(
         ['Large', 'large'],
       ]);
       select(
-        'quality',
-        'Effects quality',
-        [
-          ['Auto', 'auto'],
-          ['Low', 'low'],
-          ['High', 'high'],
-        ],
-        'Auto adapts to performance. Attack cues remain visible at every quality.',
-      );
-      select(
         'vibrationStrength',
         'Vibration strength',
         [
@@ -305,7 +340,7 @@ export function createOptions(
     if (page !== 'root' && page !== 'profile') {
       content.append(node('p', 'Restore defaults resets only this category.', 'options-help'));
       content.append(
-        button('Restore defaults', () => {
+        button(page === 'graphics' ? 'Reset to recommended' : 'Restore defaults', () => {
           const defaults = defaultSettings();
           if (page === 'audio') {
             settings.muted = false;
@@ -321,12 +356,11 @@ export function createOptions(
             settings.reducedFlashes = 'system';
             settings.textSize = 'normal';
             settings.menuStyle = 'scroll';
-            settings.quality = 'auto';
-            settings.debrisStyle = 'sprites';
 
             settings.vibration = true;
             settings.vibrationStrength = 'full';
           }
+          if (page === 'graphics') settings.graphics = graphicsPreset('auto', device);
           capture = null;
           message = `${TITLES[page]} defaults restored.`;
           persist();
@@ -343,7 +377,7 @@ export function createOptions(
       const state = win.history.state;
       if (
         state?.issenOptions === historyId &&
-        ['root', 'audio', 'controls', 'display', 'profile'].includes(state.page)
+        ['root', 'audio', 'controls', 'display', 'graphics', 'profile'].includes(state.page)
       ) {
         page = state.page;
         capture = null;

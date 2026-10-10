@@ -8,6 +8,55 @@ test.beforeEach(async ({ page }) => {
 });
 const options = (page: import('@playwright/test').Page) => page.locator('#options');
 
+test('Graphics migrates legacy presets, saves separately and links to accessibility', async ({
+  page,
+}, testInfo) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('issen.settings'))
+      localStorage.setItem(
+        'issen.settings',
+        JSON.stringify({
+          version: 1,
+          quality: 'low',
+          debrisStyle: 'sprites',
+          reducedMotion: 'on',
+          effectsVolume: 0.35,
+        }),
+      );
+  });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.locator('#bOptions').click();
+  await expect(options(page).getByRole('button', { name: /^Graphics/ })).toContainText('Low');
+  await options(page)
+    .getByRole('button', { name: /^Graphics/ })
+    .click();
+  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue('low');
+  await page.getByLabel('Preset', { exact: true }).selectOption('balanced');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.settings')!));
+  expect(saved.version).toBe(2);
+  expect(saved.graphics.preset).toBe('balanced');
+  expect(saved.graphics.particles).toBe('medium');
+  expect(saved.quality).toBeUndefined();
+  expect(saved.debrisStyle).toBeUndefined();
+  expect(saved.effectsVolume).toBe(0.35);
+  expect(saved.reducedMotion).toBe('on');
+  await page.getByRole('button', { name: 'Motion and flashes', exact: true }).click();
+  await expect(page.getByLabel('Reduced motion', { exact: true })).toHaveValue('on');
+  await expect(page.getByLabel('Effects quality', { exact: true })).toHaveCount(0);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.locator('#bOptions').click();
+  await options(page)
+    .getByRole('button', { name: /^Graphics/ })
+    .click();
+  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue('balanced');
+  await page.getByRole('button', { name: 'Reset to recommended', exact: true }).click();
+  await expect(page.getByLabel('Preset', { exact: true })).toHaveValue('auto');
+  const reset = await page.evaluate(() => JSON.parse(localStorage.getItem('issen.settings')!));
+  expect(reset.reducedMotion).toBe('on');
+  expect(reset.effectsVolume).toBe(0.35);
+  await page.screenshot({ path: testInfo.outputPath('graphics-presets-portrait.png') });
+});
+
 test('legacy mute, live volume controls, persistence and category reset', async ({ page }) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('issen.settings')) localStorage.setItem('issen.muted', 'true');
@@ -79,9 +128,13 @@ test('Options preserves paused encounter state, checkpoint and return screen', a
     });
   const before = await snapshot();
   await options(page)
+    .getByRole('button', { name: /^Graphics/ })
+    .click();
+  await page.getByLabel('Preset', { exact: true }).selectOption('low');
+  await page.keyboard.press('Escape');
+  await options(page)
     .getByRole('button', { name: /^Display/ })
     .click();
-  await page.getByLabel('Effects quality', { exact: true }).selectOption('low');
   await page.getByLabel('Reduced motion', { exact: true }).selectOption('on');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Space');

@@ -2,6 +2,8 @@
 
 # Repository documentation
 
+- [Graphics settings](features/graphics-settings.md): preset migration and the active graphics menu/renderer feature batch.
+
 - [Performance and seamless transitions](development/performance-goal-progress.md): active goal checkpoints, measured baselines and verification.
 - [Mobile performance completion report](development/mobile-performance-final-report.md): consolidated evidence, measurement limits and remaining verification; currently incomplete.
 
