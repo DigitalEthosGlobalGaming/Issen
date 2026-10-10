@@ -7,6 +7,10 @@ renderer coverage is tracked separately below.
 
 ## Scope and status
 
+As of1.70.12, Graphics AA controls native back-buffer MSAA; browser-context AA is
+disabled after identical-output comparisons. Live changes retire only the previous
+back-buffer source. No authored pixels, material maps or asset packing changed.
+
 As of1.70.7, scenery detail changes decorative density in all nine ordinary
 worker compositions; terrain and seeded landmarks remain. Normal is a distinct
 middle tier. Authored atlases and material coverage are unchanged. Native tier

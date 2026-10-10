@@ -24,6 +24,17 @@ export function createGraphicsApplication(
     appliedScenery = data.graphicsScenery as SceneryDetail | undefined;
   let requestedMemory: GraphicsSettings['memory'] | undefined,
     appliedMemory = data.graphicsMemory as GraphicsSettings['memory'] | undefined;
+  let requestedAntialias: boolean | undefined,
+    appliedAntialias: boolean | undefined =
+      data.graphicsAntialias === undefined ? undefined : data.graphicsAntialias === 'true';
+  function settled() {
+    return (
+      !memoryPending &&
+      canvas.dataset.sceneState !== 'loading' &&
+      (appliedAntialias === undefined ||
+        canvas.dataset.graphicsAntialiasApplied === String(appliedAntialias))
+    );
+  }
   function applying(value: boolean) {
     data.graphicsApplying = String(value);
   }
@@ -38,6 +49,8 @@ export function createGraphicsApplication(
     data.graphicsScenery = appliedScenery!;
     appliedMemory = requestedMemory;
     data.graphicsMemory = appliedMemory!;
+    appliedAntialias = requestedAntialias;
+    data.graphicsAntialias = String(appliedAntialias);
     if (memoryChanged) {
       applyMainImageBudget(doc);
       const pending: Promise<unknown>[] = [];
@@ -46,18 +59,21 @@ export function createGraphicsApplication(
       reclaimSceneMemory(doc);
       void Promise.allSettled(pending).then(() => {
         memoryPending--;
-        if (!timer && !memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
+        if (!timer && settled()) applying(false);
       });
     }
     if (resized) win.dispatchEvent(new Event('issen:graphics-resolution'));
     if (sceneryChanged) prepareScene();
     invalidate();
-    if (!memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
+    applying(!settled());
   }
   const observer = new MutationObserver(() => {
-    if (!timer && !memoryPending && canvas.dataset.sceneState !== 'loading') applying(false);
+    if (!timer && settled()) applying(false);
   });
-  observer.observe(canvas, { attributes: true, attributeFilter: ['data-scene-state'] });
+  observer.observe(canvas, {
+    attributes: true,
+    attributeFilter: ['data-scene-state', 'data-graphics-antialias-applied'],
+  });
   lifecycle.add(() => {
     observer.disconnect();
     applying(false);
@@ -75,19 +91,22 @@ export function createGraphicsApplication(
       if (
         requested !== state.resolution ||
         requestedScenery !== state.scenery ||
-        requestedMemory !== state.memory
+        requestedMemory !== state.memory ||
+        requestedAntialias !== state.antialias
       ) {
         requested = state.resolution;
         requestedScenery = state.scenery;
         requestedMemory = state.memory;
+        requestedAntialias = state.antialias;
         lifecycle.clearTimeout(timer);
         timer = 0;
         if (
           requested === applied &&
           requestedScenery === appliedScenery &&
-          requestedMemory === appliedMemory
+          requestedMemory === appliedMemory &&
+          requestedAntialias === appliedAntialias
         )
-          applying(false);
+          applying(!settled());
         else if (immediate) commitHeavyChoices();
         else {
           applying(true);

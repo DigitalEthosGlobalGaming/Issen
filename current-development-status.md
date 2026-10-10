@@ -1,6 +1,22 @@
 # Current development status
 
-## Active goal — Graphics menu and renderer optimizations (1.70.11)
+## Active goal — Graphics menu and renderer optimizations (1.70.12)
+
+AA assessed and integrated. Native four-combination comparison across DPR1/2,
+Off/Half/Full lighting, Medium/High grass, vectors/text/filters and ordinary/noir
+paths proves browser-context AA changes zero channels in24 cases, while useful
+back-buffer MSAA changes3993 channels(max139/255) in a representative DPR1 case.
+Direct GL positive control has4samples,783changed channels(max128). Keep the player
+option; disable redundant context AA and switch back-buffer MSAA live after300ms.
+Detach its old sampler, retire source, allocate next render, acknowledge Applying;
+same browser canvas and paused scene remain. Initial zero-difference assumption
+failed; retained evidence led to isolation and keeping the control, not suppressing
+the differences. Isolation browser1 PASS1.7s/3.8s; live/fresh-output equivalence,
+old-source retirement and paused/persistence browser2 PASS12.4s total; strictTS PASS.
+Artifacts under `tmp/test-results/browser/antialias-assessment/`,
+`antialias-isolation/` and `antialias-control/`. Comparison image reviewed. No full
+suites/performance captures. Preset/impact measurements, previous Shore strict
+comparison failure and all Part B remain unfinished. Versions/changelog1.70.12.
 
 Title showcase added: Graphics borrows cinematic stage preparation for Hollow
 Forest with fixed preview seed, no viewer awards/visit mutation/attract spawning.

@@ -421,6 +421,18 @@ export function createOptions(
         ['Half', 'half'],
         ['Full', 'full'],
       ]);
+      const aaRow = node('div', '', 'option-row'),
+        aaLabel = node('label', 'Anti-aliasing'),
+        aaInput = node('input');
+      aaLabel.htmlFor = 'option-graphics-antialias';
+      aaInput.id = aaLabel.htmlFor;
+      aaInput.type = 'checkbox';
+      aaInput.checked = settings.graphics.antialias;
+      aaInput.addEventListener('change', () => setGraphic('antialias', aaInput.checked), {
+        signal: renderEvents.signal,
+      });
+      aaRow.append(aaLabel, aaInput);
+      content.append(aaRow);
       graphicSelect('particles', 'Ambient particles', [
         ['Off', 'off'],
         ['Low', 'low'],

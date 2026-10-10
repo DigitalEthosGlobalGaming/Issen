@@ -51,6 +51,24 @@ cosmetic leaf gust after two seconds and every six seconds thereafter. Ambient
 particle choices govern the motes/gusts; reduced motion suppresses gusts and
 lantern flicker. The preview shares ordinary lighting, weather and drawing paths.
 
+Anti-aliasing is retained because native comparisons show visible edge changes.
+An Edge WebGL2 assessment compared four combinations of browser-context and Pixi
+back-buffer MSAA at DPR1/2, all three lighting modes, Medium/High grass, rotated
+vectors, text, filters and ordinary/noir film paths. Browser-context AA alone
+changed zero channels in all24 cases. Back-buffer AA changed3993 channels with
+maximum139/255 in the DPR1 flat/Medium/no-film case; the noir copy-film path had
+zero differences. A direct WebGL triangle control verified actual four-sample
+MSAA (783 changed channels, maximum128/255).
+
+The browser context therefore uses AA Off; the player control changes the useful
+Pixi back-buffer MSAA instead. This deliberately avoids an unnecessary context
+restart. Changes coalesce300ms, detach the previous presentation sampler and retire
+its owned source, then allocate the new target on the next rendered frame. Applying
+waits for painter acknowledgement; the browser canvas, active scene and pinned
+artwork stay intact. High retains AA On; Low/Balanced retain Off. Unsupported MSAA
+is acknowledged with the effective renderer state available in canvas diagnostics.
+Final device measurements and impact labels remain pending.
+
 Ambient particles, grass density, cosmetic weather and combat cues have independent
 runtime ports. Off removes ambient leaves and gusts; combat cues remain visible.
 Frame rate is a live control: 30/60 are always available,

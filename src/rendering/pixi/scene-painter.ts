@@ -515,6 +515,7 @@ export class PixiScenePainter implements SceneDrawing {
   }
 
   begin(): void {
+    this.applyAntialias();
     if (this.disposed) return;
     this.invalidateLighting();
     this.retainTree = this.transientGroups.length === 0 && this.clips.length === 0;
@@ -535,6 +536,35 @@ export class PixiScenePainter implements SceneDrawing {
     this.textures.beginFrame();
     this.matrix.identity();
     this.beginPath();
+  }
+
+  /** Back-buffer MSAA can change without replacing the browser canvas/context. */
+  private applyAntialias(): void {
+    if (this.disposed || this.contextLost) return;
+    const choice =
+      this.canvas.dataset.graphicsAntialias ??
+      this.canvas.ownerDocument.documentElement.dataset.graphicsAntialias;
+    const requested = choice === undefined ? this.renderer.view.antialias : choice === 'true';
+    const enabled = requested && this.renderer.context.supports.msaa;
+    const requestedText = requested ? 'true' : 'false',
+      enabledText = enabled ? 'true' : 'false';
+    if (
+      this.canvas.dataset.graphicsAntialiasApplied === requestedText &&
+      this.canvas.dataset.graphicsAntialiasEnabled === enabledText
+    )
+      return;
+    if (Reflect.get(this.renderer.backBuffer, '_antialias') !== enabled) {
+      const previous: unknown = Reflect.get(this.renderer.backBuffer, '_backBufferTexture');
+      const source = previous instanceof Texture ? previous.source : undefined;
+      const shader: unknown = Reflect.get(this.renderer.backBuffer, '_bigTriangleShader');
+      if (shader instanceof Shader) shader.resources.uTexture = Texture.WHITE.source;
+      this.renderer.backBuffer.destroy();
+      source?.destroy();
+      Reflect.set(this.renderer.backBuffer, '_antialias', enabled);
+      this.renderer.view.antialias = enabled;
+    }
+    this.canvas.dataset.graphicsAntialiasApplied = requestedText;
+    this.canvas.dataset.graphicsAntialiasEnabled = enabledText;
   }
 
   private detachLightingTargets(detachGeometry = true): void {
@@ -1636,12 +1666,16 @@ export class PixiScenePainter implements SceneDrawing {
   }
 }
 
-export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise<PixiScenePainter> {
+export async function createPixiScenePainter(
+  canvas: HTMLCanvasElement,
+  options: { antialias?: boolean; contextAntialias?: boolean } = {},
+): Promise<PixiScenePainter> {
+  const antialias = options.antialias ?? true;
   const renderer = new WebGLRenderer<HTMLCanvasElement>();
   try {
     const context = canvas.getContext('webgl2', {
       alpha: true,
-      antialias: true,
+      antialias: options.contextAntialias ?? false,
       premultipliedAlpha: true,
       preserveDrawingBuffer: false,
       stencil: true,
@@ -1656,7 +1690,7 @@ export async function createPixiScenePainter(canvas: HTMLCanvasElement): Promise
       width: Math.max(1, canvas.width),
       height: Math.max(1, canvas.height),
       resolution: 1,
-      antialias: true,
+      antialias,
       backgroundAlpha: 0,
       preserveDrawingBuffer: false,
       useBackBuffer: true,
