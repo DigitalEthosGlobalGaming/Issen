@@ -70,6 +70,24 @@ test('pixel accounting shares identities and follows decoding, resizing and rele
   assert.equal(memory.snapshot().decodedBytes + memory.snapshot().canvasBytes, 0);
 });
 
+test('incremental totals follow owned source writes and avoid scanning unrelated dimensions', () => {
+  const memory = createPixelMemory();
+  const canvas = memory.track({ width: 10, height: 20 }, 'canvas');
+  assert.equal(memory.snapshot(true).canvasBytes, 800);
+  canvas.width = 30;
+  assert.equal(memory.snapshot(true).canvasBytes, 2400);
+  canvas.height = 0;
+  assert.equal(memory.snapshot(true).canvases, 0);
+  const gpu = {
+    get memorySnapshot() {
+      throw Error('Exact GPU scan');
+    },
+    admissionMemorySnapshot: { sources: 2, bytes: 1234 },
+  };
+  memory.trackGpu(gpu);
+  assert.equal(memory.snapshot(true).gpuBytes, 1234);
+});
+
 test('GPU consumers count independently, with exact odd and rectangular mip chains', () => {
   const memory = createPixelMemory();
   const a = { memorySnapshot: { sources: 1, bytes: rgbaMipBytes(3, 5, true) } };

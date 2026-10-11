@@ -27,8 +27,8 @@ function monitorMainDecodes(doc: Document) {
     reclaimSceneMemory(doc);
   });
 }
-export function reclaimSceneMemory(doc: Document, additionalBytes = 0) {
-  const before = documentSceneMemory(doc);
+export function reclaimSceneMemory(doc: Document, additionalBytes = 0, incremental = false) {
+  const before = documentSceneMemory(doc, incremental);
   if (before.committedBytes + additionalBytes <= before.budget) return before;
   trimMainImages(doc, before.committedBytes + additionalBytes - before.budget);
   return documentSceneMemory(doc);
@@ -49,9 +49,9 @@ export function registerSceneMemory(doc: Document, owner: SceneOwner) {
 }
 
 /** Shared across live/preview owners; reservations cover work not yet in a worker response. */
-export function documentSceneMemory(doc: Document) {
+export function documentSceneMemory(doc: Document, incremental = false) {
   monitorMainDecodes(doc);
-  const main = documentPixelMemory(doc).snapshot();
+  const main = documentPixelMemory(doc).snapshot(incremental);
   let workerDecodedBytes = 0,
     workerCanvasBytes = 0,
     transferredBytes = 0,

@@ -153,6 +153,22 @@ export function createInkEnemyRenderer(doc: Document) {
     pending: Promise<boolean> | undefined;
   const preparation = new AbortController();
   let preparedParts: { key: string; uploads: TextureUpload[] } | undefined;
+  let cacheGeneration = 0;
+  /** Decoded atlases survive restoration; derived canvas pixels may not. */
+  function resetCachedParts() {
+    if (disposed) return { parts: 0, tones: 0 };
+    const released = { parts: cache.size, tones: tones.size };
+    cacheGeneration++;
+    preparedParts = undefined;
+    for (const canvas of new Set([...cache.values(), ...tones.values()])) {
+      retireSceneTexture(canvas, true);
+      canvas.width = canvas.height = 0;
+    }
+    cache.clear();
+    tones.clear();
+    variantPixels = tonePixels = 0;
+    return released;
+  }
   function prepare(): Promise<boolean> {
     if (pending) return pending;
     if (disposed) return Promise.resolve(false);
@@ -222,7 +238,8 @@ export function createInkEnemyRenderer(doc: Document) {
     const ratio = 256 / Math.max(sw, sh);
     c.width = Math.max(1, Math.round(sw * ratio));
     c.height = Math.max(1, Math.round(sh * ratio));
-    const g = c.getContext('2d');
+    // Static upload sources do not need an additional GPU-backed Canvas surface.
+    const g = c.getContext('2d', { willReadFrequently: true });
     if (!g) return null;
     if (palette) {
       const toneKey = key + ':' + palette.robeD + ':' + palette.robeL;
@@ -305,10 +322,18 @@ export function createInkEnemyRenderer(doc: Document) {
       stamps.push({ key: 'variationHead:' + i, frame, cloth: false });
     const uploads: TextureUpload[] = [];
     let complete = true;
+    let uploadGeneration = cacheGeneration;
     const ready = await paceTextureUploads(stamps, lifetime, {
       nextFrame: (abort) => nextVisibleFrame(doc, abort),
       ready: () => !disposed && !doc.hidden,
-      generation: () => 0,
+      generation: () => cacheGeneration,
+      beforeBatch: () => {
+        if (uploadGeneration !== cacheGeneration) {
+          uploadGeneration = cacheGeneration;
+          uploads.length = 0;
+          complete = true;
+        }
+      },
       now: () => doc.defaultView!.performance.now(),
       upload: ({ key, frame, cloth, palette }) => {
         const image = sprite(
@@ -331,6 +356,8 @@ export function createInkEnemyRenderer(doc: Document) {
         );
       },
     });
+    if (!lifetime.aborted && !disposed && uploadGeneration !== cacheGeneration)
+      return prepareUploads(extraPalettes, signal);
     if (ready && complete && uploads.every(({ texture }) => texture.source.width > 0)) {
       preparedParts = { key, uploads };
       return uploads;
@@ -545,6 +572,7 @@ export function createInkEnemyRenderer(doc: Document) {
   return {
     prepare,
     prepareUploads,
+    resetCachedParts,
     drawPart,
     snapshot: () => ({
       ready:
@@ -557,6 +585,7 @@ export function createInkEnemyRenderer(doc: Document) {
       tonePixels,
       maxCachePixels: budgets.variants + budgets.tones,
       compact,
+      cacheGeneration,
       disposed,
     }),
     dispose() {

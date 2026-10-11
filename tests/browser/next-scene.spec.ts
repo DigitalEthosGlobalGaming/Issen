@@ -69,7 +69,7 @@ test('cancelling next-scene fog before transport retains only unfinished decode 
       sampleAssetBackground(8, true, 0, 8.3, 0, next);
       await waiting;
       const before = owner.snapshot();
-      sampleAssetBackground(8, false, 7, 8.3, 0, next);
+      sampleAssetBackground(8, false, 7, 8.3);
       const cancelled = owner.snapshot();
       const foregroundReady = await owner.compose(next);
       const foreground = owner.snapshot();
@@ -329,7 +329,7 @@ test('next-scene admission denies pressure and releases invalidated transferred 
   expect(result.remaining.reservedBytes).toBe(0);
 });
 
-test('busy frames cancel pending next-scene warming without failing the current scene', async ({
+test('busy frames preserve pending warming and forecast removal cancels without failing the current scene', async ({
   page,
 }) => {
   test.setTimeout(60000);
@@ -380,13 +380,16 @@ test('busy frames cancel pending next-scene warming without failing the current 
       await waiting;
       const pending = owner.snapshot();
       sampleAssetBackground(1, false, 7, 8.3, 2, next);
-      for (let i = 0; i < 20 && documentSceneMemory(document).reservedBytes; i++)
+      const busy = owner.snapshot().imagePreload?.status;
+      sampleAssetBackground(1, false, 7, 8.3);
+      for (let i = 0; i < 20 && nextPlanes.some((source) => source.width > 0); i++)
         await new Promise((resolve) => setTimeout(resolve, 10));
       drawing.begin();
       const currentDraw = owner.draw(drawing, frame);
       drawing.flush();
       return {
         pending,
+        busy,
         after: owner.snapshot(),
         currentDraw,
         closed: nextPlanes.length > 0 && nextPlanes.every((source) => source.width === 0),
@@ -398,6 +401,7 @@ test('busy frames cancel pending next-scene warming without failing the current 
     }
   });
   expect(result.pending.imagePreload?.status).toBe('pending');
+  expect(result.busy).toBe('pending');
   expect(result.pending.nextScene.reservedBytes).toBeGreaterThan(0);
   expect(result.after.imagePreload?.status).toBe('none');
   expect(result.after.workerFailure).toBeUndefined();

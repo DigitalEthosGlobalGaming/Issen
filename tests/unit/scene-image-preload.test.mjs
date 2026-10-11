@@ -4,6 +4,44 @@ import { sampleAssetBackground } from '../../src/platform/asset-background.ts';
 import { createSceneImagePreload } from '../../src/rendering/environment/image-preload.ts';
 import { compositionKey } from '../../src/rendering/environment/worker-types.ts';
 
+test('pending scenery survives busy frames but still cancels for pressure or changed identity', async () => {
+  const doc = new EventTarget();
+  doc.hidden = false;
+  const current = { width: 100, height: 100, dpr: 1, lowQuality: false, stage: 0, stageSeed: 1 };
+  const next = { ...current, stage: 1, stageSeed: 2 };
+  let finish,
+    releases = 0,
+    allowed = true;
+  const preload = createSceneImagePreload(
+    doc,
+    () => current,
+    () => ({
+      ready: new Promise((resolve) => (finish = resolve)),
+      release() {
+        releases++;
+      },
+      active: () => allowed,
+    }),
+    { retainPendingWhenBusy: true, retainReadyWhenBusy: true },
+  );
+  try {
+    sampleAssetBackground(0, true, 1, 16, 1, next);
+    sampleAssetBackground(0, false, 30, 16, 1, next);
+    assert.equal(preload.snapshot().status, 'pending');
+    assert.equal(releases, 0);
+    finish(true);
+    await Promise.resolve();
+    sampleAssetBackground(0, false, 30, 16, 1, next);
+    assert.equal(preload.snapshot().status, 'ready');
+    allowed = false;
+    sampleAssetBackground(0, false, 30, 16, 1, next);
+    assert.equal(releases, 1);
+    assert.equal(preload.snapshot().status, 'none');
+  } finally {
+    preload.dispose();
+  }
+});
+
 test('removing the forecast releases pending and ready next scenes even during busy frames', async () => {
   for (const ready of [false, true]) {
     const doc = new EventTarget();

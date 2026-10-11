@@ -43,6 +43,10 @@ export interface SceneFlowViews {
   reclaimMemory(): unknown;
   readonly environmentRenderer: {
     compose(frame: ScenePreparationFrame): Promise<boolean>;
+    prepareReplacement?(
+      frame: ScenePreparationFrame,
+      signal: AbortSignal,
+    ): Promise<(() => boolean) | undefined>;
     snapshot?(): { texturesWarmed?: boolean; backend?: string; workerFailure?: string };
     retry?(): boolean;
     suspend(): void;
@@ -50,6 +54,7 @@ export interface SceneFlowViews {
   readonly sceneRecovery?: { show(retry: () => void): void; clear(): void };
   readonly lifecycle: { readonly disposed: boolean };
   readonly frameLoop: { resetClock(): void };
+  recommendLowerGraphics?(): void;
   requestedSceneKey: string;
   sceneRequest: number;
   requestedSceneIdentity: string;
@@ -62,6 +67,10 @@ export interface SceneFlowViews {
 export function createSceneFlow(readViews: () => SceneFlowViews) {
   let figurePreparation: AbortController | undefined;
   let occluded = false;
+  let recommendationRun: Set<string> | undefined;
+  let interruptions = 0;
+  let recommendationPending = false;
+  let recommendationShown = false;
   function setOccluded(value: boolean) {
     if (value === occluded) return;
     occluded = value;
@@ -118,7 +127,22 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     };
     const demon = activeTrial?.realm === 'demon' || environmentState.previewDemon;
     const key = `${demon}:${compositionKey(frame)}${views.figureIdentity ? ':' + views.figureIdentity : ''}`;
+    if (recommendationRun !== G.bless) {
+      recommendationRun = G.bless;
+      interruptions = 0;
+      recommendationPending = recommendationShown = false;
+    }
     if (key === views.requestedSceneKey) return;
+    const identity = `${demon}:${G.stage}:${stageSeed}`;
+    if (
+      !views.sceneLoading &&
+      identity === views.requestedSceneIdentity &&
+      !G.panel &&
+      ['playing', 'boss', 'standoff'].includes(G.state)
+    ) {
+      interruptions++;
+      if (interruptions > 1 && !recommendationShown) recommendationPending = true;
+    }
     figurePreparation?.abort();
     figurePreparation = new AbortController();
     if (!demon) demonRealmRenderer.release();
@@ -129,7 +153,6 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
     const request = ++views.sceneRequest;
     views.sceneRecovery?.clear();
     delete cvs.dataset.sceneError;
-    const identity = `${demon}:${G.stage}:${stageSeed}`;
     if (identity !== views.requestedSceneIdentity) views.sceneContinuation = undefined;
     views.requestedSceneIdentity = identity;
     views.sceneLoading = true;
@@ -219,6 +242,11 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       views.sceneLoading = false;
       views.sceneReadyToPresent = false;
       cvs.dataset.sceneState = 'ready';
+      if (recommendationPending && !recommendationShown) {
+        recommendationPending = false;
+        recommendationShown = true;
+        views.recommendLowerGraphics?.();
+      }
       const continuation = views.sceneContinuation;
       views.sceneContinuation = undefined;
       const paused = G.state === 'paused';
@@ -230,5 +258,56 @@ export function createSceneFlow(readViews: () => SceneFlowViews) {
       frameLoop.resetClock();
     }
   }
-  return { prepareScene, retryScene, deferUntilSceneReady, settlePresentedScene, setOccluded };
+  async function prepareResolution(dpr: number, signal: AbortSignal) {
+    const views = readViews();
+    if (
+      occluded ||
+      views.sceneLoading ||
+      !views.requestedSceneKey ||
+      views.activeTrial?.realm === 'demon' ||
+      views.environmentState.previewDemon ||
+      !views.environmentRenderer.prepareReplacement
+    )
+      return;
+    const key = views.requestedSceneKey;
+    const frame: ScenePreparationFrame = {
+      stageSeed: views.stageSeed,
+      width: views.W,
+      height: views.H,
+      dpr,
+      time: views.presentationState.time,
+      stage: views.G.stage,
+      reducedMotion: views.reducedMotion(),
+      reducedFlashes: views.reducedFlashes(),
+      lowQuality: sceneryLowQuality(views.sceneryDetail?.(), views.density() <= 0.3),
+      sceneryDetail: views.sceneryDetail?.(),
+    };
+    const commit = await views.environmentRenderer.prepareReplacement(frame, signal);
+    if (!commit || signal.aborted) return;
+    return () => {
+      if (
+        signal.aborted ||
+        occluded ||
+        views.lifecycle.disposed ||
+        views.sceneLoading ||
+        views.requestedSceneKey !== key ||
+        views.stageSeed !== frame.stageSeed ||
+        views.W !== frame.width ||
+        views.H !== frame.height ||
+        !commit()
+      )
+        return false;
+      views.requestedSceneKey = `false:${views.compositionKey(frame)}${views.figureIdentity ? ':' + views.figureIdentity : ''}`;
+      views.screenAnimation.invalidate();
+      return true;
+    };
+  }
+  return {
+    prepareScene,
+    prepareResolution,
+    retryScene,
+    deferUntilSceneReady,
+    settlePresentedScene,
+    setOccluded,
+  };
 }

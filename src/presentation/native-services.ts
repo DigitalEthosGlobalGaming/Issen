@@ -27,7 +27,7 @@ export function createNativeServices(
   ownerDocument: Document,
   lifecycle: { add(cleanup: () => void): void },
   lighting?: PreparedLighting,
-  painter?: Pick<PixiScenePainter, 'warmScene' | 'retainTextureSources'>,
+  painter?: Pick<PixiScenePainter, 'warmScene' | 'retainTextureSources' | 'canvas'>,
 ) {
   const environmentRenderer = createEnvironmentRenderer(ownerDocument, {
     ownsUploadReservation: !!painter,
@@ -45,6 +45,17 @@ export function createNativeServices(
   const inkCharm = createInkCharmRenderer(ownerDocument);
   const inkCompanion = createInkCompanionRenderer(ownerDocument);
   const inkEnemy = createInkEnemyRenderer(ownerDocument);
+  if (painter) {
+    const restoreEnemies = () => {
+      cancelBackgroundFigures();
+      releaseFigureSources?.();
+      releaseFigureSources = undefined;
+      const released = inkEnemy.resetCachedParts();
+      console.warn('[Issen] Enemy artwork cache reset after graphics restoration.', released);
+    };
+    painter.canvas.addEventListener('webglcontextrestored', restoreEnemies);
+    lifecycle.add(() => painter.canvas.removeEventListener('webglcontextrestored', restoreEnemies));
+  }
   const inkPlayer = createInkPlayerRenderer(ownerDocument);
   const inkSword = createInkSwordRenderer(ownerDocument);
   const figureLifetime = new AbortController();

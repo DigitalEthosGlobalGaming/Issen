@@ -36,6 +36,16 @@ export function rendererGpuMemory(renderer: WebGLRenderer<HTMLCanvasElement>) {
         texturePixelBytes(source.format)) /
       4;
 
+  const renderbufferBytes = rendererRenderbufferBytes(renderer);
+  return {
+    sources: sources.size,
+    bytes: bytes + renderbufferBytes,
+    textureBytes: bytes,
+    renderbufferBytes,
+  };
+}
+
+function rendererRenderbufferBytes(renderer: WebGLRenderer<HTMLCanvasElement>) {
   // Pixi exposes textures publicly but keeps stencil/MSAA renderbuffers in this hash.
   // Read descriptors only: no GL queries, binding changes or new native allocations.
   const hash: unknown = Reflect.get(renderer.renderTarget, '_gpuRenderTargetHash');
@@ -67,10 +77,88 @@ export function rendererGpuMemory(renderer: WebGLRenderer<HTMLCanvasElement>) {
               pixels * texturePixelBytes(formats.get(id)?.[index] ?? 'unknown') * 4;
         });
     }
+  return renderbufferBytes;
+}
+
+/** Observe Pixi8.22's owned residency hash; restore its methods on disposal. */
+export function createGpuMemoryLedger(renderer: WebGLRenderer<HTMLCanvasElement>) {
+  type Hash = {
+    items: Record<string, TextureSource | null>;
+    add(source: TextureSource): boolean;
+    remove(source: TextureSource, ...args: unknown[]): void;
+  };
+  const hash = Reflect.get(renderer.texture, '_managedTextures') as Hash;
+  const add = hash.add,
+    remove = hash.remove;
+  const entries = new Map<
+    TextureSource,
+    { bytes: number; update: () => void; unload: () => void }
+  >();
+  let bytes = 0;
+  function forget(source: TextureSource) {
+    const entry = entries.get(source);
+    if (!entry) return;
+    bytes -= entry.bytes;
+    source.off('update', entry.update);
+    source.off('resize', entry.update);
+    source.off('unload', entry.unload);
+    entries.delete(source);
+  }
+  function watch(source: TextureSource) {
+    if (entries.has(source)) return;
+    const entry = {
+      bytes: 0,
+      update: () => {
+        const next =
+          (rgbaMipBytes(source.pixelWidth, source.pixelHeight, source.autoGenerateMipmaps) *
+            texturePixelBytes(source.format)) /
+          4;
+        bytes += next - entry.bytes;
+        entry.bytes = next;
+      },
+      unload: () => forget(source),
+    };
+    entries.set(source, entry);
+    source.on('update', entry.update);
+    source.on('resize', entry.update);
+    source.on('unload', entry.unload);
+    entry.update();
+  }
+  function added(this: Hash, source: TextureSource) {
+    const result = add.call(this, source);
+    watch(source);
+    return result;
+  }
+  function removed(this: Hash, source: TextureSource, ...args: unknown[]) {
+    remove.call(this, source, ...args);
+    forget(source);
+  }
+  hash.add = added;
+  hash.remove = removed;
+  for (const source of Object.values(hash.items))
+    if (source) {
+      source.off('unload', remove, hash);
+      source.once('unload', removed, hash);
+      watch(source);
+    }
   return {
-    sources: sources.size,
-    bytes: bytes + renderbufferBytes,
-    textureBytes: bytes,
-    renderbufferBytes,
+    snapshot() {
+      const renderbufferBytes = rendererRenderbufferBytes(renderer);
+      return {
+        sources: entries.size,
+        bytes: bytes + renderbufferBytes,
+        textureBytes: bytes,
+        renderbufferBytes,
+      };
+    },
+    dispose() {
+      for (const source of [...entries.keys()]) {
+        source.off('unload', removed, hash);
+        source.once('unload', remove, hash);
+        forget(source);
+      }
+      if (hash.add === added) hash.add = add;
+      if (hash.remove === removed) hash.remove = remove;
+    },
   };
 }

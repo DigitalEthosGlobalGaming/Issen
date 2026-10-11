@@ -148,6 +148,7 @@ export function createRuntimeFrames(
       buildPost: presentation.buildPost,
       screenAnimation: ui.screenAnimation,
       prepareScene: game.prepareScene,
+      prepareResolution: game.prepareResolution,
       environmentState: presentation.environmentState,
       get artworkReady() {
         return readArtworkReady();

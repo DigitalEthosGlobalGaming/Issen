@@ -28,13 +28,16 @@ export interface ViewportViews {
   buildWeather(resetSimulation?: boolean): void;
   buildPost(): void;
   prepareScene(): unknown;
+  prepareResolution?(ratio: number, signal: AbortSignal): Promise<(() => boolean) | undefined>;
   reposition(): void;
 }
 /** Own viewport rebuilding and resize debounce; character adoption is a rule port. */
 export function createViewport(readViews: () => ViewportViews) {
   let rt = 0;
   let viewportPrepared = false;
-  function resize() {
+  let resolutionRequest: AbortController | undefined;
+  let resolutionRetry = 0;
+  function applyResize(scenePrepared = false) {
     const views = readViews();
     const {
       cvs,
@@ -78,14 +81,48 @@ export function createViewport(readViews: () => ViewportViews) {
     buildPost();
     viewportPrepared = true;
     screenAnimation.invalidate();
-    if (artworkReady) prepareScene();
+    if (artworkReady && !scenePrepared) prepareScene();
     environmentState.prevBg = null;
     environmentState.stageFade = 0;
     reposition();
   }
   const { lifecycle } = readViews();
-  window.addEventListener('issen:graphics-resolution', resize);
-  lifecycle.add(() => window.removeEventListener('issen:graphics-resolution', resize));
+  function resize() {
+    resolutionRequest?.abort();
+    lifecycle.clearTimeout(resolutionRetry);
+    applyResize();
+  }
+  async function resolution() {
+    resolutionRequest?.abort();
+    lifecycle.clearTimeout(resolutionRetry);
+    const views = readViews(),
+      doc = views.cvs.ownerDocument;
+    const rect = views.cvs.getBoundingClientRect();
+    if (
+      !viewportPrepared ||
+      !views.artworkReady ||
+      !views.prepareResolution ||
+      doc.documentElement.dataset.graphicsOpen === 'true' ||
+      rect.width !== views.W ||
+      rect.height !== views.H
+    ) {
+      resize();
+      return;
+    }
+    const ratio = drawingPixelRatio(doc, views.W, views.H, window.devicePixelRatio || 1);
+    if (ratio === views.DPR) return;
+    const request = (resolutionRequest = new AbortController());
+    const commit = await views.prepareResolution(ratio, request.signal);
+    if (request.signal.aborted || lifecycle.disposed) return;
+    if (commit?.()) applyResize(true);
+    else resolutionRetry = lifecycle.timeout(() => void resolution(), 500);
+  }
+  window.addEventListener('issen:graphics-resolution', resolution);
+  lifecycle.add(() => {
+    resolutionRequest?.abort();
+    lifecycle.clearTimeout(resolutionRetry);
+    window.removeEventListener('issen:graphics-resolution', resolution);
+  });
   lifecycle.listen(window, 'resize', () => {
     lifecycle.clearTimeout(rt);
     rt = lifecycle.timeout(resize, 80);

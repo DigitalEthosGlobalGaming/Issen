@@ -375,7 +375,7 @@ export function createFrameBindings(
           effectQuality.suspend();
           return;
         }
-        effectQuality.sample(interval);
+        effectQuality.sample(interval, !['playing', 'boss', 'standoff'].includes(G.state));
       },
     },
   );

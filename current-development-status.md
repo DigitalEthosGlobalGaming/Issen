@@ -1,5 +1,75 @@
 # Current development status
 
+## Incremental memory and continuous adaptive scenery (1.73.0)
+
+Ordinary upload admission now reads maintained source/residency totals. Owned
+canvas dimension writes and image load/error events update CPU pixels; the
+Pixi8.22 residency adapter updates GPU sources on add/remove/resize/update/unload
+and restores hooks on disposal. Exact diagnostics and one-second reconciliation
+remain; memory ceilings and explicit warm-upload checks are unchanged.
+
+Same-scene automatic resolution changes reserve a worker replacement, retain
+current scenery and combat, then promote uploaded planes and viewport DPR
+together. Supersession, stage/viewport changes, visibility and disposal cancel
+obsolete work; insufficient headroom defers changes. Resolution increases wait
+for quiet gameplay phases. Manual Options/physical resize retain normal readiness.
+Pending scenery/figure preloads now survive busy frames instead of repeatedly
+restarting. Texture-store current-frame sources are collected on touch, and
+immutable scenery material stamps are reused without holding retired planes.
+
+Minimal checks: focused ledger/quality/preload units17 PASS; four native browser
+cases PASS covering uninterrupted combat, exact incremental GPU totals, preload
+promotion/cancellation and restored graphics lifetime. An initial cancellation
+assertion read before promise cleanup; it now waits for the actual planes to close.
+The unrelated long preload visual combinations were interrupted to keep checks
+focused. Short identical combat timing (two repeats, one-second warmup, three-second
+samples) passed: median render2.3 to2.2ms, p95 4.5 to3.0ms versus1.72.0; desktop
+variation and short samples prevent a mobile FPS claim. Results remain under
+ignored `tmp/performance/`. Device validation is next; native GPU crash prevention
+is not established. Checked production build and strict TypeScript PASS. No full
+suites, save resets, commit, deployment or APK changes.
+
+## Memory admission and interruption recommendation (1.72.0)
+
+Repeated unchanged pending uploads no longer trigger a document-wide pixel/GPU
+scan each frame. New/changed storage checks immediately, native residency clears
+pending admission, context generations readmit sources, and unchanged frames
+reconcile once per second. Explicit warm uploads retain per-batch budget checks;
+memory limits and exact diagnostics are unchanged.
+
+The second same-scene preparation during active combat queues a seven-second
+recommendation to lower Graphics in Options after readiness. It appears once per
+run, resets on a fresh run (including repeated daily seeds), excludes stage entry,
+paused/menu changes and overlapping preparations, and preserves player choices.
+
+Focused units15 PASS; recommendation/admission, memory budget/reclamation and
+enemy/WebGL recovery browsers8 PASS. Identical short desktop combat measurements
+(two repeats, one-second warmup, three-second samples) both passed. Median render
+time stayed2.3ms; p95 changed3.3 to4.5ms. These noisy short samples establish no
+FPS gain. Retained results and frame-budget summaries are under ignored
+`tmp/performance/`; the affected device needs a fresh trace to validate improvement.
+
+## Local Autoplay and enemy graphics recovery (1.71.0)
+
+Development builds expose an optional Autoplay checkbox in Draw your blade. It
+uses true enemy attacks and normal combat inputs, waits for boss and standoff
+windows, and chooses random blessings. Pause and run menus remain manual; the
+selection is per-tab session storage, independent of saves. Production excludes it.
+
+Main-canvas WebGL restoration now invalidates derived enemy part and tone caches,
+cancels background figure warming and releases stale upload leases. Decoded
+atlases rebuild cutouts within unchanged bounds. Static cutouts and compact planes
+request CPU-backed Canvas sources to reduce redundant graphics surfaces. This
+repairs the reproduced blank enemy cache; prevention of the native browser GPU
+allocation crash still requires device validation.
+
+Focused units19 PASS; autoplay, enemy cache/recovery, compact enemy and player
+charm browsers15 PASS. The graphics lifetime test now awaits shader recovery and
+accepts small raster differences while retaining GL/error/listener checks; its
+focused rerun PASS. The unrelated historical converted-plane test still fails
+image decoding. Checked production build and strict TypeScript PASS. No profiles,
+benchmarks, save resets or deployments.
+
 ## Saved-run scenery startup fix (1.70.20)
 
 Startup artwork composition omitted scenery detail after checkpoint restoration

@@ -10,6 +10,7 @@ export function createSceneImagePreload(
   start: (stage: number, next: CompositionIdentity) => Preload | undefined,
   options: {
     retainReadyWhenBusy?: boolean;
+    retainPendingWhenBusy?: boolean;
     allowCurrentScene?: boolean;
     predict?: (
       current: CompositionIdentity,
@@ -32,7 +33,11 @@ export function createSceneImagePreload(
     if (options.predict) next = predicted?.identity;
     if (
       doc.hidden ||
-      ((!quiet || work > budget * 0.75) && !(options.retainReadyWhenBusy && status === 'ready')) ||
+      ((!quiet || work > budget * 0.75) &&
+        !(
+          (options.retainReadyWhenBusy && status === 'ready') ||
+          (options.retainPendingWhenBusy && status === 'pending')
+        )) ||
       !Number.isFinite(work) ||
       !Number.isFinite(budget) ||
       budget <= 0 ||

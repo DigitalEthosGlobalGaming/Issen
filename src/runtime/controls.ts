@@ -10,6 +10,7 @@ import { stateView } from '../game/session/state-view.ts';
 import { bindProfileWiring } from '../ui/wiring/profile.ts';
 import { bindPurchaseWiring } from '../ui/wiring/purchases.ts';
 import { createInputWiring } from '../ui/wiring/input.ts';
+import { mountLocalAutoplay } from '../ui/wiring/autoplay.ts';
 import { createTitleSecrets } from '../ui/wiring/secrets.ts';
 
 import { PREMIUM_FILM } from '../platform/premium.ts';
@@ -328,6 +329,21 @@ export function createRuntimeControls(
     ),
   );
   const disposeKeyboard = bindNavigation();
+  if (import.meta.env.DEV) {
+    mountLocalAutoplay(foundation.browser.cvs.ownerDocument, {
+      lifecycle: foundation.lifecycle,
+      G: foundation.run.G,
+      blocked: () =>
+        !readArtworkReady() ||
+        foundation.run.sceneState.sceneLoading ||
+        cinematic.active ||
+        ui.rewardScreen.open,
+      ordered: () => game.waveConfiguration().ordered,
+      mirrored: () => !!foundation.run.activity.activeTrial?.mirrored,
+      onSwipe: game.onSwipe,
+      onTapDown: game.onTapDown,
+    });
+  }
   return {
     setBestLine,
     openPanel,

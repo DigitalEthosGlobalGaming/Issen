@@ -28,7 +28,10 @@ export function createPreparedFigureAtlas(
     canvas.width = Math.max(1, Math.round(frame[2] * ratio));
     canvas.height = Math.max(1, Math.round(frame[3] * ratio));
     canvases.push(canvas);
-    canvas.getContext('2d')!.drawImage(source, ...frame, 0, 0, canvas.width, canvas.height);
+    // Request CPU backing for these immutable upload planes instead of another GPU surface.
+    canvas
+      .getContext('2d', { willReadFrequently: true })!
+      .drawImage(source, ...frame, 0, 0, canvas.width, canvas.height);
     return canvas;
   }
   function prepare(): Promise<boolean> {

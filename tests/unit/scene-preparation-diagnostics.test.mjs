@@ -10,7 +10,7 @@ function fixture(overrides = {}) {
     H: 844,
     DPR: 1.5,
     presentationState: { time: 0 },
-    G: { stage: 3, state: 'paused' },
+    G: { stage: 3, state: 'paused', bless: new Set(), panel: null },
     reducedMotion: () => false,
     reducedFlashes: () => false,
     density: () => 1,
@@ -37,6 +37,57 @@ function fixture(overrides = {}) {
   };
   return { views, flow: createSceneFlow(() => views) };
 }
+
+test('second same-scene combat interruption recommends lower graphics once per run after readiness', async () => {
+  let recommendations = 0;
+  const { views, flow } = fixture({ recommendLowerGraphics: () => recommendations++ });
+  const prepare = async () => {
+    flow.prepareScene();
+    await turn();
+    flow.settlePresentedScene();
+  };
+  views.G.state = 'playing';
+  await prepare(); // Initial stage preparation does not count.
+  views.W++;
+  await prepare();
+  assert.equal(recommendations, 0);
+  views.W++;
+  flow.prepareScene();
+  assert.equal(recommendations, 0, 'show after readiness, not over loading');
+  await turn();
+  flow.settlePresentedScene();
+  assert.equal(recommendations, 1);
+  views.W++;
+  await prepare();
+  assert.equal(recommendations, 1);
+  views.G.bless = new Set(); // New runs, including the same daily seed, get a fresh identity.
+  views.stageSeed++;
+  await prepare();
+  views.W++;
+  await prepare();
+  views.W++;
+  await prepare();
+  assert.equal(recommendations, 2);
+});
+
+test('stage entries, paused changes and duplicate in-flight requests do not count as combat interruptions', async () => {
+  let recommendations = 0;
+  const { views, flow } = fixture({ recommendLowerGraphics: () => recommendations++ });
+  for (let i = 0; i < 4; i++) {
+    views.G.stage++;
+    views.G.state = 'playing';
+    flow.prepareScene();
+    flow.prepareScene();
+    await turn();
+    flow.settlePresentedScene();
+    views.G.state = 'paused';
+    views.W++;
+    flow.prepareScene();
+    await turn();
+    flow.settlePresentedScene();
+  }
+  assert.equal(recommendations, 0);
+});
 
 for (const step of ['scenery', 'drift', 'figures']) {
   test(`a failed ${step} readiness check identifies its step and preserves paused gameplay`, async (t) => {

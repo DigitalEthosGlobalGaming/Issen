@@ -793,6 +793,33 @@ Phase, kill and frame views are cached per lifetime; request snapshots are not.
 borrowed. Geometry, stage visits, seals, equipment previews, environment caches,
 figures and post history have their own presentation owners. Graphics recovery
 and viewport orchestration belong to `graphics-lifecycle.ts` and `viewport.ts`.
+Native services invalidate derived enemy part and tone caches when their supplied
+painter canvas restores WebGL. Decoded atlases remain owned by the enemy renderer;
+subsequent preparation or drawing rebuilds cutouts within the existing cache bounds.
+Static enemy cutouts and compact prepared planes request CPU-backed 2D canvases
+to reduce duplicate native graphics surfaces.
+The painter admits new or changed pending texture storage before drawing and
+reconciles document memory once per second while unchanged frames continue.
+Explicit upload warming retains its per-batch allocation checks. Admission uses
+weak source identities and resets for context generations; native residency
+clears pending admission so subsequent unloads require a fresh check.
+Admission reads incremental pixel and GPU ledgers instead of enumerating every
+resource. Owned canvas dimension setters delegate to browser setters and update
+their nominal bytes; decoded image load/error events update image totals. Exact
+snapshots periodically reconcile unsupported/attribute writes and collected weak
+sources. The Pixi8.22 residency hash adapter observes add/remove and source
+update/resize/unload, restoring methods and listeners on painter disposal.
+
+Same-scene resolution changes use a separately reserved worker replacement.
+Viewport geometry and live canvases keep the old DPR until uploaded planes can
+be promoted synchronously. Stage, viewport or generation changes cancel stale
+transactions; insufficient background headroom defers changes. Explicit Options
+changes and real viewport resize keep the ordinary readiness path. Adaptive
+resolution increases wait for a quiet gameplay phase.
+Pending scenery and figure preloads survive busy frames while their identity,
+visibility and memory allowance remain valid. A ready slot transfers ownership
+to the foreground without recomposing. Frame texture sources are collected as
+they are touched, and immutable scenery material stamps are reused per layer.
 Live weather hazards, hit stop, slow motion and player records remain rule-owned.
 
 `platform/pixel-memory.ts` weakly observes decoded images and canvas backing

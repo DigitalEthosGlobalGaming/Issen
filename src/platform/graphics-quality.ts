@@ -69,7 +69,8 @@ export function createGraphicsQuality(
     } else return false;
     return true;
   }
-  function restore(): boolean {
+  function restore(allowResolutionIncrease: boolean): boolean {
+    if (!allowResolutionIncrease && reductions.at(-1)?.key === 'resolution') return false;
     const reduction = reductions.pop();
     if (!reduction) return false;
     switch (reduction.key) {
@@ -107,7 +108,7 @@ export function createGraphicsQuality(
         listeners.delete(listener);
       };
     },
-    sample(intervalMs: number): boolean {
+    sample(intervalMs: number, allowResolutionIncrease = true): boolean {
       sync();
       if (
         !effective.adaptive ||
@@ -135,7 +136,11 @@ export function createGraphicsQuality(
       // Two slow one-second windows to reduce; ten seconds of stable cadence
       // between recovery probes. A failed probe cannot immediately oscillate up.
       const changed =
-        slowWindows >= 2 ? reduce() : fastWindows >= 8 && sinceChange >= 10_000 ? restore() : false;
+        slowWindows >= 2
+          ? reduce()
+          : fastWindows >= 8 && sinceChange >= 10_000
+            ? restore(allowResolutionIncrease)
+            : false;
       if (changed) {
         sinceChange = 0;
         suspend();

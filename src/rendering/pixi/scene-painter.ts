@@ -30,8 +30,9 @@ import type { SceneDrawing } from '../scene-drawing.ts';
 import { registerScenePathSink, registerSceneFilmPass } from '../scene-drawing.ts';
 import { createCopyFilmPass } from './film-pass.ts';
 import { SceneTextureStore } from './texture-store.ts';
-import { rendererGpuMemory, pendingTextureBytes } from './gpu-memory.ts';
+import { rendererGpuMemory, pendingTextureBytes, createGpuMemoryLedger } from './gpu-memory.ts';
 import { registerSceneMemory, reclaimSceneMemory } from '../../platform/scene-memory.ts';
+import { createTextureAdmission } from './texture-admission.ts';
 import { documentPixelMemory, trackPixelSource } from '../../platform/pixel-memory.ts';
 import { installWebGLGraphicsData } from './webgl-graphics-data.ts';
 import { detachSourceBindings } from './source-bindings.ts';
@@ -361,6 +362,9 @@ export class PixiScenePainter implements SceneDrawing {
 
   private readonly geometryBuffer: GeometryBuffer;
   private readonly pendingUploads = new Map<AbortSignal, Set<TextureSource>>();
+  private readonly textureAdmission = createTextureAdmission();
+  private readonly gpuMemoryLedger;
+  private memoryReconciliationAt = 0;
   private readonly uploadMemoryOwner;
   private readonly lightBuffer: LightBuffer;
   private readonly artworkMaterials: ArtworkMaterials;
@@ -376,6 +380,7 @@ export class PixiScenePainter implements SceneDrawing {
     private readonly renderer: WebGLRenderer<HTMLCanvasElement>,
   ) {
     this.geometryBuffer = new GeometryBuffer(renderer);
+    this.gpuMemoryLedger = createGpuMemoryLedger(renderer);
     documentPixelMemory(canvas.ownerDocument).trackGpu(this);
     const painter = this;
     this.uploadMemoryOwner = {
@@ -711,8 +716,19 @@ export class PixiScenePainter implements SceneDrawing {
     if (this.disposed || this.contextLost || this.recoveringShaders) return;
     // Ordinary drawing uploads text, patterns and effects too. Publish their
     // pending storage before reclaiming, rather than waiting for native residency.
-    if (pendingTextureBytes(this.drawingTextureSources(), this.renderer.uid))
-      reclaimSceneMemory(this.canvas.ownerDocument);
+    if (
+      this.textureAdmission.required(
+        this.drawingTextureSources(),
+        this.renderer.uid,
+        this.contextGeneration,
+        performance.now(),
+      )
+    ) {
+      const now = performance.now();
+      const reconcile = now >= this.memoryReconciliationAt;
+      if (reconcile) this.memoryReconciliationAt = now + 1000;
+      reclaimSceneMemory(this.canvas.ownerDocument, 0, !reconcile);
+    }
     this.lightPass();
     // Pixi's back-buffer presentation blends onto the view without clearing it.
     // Explicitly clear the view too, so consecutive transparent frames in one
@@ -1548,6 +1564,15 @@ export class PixiScenePainter implements SceneDrawing {
         };
   }
 
+  get admissionMemorySnapshot() {
+    return this.disposed
+      ? this.memorySnapshot
+      : {
+          ...this.gpuMemoryLedger.snapshot(),
+          browserReserveBytes: this.canvas.width * this.canvas.height * 12,
+        };
+  }
+
   get sourceRetirementSnapshot(): { sources: number; bytes: number } {
     return this.textures.retirementSnapshot;
   }
@@ -1767,6 +1792,7 @@ export class PixiScenePainter implements SceneDrawing {
     this.uploadLifetime.abort();
     if (this.disposed) return;
     this.disposed = true;
+    this.gpuMemoryLedger.dispose();
     this.canvas.removeEventListener('webglcontextlost', this.loseContext);
     this.canvas.removeEventListener('webglcontextrestored', this.restoreContext);
     this.root.removeChildren();

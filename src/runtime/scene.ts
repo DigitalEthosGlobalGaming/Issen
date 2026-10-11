@@ -134,6 +134,7 @@ export function createRuntimeSceneCoordination(
     },
     {
       retainReadyWhenBusy: true,
+      retainPendingWhenBusy: true,
       allowCurrentScene: true,
       predict: (current, next) => {
         const trial = foundation.run.activity.activeTrial;
@@ -178,6 +179,12 @@ export function createRuntimeSceneCoordination(
                 : '';
             },
             presentationState: foundation.view.presentationState,
+            recommendLowerGraphics: () =>
+              ui.notifications.hint(
+                'graphics-preparation',
+                'Scenery keeps interrupting your run. Try lower Graphics in Options.',
+                7000,
+              ),
             G: foundation.run.G,
             reducedMotion: foundation.browser.reducedMotion,
             reducedFlashes: foundation.browser.reducedFlashes,
@@ -240,6 +247,7 @@ export function createRuntimeSceneCoordination(
     buildWeather,
     setStage,
     sceneFlow,
+    prepareResolution: sceneFlow.prepareResolution,
     figurePreload,
     prepareScene,
     deferUntilSceneReady,

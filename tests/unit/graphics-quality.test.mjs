@@ -21,6 +21,26 @@ function reduceOnce(quality) {
   for (let i = 0; i < 1000; i++) if (quality.sample(50)) return;
   assert.fail('No reduction after sustained slow delivery');
 }
+
+test('resolution recovery waits until combat permits a quiet transition', () => {
+  const settings = {
+    ...graphicsPreset('balanced'),
+    preset: 'custom',
+    lighting: 'off',
+    resolution: 75,
+  };
+  const quality = createGraphicsQuality(
+    () => settings,
+    { mobile: true },
+    () => false,
+  );
+  reduceOnce(quality);
+  assert.equal(quality.effective.resolution, 65);
+  for (let i = 0; i < 900; i++) quality.sample(1000 / 60, false);
+  assert.equal(quality.effective.resolution, 65);
+  for (let i = 0; i < 65; i++) quality.sample(1000 / 60, true);
+  assert.equal(quality.effective.resolution, 75);
+});
 test('ordered reductions cover rate, lighting, resolution, particles and grass without modifying saves', () => {
   const settings = graphicsPreset('high'),
     original = structuredClone(settings);

@@ -24,6 +24,58 @@ The development watcher ignores Android outputs, local toolchains and
 `tmp/` and legacy `.verification*` directories so building or verifying another
 edition does not reload a running game.
 
+## Local Autoplay
+
+With `npm run dev`, open Draw your blade and tick Autoplay before pressing Begin.
+It reads true enemy directions, cuts quickly, waits for duel parry and standoff
+windows, and selects a random offered blessing. Start, resume and restart remain
+manual. Pause, open panels, hidden pages and scenery preparation suspend inputs.
+The checkbox defaults off and remembers its selection for the current browser
+tab using session storage, independently of player saves. It also works through
+localhost forwarding to a phone. Production web and Android builds exclude it.
+
+The tactical reader lives in `src/input/autoplay.ts`; development-only UI wiring
+in `src/ui/wiring/autoplay.ts` calls the runtime's normal combat inputs and
+blessing buttons. Input exceptions stop Autoplay and report the original error
+in Console.
+
+## Graphics recovery
+
+The drawing path checks memory immediately for new or changed pending upload
+storage using incremental source/residency ledgers, with one-second exact
+reconciliation. Explicit warming still checks each upload batch. It keeps the
+existing memory limits and exact diagnostic snapshots.
+
+Automatic same-scene resolution changes prepare and upload a replacement while
+combat and current scenery continue. Promotion commits the new DPR and canvas
+sizes together; memory pressure defers the change. Resolution increases wait for
+a quiet phase. Options changes and physical viewport resizing still use normal
+readiness. Pending next-stage scenery and figure preparation survive busy frames
+but cancel when hidden, obsolete, disposed or outside their memory allowance.
+
+After the second same-scene preparation interrupting active combat in a run, a
+seven-second hint recommends lower Graphics in Options. Initial preparation,
+stage transitions, paused/menu changes and overlapping requests do not count.
+The hint appears after scenery is ready, once per run, without changing graphics
+preferences or blocking pause. It uses the current run's blessing-set identity,
+so restarting the same daily seed also resets the recommendation.
+
+WebGL restoration clears derived enemy parts and tones, cancels background figure
+warming and releases obsolete figure upload leases. Console reports
+`[Issen] Enemy artwork cache reset after graphics restoration.` with released
+part counts. Enemies rebuild from decoded atlases on preparation or their next
+draw; pause and Continue remain under player control. Cache bounds are unchanged.
+
+Static cutouts and compact prepared planes request CPU backing with the Canvas
+`willReadFrequently` hint. This reduces redundant graphics surfaces but does not
+establish that native browser allocation or driver crashes are prevented. Repeat
+the affected device run to validate that separately.
+
+The graphics lifetime test accepts small restoration raster differences: average
+absolute channel difference at most 5/255 and the 99th percentile at most 32/255.
+Peer disposal remains pixel-exact; GL errors, uncaught errors and listener leaks
+still fail the test.
+
 ## Scene preparation diagnostics
 
 The Console reports `[Issen] Scene preparation failed.` with the failed

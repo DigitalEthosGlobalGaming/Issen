@@ -60,868 +60,95 @@
         <h1>Changelog</h1>
         <p class="date">Issen · What changed</p>
       </header>
-      <section aria-labelledby="version-1-70-20">
-        <h2 id="version-1-70-20">1.70.20</h2>
-        <ul>
-          <li>Fix scenery preparation getting stuck when restoring a saved run.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-19">
-        <h2 id="version-1-70-19">1.70.19</h2>
-        <ul>
-          <li>Add clearer diagnostics when scenery cannot be prepared.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-18">
-        <h2 id="version-1-70-18">1.70.18</h2>
-        <ul>
-          <li>Keep the previous scene visible while heavy Graphics changes prepare.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-17">
-        <h2 id="version-1-70-17">1.70.17</h2>
+      <section aria-labelledby="version-1-73">
+        <h2 id="version-1-73">1.73 · Smoother runs</h2>
         <ul>
           <li>
-            Use lighter colour and lighting calculations while retaining precise scenery placement
-            and normals.
+            Auto graphics now adjusts resolution in the background, keeping combat moving while
+            scenery updates.
+          </li>
+          <li>
+            Less repeated graphics work during combat and more reliable next-stage loading help
+            reduce stutters.
+          </li>
+          <li>Enemy artwork is restored after a graphics interruption.</li>
+          <li>
+            If scenery repeatedly interrupts your run, a message suggests lowering Graphics in
+            Options.
           </li>
         </ul>
       </section>
-      <section aria-labelledby="version-1-70-16">
-        <h2 id="version-1-70-16">1.70.16</h2>
-        <ul>
-          <li>Reduce temporary objects created while drawing scenery, lighting and effects.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-15">
-        <h2 id="version-1-70-15">1.70.15</h2>
+      <section aria-labelledby="version-1-70">
+        <h2 id="version-1-70">1.70 · Graphics your way</h2>
         <ul>
           <li>
-            Prepare grass, lighting and film effects during loading to avoid first-use shader work.
+            A dedicated Graphics menu lets you choose frame rate, resolution, lighting, grass,
+            scenery detail and effects.
           </li>
-          <li>Graphics recovery prepares effects before gameplay resumes.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-14">
-        <h2 id="version-1-70-14">1.70.14</h2>
-        <ul>
-          <li>Unchanged blurred scenery reuses its filtered artwork to reduce rendering work.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-13">
-        <h2 id="version-1-70-13">1.70.13</h2>
-        <ul>
-          <li>Static scenery reuses its lighting while cosmetic effects keep animating.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-12">
-        <h2 id="version-1-70-12">1.70.12</h2>
-        <ul>
-          <li>Turn anti-aliasing on or off in Graphics to adjust edge smoothing.</li>
-          <li>Changes apply live while keeping the current scene visible.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-11">
-        <h2 id="version-1-70-11">1.70.11</h2>
-        <ul>
           <li>
-            Preview Graphics from the title in a rainy forest with lantern light, embers and
-            drifting leaves.
+            Use Auto to adjust graphics as performance changes, or tune individual settings
+            yourself.
           </li>
-          <li>The showcase includes an idling player and periodic cosmetic gusts.</li>
+          <li>Preview changes in a live scene and show an optional FPS counter during play.</li>
+          <li>Choose memory usage and next-stage preloading to suit your device.</li>
+          <li>Fixed saved runs getting stuck on Preparing scenery.</li>
         </ul>
       </section>
-      <section aria-labelledby="version-1-70-10">
-        <h2 id="version-1-70-10">1.70.10</h2>
+      <section aria-labelledby="version-1-69">
+        <h2 id="version-1-69">1.69 · Faster stage changes</h2>
         <ul>
-          <li>Graphics opens beside the scene or as a bottom sheet on portrait phones.</li>
           <li>
-            Leaves, weather and other cosmetics animate while adjusting a paused game's graphics.
+            Upcoming scenery and boss artwork prepare during quiet moments to reduce waits between
+            encounters.
           </li>
+          <li>
+            Equipped weapons, outfits and companions prepare before combat to reduce
+            first-appearance stutters.
+          </li>
+          <li>
+            Unused artwork is released more reliably, reducing memory pressure during long runs and
+            equipment previews.
+          </li>
+          <li>Scenery loading failures offer a retry while combat stays paused.</li>
         </ul>
       </section>
-      <section aria-labelledby="version-1-70-9">
-        <h2 id="version-1-70-9">1.70.9</h2>
-        <ul>
-          <li>Choose Low, Normal or High memory usage in Graphics.</li>
-          <li>Memory changes keep the current scene visible while unused artwork is released.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-8">
-        <h2 id="version-1-70-8">1.70.8</h2>
-        <ul>
-          <li>Artwork stays intact when an active memory budget is reduced.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-7">
-        <h2 id="version-1-70-7">1.70.7</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Choose Low, Normal or High scenery detail independently of motion settings.</li>
-          <li>Combine rapid scenery changes into one preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-6">
-        <h2 id="version-1-70-6">1.70.6</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Show live FPS and frame time in Graphics, with an optional gameplay counter.</li>
-          <li>Keep Graphics rendering at your selected frame rate.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-5">
-        <h2 id="version-1-70-5">1.70.5</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Choose Low, Medium or High grass quality.</li>
-          <li>Use simpler lighting for Low and Medium grass while retaining wind and movement.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-4">
-        <h2 id="version-1-70-4">1.70.4</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Skip outdated scenery requests when another scene is selected during preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-3">
-        <h2 id="version-1-70-3">1.70.3</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Choose whether to prepare the next stage ahead of time.</li>
-          <li>Release next-stage preparation when preloading is switched off.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-2">
-        <h2 id="version-1-70-2">1.70.2</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Adjust lighting, resolution, ambient particles and weather separately.</li>
-          <li>Adapt graphics to sustained frame delays without changing saved preferences.</li>
-          <li>Combine rapid resolution changes and avoid scenery preparation for audio changes.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-1">
-        <h2 id="version-1-70-1">1.70.1</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Choose a frame rate while keeping combat timing unchanged.</li>
-          <li>Offer 120 fps when the display supports it.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-70-0">
-        <h2 id="version-1-70-0">1.70.0</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Group graphics preferences separately from accessibility.</li>
-          <li>Keep existing preferences when upgrading graphics settings.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-58">
-        <h2 id="version-1-69-58">1.69.58</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Simplify scenery preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-57">
-        <h2 id="version-1-69-57">1.69.57</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Reduce repeated work while preparing stages.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-56">
-        <h2 id="version-1-69-56">1.69.56</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Keep scenery lighting consistent after graphics recovery.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-55">
-        <h2 id="version-1-69-55">1.69.55</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Leave more memory available for combat while preparing the next stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-54">
-        <h2 id="version-1-69-54">1.69.54</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Improve memory handling for combat artwork during stage preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-53">
-        <h2 id="version-1-69-53">1.69.53</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Improve memory handling when stage preparation is interrupted.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-52">
-        <h2 id="version-1-69-52">1.69.52</h2>
-        <p class="date">10 October 2026</p>
+      <section aria-labelledby="version-1-68">
+        <h2 id="version-1-68">1.68 · Richer lighting, smoother play</h2>
         <ul>
           <li>
-            Defer menu artwork preparation under memory pressure and cancel it during busy gameplay.
+            Armour, blades, grass and scenery respond to lighting. Cuts, parries, lanterns and
+            spirit flames light nearby surfaces.
+          </li>
+          <li>
+            Busy scenes and high-refresh displays receive smoother rendering and frame pacing.
+          </li>
+          <li>
+            Scenery loads ahead and prepares before appearing, reducing sudden pauses at stage
+            changes.
+          </li>
+          <li>Artwork uses less temporary memory during loading and longer runs.</li>
+        </ul>
+      </section>
+      <section aria-labelledby="version-1-67">
+        <h2 id="version-1-67">1.67 · Clearer graphics recovery</h2>
+        <ul>
+          <li>
+            Clearer messages explain when your device cannot display the game graphics and needs to
+            recover.
           </li>
         </ul>
       </section>
-      <section aria-labelledby="version-1-69-51">
-        <h2 id="version-1-69-51">1.69.51</h2>
-        <p class="date">10 October 2026</p>
+      <section aria-labelledby="version-1-66">
+        <h2 id="version-1-66">1.66 · Lighting and loading improvements</h2>
         <ul>
-          <li>Release temporary menu lighting resources sooner during gameplay.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-50">
-        <h2 id="version-1-69-50">1.69.50</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Improve character artwork preparation reliability.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-49">
-        <h2 id="version-1-69-49">1.69.49</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
+          <li>Scenery, drifting debris, menus and the Armoury room now react to lighting.</li>
+          <li>Encounters wait for scenery to be ready before enemies appear and combat begins.</li>
+          <li>More reliable startup retries and graphics recovery in previews and practice.</li>
           <li>
-            Prepare scenery artwork in small parallel batches while respecting texture memory
-            budgets.
+            Fixed incorrect Boss Rush duel numbers after scene changes and improved the setup menu
+            on small portrait screens.
           </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-48">
-        <h2 id="version-1-69-48">1.69.48</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>
-            Keep shared scenery artwork available during memory reclamation to reduce loading waits.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-47">
-        <h2 id="version-1-69-47">1.69.47</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>
-            Reuse scenery artwork when memory allows, reducing waits on repeated stage changes.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-46">
-        <h2 id="version-1-69-46">1.69.46</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>
-            Lower weapon lighting texture memory on low-memory phones, leaving more room for
-            upcoming scenery.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-45">
-        <h2 id="version-1-69-45">1.69.45</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>
-            Reduce companion texture memory on low-memory phones while preserving their look and
-            motion.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-44">
-        <h2 id="version-1-69-44">1.69.44</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>
-            Prepare later trial bosses before entry, including duels that share the same scenery.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-43">
-        <h2 id="version-1-69-43">1.69.43</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Prepare equipped companion artwork before play to avoid first-appearance hitches.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-42">
-        <h2 id="version-1-69-42">1.69.42</h2>
-        <p class="date">10 October 2026</p>
-        <ul>
-          <li>Prepare upcoming boss artwork during quiet moments for smoother duel transitions.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-41">
-        <h2 id="version-1-69-41">1.69.41</h2>
-        <ul>
-          <li>
-            Reduce outfit and charm memory on low-memory devices to prepare more stage transitions.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-40">
-        <h2 id="version-1-69-40">1.69.40</h2>
-        <ul>
-          <li>Prepare your outfit and charm before gameplay to reduce first-appearance hitches.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-39">
-        <h2 id="version-1-69-39">1.69.39</h2>
-        <ul>
-          <li>Use less memory when preparing a return to the meadow stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-38">
-        <h2 id="version-1-69-38">1.69.38</h2>
-        <ul>
-          <li>Reduce scenery memory on low-memory devices to make room for the next stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-37">
-        <h2 id="version-1-69-37">1.69.37</h2>
-        <ul>
-          <li>Account for temporary scenery copies while managing graphics memory.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-36">
-        <h2 id="version-1-69-36">1.69.36</h2>
-        <ul>
-          <li>Make drifting mist in the Demon realm cheaper to render.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-35">
-        <h2 id="version-1-69-35">1.69.35</h2>
-        <ul>
-          <li>Reduce memory used by pan and beam weapons on low-memory devices.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-34">
-        <h2 id="version-1-69-34">1.69.34</h2>
-        <ul>
-          <li>Load special-weapon artwork when selected instead of during every startup.</li>
-          <li>Refresh equipment previews when selected weapon artwork becomes ready.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-33">
-        <h2 id="version-1-69-33">1.69.33</h2>
-        <ul>
-          <li>Make room for graphics uploads while preparing scenery and figures.</li>
-          <li>Reclaim unused artwork before decoding new images under memory pressure.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-32">
-        <h2 id="version-1-69-32">1.69.32</h2>
-        <ul>
-          <li>Account for artwork currently decoding when managing scenery memory.</li>
-          <li>Reclaim unused artwork as scenery loading progresses.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-31">
-        <h2 id="version-1-69-31">1.69.31</h2>
-        <ul>
-          <li>Release room artwork inputs after equipment-preview graphics are prepared.</li>
-          <li>Keep the room visible while resizing and reduce restoration memory overlap.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-30">
-        <h2 id="version-1-69-30">1.69.30</h2>
-        <ul>
-          <li>Release temporary scenery graphics before preparing them for display.</li>
-          <li>Reduce memory overlap when returning from equipment inspection.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-29">
-        <h2 id="version-1-69-29">1.69.29</h2>
-        <ul>
-          <li>
-            Reduce memory use while inspecting equipment by releasing hidden scenery graphics.
-          </li>
-          <li>Restore scenery at the current screen size when inspection closes.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-28">
-        <h2 id="version-1-69-28">1.69.28</h2>
-        <ul>
-          <li>Load equipment-preview rooms on demand and release unused preview graphics.</li>
-          <li>Limit inspection rendering memory on low-memory devices.</li>
-          <li>Restore the Armoury room's material lighting.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-27">
-        <h2 id="version-1-69-27">1.69.27</h2>
-        <ul>
-          <li>Reduce memory spikes when preparing a new stage.</li>
-          <li>Keep scenery visible while making room for incoming artwork.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-26">
-        <h2 id="version-1-69-26">1.69.26</h2>
-        <ul>
-          <li>Reduce scenery loading memory on low-memory devices.</li>
-          <li>Reclaim unused artwork before preparing a new stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-25">
-        <h2 id="version-1-69-25">1.69.25</h2>
-        <ul>
-          <li>Improve memory diagnostics for stage loading.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-24">
-        <h2 id="version-1-69-24">1.69.24</h2>
-        <ul>
-          <li>Reduce rendering memory on low-memory devices.</li>
-          <li>Reclaim unused artwork during stage changes and release meadow fog when leaving.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-23">
-        <h2 id="version-1-69-23">1.69.23</h2>
-        <ul>
-          <li>
-            Use smaller prepared enemy artwork on low-memory devices while retaining scene lighting.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-22">
-        <h2 id="version-1-69-22">1.69.22</h2>
-        <ul>
-          <li>Free ordinary scenery memory while playing or previewing the Demon realm.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-21">
-        <h2 id="version-1-69-21">1.69.21</h2>
-        <ul>
-          <li>Prepare Demon scenery before play resumes and release its artwork when leaving.</li>
-          <li>Reduce Demon scenery hitches after graphics recovery.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-20">
-        <h2 id="version-1-69-20">1.69.20</h2>
-        <ul>
-          <li>Prepare enemy and weapon artwork before combat resumes after a stage change.</li>
-          <li>Reduce first-draw texture uploads after graphics recovery.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-19">
-        <h2 id="version-1-69-19">1.69.19</h2>
-        <ul>
-          <li>Prepare upcoming scenery during quiet moments for faster stage changes.</li>
-          <li>Recover from scenery worker failures during play without losing the stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-18">
-        <h2 id="version-1-69-18">1.69.18</h2>
-        <ul>
-          <li>Stage artwork uses less memory, with Demon scenery loaded when needed.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-17">
-        <h2 id="version-1-69-17">1.69.17</h2>
-        <ul>
-          <li>Added groundwork for keeping scenery and character memory bounded on mobile.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-16">
-        <h2 id="version-1-69-16">1.69.16</h2>
-        <ul>
-          <li>Scene loading failures offer a clear retry without advancing combat.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-15">
-        <h2 id="version-1-69-15">1.69.15</h2>
-        <ul>
-          <li>
-            Leaves and embers use lighter textures and lighting, reducing memory use on mobile.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-14">
-        <h2 id="version-1-69-14">1.69.14</h2>
-        <ul>
-          <li>
-            Added groundwork for lighter scenery effects on mobile; visual changes are still in
-            development.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-13">
-        <h2 id="version-1-69-13">1.69.13</h2>
-        <ul>
-          <li>Weapon artwork prepares before battles.</li>
-          <li>Prepared scenery stays ready when revisited.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-12">
-        <h2 id="version-1-69-12">1.69.12</h2>
-        <ul>
-          <li>Scenery loading releases unused artwork when memory is needed.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-11">
-        <h2 id="version-1-69-11">1.69.11</h2>
-        <ul>
-          <li>Drifting scenery prepares its textures before a scene appears.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-10">
-        <h2 id="version-1-69-10">1.69.10</h2>
-        <ul>
-          <li>Drifting scenery loads for the current scene and stays moving during loading.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-9">
-        <h2 id="version-1-69-9">1.69.9</h2>
-        <ul>
-          <li>Drifting scenery shares artwork memory and releases unused textures reliably.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-8">
-        <h2 id="version-1-69-8">1.69.8</h2>
-        <ul>
-          <li>Streamlined scenery loading at startup.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-7">
-        <h2 id="version-1-69-7">1.69.7</h2>
-        <ul>
-          <li>Player and menu artwork share image memory and release preview textures reliably.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-6">
-        <h2 id="version-1-69-6">1.69.6</h2>
-        <ul>
-          <li>
-            Outfit artwork loads for your equipped robe and active previews, using less memory.
-          </li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-5">
-        <h2 id="version-1-69-5">1.69.5</h2>
-        <ul>
-          <li>Menu artwork shares image memory and releases cached textures more reliably.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-4">
-        <h2 id="version-1-69-4">1.69.4</h2>
-        <ul>
-          <li>Animated combat effects release their graphics resources more reliably.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-3">
-        <h2 id="version-1-69-3">1.69.3</h2>
-        <ul>
-          <li>Combat lighting prepares more efficiently.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-2">
-        <h2 id="version-1-69-2">1.69.2</h2>
-        <ul>
-          <li>Smoother combat effects as on-screen cues change.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-1">
-        <h2 id="version-1-69-1">1.69.1</h2>
-        <ul>
-          <li>Stage scenery prepares more efficiently.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-69-0">
-        <h2 id="version-1-69-0">1.69.0</h2>
-        <ul>
-          <li>Upcoming stage artwork loads during quiet moments.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-35">
-        <h2 id="version-1-68-35">1.68.35</h2>
-        <ul>
-          <li>Under-the-hood improvements to artwork loading.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-34">
-        <h2 id="version-1-68-34">1.68.34</h2>
-        <ul>
-          <li>Reduced temporary scenery memory during loading.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-33">
-        <h2 id="version-1-68-33">1.68.33</h2>
-        <ul>
-          <li>Scenery releases temporary artwork caches when loading finishes.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-32">
-        <h2 id="version-1-68-32">1.68.32</h2>
-        <ul>
-          <li>Scenery loading now tracks upcoming stage visits more accurately.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-31">
-        <h2 id="version-1-68-31">1.68.31</h2>
-        <ul>
-          <li>Released scenery source artwork after its scene is ready.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-30">
-        <h2 id="version-1-68-30">1.68.30</h2>
-        <ul>
-          <li>Released unused player and weapon artwork textures.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-29">
-        <h2 id="version-1-68-29">1.68.29</h2>
-        <ul>
-          <li>Reduced memory held by cached enemy artwork.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-28">
-        <h2 id="version-1-68-28">1.68.28</h2>
-        <ul>
-          <li>Released material textures when their artwork is disposed.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-27">
-        <h2 id="version-1-68-27">1.68.27</h2>
-        <ul>
-          <li>Reduced enemy artwork memory and unnecessary startup loading.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-26">
-        <h2 id="version-1-68-26">1.68.26</h2>
-        <ul>
-          <li>Loaded companion artwork only when equipped or shown in a preview.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-25">
-        <h2 id="version-1-68-25">1.68.25</h2>
-        <ul>
-          <li>Released unused artwork textures when clearing cached images.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-24">
-        <h2 id="version-1-68-24">1.68.24</h2>
-        <ul>
-          <li>Reduced shader stalls when scenery first appears.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-23">
-        <h2 id="version-1-68-23">1.68.23</h2>
-        <ul>
-          <li>Prepared scenery textures before displaying a new stage.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-22">
-        <h2 id="version-1-68-22">1.68.22</h2>
-        <ul>
-          <li>Improved scenery texture cleanup during longer runs and trial retries.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-21">
-        <h2 id="version-1-68-21">1.68.21</h2>
-        <ul>
-          <li>Prepared upcoming scenery downloads according to the active game mode.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-20">
-        <h2 id="version-1-68-20">1.68.20</h2>
-        <ul>
-          <li>Released scenery textures promptly between stages.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-19">
-        <h2 id="version-1-68-19">1.68.19</h2>
-        <ul>
-          <li>Under-the-hood improvements for artwork memory tracking.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-18">
-        <h2 id="version-1-68-18">1.68.18</h2>
-        <ul>
-          <li>Reserved background artwork preparation for quiet, visible moments.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-17">
-        <h2 id="version-1-68-17">1.68.17</h2>
-        <ul>
-          <li>Added a quiet ink veil when scenery takes longer to prepare.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-16">
-        <h2 id="version-1-68-16">1.68.16</h2>
-        <ul>
-          <li>Kept ambient animation moving while scenery loads.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-15">
-        <h2 id="version-1-68-15">1.68.15</h2>
-        <ul>
-          <li>Under-the-hood improvements for stage preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-14">
-        <h2 id="version-1-68-14">1.68.14</h2>
-        <ul>
-          <li>Shared charm artwork safely between previews.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-13">
-        <h2 id="version-1-68-13">1.68.13</h2>
-        <ul>
-          <li>Released temporary artwork used during startup.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-12">
-        <h2 id="version-1-68-12">1.68.12</h2>
-        <ul>
-          <li>Released temporary menu artwork after lighting it.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-11">
-        <h2 id="version-1-68-11">1.68.11</h2>
-        <ul>
-          <li>Reused scenery artwork safely across independent previews.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-10">
-        <h2 id="version-1-68-10">1.68.10</h2>
-        <ul>
-          <li>Bounded scenery material memory when worker rendering is unavailable.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-9">
-        <h2 id="version-1-68-9">1.68.9</h2>
-        <ul>
-          <li>Fetched scenery files ahead while the game is idle.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-8">
-        <h2 id="version-1-68-8">1.68.8</h2>
-        <ul>
-          <li>Reused scenery images between stages.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-7">
-        <h2 id="version-1-68-7">1.68.7</h2>
-        <ul>
-          <li>Reduced memory used to prepare scenery and menu materials.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-6">
-        <h2 id="version-1-68-6">1.68.6</h2>
-        <ul>
-          <li>Reused scenery material cutouts during stage preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-5">
-        <h2 id="version-1-68-5">1.68.5</h2>
-        <ul>
-          <li>Improved stage preparation.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-4">
-        <h2 id="version-1-68-4">1.68.4</h2>
-        <ul>
-          <li>Improved frame pacing on high-refresh displays.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-3">
-        <h2 id="version-1-68-3">1.68.3</h2>
-        <ul>
-          <li>Smoother character rendering and trial progress updates.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-2">
-        <h2 id="version-1-68-2">1.68.2</h2>
-        <ul>
-          <li>Smoother rendering in busy scenes.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-1">
-        <h2 id="version-1-68-1">1.68.1</h2>
-        <ul>
-          <li>Under-the-hood improvements.</li>
-        </ul>
-      </section>
-      <section aria-labelledby="version-1-68-0">
-        <h2 id="version-1-68-0">1.68.0</h2>
-        <ul>
-          <li>Under-the-hood improvements.</li>
-          <li>Improved lighting previews and quality controls in testing tools.</li>
-          <li>Improved lighting on armour, blades, grass, leaves and scenery.</li>
-          <li>Cuts and parries briefly light nearby surfaces.</li>
-          <li>Lanterns, embers and foxfire illuminate nearby surfaces.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.67.0</h2>
-        <ul>
-          <li>Under-the-hood improvements.</li>
-          <li>Clearer recovery messages when device graphics are unavailable.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.8</h2>
-        <p class="date">7 October 2026</p>
-        <ul>
-          <li>Smaller download</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.7</h2>
-        <p class="date">7 October 2026</p>
-        <ul>
-          <li>Made startup retry and cleanup more reliable.</li>
-          <li>Restored preview and practice recovery when graphics become unavailable.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.6</h2>
-        <p class="date">7 October 2026</p>
-        <ul>
-          <li>Restored the original artwork loading for scenes, characters and menus.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.5</h2>
-        <p class="date">7 October 2026</p>
-        <ul>
-          <li>
-            Improved startup and cleanup handling while keeping artwork loading retry available.
-          </li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.4</h2>
-        <p class="date">7 October 2026</p>
-        <ul>
-          <li>Consolidated rendering code and checks to keep lighting and previews consistent.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.2</h2>
-        <p class="date">6 October 2026</p>
-        <ul>
-          <li>Boss Rush keeps the correct duel number after loading a new scene.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.1</h2>
-        <p class="date">5 October 2026</p>
-        <ul>
-          <li>Cinematic navigation prepares and displays the selected scene.</li>
-          <li>Encounters wait for their scenery before enemies appear and combat begins.</li>
-        </ul>
-      </section>
-      <section>
-        <h2>1.66.0</h2>
-        <p class="date">5 October 2026</p>
-        <ul>
-          <li>Scenery, drifting debris, menus and the armoury room now react to lighting.</li>
-          <li>Inspect every generated material from the lighting debug panel.</li>
-          <li>Scenery prepares in the background while the current scene keeps drawing.</li>
-          <li>Lighting loads material maps as needed and reuses shared materials.</li>
-          <li>Fixed stale scenery textures and kept setup within smaller portrait screens.</li>
+          <li>Smaller game download.</li>
         </ul>
       </section>
       <section>

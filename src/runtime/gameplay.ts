@@ -528,6 +528,7 @@ export function createRuntimeGameplay(
     sceneFlow: scene.sceneFlow,
     figurePreload: scene.figurePreload,
     prepareScene: scene.prepareScene,
+    prepareResolution: scene.prepareResolution,
     deferUntilSceneReady: scene.deferUntilSceneReady,
     checkUnlocks: rules.checkUnlocks,
     sessionBindings,

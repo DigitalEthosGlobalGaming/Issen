@@ -4,7 +4,7 @@ import type { TextureUpload, WarmSceneTextures } from '../texture-upload.ts';
 import type { EnvironmentFrame } from './local-renderer.ts';
 import { createAssetMaterials } from '../asset-materials.ts';
 import { createCachedMaterials } from '../cached-materials.ts';
-import { drawMaterialStamp } from '../scene-material.ts';
+import { drawMaterialStamp, type MaterialStamp } from '../scene-material.ts';
 import { drawEnvironmentMotion } from './motion.ts';
 import { closeLayers, compositionKey, composedLayerBytes } from './worker-types.ts';
 import { createSceneImagePreload } from './image-preload.ts';
@@ -118,7 +118,7 @@ export function createWorkerEnvironmentRenderer(
         ? completed
         : undefined,
     (_stage, next) => startNext(next),
-    { retainReadyWhenBusy: true },
+    { retainReadyWhenBusy: true, retainPendingWhenBusy: true },
   );
   const cancelUploads = (key?: string) => {
     for (const [controller, pendingKey] of uploads) if (pendingKey !== key) controller.abort();
@@ -135,7 +135,8 @@ export function createWorkerEnvironmentRenderer(
     currentKey = '';
   }
   function releaseOutgoingMaterials() {
-    for (const layer of [...layers, ...foreground])
+    for (const layer of [...layers, ...foreground]) {
+      stamps.delete(layer);
       for (const kind of ['normal', 'surface', 'emissive'] as const) {
         const source = layer[kind];
         if (!source) continue;
@@ -143,6 +144,7 @@ export function createWorkerEnvironmentRenderer(
         source.close();
         delete layer[kind];
       }
+    }
     // Retain outgoing colour for responsive loading. Returning to this identity
     // must compose its full material planes again before scene readiness.
     currentKey = '';
@@ -459,6 +461,7 @@ export function createWorkerEnvironmentRenderer(
   function startNext(next: import('./worker-types.ts').CompositionIdentity) {
     if (
       backgroundPending ||
+      nextSlot ||
       !completed ||
       !warmWorkerScene ||
       !options.retainWorkerSources ||
@@ -762,25 +765,35 @@ export function createWorkerEnvironmentRenderer(
     width: number,
     height: number,
   ) {
-    drawMaterialStamp(ctx, {
-      texture: { source: layer.colour, revision: 0 },
-      x,
-      y,
-      width,
-      height,
-      material: {
-        normal: layer.normal ? { source: layer.normal, revision: 0 } : undefined,
-        surface: layer.surface ? { source: layer.surface, revision: 0 } : undefined,
-        emissive: layer.emissive ? { source: layer.emissive, revision: 0 } : undefined,
-        surfaceCoverage: true,
-        normalY: -1,
-        lighting: 1,
-        depth: 0,
-        fog: 0,
-        fogColor: [0, 0, 0],
-      },
-    });
+    let prepared = stamps.get(layer);
+    if (!prepared) {
+      prepared = {
+        texture: { source: layer.colour, revision: 0 },
+        x,
+        y,
+        width,
+        height,
+        material: {
+          normal: layer.normal ? { source: layer.normal, revision: 0 } : undefined,
+          surface: layer.surface ? { source: layer.surface, revision: 0 } : undefined,
+          emissive: layer.emissive ? { source: layer.emissive, revision: 0 } : undefined,
+          surfaceCoverage: true,
+          normalY: -1,
+          lighting: 1,
+          depth: 0,
+          fog: 0,
+          fogColor: [0, 0, 0],
+        },
+      };
+      stamps.set(layer, prepared);
+    }
+    prepared.x = x;
+    prepared.y = y;
+    prepared.width = width;
+    prepared.height = height;
+    drawMaterialStamp(ctx, prepared);
   }
+  const stamps = new WeakMap<ComposedLayer, MaterialStamp>();
   const onVisibility = () => {
     if (!doc.hidden) void pump();
   };
@@ -804,6 +817,68 @@ export function createWorkerEnvironmentRenderer(
   const owner = {
     prepare,
     compose,
+    async prepareReplacement(frame: EnvironmentFrame, signal: AbortSignal) {
+      if (
+        !completed ||
+        running ||
+        disposed ||
+        signal.aborted ||
+        frame.stage !== completed.stage ||
+        frame.stageSeed !== completed.stageSeed ||
+        frame.width !== completed.width ||
+        frame.height !== completed.height
+      )
+        return;
+      imagePreload.cancel();
+      const previous = nextSlot;
+      cancelNext();
+      if (previous && !previous.finished) await previous.ready;
+      if (signal.aborted || disposed || running) return;
+      const lease = startNext(frame);
+      const slot = nextSlot;
+      if (!lease || !slot) return;
+      const cancel = () => {
+        if (nextSlot === slot) cancelNext();
+      };
+      signal.addEventListener('abort', cancel, { once: true });
+      const memoryTimer = doc.defaultView!.setInterval(() => {
+        if (signal.aborted || lease.active?.() === false) cancel();
+      }, 250);
+      let ready: boolean;
+      try {
+        ready = await lease.ready;
+      } finally {
+        doc.defaultView!.clearInterval(memoryTimer);
+      }
+      if (!ready || signal.aborted || disposed || nextSlot !== slot) {
+        signal.removeEventListener('abort', cancel);
+        return;
+      }
+      return () => {
+        signal.removeEventListener('abort', cancel);
+        if (
+          signal.aborted ||
+          disposed ||
+          running ||
+          nextSlot !== slot ||
+          !slot.response ||
+          lease.active?.() === false
+        ) {
+          lease.release();
+          return false;
+        }
+        release();
+        layers = slot.response.layers;
+        foreground = slot.response.foreground;
+        completed = desired = frame;
+        currentKey = slot.key;
+        snapshot = { ...slot.response.snapshot, texturesWarmed: true };
+        slot.adopted = true;
+        closeNext(slot);
+        promotions++;
+        return true;
+      };
+    },
     retry,
     suspend,
     observeFailure(listener: () => void) {
