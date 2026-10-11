@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| foam-strips-atlas | [diffuse](foam-strips-atlas_diffuse.webp), [normal](foam-strips-atlas_normal.webp), [surface](foam-strips-atlas_surface.webp), [emissive](foam-strips-atlas_emissive.webp) |
+| foam-strips-atlas | [diffuse](../../foam-strips-atlas.webp), [normal](foam-strips-atlas_normal.webp), [surface](foam-strips-atlas_surface.webp), [emissive](foam-strips-atlas_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

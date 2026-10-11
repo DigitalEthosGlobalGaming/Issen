@@ -12,10 +12,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/bamboo-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/bamboo-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/bamboo-atlas/bamboo-atlas_normal.webp',
         import.meta.url,
@@ -31,10 +28,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/bamboo-landmarks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/bamboo-landmarks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_normal.webp',
         import.meta.url,
@@ -50,10 +44,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/cherry-landmarks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/cherry-landmarks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_normal.webp',
         import.meta.url,
@@ -69,10 +60,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/cherry-trees-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/cherry-trees-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_normal.webp',
         import.meta.url,
@@ -88,10 +76,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/demon-landmarks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/demon-landmarks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_normal.webp',
         import.meta.url,
@@ -107,10 +92,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/demon-terrain-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/demon-terrain-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_normal.webp',
         import.meta.url,
@@ -126,10 +108,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/fallen-bamboo-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/fallen-bamboo-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_normal.webp',
         import.meta.url,
@@ -145,10 +124,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/field-banks-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/field-banks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/field-banks-atlas/field-banks-atlas_normal.webp',
         import.meta.url,
@@ -164,10 +140,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/field-rocks-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/field-rocks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_normal.webp',
         import.meta.url,
@@ -183,10 +156,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/foam-strips-atlas.webp', import.meta.url).href,
     dimensions: [1659, 948] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/foam-strips-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_normal.webp',
         import.meta.url,
@@ -206,10 +176,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/fog-wisps-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/fog-wisps-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_normal.webp',
         import.meta.url,
@@ -229,10 +196,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/foreground-boulders-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/foreground-boulders-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_normal.webp',
         import.meta.url,
@@ -248,10 +212,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/grass-edges-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/grass-edges-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_normal.webp',
         import.meta.url,
@@ -267,10 +228,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/landmark-stones-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/landmark-stones-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_normal.webp',
         import.meta.url,
@@ -286,10 +244,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/meadow-patches-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/meadow-patches-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_normal.webp',
         import.meta.url,
@@ -305,10 +260,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/mountain-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/mountain-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/mountain-atlas/mountain-atlas_normal.webp',
         import.meta.url,
@@ -324,10 +276,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/petal-ground-atlas.webp', import.meta.url).href,
     dimensions: [1659, 948] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/petal-ground-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_normal.webp',
         import.meta.url,
@@ -343,10 +292,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/pine-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/pine-atlas.webp', import.meta.url).href,
       normal: new URL('./environment/assets/pbr/pine-atlas/pine-atlas_normal.webp', import.meta.url)
         .href,
       surface: new URL(
@@ -360,10 +306,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/reeds-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/reeds-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/reeds-atlas/reeds-atlas_normal.webp',
         import.meta.url,
@@ -379,10 +322,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/rocks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/rocks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/rocks-atlas/rocks-atlas_normal.webp',
         import.meta.url,
@@ -398,10 +338,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/sea-stacks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/sea-stacks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_normal.webp',
         import.meta.url,
@@ -417,10 +354,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/shrubs-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/shrubs-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/shrubs-atlas/shrubs-atlas_normal.webp',
         import.meta.url,
@@ -436,10 +370,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/snow-boulders-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/snow-boulders-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_normal.webp',
         import.meta.url,
@@ -455,8 +386,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/snow-peak.webp', import.meta.url).href,
     dimensions: [1881, 836] as const,
     maps: {
-      diffuse: new URL('./environment/assets/pbr/snow-peak/snow-peak_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./environment/assets/snow-peak.webp', import.meta.url).href,
       normal: new URL('./environment/assets/pbr/snow-peak/snow-peak_normal.webp', import.meta.url)
         .href,
       surface: new URL('./environment/assets/pbr/snow-peak/snow-peak_surface.webp', import.meta.url)
@@ -468,10 +398,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/snow-pines-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/snow-pines-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_normal.webp',
         import.meta.url,
@@ -487,10 +414,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/snow-rocks-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/snow-rocks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_normal.webp',
         import.meta.url,
@@ -507,10 +431,8 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
       .href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/snow-woodland-landmarks-atlas.webp', import.meta.url)
+        .href,
       normal: new URL(
         './environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_normal.webp',
         import.meta.url,
@@ -526,10 +448,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/temple-posts-atlas.webp', import.meta.url).href,
     dimensions: [2172, 724] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/temple-posts-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_normal.webp',
         import.meta.url,
@@ -545,10 +464,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/temple-roofs-atlas.webp', import.meta.url).href,
     dimensions: [2172, 724] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/temple-roofs-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_normal.webp',
         import.meta.url,
@@ -564,10 +480,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/temple-steps-atlas.webp', import.meta.url).href,
     dimensions: [2172, 724] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/temple-steps-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_normal.webp',
         import.meta.url,
@@ -583,10 +496,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/temple-walls-atlas.webp', import.meta.url).href,
     dimensions: [2172, 724] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/temple-walls-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_normal.webp',
         import.meta.url,
@@ -602,10 +512,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./environment/assets/woodland-landmarks-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./environment/assets/woodland-landmarks-atlas.webp', import.meta.url).href,
       normal: new URL(
         './environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_normal.webp',
         import.meta.url,
@@ -621,10 +528,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/armour-plates-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/armour-plates-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_normal.webp',
         import.meta.url,
@@ -640,8 +544,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/charm-atlas.webp', import.meta.url).href,
     dimensions: [1536, 1024] as const,
     maps: {
-      diffuse: new URL('./figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./figures/assets/charm-atlas.webp', import.meta.url).href,
       normal: new URL('./figures/assets/pbr/charm-atlas/charm-atlas_normal.webp', import.meta.url)
         .href,
       surface: new URL('./figures/assets/pbr/charm-atlas/charm-atlas_surface.webp', import.meta.url)
@@ -653,10 +556,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/companion-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/companion-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/companion-atlas/companion-atlas_normal.webp',
         import.meta.url,
@@ -672,10 +572,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/companion-parts-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/companion-parts-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_normal.webp',
         import.meta.url,
@@ -691,10 +588,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/handle-guard-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/handle-guard-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_normal.webp',
         import.meta.url,
@@ -710,7 +604,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/katana.webp', import.meta.url).href,
     dimensions: [2172, 724] as const,
     maps: {
-      diffuse: new URL('./figures/assets/pbr/katana/katana_diffuse.webp', import.meta.url).href,
+      diffuse: new URL('./figures/assets/katana.webp', import.meta.url).href,
       normal: new URL('./figures/assets/pbr/katana/katana_normal.webp', import.meta.url).href,
       surface: new URL('./figures/assets/pbr/katana/katana_surface.webp', import.meta.url).href,
     },
@@ -720,8 +614,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/mystic-rock.webp', import.meta.url).href,
     dimensions: [1145, 1373] as const,
     maps: {
-      diffuse: new URL('./figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./figures/assets/mystic-rock.webp', import.meta.url).href,
       normal: new URL('./figures/assets/pbr/mystic-rock/mystic-rock_normal.webp', import.meta.url)
         .href,
       surface: new URL('./figures/assets/pbr/mystic-rock/mystic-rock_surface.webp', import.meta.url)
@@ -733,10 +626,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/outfit-cloth-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/outfit-cloth-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_normal.webp',
         import.meta.url,
@@ -752,10 +642,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/outfit-headwear-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/outfit-headwear-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_normal.webp',
         import.meta.url,
@@ -771,10 +658,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/player-mask-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/player-mask-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/player-mask-atlas/player-mask-atlas_normal.webp',
         import.meta.url,
@@ -790,10 +674,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/player-ronin-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/player-ronin-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_normal.webp',
         import.meta.url,
@@ -809,10 +690,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/player-special-headwear-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/player-special-headwear-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_normal.webp',
         import.meta.url,
@@ -828,10 +706,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./figures/assets/special-weapons-atlas.webp', import.meta.url).href,
     dimensions: [1774, 887] as const,
     maps: {
-      diffuse: new URL(
-        './figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./figures/assets/special-weapons-atlas.webp', import.meta.url).href,
       normal: new URL(
         './figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_normal.webp',
         import.meta.url,
@@ -847,8 +722,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/armoury-room.webp', import.meta.url).href,
     dimensions: [1536, 1024] as const,
     maps: {
-      diffuse: new URL('./../ui/assets/pbr/armoury-room/armoury-room_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./../ui/assets/armoury-room.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/armoury-room/armoury-room_normal.webp', import.meta.url)
         .href,
       surface: new URL('./../ui/assets/pbr/armoury-room/armoury-room_surface.webp', import.meta.url)
@@ -864,10 +738,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/awakening-button-awakened.webp', import.meta.url).href,
     dimensions: [256, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/awakening-button-awakened.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_normal.webp',
         import.meta.url,
@@ -883,10 +754,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/awakening-button-normal.webp', import.meta.url).href,
     dimensions: [256, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/awakening-button-normal.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/awakening-button-normal/awakening-button-normal_normal.webp',
         import.meta.url,
@@ -902,10 +770,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/awakening-button-third.webp', import.meta.url).href,
     dimensions: [256, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/awakening-button-third.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/awakening-button-third/awakening-button-third_normal.webp',
         import.meta.url,
@@ -921,10 +786,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/awakening-buttons-atlas.webp', import.meta.url).href,
     dimensions: [768, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/awakening-buttons-atlas.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_normal.webp',
         import.meta.url,
@@ -940,8 +802,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/button-atlas.webp', import.meta.url).href,
     dimensions: [256, 128] as const,
     maps: {
-      diffuse: new URL('./../ui/assets/pbr/button-atlas/button-atlas_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./../ui/assets/button-atlas.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/button-atlas/button-atlas_normal.webp', import.meta.url)
         .href,
       surface: new URL('./../ui/assets/pbr/button-atlas/button-atlas_surface.webp', import.meta.url)
@@ -953,10 +814,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/button-highlighted.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/button-highlighted/button-highlighted_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/button-highlighted.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/button-highlighted/button-highlighted_normal.webp',
         import.meta.url,
@@ -972,10 +830,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/button-normal.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/button-normal/button-normal_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/button-normal.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/button-normal/button-normal_normal.webp', import.meta.url)
         .href,
       surface: new URL(
@@ -989,10 +844,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/demon-mirror-symbol.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/demon-mirror-symbol.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_normal.webp',
         import.meta.url,
@@ -1012,8 +864,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/issen-logo.webp', import.meta.url).href,
     dimensions: [600, 400] as const,
     maps: {
-      diffuse: new URL('./../ui/assets/pbr/issen-logo/issen-logo_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./../ui/assets/issen-logo.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/issen-logo/issen-logo_normal.webp', import.meta.url).href,
       surface: new URL('./../ui/assets/pbr/issen-logo/issen-logo_surface.webp', import.meta.url)
         .href,
@@ -1026,8 +877,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/panel-atlas.webp', import.meta.url).href,
     dimensions: [384, 192] as const,
     maps: {
-      diffuse: new URL('./../ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./../ui/assets/panel-atlas.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/panel-atlas/panel-atlas_normal.webp', import.meta.url)
         .href,
       surface: new URL('./../ui/assets/pbr/panel-atlas/panel-atlas_surface.webp', import.meta.url)
@@ -1039,10 +889,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/panel-highlighted.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/panel-highlighted.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/panel-highlighted/panel-highlighted_normal.webp',
         import.meta.url,
@@ -1058,8 +905,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/panel-normal.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL('./../ui/assets/pbr/panel-normal/panel-normal_diffuse.webp', import.meta.url)
-        .href,
+      diffuse: new URL('./../ui/assets/panel-normal.webp', import.meta.url).href,
       normal: new URL('./../ui/assets/pbr/panel-normal/panel-normal_normal.webp', import.meta.url)
         .href,
       surface: new URL('./../ui/assets/pbr/panel-normal/panel-normal_surface.webp', import.meta.url)
@@ -1071,10 +917,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/temple-symbols-atlas.webp', import.meta.url).href,
     dimensions: [1254, 1254] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/temple-symbols-atlas.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_normal.webp',
         import.meta.url,
@@ -1094,10 +937,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/trial-symbols-atlas.webp', import.meta.url).href,
     dimensions: [1448, 1086] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/trial-symbols-atlas.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_normal.webp',
         import.meta.url,
@@ -1117,10 +957,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/ui-strokes-atlas.webp', import.meta.url).href,
     dimensions: [1536, 256] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/ui-strokes-atlas.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_normal.webp',
         import.meta.url,
@@ -1136,10 +973,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-atlas.webp', import.meta.url).href,
     dimensions: [768, 640] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-atlas.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-atlas/world-ui-atlas_normal.webp',
         import.meta.url,
@@ -1155,10 +989,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-aoi.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-aoi.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_normal.webp',
         import.meta.url,
@@ -1174,10 +1005,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-fuji.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-fuji.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_normal.webp',
         import.meta.url,
@@ -1193,10 +1021,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-juji.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-juji.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_normal.webp',
         import.meta.url,
@@ -1212,10 +1037,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-kikyo.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-kikyo.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_normal.webp',
         import.meta.url,
@@ -1231,10 +1053,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-rokumon.compact.png', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-rokumon.compact.png', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_normal.webp',
         import.meta.url,
@@ -1250,10 +1069,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-tomoe.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-tomoe.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_normal.webp',
         import.meta.url,
@@ -1269,10 +1085,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-crest-tsuru.webp', import.meta.url).href,
     dimensions: [128, 128] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-crest-tsuru.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_normal.webp',
         import.meta.url,
@@ -1288,10 +1101,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-material-metal.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-material-metal.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_normal.webp',
         import.meta.url,
@@ -1307,10 +1117,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-material-paper.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-material-paper.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_normal.webp',
         import.meta.url,
@@ -1326,10 +1133,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-material-silk.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-material-silk.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_normal.webp',
         import.meta.url,
@@ -1345,10 +1149,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-material-stone.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-material-stone.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_normal.webp',
         import.meta.url,
@@ -1364,10 +1165,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-material-wood.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-material-wood.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_normal.webp',
         import.meta.url,
@@ -1383,10 +1181,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-scroll-paper.webp', import.meta.url).href,
     dimensions: [192, 192] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.webp',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-scroll-paper.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_normal.webp',
         import.meta.url,
@@ -1402,10 +1197,7 @@ export const assetMaterialCatalog: readonly AssetMaterialPack[] = [
     source: new URL('./../ui/assets/world-ui-scroll-rod.webp', import.meta.url).href,
     dimensions: [192, 48] as const,
     maps: {
-      diffuse: new URL(
-        './../ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png',
-        import.meta.url,
-      ).href,
+      diffuse: new URL('./../ui/assets/world-ui-scroll-rod.webp', import.meta.url).href,
       normal: new URL(
         './../ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_normal.webp',
         import.meta.url,

@@ -2,6 +2,7 @@ import { readFile, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { loadRuntimeAliases } from '../assets/asset-locations.mjs';
 
 async function existing(root, names, required = true) {
   for (const name of names) {
@@ -16,6 +17,7 @@ async function existing(root, names, required = true) {
 }
 
 export async function generateRuntimeCatalog(root = path.resolve(import.meta.dirname, '../..')) {
+  const aliases = await loadRuntimeAliases(root);
   const jobs = JSON.parse(await readFile(path.join(root, 'scripts/pbr/asset-packs.json'), 'utf8'));
   const entries = Array.isArray(jobs) ? jobs : [...jobs.assets, ...(jobs.installed ?? [])];
   const relative = (p) =>
@@ -58,11 +60,11 @@ export async function generateRuntimeCatalog(root = path.resolve(import.meta.dir
       `{ sourcePath: ${JSON.stringify(pack.source)}, source: new URL(${JSON.stringify(relative(source))}, import.meta.url).href, dimensions: [${pack.dimensions}] as const, maps: {`,
     );
     for (const kind of ['diffuse', 'normal', 'surface', 'emissive']) {
-      const plane = await existing(
-        root,
-        ['compact.png', 'webp', 'png'].map((ext) => `${pack.output}/${stem}_${kind}.${ext}`),
-        kind !== 'emissive',
+      const candidates = ['compact.png', 'webp', 'png'].map(
+        (ext) => `${pack.output}/${stem}_${kind}.${ext}`,
       );
+      const alias = candidates.map((candidate) => aliases[candidate]).find(Boolean);
+      const plane = await existing(root, alias ? [alias] : candidates, kind !== 'emissive');
       if (kind === 'emissive' && plane?.endsWith('.png') && zeroEmission.has(plane)) {
         const hash = createHash('sha256')
           .update(await readFile(path.join(root, plane)))

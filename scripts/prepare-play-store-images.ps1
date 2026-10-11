@@ -4,7 +4,7 @@ Add-Type -AssemblyName System.Drawing
 $repo = Split-Path -Parent $PSScriptRoot
 $output = Join-Path $repo 'assets/play-store'
 New-Item -ItemType Directory -Force (Join-Path $output 'common'), (Join-Path $output 'pc') | Out-Null
-Copy-Item -LiteralPath (Join-Path $repo 'assets/branding/issen-play-store-icon-512.png') -Destination (Join-Path $output 'common/app-icon-512.png')
+# Store icon: use assets/branding/issen-play-store-icon-512.png directly.
 if (-not ('IssenStoreBounds' -as [type])) {
     Add-Type -ReferencedAssemblies @([System.Drawing.Bitmap].Assembly.Location, [System.Drawing.Rectangle].Assembly.Location) -TypeDefinition @'
 using System;
@@ -75,5 +75,5 @@ try {
     $parameters.Param[0] = [System.Drawing.Imaging.EncoderParameter]::new([System.Drawing.Imaging.Encoder]::Quality,[long]95)
     $featureJpeg.Save((Join-Path $output 'issen-feature-graphic-1024x500.jpg'),$codec,$parameters)
 } finally { $parameters.Dispose(); $featureGraphics.Dispose(); $featureJpeg.Dispose(); $featureSource.Dispose() }
-Save-StoreArtwork (Join-Path $repo 'assets/branding/issen-launcher-foreground-v1.png') (Join-Path $output 'pc/logo-600x400.png') 600 400 'logo'
+# The 600x400 store logo shares src/ui/assets/issen-logo.png.
 Save-StoreArtwork (Join-Path $repo 'assets/branding/issen-text-free-cover-v1.png') (Join-Path $output 'pc/feature-graphic-1920x1080.png') 1920 1080 'cover'

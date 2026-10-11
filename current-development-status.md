@@ -1,5 +1,26 @@
 # Current development status
 
+## Artwork deduplication and unused archive (1.73.1)
+
+Removed23 SHA-256-identical artwork copies after redirecting their consumers;
+61 unused generated colour planes moved to `assets/unused/` with mirrored paths
+and recorded hashes. `scripts/assets/asset-cleanup.json` keeps catalogue/docs
+regeneration on canonical colour sources. Authoring originals and required figure
+colour/material planes remain active. Default and landscape mdpi splash resources
+share one bitmap through XML aliases; the splash generator preserves this setup.
+
+Checkout reduction is14.7MB from duplicates. Archived33.0MB remains in Git but
+is excluded from builds; Android production artwork fell112.40→79.42MB. No pixel
+compression, layout changes or tight repacking. The prior signed1.73.0 APK/AAB
+have not been rebuilt. Version/title/lockfile now1.73.1, with grouped1.73 notes.
+
+Minimal checks: three compaction/catalogue units PASS, archive/canonical hashes
+PASS, remaining exact artwork duplicate scan empty, checked Android web build
+and strict TypeScript PASS, native release resource compilation PASS, one offline
+Android browser cold-load/font/startup check PASS. First browser invocation lacked
+local Vite on PATH; corrected invocation passed. No full suites, player-save edits,
+commit or deployment.
+
 ## Incremental memory and continuous adaptive scenery (1.73.0)
 
 Ordinary upload admission now reads maintained source/residency totals. Owned
@@ -27,7 +48,11 @@ samples) passed: median render2.3 to2.2ms, p95 4.5 to3.0ms versus1.72.0; desktop
 variation and short samples prevent a mobile FPS claim. Results remain under
 ignored `tmp/performance/`. Device validation is next; native GPU crash prevention
 is not established. Checked production build and strict TypeScript PASS. No full
-suites, save resets, commit, deployment or APK changes.
+suites, save resets, commit or deployment. Signed production Android APK and AAB
+now built for 1.73.0 (version code 17300); strict TypeScript and both signature
+checks passed. Autoplay is absent from bundled JavaScript. Native release
+optimization emitted dependency warnings; installed-device validation remains
+pending. Release mapping is retained under ignored `tmp/android-release-1.73.0-17300/`.
 
 ## Memory admission and interruption recommendation (1.72.0)
 

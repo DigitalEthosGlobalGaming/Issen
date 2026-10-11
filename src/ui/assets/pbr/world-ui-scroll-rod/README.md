@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| world-ui-scroll-rod | [diffuse](world-ui-scroll-rod_diffuse.compact.png), [normal](world-ui-scroll-rod_normal.webp), [surface](world-ui-scroll-rod_surface.webp) |
+| world-ui-scroll-rod | [diffuse](../../world-ui-scroll-rod.webp), [normal](world-ui-scroll-rod_normal.webp), [surface](world-ui-scroll-rod_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

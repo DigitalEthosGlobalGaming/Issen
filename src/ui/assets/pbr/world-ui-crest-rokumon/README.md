@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| world-ui-crest-rokumon | [diffuse](world-ui-crest-rokumon_diffuse.compact.png), [normal](world-ui-crest-rokumon_normal.webp), [surface](world-ui-crest-rokumon_surface.webp) |
+| world-ui-crest-rokumon | [diffuse](../../world-ui-crest-rokumon.compact.png), [normal](world-ui-crest-rokumon_normal.webp), [surface](world-ui-crest-rokumon_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

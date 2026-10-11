@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| reeds-atlas | [diffuse](reeds-atlas_diffuse.webp), [normal](reeds-atlas_normal.webp), [surface](reeds-atlas_surface.webp) |
+| reeds-atlas | [diffuse](../../reeds-atlas.webp), [normal](reeds-atlas_normal.webp), [surface](reeds-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

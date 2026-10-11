@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| mystic-rock | [diffuse](mystic-rock_diffuse.webp), [normal](mystic-rock_normal.webp), [surface](mystic-rock_surface.webp) |
+| mystic-rock | [diffuse](../../mystic-rock.webp), [normal](mystic-rock_normal.webp), [surface](mystic-rock_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

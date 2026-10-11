@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| issen-logo | [diffuse](issen-logo_diffuse.webp), [normal](issen-logo_normal.webp), [surface](issen-logo_surface.webp), [emissive](issen-logo_emissive.webp) |
+| issen-logo | [diffuse](../../issen-logo.webp), [normal](issen-logo_normal.webp), [surface](issen-logo_surface.webp), [emissive](issen-logo_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

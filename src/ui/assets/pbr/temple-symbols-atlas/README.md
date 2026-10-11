@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| temple-symbols-atlas | [diffuse](temple-symbols-atlas_diffuse.webp), [normal](temple-symbols-atlas_normal.webp), [surface](temple-symbols-atlas_surface.webp), [emissive](temple-symbols-atlas_emissive.webp) |
+| temple-symbols-atlas | [diffuse](../../temple-symbols-atlas.webp), [normal](temple-symbols-atlas_normal.webp), [surface](temple-symbols-atlas_surface.webp), [emissive](temple-symbols-atlas_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

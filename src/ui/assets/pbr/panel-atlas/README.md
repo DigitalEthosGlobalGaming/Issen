@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| panel-atlas | [diffuse](panel-atlas_diffuse.webp), [normal](panel-atlas_normal.webp), [surface](panel-atlas_surface.webp) |
+| panel-atlas | [diffuse](../../panel-atlas.webp), [normal](panel-atlas_normal.webp), [surface](panel-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

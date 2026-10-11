@@ -6,65 +6,67 @@
     "Stage totals describe local compose kits; separate fog, figures, UI and canvas caches add memory."
   ],
   "totals": {
-    "files": 346,
-    "encodedBytes": 114158622,
-    "decodedBytes": 1461629320,
-    "unusedDiffuseBytes": 315778876,
+    "files": 270,
+    "encodedBytes": 79515251,
+    "decodedBytes": 1145850444,
+    "unusedDiffuseBytes": 0,
     "startupOnlyBytes": 4374528
   },
   "stages": [
     {
       "stage": 0,
-      "decodedBytesBefore": 283171432,
-      "unusedDiffuseBytes": 69219320
+      "decodedBytesBefore": 213952112,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 1,
-      "decodedBytesBefore": 176170848,
-      "unusedDiffuseBytes": 44042712
+      "decodedBytesBefore": 132128136,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 2,
-      "decodedBytesBefore": 201334560,
-      "unusedDiffuseBytes": 50333640
+      "decodedBytesBefore": 151000920,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 3,
-      "decodedBytesBefore": 226507712,
-      "unusedDiffuseBytes": 56626928
+      "decodedBytesBefore": 169880784,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 4,
-      "decodedBytesBefore": 176187200,
-      "unusedDiffuseBytes": 44046800
+      "decodedBytesBefore": 132140400,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 5,
-      "decodedBytesBefore": 151010592,
-      "unusedDiffuseBytes": 37752648
+      "decodedBytesBefore": 113257944,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 6,
-      "decodedBytesBefore": 201315520,
-      "unusedDiffuseBytes": 50328880
+      "decodedBytesBefore": 150986640,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 7,
-      "decodedBytesBefore": 232802096,
-      "unusedDiffuseBytes": 56627792
+      "decodedBytesBefore": 176174304,
+      "unusedDiffuseBytes": 0
     },
     {
       "stage": 8,
-      "decodedBytesBefore": 207625640,
-      "unusedDiffuseBytes": 50332872
+      "decodedBytesBefore": 157292768,
+      "unusedDiffuseBytes": 0
     }
   ],
   "duplicatePairs": [
     {
       "source": "src/rendering/environment/assets/bamboo-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [4],
+      "diffuse": "src/rendering/environment/assets/bamboo-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        4
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -72,9 +74,11 @@
     },
     {
       "source": "src/rendering/environment/assets/bamboo-landmarks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [4],
+      "diffuse": "src/rendering/environment/assets/bamboo-landmarks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        4
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -82,9 +86,11 @@
     },
     {
       "source": "src/rendering/environment/assets/cherry-landmarks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [2],
+      "diffuse": "src/rendering/environment/assets/cherry-landmarks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        2
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -92,9 +98,11 @@
     },
     {
       "source": "src/rendering/environment/assets/cherry-trees-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [2],
+      "diffuse": "src/rendering/environment/assets/cherry-trees-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        2
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -102,23 +110,29 @@
     },
     {
       "source": "src/rendering/environment/assets/demon-landmarks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/environment/assets/demon-landmarks-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/environment/demon-realm.ts"]
+      "consumers": [
+        "src/rendering/environment/demon-realm.ts"
+      ]
     },
     {
       "source": "src/rendering/environment/assets/demon-terrain-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/environment/assets/demon-terrain-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/environment/demon-realm.ts"]
+      "consumers": [
+        "src/rendering/environment/demon-realm.ts"
+      ]
     },
     {
       "source": "src/rendering/environment/assets/fallen-bamboo-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [4],
+      "diffuse": "src/rendering/environment/assets/fallen-bamboo-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        4
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -126,9 +140,16 @@
     },
     {
       "source": "src/rendering/environment/assets/field-banks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 2, 3, 4, 7],
+      "diffuse": "src/rendering/environment/assets/field-banks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -136,9 +157,18 @@
     },
     {
       "source": "src/rendering/environment/assets/field-rocks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8],
+      "diffuse": "src/rendering/environment/assets/field-rocks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -146,9 +176,11 @@
     },
     {
       "source": "src/rendering/environment/assets/foam-strips-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [7],
+      "diffuse": "src/rendering/environment/assets/foam-strips-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        7
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -156,9 +188,12 @@
     },
     {
       "source": "src/rendering/environment/assets/fog-wisps-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 8],
+      "diffuse": "src/rendering/environment/assets/fog-wisps-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/worker-renderer.ts",
@@ -167,9 +202,12 @@
     },
     {
       "source": "src/rendering/environment/assets/foreground-boulders-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 7],
+      "diffuse": "src/rendering/environment/assets/foreground-boulders-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        7
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -177,9 +215,12 @@
     },
     {
       "source": "src/rendering/environment/assets/grass-edges-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 3],
+      "diffuse": "src/rendering/environment/assets/grass-edges-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        3
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -187,9 +228,18 @@
     },
     {
       "source": "src/rendering/environment/assets/landmark-stones-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8],
+      "diffuse": "src/rendering/environment/assets/landmark-stones-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -197,9 +247,11 @@
     },
     {
       "source": "src/rendering/environment/assets/meadow-patches-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0],
+      "diffuse": "src/rendering/environment/assets/meadow-patches-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -207,9 +259,19 @@
     },
     {
       "source": "src/rendering/environment/assets/mountain-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      "diffuse": "src/rendering/environment/assets/mountain-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/demon-realm.ts",
@@ -218,9 +280,11 @@
     },
     {
       "source": "src/rendering/environment/assets/petal-ground-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [2],
+      "diffuse": "src/rendering/environment/assets/petal-ground-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        2
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -228,9 +292,16 @@
     },
     {
       "source": "src/rendering/environment/assets/pine-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 3, 6, 7, 8],
+      "diffuse": "src/rendering/environment/assets/pine-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        3,
+        6,
+        7,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -238,9 +309,11 @@
     },
     {
       "source": "src/rendering/environment/assets/reeds-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [3],
+      "diffuse": "src/rendering/environment/assets/reeds-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        3
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -248,16 +321,20 @@
     },
     {
       "source": "src/rendering/environment/assets/rocks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/environment/assets/rocks-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/environment/asset-sources.ts"]
+      "consumers": [
+        "src/rendering/environment/asset-sources.ts"
+      ]
     },
     {
       "source": "src/rendering/environment/assets/sea-stacks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [7],
+      "diffuse": "src/rendering/environment/assets/sea-stacks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        7
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -265,9 +342,14 @@
     },
     {
       "source": "src/rendering/environment/assets/shrubs-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 2, 3],
+      "diffuse": "src/rendering/environment/assets/shrubs-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        2,
+        3
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -275,9 +357,11 @@
     },
     {
       "source": "src/rendering/environment/assets/snow-boulders-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [5],
+      "diffuse": "src/rendering/environment/assets/snow-boulders-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        5
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -285,9 +369,11 @@
     },
     {
       "source": "src/rendering/environment/assets/snow-peak.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [5],
+      "diffuse": "src/rendering/environment/assets/snow-peak.webp",
+      "usesDiffuse": true,
+      "stages": [
+        5
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -295,9 +381,11 @@
     },
     {
       "source": "src/rendering/environment/assets/snow-pines-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [5],
+      "diffuse": "src/rendering/environment/assets/snow-pines-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        5
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -305,9 +393,11 @@
     },
     {
       "source": "src/rendering/environment/assets/snow-rocks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [5],
+      "diffuse": "src/rendering/environment/assets/snow-rocks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        5
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -315,9 +405,11 @@
     },
     {
       "source": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [5],
+      "diffuse": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        5
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -325,9 +417,12 @@
     },
     {
       "source": "src/rendering/environment/assets/temple-posts-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [6, 8],
+      "diffuse": "src/rendering/environment/assets/temple-posts-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        6,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -335,9 +430,11 @@
     },
     {
       "source": "src/rendering/environment/assets/temple-roofs-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [6],
+      "diffuse": "src/rendering/environment/assets/temple-roofs-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        6
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -345,9 +442,12 @@
     },
     {
       "source": "src/rendering/environment/assets/temple-steps-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [6, 8],
+      "diffuse": "src/rendering/environment/assets/temple-steps-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        6,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -355,9 +455,11 @@
     },
     {
       "source": "src/rendering/environment/assets/temple-walls-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [6],
+      "diffuse": "src/rendering/environment/assets/temple-walls-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        6
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -365,9 +467,15 @@
     },
     {
       "source": "src/rendering/environment/assets/woodland-landmarks-atlas.webp",
-      "diffuse": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp",
-      "usesDiffuse": false,
-      "stages": [0, 1, 3, 7, 8],
+      "diffuse": "src/rendering/environment/assets/woodland-landmarks-atlas.webp",
+      "usesDiffuse": true,
+      "stages": [
+        0,
+        1,
+        3,
+        7,
+        8
+      ],
       "consumers": [
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/environment/local-renderer.ts"
@@ -375,311 +483,380 @@
     },
     {
       "source": "src/rendering/figures/assets/armour-plates-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/armour-plates-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/outfit-kit.ts"]
+      "consumers": [
+        "src/rendering/figures/outfit-kit.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/charm-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/charm-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-charms.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-charms.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/companion-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp",
+      "diffuse": "src/rendering/figures/assets/companion-atlas.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/rendering/figures/assets/companion-parts-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/companion-parts-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-companions.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-companions.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/handle-guard-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/handle-guard-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-sword.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-sword.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/katana.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/katana/katana_diffuse.webp",
+      "diffuse": "src/rendering/figures/assets/katana.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/rendering/figures/assets/mystic-rock.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/mystic-rock.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-companions.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-companions.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/outfit-cloth-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/outfit-cloth-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/outfit-kit.ts"]
+      "consumers": [
+        "src/rendering/figures/outfit-kit.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/outfit-headwear-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/outfit-headwear-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/outfit-kit.ts"]
+      "consumers": [
+        "src/rendering/figures/outfit-kit.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/player-mask-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/player-mask-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/outfit-kit.ts"]
+      "consumers": [
+        "src/rendering/figures/outfit-kit.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/player-ronin-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp",
+      "diffuse": "src/rendering/figures/assets/player-ronin-atlas.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/rendering/figures/assets/player-special-headwear-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/player-special-headwear-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/outfit-kit.ts"]
+      "consumers": [
+        "src/rendering/figures/outfit-kit.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/special-weapons-atlas.webp",
-      "diffuse": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/rendering/figures/assets/special-weapons-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-sword.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-sword.ts"
+      ]
     },
     {
       "source": "src/ui/assets/armoury-room.webp",
-      "diffuse": "src/ui/assets/pbr/armoury-room/armoury-room_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/armoury-room.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/armory-preview.ts", "src/ui/screens/armory.css"]
+      "consumers": [
+        "src/rendering/armory-preview.ts",
+        "src/ui/screens/armory.css"
+      ]
     },
     {
       "source": "src/ui/assets/awakening-button-awakened.webp",
-      "diffuse": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/awakening-button-awakened.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.css"]
+      "consumers": [
+        "src/ui/screens/armory.css"
+      ]
     },
     {
       "source": "src/ui/assets/awakening-button-normal.webp",
-      "diffuse": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/awakening-button-normal.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.css"]
+      "consumers": [
+        "src/ui/screens/armory.css"
+      ]
     },
     {
       "source": "src/ui/assets/awakening-button-third.webp",
-      "diffuse": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/awakening-button-third.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.css"]
+      "consumers": [
+        "src/ui/screens/armory.css"
+      ]
     },
     {
       "source": "src/ui/assets/awakening-buttons-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp",
+      "diffuse": "src/ui/assets/awakening-buttons-atlas.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/button-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.webp",
+      "diffuse": "src/ui/assets/button-atlas.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/button-highlighted.webp",
-      "diffuse": "src/ui/assets/pbr/button-highlighted/button-highlighted_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/button-highlighted.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/styles/button-frames.css"]
+      "consumers": [
+        "src/styles/button-frames.css"
+      ]
     },
     {
       "source": "src/ui/assets/button-normal.webp",
-      "diffuse": "src/ui/assets/pbr/button-normal/button-normal_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/button-normal.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/styles/button-frames.css"]
+      "consumers": [
+        "src/styles/button-frames.css"
+      ]
     },
     {
       "source": "src/ui/assets/demon-mirror-symbol.webp",
-      "diffuse": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/demon-mirror-symbol.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/symbol-art.ts"]
+      "consumers": [
+        "src/ui/symbol-art.ts"
+      ]
     },
     {
       "source": "src/ui/assets/issen-logo.webp",
-      "diffuse": "src/ui/assets/pbr/issen-logo/issen-logo_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/issen-logo.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/startup-loading.ts"]
+      "consumers": [
+        "src/ui/startup-loading.ts"
+      ]
     },
     {
       "source": "src/ui/assets/panel-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp",
+      "diffuse": "src/ui/assets/panel-atlas.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/panel-highlighted.webp",
-      "diffuse": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/panel-highlighted.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/styles/panel-frames.css"]
+      "consumers": [
+        "src/styles/panel-frames.css"
+      ]
     },
     {
       "source": "src/ui/assets/panel-normal.webp",
-      "diffuse": "src/ui/assets/pbr/panel-normal/panel-normal_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/panel-normal.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/styles/panel-frames.css"]
+      "consumers": [
+        "src/styles/panel-frames.css"
+      ]
     },
     {
       "source": "src/ui/assets/temple-symbols-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/temple-symbols-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/symbol-art.ts"]
+      "consumers": [
+        "src/ui/symbol-art.ts"
+      ]
     },
     {
       "source": "src/ui/assets/trial-symbols-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/trial-symbols-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/symbol-art.ts"]
+      "consumers": [
+        "src/ui/symbol-art.ts"
+      ]
     },
     {
       "source": "src/ui/assets/ui-strokes-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/ui-strokes-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/trials.css"]
+      "consumers": [
+        "src/ui/screens/trials.css"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-atlas.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-atlas.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/ui-art.ts"]
+      "consumers": [
+        "src/rendering/ui-art.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-aoi.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-aoi.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-fuji.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-fuji.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-juji.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-juji.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-kikyo.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-kikyo.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-rokumon.compact.png",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-rokumon.compact.png",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-tomoe.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-tomoe.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-crest-tsuru.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-crest-tsuru.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/armory.ts"]
+      "consumers": [
+        "src/ui/screens/armory.ts"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-material-metal.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp",
+      "diffuse": "src/ui/assets/world-ui-material-metal.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/world-ui-material-paper.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp",
+      "diffuse": "src/ui/assets/world-ui-material-paper.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/world-ui-material-silk.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp",
+      "diffuse": "src/ui/assets/world-ui-material-silk.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/world-ui-material-stone.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp",
+      "diffuse": "src/ui/assets/world-ui-material-stone.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/world-ui-material-wood.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png",
+      "diffuse": "src/ui/assets/world-ui-material-wood.webp",
       "usesDiffuse": false,
       "stages": [],
       "consumers": []
     },
     {
       "source": "src/ui/assets/world-ui-scroll-paper.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.webp",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-scroll-paper.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/rewarded-support.css", "src/ui/scroll-menus.css"]
+      "consumers": [
+        "src/ui/screens/rewarded-support.css",
+        "src/ui/scroll-menus.css"
+      ]
     },
     {
       "source": "src/ui/assets/world-ui-scroll-rod.webp",
-      "diffuse": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png",
-      "usesDiffuse": false,
+      "diffuse": "src/ui/assets/world-ui-scroll-rod.webp",
+      "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/ui/screens/rewarded-support.css", "src/ui/scroll-menus.css"]
+      "consumers": [
+        "src/ui/screens/rewarded-support.css",
+        "src/ui/scroll-menus.css"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/blade-profile-atlas.webp",
@@ -693,35 +870,45 @@
       "diffuse": "src/rendering/figures/assets/player-pbr/player-ronin-simple_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-player.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-player.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/enemy-ronin-simple.webp",
       "diffuse": "src/rendering/figures/assets/enemy-pbr/enemy-ronin-simple_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-enemy.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-enemy.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/enemy-clothing-variants.webp",
       "diffuse": "src/rendering/figures/assets/enemy-pbr/enemy-clothing-variants_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-enemy.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-enemy.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/enemy-headwear-atlas.webp",
       "diffuse": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-atlas_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-enemy.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-enemy.ts"
+      ]
     },
     {
       "source": "src/rendering/figures/assets/enemy-headwear-variants.webp",
       "diffuse": "src/rendering/figures/assets/enemy-pbr/enemy-headwear-variants_diffuse.webp",
       "usesDiffuse": true,
       "stages": [],
-      "consumers": ["src/rendering/figures/ink-enemy.ts"]
+      "consumers": [
+        "src/rendering/figures/ink-enemy.ts"
+      ]
     }
   ],
   "startupOnly": [
@@ -739,8 +926,12 @@
       "height": 64,
       "encodedBytes": 345,
       "decodedBytes": 16384,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -755,8 +946,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [4]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/bamboo-landmarks-atlas.webp",
@@ -770,8 +967,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [4]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/cherry-landmarks-atlas.webp",
@@ -785,8 +988,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [2]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/cherry-trees-atlas.webp",
@@ -800,8 +1009,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [2]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/demon-landmarks-atlas.webp",
@@ -814,7 +1029,11 @@
         "src/rendering/environment/demon-realm.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -828,7 +1047,11 @@
         "src/rendering/environment/demon-realm.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -837,8 +1060,14 @@
       "height": 512,
       "encodedBytes": 123488,
       "decodedBytes": 2097152,
-      "consumers": ["src/main-game.ts", "src/rendering/scene/drift-catalog.ts"],
-      "roles": ["direct-reference", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/rendering/scene/drift-catalog.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -847,8 +1076,14 @@
       "height": 512,
       "encodedBytes": 32206,
       "decodedBytes": 2097152,
-      "consumers": ["src/main-game.ts", "src/rendering/scene/drift-catalog.ts"],
-      "roles": ["direct-reference", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/rendering/scene/drift-catalog.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -863,8 +1098,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [4]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/field-banks-atlas.webp",
@@ -878,8 +1119,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 2, 3, 4, 7]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/field-rocks-atlas.webp",
@@ -893,8 +1145,21 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/foam-strips-atlas.webp",
@@ -908,8 +1173,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [7]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/fog-wisps-atlas.webp",
@@ -924,8 +1195,15 @@
         "src/rendering/environment/worker-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/foreground-boulders-atlas.webp",
@@ -939,8 +1217,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 7]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/grass-edges-atlas.webp",
@@ -954,8 +1239,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 3]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/landmark-stones-atlas.webp",
@@ -969,8 +1261,21 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/meadow-patches-atlas.webp",
@@ -984,8 +1289,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0
+      ]
     },
     {
       "path": "src/rendering/environment/assets/mountain-atlas.webp",
@@ -1000,23 +1311,22 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 1387042,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [4]
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_normal.webp",
@@ -1031,8 +1341,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [4]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_surface.webp",
@@ -1047,23 +1361,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [4]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 798374,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [4]
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_normal.webp",
@@ -1078,8 +1381,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [4]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_surface.webp",
@@ -1094,23 +1401,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [4]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 895756,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [2]
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_normal.webp",
@@ -1125,8 +1421,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [2]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_surface.webp",
@@ -1141,23 +1441,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [2]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 836882,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [2]
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_normal.webp",
@@ -1172,8 +1461,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [2]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_surface.webp",
@@ -1188,22 +1481,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [2]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 841714,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/demon-realm.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": []
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_normal.webp",
@@ -1216,7 +1499,9 @@
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -1230,21 +1515,9 @@
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 616410,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/demon-realm.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -1258,7 +1531,9 @@
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -1272,23 +1547,10 @@
         "src/rendering/environment/demon-realm.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 707612,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [4]
+      "stages": []
     },
     {
       "path": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_normal.webp",
@@ -1303,8 +1565,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [4]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_surface.webp",
@@ -1319,23 +1585,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [4]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 777490,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 2, 3, 4, 7]
+      "stages": [
+        4
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_normal.webp",
@@ -1350,8 +1605,17 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 2, 3, 4, 7]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_surface.webp",
@@ -1366,23 +1630,17 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 2, 3, 4, 7]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 656352,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_normal.webp",
@@ -1397,8 +1655,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_surface.webp",
@@ -1413,23 +1682,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp",
-      "width": 1659,
-      "height": 948,
-      "encodedBytes": 746956,
-      "decodedBytes": 6290928,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [7]
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_emissive.webp",
@@ -1444,8 +1709,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["emissive"],
-      "stages": [7]
+      "roles": [
+        "emissive"
+      ],
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_normal.webp",
@@ -1460,8 +1729,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [7]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_surface.webp",
@@ -1476,24 +1749,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [7]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 650702,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/environment/worker-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 8]
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_emissive.webp",
@@ -1509,8 +1770,13 @@
         "src/rendering/environment/worker-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["emissive"],
-      "stages": [0, 8]
+      "roles": [
+        "emissive"
+      ],
+      "stages": [
+        0,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_normal.webp",
@@ -1526,8 +1792,13 @@
         "src/rendering/environment/worker-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_surface.webp",
@@ -1543,23 +1814,13 @@
         "src/rendering/environment/worker-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 826826,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 7]
+      "stages": [
+        0,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_normal.webp",
@@ -1574,8 +1835,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 7]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_surface.webp",
@@ -1590,23 +1856,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 7]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 710282,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 3]
+      "stages": [
+        0,
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_normal.webp",
@@ -1621,8 +1877,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 3]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_surface.webp",
@@ -1637,23 +1898,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 3]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 999582,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "stages": [
+        0,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_normal.webp",
@@ -1668,8 +1919,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_surface.webp",
@@ -1684,23 +1946,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 2, 3, 4, 6, 7, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 1167732,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0]
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_normal.webp",
@@ -1715,8 +1973,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_surface.webp",
@@ -1731,24 +1993,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 734302,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/demon-realm.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+      "stages": [
+        0
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_normal.webp",
@@ -1764,8 +2014,20 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_surface.webp",
@@ -1781,23 +2043,20 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp",
-      "width": 1659,
-      "height": 948,
-      "encodedBytes": 546724,
-      "decodedBytes": 6290928,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [2]
+      "stages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_normal.webp",
@@ -1812,8 +2071,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [2]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_surface.webp",
@@ -1828,23 +2091,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [2]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 1013862,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 3, 6, 7, 8]
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_normal.webp",
@@ -1859,8 +2111,17 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 3, 6, 7, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        3,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_surface.webp",
@@ -1875,23 +2136,17 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 3, 6, 7, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 954354,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [3]
+      "stages": [
+        0,
+        1,
+        3,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_normal.webp",
@@ -1906,8 +2161,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [3]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_surface.webp",
@@ -1922,22 +2181,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [3]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 604484,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": []
+      "stages": [
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_normal.webp",
@@ -1950,7 +2199,9 @@
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -1964,23 +2215,10 @@
         "src/rendering/environment/asset-sources.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 628648,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [7]
+      "stages": []
     },
     {
       "path": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_normal.webp",
@@ -1995,8 +2233,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [7]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_surface.webp",
@@ -2011,23 +2253,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [7]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 786224,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 2, 3]
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_normal.webp",
@@ -2042,8 +2273,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 2, 3]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_surface.webp",
@@ -2058,23 +2296,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 2, 3]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 777546,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [5]
+      "stages": [
+        0,
+        1,
+        2,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_normal.webp",
@@ -2089,8 +2319,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [5]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_surface.webp",
@@ -2105,23 +2339,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [5]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.webp",
-      "width": 1881,
-      "height": 836,
-      "encodedBytes": 1010550,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [5]
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_normal.webp",
@@ -2136,8 +2359,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [5]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_surface.webp",
@@ -2152,23 +2379,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [5]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 809798,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [5]
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_normal.webp",
@@ -2183,8 +2399,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [5]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_surface.webp",
@@ -2199,23 +2419,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [5]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 720956,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [5]
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_normal.webp",
@@ -2230,8 +2439,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [5]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_surface.webp",
@@ -2246,23 +2459,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [5]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 497020,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [5]
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_normal.webp",
@@ -2277,8 +2479,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [5]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_surface.webp",
@@ -2293,23 +2499,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [5]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp",
-      "width": 2172,
-      "height": 724,
-      "encodedBytes": 647182,
-      "decodedBytes": 6290112,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [6, 8]
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_normal.webp",
@@ -2324,8 +2519,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [6, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_surface.webp",
@@ -2340,23 +2540,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [6, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp",
-      "width": 2172,
-      "height": 724,
-      "encodedBytes": 740240,
-      "decodedBytes": 6290112,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [6]
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_normal.webp",
@@ -2371,8 +2561,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [6]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_surface.webp",
@@ -2387,23 +2581,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [6]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp",
-      "width": 2172,
-      "height": 724,
-      "encodedBytes": 1005876,
-      "decodedBytes": 6290112,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [6, 8]
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_normal.webp",
@@ -2418,8 +2601,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [6, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_surface.webp",
@@ -2434,23 +2622,13 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [6, 8]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp",
-      "width": 2172,
-      "height": 724,
-      "encodedBytes": 805278,
-      "decodedBytes": 6290112,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [6]
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_normal.webp",
@@ -2465,8 +2643,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [6]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_surface.webp",
@@ -2481,23 +2663,12 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [6]
-    },
-    {
-      "path": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 455408,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/environment/asset-sources.ts",
-        "src/rendering/environment/local-renderer.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
-      "stages": [0, 1, 3, 7, 8]
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_normal.webp",
@@ -2512,8 +2683,16 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
-      "stages": [0, 1, 3, 7, 8]
+      "roles": [
+        "normal"
+      ],
+      "stages": [
+        0,
+        1,
+        3,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_surface.webp",
@@ -2528,8 +2707,16 @@
         "src/rendering/environment/local-renderer.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": [0, 1, 3, 7, 8]
+      "roles": [
+        "surface"
+      ],
+      "stages": [
+        0,
+        1,
+        3,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/petal-ground-atlas.webp",
@@ -2543,8 +2730,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [2]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        2
+      ]
     },
     {
       "path": "src/rendering/environment/assets/pine-atlas.webp",
@@ -2558,8 +2751,19 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 3, 6, 7, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        3,
+        6,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/reeds-atlas.webp",
@@ -2573,8 +2777,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [3]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/rocks-atlas.webp",
@@ -2587,7 +2797,11 @@
         "src/rendering/environment/asset-sources.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2602,8 +2816,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [7]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        7
+      ]
     },
     {
       "path": "src/rendering/environment/assets/shrubs-atlas.webp",
@@ -2617,8 +2837,17 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 2, 3]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        2,
+        3
+      ]
     },
     {
       "path": "src/rendering/environment/assets/snow-boulders-atlas.webp",
@@ -2632,8 +2861,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [5]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/snow-peak.webp",
@@ -2647,8 +2882,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [5]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/snow-pines-atlas.webp",
@@ -2662,8 +2903,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [5]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/snow-rocks-atlas.webp",
@@ -2677,8 +2924,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [5]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.webp",
@@ -2692,8 +2945,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [5]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        5
+      ]
     },
     {
       "path": "src/rendering/environment/assets/temple-posts-atlas.webp",
@@ -2707,8 +2966,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [6, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/temple-roofs-atlas.webp",
@@ -2722,8 +2988,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [6]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/temple-steps-atlas.webp",
@@ -2737,8 +3009,15 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [6, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        6,
+        8
+      ]
     },
     {
       "path": "src/rendering/environment/assets/temple-walls-atlas.webp",
@@ -2752,8 +3031,14 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [6]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        6
+      ]
     },
     {
       "path": "src/rendering/environment/assets/woodland-landmarks-atlas.webp",
@@ -2767,8 +3052,18 @@
         "src/rendering/environment/local-renderer.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": [0, 1, 3, 7, 8]
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
+      "stages": [
+        0,
+        1,
+        3,
+        7,
+        8
+      ]
     },
     {
       "path": "src/rendering/figures/assets/armour-plates-atlas.webp",
@@ -2781,7 +3076,11 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2795,7 +3094,10 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse", "direct-reference"],
+      "roles": [
+        "diffuse",
+        "direct-reference"
+      ],
       "stages": []
     },
     {
@@ -2809,7 +3111,10 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["direct-reference", "normal"],
+      "roles": [
+        "direct-reference",
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -2823,7 +3128,10 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["direct-reference", "surface"],
+      "roles": [
+        "direct-reference",
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -2832,8 +3140,14 @@
       "height": 1254,
       "encodedBytes": 367024,
       "decodedBytes": 6290064,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2847,7 +3161,11 @@
         "src/rendering/figures/ink-charms.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2856,8 +3174,14 @@
       "height": 1254,
       "encodedBytes": 466614,
       "decodedBytes": 6290064,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2871,7 +3195,11 @@
         "src/rendering/figures/ink-companions.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2885,7 +3213,11 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2899,7 +3231,11 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2913,7 +3249,11 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -2927,7 +3267,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse"],
+      "roles": [
+        "diffuse"
+      ],
       "stages": []
     },
     {
@@ -2941,7 +3283,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -2955,7 +3299,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -2969,7 +3315,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse"],
+      "roles": [
+        "diffuse"
+      ],
       "stages": []
     },
     {
@@ -2983,7 +3331,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -2997,7 +3347,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3011,7 +3363,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse"],
+      "roles": [
+        "diffuse"
+      ],
       "stages": []
     },
     {
@@ -3025,7 +3379,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3039,7 +3395,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3053,7 +3411,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse"],
+      "roles": [
+        "diffuse"
+      ],
       "stages": []
     },
     {
@@ -3067,7 +3427,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3081,7 +3443,9 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3095,7 +3459,11 @@
         "src/rendering/figures/ink-enemy.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3109,7 +3477,11 @@
         "src/rendering/figures/ink-sword.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3118,8 +3490,14 @@
       "height": 724,
       "encodedBytes": 171218,
       "decodedBytes": 6290112,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3133,7 +3511,11 @@
         "src/rendering/figures/ink-companions.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3147,7 +3529,11 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3161,21 +3547,11 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 431126,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/outfit-kit.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3189,7 +3565,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3203,21 +3581,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp",
-      "width": 1536,
-      "height": 1024,
-      "encodedBytes": 555542,
-      "decodedBytes": 6291456,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/ink-charms.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3231,7 +3597,9 @@
         "src/rendering/figures/ink-charms.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3245,17 +3613,9 @@
         "src/rendering/figures/ink-charms.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 469358,
-      "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3264,8 +3624,13 @@
       "height": 1254,
       "encodedBytes": 86890,
       "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/asset-materials.ts",
+        "src/rendering/pbr-atlas.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3274,22 +3639,13 @@
       "height": 1254,
       "encodedBytes": 160862,
       "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 264394,
-      "decodedBytes": 6290064,
       "consumers": [
         "src/rendering/asset-materials.ts",
-        "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3303,7 +3659,9 @@
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3317,21 +3675,9 @@
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 491804,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/ink-sword.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3345,7 +3691,9 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3359,17 +3707,9 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/katana/katana_diffuse.webp",
-      "width": 2172,
-      "height": 724,
-      "encodedBytes": 171096,
-      "decodedBytes": 6290112,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3378,8 +3718,13 @@
       "height": 724,
       "encodedBytes": 53884,
       "decodedBytes": 6290112,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/asset-materials.ts",
+        "src/rendering/pbr-atlas.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3388,22 +3733,13 @@
       "height": 724,
       "encodedBytes": 58654,
       "decodedBytes": 6290112,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp",
-      "width": 1145,
-      "height": 1373,
-      "encodedBytes": 510622,
-      "decodedBytes": 6288340,
       "consumers": [
         "src/rendering/asset-materials.ts",
-        "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3417,7 +3753,9 @@
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3431,21 +3769,9 @@
         "src/rendering/figures/ink-companions.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 431438,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/outfit-kit.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3459,7 +3785,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3473,21 +3801,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 328046,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/outfit-kit.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3501,7 +3817,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3515,21 +3833,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 493978,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/outfit-kit.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3543,7 +3849,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3557,17 +3865,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 888636,
-      "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3576,8 +3876,13 @@
       "height": 1254,
       "encodedBytes": 164112,
       "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/asset-materials.ts",
+        "src/rendering/pbr-atlas.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3586,22 +3891,13 @@
       "height": 1254,
       "encodedBytes": 352430,
       "decodedBytes": 6290064,
-      "consumers": ["src/rendering/asset-materials.ts", "src/rendering/pbr-atlas.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 460708,
-      "decodedBytes": 6290064,
       "consumers": [
         "src/rendering/asset-materials.ts",
-        "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3615,7 +3911,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3629,21 +3927,9 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp",
-      "width": 1774,
-      "height": 887,
-      "encodedBytes": 398068,
-      "decodedBytes": 6294152,
-      "consumers": [
-        "src/rendering/asset-materials.ts",
-        "src/rendering/figures/ink-sword.ts",
-        "src/rendering/pbr-atlas.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -3657,7 +3943,9 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3671,7 +3959,9 @@
         "src/rendering/figures/ink-sword.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3685,7 +3975,11 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3699,7 +3993,9 @@
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["diffuse"],
+      "roles": [
+        "diffuse"
+      ],
       "stages": []
     },
     {
@@ -3713,7 +4009,9 @@
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -3727,7 +4025,9 @@
         "src/rendering/figures/ink-player.ts",
         "src/rendering/pbr-atlas.ts"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -3736,8 +4036,14 @@
       "height": 1254,
       "encodedBytes": 887834,
       "decodedBytes": 6290064,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3751,7 +4057,11 @@
         "src/rendering/figures/ink-player.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3765,7 +4075,11 @@
         "src/rendering/figures/outfit-kit.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3779,7 +4093,11 @@
         "src/rendering/figures/ink-sword.ts",
         "src/ui/lighting-debug.ts"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3794,7 +4112,11 @@
         "src/ui/lighting-debug.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3803,8 +4125,16 @@
       "height": 128,
       "encodedBytes": 3694,
       "decodedBytes": 131072,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.css"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.css"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3813,8 +4143,16 @@
       "height": 128,
       "encodedBytes": 3092,
       "decodedBytes": 131072,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.css"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.css"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3823,8 +4161,16 @@
       "height": 128,
       "encodedBytes": 4624,
       "decodedBytes": 131072,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.css"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.css"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3833,8 +4179,12 @@
       "height": 128,
       "encodedBytes": 5682,
       "decodedBytes": 393216,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3843,8 +4193,14 @@
       "height": 128,
       "encodedBytes": 11898,
       "decodedBytes": 393216,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3853,8 +4209,12 @@
       "height": 128,
       "encodedBytes": 5170,
       "decodedBytes": 131072,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3863,8 +4223,14 @@
       "height": 128,
       "encodedBytes": 3212,
       "decodedBytes": 131072,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3873,8 +4239,16 @@
       "height": 128,
       "encodedBytes": 1674,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/styles/button-frames.css", "src/ui/lighting-debug.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/styles/button-frames.css",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3883,8 +4257,16 @@
       "height": 128,
       "encodedBytes": 1578,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/styles/button-frames.css", "src/ui/lighting-debug.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/styles/button-frames.css",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3893,8 +4275,14 @@
       "height": 100,
       "encodedBytes": 885,
       "decodedBytes": 160000,
-      "consumers": ["src/main-game.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3903,8 +4291,16 @@
       "height": 1254,
       "encodedBytes": 626950,
       "decodedBytes": 6290064,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3913,8 +4309,16 @@
       "height": 400,
       "encodedBytes": 83758,
       "decodedBytes": 960000,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/startup-loading.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/startup-loading.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3923,8 +4327,12 @@
       "height": 192,
       "encodedBytes": 6599,
       "decodedBytes": 294912,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3933,8 +4341,14 @@
       "height": 192,
       "encodedBytes": 6308,
       "decodedBytes": 294912,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3943,8 +4357,16 @@
       "height": 192,
       "encodedBytes": 2892,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/styles/panel-frames.css", "src/ui/lighting-debug.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/styles/panel-frames.css",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3953,23 +4375,16 @@
       "height": 192,
       "encodedBytes": 2708,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/styles/panel-frames.css", "src/ui/lighting-debug.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/armoury-room/armoury-room_diffuse.webp",
-      "width": 1536,
-      "height": 1024,
-      "encodedBytes": 1571976,
-      "decodedBytes": 6291456,
       "consumers": [
-        "src/rendering/armory-preview.ts",
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.css"
+        "src/main-game.ts",
+        "src/styles/panel-frames.css",
+        "src/ui/lighting-debug.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -3984,7 +4399,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["emissive"],
+      "roles": [
+        "emissive"
+      ],
       "stages": []
     },
     {
@@ -3999,7 +4416,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4014,21 +4433,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.webp",
-      "width": 256,
-      "height": 128,
-      "encodedBytes": 3694,
-      "decodedBytes": 131072,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.css"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4042,7 +4449,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4056,21 +4465,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.webp",
-      "width": 256,
-      "height": 128,
-      "encodedBytes": 3092,
-      "decodedBytes": 131072,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.css"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4084,7 +4481,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4098,21 +4497,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.webp",
-      "width": 256,
-      "height": 128,
-      "encodedBytes": 4624,
-      "decodedBytes": 131072,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.css"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4126,7 +4513,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4140,17 +4529,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp",
-      "width": 768,
-      "height": 128,
-      "encodedBytes": 11898,
-      "decodedBytes": 393216,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -4159,8 +4540,13 @@
       "height": 128,
       "encodedBytes": 4076,
       "decodedBytes": 393216,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4169,18 +4555,13 @@
       "height": 128,
       "encodedBytes": 19686,
       "decodedBytes": 393216,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.webp",
-      "width": 256,
-      "height": 128,
-      "encodedBytes": 3212,
-      "decodedBytes": 131072,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -4189,8 +4570,13 @@
       "height": 128,
       "encodedBytes": 1832,
       "decodedBytes": 131072,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4199,22 +4585,13 @@
       "height": 128,
       "encodedBytes": 7040,
       "decodedBytes": 131072,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/button-highlighted/button-highlighted_diffuse.webp",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 1674,
-      "decodedBytes": 65536,
       "consumers": [
         "src/rendering/pbr-atlas.ts",
-        "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -4228,7 +4605,9 @@
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4242,21 +4621,9 @@
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/button-normal/button-normal_diffuse.webp",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 1578,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/styles/button-frames.css",
-        "src/ui/material-lighting.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4270,7 +4637,9 @@
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4284,21 +4653,9 @@
         "src/styles/button-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 627426,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/symbol-art.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4312,7 +4669,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["emissive"],
+      "roles": [
+        "emissive"
+      ],
       "stages": []
     },
     {
@@ -4326,7 +4685,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4340,21 +4701,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/issen-logo/issen-logo_diffuse.webp",
-      "width": 600,
-      "height": 400,
-      "encodedBytes": 83740,
-      "decodedBytes": 960000,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/startup-loading.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4368,7 +4717,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
-      "roles": ["emissive"],
+      "roles": [
+        "emissive"
+      ],
       "stages": []
     },
     {
@@ -4382,7 +4733,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4396,17 +4749,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/startup-loading.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp",
-      "width": 384,
-      "height": 192,
-      "encodedBytes": 6392,
-      "decodedBytes": 294912,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -4415,8 +4760,13 @@
       "height": 192,
       "encodedBytes": 4768,
       "decodedBytes": 294912,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4425,22 +4775,13 @@
       "height": 192,
       "encodedBytes": 15374,
       "decodedBytes": 294912,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 2892,
-      "decodedBytes": 147456,
       "consumers": [
         "src/rendering/pbr-atlas.ts",
-        "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -4454,7 +4795,9 @@
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4468,21 +4811,9 @@
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/panel-normal/panel-normal_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 2708,
-      "decodedBytes": 147456,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/styles/panel-frames.css",
-        "src/ui/material-lighting.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4496,7 +4827,9 @@
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4510,21 +4843,9 @@
         "src/styles/panel-frames.css",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp",
-      "width": 1254,
-      "height": 1254,
-      "encodedBytes": 453618,
-      "decodedBytes": 6290064,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/symbol-art.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4538,7 +4859,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["emissive"],
+      "roles": [
+        "emissive"
+      ],
       "stages": []
     },
     {
@@ -4552,7 +4875,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4566,21 +4891,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp",
-      "width": 1448,
-      "height": 1086,
-      "encodedBytes": 507556,
-      "decodedBytes": 6290112,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/symbol-art.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4594,7 +4907,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["emissive"],
+      "roles": [
+        "emissive"
+      ],
       "stages": []
     },
     {
@@ -4608,7 +4923,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4622,21 +4939,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/symbol-art.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.webp",
-      "width": 1536,
-      "height": 256,
-      "encodedBytes": 19156,
-      "decodedBytes": 1572864,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/trials.css"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4650,7 +4955,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/trials.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4664,21 +4971,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/trials.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png",
-      "width": 768,
-      "height": 640,
-      "encodedBytes": 40482,
-      "decodedBytes": 1966080,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/rendering/ui-art.ts",
-        "src/ui/material-lighting.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4692,7 +4987,9 @@
         "src/rendering/ui-art.ts",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4706,21 +5003,9 @@
         "src/rendering/ui-art.ts",
         "src/ui/material-lighting.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 2002,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4734,7 +5019,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4748,21 +5035,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 2670,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4776,7 +5051,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4790,21 +5067,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 1697,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4818,7 +5083,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4832,21 +5099,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 1566,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4860,7 +5115,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4874,21 +5131,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 986,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4902,7 +5147,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4916,21 +5163,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 2073,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4944,7 +5179,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -4958,21 +5195,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png",
-      "width": 128,
-      "height": 128,
-      "encodedBytes": 2041,
-      "decodedBytes": 65536,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/armory.ts"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -4986,7 +5211,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5000,17 +5227,9 @@
         "src/ui/material-lighting.ts",
         "src/ui/screens/armory.ts"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 4972,
-      "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5019,8 +5238,13 @@
       "height": 192,
       "encodedBytes": 8054,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5029,18 +5253,13 @@
       "height": 192,
       "encodedBytes": 15360,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 4474,
-      "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5049,8 +5268,13 @@
       "height": 192,
       "encodedBytes": 4326,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5059,18 +5283,13 @@
       "height": 192,
       "encodedBytes": 12328,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 3754,
-      "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5079,8 +5298,13 @@
       "height": 192,
       "encodedBytes": 6094,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5089,18 +5313,13 @@
       "height": 192,
       "encodedBytes": 16032,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 5604,
-      "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5109,8 +5328,13 @@
       "height": 192,
       "encodedBytes": 9058,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5119,18 +5343,13 @@
       "height": 192,
       "encodedBytes": 17686,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 6847,
-      "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["unused-decoded-diffuse"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5139,8 +5358,13 @@
       "height": 192,
       "encodedBytes": 8110,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["normal"],
+      "consumers": [
+        "src/rendering/pbr-atlas.ts",
+        "src/ui/material-lighting.ts"
+      ],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5149,23 +5373,13 @@
       "height": 192,
       "encodedBytes": 19974,
       "decodedBytes": 147456,
-      "consumers": ["src/rendering/pbr-atlas.ts", "src/ui/material-lighting.ts"],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.webp",
-      "width": 192,
-      "height": 192,
-      "encodedBytes": 4972,
-      "decodedBytes": 147456,
       "consumers": [
         "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/rewarded-support.css",
-        "src/ui/scroll-menus.css"
+        "src/ui/material-lighting.ts"
       ],
-      "roles": ["unused-decoded-diffuse"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5180,7 +5394,9 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5195,22 +5411,9 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["surface"],
-      "stages": []
-    },
-    {
-      "path": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png",
-      "width": 192,
-      "height": 48,
-      "encodedBytes": 1015,
-      "decodedBytes": 36864,
-      "consumers": [
-        "src/rendering/pbr-atlas.ts",
-        "src/ui/material-lighting.ts",
-        "src/ui/screens/rewarded-support.css",
-        "src/ui/scroll-menus.css"
+      "roles": [
+        "surface"
       ],
-      "roles": ["unused-decoded-diffuse"],
       "stages": []
     },
     {
@@ -5225,7 +5428,9 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["normal"],
+      "roles": [
+        "normal"
+      ],
       "stages": []
     },
     {
@@ -5240,7 +5445,9 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["surface"],
+      "roles": [
+        "surface"
+      ],
       "stages": []
     },
     {
@@ -5249,8 +5456,14 @@
       "height": 100,
       "encodedBytes": 274,
       "decodedBytes": 40000,
-      "consumers": ["src/main-game.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5259,8 +5472,14 @@
       "height": 128,
       "encodedBytes": 436,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5269,8 +5488,16 @@
       "height": 1254,
       "encodedBytes": 452348,
       "decodedBytes": 6290064,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5279,8 +5506,16 @@
       "height": 1086,
       "encodedBytes": 509398,
       "decodedBytes": 6290112,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/symbol-art.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/symbol-art.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5289,8 +5524,12 @@
       "height": 256,
       "encodedBytes": 80364,
       "decodedBytes": 1572864,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5299,8 +5538,16 @@
       "height": 256,
       "encodedBytes": 19156,
       "decodedBytes": 1572864,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/trials.css"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/trials.css"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5309,8 +5556,12 @@
       "height": 640,
       "encodedBytes": 48970,
       "decodedBytes": 1966080,
-      "consumers": ["src/main-game.ts"],
-      "roles": ["startup-glob"],
+      "consumers": [
+        "src/main-game.ts"
+      ],
+      "roles": [
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5319,8 +5570,16 @@
       "height": 640,
       "encodedBytes": 56642,
       "decodedBytes": 1966080,
-      "consumers": ["src/main-game.ts", "src/rendering/ui-art.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/rendering/ui-art.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5329,8 +5588,16 @@
       "height": 128,
       "encodedBytes": 3162,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5339,8 +5606,16 @@
       "height": 128,
       "encodedBytes": 4166,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5349,8 +5624,16 @@
       "height": 128,
       "encodedBytes": 2704,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5359,8 +5642,16 @@
       "height": 128,
       "encodedBytes": 2180,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5369,8 +5660,16 @@
       "height": 128,
       "encodedBytes": 986,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5379,8 +5678,16 @@
       "height": 128,
       "encodedBytes": 3400,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5389,8 +5696,16 @@
       "height": 128,
       "encodedBytes": 3574,
       "decodedBytes": 65536,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts", "src/ui/screens/armory.ts"],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts",
+        "src/ui/screens/armory.ts"
+      ],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5399,8 +5714,14 @@
       "height": 192,
       "encodedBytes": 4972,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5409,8 +5730,14 @@
       "height": 192,
       "encodedBytes": 4474,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5419,8 +5746,14 @@
       "height": 192,
       "encodedBytes": 3754,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5429,8 +5762,14 @@
       "height": 192,
       "encodedBytes": 5604,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5439,8 +5778,14 @@
       "height": 192,
       "encodedBytes": 10916,
       "decodedBytes": 147456,
-      "consumers": ["src/main-game.ts", "src/ui/lighting-debug.ts"],
-      "roles": ["material-preview", "startup-glob"],
+      "consumers": [
+        "src/main-game.ts",
+        "src/ui/lighting-debug.ts"
+      ],
+      "roles": [
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5455,7 +5800,11 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     },
     {
@@ -5470,7 +5819,11 @@
         "src/ui/screens/rewarded-support.css",
         "src/ui/scroll-menus.css"
       ],
-      "roles": ["direct-reference", "material-preview", "startup-glob"],
+      "roles": [
+        "direct-reference",
+        "material-preview",
+        "startup-glob"
+      ],
       "stages": []
     }
   ]

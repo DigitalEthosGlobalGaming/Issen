@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| world-ui-crest-tomoe | [diffuse](world-ui-crest-tomoe_diffuse.compact.png), [normal](world-ui-crest-tomoe_normal.webp), [surface](world-ui-crest-tomoe_surface.webp) |
+| world-ui-crest-tomoe | [diffuse](../../world-ui-crest-tomoe.webp), [normal](world-ui-crest-tomoe_normal.webp), [surface](world-ui-crest-tomoe_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

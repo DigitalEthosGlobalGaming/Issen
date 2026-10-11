@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| armoury-room | [diffuse](armoury-room_diffuse.webp), [normal](armoury-room_normal.webp), [surface](armoury-room_surface.webp), [emissive](armoury-room_emissive.webp) |
+| armoury-room | [diffuse](../../armoury-room.webp), [normal](armoury-room_normal.webp), [surface](armoury-room_surface.webp), [emissive](armoury-room_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

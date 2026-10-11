@@ -122,11 +122,31 @@ test('catalog lists only installed runtime planes, supports optional emission an
     await writeFile(path.join(root, zeroPath), zeroBytes);
     await writeFile(path.join(root, 'src/rendering/maps/sample_emissive.webp'), 'fixture');
     assert.match(await generateRuntimeCatalog(root), /emissive:.*sample_emissive.webp/);
-    await writeFile(path.join(root, 'src/rendering/maps/sample_diffuse.compact.png'), 'lossless PNG exception');
-    await writeFile(path.join(root, 'src/rendering/sample.compact.png'), 'lossless source exception');
+    await writeFile(
+      path.join(root, 'src/rendering/maps/sample_diffuse.compact.png'),
+      'lossless PNG exception',
+    );
+    await writeFile(
+      path.join(root, 'src/rendering/sample.compact.png'),
+      'lossless source exception',
+    );
     const exceptions = await generateRuntimeCatalog(root);
     assert.match(exceptions, /diffuse:.*sample_diffuse.compact.png/);
     assert.match(exceptions, /source:.*sample.compact.png/);
+    // Cleanup aliases survive regeneration without restoring archived colour maps.
+    await writeFile(
+      path.join(root, 'scripts/assets/asset-cleanup.json'),
+      JSON.stringify({
+        runtimeAliases: {
+          'src/rendering/maps/sample_diffuse.compact.png': 'src/rendering/sample.compact.png',
+        },
+      }),
+    );
+    await rm(path.join(root, 'src/rendering/maps/sample_diffuse.compact.png'));
+    await rm(path.join(root, 'src/rendering/maps/sample_diffuse.webp'));
+    const shared = await generateRuntimeCatalog(root);
+    assert.match(shared, /diffuse:.*sample.compact.png/);
+    assert.doesNotMatch(shared, /maps\/sample_diffuse/);
     await rm(path.join(root, 'src/rendering/maps/sample_normal.webp'));
     await assert.rejects(generateRuntimeCatalog(root), /Missing runtime plane/);
   } finally {

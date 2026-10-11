@@ -5,7 +5,7 @@ Generated from [drift-debris-atlas.png](../../drift-debris-atlas.png) with `clot
 Authoring planes retain the original atlas dimensions and diffuse alpha. This pack is excluded from the runtime material catalog as of1.69.15; drift uses the merged colour/emissive pair under `../../drift/`.
 
 <!-- runtime-planes:start -->
-## Retained authoring plane set
+## Runtime plane set
 
 | Source family | Aligned planes |
 | --- | --- |

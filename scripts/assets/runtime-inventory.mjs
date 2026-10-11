@@ -126,6 +126,9 @@ export async function runtimeInventory() {
       diffuseConsumers.has(family) ||
       rows.get(relative(fileURLToPath(pack.maps.diffuse)))?.roles.has('direct-reference') === true;
     for (const [kind, url] of Object.entries(pack.maps)) {
+      // Archived unused diffuse planes alias the original colour source.
+      // Do not mark that live source as an unused decode or drop it from loading.
+      if (kind === 'diffuse' && url === pack.source) continue;
       const row = add(
         relative(fileURLToPath(url)),
         'src/rendering/pbr-atlas.ts',

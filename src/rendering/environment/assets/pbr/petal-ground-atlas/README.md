@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| petal-ground-atlas | [diffuse](petal-ground-atlas_diffuse.webp), [normal](petal-ground-atlas_normal.webp), [surface](petal-ground-atlas_surface.webp) |
+| petal-ground-atlas | [diffuse](../../petal-ground-atlas.webp), [normal](petal-ground-atlas_normal.webp), [surface](petal-ground-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| cherry-trees-atlas | [diffuse](cherry-trees-atlas_diffuse.webp), [normal](cherry-trees-atlas_normal.webp), [surface](cherry-trees-atlas_surface.webp) |
+| cherry-trees-atlas | [diffuse](../../cherry-trees-atlas.webp), [normal](cherry-trees-atlas_normal.webp), [surface](cherry-trees-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

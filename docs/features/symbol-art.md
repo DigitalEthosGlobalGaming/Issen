@@ -3,7 +3,7 @@
 ## Shared direction
 
 Symbols, emblems and menu illustrations should use the calligraphic brush style
-of Issen's main logo. Use [the logo](../../assets/play-store/pc/logo-600x400.png)
+of Issen's main logo. Use [the logo](../../src/ui/assets/issen-logo.png)
 as the style reference: broad gestural strokes, tapered ends, dry-brush breaks,
 irregular edges and generous negative space. Symbols represent their meaning
 through a few readable strokes rather than detailed object illustrations.

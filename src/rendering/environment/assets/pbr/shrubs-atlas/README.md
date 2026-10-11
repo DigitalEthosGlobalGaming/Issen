@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| shrubs-atlas | [diffuse](shrubs-atlas_diffuse.webp), [normal](shrubs-atlas_normal.webp), [surface](shrubs-atlas_surface.webp) |
+| shrubs-atlas | [diffuse](../../shrubs-atlas.webp), [normal](shrubs-atlas_normal.webp), [surface](shrubs-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

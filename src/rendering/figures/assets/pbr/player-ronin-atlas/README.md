@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| player-ronin-atlas | [diffuse](player-ronin-atlas_diffuse.webp), [normal](player-ronin-atlas_normal.webp), [surface](player-ronin-atlas_surface.webp) |
+| player-ronin-atlas | [diffuse](../../player-ronin-atlas.webp), [normal](player-ronin-atlas_normal.webp), [surface](player-ronin-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

@@ -7,7 +7,6 @@ $masterPath = Join-Path $repositoryPath 'assets/branding/issen-splash-v1.png'
 $resourcePath = Join-Path $repositoryPath 'android/app/src/main/res'
 $sizes = [ordered]@{
     'drawable' = @(480, 320)
-    'drawable-land-mdpi' = @(480, 320)
     'drawable-land-hdpi' = @(800, 480)
     'drawable-land-xhdpi' = @(1280, 720)
     'drawable-land-xxhdpi' = @(1600, 960)
@@ -37,7 +36,8 @@ try {
                 $drawWidth, $drawHeight
             )
             $graphics.DrawImage($masterImage, $destination)
-            $outputPath = Join-Path $resourcePath "$($entry.Key)/splash.png"
+            $fileName = if ($entry.Key -eq 'drawable') { 'splash_base.png' } else { 'splash.png' }
+            $outputPath = Join-Path $resourcePath "$($entry.Key)/$fileName"
             $bitmap.Save($outputPath, [System.Drawing.Imaging.ImageFormat]::Png)
             Write-Output "$($entry.Key): ${width}x${height}"
         } finally {
@@ -47,4 +47,10 @@ try {
     }
 } finally {
     $masterImage.Dispose()
+}
+
+# Default and landscape mdpi share the same bitmap and retain their qualifiers.
+$bitmapAlias = '<bitmap xmlns:android="http://schemas.android.com/apk/res/android" android:src="@drawable/splash_base" />'
+foreach ($directory in @('drawable', 'drawable-land-mdpi')) {
+    Set-Content -LiteralPath (Join-Path $resourcePath "$directory/splash.xml") -Value $bitmapAlias
 }

@@ -20,7 +20,16 @@ sources; the old drift packs are excluded from the runtime material catalog.
 Removed generated base WebP sizes remain available in `compaction-manifest.json`
 for the generator's historical full-set comparison.
 
-## Existing compaction
+## Artwork cleanup
+
+`asset-cleanup.json` records exact duplicate removal and unused generated colour
+maps archived under `assets/unused/`. Its `runtimeAliases` keep the material
+catalogue and pack documentation on active canonical sources after regeneration.
+Authoring originals and required figure colour maps remain in place. Archived
+planes are not compaction inputs or runtime assets. Review consumers and update
+the aliases when restoring a plane; do not infer usage from file size alone.
+
+## Existing compaction workflow
 
 Generate the runtime loading inventory with
 `node scripts/assets/runtime-inventory.mjs`. The committed JSON records intrinsic

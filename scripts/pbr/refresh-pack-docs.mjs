@@ -1,9 +1,11 @@
 import { readFile, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadRuntimeAliases } from '../assets/asset-locations.mjs';
 
 /** Refresh runtime map links while preserving authoring settings and provenance. */
 export async function refreshPackDocs(root = path.resolve(import.meta.dirname, '../..')) {
+  const aliases = await loadRuntimeAliases(root);
   const catalog = JSON.parse(
     await readFile(path.join(root, 'scripts/pbr/asset-packs.json'), 'utf8'),
   );
@@ -34,6 +36,11 @@ export async function refreshPackDocs(root = path.resolve(import.meta.dirname, '
         let plane;
         for (const ext of ['compact.png', 'webp', 'png']) {
           const file = `${stem}_${kind}.${ext}`;
+          const alias = aliases[`${family.output}/${file}`];
+          if (alias) {
+            plane = path.relative(directory, path.join(root, alias)).replaceAll('\\', '/');
+            break;
+          }
           try {
             await access(path.join(directory, file));
             plane = file;

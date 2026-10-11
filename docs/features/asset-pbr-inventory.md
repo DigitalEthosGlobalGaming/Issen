@@ -1,11 +1,20 @@
 # Game asset and PBR inventory
 
-Last reviewed: 10 October 2026. This is a manually maintained inventory of the
+Last reviewed: 11 October 2026. This is a manually maintained inventory of the
 current working tree. Renderer wiring does not imply visual approval or a shipped
 release. All missing raster packs have now been generated and installed;
 renderer coverage is tracked separately below.
 
 ## Scope and status
+
+As of1.73.1, 23 byte-identical copies are consolidated (including store artwork
+and a shared native splash bitmap). Of76 unused generated colour maps,15 were
+duplicates and61 are archived under `assets/unused/`, retaining their original
+paths and hashes in `scripts/assets/asset-cleanup.json`. Normal rendering and
+material previews use the existing colour sources; required player/enemy colour,
+normal, surface and emissive maps remain active. This removes34.6MB of encoded
+colour files from runtime inputs without changing authored pixels or atlas layouts.
+Archived files remain in the checkout and Git; original authoring inputs remain.
 
 As of1.70.12, Graphics AA controls native back-buffer MSAA; browser-context AA is
 disabled after identical-output comparisons. Live changes retire only the previous
@@ -485,13 +494,7 @@ those in the family and mixed-material tables above.
 
 | Asset | Dimensions | Runtime/source | PBR export | Preset |
 | --- | --- | --- | --- | --- |
-| [common/app-icon-512.png](../../assets/play-store/common/app-icon-512.png) | 512×512 | Store presentation | N/A | — |
 | [common/feature-graphic-1024x500.png](../../assets/play-store/common/feature-graphic-1024x500.png) | 1024×500 | Store presentation | N/A | — |
-| [desktop/01-title.png](../../assets/play-store/desktop/01-title.png) | 1920×1080 | Store presentation | N/A | — |
-| [desktop/02-waves.png](../../assets/play-store/desktop/02-waves.png) | 1920×1080 | Store presentation | N/A | — |
-| [desktop/03-boss-duel.png](../../assets/play-store/desktop/03-boss-duel.png) | 1920×1080 | Store presentation | N/A | — |
-| [desktop/04-armoury.png](../../assets/play-store/desktop/04-armoury.png) | 1920×1080 | Store presentation | N/A | — |
-| [desktop/05-temple.png](../../assets/play-store/desktop/05-temple.png) | 1920×1080 | Store presentation | N/A | — |
 | [issen-feature-graphic-1024x500.jpg](../../assets/play-store/issen-feature-graphic-1024x500.jpg) | — | Store presentation | N/A | — |
 | [pc/01-title.png](../../assets/play-store/pc/01-title.png) | 1920×1080 | Store presentation | N/A | — |
 | [pc/02-waves.png](../../assets/play-store/pc/02-waves.png) | 1920×1080 | Store presentation | N/A | — |
@@ -499,7 +502,6 @@ those in the family and mixed-material tables above.
 | [pc/04-armoury.png](../../assets/play-store/pc/04-armoury.png) | 1920×1080 | Store presentation | N/A | — |
 | [pc/05-temple.png](../../assets/play-store/pc/05-temple.png) | 1920×1080 | Store presentation | N/A | — |
 | [pc/feature-graphic-1920x1080.png](../../assets/play-store/pc/feature-graphic-1920x1080.png) | 1920×1080 | Store presentation | N/A | — |
-| [pc/logo-600x400.png](../../assets/play-store/pc/logo-600x400.png) | 600×400 | Store presentation | N/A | — |
 | [phone/01-title.png](../../assets/play-store/phone/01-title.png) | 1080×1920 | Store presentation | N/A | — |
 | [phone/02-waves.png](../../assets/play-store/phone/02-waves.png) | 1080×1920 | Store presentation | N/A | — |
 | [phone/03-boss-duel.png](../../assets/play-store/phone/03-boss-duel.png) | 1080×1920 | Store presentation | N/A | — |
@@ -520,9 +522,9 @@ those in the family and mixed-material tables above.
 
 | Asset | Dimensions | Runtime/source | PBR export | Preset |
 | --- | --- | --- | --- | --- |
-| [drawable/splash.png](../../android/app/src/main/res/drawable/splash.png) | 480×320 | Native launcher/splash | N/A | — |
+| [drawable/splash.png](../../android/app/src/main/res/drawable/splash.xml) | 480×320 | Native launcher/splash | N/A | — |
 | [drawable-land-hdpi/splash.png](../../android/app/src/main/res/drawable-land-hdpi/splash.png) | 800×480 | Native launcher/splash | N/A | — |
-| [drawable-land-mdpi/splash.png](../../android/app/src/main/res/drawable-land-mdpi/splash.png) | 480×320 | Native launcher/splash | N/A | — |
+| [drawable-land-mdpi/splash.png](../../android/app/src/main/res/drawable-land-mdpi/splash.xml) | 480×320 | Native launcher/splash | N/A | — |
 | [drawable-land-xhdpi/splash.png](../../android/app/src/main/res/drawable-land-xhdpi/splash.png) | 1280×720 | Native launcher/splash | N/A | — |
 | [drawable-land-xxhdpi/splash.png](../../android/app/src/main/res/drawable-land-xxhdpi/splash.png) | 1600×960 | Native launcher/splash | N/A | — |
 | [drawable-land-xxxhdpi/splash.png](../../android/app/src/main/res/drawable-land-xxxhdpi/splash.png) | 1920×1280 | Native launcher/splash | N/A | — |

@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| fog-wisps-atlas | [diffuse](fog-wisps-atlas_diffuse.webp), [normal](fog-wisps-atlas_normal.webp), [surface](fog-wisps-atlas_surface.webp), [emissive](fog-wisps-atlas_emissive.webp) |
+| fog-wisps-atlas | [diffuse](../../fog-wisps-atlas.webp), [normal](fog-wisps-atlas_normal.webp), [surface](fog-wisps-atlas_surface.webp), [emissive](fog-wisps-atlas_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

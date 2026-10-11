@@ -1,0 +1,650 @@
+{
+  "version": 1,
+  "runtimeAliases": {
+    "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp": "src/rendering/environment/assets/bamboo-atlas.webp",
+    "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp": "src/rendering/environment/assets/bamboo-landmarks-atlas.webp",
+    "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp": "src/rendering/environment/assets/cherry-landmarks-atlas.webp",
+    "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp": "src/rendering/environment/assets/cherry-trees-atlas.webp",
+    "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp": "src/rendering/environment/assets/demon-landmarks-atlas.webp",
+    "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp": "src/rendering/environment/assets/demon-terrain-atlas.webp",
+    "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp": "src/rendering/environment/assets/fallen-bamboo-atlas.webp",
+    "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp": "src/rendering/environment/assets/field-banks-atlas.webp",
+    "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp": "src/rendering/environment/assets/field-rocks-atlas.webp",
+    "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp": "src/rendering/environment/assets/foam-strips-atlas.webp",
+    "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp": "src/rendering/environment/assets/fog-wisps-atlas.webp",
+    "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp": "src/rendering/environment/assets/foreground-boulders-atlas.webp",
+    "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp": "src/rendering/environment/assets/grass-edges-atlas.webp",
+    "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp": "src/rendering/environment/assets/landmark-stones-atlas.webp",
+    "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp": "src/rendering/environment/assets/meadow-patches-atlas.webp",
+    "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp": "src/rendering/environment/assets/mountain-atlas.webp",
+    "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp": "src/rendering/environment/assets/petal-ground-atlas.webp",
+    "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp": "src/rendering/environment/assets/pine-atlas.webp",
+    "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp": "src/rendering/environment/assets/reeds-atlas.webp",
+    "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp": "src/rendering/environment/assets/rocks-atlas.webp",
+    "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp": "src/rendering/environment/assets/sea-stacks-atlas.webp",
+    "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp": "src/rendering/environment/assets/shrubs-atlas.webp",
+    "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp": "src/rendering/environment/assets/snow-boulders-atlas.webp",
+    "src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.webp": "src/rendering/environment/assets/snow-peak.webp",
+    "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp": "src/rendering/environment/assets/snow-pines-atlas.webp",
+    "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp": "src/rendering/environment/assets/snow-rocks-atlas.webp",
+    "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.webp",
+    "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp": "src/rendering/environment/assets/temple-posts-atlas.webp",
+    "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp": "src/rendering/environment/assets/temple-roofs-atlas.webp",
+    "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp": "src/rendering/environment/assets/temple-steps-atlas.webp",
+    "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp": "src/rendering/environment/assets/temple-walls-atlas.webp",
+    "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp": "src/rendering/environment/assets/woodland-landmarks-atlas.webp",
+    "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp": "src/rendering/figures/assets/armour-plates-atlas.webp",
+    "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp": "src/rendering/figures/assets/charm-atlas.webp",
+    "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp": "src/rendering/figures/assets/companion-atlas.webp",
+    "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp": "src/rendering/figures/assets/companion-parts-atlas.webp",
+    "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp": "src/rendering/figures/assets/handle-guard-atlas.webp",
+    "src/rendering/figures/assets/pbr/katana/katana_diffuse.webp": "src/rendering/figures/assets/katana.webp",
+    "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp": "src/rendering/figures/assets/mystic-rock.webp",
+    "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp": "src/rendering/figures/assets/outfit-cloth-atlas.webp",
+    "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp": "src/rendering/figures/assets/outfit-headwear-atlas.webp",
+    "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp": "src/rendering/figures/assets/player-mask-atlas.webp",
+    "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp": "src/rendering/figures/assets/player-ronin-atlas.webp",
+    "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp": "src/rendering/figures/assets/player-special-headwear-atlas.webp",
+    "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp": "src/rendering/figures/assets/special-weapons-atlas.webp",
+    "src/ui/assets/pbr/armoury-room/armoury-room_diffuse.webp": "src/ui/assets/armoury-room.webp",
+    "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.webp": "src/ui/assets/awakening-button-awakened.webp",
+    "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.webp": "src/ui/assets/awakening-button-normal.webp",
+    "src/ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.webp": "src/ui/assets/awakening-button-third.webp",
+    "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp": "src/ui/assets/awakening-buttons-atlas.webp",
+    "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.webp": "src/ui/assets/button-atlas.webp",
+    "src/ui/assets/pbr/button-highlighted/button-highlighted_diffuse.webp": "src/ui/assets/button-highlighted.webp",
+    "src/ui/assets/pbr/button-normal/button-normal_diffuse.webp": "src/ui/assets/button-normal.webp",
+    "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp": "src/ui/assets/demon-mirror-symbol.webp",
+    "src/ui/assets/pbr/issen-logo/issen-logo_diffuse.webp": "src/ui/assets/issen-logo.webp",
+    "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp": "src/ui/assets/panel-atlas.webp",
+    "src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp": "src/ui/assets/panel-highlighted.webp",
+    "src/ui/assets/pbr/panel-normal/panel-normal_diffuse.webp": "src/ui/assets/panel-normal.webp",
+    "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp": "src/ui/assets/temple-symbols-atlas.webp",
+    "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp": "src/ui/assets/trial-symbols-atlas.webp",
+    "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.webp": "src/ui/assets/ui-strokes-atlas.webp",
+    "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png": "src/ui/assets/world-ui-atlas.webp",
+    "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png": "src/ui/assets/world-ui-crest-aoi.webp",
+    "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png": "src/ui/assets/world-ui-crest-fuji.webp",
+    "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png": "src/ui/assets/world-ui-crest-juji.webp",
+    "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png": "src/ui/assets/world-ui-crest-kikyo.webp",
+    "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.compact.png": "src/ui/assets/world-ui-crest-rokumon.compact.png",
+    "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png": "src/ui/assets/world-ui-crest-tomoe.webp",
+    "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png": "src/ui/assets/world-ui-crest-tsuru.webp",
+    "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp": "src/ui/assets/world-ui-material-metal.webp",
+    "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp": "src/ui/assets/world-ui-material-paper.webp",
+    "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp": "src/ui/assets/world-ui-material-silk.webp",
+    "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp": "src/ui/assets/world-ui-material-stone.webp",
+    "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png": "src/ui/assets/world-ui-material-wood.webp",
+    "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.webp": "src/ui/assets/world-ui-scroll-paper.webp",
+    "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png": "src/ui/assets/world-ui-scroll-rod.webp"
+  },
+  "duplicates": [
+    {
+      "path": "assets/play-store/desktop/02-waves.png",
+      "canonical": "assets/play-store/pc/02-waves.png",
+      "bytes": 3370675,
+      "sha256": "056326d04adfd9266976458c38ec82c065bd9c409d5f1b05e00d4131338da7e5"
+    },
+    {
+      "path": "assets/play-store/desktop/03-boss-duel.png",
+      "canonical": "assets/play-store/pc/03-boss-duel.png",
+      "bytes": 3369822,
+      "sha256": "1ef74c67da14ec2087448036a8f3d11e50579bb448d97e73979c34cff94e7759"
+    },
+    {
+      "path": "assets/play-store/desktop/01-title.png",
+      "canonical": "assets/play-store/pc/01-title.png",
+      "bytes": 2577213,
+      "sha256": "1e96c9583ecee3f4403003129249e964884fa6186ef739d382c602e7b28b9ec5"
+    },
+    {
+      "path": "assets/play-store/desktop/05-temple.png",
+      "canonical": "assets/play-store/pc/05-temple.png",
+      "bytes": 2087117,
+      "sha256": "6e98f8992de3a94d3aaf4f7d99f26a5ca705628249c96f744745748f872a9a1d"
+    },
+    {
+      "path": "src/ui/assets/pbr/armoury-room/armoury-room_diffuse.webp",
+      "canonical": "src/ui/assets/armoury-room.webp",
+      "bytes": 1571976,
+      "sha256": "03c4a48566ee2a3e6bda76e5a74c0d701d42dd3059e052f6b8ae3065cd92115f"
+    },
+    {
+      "path": "assets/play-store/desktop/04-armoury.png",
+      "canonical": "assets/play-store/pc/04-armoury.png",
+      "bytes": 1383388,
+      "sha256": "a6fa44aa444a67aecc4b17b714dd7b96fce2fa0ebf75674489a185d5537f96b3"
+    },
+    {
+      "path": "assets/play-store/pc/logo-600x400.png",
+      "canonical": "src/ui/assets/issen-logo.png",
+      "bytes": 115826,
+      "sha256": "46ece50c1a811ad7c640383a8e652c7da090fe4bff5a62624504fe8ebcd25d6c"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-land-mdpi/splash.png",
+      "canonical": "android/app/src/main/res/drawable/splash_base.png",
+      "bytes": 100726,
+      "sha256": "0a267b8d4d6ab5c00d5e6e4d2da6998d1832a19216dcc9cbc11925ab18d95edc"
+    },
+    {
+      "path": "assets/play-store/common/app-icon-512.png",
+      "canonical": "assets/branding/issen-play-store-icon-512.png",
+      "bytes": 92921,
+      "sha256": "122c556a82d6e2a076d0b069c846e260df6af46f9773dda63567ba11f3bcac0a"
+    },
+    {
+      "path": "src/ui/assets/pbr/ui-strokes-atlas/ui-strokes-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/ui-strokes-atlas.webp",
+      "bytes": 19156,
+      "sha256": "33372df3617b1c18db4e8a806b86cc0e1300103c40696b1ac87164de79d4f6ee"
+    },
+    {
+      "path": "src/ui/assets/pbr/awakening-buttons-atlas/awakening-buttons-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/awakening-buttons-atlas.webp",
+      "bytes": 11898,
+      "sha256": "765ec23f8b61fad3328d96588ad759c72e112741c59484db36eb8cf1ab599d93"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-material-stone/world-ui-material-stone_diffuse.webp",
+      "canonical": "src/ui/assets/world-ui-material-stone.webp",
+      "bytes": 5604,
+      "sha256": "13b3c96436ccc5ed43e6e532b58f6ec8163b0e9fa926963fa8a0b3d16bfa9d9c"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-material-metal/world-ui-material-metal_diffuse.webp",
+      "canonical": "src/ui/assets/world-ui-material-metal.webp",
+      "bytes": 4972,
+      "sha256": "5f195247070250ca5d75d330899b16bb0597b0720ac7e9e9a7dc69c407b50861"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-scroll-paper/world-ui-scroll-paper_diffuse.webp",
+      "canonical": "src/ui/assets/world-ui-scroll-paper.webp",
+      "bytes": 4972,
+      "sha256": "a505c8fdd35515a3b9998f20245f6404fc56d8b13d8fb3ee174a9d6a949f25e4"
+    },
+    {
+      "path": "src/ui/assets/pbr/awakening-button-third/awakening-button-third_diffuse.webp",
+      "canonical": "src/ui/assets/awakening-button-third.webp",
+      "bytes": 4624,
+      "sha256": "dd14cde6898c9cf103dc62370cf2a1e124f21a65ab444ea5aa7068ec8c83bfc4"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-material-paper/world-ui-material-paper_diffuse.webp",
+      "canonical": "src/ui/assets/world-ui-material-paper.webp",
+      "bytes": 4474,
+      "sha256": "29b605e1d8069099c5e2a6e7c20f851de5045905127e342a58b1f9a0a388ff25"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-material-silk/world-ui-material-silk_diffuse.webp",
+      "canonical": "src/ui/assets/world-ui-material-silk.webp",
+      "bytes": 3754,
+      "sha256": "12879e38493d807f81bf56f89c6d08528cbcb07dd1278a1f43d4489676fdfb0a"
+    },
+    {
+      "path": "src/ui/assets/pbr/awakening-button-awakened/awakening-button-awakened_diffuse.webp",
+      "canonical": "src/ui/assets/awakening-button-awakened.webp",
+      "bytes": 3694,
+      "sha256": "5340ae18527863284a6cdcc5bdf50e8d4dbfedca76a179b65329ca9dc7fa54a2"
+    },
+    {
+      "path": "src/ui/assets/pbr/button-atlas/button-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/button-atlas.webp",
+      "bytes": 3212,
+      "sha256": "3f991fa8d39bf88f7a20b1dc5a0d24ea656cdc78dd46bac696f63d87690503bf"
+    },
+    {
+      "path": "src/ui/assets/pbr/awakening-button-normal/awakening-button-normal_diffuse.webp",
+      "canonical": "src/ui/assets/awakening-button-normal.webp",
+      "bytes": 3092,
+      "sha256": "e9dc83a9ac5ef120feddc92983575d670289ab1a45c63d766f358e97c3f08d0e"
+    },
+    {
+      "path": "src/ui/assets/pbr/button-highlighted/button-highlighted_diffuse.webp",
+      "canonical": "src/ui/assets/button-highlighted.webp",
+      "bytes": 1674,
+      "sha256": "fdcb8e828ffc3db90a5270e2d7db42b6b90b8de3539aab839c2b3d6e93732d29"
+    },
+    {
+      "path": "src/ui/assets/pbr/button-normal/button-normal_diffuse.webp",
+      "canonical": "src/ui/assets/button-normal.webp",
+      "bytes": 1578,
+      "sha256": "a3680c936d4db5d5229ce642e4b98e3f4c7f507d91a8fb6713cf489eb12f05e2"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-rokumon/world-ui-crest-rokumon_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-rokumon.compact.png",
+      "bytes": 986,
+      "sha256": "93b683e1c78bda30f79d222d2ed7b65d3470e12c471cbaa26200293eb8c25c61"
+    }
+  ],
+  "archived": [
+    {
+      "path": "src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/bamboo-atlas/bamboo-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/bamboo-atlas.webp",
+      "bytes": 1387042,
+      "sha256": "f01f68c79b6342ab951ee24e5a71e0e5ab1347d4d5a260fe0bc75a1114656b62"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/bamboo-landmarks-atlas/bamboo-landmarks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/bamboo-landmarks-atlas.webp",
+      "bytes": 798374,
+      "sha256": "2341761c3a050385147992b5faec1e2d543e3d572a34387522f942fc3d5c0ebf"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/cherry-landmarks-atlas/cherry-landmarks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/cherry-landmarks-atlas.webp",
+      "bytes": 895756,
+      "sha256": "fc90a1ab6c21f92aba3b05b200ace196a2b06c54c9e649c845058b947f187870"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/cherry-trees-atlas/cherry-trees-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/cherry-trees-atlas.webp",
+      "bytes": 836882,
+      "sha256": "8117bfbbb72d8ef11dc625ec55f77f621681be0b7c4b6fa167e9219d901f9698"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/demon-landmarks-atlas/demon-landmarks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/demon-landmarks-atlas.webp",
+      "bytes": 841714,
+      "sha256": "1cc8e0b0c5ae3f5b81c32da84e07954b32e6d3447e12370f8f787b0dccf25071"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/demon-terrain-atlas/demon-terrain-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/demon-terrain-atlas.webp",
+      "bytes": 616410,
+      "sha256": "93e77972a819f1b890eeed71436afcc4b161616a7954fce83777feccee46cfb6"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/fallen-bamboo-atlas/fallen-bamboo-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/fallen-bamboo-atlas.webp",
+      "bytes": 707612,
+      "sha256": "a4b65471c81333544fe0f6739c80dade4af63ef30e297adfd662823cd82bda2f"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/field-banks-atlas/field-banks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/field-banks-atlas.webp",
+      "bytes": 777490,
+      "sha256": "c9ac0c8c144f82bc8e7b00a5f9481aee2e8b712c3391162a87d2955a449d04b8"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/field-rocks-atlas/field-rocks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/field-rocks-atlas.webp",
+      "bytes": 656352,
+      "sha256": "6b20898b89af691b016e58d85f1098c679984d9777cc3f1d7d34ab15aa657150"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/foam-strips-atlas/foam-strips-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/foam-strips-atlas.webp",
+      "bytes": 746956,
+      "sha256": "6c51db589d8e6452b8b24dfdac7455925b442beaaabed0d4b6da8f48f94d0369"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/fog-wisps-atlas/fog-wisps-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/fog-wisps-atlas.webp",
+      "bytes": 650702,
+      "sha256": "7a5f9ee22c5dede1b0195a4050cc6ddc8199724ac8ea900a074d5528dfc5ddba"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/foreground-boulders-atlas/foreground-boulders-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/foreground-boulders-atlas.webp",
+      "bytes": 826826,
+      "sha256": "2371c500382402bcfa6b7eb792f07b14d4492f40ecebd4b81b4b3e72454994bc"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/grass-edges-atlas/grass-edges-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/grass-edges-atlas.webp",
+      "bytes": 710282,
+      "sha256": "2966bd7a91a4a9f1aca4b15d4e5516417034698c56edab0b825e0df96f548d74"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/landmark-stones-atlas/landmark-stones-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/landmark-stones-atlas.webp",
+      "bytes": 999582,
+      "sha256": "770c7ab41bdca6c7994bfdbea4527fe2e4212cb28bf1e97859e3e05aaea52931"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/meadow-patches-atlas/meadow-patches-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/meadow-patches-atlas.webp",
+      "bytes": 1167732,
+      "sha256": "d22f87835b64e3fcfbbe2d248bef395633614bb2619eba68817e0aabcb12760c"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/mountain-atlas/mountain-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/mountain-atlas.webp",
+      "bytes": 734302,
+      "sha256": "4ac7f5d6ab45b3d09db2336a5d6fc9a4e81ffd28fc6d114ae7b9d5143a2e64b7"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/petal-ground-atlas/petal-ground-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/petal-ground-atlas.webp",
+      "bytes": 546724,
+      "sha256": "9028f3bc5a03a452c1f4b597b84098cf9a5e94fc01289b22f79c26d30bf48a1b"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/pine-atlas/pine-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/pine-atlas.webp",
+      "bytes": 1013862,
+      "sha256": "353640e3e1ffd8a38affeac75310cd74bdd1e3ae0ffb8ea054466184a327138a"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/reeds-atlas/reeds-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/reeds-atlas.webp",
+      "bytes": 954354,
+      "sha256": "588df02260fd0ee177e3660c89a14c157fd84eb963a1de837bcb110f3959cf7f"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/rocks-atlas/rocks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/rocks-atlas.webp",
+      "bytes": 604484,
+      "sha256": "61dbaaa563f0d1240c03469be98daa7d8497f229aeb750bfafcc27fe3436e801"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/sea-stacks-atlas/sea-stacks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/sea-stacks-atlas.webp",
+      "bytes": 628648,
+      "sha256": "d07a86edc23f7537c4b47315fdda7f2f24eeb53a2ffcc804dc21d7c29a137ab5"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/shrubs-atlas/shrubs-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/shrubs-atlas.webp",
+      "bytes": 786224,
+      "sha256": "cf26fe903be4330cca5e3f5ba2f1254603aa5b8e4f044ab82a316beacec1afe9"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/snow-boulders-atlas/snow-boulders-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/snow-boulders-atlas.webp",
+      "bytes": 777546,
+      "sha256": "513803277fdaf37247bbf265d05f0b68c63efda26218f25d143f68f2cc7441e5"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/snow-peak/snow-peak_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/snow-peak.webp",
+      "bytes": 1010550,
+      "sha256": "a1002569ee11679a11107c0507d5a963deb241bfc8278e893a573f482af900d0"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/snow-pines-atlas/snow-pines-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/snow-pines-atlas.webp",
+      "bytes": 809798,
+      "sha256": "d05d28343c1e81e95fedc830e5bf557fc6ad56dcc393b67d5a645b9c6fc98985"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/snow-rocks-atlas/snow-rocks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/snow-rocks-atlas.webp",
+      "bytes": 720956,
+      "sha256": "6dc2fef5b453e372bfb6c8feb6a6b934bdb47ed8b77c680076f9e62daa49767a"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/snow-woodland-landmarks-atlas/snow-woodland-landmarks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/snow-woodland-landmarks-atlas.webp",
+      "bytes": 497020,
+      "sha256": "432e08547d7a230de8c1c92b363c4953704856bc5a41dcacfc3b6188b096187f"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/temple-posts-atlas/temple-posts-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/temple-posts-atlas.webp",
+      "bytes": 647182,
+      "sha256": "7a22114e6679b12c6883d8af7ee8ace6edc0c920a9f5054cdce9a05d6bbc494d"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/temple-roofs-atlas/temple-roofs-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/temple-roofs-atlas.webp",
+      "bytes": 740240,
+      "sha256": "f9819c5e1929bdd3ea0ba7ec1882eb79a14c85e83bd3ce64e17e4e22230b230e"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/temple-steps-atlas/temple-steps-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/temple-steps-atlas.webp",
+      "bytes": 1005876,
+      "sha256": "8f5714aaa0a4ddb021ff39d55b2d9183a0302db9aea398c8aef5d6b193ddd832"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/temple-walls-atlas/temple-walls-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/temple-walls-atlas.webp",
+      "bytes": 805278,
+      "sha256": "3217f2a35e5e20fe66070e7063b72e72dac8f734ada0bb1d36d1c72f36ea26df"
+    },
+    {
+      "path": "src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/environment/assets/pbr/woodland-landmarks-atlas/woodland-landmarks-atlas_diffuse.webp",
+      "canonical": "src/rendering/environment/assets/woodland-landmarks-atlas.webp",
+      "bytes": 455408,
+      "sha256": "037e75a8771f01acedc45b768d17b465e3693575deb8d60fd050267408430da1"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/armour-plates-atlas/armour-plates-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/armour-plates-atlas.webp",
+      "bytes": 431126,
+      "sha256": "587534d62f2ab2519333660c8894eb0bba48838beb86fefe16a75fe124b819bc"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/charm-atlas/charm-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/charm-atlas.webp",
+      "bytes": 555542,
+      "sha256": "3e504e7865344c9369d01c90dd63af465b7a898c62165acb60c4dae82e6e1b22"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/companion-atlas/companion-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/companion-atlas.webp",
+      "bytes": 469358,
+      "sha256": "bf33ac7962983bc85807a08eec12838846a5c93c8e7957a21b23601a3679c1a2"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/companion-parts-atlas/companion-parts-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/companion-parts-atlas.webp",
+      "bytes": 264394,
+      "sha256": "98d2d1db022aea956c4dd52469c0713d6790733b416f30f37bbb68f0306527a3"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/handle-guard-atlas/handle-guard-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/handle-guard-atlas.webp",
+      "bytes": 491804,
+      "sha256": "2180298d200ae733214e1f2c176eecee4609d4fc907a5d7508f6fea00e63e236"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/katana/katana_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/katana/katana_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/katana.webp",
+      "bytes": 171096,
+      "sha256": "ec0771a4387b07b3a8404d507a2db1e9442a468b88e3b834b05dd50479317d4e"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/mystic-rock/mystic-rock_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/mystic-rock.webp",
+      "bytes": 510622,
+      "sha256": "5433ee8c72150d5e8404f6b5821190715649653bc03417e4f3812da4647be4bf"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/outfit-cloth-atlas/outfit-cloth-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/outfit-cloth-atlas.webp",
+      "bytes": 431438,
+      "sha256": "a1e53b98297ced1ad93b12290397546ebe77f08766ca60e9b04bda7268556c69"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/outfit-headwear-atlas/outfit-headwear-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/outfit-headwear-atlas.webp",
+      "bytes": 328046,
+      "sha256": "5d88eb9365066104a4bd603ab59c395599517c336cda93ce7c82ef098566f86c"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/player-mask-atlas/player-mask-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/player-mask-atlas.webp",
+      "bytes": 493978,
+      "sha256": "af1b8ec96c2fc8579a59b76891bac7fccf56e09e03bf9e59bf2d0e46ba9ac1b3"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/player-ronin-atlas/player-ronin-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/player-ronin-atlas.webp",
+      "bytes": 888636,
+      "sha256": "3fcb5c17be2592495bcb17050c8c8c6d7f32505caaff495bc2545dd899639856"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/player-special-headwear-atlas/player-special-headwear-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/player-special-headwear-atlas.webp",
+      "bytes": 460708,
+      "sha256": "5aad142a71c2b034ed08b6564cf43e1d8bad958562bb543c303715c5bb854783"
+    },
+    {
+      "path": "src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp",
+      "archive": "assets/unused/src/rendering/figures/assets/pbr/special-weapons-atlas/special-weapons-atlas_diffuse.webp",
+      "canonical": "src/rendering/figures/assets/special-weapons-atlas.webp",
+      "bytes": 398068,
+      "sha256": "5e900257f738723c0cc04b07b167e76bb9e0a1d8693d267c0b85d45a11b78a44"
+    },
+    {
+      "path": "src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/demon-mirror-symbol/demon-mirror-symbol_diffuse.webp",
+      "canonical": "src/ui/assets/demon-mirror-symbol.webp",
+      "bytes": 627426,
+      "sha256": "f3fbcb63aaaf5b1d145c7c9d0fa8e6d72e88a59f1f09ff5eb5ab9e8cd6a7de2a"
+    },
+    {
+      "path": "src/ui/assets/pbr/issen-logo/issen-logo_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/issen-logo/issen-logo_diffuse.webp",
+      "canonical": "src/ui/assets/issen-logo.webp",
+      "bytes": 83740,
+      "sha256": "2e27087a921233b0eb789564159e11e60aa87b18e5d0ec0226dca502d6a8ec7a"
+    },
+    {
+      "path": "src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/panel-atlas/panel-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/panel-atlas.webp",
+      "bytes": 6392,
+      "sha256": "44a53e6087eaf03e6defc88bc1b8127dbd3b0eeab8b9a3eeaf516a191d5f9348"
+    },
+    {
+      "path": "src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/panel-highlighted/panel-highlighted_diffuse.webp",
+      "canonical": "src/ui/assets/panel-highlighted.webp",
+      "bytes": 2892,
+      "sha256": "6f35cd8066078399c8b14da991129b8024655716d5c7c1e1456118bdac9c9663"
+    },
+    {
+      "path": "src/ui/assets/pbr/panel-normal/panel-normal_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/panel-normal/panel-normal_diffuse.webp",
+      "canonical": "src/ui/assets/panel-normal.webp",
+      "bytes": 2708,
+      "sha256": "a6441617b56042e5567107e0fae3b65519f6f0d11238a286a5c6e6d76dc826d2"
+    },
+    {
+      "path": "src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/temple-symbols-atlas/temple-symbols-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/temple-symbols-atlas.webp",
+      "bytes": 453618,
+      "sha256": "1668c70e6b850bd795dfd56160a2a5272e84c55dc8419bec6207fb06ec2a1983"
+    },
+    {
+      "path": "src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp",
+      "archive": "assets/unused/src/ui/assets/pbr/trial-symbols-atlas/trial-symbols-atlas_diffuse.webp",
+      "canonical": "src/ui/assets/trial-symbols-atlas.webp",
+      "bytes": 507556,
+      "sha256": "ef215cf648fa329f5505b55dfd6d96be3bc0bf5223162cedeecde367652a2776"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-atlas/world-ui-atlas_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-atlas.webp",
+      "bytes": 40482,
+      "sha256": "1274c4c244815af715078f2a3495f2a699dce70c656fbbeeed598a74497a6d5a"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-aoi/world-ui-crest-aoi_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-aoi.webp",
+      "bytes": 2002,
+      "sha256": "29e594c9a5cdc5091979c8bf6bdb0dd06b43a420237aa74215205467ef9fd5fc"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-fuji/world-ui-crest-fuji_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-fuji.webp",
+      "bytes": 2670,
+      "sha256": "16a51df9cb5feb2d71912477d552fed05020d518db4231a2fbf10861ad8de53b"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-juji/world-ui-crest-juji_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-juji.webp",
+      "bytes": 1697,
+      "sha256": "a9d1757957c16c140e78f7995bfae6f9eb2cefcb06115c6941ea1d2772511a48"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-kikyo/world-ui-crest-kikyo_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-kikyo.webp",
+      "bytes": 1566,
+      "sha256": "cb78bc686da33861850a1f94fac0cf1cfd07665934910bf2028719426ce96a7d"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-tomoe/world-ui-crest-tomoe_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-tomoe.webp",
+      "bytes": 2073,
+      "sha256": "b4c71020f0e169f5bbc590eb751498d80d0ef1054175075b1720abab9cd5c5f7"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-crest-tsuru/world-ui-crest-tsuru_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-crest-tsuru.webp",
+      "bytes": 2041,
+      "sha256": "a5403f473635ac7eb1791871cc39268a77db1a3c45bbbd4f3062c8fc3378a1d3"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-material-wood/world-ui-material-wood_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-material-wood.webp",
+      "bytes": 6847,
+      "sha256": "42fdbad0c9f214898e488fc465baf7f32b4f81e0e4ad29a535e7edd382a56aee"
+    },
+    {
+      "path": "src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png",
+      "archive": "assets/unused/src/ui/assets/pbr/world-ui-scroll-rod/world-ui-scroll-rod_diffuse.compact.png",
+      "canonical": "src/ui/assets/world-ui-scroll-rod.webp",
+      "bytes": 1015,
+      "sha256": "12d89f9bdc4c8b11667c1817862e824cbace738457e9e58e8072d41e6240321b"
+    }
+  ]
+}

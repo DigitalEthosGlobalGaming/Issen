@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| demon-landmarks-atlas | [diffuse](demon-landmarks-atlas_diffuse.webp), [normal](demon-landmarks-atlas_normal.webp), [surface](demon-landmarks-atlas_surface.webp) |
+| demon-landmarks-atlas | [diffuse](../../demon-landmarks-atlas.webp), [normal](demon-landmarks-atlas_normal.webp), [surface](demon-landmarks-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

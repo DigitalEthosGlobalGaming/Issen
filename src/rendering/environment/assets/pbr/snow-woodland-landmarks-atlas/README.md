@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| snow-woodland-landmarks-atlas | [diffuse](snow-woodland-landmarks-atlas_diffuse.webp), [normal](snow-woodland-landmarks-atlas_normal.webp), [surface](snow-woodland-landmarks-atlas_surface.webp) |
+| snow-woodland-landmarks-atlas | [diffuse](../../snow-woodland-landmarks-atlas.webp), [normal](snow-woodland-landmarks-atlas_normal.webp), [surface](snow-woodland-landmarks-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

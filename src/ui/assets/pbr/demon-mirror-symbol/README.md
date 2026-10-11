@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| demon-mirror-symbol | [diffuse](demon-mirror-symbol_diffuse.webp), [normal](demon-mirror-symbol_normal.webp), [surface](demon-mirror-symbol_surface.webp), [emissive](demon-mirror-symbol_emissive.webp) |
+| demon-mirror-symbol | [diffuse](../../demon-mirror-symbol.webp), [normal](demon-mirror-symbol_normal.webp), [surface](demon-mirror-symbol_surface.webp), [emissive](demon-mirror-symbol_emissive.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

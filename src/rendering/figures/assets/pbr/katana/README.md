@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| katana | [diffuse](katana_diffuse.webp), [normal](katana_normal.webp), [surface](katana_surface.webp) |
+| katana | [diffuse](../../katana.webp), [normal](katana_normal.webp), [surface](katana_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

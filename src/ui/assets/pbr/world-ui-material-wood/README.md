@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| world-ui-material-wood | [diffuse](world-ui-material-wood_diffuse.compact.png), [normal](world-ui-material-wood_normal.webp), [surface](world-ui-material-wood_surface.webp) |
+| world-ui-material-wood | [diffuse](../../world-ui-material-wood.webp), [normal](world-ui-material-wood_normal.webp), [surface](world-ui-material-wood_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

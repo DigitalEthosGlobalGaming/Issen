@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| player-special-headwear-atlas | [diffuse](player-special-headwear-atlas_diffuse.webp), [normal](player-special-headwear-atlas_normal.webp), [surface](player-special-headwear-atlas_surface.webp) |
+| player-special-headwear-atlas | [diffuse](../../player-special-headwear-atlas.webp), [normal](player-special-headwear-atlas_normal.webp), [surface](player-special-headwear-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

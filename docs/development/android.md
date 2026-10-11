@@ -103,8 +103,9 @@ Saves still use `issen.*` WebView localStorage. The debug and release apps have
 separate storage, also separate from GitHub Pages. Native durable persistence,
 Back/lifecycle handling, share sheets and haptics remain the next milestone.
 Splash resources use the checked-in [Issen master artwork](../../assets/branding/issen-splash-v1.png).
-Run `./scripts/generate-android-splash.ps1` on Windows to regenerate all eleven
-`drawable*/splash.png` resources at their existing sizes. The artwork is centered
+Run `./scripts/generate-android-splash.ps1` on Windows to regenerate ten splash
+bitmaps at their existing sizes. Default and landscape mdpi use XML aliases to
+the same `drawable/splash_base.png`. The artwork is centered
 and scaled to fit on charcoal padding, preserving its proportions in both orientations.
 Launcher icons use the [transparent Issen foreground](../../assets/branding/issen-launcher-foreground-v1.png)
 on a charcoal background. Run `./scripts/generate-android-icons.ps1` on Windows

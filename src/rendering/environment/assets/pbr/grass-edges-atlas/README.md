@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| grass-edges-atlas | [diffuse](grass-edges-atlas_diffuse.webp), [normal](grass-edges-atlas_normal.webp), [surface](grass-edges-atlas_surface.webp) |
+| grass-edges-atlas | [diffuse](../../grass-edges-atlas.webp), [normal](grass-edges-atlas_normal.webp), [surface](grass-edges-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

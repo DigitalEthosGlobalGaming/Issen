@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| awakening-button-awakened | [diffuse](awakening-button-awakened_diffuse.webp), [normal](awakening-button-awakened_normal.webp), [surface](awakening-button-awakened_surface.webp) |
+| awakening-button-awakened | [diffuse](../../awakening-button-awakened.webp), [normal](awakening-button-awakened_normal.webp), [surface](awakening-button-awakened_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,

@@ -9,7 +9,7 @@ Runtime planes retain the original atlas dimensions and diffuse alpha.
 
 | Source family | Aligned planes |
 | --- | --- |
-| fallen-bamboo-atlas | [diffuse](fallen-bamboo-atlas_diffuse.webp), [normal](fallen-bamboo-atlas_normal.webp), [surface](fallen-bamboo-atlas_surface.webp) |
+| fallen-bamboo-atlas | [diffuse](../../fallen-bamboo-atlas.webp), [normal](fallen-bamboo-atlas_normal.webp), [surface](fallen-bamboo-atlas_surface.webp) |
 
 Surface RGB stores roughness, metallic and AO. Missing emissive means zero.
 Atlas dimensions, frames and diffuse alpha are preserved. Original artwork,
