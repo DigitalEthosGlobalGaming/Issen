@@ -77,3 +77,19 @@ For every implementation change, add concise player-facing release notes to
 `public/changelog/index.html` under the matching version. See
 [changelog maintenance](docs/features/changelog.md) for update-indicator behavior.
 Planning-only documents do not bump the version.
+
+### Release notes
+
+Write for players: explain what changed and how it affects their experience.
+
+- Group patch releases under their minor version, such as `1.70`.
+  Keep `1.71` and `1.72` consolidated into `1.73`.
+- Add changes to the matching release summary and combine related notes.
+- Aim for 3–5 short bullets per release; use fewer when appropriate.
+- Lead with new features, then noticeable improvements and important fixes.
+- Use familiar game labels and concrete outcomes:
+  “Combat keeps moving while scenery updates.”
+- Omit internal code changes, testing tools, diagnostics and local-only features.
+- Avoid promises such as “crashes fixed” or “higher FPS” without supporting
+  evidence. Describe the specific improvement instead.
+- Keep older release history. Editorial regrouping does not bump the app version.
